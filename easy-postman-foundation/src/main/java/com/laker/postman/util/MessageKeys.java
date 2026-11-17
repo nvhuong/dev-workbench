@@ -2953,6 +2953,40 @@ public final class MessageKeys {
 
     // ============ Elasticsearch 工具相关 ============
     public static final String TOOLBOX_ELASTICSEARCH = "toolbox.elasticsearch";
+    public static final String TOOLBOX_DBPORTAL = "toolbox.dbportal";
+    public static final String TOOLBOX_DBPORTAL_TYPE = "toolbox.dbportal.type";
+    public static final String TOOLBOX_DBPORTAL_URL = "toolbox.dbportal.url";
+    public static final String TOOLBOX_DBPORTAL_DRIVER_CLASS = "toolbox.dbportal.driver_class";
+    public static final String TOOLBOX_DBPORTAL_DRIVER_JAR = "toolbox.dbportal.driver_jar";
+    public static final String TOOLBOX_DBPORTAL_USERNAME = "toolbox.dbportal.username";
+    public static final String TOOLBOX_DBPORTAL_PASSWORD = "toolbox.dbportal.password";
+    public static final String TOOLBOX_DBPORTAL_BROWSE = "toolbox.dbportal.browse";
+    public static final String TOOLBOX_DBPORTAL_CONNECT = "toolbox.dbportal.connect";
+    public static final String TOOLBOX_DBPORTAL_DISCONNECT = "toolbox.dbportal.disconnect";
+    public static final String TOOLBOX_DBPORTAL_OBJECTS = "toolbox.dbportal.objects";
+    public static final String TOOLBOX_DBPORTAL_SUGGESTIONS = "toolbox.dbportal.suggestions";
+    public static final String TOOLBOX_DBPORTAL_INSERT = "toolbox.dbportal.insert";
+    public static final String TOOLBOX_DBPORTAL_EXECUTE = "toolbox.dbportal.execute";
+    public static final String TOOLBOX_DBPORTAL_SQL = "toolbox.dbportal.sql";
+    public static final String TOOLBOX_DBPORTAL_RESULTS = "toolbox.dbportal.results";
+    public static final String TOOLBOX_DBPORTAL_URL_HINT = "toolbox.dbportal.url_hint";
+    public static final String TOOLBOX_DBPORTAL_DRIVER_HINT = "toolbox.dbportal.driver_hint";
+    public static final String TOOLBOX_DBPORTAL_DRIVER_JAR_HINT = "toolbox.dbportal.driver_jar_hint";
+    public static final String TOOLBOX_DBPORTAL_INVALID_URL = "toolbox.dbportal.invalid_url";
+    public static final String TOOLBOX_DBPORTAL_DRIVER_JAR_MISSING = "toolbox.dbportal.driver_jar_missing";
+    public static final String TOOLBOX_DBPORTAL_DRIVER_JAR_INVALID = "toolbox.dbportal.driver_jar_invalid";
+    public static final String TOOLBOX_DBPORTAL_DRIVER_REJECTED_URL = "toolbox.dbportal.driver_rejected_url";
+    public static final String TOOLBOX_DBPORTAL_CONNECTING = "toolbox.dbportal.connecting";
+    public static final String TOOLBOX_DBPORTAL_CONNECTED = "toolbox.dbportal.connected";
+    public static final String TOOLBOX_DBPORTAL_DISCONNECTED = "toolbox.dbportal.disconnected";
+    public static final String TOOLBOX_DBPORTAL_LOADING_OBJECTS = "toolbox.dbportal.loading_objects";
+    public static final String TOOLBOX_DBPORTAL_OBJECTS_LOADED = "toolbox.dbportal.objects_loaded";
+    public static final String TOOLBOX_DBPORTAL_EXECUTING = "toolbox.dbportal.executing";
+    public static final String TOOLBOX_DBPORTAL_QUERY_COMPLETE = "toolbox.dbportal.query_complete";
+    public static final String TOOLBOX_DBPORTAL_UPDATE_COMPLETE = "toolbox.dbportal.update_complete";
+    public static final String TOOLBOX_DBPORTAL_STATEMENT_COMPLETE = "toolbox.dbportal.statement_complete";
+    public static final String TOOLBOX_DBPORTAL_ERROR = "toolbox.dbportal.error";
+    public static final String TOOLBOX_DBPORTAL_AUTOCOMMIT_HINT = "toolbox.dbportal.autocommit_hint";
 
     // 连接面板
     public static final String TOOLBOX_ES_HOST = "toolbox.es.host";

@@ -210,6 +210,7 @@ public class ToolboxPanel extends UiSingletonPanel {
         // 数据库
         regBuiltIn("es", MessageKeys.TOOLBOX_ELASTICSEARCH, "icons/elasticsearch.svg", GRP_DB, ElasticsearchPanel::new);
         regBuiltIn("influxdb", MessageKeys.TOOLBOX_INFLUXDB, "icons/influxdb.svg", GRP_DB, InfluxDbPanel::new);
+        regBuiltIn("dbportal", MessageKeys.TOOLBOX_DBPORTAL, "icons/database.svg", GRP_DB, DbPortalPanel::new);
         // 开发
         regBuiltIn("diff", MessageKeys.TOOLBOX_DIFF, "icons/file.svg", GRP_DEV, DiffPanel::new);
         registerPluginTools();
