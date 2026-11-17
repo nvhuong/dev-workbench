@@ -1,6 +1,6 @@
 {
   "name": "EasyPostman Official Plugin Catalog (GitHub)",
-  "generatedAt": "2026-11-09T05:26:52Z",
+  "generatedAt": "2026-11-17T21:13:08Z",
   "plugins": [
     {
       "id": "plugin-capture",
@@ -303,6 +303,22 @@
           "minAppVersion": "5.3.18",
           "minPlatformVersion": "1.0.0",
           "maxPlatformVersion": "1.0.0"
+        }
+      ]
+    },
+    {
+      "id": "plugin-sql",
+      "name": "SQL Plugin",
+      "description": "JDBC database explorer and SQL workbench.",
+      "homepage": "https://github.com/nvhuong/easy-postman",
+      "releases": [
+        {
+          "version": "1.0.0",
+          "downloadUrl": "https://github.com/nvhuong/easy-postman/releases/download/plugin-sql-v1.0.0/easy-postman-1.0.0-plugin-sql.jar",
+          "sha256": "17aa31579ff35b53b1ef3b56d4890d3e190fe14cf5265037302f9f23f4261073",
+          "minAppVersion": "6.0.14",
+          "minPlatformVersion": "4.0.0",
+          "maxPlatformVersion": "4.0.0"
         }
       ]
     }
