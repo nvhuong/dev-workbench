@@ -22,6 +22,7 @@ public class EncoderPanel extends JPanel {
     private JTextArea inputArea;
     private JTextArea outputArea;
     private JComboBox<String> typeCombo;
+    private JButton encodeBtn;
 
     public EncoderPanel() {
         initUI();
@@ -34,10 +35,10 @@ public class EncoderPanel extends JPanel {
         JLabel typeLabel = new JLabel(I18nUtil.getMessage(MessageKeys.TOOLBOX_ENCODER_TITLE) + ":");
 
         typeCombo = new JComboBox<>(new String[]{
-                "Base64", "URL", "HTML Entity", "Unicode"
+                "Base64", "URL", "HTML Entity", "Unicode", I18nUtil.getMessage(MessageKeys.TOOLBOX_ENCODER_JWT)
         });
 
-        JButton encodeBtn = new JButton(I18nUtil.getMessage(MessageKeys.TOOLBOX_ENCODER_ENCODE));
+        encodeBtn = new JButton(I18nUtil.getMessage(MessageKeys.TOOLBOX_ENCODER_ENCODE));
         JButton decodeBtn = new JButton(I18nUtil.getMessage(MessageKeys.TOOLBOX_ENCODER_DECODE));
         JButton copyBtn = new JButton(I18nUtil.getMessage(MessageKeys.BUTTON_COPY));
         JButton clearBtn = new JButton(I18nUtil.getMessage(MessageKeys.BUTTON_CLEAR));
@@ -79,6 +80,7 @@ public class EncoderPanel extends JPanel {
         // 按钮事件
         encodeBtn.addActionListener(e -> encode());
         decodeBtn.addActionListener(e -> decode());
+        typeCombo.addActionListener(e -> encodeBtn.setEnabled(typeCombo.getSelectedIndex() != 4));
         copyBtn.addActionListener(e -> copyToClipboard());
         clearBtn.addActionListener(e -> {
             inputArea.setText("");
@@ -99,6 +101,7 @@ public class EncoderPanel extends JPanel {
                 case 1 -> URLEncoder.encode(input, StandardCharsets.UTF_8);
                 case 2 -> htmlEncode(input);
                 case 3 -> unicodeEncode(input);
+                case 4 -> input;
                 default -> input;
             };
             outputArea.setText(result);
@@ -121,6 +124,10 @@ public class EncoderPanel extends JPanel {
                 case 1 -> URLDecoder.decode(input, StandardCharsets.UTF_8);
                 case 2 -> htmlDecode(input);
                 case 3 -> unicodeDecode(input);
+                case 4 -> JwtDecoder.decode(input,
+                        I18nUtil.getMessage(MessageKeys.TOOLBOX_ENCODER_JWT_HEADER),
+                        I18nUtil.getMessage(MessageKeys.TOOLBOX_ENCODER_JWT_PAYLOAD),
+                        I18nUtil.getMessage(MessageKeys.TOOLBOX_ENCODER_JWT_SIGNATURE_NOTE));
                 default -> input;
             };
             outputArea.setText(result);

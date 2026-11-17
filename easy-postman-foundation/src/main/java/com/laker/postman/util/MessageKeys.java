@@ -2683,6 +2683,10 @@ public final class MessageKeys {
     public static final String TOOLBOX_ENCODER_OUTPUT = "toolbox.encoder.output";
     public static final String TOOLBOX_ENCODER_ENCODE = "toolbox.encoder.encode";
     public static final String TOOLBOX_ENCODER_DECODE = "toolbox.encoder.decode";
+    public static final String TOOLBOX_ENCODER_JWT = "toolbox.encoder.jwt";
+    public static final String TOOLBOX_ENCODER_JWT_HEADER = "toolbox.encoder.jwt.header";
+    public static final String TOOLBOX_ENCODER_JWT_PAYLOAD = "toolbox.encoder.jwt.payload";
+    public static final String TOOLBOX_ENCODER_JWT_SIGNATURE_NOTE = "toolbox.encoder.jwt.signature_note";
 
     public static final String TOOLBOX_CRYPTO = "toolbox.crypto";
     public static final String TOOLBOX_CRYPTO_ALGORITHM = "toolbox.crypto.algorithm";
