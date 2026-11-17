@@ -1,6 +1,6 @@
 {
   "name": "EasyPostman Official Plugin Catalog (GitHub)",
-  "generatedAt": "2026-11-17T21:14:57Z",
+  "generatedAt": "2026-11-17T21:16:50Z",
   "plugins": [
     {
       "id": "plugin-capture",
@@ -247,6 +247,22 @@
           "minAppVersion": "5.3.18",
           "minPlatformVersion": "1.0.0",
           "maxPlatformVersion": "1.0.0"
+        }
+      ]
+    },
+    {
+      "id": "plugin-minio",
+      "name": "MinIO Plugin",
+      "description": "MinIO object storage browser for bucket and object management.",
+      "homepage": "https://github.com/nvhuong/easy-postman",
+      "releases": [
+        {
+          "version": "1.0.0",
+          "downloadUrl": "https://github.com/nvhuong/easy-postman/releases/download/plugin-minio-v1.0.0/easy-postman-1.0.0-plugin-minio.jar",
+          "sha256": "b61e1519d8197fc02df503808fd74ebfa4fb195bbc2b5b096e124afd45adf26f",
+          "minAppVersion": "6.0.14",
+          "minPlatformVersion": "4.0.0",
+          "maxPlatformVersion": "4.0.0"
         }
       ]
     },
