@@ -56,7 +56,7 @@
          -->
         <plugin.platform.version>4.0.0</plugin.platform.version>
         <!-- 官方插件默认主页，供 descriptor 模板统一复用。 -->
-        <plugin.homepage>https://github.com/lakernote/easy-postman</plugin.homepage>
+        <plugin.homepage>https://github.com/nvhuong/easy-postman</plugin.homepage>
         <maven.compiler.release>21</maven.compiler.release>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.build.timestamp.format>yyyy-MM-dd'T'HH:mm:ssXXX</maven.build.timestamp.format>

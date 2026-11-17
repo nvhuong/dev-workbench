@@ -117,7 +117,7 @@ public class UpdateUiController {
      */
     private void openGitHubReleasePage(String version) {
         try {
-            String url = "https://github.com/lakernote/easy-postman/releases/tag/" + version;
+            String url = "https://github.com/nvhuong/easy-postman/releases/tag/" + version;
             log.info("Opening GitHub release page: {}", url);
             Desktop.getDesktop().browse(new URI(url));
         } catch (Exception ex) {

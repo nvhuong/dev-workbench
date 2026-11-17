@@ -18,6 +18,9 @@ on:
           - kafka
           - decompiler
           - client-cert
+          - sql
+          - remote
+          - minio
       dry_run:
         description: 仅做构建验证，不创建 Release，不回写 catalog
         required: true

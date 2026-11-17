@@ -42,7 +42,7 @@ public class PluginCatalogServiceTest {
     public void shouldExposeOfficialCatalogUrls() {
         assertEquals(
                 PluginCatalogService.getOfficialCatalogUrl("github"),
-                "https://raw.githubusercontent.com/lakernote/easy-postman/master/plugin-catalog/catalog-github.json"
+                "https://raw.githubusercontent.com/nvhuong/easy-postman/main/plugin-catalog/catalog-github.json"
         );
         assertEquals(
                 PluginCatalogService.getOfficialCatalogUrl("gitee"),

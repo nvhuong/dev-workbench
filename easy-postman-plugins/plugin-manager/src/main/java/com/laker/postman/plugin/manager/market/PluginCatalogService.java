@@ -26,7 +26,7 @@ public class PluginCatalogService {
 
     public static final String SETTINGS_KEY_CATALOG_URL = "plugin.market.catalogUrl";
     public static final String OFFICIAL_GITHUB_CATALOG_URL =
-            "https://raw.githubusercontent.com/lakernote/easy-postman/master/plugin-catalog/catalog-github.json";
+            "https://raw.githubusercontent.com/nvhuong/easy-postman/main/plugin-catalog/catalog-github.json";
     public static final String OFFICIAL_GITEE_CATALOG_URL =
             "https://gitee.com/lakernote/easy-postman/raw/master/plugin-catalog/catalog-gitee.json";
     public static final String OFFICIAL_GITHUB_CATALOG_RESOURCE = "/plugin-catalog/catalog-github.json";
