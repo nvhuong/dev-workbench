@@ -13,6 +13,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 
 public class ModuleArchitectureBoundaryTest {
@@ -1300,6 +1301,21 @@ public class ModuleArchitectureBoundaryTest {
         assertTrue(appIcons.isEmpty(),
                 "Icon resources must have a single owner. Shared control icons belong in easy-postman-ui, "
                         + "and app/domain icons belong in easy-postman-app: " + appIcons);
+    }
+
+    @Test
+    public void toolboxStructuredFormatsAndQrCodeHaveDistinctIcons() throws IOException {
+        Path root = repositoryRoot();
+        Path toolboxPanel = root.resolve("easy-postman-app/src/main/java/com/laker/postman/panel/toolbox/ToolboxPanel.java");
+        String source = Files.readString(toolboxPanel);
+        List<String> icons = List.of("json-file.svg", "yaml-file.svg", "xml-file.svg", "qrcode.svg");
+
+        for (String icon : icons) {
+            assertTrue(source.contains("icons/" + icon), "ToolboxPanel must register " + icon);
+            assertTrue(Files.isRegularFile(root.resolve("easy-postman-app/src/main/resources/icons/" + icon)),
+                    "Toolbox icon resource must exist: " + icon);
+        }
+        assertEquals(new TreeSet<>(icons).size(), icons.size(), "Each toolbox format must use its own icon");
     }
 
     @Test

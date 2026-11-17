@@ -193,9 +193,9 @@ public class ToolboxPanel extends UiSingletonPanel {
     // ===== 注册所有工具 =====
     private void registerAllTools() {
         // 格式化
-        regBuiltIn("json", MessageKeys.TOOLBOX_JSON, "icons/format.svg", GRP_FORMAT, JsonToolPanel::new);
-        regBuiltIn("yaml", MessageKeys.TOOLBOX_YAML, "icons/format.svg", GRP_FORMAT, YamlToolPanel::new);
-        regBuiltIn("xml", MessageKeys.TOOLBOX_XML, "icons/format.svg", GRP_FORMAT, XmlToolPanel::new);
+        regBuiltIn("json", MessageKeys.TOOLBOX_JSON, "icons/json-file.svg", GRP_FORMAT, JsonToolPanel::new);
+        regBuiltIn("yaml", MessageKeys.TOOLBOX_YAML, "icons/yaml-file.svg", GRP_FORMAT, YamlToolPanel::new);
+        regBuiltIn("xml", MessageKeys.TOOLBOX_XML, "icons/xml-file.svg", GRP_FORMAT, XmlToolPanel::new);
         regBuiltIn("sql", MessageKeys.TOOLBOX_SQL, "icons/database.svg", GRP_FORMAT, SqlToolPanel::new);
         regBuiltIn("markdown", "toolbox.markdown", "icons/edit.svg", GRP_FORMAT, MarkdownToolPanel::new);
         // 转换
@@ -204,7 +204,7 @@ public class ToolboxPanel extends UiSingletonPanel {
         regBuiltIn("crypto", MessageKeys.TOOLBOX_CRYPTO, "icons/security.svg", GRP_CONVERT, CryptoPanel::new);
         // 生成
         regBuiltIn("uuid", MessageKeys.TOOLBOX_UUID, "icons/plus.svg", GRP_GEN, UuidPanel::new);
-        regBuiltIn("qrcode", MessageKeys.TOOLBOX_QR_CODE, "icons/format.svg", GRP_GEN, QrCodePanel::new);
+        regBuiltIn("qrcode", MessageKeys.TOOLBOX_QR_CODE, "icons/qrcode.svg", GRP_GEN, QrCodePanel::new);
         regBuiltIn("hash", MessageKeys.TOOLBOX_HASH, "icons/hash.svg", GRP_GEN, HashPanel::new);
         regBuiltIn("cron", MessageKeys.TOOLBOX_CRON, "icons/time.svg", GRP_GEN, CronPanel::new);
         // 数据库
