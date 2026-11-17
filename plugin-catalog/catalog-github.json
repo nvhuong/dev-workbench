@@ -1,6 +1,6 @@
 {
   "name": "EasyPostman Official Plugin Catalog (GitHub)",
-  "generatedAt": "2026-11-17T21:13:08Z",
+  "generatedAt": "2026-11-17T21:14:57Z",
   "plugins": [
     {
       "id": "plugin-capture",
@@ -303,6 +303,22 @@
           "minAppVersion": "5.3.18",
           "minPlatformVersion": "1.0.0",
           "maxPlatformVersion": "1.0.0"
+        }
+      ]
+    },
+    {
+      "id": "plugin-remote",
+      "name": "Remote Plugin",
+      "description": "Manage saved servers and concurrent SSH terminal sessions.",
+      "homepage": "https://github.com/nvhuong/easy-postman",
+      "releases": [
+        {
+          "version": "1.0.0",
+          "downloadUrl": "https://github.com/nvhuong/easy-postman/releases/download/plugin-remote-v1.0.0/easy-postman-1.0.0-plugin-remote.jar",
+          "sha256": "107bff47e561a298c83b6c5f563b6ddb61412c27e204a2893a00a1b9881cc1f6",
+          "minAppVersion": "6.0.14",
+          "minPlatformVersion": "4.0.0",
+          "maxPlatformVersion": "4.0.0"
         }
       ]
     },
