@@ -11,7 +11,7 @@
 [![GitHub release](https://img.shields.io/github/v/release/lakernote/easy-postman?style=flat-square&color=brightgreen)](https://github.com/lakernote/easy-postman/releases)
 [![GitHub downloads](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Flakernote%2Feasy-postman%2Fbadges%2Fgithub-downloads.json&style=flat-square&cacheSeconds=3600)](https://github.com/lakernote/easy-postman/releases)
 [![GitHub stars](https://img.shields.io/github/stars/lakernote/easy-postman?style=flat-square&color=yellow)](https://github.com/lakernote/easy-postman/stargazers)
-[![Java](https://img.shields.io/badge/Java-17+-ED8B00?style=flat-square&logo=openjdk&logoColor=white)](https://openjdk.org/)
+[![Java](https://img.shields.io/badge/Java-21+-ED8B00?style=flat-square&logo=openjdk&logoColor=white)](https://openjdk.org/)
 [![Platform](https://img.shields.io/badge/Platform-Windows%20%7C%20macOS%20%7C%20Linux-0078D4?style=flat-square)](https://github.com/lakernote/easy-postman/releases)
 
 [简体中文](README_zh.md) · [📦 Download](#-download-and-install) · [🤖 Install MCP](#-mcp-server) · [📖 Docs](#-documentation) · [💬 Discuss](https://github.com/lakernote/easy-postman/discussions) · WeChat: `lakernote`
@@ -22,13 +22,13 @@
 
 ## What is EasyPostman?
 
-EasyPostman combines **Postman-style API debugging** and **JMeter-style performance testing** in one Java 17 desktop application. Collections, environments, and test data stay local by default, while Git workspaces support team collaboration. The same workspace can also run in CI through the headless CLI or be exposed to AI clients such as Codex, Claude Desktop, and Cursor through MCP.
+EasyPostman combines **Postman-style API debugging** and **JMeter-style performance testing** in one Java 21 desktop application. Collections, environments, and test data stay local by default, while Git workspaces support team collaboration. The same workspace can also run in CI through the headless CLI or be exposed to AI clients such as Codex, Claude Desktop, and Cursor through MCP.
 
 | Core capability | What it provides |
 |---|---|
 | 🔌 API debugging | HTTP/HTTPS, SSE, WebSocket, auth, cookies, multiple body types, response inspection, and network logs |
 | 🧩 Collections and scripts | Postman v2.1 / cURL import, environments, pre/post scripts, assertions, and request chaining |
-| ⚡ Performance testing | Thread groups, timers, extractors, live metrics, reports, and distributed master/worker runs |
+| ⚡ Performance testing | Thread groups, timers, extractors, live metrics, PDF reports, and distributed master/worker runs |
 | 🏢 Local and Git workspaces | Isolated collections, environments, and settings with user-controlled storage |
 | 🤖 MCP and headless CLI | Let AI run saved APIs; run collections, functional tests, and load plans in CI |
 
@@ -59,7 +59,7 @@ EasyPostman combines **Postman-style API debugging** and **JMeter-style performa
 
 ## 📦 Download and install
 
-Download the latest release from **[GitHub Releases](https://github.com/lakernote/easy-postman/releases)**. A **[Gitee mirror](https://gitee.com/lakernote/easy-postman/releases)** is also available. Native installers and the Windows portable package include a runtime, so neither the desktop app nor MCP needs a separate Java installation. Only the cross-platform JAR requires Java 17+.
+Download the latest release from **[GitHub Releases](https://github.com/lakernote/easy-postman/releases)**. A **[Gitee mirror](https://gitee.com/lakernote/easy-postman/releases)** is also available. Native installers and the Windows portable package include a runtime, so neither the desktop app nor MCP needs a separate Java installation. Only the cross-platform JAR requires Java 21+.
 
 ### Windows WinGet
 
@@ -83,7 +83,7 @@ winget upgrade --id Laker.EasyPostman --exact
 | Debian / Ubuntu x64 | `EasyPostman-{version}-linux-amd64.deb` |
 | Debian / Ubuntu ARM64 | `EasyPostman-{version}-linux-arm64.deb`; use `-compat.deb` only for older incompatible `dpkg` versions |
 | RHEL / Rocky / CentOS / Fedora | `EasyPostman-{version}-1.x86_64.rpm` or `-1.aarch64.rpm` |
-| Cross-platform JAR | `easy-postman-{version}.jar`, requires Java 17+ |
+| Cross-platform JAR | `easy-postman-{version}.jar`, requires Java 21+ |
 
 Windows SmartScreen or macOS Gatekeeper may show a warning on first launch. Choose “Run anyway,” or right-click the macOS app and choose “Open.” The project does not currently use a commercial code-signing certificate, and all source code is available for review.
 
@@ -122,7 +122,7 @@ codex mcp add easy-postman -- /Applications/EasyPostman.app/Contents/MacOS/EasyP
 
 Keep `args` empty for the default setup; no workspace path is required. The client starts one process per MCP connection and reuses it across tool calls—it does not restart EasyPostman for every API call. Keep the entire Windows portable directory together; `EasyPostmanMCP.exe` cannot be copied out by itself.
 
-If you download only the cross-platform JAR, use this fallback and make sure Java 17+ is available:
+If you download only the cross-platform JAR, use this fallback and make sure Java 21+ is available:
 
 ```json
 {

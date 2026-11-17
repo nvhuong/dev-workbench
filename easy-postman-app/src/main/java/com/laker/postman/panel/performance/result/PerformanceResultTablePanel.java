@@ -456,6 +456,27 @@ public class PerformanceResultTablePanel extends JPanel {
         hideDetailPanel();
     }
 
+    /** Snapshot of currently retained result samples for report export; call on the EDT. */
+    public List<com.laker.postman.performance.model.PerformanceSampleResult> reportSamples() {
+        if (!SwingUtilities.isEventDispatchThread()) {
+            throw new IllegalStateException("Report samples must be captured on the EDT");
+        }
+        flushPendingResults();
+        List<com.laker.postman.performance.model.PerformanceSampleResult> samples = new ArrayList<>();
+        for (int i = 0; i < tableModel.getRowCount(); i++) {
+            ResultNodeInfo info = tableModel.getRow(i);
+            if (info == null) continue;
+            samples.add(com.laker.postman.performance.model.PerformanceSampleResult.builder()
+                    .apiId(info.name).apiName(info.name).errorMsg(info.errorMsg).protocol(info.protocol)
+                    .elapsedTimeMs(Math.max(0, info.costMs)).startTimeMs(info.timing.startTimeMs())
+                    .endTimeMs(info.timing.startTimeMs() + Math.max(0, info.costMs)).responseCode(info.responseCode)
+                    .executionFailed(info.executionFailed).interrupted(info.cancelled)
+                    .successful(info.isActuallySuccessful())
+                    .testResults(info.testResults == null ? List.of() : List.copyOf(info.testResults)).build());
+        }
+        return List.copyOf(samples);
+    }
+
     private void trimPendingQueueForRetention(int rowLimit) {
         int effectiveLimit = Math.max(1, rowLimit);
         while (pendingResultCount.get() > effectiveLimit

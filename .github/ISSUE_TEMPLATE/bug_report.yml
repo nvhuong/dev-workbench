@@ -49,7 +49,7 @@ body:
     attributes:
       label: Java 版本 | Java Version
       description: 如果使用 JAR 运行，请提供 Java 版本（运行 `java -version`）| If running JAR, provide Java version (run `java -version`)
-      placeholder: 例如 | e.g. Java 17.0.8
+      placeholder: 例如 | e.g. Java 21.0.8
 
   - type: textarea
     id: description

@@ -625,10 +625,10 @@ final class PerformanceRemoteRunControlSupport {
                 now
         )
                 : progress.trendSnapshot();
-        SwingUtilities.invokeLater(() -> performanceTrendPanel.addOrUpdate(
-                new Millisecond(new Date(now)),
-                trendSnapshot
-        ));
+        SwingUtilities.invokeLater(() -> {
+            performanceTrendPanel.addOrUpdate(new Millisecond(new Date(now)), trendSnapshot);
+            performanceReportPanel.setTrendReportPoints(performanceTrendPanel.reportPoints());
+        });
     }
 
     private void updateFinalTrend(PerformanceJsonReport report, int totalUsers, int workerCount) {
@@ -640,10 +640,11 @@ final class PerformanceRemoteRunControlSupport {
         if (!isTrendEnabled() || performanceTrendPanel == null) {
             return;
         }
-        SwingUtilities.invokeLater(() -> performanceTrendPanel.addOrUpdate(
-                new Millisecond(new Date(System.currentTimeMillis() + 1L)),
-                PerformanceTrendSnapshot.terminalIdle()
-        ));
+        SwingUtilities.invokeLater(() -> {
+            performanceTrendPanel.addOrUpdate(new Millisecond(new Date(System.currentTimeMillis() + 1L)),
+                    PerformanceTrendSnapshot.terminalIdle());
+            performanceReportPanel.setTrendReportPoints(performanceTrendPanel.reportPoints());
+        });
     }
 
     private RemoteProgressSnapshot finalProgress(PerformanceJsonReport report, int totalUsers, int workerCount) {

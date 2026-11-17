@@ -38,7 +38,7 @@ EasyPostman
 
 ### Core Technologies
 
-- **Java 17**: Modern LTS version for latest Java features
+- **Java 21**: Java 21 LTS with modern Java features
   - Records, Sealed Classes, Pattern Matching
   - Enhanced NullPointerException messages
   - Text Blocks for better string handling
@@ -102,7 +102,7 @@ EasyPostman
   - ECMAScript 5.1 support
   - Java interoperability
   
-- **GraalVM JavaScript** (Java 17+): Modern JavaScript engine
+- **GraalVM JavaScript** (Java 21+): Modern JavaScript engine
   - ECMAScript 2021+ support
   - Better performance
   - Polyglot support
@@ -156,7 +156,7 @@ EasyPostman
    mvn clean package
    ```
    - Produces `easy-postman-{version}.jar`
-   - Requires Java 17+ runtime
+   - Requires Java 21+ runtime
    - Smallest distribution size
 
 2. **Native Installers**:

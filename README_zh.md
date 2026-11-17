@@ -11,7 +11,7 @@
 [![GitHub release](https://img.shields.io/github/v/release/lakernote/easy-postman?style=flat-square&color=brightgreen)](https://github.com/lakernote/easy-postman/releases)
 [![GitHub downloads](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Flakernote%2Feasy-postman%2Fbadges%2Fgithub-downloads.json&style=flat-square&cacheSeconds=3600)](https://github.com/lakernote/easy-postman/releases)
 [![GitHub stars](https://img.shields.io/github/stars/lakernote/easy-postman?style=flat-square&color=yellow)](https://github.com/lakernote/easy-postman/stargazers)
-[![Java](https://img.shields.io/badge/Java-17+-ED8B00?style=flat-square&logo=openjdk&logoColor=white)](https://openjdk.org/)
+[![Java](https://img.shields.io/badge/Java-21+-ED8B00?style=flat-square&logo=openjdk&logoColor=white)](https://openjdk.org/)
 [![Platform](https://img.shields.io/badge/Platform-Windows%20%7C%20macOS%20%7C%20Linux-0078D4?style=flat-square)](https://github.com/lakernote/easy-postman/releases)
 
 [English](README.md) · [📦 下载](#-下载与安装) · [🤖 安装 MCP](#-mcp-server) · [📖 文档](#-文档) · [💬 讨论区](https://github.com/lakernote/easy-postman/discussions) · 微信：`lakernote`
@@ -22,13 +22,13 @@
 
 ## EasyPostman 是什么
 
-EasyPostman 把 **Postman 风格的接口调试**和 **JMeter 风格的性能测试**放进同一个 Java 17 桌面应用。集合、环境和测试数据默认保存在本地，也可以用 Git 工作区协作；同一份工作区还能通过 CLI 在 CI 中运行，或通过 MCP 交给 Codex、Claude Desktop、Cursor 等 AI 客户端调用。
+EasyPostman 把 **Postman 风格的接口调试**和 **JMeter 风格的性能测试**放进同一个 Java 21 桌面应用。集合、环境和测试数据默认保存在本地，也可以用 Git 工作区协作；同一份工作区还能通过 CLI 在 CI 中运行，或通过 MCP 交给 Codex、Claude Desktop、Cursor 等 AI 客户端调用。
 
 | 核心能力 | 说明 |
 |---|---|
 | 🔌 API 调试 | HTTP/HTTPS、SSE、WebSocket、认证、Cookie、多种 Body、响应查看与网络日志 |
 | 🧩 集合与脚本 | Postman v2.1 / cURL 导入、环境变量、前后置脚本、断言、请求链路 |
-| ⚡ 性能测试 | 线程组、定时器、提取器、实时指标、报告和 master/worker 分布式执行 |
+| ⚡ 性能测试 | 线程组、定时器、提取器、实时指标、PDF 报告和 master/worker 分布式执行 |
 | 🏢 本地与 Git 工作区 | 每个工作区独立保存集合、环境和设置，数据由用户自己掌控 |
 | 🤖 MCP 与无头 CLI | AI 调用已保存的 API；CI 运行集合、功能测试和压测计划 |
 
@@ -59,7 +59,7 @@ EasyPostman 把 **Postman 风格的接口调试**和 **JMeter 风格的性能测
 
 ## 📦 下载与安装
 
-从 **[GitHub Releases](https://github.com/lakernote/easy-postman/releases)** 下载最新版本；国内用户也可以使用 **[Gitee Releases](https://gitee.com/lakernote/easy-postman/releases)**。原生安装包和 Windows 便携版已包含运行时，桌面端和 MCP 都不用另装 Java；只有跨平台 JAR 需要 Java 17+。
+从 **[GitHub Releases](https://github.com/lakernote/easy-postman/releases)** 下载最新版本；国内用户也可以使用 **[Gitee Releases](https://gitee.com/lakernote/easy-postman/releases)**。原生安装包和 Windows 便携版已包含运行时，桌面端和 MCP 都不用另装 Java；只有跨平台 JAR 需要 Java 21+。
 
 ### Windows WinGet
 
@@ -83,7 +83,7 @@ winget upgrade --id Laker.EasyPostman --exact
 | Debian / Ubuntu x64 | `EasyPostman-{版本号}-linux-amd64.deb` |
 | Debian / Ubuntu ARM64 | `EasyPostman-{版本号}-linux-arm64.deb`；旧版 `dpkg` 不兼容时使用 `-compat.deb` |
 | RHEL / Rocky / CentOS / Fedora | `EasyPostman-{版本号}-1.x86_64.rpm` 或 `-1.aarch64.rpm` |
-| 跨平台 JAR | `easy-postman-{版本号}.jar`，需要 Java 17+ |
+| 跨平台 JAR | `easy-postman-{版本号}.jar`，需要 Java 21+ |
 
 首次启动若遇到 Windows SmartScreen 或 macOS Gatekeeper 提示，请选择“仍要运行”或右键应用后选择“打开”。项目未购买商业代码签名证书，所有源代码均可公开审查。
 
@@ -122,7 +122,7 @@ codex mcp add easy-postman -- /Applications/EasyPostman.app/Contents/MacOS/EasyP
 
 默认 `args` 为空，不需要配置工作区目录。客户端为一次 MCP 连接启动一个进程，并在多次 Tool 调用间复用它；不是每调用一个 API 就重新启动一次。Windows 便携版要保留整个解压目录，不能只复制 `EasyPostmanMCP.exe`。
 
-如果只下载跨平台 JAR，则使用下面的备用配置，并确保 Java 17+ 可用：
+如果只下载跨平台 JAR，则使用下面的备用配置，并确保 Java 21+ 可用：
 
 ```json
 {

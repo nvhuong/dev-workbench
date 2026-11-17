@@ -1,6 +1,6 @@
 ## Project Overview
 
-EasyPostman is a Java 17 + Swing desktop API testing app. Entry point: `com.laker.postman.App`. Build tool: Maven multi-module.
+EasyPostman is a Java 21 + Swing desktop API testing app. Entry point: `com.laker.postman.App`. Build tool: Maven multi-module.
 
 ---
 

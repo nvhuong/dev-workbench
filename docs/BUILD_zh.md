@@ -13,7 +13,7 @@
 
 ### 必需
 
-- **Java 17** 或更高版本
+- **Java 21** 或更高版本
 - **Maven 3.6+**
 - **Git**
 
@@ -100,7 +100,7 @@ mvn clean package -DskipTests
 #### 要求
 - macOS 10.13+（High Sierra 或更高版本）
 - Xcode 命令行工具：`xcode-select --install`
-- 支持 jpackage 的 JDK 17+
+- 支持 jpackage 的 JDK 21+
 
 #### 构建 DMG
 
@@ -158,7 +158,7 @@ jpackage \
 
 #### 要求
 - Windows 10/11
-- 支持 jpackage 的 JDK 17+
+- 支持 jpackage 的 JDK 21+
 - [WiX Toolset 3.11+](https://wixtoolset.org/)（用于 MSI）
 - [Inno Setup 6+](https://jrsoftware.org/isinfo.php)（用于 EXE 安装程序）
 
@@ -209,7 +209,7 @@ cd ..\..
 
 #### 要求
 - Ubuntu 18.04+ 或 Debian 10+
-- 支持 jpackage 的 JDK 17+
+- 支持 jpackage 的 JDK 21+
 - dpkg-dev: `sudo apt install dpkg-dev`
 
 #### 构建 DEB 包
@@ -262,7 +262,7 @@ sudo apt-get install -f
 
 #### 要求
 - Fedora/RHEL/CentOS
-- 支持 jpackage 的 JDK 17+
+- 支持 jpackage 的 JDK 21+
 - rpm-build: `sudo dnf install rpm-build`
 
 #### 构建 RPM 包
@@ -343,7 +343,7 @@ sudo dnf install <缺少的包>
 
 ### 构建失败，提示 "jpackage: command not found"
 
-确保使用的是 JDK 17+（不是 JRE）且 jpackage 在 PATH 中：
+确保使用的是 JDK 21+（不是 JRE）且 jpackage 在 PATH 中：
 
 ```bash
 # 检查 Java 版本

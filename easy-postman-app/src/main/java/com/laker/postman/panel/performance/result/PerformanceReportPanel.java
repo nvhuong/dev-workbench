@@ -13,6 +13,12 @@ import com.laker.postman.common.component.ToolWindowSurfaceStyle;
 import com.laker.postman.performance.model.PerformanceProtocolLabels;
 import com.laker.postman.performance.report.PerformanceProtocolReportData;
 import com.laker.postman.performance.report.PerformanceReportMarkdownBuilder;
+import com.laker.postman.performance.report.PerformanceReportPdfExporter;
+import com.laker.postman.util.FileChooserUtil;
+import com.formdev.flatlaf.util.SystemFileChooser;
+import java.nio.file.Path;
+import java.nio.file.Files;
+import java.util.Locale;
 import com.laker.postman.performance.report.PerformanceReportRowMapper;
 import com.laker.postman.performance.report.PerformanceReportTableSchema;
 import com.laker.postman.util.I18nUtil;
@@ -34,7 +40,15 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.Map;
+import java.util.LinkedHashMap;
+import java.util.concurrent.atomic.AtomicReference;
+import com.laker.postman.performance.core.model.PerformanceTrendSnapshot;
+import com.laker.postman.performance.core.run.PerformanceRunPlan;
+import com.laker.postman.performance.model.PerformanceSampleResult;
+import com.laker.postman.panel.performance.PerformancePanel;
 
+@lombok.extern.slf4j.Slf4j
 public class PerformanceReportPanel extends JPanel {
 
     // 成功率阈值
@@ -58,6 +72,12 @@ public class PerformanceReportPanel extends JPanel {
     private JPanel reportCards;
     private PerformanceProtocol selectedProtocol = PerformanceProtocol.HTTP;
     private Set<PerformanceProtocol> availableProtocols = EnumSet.of(PerformanceProtocol.HTTP);
+    private final AtomicReference<List<PerformanceTrendView.TrendReportPoint>> trendPoints =
+            new AtomicReference<>(List.of());
+    private PerformanceRunPlan reportPlan;
+    private List<PerformanceSampleResult> sampleResults = List.of();
+    private String reportEnvironment = "";
+    private String reportError = "";
 
     public PerformanceReportPanel() {
         // Initialize internationalized column names
@@ -110,7 +130,10 @@ public class PerformanceReportPanel extends JPanel {
                 false
         );
         copyReportButton.addActionListener(e -> copyMarkdownReport());
-        toolbar.add(ToolWindowActionToolbar.inlineRight(copyReportButton), BorderLayout.EAST);
+        JButton pdfButton = ModernButtonFactory.createButton(
+                I18nUtil.getMessage(MessageKeys.PERFORMANCE_REPORT_PDF_EXPORT), false);
+        pdfButton.addActionListener(e -> exportPdfReport(pdfButton));
+        toolbar.add(ToolWindowActionToolbar.inlineRight(copyReportButton, pdfButton), BorderLayout.EAST);
         return toolbar;
     }
 
@@ -558,6 +581,27 @@ public class PerformanceReportPanel extends JPanel {
         reportTableModel.setRowCount(0);
         webSocketReportTableModel.setRowCount(0);
         sseReportTableModel.setRowCount(0);
+        trendPoints.set(List.of());
+        sampleResults = List.of();
+        reportEnvironment = "";
+        reportError = "";
+    }
+
+    public void setReportContext(PerformanceRunPlan plan, String environment) {
+        reportPlan = plan;
+        reportEnvironment = environment == null ? "" : environment;
+    }
+
+    public void setTrendReportPoints(List<PerformanceTrendView.TrendReportPoint> points) {
+        trendPoints.set(points == null ? List.of() : List.copyOf(points));
+    }
+
+    public void setSampleResults(List<PerformanceSampleResult> results) {
+        sampleResults = results == null ? List.of() : List.copyOf(results);
+    }
+
+    public List<PerformanceSampleResult> getSampleResults() {
+        return sampleResults;
     }
 
     private void addReportRow(DefaultTableModel model, Object[] rowData) {
@@ -581,6 +625,10 @@ public class PerformanceReportPanel extends JPanel {
     }
 
     public void updateReport(PerformanceJsonReport jsonReport) {
+        if (jsonReport != null && jsonReport.getMetadata() != null
+                && !jsonReport.getMetadata().getError().isBlank()) {
+            reportError = jsonReport.getMetadata().getError();
+        }
         updateReport(PerformanceProtocolReportData.fromJsonReport(jsonReport, totalRowName));
     }
 
@@ -631,15 +679,71 @@ public class PerformanceReportPanel extends JPanel {
         NotificationCenter.showSuccess(I18nUtil.getMessage(MessageKeys.PERFORMANCE_REPORT_MARKDOWN_COPIED));
     }
 
+    private List<PerformanceReportMarkdownBuilder.ReportTable> reportTables() {
+        return List.of(
+                reportTable(PerformanceProtocolLabels.displayName(PerformanceProtocol.HTTP), reportTableModel),
+                reportTable(PerformanceProtocolLabels.displayName(PerformanceProtocol.WEBSOCKET), webSocketReportTableModel),
+                reportTable(PerformanceProtocolLabels.displayName(PerformanceProtocol.SSE), sseReportTableModel));
+    }
+
+    private void exportPdfReport(JButton button) {
+        // Capture every table on the EDT; the running test may update it during PDF generation.
+        var tables = reportTables();
+        if (tables.stream().allMatch(table -> table.rows().isEmpty())) {
+            NotificationCenter.showWarning(I18nUtil.getMessage(MessageKeys.PERFORMANCE_REPORT_MARKDOWN_EMPTY));
+            return;
+        }
+        SystemFileChooser chooser = FileChooserUtil.createSaveFileChooser(
+                "performance.report.pdf", I18nUtil.getMessage(MessageKeys.PERFORMANCE_REPORT_PDF_EXPORT));
+        chooser.setFileFilter(FileChooserUtil.extensionFilter(I18nUtil.getMessage(MessageKeys.PERFORMANCE_REPORT_PDF_EXPORT) + " (*.pdf)", "pdf"));
+        chooser.setSelectedFile(new java.io.File("performance-report.pdf"));
+        if (chooser.showSaveDialog(this) != SystemFileChooser.APPROVE_OPTION) return;
+        List<PerformanceSampleResult> exportSamples = performanceResultSamples();
+        Path selected = chooser.getSelectedFile().toPath();
+        Path destination = selected.toString().toLowerCase(Locale.ROOT).endsWith(".pdf")
+                ? selected : Path.of(selected + ".pdf");
+        if (Files.exists(destination) && JOptionPane.showConfirmDialog(this,
+                I18nUtil.getMessage(MessageKeys.PERFORMANCE_REPORT_PDF_OVERWRITE),
+                I18nUtil.getMessage(MessageKeys.PERFORMANCE_REPORT_PDF_EXPORT),
+                JOptionPane.YES_NO_OPTION) != JOptionPane.YES_OPTION) return;
+        String title = I18nUtil.getMessage(MessageKeys.PERFORMANCE_REPORT_MARKDOWN_TITLE);
+        PerformanceReportPdfExporter.ReportContext context = new PerformanceReportPdfExporter.ReportContext(
+                title, reportPlan, reportEnvironment, List.copyOf(trendPoints.get()), exportSamples, reportError);
+        button.setEnabled(false);
+        new SwingWorker<Void, Void>() {
+            @Override protected Void doInBackground() throws Exception {
+                PerformanceReportPdfExporter.export(destination, context, tables);
+                return null;
+            }
+            @Override protected void done() {
+                button.setEnabled(true);
+                try {
+                    get();
+                    NotificationCenter.showSuccess(I18nUtil.getMessage(MessageKeys.PERFORMANCE_REPORT_PDF_SAVED) + " " + destination);
+                } catch (Exception ex) {
+                    log.error("Failed to export performance PDF to {}", destination, ex);
+                    NotificationCenter.showError(I18nUtil.getMessage(MessageKeys.PERFORMANCE_REPORT_PDF_FAILED));
+                }
+            }
+        }.execute();
+    }
+
+    private List<PerformanceSampleResult> performanceResultSamples() {
+        java.awt.Container parent = getParent();
+        while (parent != null) {
+            if (parent instanceof PerformancePanel performancePanel) {
+                return performancePanel.getPerformanceResultTablePanel().reportSamples();
+            }
+            parent = parent.getParent();
+        }
+        return sampleResults;
+    }
+
     String buildMarkdownReport() {
         return PerformanceReportMarkdownBuilder.build(
                 I18nUtil.getMessage(MessageKeys.PERFORMANCE_REPORT_MARKDOWN_TITLE),
                 I18nUtil.getMessage(MessageKeys.PERFORMANCE_REPORT_MARKDOWN_EMPTY),
-                List.of(
-                        reportTable(PerformanceProtocolLabels.displayName(PerformanceProtocol.HTTP), reportTableModel),
-                        reportTable(PerformanceProtocolLabels.displayName(PerformanceProtocol.WEBSOCKET), webSocketReportTableModel),
-                        reportTable(PerformanceProtocolLabels.displayName(PerformanceProtocol.SSE), sseReportTableModel)
-                )
+                reportTables()
         );
     }
 

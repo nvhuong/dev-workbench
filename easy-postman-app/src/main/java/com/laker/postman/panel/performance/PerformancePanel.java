@@ -61,6 +61,7 @@ import com.laker.postman.panel.performance.tree.PerformanceSwingTreePlanAdapter;
 import com.laker.postman.request.model.HttpRequestItem;
 import com.laker.postman.request.model.RequestItemProtocolEnum;
 import com.laker.postman.service.EnvironmentService;
+import com.laker.postman.model.Environment;
 import com.laker.postman.service.GlobalVariablesService;
 import com.laker.postman.service.PerformancePersistenceService;
 import com.laker.postman.service.collections.RequestSaveEventPublisher;
@@ -1177,6 +1178,9 @@ public class PerformancePanel extends UiSingletonPanel {
                 efficientMode,
                 value -> efficientMode = value
         );
+        Environment activeEnvironment = EnvironmentService.getActiveEnvironment();
+        performanceReportPanel.setReportContext(null,
+                activeEnvironment == null ? "" : activeEnvironment.getName());
     }
 
     private void startRemoteRun(JLabel progressLabel, JLabel limitLabel) {
@@ -1211,6 +1215,8 @@ public class PerformancePanel extends UiSingletonPanel {
                     GlobalVariablesService.getInstance().getGlobalVariables(),
                     AppConstants.APP_NAME + " " + SystemUtil.getCurrentVersion()
             );
+            performanceReportPanel.setReportContext(runPlan,
+                    runPlan.getEnvironment() == null ? "" : runPlan.getEnvironment().getName());
             if (timerManager != null) {
                 // 远程执行由 worker 轮询刷新趋势和报表，停掉本地 stats 定时器，避免空本地快照覆盖 master 报表。
                 timerManager.stopAll();
@@ -1384,6 +1390,10 @@ public class PerformancePanel extends UiSingletonPanel {
         trendWindowCollector.clear();
         trendWindowCollector.setEnabled(trendEnabled);
         executionEngine.resetVirtualUsers();
+    }
+
+    public PerformanceResultTablePanel getPerformanceResultTablePanel() {
+        return performanceResultTablePanel;
     }
 
     private void applyTrendEnabled(boolean enabled) {

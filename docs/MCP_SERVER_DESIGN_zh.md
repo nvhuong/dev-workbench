@@ -12,7 +12,7 @@ MCP 已包含在主程序中，不发布单独的 MCP 安装包：
 |---|---|---|
 | macOS / Windows / Linux 原生安装包 | 使用包内的 `EasyPostmanMCP` 启动器 | 否，已包含 JRE |
 | Windows 便携版 ZIP | 解压后使用 `EasyPostmanMCP.exe` | 否，已包含 JRE |
-| 跨平台 JAR | `java -jar ... mcp serve` | 是，需要 Java 17+ |
+| 跨平台 JAR | `java -jar ... mcp serve` | 是，需要 Java 21+ |
 
 推荐从 [GitHub Releases](https://github.com/lakernote/easy-postman/releases) 下载原生包。Windows 便携版无需安装，解压后即可使用桌面端和 MCP。
 
@@ -127,7 +127,7 @@ MCP 客户端为一次连接启动一个 `EasyPostmanMCP` 进程，并在多次 
 
 ### 6. 跨平台 JAR 备用方式
 
-只下载 JAR 时仍可使用下面的配置，但需要 Java 17+：
+只下载 JAR 时仍可使用下面的配置，但需要 Java 21+：
 
 ```json
 {

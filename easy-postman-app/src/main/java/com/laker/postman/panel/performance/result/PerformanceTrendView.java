@@ -5,6 +5,7 @@ import com.laker.postman.performance.core.model.PerformanceProtocol;
 import org.jfree.data.time.RegularTimePeriod;
 
 import java.util.Set;
+import java.util.List;
 
 public interface PerformanceTrendView {
     default void setAvailableProtocols(Set<PerformanceProtocol> protocols) {
@@ -13,4 +14,11 @@ public interface PerformanceTrendView {
     void clearTrendDataset();
 
     void addOrUpdate(RegularTimePeriod period, PerformanceTrendSnapshot snapshot);
+
+    default List<TrendReportPoint> reportPoints() {
+        return List.of();
+    }
+
+    record TrendReportPoint(long timestampMs, PerformanceTrendSnapshot snapshot) {
+    }
 }

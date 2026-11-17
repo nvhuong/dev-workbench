@@ -16,6 +16,11 @@
 
     <dependencies>
         <dependency>
+            <groupId>org.apache.pdfbox</groupId>
+            <artifactId>pdfbox</artifactId>
+            <version>3.0.8</version>
+        </dependency>
+        <dependency>
             <groupId>com.laker.tools</groupId>
             <artifactId>easy-postman-plugin-api</artifactId>
             <version>${project.version}</version>

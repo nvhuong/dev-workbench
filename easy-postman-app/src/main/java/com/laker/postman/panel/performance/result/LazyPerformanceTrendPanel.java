@@ -11,6 +11,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.util.EnumSet;
 import java.util.Set;
+import java.util.List;
 import java.util.function.Supplier;
 
 public class LazyPerformanceTrendPanel extends JPanel implements PerformanceTrendView {
@@ -56,6 +57,11 @@ public class LazyPerformanceTrendPanel extends JPanel implements PerformanceTren
             return;
         }
         getOrCreateTrendPanel().addOrUpdate(period, snapshot);
+    }
+
+    @Override
+    public List<TrendReportPoint> reportPoints() {
+        return trendPanel == null ? List.of() : trendPanel.reportPoints();
     }
 
     private PerformanceTrendPanel getOrCreateTrendPanel() {

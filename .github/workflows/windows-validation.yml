@@ -20,7 +20,7 @@ permissions:
   contents: read
 
 env:
-  JAVA_VERSION: '17'
+  JAVA_VERSION: '21'
   JAVA_DISTRIBUTION: 'jetbrains'
   JLINK_MODULES_WINDOWS: 'java.base,java.desktop,java.logging,jdk.unsupported,java.naming,java.net.http,jdk.httpserver,java.prefs,java.sql,java.security.sasl,java.security.jgss,jdk.crypto.ec,jdk.crypto.mscapi,java.management,java.management.rmi,jdk.crypto.cryptoki'
 

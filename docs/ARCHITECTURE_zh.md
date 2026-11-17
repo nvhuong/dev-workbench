@@ -38,7 +38,7 @@ EasyPostman
 
 ### 核心技术栈
 
-- **Java 17**: 使用最新 LTS 版本，享受现代 Java 特性
+- **Java 21**: 使用 Java 21 LTS，享受现代 Java 特性
   - Records、Sealed Classes、Pattern Matching
   - 增强的 NullPointerException 消息
   - Text Blocks 更好的字符串处理
@@ -102,7 +102,7 @@ EasyPostman
   - ECMAScript 5.1 支持
   - Java 互操作性
   
-- **GraalVM JavaScript** (Java 17+): 现代 JavaScript 引擎
+- **GraalVM JavaScript** (Java 21+): 现代 JavaScript 引擎
   - ECMAScript 2021+ 支持
   - 更好的性能
   - 多语言支持
@@ -156,7 +156,7 @@ EasyPostman
    mvn clean package
    ```
    - 生成 `easy-postman-{版本号}.jar`
-   - 需要 Java 17+ 运行时
+   - 需要 Java 21+ 运行时
    - 最小的分发大小
 
 2. **原生安装包**:

@@ -131,6 +131,7 @@ public final class PerformanceStatisticsCoordinator {
                 log.debug("采样数据 {} - 用户数: {}, HTTP: {}, WS: {}, SSE: {}",
                         period, snapshot.activeUsers(), snapshot.http().samples(), snapshot.webSocket().samples(), snapshot.sse().samples());
                 performanceTrendPanel.addOrUpdate(period, snapshot);
+                performanceReportPanel.setTrendReportPoints(performanceTrendPanel.reportPoints());
             });
         });
     }
@@ -158,6 +159,7 @@ public final class PerformanceStatisticsCoordinator {
         log.debug("同步采样数据 {} - 用户数: {}, HTTP: {}, WS: {}, SSE: {}",
                 period, snapshot.activeUsers(), snapshot.http().samples(), snapshot.webSocket().samples(), snapshot.sse().samples());
         performanceTrendPanel.addOrUpdate(period, snapshot);
+        performanceReportPanel.setTrendReportPoints(performanceTrendPanel.reportPoints());
     }
 
     public void appendTerminalIdleTrendPointSync() {
@@ -175,6 +177,7 @@ public final class PerformanceStatisticsCoordinator {
 
         performanceTrendPanel.addOrUpdate(createTrendPeriod(timestampMs),
                 PerformanceTrendSnapshot.terminalIdle());
+        performanceReportPanel.setTrendReportPoints(performanceTrendPanel.reportPoints());
     }
 
     public void markRunStarted(long startTimeMs) {

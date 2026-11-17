@@ -575,6 +575,46 @@ public class PerformanceTrendPanel extends UiSingletonPanel implements Performan
         syncDomainAxes(period);
     }
 
+    @Override
+    public List<TrendReportPoint> reportPoints() {
+        TimeSeries users = httpVirtualUsersSeries;
+        TimeSeries rps = httpRpsSeries;
+        TimeSeries avg = httpAvgResponseSeries;
+        TimeSeries max = httpMaxResponseSeries;
+        TimeSeries errors = httpErrorRateSeries;
+        List<TrendReportPoint> points = new ArrayList<>();
+        for (int index = 0; index < users.getItemCount(); index++) {
+            RegularTimePeriod period = users.getTimePeriod(index);
+            long timestamp = period.getStart().getTime();
+            double average = value(avg, period);
+            double maximum = value(max, period);
+            double qps = value(rps, period);
+            double errorRate = value(errors, period);
+            if (!Double.isFinite(average) && !Double.isFinite(maximum) && !Double.isFinite(qps)
+                    && !Double.isFinite(errorRate)) continue;
+            points.add(new TrendReportPoint(timestamp, new PerformanceTrendSnapshot(
+                    intValue(users, period), 0, 0,
+                    new PerformanceTrendSnapshot.ProtocolWindowMetrics(
+                            0, 0, errorRate, qps, average,
+                            0, 0, 0, Double.NaN, Double.NaN, Double.NaN, Double.NaN,
+                            maximum),
+                    PerformanceTrendSnapshot.terminalIdle().http(),
+                    PerformanceTrendSnapshot.terminalIdle().webSocket(),
+                    PerformanceTrendSnapshot.terminalIdle().sse())));
+        }
+        return List.copyOf(points);
+    }
+
+    private static double value(TimeSeries series, RegularTimePeriod period) {
+        var item = series.getDataItem(period);
+        return item == null || item.getValue() == null ? Double.NaN : item.getValue().doubleValue();
+    }
+
+    private static int intValue(TimeSeries series, RegularTimePeriod period) {
+        double value = value(series, period);
+        return Double.isFinite(value) ? (int) value : 0;
+    }
+
     private RegularTimePeriod normalizeDisplayPeriod(RegularTimePeriod period, PerformanceTrendSnapshot snapshot) {
         if (trendDomainStartMs == null || !isIdleSnapshot(snapshot)) {
             return period;

@@ -4,7 +4,7 @@
 
 ### Required
 
-- **Java 17** or higher
+- **Java 21** or higher
 - **Maven 3.6+**
 - **Git**
 
@@ -74,7 +74,7 @@ java -jar easy-postman-app/target/easy-postman-*.jar mcp serve --help
 #### Requirements
 - macOS 10.13+ (High Sierra or later)
 - Xcode Command Line Tools: `xcode-select --install`
-- JDK 17+ with jpackage support
+- JDK 21+ with jpackage support
 
 #### Build DMG
 
@@ -132,7 +132,7 @@ jpackage \
 
 #### Requirements
 - Windows 10/11
-- JDK 17+ with jpackage support
+- JDK 21+ with jpackage support
 - [WiX Toolset 3.11+](https://wixtoolset.org/) (for MSI)
 - [Inno Setup 6+](https://jrsoftware.org/isinfo.php) (for EXE installer)
 
@@ -183,7 +183,7 @@ cd ..\..
 
 #### Requirements
 - Ubuntu 18.04+ or Debian 10+
-- JDK 17+ with jpackage support
+- JDK 21+ with jpackage support
 - dpkg-dev: `sudo apt install dpkg-dev`
 
 #### Build DEB Package
@@ -236,7 +236,7 @@ sudo apt-get install -f
 
 #### Requirements
 - Fedora/RHEL/CentOS
-- JDK 17+ with jpackage support
+- JDK 21+ with jpackage support
 - rpm-build: `sudo dnf install rpm-build`
 
 #### Build RPM Package
@@ -317,7 +317,7 @@ sudo dnf install <missing-package>
 
 ### Build fails with "jpackage: command not found"
 
-Ensure you're using JDK 17+ (not JRE) and jpackage is in PATH:
+Ensure you're using JDK 21+ (not JRE) and jpackage is in PATH:
 
 ```bash
 # Check Java version

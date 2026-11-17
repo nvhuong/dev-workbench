@@ -3364,4 +3364,29 @@ public final class MessageKeys {
     public static final String CERT_PLUGIN_OPEN_MANAGER = "cert.plugin.open_manager";
     public static final String CERT_CONSOLE_LOAD_FAILED = "cert.console.load_failed";
 
+    public static final String PERFORMANCE_REPORT_PDF_EXPORT = "performance.report.pdf.export";
+    public static final String PERFORMANCE_REPORT_PDF_OVERWRITE = "performance.report.pdf.overwrite";
+    public static final String PERFORMANCE_REPORT_PDF_SAVED = "performance.report.pdf.saved";
+    public static final String PERFORMANCE_REPORT_PDF_FAILED = "performance.report.pdf.failed";
+    public static final String PERFORMANCE_REPORT_PDF_OUTCOMES = "performance.report.pdf.outcomes";
+    public static final String PERFORMANCE_REPORT_PDF_DETAILS = "performance.report.pdf.details";
+    public static final String PERFORMANCE_REPORT_PDF_NOTE = "performance.report.pdf.note";
+    public static final String PERFORMANCE_REPORT_PDF_SETUP = "performance.report.pdf.setup";
+    public static final String PERFORMANCE_REPORT_PDF_ENVIRONMENT = "performance.report.pdf.environment";
+    public static final String PERFORMANCE_REPORT_PDF_DURATION = "performance.report.pdf.duration";
+    public static final String PERFORMANCE_REPORT_PDF_RUN_SOURCE = "performance.report.pdf.runSource";
+    public static final String PERFORMANCE_REPORT_PDF_LOAD_PROFILE = "performance.report.pdf.loadProfile";
+    public static final String PERFORMANCE_REPORT_PDF_SLOWEST = "performance.report.pdf.slowest";
+    public static final String PERFORMANCE_REPORT_PDF_SUMMARY = "performance.report.pdf.summary";
+    public static final String PERFORMANCE_REPORT_PDF_REQUEST_METRICS = "performance.report.pdf.requestMetrics";
+    public static final String PERFORMANCE_REPORT_PDF_ERRORS = "performance.report.pdf.errors";
+    public static final String PERFORMANCE_REPORT_PDF_NO_ERRORS = "performance.report.pdf.noErrors";
+    public static final String PERFORMANCE_REPORT_PDF_DATA_UNAVAILABLE = "performance.report.pdf.dataUnavailable";
+    public static final String PERFORMANCE_REPORT_PDF_CONTINUED = "performance.report.pdf.continued";
+    public static final String PERFORMANCE_REPORT_PDF_SAMPLE_LIMIT = "performance.report.pdf.sampleLimit";
+    public static final String PERFORMANCE_REPORT_PDF_RESPONSE_TIME = "performance.report.pdf.responseTime";
+    public static final String PERFORMANCE_REPORT_PDF_THROUGHPUT = "performance.report.pdf.throughput";
+    public static final String PERFORMANCE_REPORT_PDF_CHART_NOTE = "performance.report.pdf.chartNote";
+    public static final String PERFORMANCE_REPORT_PDF_CHART_UNAVAILABLE = "performance.report.pdf.chartUnavailable";
+    public static final String PERFORMANCE_REPORT_PDF_MAX_RESPONSE = "performance.report.pdf.maxResponse";
 }

@@ -14,7 +14,7 @@
 ```bash
 # 安装必需的工具
 sudo apt-get update
-sudo apt-get install -y openjdk-17-jdk maven fakeroot binutils
+sudo apt-get install -y openjdk-21-jdk maven fakeroot binutils
 
 # 注意：生成的 DEB 包安装时需要 xdg-utils，但打包时不需要
 ```
@@ -22,10 +22,10 @@ sudo apt-get install -y openjdk-17-jdk maven fakeroot binutils
 #### CentOS/RedHat 系统（打包 RPM）
 ```bash
 # CentOS 7/8
-sudo yum install -y java-17-openjdk java-17-openjdk-devel maven rpm-build binutils
+sudo yum install -y java-21-openjdk java-21-openjdk-devel maven rpm-build binutils
 
 # 或者使用 dnf (CentOS 8+/Fedora)
-sudo dnf install -y java-17-openjdk java-17-openjdk-devel maven rpm-build binutils
+sudo dnf install -y java-21-openjdk java-21-openjdk-devel maven rpm-build binutils
 ```
 
 ### 2. 验证环境
@@ -36,7 +36,7 @@ java -version
 # 检查 Maven
 mvn -version
 
-# 检查 jlink 和 jpackage（JDK 17+ 自带）
+# 检查 jlink 和 jpackage（JDK 21+ 自带）
 jlink --version
 jpackage --version
 ```
@@ -165,12 +165,12 @@ jpackage --version
 
 **解决方案**: 
 ```bash
-# 确保安装了完整的 JDK 17+（不是 JRE）
+# 确保安装了完整的 JDK 21+（不是 JRE）
 # Ubuntu/Debian
-sudo apt-get install openjdk-17-jdk
+sudo apt-get install openjdk-21-jdk
 
 # CentOS/RedHat
-sudo yum install java-17-openjdk-devel
+sudo yum install java-21-openjdk-devel
 ```
 
 ### 2. 安装后无法启动

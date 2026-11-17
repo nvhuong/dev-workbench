@@ -23,7 +23,7 @@ java -jar easy-postman.jar collection run /srv/api-workspace
 - [GitHub 最新 Release](https://github.com/lakernote/easy-postman/releases/latest)
 - [Gitee Releases（国内镜像）](https://gitee.com/lakernote/easy-postman/releases)
 
-Gitee 附件同步可能稍晚；如果最新版本中暂时没有主 JAR，请使用 GitHub 下载地址。运行 CLI 需要 Java 17 或更高版本。
+Gitee 附件同步可能稍晚；如果最新版本中暂时没有主 JAR，请使用 GitHub 下载地址。运行 CLI 需要 Java 21 或更高版本。
 
 ## 1. Workspace 文件
 
@@ -213,7 +213,7 @@ jobs:
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: "17"
+          java-version: "21"
 
       - name: Run collection
         run: |

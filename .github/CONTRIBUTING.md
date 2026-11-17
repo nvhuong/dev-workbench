@@ -59,7 +59,7 @@ cd easy-postman
 git remote add upstream https://github.com/lakernote/easy-postman.git
 
 # 4. 安装依赖
-# 确保已安装 Java 17+
+# 确保已安装 Java 21+
 mvn clean install
 ```
 
@@ -237,7 +237,7 @@ cd easy-postman
 git remote add upstream https://github.com/lakernote/easy-postman.git
 
 # 4. Install dependencies
-# Ensure Java 17+ is installed
+# Ensure Java 21+ is installed
 mvn clean install
 ```
 
