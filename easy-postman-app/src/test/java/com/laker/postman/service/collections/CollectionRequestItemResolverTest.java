@@ -11,7 +11,7 @@ import static org.testng.Assert.assertTrue;
 
 public class CollectionRequestItemResolverTest {
 
-    @Test(description = "应通过已注册的 Collection 树根节点按 ID 查找请求并返回深拷贝")
+    @Test(description = "Nên đăng ký Collection Bấm vào nút gốc cây ID Tìm yêu cầu và trả lại một bản sao sâu")
     public void shouldResolveRequestItemFromRegisteredCollectionTreeRoot() {
         HttpRequestItem requestItem = new HttpRequestItem();
         requestItem.setId("req-registered");

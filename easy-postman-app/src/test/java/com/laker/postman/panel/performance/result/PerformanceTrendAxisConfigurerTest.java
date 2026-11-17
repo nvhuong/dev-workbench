@@ -19,11 +19,11 @@ public class PerformanceTrendAxisConfigurerTest {
         org.jfree.data.time.TimeSeries series = new org.jfree.data.time.TimeSeries("error rate");
         series.add(new org.jfree.data.time.Second(new Date(1_000L)), 0.0);
         series.add(new org.jfree.data.time.Second(new Date(2_000L)), 0.0);
-        NumberAxis axis = new NumberAxis("错误率");
+        NumberAxis axis = new NumberAxis("tỷ lệ lỗi");
         PerformanceTrendAxisConfigurer.configureMetricAxis(axis);
         org.jfree.chart.plot.XYPlot plot = new org.jfree.chart.plot.XYPlot(
                 new org.jfree.data.time.TimeSeriesCollection(series),
-                new DateAxis("时间"),
+                new DateAxis("thời gian"),
                 axis,
                 new org.jfree.chart.renderer.xy.XYLineAndShapeRenderer()
         );
@@ -35,7 +35,7 @@ public class PerformanceTrendAxisConfigurerTest {
 
     @Test
     public void integerAxisShouldUseIntegerTickUnitsToAvoidDuplicateRoundedLabels() {
-        NumberAxis axis = new NumberAxis("虚拟用户数");
+        NumberAxis axis = new NumberAxis("Số lượng người dùng ảo");
 
         PerformanceTrendAxisConfigurer.configureIntegerAxis(axis);
 
@@ -45,7 +45,7 @@ public class PerformanceTrendAxisConfigurerTest {
 
     @Test
     public void timeAxisShouldUseReadableWallClockTicksForShortRuns() {
-        DateAxis axis = new DateAxis("时间");
+        DateAxis axis = new DateAxis("thời gian");
 
         PerformanceTrendAxisConfigurer.configureTimeAxis(axis, 10_500L);
 
@@ -58,7 +58,7 @@ public class PerformanceTrendAxisConfigurerTest {
 
     @Test
     public void timeAxisShouldUseTwoSecondTicksWhenOneSecondLabelsWouldCrowd() {
-        DateAxis axis = new DateAxis("时间");
+        DateAxis axis = new DateAxis("thời gian");
 
         PerformanceTrendAxisConfigurer.configureTimeAxis(axis, 14_000L);
 
@@ -68,7 +68,7 @@ public class PerformanceTrendAxisConfigurerTest {
 
     @Test
     public void timeAxisShouldUseTenSecondTicksForOneMinuteRuns() {
-        DateAxis axis = new DateAxis("时间");
+        DateAxis axis = new DateAxis("thời gian");
 
         PerformanceTrendAxisConfigurer.configureTimeAxis(axis, 60_000L);
 
@@ -78,7 +78,7 @@ public class PerformanceTrendAxisConfigurerTest {
 
     @Test
     public void timeAxisShouldUseCoarserTicksForLongRuns() {
-        DateAxis axis = new DateAxis("时间");
+        DateAxis axis = new DateAxis("thời gian");
 
         PerformanceTrendAxisConfigurer.configureTimeAxis(axis, 120_000L);
 
@@ -88,7 +88,7 @@ public class PerformanceTrendAxisConfigurerTest {
 
     @Test
     public void timeAxisShouldUseThirtyMinuteTicksForTwelveHourRuns() {
-        DateAxis axis = new DateAxis("时间");
+        DateAxis axis = new DateAxis("thời gian");
 
         PerformanceTrendAxisConfigurer.configureTimeAxis(axis, 12 * 60 * 60_000L);
 

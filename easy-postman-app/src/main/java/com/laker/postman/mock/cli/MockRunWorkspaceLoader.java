@@ -63,7 +63,7 @@ final class MockRunWorkspaceLoader {
 
     private Path requireFile(Path path, String name) {
         if (!Files.isRegularFile(path) || !Files.isReadable(path)) {
-            throw new IllegalArgumentException("EasyPostman " + name + " does not exist: " + path);
+            throw new IllegalArgumentException("Dev Workbench " + name + " does not exist: " + path);
         }
         return path;
     }

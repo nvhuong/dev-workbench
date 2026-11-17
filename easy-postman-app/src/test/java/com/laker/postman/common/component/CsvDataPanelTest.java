@@ -42,7 +42,7 @@ public class CsvDataPanelTest {
         restore(previousThemeTokens);
     }
 
-    @Test(description = "CsvDataPanel 应支持状态导出和恢复")
+    @Test(description = "CsvDataPanel Xuất khẩu và phục hồi của nhà nước cần được hỗ trợ")
     public void shouldRoundTripCsvState() {
         CsvDataPanel.CsvState state = new CsvDataPanel.CsvState(
                 "users.csv",
@@ -67,7 +67,7 @@ public class CsvDataPanelTest {
         assertEquals(exported.getRows().get(0).get("password"), "secret");
     }
 
-    @Test(description = "恢复后的状态应保持列顺序")
+    @Test(description = "Trạng thái được khôi phục sẽ duy trì thứ tự cột")
     public void shouldPreserveHeaderOrderAfterRestore() {
         CsvDataPanel panel = new CsvDataPanel();
         panel.restoreState(new CsvDataPanel.CsvState(
@@ -81,7 +81,7 @@ public class CsvDataPanelTest {
         assertEquals(exported.getHeaders(), List.of("cookie", "username", "token"));
     }
 
-    @Test(description = "CSV 斑马纹默认背景应使用主题 hover token")
+    @Test(description = "CSV Nền mặc định của Zebra nên sử dụng chủ đề hover token")
     public void stripeBackgroundShouldUseSemanticHoverColorWhenLafAlternateColorMissing() throws Exception {
         Color hover = new Color(31, 32, 33);
         UIManager.put("Table.alternateRowColor", null);
@@ -90,7 +90,7 @@ public class CsvDataPanelTest {
         assertEquals(invokeStripeBackground(Color.WHITE), hover);
     }
 
-    @Test(description = "CSV 表格选中背景应优先使用 FlatLaf Table.selectionBackground")
+    @Test(description = "CSV Nền lựa chọn bảng nên được sử dụng đầu tiên FlatLaf Table.selectionBackground")
     public void csvTableSelectionShouldUseFlatLafTableSelectionBackground() throws Exception {
         Color selectionBackground = new Color(41, 42, 43);
         UIManager.put("Table.selectionBackground", selectionBackground);
@@ -102,7 +102,7 @@ public class CsvDataPanelTest {
         assertEquals(table.getSelectionBackground(), selectionBackground);
     }
 
-    @Test(description = "CSV 表格基础背景应使用 FlatLaf table token")
+    @Test(description = "CSV Nên sử dụng nền nền bảng FlatLaf table token")
     public void csvTableBackgroundShouldUseTableBackgroundToken() throws Exception {
         Color tableBackground = new Color(20, 21, 22);
         Color cardBackground = new Color(31, 32, 33);
@@ -116,7 +116,7 @@ public class CsvDataPanelTest {
         assertEquals(table.getBackground(), tableBackground);
     }
 
-    @Test(description = "CSV 弹窗尺寸应保持工具型弹窗的紧凑比例")
+    @Test(description = "CSV Kích thước cửa sổ bật lên phải duy trì tỷ lệ nhỏ gọn của cửa sổ bật lên loại công cụ")
     public void csvDialogSizesShouldUseCompactToolWindowScale() {
         assertEquals(CsvDataPanel.csvOverviewDialogSize(), new Dimension(560, 390));
         assertEquals(CsvDataPanel.csvManualDialogSize(), new Dimension(620, 260));
@@ -124,14 +124,14 @@ public class CsvDataPanelTest {
         assertEquals(CsvDataPanel.csvManageDialogMinimumSize(), new Dimension(760, 500));
     }
 
-    @Test(description = "手动创建 CSV 弹窗默认紧凑，但不应小于实际 pack 后尺寸")
+    @Test(description = "Tạo thủ công CSV Theo mặc định, cửa sổ bật lên có kích thước nhỏ gọn nhưng không được nhỏ hơn kích thước thực tế pack Kích thước trở lại")
     public void csvManualDialogDisplaySizeShouldRespectPackedSize() {
         assertEquals(CsvDataPanel.csvManualDialogDisplaySize(null), new Dimension(620, 260));
         assertEquals(CsvDataPanel.csvManualDialogDisplaySize(new Dimension(500, 220)), new Dimension(620, 260));
         assertEquals(CsvDataPanel.csvManualDialogDisplaySize(new Dimension(660, 310)), new Dimension(660, 310));
     }
 
-    @Test(description = "CSV 管理工具栏应放在表格上方而不是底部说明区")
+    @Test(description = "CSV Thanh công cụ quản trị phải được đặt phía trên bảng thay vì ở khu vực mô tả phía dưới")
     public void csvManageHeaderShouldPlaceToolbarAboveTable() {
         JLabel infoLabel = new JLabel("source");
         JPanel toolbar = new JPanel();
@@ -143,7 +143,7 @@ public class CsvDataPanelTest {
         assertSame(layout.getLayoutComponent(BorderLayout.SOUTH), toolbar);
     }
 
-    @Test(description = "CSV 使用说明应通过独立帮助入口打开，避免占用主弹窗高度")
+    @Test(description = "CSV Hướng dẫn sử dụng nên được mở thông qua một lối vào trợ giúp riêng để tránh chiếm chiều cao của cửa sổ bật lên chính")
     public void csvUsagePanelShouldExposeHelpButtonAction() {
         AtomicBoolean actionInvoked = new AtomicBoolean(false);
         JPanel panel = CsvDataPanel.createUsageHelpPanel("summary", () -> actionInvoked.set(true));
@@ -161,7 +161,7 @@ public class CsvDataPanelTest {
         assertTrue(actionInvoked.get());
     }
 
-    @Test(description = "手动创建 CSV 时应解析有效列名并识别重复列")
+    @Test(description = "Tạo thủ công CSV Tên cột hợp lệ phải được phân tích cú pháp và xác định các cột trùng lặp")
     public void csvManualHeadersShouldBeParsedAndValidated() {
         List<String> headers = CsvDataPanel.parseManualHeaders(" username, password, , email ");
 
@@ -170,7 +170,7 @@ public class CsvDataPanelTest {
         assertEquals(CsvDataPanel.findDuplicateHeader(List.of("userId", "token", "userId")), "userId");
     }
 
-    @Test(description = "CSV 文件选择器应优先使用当前 CSV 所在目录，其次使用上一次成功导入目录")
+    @Test(description = "CSV Bộ chọn tệp phải được ưu tiên hơn bộ chọn hiện tại CSV thư mục, sau đó sử dụng thư mục được nhập thành công cuối cùng")
     public void csvFileChooserShouldResolveInitialDirectoryFromCurrentFileOrRememberedDirectory() {
         File rememberedDir = new File(System.getProperty("java.io.tmpdir"));
         File currentFile = new File(rememberedDir, "users.csv");
@@ -180,7 +180,7 @@ public class CsvDataPanelTest {
         assertNull(CsvFileChooserDirectoryMemory.resolveInitialDirectory(null, "/path/not-exist/easy-postman-csv"));
     }
 
-    @Test(description = "成功选择 CSV 文件后应记住父目录")
+    @Test(description = "Đã chọn thành công CSV Thư mục mẹ nên được ghi nhớ sau tập tin")
     public void csvFileChooserShouldRememberSelectedFileParentDirectory() {
         File selectedFile = new File(System.getProperty("java.io.tmpdir"), "users.csv");
 

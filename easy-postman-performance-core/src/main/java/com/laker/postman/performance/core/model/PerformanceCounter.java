@@ -3,7 +3,7 @@ package com.laker.postman.performance.core.model;
 import java.util.concurrent.atomic.LongAdder;
 
 /**
- * 单调递增计数器，对应 Micrometer Counter 语义：只记录累计增量，速率由调用方按窗口派生。
+ * Bộ đếm tăng đơn điệu, tương ứng Micrometer Counter Ngữ nghĩa: Chỉ số gia tăng tích lũy mới được ghi lại, tốc độ được người gọi tính theo từng cửa sổ.
  */
 final class PerformanceCounter {
     private final LongAdder count = new LongAdder();

@@ -11,9 +11,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Form-Urlencoded 表格面板组件
- * 专门用于处理 application/x-www-form-urlencoded 类型的请求体数据
- * 支持 Enable、Key、Value 和 Delete 列结构
+ * Form-Urlencoded Thành phần bảng điều khiển
+ * Được thiết kế đặc biệt để xử lý application/x-www-form-urlencoded Loại dữ liệu nội dung yêu cầu
+ * Hỗ trợ Enable、Key、Value và Delete cấu trúc cột
  */
 @Slf4j
 public class FormUrlencodedTablePanel extends AbstractTablePanel<HttpFormUrlencoded> {
@@ -26,17 +26,17 @@ public class FormUrlencodedTablePanel extends AbstractTablePanel<HttpFormUrlenco
     private static final int COL_DELETE = 4;
 
     /**
-     * 构造函数，创建默认的 Form-Urlencoded 表格面板
+     * Trình xây dựng, tạo cái mặc định Form-Urlencoded Bảng điều khiển
      */
     public FormUrlencodedTablePanel() {
         this(true, true);
     }
 
     /**
-     * 构造函数，支持自定义配置
+     * Trình xây dựng, hỗ trợ cấu hình tùy chỉnh
      *
-     * @param popupMenuEnabled     是否启用右键菜单
-     * @param autoAppendRowEnabled 是否启用自动补空行
+     * @param popupMenuEnabled     Có bật menu chuột phải hay không
+     * @param autoAppendRowEnabled Có bật tự động điền dòng trống hay không
      */
     public FormUrlencodedTablePanel(boolean popupMenuEnabled, boolean autoAppendRowEnabled) {
         super(new String[]{
@@ -62,7 +62,7 @@ public class FormUrlencodedTablePanel extends AbstractTablePanel<HttpFormUrlenco
         addRow();
     }
 
-    // ========== 实现抽象方法 ==========
+    // ========== Thực hiện các phương pháp trừu tượng ==========
 
     @Override
     protected int getEnabledColumnIndex() {
@@ -102,13 +102,13 @@ public class FormUrlencodedTablePanel extends AbstractTablePanel<HttpFormUrlenco
         return !key.isEmpty() || !value.isEmpty() || !description.isEmpty();
     }
 
-    // ========== 初始化方法 ==========
+    // ========== Phương pháp khởi tạo ==========
     @Override
     protected void initializeTableUI() {
-        // 调用父类的通用UI配置
+        // Gọi hàm chung của lớp chaUIcấu hình
         super.initializeTableUI();
 
-        // 设置列宽
+        // Đặt chiều rộng cột
         setEnabledColumnWidth(40);
         setDeleteColumnWidth();
 
@@ -130,8 +130,8 @@ public class FormUrlencodedTablePanel extends AbstractTablePanel<HttpFormUrlenco
     }
 
     /**
-     * 从 tableModel 直接读取，不停止单元格编辑。
-     * 用于 tab 指示器等后台场景，避免打断用户正在进行的输入（如 Tab 导航）。
+     * Từ tableModel Đọc trực tiếp mà không dừng chỉnh sửa ô.
+     * Được sử dụng cho tab Các cảnh nền như chỉ báo để tránh làm gián đoạn quá trình nhập liệu đang diễn ra của người dùng (ví dụ: Tab điều hướng).
      */
     public List<HttpFormUrlencoded> getFormDataListFromModel() {
         List<HttpFormUrlencoded> dataList = new ArrayList<>();

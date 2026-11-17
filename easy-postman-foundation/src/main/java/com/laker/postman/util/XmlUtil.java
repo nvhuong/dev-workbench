@@ -16,7 +16,7 @@ import org.xml.sax.InputSource;
 @UtilityClass
 public class XmlUtil {
     /**
-     * 判断字符串是否为合法 XML
+     * Xác định xem chuỗi có hợp pháp hay không XML
      */
     public static boolean isXml(String str) {
         if (str == null || str.trim().isEmpty()) return false;
@@ -32,7 +32,7 @@ public class XmlUtil {
     }
 
     /**
-     * 格式化 XML 字符串，避免重复插入空白行
+     * Định dạng XML Chuỗi để tránh chèn nhiều lần các dòng trống
      */
     public static String formatXml(String xml) {
         if (!isXml(xml)) return xml;
@@ -50,7 +50,7 @@ public class XmlUtil {
 
             StringWriter writer = new StringWriter();
             transformer.transform(new DOMSource(document), new StreamResult(writer));
-            // 去除多余空白行
+            // Loại bỏ các dòng trống thừa
             String result = writer.toString().replaceAll("(?m)^\s*$", "");
             return result.trim();
         } catch (Exception e) {

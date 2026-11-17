@@ -1,17 +1,17 @@
 package com.laker.postman.ioc;
 
 /**
- * Bean初始化接口
- * 实现此接口的Bean会在属性注入完成后自动调用afterPropertiesSet方法
- * 这是@PostConstruct注解的接口方式替代
+ * BeanKhởi tạo giao diện
+ * Thực hiện giao diện nàyBeanSẽ được gọi tự động sau khi việc tiêm thuộc tính hoàn tấtafterPropertiesSetphương pháp
+ * Đây là@PostConstructPhương thức giao diện thay thế cho chú thích
  */
 public interface InitializingBean {
-    
+
     /**
-     * Bean的所有属性被设置后调用
-     * 可以用于初始化资源、验证配置等
-     * 
-     * @throws Exception 如果初始化失败
+     * BeanĐược gọi sau khi tất cả thuộc tính đã được thiết lập
+     * Có thể được sử dụng để khởi tạo tài nguyên, xác minh cấu hình, v.v
+     *
+     * @throws Exception Nếu khởi tạo không thành công
      */
     void afterPropertiesSet() throws Exception;
 }

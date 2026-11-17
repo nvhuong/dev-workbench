@@ -10,9 +10,9 @@ import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 /**
- * 请求编辑器数据控制器。
+ * Yêu cầu bộ điều khiển dữ liệu biên tập.
  * <p>
- * 负责当前请求 ID、名称、协议、延迟初始化 pending 数据、原始请求基线和表单草稿收集。
+ * Chịu trách nhiệm về yêu cầu hiện tại ID、Tên, giao thức, khởi tạo lười biếng pending Dữ liệu, đường cơ sở yêu cầu ban đầu và bộ sưu tập dự thảo biểu mẫu.
  */
 final class RequestEditorDataController {
     private final RequestItemProtocolEnum baseProtocol;

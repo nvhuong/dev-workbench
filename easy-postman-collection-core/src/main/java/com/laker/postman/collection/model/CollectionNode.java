@@ -11,8 +11,8 @@ import java.util.List;
 @Data
 public class CollectionNode {
     private final CollectionNodeType type;
-    private final Object data; // RequestGroup 或 HttpRequestItem
-    private final List<CollectionNode> children; // 仅对分组类型有效
+    private final Object data; // RequestGroup hoặc HttpRequestItem
+    private final List<CollectionNode> children; // Chỉ hợp lệ cho các loại nhóm
 
     public CollectionNode(CollectionNodeType type, Object data) {
         this.type = type;

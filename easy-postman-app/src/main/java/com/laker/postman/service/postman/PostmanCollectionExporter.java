@@ -32,17 +32,17 @@ import static com.laker.postman.request.model.RequestBodyTypes.BODY_TYPE_FORM_UR
 import static com.laker.postman.request.model.RequestBodyTypes.BODY_TYPE_RAW;
 
 /**
- * Postman Collection导出器
- * 负责将内部数据结构导出为Postman Collection格式（v2.1格式）
+ * Postman CollectionNhà xuất khẩu
+ * Chịu trách nhiệm xuất cấu trúc dữ liệu nội bộ dưới dạngPostman Collectionđịnh dạng (v2.1định dạng)
  */
 @UtilityClass
 public class PostmanCollectionExporter {
 
     /**
-     * 从树节点递归构建 Postman Collection v2.1 JSON
+     * Xây dựng đệ quy từ các nút cây Postman Collection v2.1 JSON
      *
-     * @param groupNode 分组节点
-     * @param groupName 分组名（如果根节点有 RequestGroup，会使用其名称）
+     * @param groupNode Các nút nhóm
+     * @param groupName Tên nhóm (nếu nút gốc có RequestGroup，sẽ sử dụng tên của nó)
      * @return Postman Collection v2.1 JSONObject
      */
     public static JSONObject buildPostmanCollectionFromTreeNode(DefaultMutableTreeNode groupNode, String groupName) {
@@ -58,14 +58,14 @@ public class PostmanCollectionExporter {
         info.put("name", groupName);
         info.put("schema", "https://schema.getpostman.com/json/collection/v2.1.0/collection.json");
 
-        // 导出集合描述
+        // Xuất mô tả bộ sưu tập
         if (rootGroup != null && rootGroup.getDescription() != null && !rootGroup.getDescription().isEmpty()) {
             info.put("description", rootGroup.getDescription());
         }
 
         collection.put("info", info);
 
-        // 导出集合级别的认证（从根节点）
+        // Xuất chứng chỉ cấp bộ sưu tập (từ nút gốc)
         if (rootGroup != null && rootGroup.hasAuth()) {
             JSONObject auth = authJson(
                     rootGroup.getAuthType(),
@@ -81,7 +81,7 @@ public class PostmanCollectionExporter {
             }
         }
 
-        // 导出集合级别的脚本（从根节点）
+        // Xuất tập lệnh cấp bộ sưu tập (từ nút gốc)
         if (rootGroup != null && (rootGroup.hasPreScript() || rootGroup.hasPostScript())) {
             JSONArray events = new JSONArray();
             if (rootGroup.hasPreScript()) {
@@ -105,7 +105,7 @@ public class PostmanCollectionExporter {
             collection.put("event", events);
         }
 
-        // 导出集合级别的变量（从根节点）
+        // Xuất các biến cấp độ bộ sưu tập (từ nút gốc)
         if (rootGroup != null && rootGroup.hasVariables()) {
             JSONArray variables = new JSONArray();
             for (Variable variable : rootGroup.getVariables()) {
@@ -125,7 +125,7 @@ public class PostmanCollectionExporter {
     }
 
     /**
-     * 递归构建 Postman items 数组
+     * Xây dựng đệ quy Postman items mảng
      */
     private static JSONArray buildPostmanItemsFromNode(DefaultMutableTreeNode node) {
         JSONArray items = new JSONArray();
@@ -193,14 +193,14 @@ public class PostmanCollectionExporter {
     }
 
     /**
-     * HttpRequestItem 转 Postman 单请求 item
+     * HttpRequestItem thay đổi Postman Yêu cầu duy nhất item
      */
     public static JSONObject toPostmanItem(HttpRequestItem item) {
         JSONObject postmanItem = new JSONObject();
         postmanItem.put("name", item.getName());
         JSONObject request = new JSONObject();
 
-        // 导出请求描述
+        // Mô tả yêu cầu xuất
         if (item.getDescription() != null && !item.getDescription().isEmpty()) {
             request.put("description", item.getDescription());
         }
@@ -241,7 +241,7 @@ public class PostmanCollectionExporter {
             }
         } catch (Exception ignore) {
         }
-        // 额外合并 params
+        // Sự hợp nhất bổ sung params
         if (item.getParamsList() != null && !item.getParamsList().isEmpty()) {
             JSONArray queryArr = url.containsKey("query") ? url.getJSONArray("query") : new JSONArray();
             for (HttpParam param : item.getParamsList()) {
@@ -338,7 +338,7 @@ public class PostmanCollectionExporter {
             request.put("auth", auth);
         }
         postmanItem.put("request", request);
-        // 脚本 event
+        // kịch bản event
         JSONArray events = new JSONArray();
         if (item.getPrescript() != null && !item.getPrescript().isEmpty()) {
             JSONObject pre = new JSONObject();
@@ -362,7 +362,7 @@ public class PostmanCollectionExporter {
             postmanItem.put("event", events);
         }
 
-        // 导出 response（Postman 的 Examples/Saved Responses）
+        // Xuất khẩu response（Postman của Examples/Saved Responses）
         if (item.getResponse() != null && !item.getResponse().isEmpty()) {
             JSONArray responsesArray = new JSONArray();
             for (SavedResponse savedResp : item.getResponse()) {
@@ -431,12 +431,12 @@ public class PostmanCollectionExporter {
     }
 
     /**
-     * 将 SavedResponse 转换为 Postman 响应格式
+     * Sẽ SavedResponse Chuyển đổi sang  Postman Định dạng phản hồi
      */
     private static JSONObject toPostmanResponse(SavedResponse savedResp) {
         JSONObject respJson = new JSONObject();
 
-        // 基本信息
+        // Thông tin cơ bản
         respJson.put("name", savedResp.getName());
         respJson.put("status", savedResp.getStatus());
         respJson.put("code", savedResp.getCode());
@@ -445,7 +445,7 @@ public class PostmanCollectionExporter {
             respJson.put("_postman_previewlanguage", savedResp.getPreviewLanguage());
         }
 
-        // 响应头
+        // tiêu đề phản hồi
         if (savedResp.getHeaders() != null && !savedResp.getHeaders().isEmpty()) {
             JSONArray headersArray = new JSONArray();
             for (HttpHeader header : savedResp.getHeaders()) {
@@ -457,19 +457,19 @@ public class PostmanCollectionExporter {
             respJson.put("header", headersArray);
         }
 
-        // Cookies (如果有)
+        // Cookies (Nếu vậy)
         if (savedResp.getCookies() != null && !savedResp.getCookies().isEmpty()) {
             JSONArray cookiesArray = new JSONArray();
-            // Postman cookie 格式可以在这里添加
+            // Postman cookie Định dạng có thể được thêm vào đây
             respJson.put("cookie", cookiesArray);
         }
 
-        // 响应体
+        // cơ quan phản ứng
         if (savedResp.getBody() != null) {
             respJson.put("body", savedResp.getBody());
         }
 
-        // 原始请求信息
+        // Thông tin yêu cầu ban đầu
         if (savedResp.getOriginalRequest() != null) {
             SavedResponse.OriginalRequest origReq = savedResp.getOriginalRequest();
             JSONObject originalRequest = new JSONObject();
@@ -480,7 +480,7 @@ public class PostmanCollectionExporter {
             JSONObject url = new JSONObject();
             url.put("raw", origReq.getUrl());
 
-            // 解析 URL 的各个部分
+            // phân tích URL các bộ phận khác nhau của
             try {
                 java.net.URI uri = new java.net.URI(origReq.getUrl());
                 if (uri.getScheme() != null) {
@@ -497,7 +497,7 @@ public class PostmanCollectionExporter {
             } catch (Exception ignore) {
             }
 
-            // Query 参数
+            // Query các thông số
             if (origReq.getParams() != null && !origReq.getParams().isEmpty()) {
                 JSONArray queryArray = new JSONArray();
                 for (HttpParam param : origReq.getParams()) {
@@ -515,7 +515,7 @@ public class PostmanCollectionExporter {
 
             originalRequest.put("url", url);
 
-            // 请求头
+            // Tiêu đề yêu cầu
             if (origReq.getHeaders() != null && !origReq.getHeaders().isEmpty()) {
                 JSONArray headersArray = new JSONArray();
                 for (HttpHeader header : origReq.getHeaders()) {
@@ -530,7 +530,7 @@ public class PostmanCollectionExporter {
                 originalRequest.put("header", headersArray);
             }
 
-            // 请求体
+            // Request body
             if (origReq.getBodyType() != null && !origReq.getBodyType().isEmpty()) {
                 JSONObject body = new JSONObject();
                 String bodyType = origReq.getBodyType();

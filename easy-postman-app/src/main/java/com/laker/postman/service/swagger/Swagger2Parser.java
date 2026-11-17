@@ -28,7 +28,7 @@ import static com.laker.postman.request.model.RequestBodyTypes.BODY_TYPE_FORM_UR
 import static com.laker.postman.request.model.RequestBodyTypes.BODY_TYPE_RAW;
 
 /**
- * Swagger 2.0 格式解析器
+ * Swagger 2.0 Trình phân tích cú pháp định dạng
  */
 @Slf4j
 @UtilityClass
@@ -50,13 +50,13 @@ class Swagger2Parser {
         String host = swaggerRoot.getStr("host", "");
         if (!host.isEmpty()) {
             baseUrl = "{{baseUrl}}";
-            log.debug("检测到 host 配置，请求URL将使用 {{{{baseUrl}}}} 变量");
+            log.debug("được phát hiện host Cấu hình, yêu cầuURLsẽ được sử dụng {{{{baseUrl}}}} các biến");
         }
 
         JSONObject securityDefsMap = swaggerRoot.getJSONObject("securityDefinitions");
         JSONObject paths = swaggerRoot.getJSONObject("paths");
         if (paths == null || paths.isEmpty()) {
-            log.warn("Swagger 2.0 文件中没有定义任何路径");
+            log.warn("Swagger 2.0 Không có đường dẫn nào được xác định trong tệp");
             return result;
         }
 
@@ -327,7 +327,7 @@ class Swagger2Parser {
     private static void parseSchemesToEnvironments(JSONObject swaggerRoot, CollectionParseResult result, String apiTitle) {
         String host = swaggerRoot.getStr("host", "");
         if (host.isEmpty()) {
-            log.debug("Swagger 2.0 文件中没有定义 host，跳过环境变量创建");
+            log.debug("Swagger 2.0 Không có định nghĩa trong tập tin host，Bỏ qua việc tạo biến môi trường");
             return;
         }
 
@@ -338,7 +338,7 @@ class Swagger2Parser {
             schemes.add("http");
         }
 
-        log.info("解析到 {} 个协议方案，将创建对应的环境变量", schemes.size());
+        log.info("được phân tích cú pháp thành {} Đối với mỗi sơ đồ giao thức, các biến môi trường tương ứng sẽ được tạo", schemes.size());
         for (int i = 0; i < schemes.size(); i++) {
             String scheme = schemes.getStr(i);
             StringBuilder urlBuilder = new StringBuilder(scheme);

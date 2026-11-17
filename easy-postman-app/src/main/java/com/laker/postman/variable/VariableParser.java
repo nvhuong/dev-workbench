@@ -8,9 +8,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * 变量解析工具类
+ * Lớp công cụ phân tích cú pháp biến
  * <p>
- * 负责解析字符串中的变量占位符 {{variableName}}
+ * Chịu trách nhiệm phân tích các phần giữ chỗ biến trong chuỗi {{variableName}}
  */
 @UtilityClass
 public class VariableParser {
@@ -18,10 +18,10 @@ public class VariableParser {
     private static final Pattern VARIABLE_PATTERN = Pattern.compile("\\{\\{([^}]+)}}");
 
     /**
-     * 获取字符串中的变量段
+     * Lấy đoạn biến trong chuỗi
      *
-     * @param value 包含变量的字符串
-     * @return 变量段列表
+     * @param value Một chuỗi chứa các biến
+     * @return Danh sách các phân đoạn có thể thay đổi
      */
     public static List<VariableSegment> getVariableSegments(String value) {
         List<VariableSegment> segments = new ArrayList<>();

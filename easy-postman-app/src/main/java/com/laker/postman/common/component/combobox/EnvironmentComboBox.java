@@ -61,7 +61,7 @@ public class EnvironmentComboBox extends MenuBarComboBox<EnvironmentItem> {
     }
 
     /**
-     * 选中指定环境
+     * Chọn Chỉ định môi trường
      */
     public void setSelectedEnvironment(Environment env) {
         if (env == null || env.getId() == null) return;

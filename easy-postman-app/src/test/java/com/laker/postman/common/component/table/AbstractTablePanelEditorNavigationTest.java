@@ -52,14 +52,14 @@ public class AbstractTablePanelEditorNavigationTest extends AbstractSwingUiTest 
             assertTrue(table.isEditing());
 
             JTextArea textArea = findVisibleTextArea(table.getEditorComponent());
-            assertNotNull(textArea, "长值应使用当前可见的 JTextArea 编辑");
+            assertNotNull(textArea, "Các giá trị dài nên sử dụng giá trị hiện có JTextArea Chỉnh sửa");
 
             InputMap inputMap = textArea.getInputMap(JComponent.WHEN_FOCUSED);
             Object nextActionKey = inputMap.get(KeyStroke.getKeyStroke(KeyEvent.VK_TAB, 0));
             Object previousActionKey = inputMap.get(
                     KeyStroke.getKeyStroke(KeyEvent.VK_TAB, InputEvent.SHIFT_DOWN_MASK));
-            assertNotNull(nextActionKey, "Tab 应绑定到表格单元格导航");
-            assertNotNull(previousActionKey, "Shift+Tab 应绑定到表格单元格导航");
+            assertNotNull(nextActionKey, "Tab Nên được liên kết với điều hướng ô của bảng");
+            assertNotNull(previousActionKey, "Shift+Tab Nên được liên kết với điều hướng ô của bảng");
 
             Action nextAction = textArea.getActionMap().get(nextActionKey);
             assertNotNull(nextAction);

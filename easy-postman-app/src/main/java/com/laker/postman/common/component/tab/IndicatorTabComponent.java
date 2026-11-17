@@ -7,59 +7,59 @@ import javax.swing.*;
 import java.awt.*;
 
 /**
- * 带指示器的Tab头组件
- * 支持在Tab标题后显示状态指示器（绿点），用于标识该Tab是否有内容
- * 类似 Postman 的 标签效果
+ * Với chỉ sốTabThành phần tiêu đề
+ * Đã có hỗ trợTabChỉ báo trạng thái (dấu chấm màu xanh lá cây) xuất hiện sau tiêu đề để xác định điều nàyTabCó nội dung hay không
+ * Tương tự Postman của hiệu ứng nhãn
  */
 @Slf4j
 public class IndicatorTabComponent extends JPanel {
-    private static final int INDICATOR_DIAMETER = 6; // 指示器直径
-    private static final int INDICATOR_SPACING = 6; // 指示器与文字之间的间距
-    private static final int LABEL_HORIZONTAL_PADDING = 6; // Label 左右内边距
-    private static final int LABEL_VERTICAL_PADDING = 4; // Label 上下内边距
-    private static final int INDICATOR_STROKE_MARGIN = 1; // drawOval 右/下边框占用
+    private static final int INDICATOR_DIAMETER = 6; // Đường kính chỉ báo
+    private static final int INDICATOR_SPACING = 6; // Khoảng cách giữa chỉ báo và văn bản
+    private static final int LABEL_HORIZONTAL_PADDING = 6; // Label Đệm trái và phải
+    private static final int LABEL_VERTICAL_PADDING = 4; // Label Đệm trên và dưới
+    private static final int INDICATOR_STROKE_MARGIN = 1; // drawOval Đúng/Biên giới phía dưới đã bị chiếm đóng
 
     private final String title;
-    private boolean showIndicator = false; // 是否显示指示器
+    private boolean showIndicator = false; // Có hiển thị chỉ báo hay không
     private final Font font;
 
     /**
-     * 创建一个带指示器的Tab组件
+     * Tạo một cái có chỉ báoTabthành phần
      *
-     * @param title Tab标题
+     * @param title Tabtiêu đề
      */
     public IndicatorTabComponent(String title) {
         this.title = title;
         this.font = FontsUtil.getDefaultFont(Font.PLAIN);
         setOpaque(false);
-        // 设置初始大小
+        // Đặt kích thước ban đầu
         updatePreferredSize();
     }
 
     /**
-     * 设置是否显示指示器
+     * Đặt xem có hiển thị chỉ báo hay không
      *
-     * @param show true 显示绿点，false 隐藏绿点
+     * @param show true Một chấm màu xanh lá cây được hiển thị.false Ẩn dấu chấm màu xanh lá cây
      */
     public void setShowIndicator(boolean show) {
         if (this.showIndicator != show) {
             this.showIndicator = show;
-            // 重新计算大小，根据绿点显示状态动态调整宽度
+            // Tính toán lại kích thước và tự động điều chỉnh độ rộng theo trạng thái hiển thị chấm xanh
             updatePreferredSize();
             repaint();
         }
     }
 
     /**
-     * 更新组件的首选大小
-     * 根据是否显示指示器动态计算宽度
+     * Cập nhật kích thước ưa thích của thành phần
+     * Chiều rộng được tính toán linh hoạt dựa trên việc chỉ báo có được hiển thị hay không
      */
     private void updatePreferredSize() {
         FontMetrics fm = getFontMetrics(font);
         int textWidth = fm.stringWidth(title);
         int width = textWidth + LABEL_HORIZONTAL_PADDING * 2;
 
-        // 只有在显示指示器时才增加指示器的宽度
+        // Chỉ tăng chiều rộng của chỉ báo khi nó được hiển thị
         if (showIndicator) {
             width += INDICATOR_DIAMETER + INDICATOR_STROKE_MARGIN + INDICATOR_SPACING;
         }
@@ -77,42 +77,42 @@ public class IndicatorTabComponent extends JPanel {
 
         Graphics2D g2 = (Graphics2D) g.create();
         try {
-            // 启用抗锯齿
+            // Kích hoạt tính năng khử răng cưa
             g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
             g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 
-            // 设置字体和颜色
+            // Đặt phông chữ và màu sắc
             g2.setFont(font);
             g2.setColor(getForeground());
 
-            // 计算文字尺寸
+            // Tính kích thước văn bản
             FontMetrics fm = g2.getFontMetrics();
             int textHeight = fm.getAscent();
 
-            // 组件的总高度
+            // Tổng chiều cao của thành phần
             int totalHeight = getHeight();
 
-            // 文字从左边开始绘制（加上padding）
+            // Văn bản được vẽ bắt đầu từ bên trái (cộngpadding）
             int textX = LABEL_HORIZONTAL_PADDING;
 
-            // 文字垂直居中
+            // Văn bản được căn giữa theo chiều dọc
             int textY = (totalHeight - fm.getHeight()) / 2 + textHeight;
 
-            // 绘制文字
+            // Vẽ văn bản
             g2.drawString(title, textX, textY);
 
-            // 如果需要显示指示器
+            // Hiển thị chỉ báo nếu được yêu cầu
             if (showIndicator) {
                 int textWidth = fm.stringWidth(title);
-                // 指示器在文字右侧
+                // Chỉ báo nằm ở bên phải của văn bản
                 int indicatorX = textX + textWidth + INDICATOR_SPACING;
                 int indicatorY = (totalHeight - INDICATOR_DIAMETER) / 2;
 
-                // 绘制绿色圆点
+                // Vẽ các chấm màu xanh lá cây
                 g2.setColor(IndicatorTabTheme.indicator());
                 g2.fillOval(indicatorX, indicatorY, INDICATOR_DIAMETER, INDICATOR_DIAMETER);
 
-                // 添加一个微妙的边框使其更明显
+                // Thêm một đường viền tinh tế để làm cho nó dễ nhìn hơn
                 g2.setColor(IndicatorTabTheme.indicatorBorder());
                 g2.drawOval(indicatorX, indicatorY, INDICATOR_DIAMETER, INDICATOR_DIAMETER);
             }

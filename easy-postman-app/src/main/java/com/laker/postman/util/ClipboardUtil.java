@@ -8,7 +8,7 @@ public final class ClipboardUtil {
     }
 
     /**
-     * 检查剪贴板是否有 cURL 命令，有则返回文本，否则返回 null。
+     * Kiểm tra xem clipboard có ở đó không cURL lệnh, nếu có, trả về văn bản, nếu không thì trả về null。
      */
     public static CompletableFuture<String> getClipboardCurlTextAsync() {
         return AsyncClipboardUtil.readStringAsync().thenApply(ClipboardUtil::extractCurlText);

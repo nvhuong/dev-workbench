@@ -9,7 +9,7 @@ import javax.swing.*;
 import java.awt.*;
 
 /**
- * 编辑按钮
+ * Nút chỉnh sửa
  */
 public class EditButton extends JButton {
     public EditButton() {

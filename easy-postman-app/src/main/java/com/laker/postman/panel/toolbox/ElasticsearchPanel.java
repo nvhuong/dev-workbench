@@ -98,12 +98,12 @@ import java.util.Map;
 import java.util.UUID;
 
 /**
- * Elasticsearch 可视化 CRUD + DSL 工具面板
+ * Elasticsearch Trực quan hóa CRUD + DSL Bảng công cụ
  */
 @Slf4j
 public class ElasticsearchPanel extends JPanel {
 
-    // ===== 连接 =====
+    // ===== kết nối =====
     private JComboBox<ElasticsearchConnectionProfile> profileCombo;
     private JButton newProfileBtn;
     private JButton saveProfileBtn;
@@ -118,13 +118,13 @@ public class ElasticsearchPanel extends JPanel {
     private JButton connectBtn;
     private JButton testConnectionBtn;
     private JButton disconnectBtn;
-    private CardLayout btnCardLayout;   // 用于在 connectBtn/disconnectBtn 之间切换
+    private CardLayout btnCardLayout;   // Được sử dụng trong connectBtn/disconnectBtn chuyển đổi giữa
     private JPanel btnCard;
     private final ElasticsearchConnectionProfileStore connectionProfileStore =
             new ElasticsearchConnectionProfileStore();
     private boolean loadingConnectionProfiles;
 
-    // ===== 索引管理 =====
+    // ===== Quản lý chỉ số =====
     private DefaultListModel<String> indexListModel;
     private DefaultListModel<String> indexFilteredModel;
     private JList<String> indexList;
@@ -136,11 +136,11 @@ public class ElasticsearchPanel extends JPanel {
     private boolean loadingIndices;
     private SearchTextField indexSearchField;
     /**
-     * indexName -> docCount (从 _cat/indices 解析)
+     * indexName -> docCount (Từ _cat/indices phân tích)
      */
     private final Map<String, Long> indexDocCountMap = new LinkedHashMap<>();
 
-    // ===== DSL 编辑器 =====
+    // ===== DSL Biên tập viên =====
     private JComboBox<String> templateCombo;
     private JComboBox<String> methodCombo;
     private JTextField pathField;
@@ -149,7 +149,7 @@ public class ElasticsearchPanel extends JPanel {
     private SearchableTextArea searchableResultArea;
     private SearchableTextArea searchableDslArea;
 
-    // ===== 结果表格 =====
+    // ===== Bảng kết quả =====
     private EnhancedTablePanel enhancedTable;
     private EnhancedTablePanel aggTable;
     private JTabbedPane resultTabs;
@@ -157,10 +157,10 @@ public class ElasticsearchPanel extends JPanel {
     private JLabel hitsInfoLabel;
     private CompactPrimaryButton executeBtn;
 
-    // ===== 请求历史 =====
+    // ===== Yêu cầu lịch sử =====
     private static final int MAX_HISTORY = 20;
     /**
-     * 每条记录格式: "METHOD PATH\nBODY"
+     * Mỗi định dạng bản ghi: "METHOD PATH\nBODY"
      */
     private final Deque<HistoryEntry> requestHistory = new ArrayDeque<>();
     private DefaultListModel<HistoryEntry> historyListModel;
@@ -170,7 +170,7 @@ public class ElasticsearchPanel extends JPanel {
     private String authHeader = null;
     private boolean connected = false;
 
-    // ===== 常量 =====
+    // ===== không thay đổi =====
     private static final String SEARCH_PATH = "/{index}/_search";
     private static final String HTTP_DELETE = "DELETE";
     private static final String CLUSTER_HEALTH_PATH = "/_cluster/health";
@@ -195,7 +195,7 @@ public class ElasticsearchPanel extends JPanel {
     private static final int FIELD_GROUP_MIN_WIDTH = 110;
     private static final int FIELD_GROUP_PREF_WIDTH = 200;
 
-    // ===== 内置 DSL 模板 =====
+    // ===== Tích hợp sẵn DSL bản mẫu =====
     private static final String[][] DSL_TEMPLATES = {
             {"toolbox.es.tpl.match_all", "GET", SEARCH_PATH,
                     "{\n  \"query\": {\n    \"match_all\": {}\n  },\n  \"size\": 60\n}"},
@@ -230,7 +230,7 @@ public class ElasticsearchPanel extends JPanel {
                     "{\n  \"script\": {\n    \"source\": \"ctx._source.status = 'updated'\"\n  },\n  \"query\": {\n    \"match_all\": {}\n  }\n}"},
     };
 
-    // ===== 历史记录条目 =====
+    // ===== Mục nhập lịch sử =====
     @RequiredArgsConstructor
     private static class HistoryEntry {
         final String method;
@@ -264,10 +264,10 @@ public class ElasticsearchPanel extends JPanel {
         setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
         ToolWindowSurfaceStyle.applyCard(this);
 
-        // 顶部连接栏
+        // Thanh kết nối phía trên
         add(buildConnectionPanel(), BorderLayout.NORTH);
 
-        // 主内容区：左侧（索引+历史）+ 右侧 DSL
+        // Khu vực nội dung chính: bên trái (index+lịch sử)+ bên phải DSL
         JSplitPane mainSplit = AppToolWindowChrome.createHorizontalInnerSplitPane(
                 buildLeftPanel(),
                 buildDslPanel(),
@@ -280,7 +280,7 @@ public class ElasticsearchPanel extends JPanel {
         respStatusLabel.setText(I18nUtil.getMessage(MessageKeys.TOOLBOX_ES_STATUS_NOT_CONNECTED));
     }
 
-    // ===== 连接面板 =====
+    // ===== Kết nối bảng điều khiển =====
     private JPanel buildConnectionPanel() {
         JPanel panel = new JPanel(new BorderLayout());
         ToolWindowSurfaceStyle.applySectionHeader(panel, 3, 6, 3, 6);
@@ -343,7 +343,7 @@ public class ElasticsearchPanel extends JPanel {
         testConnectionBtn.setToolTipText(I18nUtil.getMessage(MessageKeys.TOOLBOX_ES_TEST_CONNECTION_TOOLTIP));
         testConnectionBtn.addActionListener(e -> testConnection());
 
-        // 用 CardLayout 将 connectBtn / disconnectBtn 叠放在同一格，切换时不留空白
+        // Sử dụng CardLayout Sẽ connectBtn / disconnectBtn Xếp chồng lên nhau trong cùng một lưới, không còn khoảng trống khi chuyển đổi
         btnCardLayout = new CardLayout();
         btnCard = new JPanel(btnCardLayout);
         btnCard.setOpaque(false);
@@ -373,7 +373,7 @@ public class ElasticsearchPanel extends JPanel {
         actions.add(testConnectionBtn, buttonHeight);
         actions.add(btnCard, buttonHeight);
 
-        // 与 Kafka/Redis 一致：两行共用同一网格，各列左右边缘对齐；地址跨列，密码框跨列与连接按钮右对齐。
+        // Và Kafka/Redis Nhất quán: Hai hàng dùng chung một lưới và các cạnh trái và phải của mỗi cột được căn chỉnh; địa chỉ kéo dài cột, hộp mật khẩu kéo dài cột và nút kết nối được căn phải.
         connectionForm = new JPanel(new MigLayout(
                 "insets 0, novisualpadding, gapy 4",
                 growFieldColumns(PROFILE_GROUP_MIN_WIDTH, PROFILE_GROUP_PREF_WIDTH) + GROUP_GAP
@@ -385,14 +385,14 @@ public class ElasticsearchPanel extends JPanel {
         ));
         connectionForm.setOpaque(false);
 
-        // 第 1 行：配置 + 地址 + 操作
+        // KHÔNG.  1 Dòng: cấu hình + địa chỉ + hoạt động
         connectionForm.add(ConnectionToolbarUi.label(I18nUtil.getMessage(MessageKeys.TOOLBOX_ES_PROFILE)));
         connectionForm.add(profileGroup, controlHeight);
         connectionForm.add(ConnectionToolbarUi.label(I18nUtil.getMessage(MessageKeys.TOOLBOX_ES_HOST)));
         connectionForm.add(hostField, "span 3, growx, " + controlHeight);
         connectionForm.add(actions, "right, wrap");
 
-        // 第 2 行：认证
+        // KHÔNG.  2 Dòng: Xác thực
         JLabel userLabel = ConnectionToolbarUi.label(I18nUtil.getMessage(MessageKeys.TOOLBOX_ES_USER));
         JLabel passLabel = ConnectionToolbarUi.label(I18nUtil.getMessage(MessageKeys.TOOLBOX_ES_PASS));
         connectionForm.add(ConnectionToolbarUi.label(I18nUtil.getMessage(MessageKeys.TOOLBOX_ES_AUTH)));
@@ -416,7 +416,7 @@ public class ElasticsearchPanel extends JPanel {
     }
 
     /**
-     * 标签列按本列最长标签自适应；字段列窄窗口可压缩到 min，宽窗口均分多余空间，最多拉伸到 2 倍。
+     * Cột nhãn thích ứng theo nhãn dài nhất trong cột; cửa sổ hẹp của cột trường có thể được nén thành min，Cửa sổ rộng chia đều không gian thừa, kéo dài tới 2 lần.
      */
     private static String growFieldColumns(int minWidth, int prefWidth) {
         return "[pref!,right]4[" + minWidth + ":" + prefWidth + ":" + (prefWidth * 2) + ",fill,grow,shrink]";
@@ -641,7 +641,7 @@ public class ElasticsearchPanel extends JPanel {
     }
 
     /**
-     * 无认证时禁用（而非隐藏）用户名与密码：布局保持稳定，用户也能看到切换认证方式后可填写哪些项。
+     * Vô hiệu hóa (thay vì ẩn) tên người dùng và mật khẩu mà không cần xác thực: bố cục vẫn ổn định và người dùng có thể xem trường nào có thể điền sau khi chuyển đổi phương thức xác thực.
      */
     private void setAuthFieldsEnabled(boolean enabled) {
         if (authComponents == null) {
@@ -667,7 +667,7 @@ public class ElasticsearchPanel extends JPanel {
         return ElasticsearchConnectionProfileStore.normalizeHostHistory(existingHistory, activeHost);
     }
 
-    // ===== 左侧面板：索引管理 + 历史记录（JTabbedPane）=====
+    // ===== Bảng bên trái: Quản lý chỉ mục + Lịch sử (JTabbedPane）=====
     private JPanel buildLeftPanel() {
         JPanel wrapper = new JPanel(new BorderLayout());
         wrapper.setOpaque(false);
@@ -683,7 +683,7 @@ public class ElasticsearchPanel extends JPanel {
         return wrapper;
     }
 
-    // ===== 索引管理面板 =====
+    // ===== Bảng quản lý chỉ mục =====
     private JPanel buildIndexPanel() {
         JPanel panel = new JPanel(new BorderLayout(0, 0));
         panel.setBorder(BorderFactory.createEmptyBorder());
@@ -693,11 +693,11 @@ public class ElasticsearchPanel extends JPanel {
         ToolWindowSidebarHeader titleBar = new ToolWindowSidebarHeader(
                 I18nUtil.getMessage(MessageKeys.TOOLBOX_ES_INDEX_MANAGEMENT), refreshIndicesBtn);
 
-        // 搜索框：仅做名称包含过滤，不需要大小写/整词等选项
+        // Hộp tìm kiếm: Chỉ thực hiện lọc bao gồm tên, không yêu cầu viết hoa chữ thường/Toàn bộ từ và các tùy chọn khác
         indexSearchField = new SearchTextField();
         indexSearchField.putClientProperty(FlatClientProperties.TEXT_FIELD_TRAILING_COMPONENT, null);
         indexSearchField.setMaximumSize(new Dimension(Integer.MAX_VALUE, 28));
-        // 索引列表
+        // Danh sách chỉ mục
         indexListModel = new DefaultListModel<>();
         indexFilteredModel = new DefaultListModel<>();
         indexList = new JList<>(indexFilteredModel) {
@@ -738,7 +738,7 @@ public class ElasticsearchPanel extends JPanel {
         ToolWindowSurfaceStyle.applyListScrollPaneCard(listScroll, indexList);
         listScroll.setToolTipText(I18nUtil.getMessage(MessageKeys.TOOLBOX_ES_INDEX_LIST_HINT));
 
-        // 实时过滤
+        // Lọc theo thời gian thực
         indexSearchField.getDocument().addDocumentListener(new DocumentListener() {
             public void insertUpdate(DocumentEvent e) {
                 filterIndices(indexSearchField.getText());
@@ -753,7 +753,7 @@ public class ElasticsearchPanel extends JPanel {
             }
         });
 
-        // 创建索引：名称独占一行，分片/副本/创建按钮共用一行，避免窄侧栏被裁剪
+        // Tạo một chỉ mục: tên trên một dòng, được phân chia/sao chép/Tạo các nút chia sẻ một hàng để ngăn chặn việc cắt bớt các thanh bên hẹp
         JPanel createPanel = new JPanel(new MigLayout(
                 "insets 6 8 6 8, fillx, novisualpadding",
                 "[pref!,right]4[grow,fill]8[pref!,right]4[grow,fill]",
@@ -824,7 +824,7 @@ public class ElasticsearchPanel extends JPanel {
     }
 
     /**
-     * 索引列表 Cell Renderer：索引名 + 右侧文档数
+     * Danh sách chỉ mục Cell Renderer：Tên chỉ mục + Số lượng tài liệu ở bên phải
      */
     private class IndexCellRenderer extends DefaultListCellRenderer {
         @Override
@@ -849,7 +849,7 @@ public class ElasticsearchPanel extends JPanel {
         }
     }
 
-    // ===== 请求历史面板 =====
+    // ===== Yêu cầu bảng lịch sử =====
     private JPanel buildHistoryPanel() {
         JPanel panel = new JPanel(new BorderLayout(0, 0));
 
@@ -901,7 +901,7 @@ public class ElasticsearchPanel extends JPanel {
     }
 
     /**
-     * 历史记录 Cell Renderer
+     * Lịch sử Cell Renderer
      */
     private static class HistoryCellRenderer extends DefaultListCellRenderer {
         @Override
@@ -928,10 +928,10 @@ public class ElasticsearchPanel extends JPanel {
     }
 
     private void addToHistory(String method, String path, String body) {
-        // 去重：相同 method+path+body 不重复加
+        // Chống trùng lặp: Tương tự method+path+body Không thêm nhiều lần
         for (HistoryEntry e : requestHistory) {
             if (e.method.equals(method) && e.path.equals(path) && e.body.equals(body)) {
-                // 移到顶部
+                // Di chuyển lên trên cùng
                 requestHistory.remove(e);
                 requestHistory.addFirst(e);
                 rebuildHistoryListModel();
@@ -982,7 +982,7 @@ public class ElasticsearchPanel extends JPanel {
         JPopupMenu menu = new JPopupMenu();
         ToolWindowSurfaceStyle.applyPopupMenuCard(menu);
 
-        // 复制索引名
+        // Sao chép tên chỉ mục
         JMenuItem copyNameItem = new JMenuItem(I18nUtil.getMessage(MessageKeys.TOOLBOX_ES_INDEX_COPY_NAME));
         copyNameItem.setEnabled(primarySelected != null);
         copyNameItem.addActionListener(e -> {
@@ -997,7 +997,7 @@ public class ElasticsearchPanel extends JPanel {
 
         menu.addSeparator();
 
-        // 查看别名
+        // Xem bí danh
         JMenuItem aliasItem = new JMenuItem(I18nUtil.getMessage(MessageKeys.TOOLBOX_ES_INDEX_VIEW_ALIASES));
         aliasItem.setEnabled(primarySelected != null);
         aliasItem.addActionListener(e -> {
@@ -1084,7 +1084,7 @@ public class ElasticsearchPanel extends JPanel {
     }
 
     /**
-     * 解析 _cat/indices JSON，填充索引列表 Model + 文档数 Map
+     * phân tích _cat/indices JSON，Điền vào danh sách chỉ mục Model + Số lượng tài liệu Map
      */
     private void parseAndFillIndexList(String json) {
         try {
@@ -1097,7 +1097,7 @@ public class ElasticsearchPanel extends JPanel {
                 if (idx != null && !idx.isNull()) {
                     String name = idx.toString().replace("\"", "");
                     indexListModel.addElement(name);
-                    // 解析文档数
+                    // Số lượng tài liệu được phân tích cú pháp
                     JsonNode docsCount = node.get("docs.count");
                     if (docsCount != null && !docsCount.isNull()) {
                         try {
@@ -1111,13 +1111,13 @@ public class ElasticsearchPanel extends JPanel {
         }
     }
 
-    // ===== DSL 编辑 + 结果面板 =====
+    // ===== DSL Chỉnh sửa + Bảng kết quả =====
     private JPanel buildDslPanel() {
         JPanel panel = new JPanel(new BorderLayout(0, 4));
         panel.setOpaque(false);
         panel.setBorder(BorderFactory.createEmptyBorder(0, 4, 0, 0));
 
-        // ---- 工具栏（MigLayout）----
+        // ---- thanh công cụ (MigLayout）----
         JPanel toolBar = new JPanel(new MigLayout("insets 4, fillx", "[][][][]8[][]push", "[]"));
         ToolWindowSurfaceStyle.applySectionHeader(toolBar);
 
@@ -1156,18 +1156,18 @@ public class ElasticsearchPanel extends JPanel {
         toolBar.add(copyBtn);
         toolBar.add(clearBtn);
 
-        // ---- 请求行（MigLayout）----
+        // ---- Dòng yêu cầu (MigLayout）----
         JPanel requestRow = new JPanel(new MigLayout("insets 4 2 4 2, fillx", "[90!][grow,fill][]", "[]"));
         methodCombo = new JComboBox<>(new String[]{"GET", "POST", "PUT", HTTP_DELETE, "HEAD"});
         methodCombo.setPreferredSize(new Dimension(90, ConnectionToolbarUi.FORM_CONTROL_HEIGHT));
-        // Method 颜色渲染
+        // Method Kết xuất màu
         methodCombo.setRenderer(new MethodComboRenderer());
 
         pathField = new JTextField(CLUSTER_HEALTH_PATH);
         pathField.setPreferredSize(new Dimension(400, ConnectionToolbarUi.FORM_CONTROL_HEIGHT));
         pathField.putClientProperty(FlatClientProperties.PLACEHOLDER_TEXT,
                 I18nUtil.getMessage(MessageKeys.TOOLBOX_ES_PATH_PLACEHOLDER));
-        // 路径框回车执行
+        // Nhập vào ô đường dẫn để thực hiện
         pathField.addActionListener(e -> executeRequest());
 
         executeBtn = new CompactPrimaryButton(
@@ -1185,11 +1185,11 @@ public class ElasticsearchPanel extends JPanel {
         topArea.add(requestRow, BorderLayout.CENTER);
         panel.add(topArea, BorderLayout.NORTH);
 
-        // ---- 主分割：DSL 编辑器(上) + 结果(下) ----
-        // DSL 编辑器 - 参考 RequestBodyPanel，可编辑，用 SearchableTextArea 包装（启用搜索替换）
+        // ---- Bộ phận chính:DSL Biên tập viên(thượng đẳng) + kết quả(Xuống) ----
+        // DSL Biên tập viên - Tham khảo RequestBodyPanel，Có thể chỉnh sửa, sử dụng SearchableTextArea Gói (cho phép tìm kiếm và thay thế)
         JPanel editorPanel = new JPanel(new BorderLayout());
         editorPanel.setOpaque(false);
-        // DSL 编辑器顶部标题 + 工具按钮（MigLayout）
+        // DSL Tiêu đề ở đầu trình soạn thảo + Nút công cụ (MigLayout）
         JPanel dslHeaderBar = new JPanel(new MigLayout("insets 2 4 2 4, fillx", "[]push", "[]"));
         ToolWindowSurfaceStyle.applySectionHeader(dslHeaderBar);
         JLabel dslLabel = new JLabel(I18nUtil.getMessage(MessageKeys.TOOLBOX_ES_DSL_TITLE));
@@ -1199,16 +1199,16 @@ public class ElasticsearchPanel extends JPanel {
         dslEditor = createJsonEditor(true);
         registerCtrlEnterShortcut(executeBtn);
         dslEditor.setText("{\n  \"query\": {\n    \"match_all\": {}\n  },\n  \"size\": 60\n}");
-        // 参考 RequestBodyPanel：可编辑编辑器使用 SearchableTextArea(area) 包装（启用搜索替换）
+        // Tham khảo RequestBodyPanel：Có thể sử dụng trình soạn thảo có thể chỉnh sửa SearchableTextArea(area) Gói (cho phép tìm kiếm và thay thế)
         searchableDslArea = new SearchableTextArea(dslEditor);
         editorPanel.add(dslHeaderBar, BorderLayout.NORTH);
         editorPanel.add(searchableDslArea, BorderLayout.CENTER);
 
-        // 结果区（Tab: 表格 + 聚合 + 原始 JSON）
+        // Vùng kết quả (Tab: cái bàn + sự polyme hóa + nguyên bản JSON）
         JPanel resultPanel = new JPanel(new BorderLayout());
         resultPanel.setOpaque(false);
 
-        // 响应标题栏（MigLayout）：标题 + hits 统计 + 状态
+        // Thanh tiêu đề đáp ứng (MigLayout）：tiêu đề + hits số liệu thống kê + trạng thái
         JPanel respHeader = new JPanel(new MigLayout("insets 2 4 2 4, fillx", "[]push[][]", "[]"));
         ToolWindowSurfaceStyle.applySectionHeader(respHeader);
         JLabel respLabel = new JLabel(I18nUtil.getMessage(MessageKeys.TOOLBOX_ES_RESPONSE_TITLE));
@@ -1228,7 +1228,7 @@ public class ElasticsearchPanel extends JPanel {
         ToolWindowSurfaceStyle.applyTabbedPaneCard(resultTabs);
         enhancedTable = new EnhancedTablePanel(new String[]{});
         aggTable = new EnhancedTablePanel(new String[]{});
-        // 参考 ResponseBodyPanel：不可编辑编辑器使用 SearchableTextArea(area, false) 包装（仅搜索）
+        // Tham khảo ResponseBodyPanel：Không có sẵn để sử dụng biên tập chỉnh sửa SearchableTextArea(area, false) Bao bì (chỉ tìm kiếm)
         resultArea = createJsonEditor(false);
         resultArea.setLineWrap(false);
         resultArea.setHighlightCurrentLine(false);
@@ -1253,7 +1253,7 @@ public class ElasticsearchPanel extends JPanel {
     }
 
     /**
-     * Method 下拉颜色渲染
+     * Method Hiển thị màu thả xuống
      */
     private static class MethodComboRenderer extends DefaultListCellRenderer {
         @Override
@@ -1290,7 +1290,7 @@ public class ElasticsearchPanel extends JPanel {
         dslEditor.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, InputEvent.META_DOWN_MASK), "executeRequest");
     }
 
-    // ===== 核心功能方法 =====
+    // ===== Các phương pháp chức năng cốt lõi =====
 
     private void deleteIndices(List<String> indices) {
         List<String> targets = normalizeIndexTargets(indices);
@@ -1386,7 +1386,7 @@ public class ElasticsearchPanel extends JPanel {
     }
 
     /**
-     * 读取并校验当前表单的连接参数；地址为空时提示并返回 null。
+     * Đọc và xác minh các tham số kết nối của biểu mẫu hiện tại; nhắc và quay lại khi địa chỉ trống null。
      */
     private ConnectionParams readConnectionParams() {
         String url = getCurrentHost();
@@ -1404,7 +1404,7 @@ public class ElasticsearchPanel extends JPanel {
     }
 
     /**
-     * 请求 _cluster/health 验证连通性；非 2xx（如 401 认证失败）视为失败，不修改当前连接状态。
+     * yêu cầu _cluster/health Xác minh kết nối; không 2xx（Chẳng hạn như 401 Lỗi xác thực) được coi là lỗi và trạng thái kết nối hiện tại không được sửa đổi.
      */
     private ResponseWrapper probeCluster(ConnectionParams params) throws IOException {
         Request.Builder builder = new Request.Builder().url(params.baseUrl() + CLUSTER_HEALTH_PATH).get();
@@ -1444,7 +1444,7 @@ public class ElasticsearchPanel extends JPanel {
     }
 
     /**
-     * 仅验证当前表单配置能否连通，不加载索引、不改变已连接状态。
+     * Nó chỉ xác minh xem cấu hình biểu mẫu hiện tại có thể được kết nối hay không mà không cần tải chỉ mục hoặc thay đổi trạng thái được kết nối.
      */
     private void testConnection() {
         ConnectionParams params = readConnectionParams();
@@ -1540,7 +1540,7 @@ public class ElasticsearchPanel extends JPanel {
     }
 
     /**
-     * 连接/测试连接进行中时互斥，避免重复点击触发并发连接。
+     * kết nối/Loại trừ lẫn nhau khi kết nối thử nghiệm đang diễn ra, để tránh các lần nhấp chuột lặp lại kích hoạt các kết nối đồng thời.
      */
     private void setConnectionBusy(boolean busy) {
         connectBtn.setEnabled(!busy);
@@ -1563,14 +1563,14 @@ public class ElasticsearchPanel extends JPanel {
     }
 
     /**
-     * 获取当前选中/输入的 host
+     * Lấy lựa chọn hiện tại/đã vào host
      */
     private String getCurrentHost() {
         return hostField.getText().trim();
     }
 
     /**
-     * 将 host 写回地址输入框，历史由当前 profile 保存。
+     * Sẽ host Ghi lại vào ô nhập địa chỉ, lịch sử được thay đổi so với hiện tại profile cứu.
      */
     private void addHostHistory(String host) {
         host = ElasticsearchConnectionProfileStore.normalizeBaseUrl(host);
@@ -1687,7 +1687,7 @@ public class ElasticsearchPanel extends JPanel {
         pathField.setText(path);
         String body = dslEditor.getText().trim();
 
-        // 加入历史
+        // Tham gia lịch sử
         addToHistory(method, path, body);
 
         clearTable();
@@ -1731,7 +1731,7 @@ public class ElasticsearchPanel extends JPanel {
     }
 
     /**
-     * 包含 HTTP 状态码的响应包装
+     * Chứa HTTP Trình bao bọc phản hồi cho mã trạng thái
      */
     private record ResponseWrapper(int code, String body) {
     }
@@ -1742,7 +1742,7 @@ public class ElasticsearchPanel extends JPanel {
         resultArea.setText(formatted);
         resultArea.setCaretPosition(0);
 
-        // 状态码颜色
+        // Màu mã trạng thái
         int code = rw.code();
         Color statusColor;
         if (code >= 200 && code < 300) statusColor = ModernColors.getSuccess();
@@ -1758,13 +1758,13 @@ public class ElasticsearchPanel extends JPanel {
                 I18nUtil.getMessage(statusKey), elapsed));
         respStatusLabel.setForeground(statusColor);
 
-        // 填表格 + 聚合
+        // Điền vào mẫu đơn + sự polyme hóa
         if (JsonUtil.isTypeJSON(resp)) {
             populateTable(resp);
             populateAggTable(resp);
         }
 
-        // totalHits 统计
+        // totalHits số liệu thống kê
         Object totalHits = enhancedTable.getClientProperty(CLIENT_PROP_TOTAL_HITS);
         int tableRows = enhancedTable.getTable().getRowCount();
         if (totalHits instanceof Long th) {
@@ -1774,7 +1774,7 @@ public class ElasticsearchPanel extends JPanel {
             hitsInfoLabel.setText("");
         }
 
-        // 自动选中最佳 Tab
+        // Tự động chọn tốt nhất Tab
         boolean hasAgg = aggTable.getTable().getRowCount() > 0;
         boolean hasHits = enhancedTable.getTable().getRowCount() > 0;
         if (hasAgg) resultTabs.setSelectedIndex(1);
@@ -1782,7 +1782,7 @@ public class ElasticsearchPanel extends JPanel {
         else resultTabs.setSelectedIndex(2);
     }
 
-    // ===== 表格填充 =====
+    // ===== Đổ đầy bàn =====
 
     private void populateTable(String json) {
         try {
@@ -1818,7 +1818,7 @@ public class ElasticsearchPanel extends JPanel {
     }
 
     /**
-     * 解析 aggregations 节点并以 "name | type | buckets/value" 平铺展示
+     * phân tích aggregations Các nút và  "name | type | buckets/value" Hiển thị lát gạch
      */
     private void populateAggTable(String json) {
         try {
@@ -1846,7 +1846,7 @@ public class ElasticsearchPanel extends JPanel {
         for (Map.Entry<String, JsonNode> entry : node.properties()) {
             String aggName = prefix.isEmpty() ? entry.getKey() : prefix + "." + entry.getKey();
             JsonNode aggNode = entry.getValue();
-            // buckets 类型（terms、range、date_histogram 等）
+            // buckets gõ (terms、range、date_histogram Chờ đợi)
             JsonNode buckets = aggNode.get(AGG_BUCKETS);
             if (buckets != null && buckets.isArray()) {
                 for (JsonNode bucket : buckets) {
@@ -1855,7 +1855,7 @@ public class ElasticsearchPanel extends JPanel {
                     String key = nodeText(keyNode);
                     String docCount = nodeText(bucket.get(AGG_DOC_COUNT));
                     rows.add(new Object[]{aggName, key, docCount});
-                    // 嵌套 sub-aggregations
+                    // Lồng nhau sub-aggregations
                     for (Map.Entry<String, JsonNode> sub : bucket.properties()) {
                         String sk = sub.getKey();
                         if (!sk.startsWith("_") && !sk.equals(AGG_DOC_COUNT)
@@ -1865,10 +1865,10 @@ public class ElasticsearchPanel extends JPanel {
                     }
                 }
             } else if (aggNode.has(AGG_VALUE)) {
-                // metric 类型（sum、avg、max、min 等）
+                // metric gõ (sum、avg、max、min Chờ đợi)
                 rows.add(new Object[]{aggName, AGG_VALUE, nodeText(aggNode.get(AGG_VALUE))});
             } else if (aggNode.has(AGG_DOC_COUNT)) {
-                // filter 类型
+                // filter loại
                 rows.add(new Object[]{aggName, AGG_DOC_COUNT, nodeText(aggNode.get(AGG_DOC_COUNT))});
             }
         }
@@ -1977,7 +1977,7 @@ public class ElasticsearchPanel extends JPanel {
             Toolkit.getDefaultToolkit().getSystemClipboard().setContents(new StringSelection(txt), null);
     }
 
-    // ===== HTTP 方法封装（返回 ResponseWrapper 含状态码）=====
+    // ===== HTTP Đóng gói phương thức (return ResponseWrapper bao gồm cả mã trạng thái)=====
 
     private ResponseWrapper doGetWithCode(String path, String body) throws IOException {
         if (body != null && !body.isEmpty()) {
@@ -2018,7 +2018,7 @@ public class ElasticsearchPanel extends JPanel {
         return executeHttpWithCode(builder.build());
     }
 
-    // ===== 原始 String HTTP 方法（供内部非 executeRequest 调用）=====
+    // ===== nguyên bản String HTTP Phương thức (đối với nội bộ không executeRequest gọi)=====
     private String doGet(String path, String body) throws IOException {
         return doGetWithCode(path, body).body();
     }
@@ -2070,7 +2070,7 @@ public class ElasticsearchPanel extends JPanel {
         return trimmed.startsWith("/") ? trimmed : "/" + trimmed;
     }
 
-    // ===== 工具方法 =====
+    // ===== Phương pháp công cụ =====
 
     private RSyntaxTextArea createJsonEditor(boolean editable) {
         RSyntaxTextArea area = new FallbackAwareRSyntaxTextArea(10, 60);

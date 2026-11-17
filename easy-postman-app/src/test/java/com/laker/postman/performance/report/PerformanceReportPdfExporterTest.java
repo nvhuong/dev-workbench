@@ -129,7 +129,7 @@ public class PerformanceReportPdfExporterTest {
         List<Object[]> rows = new ArrayList<>();
         for (int i = 0; i < 8; i++) {
             int average = 80 + i * 37;
-            rows.add(new Object[]{"GET /api/orders/" + i + " · Kiểm thử 性能测试", 128, 126, 2,
+            rows.add(new Object[]{"GET /api/orders/" + i + " · Kiểm thử Kiểm tra hiệu suất", 128, 126, 2,
                     "98.44%", "0.71", "12.5", "48.0", average + " ms", (average - 35) + " ms",
                     (average + 190) + " ms", (average + 45) + " ms", (average + 85) + " ms", (average + 165) + " ms"});
         }

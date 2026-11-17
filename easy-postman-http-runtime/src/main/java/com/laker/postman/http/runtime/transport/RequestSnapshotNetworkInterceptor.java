@@ -18,7 +18,7 @@ final class RequestSnapshotNetworkInterceptor implements Interceptor {
 
     @Override
     public Response intercept(Chain chain) throws IOException {
-        // network interceptor 才能看到 OkHttp 实际使用的连接和补齐后的请求头。
+        // network interceptor Chỉ khi đó bạn mới có thể nhìn thấy nó OkHttp Kết nối thực tế được sử dụng và tiêu đề yêu cầu đã hoàn thành.
         HttpExchangeTraceSupport.updateFromConnection(preparedRequest, chain.connection());
         OkHttpRequestSnapshotCapture.capture(preparedRequest, chain.request(), captureBody);
         return chain.proceed(chain.request());

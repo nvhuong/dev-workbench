@@ -71,7 +71,7 @@ public class CollectionTreeToolbar extends UiSingletonPanel {
 
     private SearchTextField searchField;
     /**
-     * + 按钮（新建集合 / 各种导入）
+     * + Nút (Bộ sưu tập mới / nhập khẩu khác nhau)
      */
     private PlusButton plusBtn;
 
@@ -90,7 +90,7 @@ public class CollectionTreeToolbar extends UiSingletonPanel {
     }
 
     /**
-     * 点击 + 按钮弹出菜单：新建集合 + 分隔线 + 各种导入
+     * Bấm vào + Menu bật lên nút: Tạo bộ sưu tập mới + Bộ chia + Hàng nhập khẩu đa dạng
      */
     private void showPlusMenu() {
         readClipboardCurlTextAsync()
@@ -122,7 +122,7 @@ public class CollectionTreeToolbar extends UiSingletonPanel {
         JPopupMenu menu = new JPopupMenu();
         ToolWindowSurfaceStyle.applyPopupMenuCard(menu);
 
-        // ── 新建集合
+        // ── Tạo một bộ sưu tập mới
         JMenuItem newCollection = new JMenuItem(
                 I18nUtil.getMessage(MessageKeys.COLLECTIONS_NEW_COLLECTION),
                 IconUtil.create("icons/collection.svg", IconUtil.SIZE_MEDIUM, IconUtil.SIZE_MEDIUM));
@@ -135,7 +135,7 @@ public class CollectionTreeToolbar extends UiSingletonPanel {
 
         menu.addSeparator();
 
-        // ── 各种导入
+        // ── Hàng nhập khẩu đa dạng
         JMenuItem importEasy = new JMenuItem(
                 I18nUtil.getMessage(MessageKeys.COLLECTIONS_IMPORT_EASY),
                 new FlatSVGIcon("icons/easy.svg", IconUtil.SIZE_MEDIUM, IconUtil.SIZE_MEDIUM));
@@ -189,27 +189,27 @@ public class CollectionTreeToolbar extends UiSingletonPanel {
 
     @Override
     protected void registerListeners() {
-        // 搜索过滤逻辑
+        // Logic lọc tìm kiếm
         searchField.getDocument().addDocumentListener(new DocumentListener() {
             private void filterTree() {
                 CollectionTreePanel leftPanel = UiSingletonFactory.getInstance(CollectionTreePanel.class);
                 String text = searchField.getText().trim();
                 if (text.isEmpty()) {
                     searchField.setNoResult(false);
-                    // 展开所有一级分组，显示全部
+                    // Mở rộng tất cả các nhóm cấp một để hiển thị tất cả
                     expandAll(leftPanel.getRequestTree(), false);
                     leftPanel.getTreeModel().setRoot(leftPanel.getRootTreeNode());
                     leftPanel.getTreeModel().reload();
                     return;
                 }
 
-                // 获取搜索选项
+                // Nhận các tùy chọn tìm kiếm
                 boolean caseSensitive = searchField.isCaseSensitive();
                 boolean wholeWord = searchField.isWholeWord();
 
                 DefaultMutableTreeNode filteredRoot = new DefaultMutableTreeNode(ROOT);
                 boolean hasResult = filterNodes(leftPanel.getRootTreeNode(), filteredRoot, text, caseSensitive, wholeWord);
-                // 无结果时搜索框变红，有结果时恢复正常
+                // Ô tìm kiếm chuyển sang màu đỏ khi không có kết quả và trở lại bình thường khi có kết quả
                 searchField.setNoResult(!hasResult);
                 leftPanel.getTreeModel().setRoot(filteredRoot);
                 leftPanel.getTreeModel().reload();
@@ -232,7 +232,7 @@ public class CollectionTreeToolbar extends UiSingletonPanel {
             }
         });
 
-        // 监听搜索选项变化，触发重新过滤
+        // Theo dõi các thay đổi trong tùy chọn tìm kiếm và kích hoạt quá trình lọc lại
         searchField.addPropertyChangeListener("caseSensitive", evt -> {
             if (!searchField.getText().isEmpty()) {
                 CollectionTreePanel leftPanel = UiSingletonFactory.getInstance(CollectionTreePanel.class);
@@ -264,7 +264,7 @@ public class CollectionTreeToolbar extends UiSingletonPanel {
     }
 
 
-    // 导入请求集合JSON文件
+    // Bộ sưu tập yêu cầu nhập khẩuJSONtập tin
     private void importRequestCollection() {
         CollectionTreePanel leftPanel = UiSingletonFactory.getInstance(CollectionTreePanel.class);
         MainFrame mainFrame = UiSingletonFactory.getInstance(MainFrame.class);
@@ -275,8 +275,8 @@ public class CollectionTreeToolbar extends UiSingletonPanel {
         if (userSelection == SystemFileChooser.APPROVE_OPTION) {
             File fileToOpen = fileChooser.getSelectedFile();
             try {
-                // 导入时不清空老数据，而是全部加入到一个新分组下
-                String groupName = "EasyPostman";
+                // Khi nhập, dữ liệu cũ không bị xóa mà tất cả được thêm vào nhóm mới
+                String groupName = "Dev Workbench";
                 DefaultMutableTreeNode easyPostmanGroup = leftPanel.findGroupNode(leftPanel.getRootTreeNode(), groupName);
                 if (easyPostmanGroup == null) {
                     RequestGroup group = new RequestGroup(groupName);
@@ -308,7 +308,7 @@ public class CollectionTreeToolbar extends UiSingletonPanel {
         }
     }
 
-    // 导入Postman集合
+    // Nhập khẩuPostmantập trung
     private void importPostmanCollection() {
         CollectionTreePanel leftPanel = UiSingletonFactory.getInstance(CollectionTreePanel.class);
         MainFrame mainFrame = UiSingletonFactory.getInstance(MainFrame.class);
@@ -340,7 +340,7 @@ public class CollectionTreeToolbar extends UiSingletonPanel {
         }
     }
 
-    // 导入HAR集合
+    // Nhập khẩuHARtập trung
     private void importHarCollection() {
         CollectionTreePanel leftPanel = UiSingletonFactory.getInstance(CollectionTreePanel.class);
         MainFrame mainFrame = UiSingletonFactory.getInstance(MainFrame.class);
@@ -369,7 +369,7 @@ public class CollectionTreeToolbar extends UiSingletonPanel {
         }
     }
 
-    // 导入Swagger/OpenAPI集合
+    // Nhập khẩuSwagger/OpenAPItập trung
     private void importSwaggerCollection() {
         CollectionTreePanel leftPanel = UiSingletonFactory.getInstance(CollectionTreePanel.class);
         MainFrame mainFrame = UiSingletonFactory.getInstance(MainFrame.class);
@@ -390,7 +390,7 @@ public class CollectionTreeToolbar extends UiSingletonPanel {
                     leftPanel.getCollectionTreePersistence().saveCurrentTree();
                     leftPanel.getRequestTree().expandPath(new TreePath(collectionNode.getPath()));
 
-                    // 导入环境变量
+                    // Nhập các biến môi trường
                     importEnvironmentsFromParseResult(parseResult);
 
                     NotificationCenter.showSuccess(I18nUtil.getMessage(MessageKeys.COLLECTIONS_IMPORT_SUCCESS));
@@ -405,7 +405,7 @@ public class CollectionTreeToolbar extends UiSingletonPanel {
     }
 
     /**
-     * 从解析结果中导入环境变量
+     * Nhập các biến môi trường từ kết quả được phân tích cú pháp
      */
     private void importEnvironmentsFromParseResult(CollectionParseResult parseResult) {
         if (parseResult.getEnvironments() == null || parseResult.getEnvironments().isEmpty()) {
@@ -417,29 +417,29 @@ public class CollectionTreeToolbar extends UiSingletonPanel {
             try {
                 EnvironmentService.saveEnvironment(env);
                 importedCount++;
-                log.info("导入环境变量: {} ({}个变量)", env.getName(), env.getVariableList().size());
+                log.info("Nhập các biến môi trường: {} ({}các biến)", env.getName(), env.getVariableList().size());
             } catch (Exception e) {
-                log.error("导入环境变量失败: {}", env.getName(), e);
+                log.error("Không thể nhập biến môi trường: {}", env.getName(), e);
             }
         }
 
         if (importedCount > 0) {
-            log.info("成功导入 {} 个环境", importedCount);
+            log.info("Đã nhập thành công {} một môi trường", importedCount);
 
-            // 刷新 TopMenuBar 的环境下拉框
+            // Làm mới TopMenuBar hộp thả xuống môi trường
             try {
                 TopMenuBar topMenuBar = UiSingletonFactory.getInstance(TopMenuBar.class);
                 if (topMenuBar.getEnvironmentComboBox() != null) {
                     topMenuBar.getEnvironmentComboBox().reload();
-                    log.debug("已刷新环境下拉框");
+                    log.debug("Hộp thả xuống môi trường đã được làm mới");
                 }
             } catch (Exception e) {
-                log.error("刷新环境下拉框失败", e);
+                log.error("Không làm mới được hộp thả xuống môi trường", e);
             }
         }
     }
 
-    // 导入HTTP文件
+    // Nhập khẩuHTTPtập tin
     private void importHttpFile() {
         CollectionTreePanel leftPanel = UiSingletonFactory.getInstance(CollectionTreePanel.class);
         MainFrame mainFrame = UiSingletonFactory.getInstance(MainFrame.class);
@@ -476,7 +476,7 @@ public class CollectionTreeToolbar extends UiSingletonPanel {
     }
 
     /**
-     * 导入 ApiPost 文档
+     * Nhập khẩu ApiPost Tài liệu
      */
     private void importApiPostCollection() {
         CollectionTreePanel leftPanel = UiSingletonFactory.getInstance(CollectionTreePanel.class);
@@ -545,7 +545,7 @@ public class CollectionTreeToolbar extends UiSingletonPanel {
                 saved = saveRequestWithGroupDialog(importResult.items().get(0));
             }
 
-            // 导入成功后清空剪贴板
+            // Xóa clipboard sau khi nhập thành công
             if (saved) {
                 AsyncClipboardUtil.clearStringAsync();
                 notifyCurlImportResult(importResult);
@@ -610,9 +610,9 @@ public class CollectionTreeToolbar extends UiSingletonPanel {
 
 
     /**
-     * 通过弹窗让用户选择分组和命名，保存 HttpRequestItem 到集合（公用方法，适用于cURL导入等场景）
+     * Một cửa sổ bật lên cho phép người dùng chọn nhóm, đặt tên và lưu HttpRequestItem toCollection(phương thức công khai, áp dụng cho cURLNhập khẩu và các kịch bản khác)
      *
-     * @param item 要保存的请求
+     * @param item Yêu cầu lưu
      */
     private boolean saveRequestWithGroupDialog(HttpRequestItem item) {
         CollectionTreePanel collectionPanel = UiSingletonFactory.getInstance(CollectionTreePanel.class);
@@ -626,8 +626,8 @@ public class CollectionTreeToolbar extends UiSingletonPanel {
         item.setName(requestName);
         item.setId(IdUtil.simpleUUID());
         collectionPanel.saveRequestToGroup(selection.group(), item);
-        requestEditPanel.showOrCreateTab(item); // 打开请求编辑tab
-        // tree选中新增的请求节点
+        requestEditPanel.showOrCreateTab(item); // Mở một yêu cầu chỉnh sửatab
+        // treeChọn nút yêu cầu mới
         collectionPanel.locateAndSelectRequest(item.getId());
         return true;
     }
@@ -666,7 +666,7 @@ public class CollectionTreeToolbar extends UiSingletonPanel {
     }
 
 
-    // 递归过滤节点，支持大小写敏感和整词匹配
+    // Nút lọc đệ quy, hỗ trợ phân biệt chữ hoa chữ thường và khớp toàn bộ từ
     private boolean filterNodes(DefaultMutableTreeNode src, DefaultMutableTreeNode dest, String keyword,
                                 boolean caseSensitive, boolean wholeWord) {
         boolean matched = false;
@@ -696,7 +696,7 @@ public class CollectionTreeToolbar extends UiSingletonPanel {
                 matched = true;
             }
         } else {
-            // 处理 root 节点
+            // xử lý root nút
             boolean childMatched = false;
             for (int i = 0; i < src.getChildCount(); i++) {
                 DefaultMutableTreeNode child = (DefaultMutableTreeNode) src.getChildAt(i);
@@ -710,7 +710,7 @@ public class CollectionTreeToolbar extends UiSingletonPanel {
     }
 
     /**
-     * 判断文本是否匹配关键字，支持大小写敏感和整词匹配
+     * Xác định xem văn bản có khớp với từ khóa hay không, hỗ trợ phân biệt chữ hoa chữ thường và khớp toàn bộ từ
      */
     private boolean matchesText(String text, String keyword, boolean caseSensitive, boolean wholeWord) {
         if (text == null || keyword == null) {
@@ -721,19 +721,19 @@ public class CollectionTreeToolbar extends UiSingletonPanel {
         String searchKeyword = caseSensitive ? keyword : keyword.toLowerCase();
 
         if (!wholeWord) {
-            // 简单包含匹配
+            // Đơn giản bao gồm kết hợp
             return searchText.contains(searchKeyword);
         }
 
-        // 整词匹配：使用正则表达式
-        // \b 表示单词边界
+        // So khớp toàn bộ từ: sử dụng biểu thức thông thường
+        // \b Đại diện cho ranh giới từ
         String regex = "\\b" + java.util.regex.Pattern.quote(searchKeyword) + "\\b";
         int flags = caseSensitive ? 0 : java.util.regex.Pattern.CASE_INSENSITIVE;
         java.util.regex.Pattern pattern = java.util.regex.Pattern.compile(regex, flags);
         return pattern.matcher(text).find();
     }
 
-    // 展开/收起所有节点
+    // Mở rộng/Thu gọn tất cả các nút
     private void expandAll(JTree tree, boolean expand) {
         TreeNode root = (TreeNode) tree.getModel().getRoot();
         expandAll(tree, new TreePath(root), expand);

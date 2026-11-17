@@ -9,7 +9,7 @@ import java.awt.*;
 import java.awt.event.KeyEvent;
 
 /**
- * 全局变量管理对话框。
+ * Hộp thoại quản lý biến toàn cầu.
  */
 public class GlobalVariablesDialog extends JDialog {
 

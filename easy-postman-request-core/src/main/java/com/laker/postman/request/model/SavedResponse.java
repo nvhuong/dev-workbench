@@ -7,72 +7,72 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * 保存的响应对象
- * 类似 Postman 中保存的 Example 响应
+ * Đối tượng phản hồi đã lưu
+ * Tương tự Postman đã lưu vào Example phản hồi
  */
 @Data
 public class SavedResponse implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    private String id; // 响应唯一标识
-    private String name; // 响应名称
-    private long timestamp; // 保存时间戳
+    private String id; // Phản hồi định danh duy nhất
+    private String name; // Tên phản hồi
+    private long timestamp; // Lưu dấu thời gian
 
-    // 原始请求信息（用于显示和对比）
+    // Thông tin yêu cầu ban đầu (để hiển thị và so sánh)
     private OriginalRequest originalRequest;
 
-    // 响应信息
-    private int code; // 状态码
-    private String status; // 状态描述，如 "OK"
-    private List<HttpHeader> headers = new ArrayList<>(); // 响应头
+    // Thông tin phản hồi
+    private int code; // mã trạng thái
+    private String status; // Mô tả trạng thái, chẳng hạn như "OK"
+    private List<HttpHeader> headers = new ArrayList<>(); // tiêu đề phản hồi
     private List<CookieInfo> cookies = new ArrayList<>(); // Cookies
-    private String body; // 响应体
-    private String previewLanguage; // 预览语言类型，如 "json", "html", "xml" 等
+    private String body; // cơ quan phản ứng
+    private String previewLanguage; // Xem trước loại ngôn ngữ, ví dụ "json", "html", "xml" Đợi đã
     /**
-     * 文件类型响应的元信息。非空表示这是文件响应，示例只保存元信息、不保存文件内容（{@link #body} 为空）。
+     * Thông tin meta cho phản hồi loại tệp. Không trống có nghĩa đây là phản hồi của tệp. Ví dụ chỉ lưu thông tin meta và không lưu nội dung tệp ({@link #body} trống).
      */
     private FileInfo file;
 
-    // 本地 Mock 扩展。为空时保持普通静态 Example 行为。
+    // địa phương Mock Sự mở rộng. Vẫn ở trạng thái tĩnh khi trống Example hành vi.
     private int mockDelayMs;
     private String mockScript = "";
 
-    // 性能信息
-    private long costMs; // 请求耗时（毫秒）
-    private long bodySize; // 响应体大小（字节）
-    private long headersSize; // 响应头大小（字节）
+    // Thông tin hiệu suất
+    private long costMs; // Thời gian thực hiện yêu cầu (mili giây)
+    private long bodySize; // Kích thước nội dung phản hồi (byte)
+    private long headersSize; // Kích thước tiêu đề phản hồi (byte)
 
     /**
-     * 文件响应元信息。二进制文件只保存元信息；可无损还原的文本附件额外把内容保存在 body 中
+     * Thông tin meta phản hồi tệp. Tệp nhị phân chỉ lưu siêu thông tin; các tệp đính kèm văn bản có thể được khôi phục dễ dàng, lưu thêm nội dung body ở giữa
      */
     @Data
     public static class FileInfo implements Serializable {
         private static final long serialVersionUID = 1L;
 
-        private String fileName; // 下载文件名
-        private String extension; // 根据内容识别出的扩展名（包含点），如 ".xlsx"；未识别时为空
-        private boolean attachment; // Content-Disposition 为 attachment
-        private boolean contentInBody; // 文件内容以文本形式保存在 body 中（文本附件），可按 Content-Type 字符集还原
+        private String fileName; // Tải xuống tên tập tin
+        private String extension; // Các tiện ích mở rộng (bao gồm cả dấu chấm) được xác định dựa trên nội dung, ví dụ: ".xlsx"；Trống nếu không được công nhận
+        private boolean attachment; // Content-Disposition vì attachment
+        private boolean contentInBody; // Nội dung tập tin được lưu ở dạng văn bản body Trung bình (đính kèm văn bản), có thể nhấn Content-Type Phục hồi bộ ký tự
     }
 
     /**
-     * 原始请求信息（保存的快照）
+     * Thông tin yêu cầu ban đầu (ảnh chụp nhanh đã lưu)
      */
     @Data
     public static class OriginalRequest implements Serializable {
         private static final long serialVersionUID = 1L;
 
-        private String method; // 请求方法
-        private String url; // 请求URL
-        private List<HttpHeader> headers = new ArrayList<>(); // 请求头
+        private String method; // Phương pháp yêu cầu
+        private String url; // yêu cầuURL
+        private List<HttpHeader> headers = new ArrayList<>(); // Tiêu đề yêu cầu
         private List<HttpParam> pathVariables = new ArrayList<>(); // Path Variables
-        private List<HttpParam> params = new ArrayList<>(); // Query 参数
-        private String bodyType; // 请求体类型
-        private String body; // 请求体内容
-        private boolean bodyTruncated; // 请求体内容是否仅保存了预览
-        private long originalBodySize; // 原始请求体大小（字节）
+        private List<HttpParam> params = new ArrayList<>(); // Query các thông số
+        private String bodyType; // Yêu cầu loại cơ thể
+        private String body; // Request body content
+        private boolean bodyTruncated; // Whether the request body content only saves the preview
+        private long originalBodySize; // Kích thước nội dung yêu cầu ban đầu (byte)
         private List<HttpFormData> formDataList = new ArrayList<>(); // FormData
-        private List<HttpFormUrlencoded> urlencodedList = new ArrayList<>(); // URL编码表单
+        private List<HttpFormUrlencoded> urlencodedList = new ArrayList<>(); // URLHình thức mã hóa
     }
 
 }

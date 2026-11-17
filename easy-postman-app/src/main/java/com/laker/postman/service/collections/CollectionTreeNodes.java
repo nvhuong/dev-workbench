@@ -22,7 +22,7 @@ public class CollectionTreeNodes {
     }
 
     /**
-     * 创建请求节点，并为其 Example 创建子节点。
+     * Tạo một nút yêu cầu và gán nó cho nó Example Tạo các nút con.
      */
     public static DefaultMutableTreeNode requestNodeWithExamples(HttpRequestItem request) {
         DefaultMutableTreeNode requestNode = requestNode(request);

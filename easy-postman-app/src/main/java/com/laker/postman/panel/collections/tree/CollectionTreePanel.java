@@ -46,8 +46,8 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 请求集合面板，展示所有请求分组和请求项
- * 支持请求的增删改查、分组管理、拖拽排序等功能
+ * Bảng thu thập yêu cầu hiển thị tất cả các nhóm yêu cầu và mục yêu cầu
+ * Hỗ trợ các chức năng như yêu cầu thêm, xóa, sửa đổi, quản lý nhóm, sắp xếp kéo thả, v.v
  */
 @Slf4j
 public class CollectionTreePanel extends UiSingletonPanel {
@@ -55,14 +55,14 @@ public class CollectionTreePanel extends UiSingletonPanel {
     public static final String GROUP = CollectionTreeNodeTypes.GROUP;
     public static final String ROOT = CollectionTreeNodeTypes.ROOT;
     public static final String SAVED_RESPONSE = CollectionTreeNodeTypes.SAVED_RESPONSE;
-    public static final String EXPORT_FILE_NAME = "EasyPostman-Collections.json";
-    // 请求集合的根节点
+    public static final String EXPORT_FILE_NAME = "Dev Workbench-Collections.json";
+    // Nút gốc của bộ sưu tập yêu cầu
     @Getter
     private DefaultMutableTreeNode rootTreeNode;
-    // 请求树组件
+    // Request tree component
     @Getter
     private JTree requestTree;
-    // 树模型，用于管理树节点
+    // Mô hình cây, được sử dụng để quản lý các nút cây
     @Getter
     private DefaultTreeModel treeModel;
     @Getter
@@ -79,7 +79,7 @@ public class CollectionTreePanel extends UiSingletonPanel {
         setOpaque(false);
         setPreferredSize(new Dimension(200, 200));
 
-        // 顶部面板，导入导出按钮在最上方，环境信息在下方
+        // Trên bảng trên cùng, các nút nhập và xuất ở trên cùng và thông tin môi trường ở dưới cùng
         JPanel topPanel = getTopPanel();
         topPanel.setOpaque(false);
         add(topPanel, BorderLayout.NORTH);
@@ -89,18 +89,18 @@ public class CollectionTreePanel extends UiSingletonPanel {
     }
 
     private JScrollPane getTreeScrollPane() {
-        // 初始化请求树
+        // Khởi tạo cây yêu cầu
         rootTreeNode = new DefaultMutableTreeNode(ROOT);
         CollectionTreeRootRegistry.registerRootSupplier(() -> rootTreeNode);
         CollectionDocumentRegistry.registerDocumentSupplier(() -> SwingCollectionTreeDocumentMapper.fromRoot(rootTreeNode));
         treeModel = new DefaultTreeModel(rootTreeNode);
         Workspace currentWorkspace = WorkspaceService.getInstance().getCurrentWorkspace();
         String filePath = SystemUtil.getCollectionPathForWorkspace(currentWorkspace);
-        // 初始化持久化工具
+        // Khởi tạo công cụ kiên trì
         collectionTreePersistence = new SwingCollectionTreePersistence(filePath, rootTreeNode, treeModel);
         requestSaveCoordinator = new SwingCollectionRequestSaveCoordinator(rootTreeNode, collectionTreePersistence::saveCurrentTree);
-        // 创建树组件，重写 getScrollableTracksViewportWidth 确保树宽度始终铺满 viewport，
-        // 这样鼠标在行的右侧空白区域仍在 JTree 上，mouseMoved 事件能正常触发
+        // Tạo một thành phần cây và ghi đè lên nó getScrollableTracksViewportWidth Đảm bảo chiều rộng của cây luôn được che chắn viewport，
+        // Bằng cách này, chuột vẫn ở trong khoảng trống ở phía bên phải của hàng JTree thượng đẳng,mouseMoved Sự kiện có thể được kích hoạt bình thường
         requestTree = new JTree(treeModel) {
             @Override
             public boolean isPathEditable(TreePath path) {
@@ -119,30 +119,30 @@ public class CollectionTreePanel extends UiSingletonPanel {
             @Override
             public void paint(Graphics g) {
                 super.paint(g);
-                // 在树正常绘制之后，对 hover 行叠加整行背景高亮
+                // Sau khi vẽ cây bình thường đúng không hover Lớp phủ hàng Toàn bộ hàng được đánh dấu bằng nền
                 CollectionTreeHoverOverlay.paint(g, this);
             }
         };
-        // 不显示根节点
+        // Nút gốc không được hiển thị
         requestTree.setRootVisible(false);
-        // 让 JTree 组件显示根节点的"展开/收起"小三角（即树形结构的手柄）
+        // cho phép JTree Thành phần này hiển thị nút gốc"Mở rộng/Bỏ đi"Hình tam giác nhỏ (tức là tay cầm của cấu trúc cây)
         requestTree.setShowsRootHandles(true);
-        // 禁用双击展开/收起：设置 toggleClickCount 为 0
-        // 这样双击只会触发我们自定义的打开 tab 行为，不会展开/收起
+        // Vô hiệu hóa mở rộng nhấp đúp/Thu gọn: Cài đặt toggleClickCount vì 0
+        // Bằng cách này, một cú nhấp đúp sẽ chỉ kích hoạt thao tác mở tùy chỉnh của chúng tôi tab Hành vi, sẽ không diễn ra/Bỏ đi
         requestTree.setToggleClickCount(0);
-        // 设置树支持多选（支持批量删除）
+        // Cây cài đặt hỗ trợ nhiều lựa chọn (hỗ trợ xóa hàng loạt)
         requestTree.getSelectionModel().setSelectionMode(TreeSelectionModel.DISCONTIGUOUS_TREE_SELECTION);
-        // FlatLaf wideCellRenderer：让 CellRenderer 宽度铺满整行，使 "+" 号精确贴在右侧
+        // FlatLaf wideCellRenderer：cho phép CellRenderer Chiều rộng bao phủ toàn bộ hàng như vậy "+" Con số được dán chính xác ở bên phải
         requestTree.putClientProperty("FlatLaf.style", "wideCellRenderer: true");
-        // 注册 ToolTipManager，允许动态设置 tooltip（hover "+" 时显示 Add Request）
+        // Đăng ký ToolTipManager，Cho phép cài đặt động tooltip（hover "+" được hiển thị Add Request）
         ToolTipManager.sharedInstance().registerComponent(requestTree);
-        // 设置树的字体和行高
+        // Đặt phông chữ và chiều cao dòng của cây
         requestTree.setCellRenderer(new RequestTreeCellRenderer());
         requestTree.setRowHeight(28);
         JScrollPane treeScrollPane = new JScrollPane(requestTree);
         ToolWindowSurfaceStyle.applyTreeScrollPaneCard(treeScrollPane, requestTree);
-        treeScrollPane.getVerticalScrollBar().setUnitIncrement(16); // 设置滚动条增量
-        // 启用拖拽排序
+        treeScrollPane.getVerticalScrollBar().setUnitIncrement(16); // Đặt mức tăng của thanh cuộn
+        // Bật sắp xếp kéo
         requestTree.setDragEnabled(true);
         requestTree.setDropMode(DropMode.ON_OR_INSERT);
         requestTree.setTransferHandler(new TreeTransferHandler(requestTree, treeModel, this::saveCurrentTree));
@@ -233,10 +233,10 @@ public class CollectionTreePanel extends UiSingletonPanel {
 
 
     /**
-     * 将请求保存到指定分组
+     * Lưu yêu cầu vào nhóm được chỉ định
      *
-     * @param targetGroup 分组信息
-     * @param item        请求项
+     * @param targetGroup Thông tin nhóm
+     * @param item        yêu cầu các mục
      */
     public void saveRequestToGroup(RequestGroup targetGroup, HttpRequestItem item) {
         requestSaveCoordinator.addRequestToGroup(targetGroup, item)
@@ -247,7 +247,7 @@ public class CollectionTreePanel extends UiSingletonPanel {
     }
 
     /**
-     * 根据名称查找分组节点
+     * Tìm các nút được nhóm theo tên
      */
     public DefaultMutableTreeNode findGroupNode(DefaultMutableTreeNode node, String groupName) {
         if (node == null) return null;
@@ -270,10 +270,10 @@ public class CollectionTreePanel extends UiSingletonPanel {
     }
 
     /**
-     * 更新已存在的请求
+     * Cập nhật một yêu cầu hiện có
      *
-     * @param item 请求项
-     * @return 是否更新成功
+     * @param item yêu cầu các mục
+     * @return Liệu việc cập nhật có thành công hay không
      */
     public boolean updateExistingRequest(HttpRequestItem item) {
         if (item == null || item.getId() == null || item.getId().isEmpty()) {
@@ -288,7 +288,7 @@ public class CollectionTreePanel extends UiSingletonPanel {
         HttpRequestItem updatedItem = result.requestItem();
 
         treeModel.nodeChanged(result.requestNode());
-        // 保存后通知各 UI 订阅者自行同步最新数据。
+        // Thông báo cho mọi người sau khi lưu UI Thuê bao tự đồng bộ dữ liệu mới nhất.
         SwingUtilities.invokeLater(() -> RequestSaveEventPublisher.publishRequestSaved(updatedItem));
         return true;
     }
@@ -332,14 +332,14 @@ public class CollectionTreePanel extends UiSingletonPanel {
 
 
     /**
-     * 获取分组树的 TreeModel（用于分组选择树）
+     * Lấy cây nhóm TreeModel（đối với các cây chọn lọc được nhóm)
      */
     public DefaultTreeModel getGroupTreeModel() {
         return treeModel;
     }
 
 
-    // 创建一个可多选的请求/分组选择树（用于Runner面板弹窗）
+    // Tạo một yêu cầu nhiều lựa chọn/Cây lựa chọn được nhóm (đối với Runnercửa sổ bật lên của bảng điều khiển)
     public JTree createRequestSelectionTree() {
         DefaultTreeModel model = new DefaultTreeModel(TreeNodeCloner.cloneTreeNode(rootTreeNode));
         JTree tree = new JTree(model);
@@ -347,12 +347,12 @@ public class CollectionTreePanel extends UiSingletonPanel {
         tree.setShowsRootHandles(true);
         tree.setCellRenderer(new RequestTreeCellRenderer());
         tree.setRowHeight(28);
-        // 支持多选
+        // Hỗ trợ nhiều lựa chọn
         tree.getSelectionModel().setSelectionMode(TreeSelectionModel.DISCONTIGUOUS_TREE_SELECTION);
         return tree;
     }
 
-    // 获取树中选中的所有请求（包含分组下所有请求）
+    // Nhận tất cả các yêu cầu được chọn trong cây (bao gồm tất cả các yêu cầu trong nhóm)
     public List<HttpRequestItem> getSelectedRequestsFromTree(JTree tree) {
         List<HttpRequestItem> result = new ArrayList<>();
         TreePath[] paths = tree.getSelectionPaths();
@@ -361,7 +361,7 @@ public class CollectionTreePanel extends UiSingletonPanel {
             DefaultMutableTreeNode node = (DefaultMutableTreeNode) path.getLastPathComponent();
             collectRequestsRecursively(node, result);
         }
-        // 去重（按id）
+        // Chống trùng lặp (nhấnid）
         Map<String, HttpRequestItem> map = new LinkedHashMap<>();
         for (HttpRequestItem item : result) {
             map.put(item.getId(), item);
@@ -369,7 +369,7 @@ public class CollectionTreePanel extends UiSingletonPanel {
         return new ArrayList<>(map.values());
     }
 
-    // 递归收集请求
+    // Yêu cầu thu thập đệ quy
     private void collectRequestsRecursively(DefaultMutableTreeNode node, List<HttpRequestItem> list) {
         CollectionTreeNodes.request(node).ifPresent(list::add);
         if (CollectionTreeNodes.isGroup(node)) {
@@ -380,9 +380,9 @@ public class CollectionTreePanel extends UiSingletonPanel {
     }
 
     /**
-     * 根据请求ID定位并选中树中的对应节点
+     * Theo yêu cầuIDXác định vị trí và chọn nút tương ứng trong cây
      *
-     * @param requestId 请求ID
+     * @param requestId yêu cầuID
      */
     public void locateAndSelectRequest(String requestId) {
         if (requestId == null || requestId.isEmpty()) {
@@ -401,20 +401,20 @@ public class CollectionTreePanel extends UiSingletonPanel {
     }
 
     /**
-     * 切换到指定工作区的请求集合文件，并在集合树加载完成后执行回调。
+     * Chuyển sang tệp bộ sưu tập được yêu cầu của không gian làm việc đã chỉ định và thực hiện lệnh gọi lại sau khi cây bộ sưu tập được tải.
      */
     public void switchWorkspaceAndRefreshUI(String collectionFilePath, Runnable onSuccessCallback) {
-        // 使用 AsyncTaskExecutor 异步切换工作区
+        // sử dụng AsyncTaskExecutor Chuyển đổi không gian làm việc không đồng bộ
         EasyTaskExecutor.builder()
                 .threadName("SwitchWorkspace-Loader")
                 .backgroundTask(() -> {
-                    // 后台线程：执行文件加载操作
+                    // Chủ đề nền: thực hiện các thao tác tải tập tin
                     if (collectionTreePersistence != null) {
                         collectionTreePersistence.switchDataFilePath(collectionFilePath);
                     }
                 })
                 .onSuccess(() -> {
-                    // EDT线程：更新UI
+                    // EDTChủ đề: Cập nhậtUI
                     UiSingletonFactory.getInstance(RequestEditorPanel.class).getTabbedPane().removeAll();
                     UiSingletonFactory.getInstance(RequestEditorPanel.class).addPlusTab();
                     expandFirstGroup();
@@ -423,7 +423,7 @@ public class CollectionTreePanel extends UiSingletonPanel {
                     }
                 })
                 .onError(error -> {
-                    // EDT线程：处理错误
+                    // EDTChủ đề: xử lý lỗi
                     log.error("Error switching workspace and loading collections", error);
                     UiSingletonFactory.getInstance(RequestEditorPanel.class).getTabbedPane().removeAll();
                     UiSingletonFactory.getInstance(RequestEditorPanel.class).addPlusTab();
@@ -432,7 +432,7 @@ public class CollectionTreePanel extends UiSingletonPanel {
     }
 
     /**
-     * 展开第一个分组
+     * Mở rộng nhóm đầu tiên
      */
     public void expandFirstGroup() {
         if (rootTreeNode != null && rootTreeNode.getChildCount() > 0) {

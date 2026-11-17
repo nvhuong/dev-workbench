@@ -11,7 +11,7 @@ import okhttp3.WebSocketListener;
 import okio.ByteString;
 
 /**
- * WebSocket 网络日志装饰器：记录升级握手的实际请求/响应快照，不参与消息处理。
+ * WebSocket Trình trang trí nhật ký mạng: ghi lại yêu cầu thực tế cho quá trình bắt tay nâng cấp/Trả lời ảnh chụp nhanh và không tham gia xử lý tin nhắn.
  */
 final class WebSocketNetworkLogListener extends WebSocketListener {
     private final WebSocketListener delegate;

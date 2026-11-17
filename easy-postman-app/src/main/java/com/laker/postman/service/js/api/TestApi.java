@@ -8,15 +8,15 @@ import org.graalvm.polyglot.proxy.ProxyExecutable;
 import java.util.UUID;
 
 /**
- * 测试 API (pm.test)
+ * Bài kiểm tra API (pm.test)
  * <p>
- * 提供 Postman 风格的测试接口，支持：
- * - pm.test(name, function) - 执行测试
+ * cung cấp Postman Giao diện kiểm tra phong cách, hỗ trợ: .
+ * - pm.test(name, function) - Thực hiện bài kiểm tra
  * </p>
  *
- * <h3>使用示例：</h3>
+ * <h3>Ví dụ sử dụng:</h3>
  * <pre>{@code
- * // 执行测试
+ * // Thực hiện bài kiểm tra
  * pm.test("Status code is 200", function() {
  *     pm.expect(pm.response.code).to.equal(200);
  * });
@@ -41,11 +41,11 @@ public class TestApi implements ProxyExecutable {
     }
 
     /**
-     * 执行测试断言
-     * 对应脚本中的: pm.test(name, function)
+     * Thực hiện các xác nhận kiểm tra
+     * Tương ứng với kịch bản: pm.test(name, function)
      *
-     * @param name         测试名称
-     * @param testFunction 测试函数
+     * @param name         Tên thử nghiệm
+     * @param testFunction Chức năng kiểm tra
      */
     public void run(String name, Value testFunction) {
         String errorMessage = null;
@@ -58,7 +58,7 @@ public class TestApi implements ProxyExecutable {
         } catch (Exception e) {
             passed = false;
             errorMessage = e.getMessage();
-            log.debug("测试失败: {}, 错误: {}", name, e.getMessage());
+            log.debug("Thử nghiệm thất bại: {}, sai lầm: {}", name, e.getMessage());
         }
 
         TestResult result = new TestResult(name, passed, errorMessage);

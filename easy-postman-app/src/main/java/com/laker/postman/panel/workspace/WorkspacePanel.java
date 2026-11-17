@@ -42,8 +42,8 @@ import java.util.Locale;
 import java.util.Objects;
 
 /**
- * 工作区面板
- * 显示工作区列表，支持创建、切换、管理工作区
+ * Bảng điều khiển không gian làm việc
+ * Hiển thị danh sách không gian làm việc và hỗ trợ tạo, chuyển đổi và quản lý không gian làm việc
  */
 @Slf4j
 public class WorkspacePanel extends UiSingletonPanel {
@@ -51,7 +51,7 @@ public class WorkspacePanel extends UiSingletonPanel {
     private static final String HTML_START = "<html>";
     private static final String HTML_END = "</html>";
     private static final String WORKSPACE_DETAIL_DIVIDER_APPLIED_PROPERTY =
-            "EasyPostman.workspace.detailDividerApplied";
+            "Dev Workbench.workspace.detailDividerApplied";
     private static final int WORKSPACE_DETAIL_DEFAULT_HEIGHT = 360;
     private static final int WORKSPACE_DETAIL_MIN_HEIGHT = 320;
     private static final int WORKSPACE_DETAIL_MAX_HEIGHT = 400;
@@ -96,15 +96,15 @@ public class WorkspacePanel extends UiSingletonPanel {
 
         add(mainSplitPane, BorderLayout.CENTER);
 
-        // 刷新工作区列表
+        // Làm mới danh sách không gian làm việc
         refreshWorkspaceList();
     }
 
     /**
-     * 创建工具栏
+     * Tạo một thanh công cụ
      */
     private JPanel createToolbar() {
-        // 新建工作区按钮
+        // Nút không gian làm việc mới
         JButton newButton = new PlusButton();
         newButton.addActionListener(e -> showCreateWorkspaceDialog());
 
@@ -129,22 +129,22 @@ public class WorkspacePanel extends UiSingletonPanel {
     }
 
     /**
-     * 创建工作区列表面板
+     * Tạo bảng danh sách không gian làm việc
      */
     private JScrollPane createWorkspaceListPanel() {
         JPanel panel = new JPanel(new BorderLayout());
         ToolWindowSurfaceStyle.applyCard(panel);
-        // 创建列表模型和列表
+        // Tạo mô hình danh sách và danh sách
         listModel = new DefaultListModel<>();
         workspaceList = new JList<>(listModel);
 
-        // 设置列表样式
+        // Đặt kiểu danh sách
         workspaceList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         workspaceList.setCellRenderer(new WorkspaceListCellRenderer());
-        // 动态计算单元格高度，基于字体大小
+        // Tự động tính toán chiều cao ô, dựa trên kích thước phông chữ
         workspaceList.setFixedCellHeight(WorkspaceListCellRenderer.calculateCellHeight());
 
-        // 添加右键菜单和双击事件
+        // Thêm menu chuột phải và sự kiện nhấp đúp
         workspaceList.addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
@@ -160,7 +160,7 @@ public class WorkspacePanel extends UiSingletonPanel {
             }
         });
 
-        // 添加选择监听器
+        // Thêm người nghe lựa chọn
         workspaceList.addListSelectionListener(e -> {
             if (!e.getValueIsAdjusting()) {
                 updateInfoPanel();
@@ -174,7 +174,7 @@ public class WorkspacePanel extends UiSingletonPanel {
             }
         });
 
-        // 拖拽排序支持
+        // Hỗ trợ sắp xếp kéo và thả
         setupDragAndDrop();
 
         JScrollPane scrollPane = new JScrollPane(workspaceList);
@@ -185,7 +185,7 @@ public class WorkspacePanel extends UiSingletonPanel {
     }
 
     /**
-     * 创建信息面板
+     * Tạo một bảng thông tin
      */
     private JPanel createInfoPanel() {
         infoPanel = new JPanel(new BorderLayout());
@@ -205,7 +205,7 @@ public class WorkspacePanel extends UiSingletonPanel {
     }
 
     /**
-     * 创建工作区内嵌工具区域
+     * Tạo vùng công cụ nhúng trong không gian làm việc
      */
     private JPanel createWorkspaceToolPanel() {
         workspaceToolPanel = new JPanel(new BorderLayout());
@@ -317,7 +317,7 @@ public class WorkspacePanel extends UiSingletonPanel {
     }
 
     /**
-     * 设置拖拽排序功能
+     * Đặt chức năng sắp xếp kéo và thả
      */
     private void setupDragAndDrop() {
         workspaceList.setDragEnabled(true);
@@ -355,7 +355,7 @@ public class WorkspacePanel extends UiSingletonPanel {
                 listModel.add(toIndex, moved);
                 workspaceList.setSelectedIndex(toIndex);
 
-                // 持久化顺序
+                // Lệnh kiên trì
                 persistWorkspaceOrder();
                 return true;
             }
@@ -363,7 +363,7 @@ public class WorkspacePanel extends UiSingletonPanel {
     }
 
     /**
-     * 持久化工作区顺序
+     * Thứ tự không gian làm việc liên tục
      */
     private void persistWorkspaceOrder() {
         List<String> idOrder = new ArrayList<>();
@@ -378,7 +378,7 @@ public class WorkspacePanel extends UiSingletonPanel {
     }
 
     /**
-     * 显示创建工作区对话框
+     * Hiển thị hộp thoại Tạo không gian làm việc
      */
     private void showCreateWorkspaceDialog() {
         WorkspaceCreateDialog dialog = new WorkspaceCreateDialog(
@@ -388,13 +388,13 @@ public class WorkspacePanel extends UiSingletonPanel {
 
         if (dialog.isConfirmed()) {
             refreshWorkspaceList();
-            // 更新顶部菜单栏的工作区下拉框（不需要重新加载整个菜单栏）
+            // Update the workspace dropdown in the top menu bar (no need to reload the entire menu bar)
             UiSingletonFactory.getInstance(TopMenuBar.class).updateWorkspaceComboBox();
         }
     }
 
     /**
-     * 显示右键菜单
+     * Hiển thị menu chuột phải
      */
     private void showContextMenu(MouseEvent e) {
         Workspace workspace = workspaceList.getSelectedValue();
@@ -405,7 +405,7 @@ public class WorkspacePanel extends UiSingletonPanel {
     }
 
     /**
-     * 创建工作区右键菜单
+     * Tạo một menu chuột phải vào không gian làm việc
      */
     private JPopupMenu createWorkspaceContextMenu(Workspace workspace) {
         JPopupMenu menu = new JPopupMenu();
@@ -436,7 +436,7 @@ public class WorkspacePanel extends UiSingletonPanel {
             return;
         }
 
-        // 所有本地工作区都可以转换为 Git 工作区（包括默认工作区）。
+        // Tất cả các không gian làm việc cục bộ có thể được chuyển đổi sang  Git Không gian làm việc (bao gồm không gian làm việc mặc định).
         JMenuItem convertToGitItem = new JMenuItem(I18nUtil.getMessage(MessageKeys.WORKSPACE_CONVERT_TO_GIT));
         convertToGitItem.setIcon(IconUtil.create("icons/git.svg", IconUtil.SIZE_SMALL, IconUtil.SIZE_SMALL));
         convertToGitItem.addActionListener(e -> convertToGitWorkspace(workspace));
@@ -447,16 +447,16 @@ public class WorkspacePanel extends UiSingletonPanel {
     }
 
     private void addManagementMenuItems(JPopupMenu menu, Workspace workspace) {
-        // 默认工作区不可重命名和移除
+        // Không thể đổi tên hoặc xóa không gian làm việc mặc định
         if (!WorkspaceStorageUtil.isDefaultWorkspace(workspace)) {
-            // 重命名
+            // Đổi tên
             JMenuItem renameItem = new JMenuItem(I18nUtil.getMessage(MessageKeys.WORKSPACE_RENAME));
             renameItem.setIcon(IconUtil.createThemed("icons/refresh.svg", IconUtil.SIZE_SMALL, IconUtil.SIZE_SMALL));
             renameItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F2, 0));
             renameItem.addActionListener(e -> renameWorkspace(workspace));
             menu.add(renameItem);
 
-            // 移除工作区记录，保留本地文件
+            // Xóa bản ghi không gian làm việc, giữ các tệp cục bộ
             JMenuItem removeItem = new JMenuItem(I18nUtil.getMessage(MessageKeys.WORKSPACE_REMOVE));
             removeItem.setIcon(IconUtil.createThemed("icons/close.svg", IconUtil.SIZE_SMALL, IconUtil.SIZE_SMALL));
             removeItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0));
@@ -484,7 +484,7 @@ public class WorkspacePanel extends UiSingletonPanel {
     }
 
     /**
-     * 处理双击事件
+     * Xử lý các sự kiện nhấp đúp
      */
     private void handleDoubleClick() {
         Workspace workspace = workspaceList.getSelectedValue();
@@ -494,19 +494,19 @@ public class WorkspacePanel extends UiSingletonPanel {
     }
 
     /**
-     * 切换到指定工作区
+     * Chuyển sang không gian làm việc được chỉ định
      */
     private void switchToWorkspace(Workspace workspace) {
         try {
             saveCurrentWorkspaceScopedPanels();
             workspaceService.switchWorkspace(workspace.getId());
-            // 切换环境变量文件
+            // Chuyển đổi tập tin biến môi trường
             UiSingletonFactory.getInstance(EnvironmentPanel.class).switchWorkspaceAndRefreshUI(SystemUtil.getEnvPathForWorkspace(workspace));
-            // 切换请求集合文件
+            // Chuyển tập tin thu thập yêu cầu
             UiSingletonFactory.getInstance(CollectionTreePanel.class)
                     .switchWorkspaceAndRefreshUI(SystemUtil.getCollectionPathForWorkspace(workspace), () -> {
                         refreshExistingWorkspaceScopedPanels();
-                        // 更新顶部菜单栏工作区显示
+                        // Đã cập nhật hiển thị không gian làm việc của thanh menu trên cùng
                         UiSingletonFactory.getInstance(TopMenuBar.class).updateWorkspaceDisplay();
                         refreshWorkspaceList();
                     });
@@ -530,7 +530,7 @@ public class WorkspacePanel extends UiSingletonPanel {
     }
 
     /**
-     * Git拉取操作
+     * GitThao tác kéo
      */
     private void performGitPull(Workspace workspace) {
         saveCurrentWorkspaceScopedPanels();
@@ -542,7 +542,7 @@ public class WorkspacePanel extends UiSingletonPanel {
         dialog.setVisible(true);
 
         if (dialog.isConfirmed()) {
-            // 刷新 requests 和 env 面板
+            // Làm mới requests và env bảng điều khiển
             UiSingletonFactory.getInstance(CollectionTreePanel.class)
                     .switchWorkspaceAndRefreshUI(SystemUtil.getCollectionPathForWorkspace(workspace), () -> {
                         refreshExistingWorkspaceScopedPanels();
@@ -554,7 +554,7 @@ public class WorkspacePanel extends UiSingletonPanel {
     }
 
     /**
-     * Git提交操作
+     * GitGửi hoạt động
      */
     private void performGitCommit(Workspace workspace) {
         saveCurrentWorkspaceScopedPanels();
@@ -571,7 +571,7 @@ public class WorkspacePanel extends UiSingletonPanel {
     }
 
     /**
-     * Git推送操作
+     * Gitthao tác đẩy
      */
     private void performGitPush(Workspace workspace) {
         saveCurrentWorkspaceScopedPanels();
@@ -583,7 +583,7 @@ public class WorkspacePanel extends UiSingletonPanel {
         dialog.setVisible(true);
 
         if (dialog.isConfirmed()) {
-            // 刷新 requests 和 env 面板
+            // Làm mới requests và env bảng điều khiển
             UiSingletonFactory.getInstance(CollectionTreePanel.class)
                     .switchWorkspaceAndRefreshUI(SystemUtil.getCollectionPathForWorkspace(workspace), () -> {
                         refreshExistingWorkspaceScopedPanels();
@@ -595,7 +595,7 @@ public class WorkspacePanel extends UiSingletonPanel {
     }
 
     /**
-     * 显示 Git 历史记录
+     * trình diễn Git Lịch sử
      */
     private void showGitHistory(Workspace workspace) {
         showWorkspaceTool(new GitHistoryPanel(workspace, () -> refreshAfterGitHistoryRestore(workspace)));
@@ -653,7 +653,7 @@ public class WorkspacePanel extends UiSingletonPanel {
     }
 
     /**
-     * 重命名工作区
+     * Đổi tên không gian làm việc
      */
     private void renameWorkspace(Workspace workspace) {
         TextInputDialog.showRequiredName(
@@ -668,10 +668,10 @@ public class WorkspacePanel extends UiSingletonPanel {
             try {
                 workspaceService.renameWorkspace(workspace.getId(), newName);
                 refreshWorkspaceList();
-                // 如果重命名的是当前工作区，更新顶部菜单栏的工作区下拉框
+                // Nếu bạn định đổi tên không gian làm việc hiện tại, hãy cập nhật hộp thả xuống không gian làm việc ở thanh menu trên cùng
                 Workspace current = workspaceService.getCurrentWorkspace();
                 if (current != null && current.getId().equals(workspace.getId())) {
-                    // 只更新下拉框，不需要重新加载整个菜单栏（工作区类型未变）
+                    // Chỉ có hộp thả xuống được cập nhật, không cần tải lại toàn bộ thanh menu (loại không gian làm việc không thay đổi)
                     UiSingletonFactory.getInstance(TopMenuBar.class).updateWorkspaceComboBox();
                 }
             } catch (Exception e) {
@@ -681,7 +681,7 @@ public class WorkspacePanel extends UiSingletonPanel {
     }
 
     /**
-     * 移除工作区记录，本地目录及文件始终保留。
+     * Xóa các bản ghi không gian làm việc, các thư mục và tệp cục bộ luôn được giữ lại.
      */
     private void removeWorkspace(Workspace workspace) {
         String[] options = {
@@ -702,7 +702,7 @@ public class WorkspacePanel extends UiSingletonPanel {
         );
 
         if (choice == 0) {
-            // 检查是否移除的是当前工作区
+            // Kiểm tra xem không gian làm việc hiện tại đã bị xóa hay chưa
             boolean isRemovingCurrentWorkspace = workspaceService.getCurrentWorkspace() != null &&
                     workspaceService.getCurrentWorkspace().getId().equals(workspace.getId());
 
@@ -718,14 +718,14 @@ public class WorkspacePanel extends UiSingletonPanel {
             }
 
             try {
-                // 如果移除的是当前工作区，需要切换到新的当前工作区并刷新相关UI
+                // Nếu không gian làm việc hiện tại bị xóa, bạn cần chuyển sang không gian làm việc hiện tại mới và làm mới các thông tin liên quanUI
                 if (isRemovingCurrentWorkspace) {
                     Workspace newCurrentWorkspace = workspaceService.getCurrentWorkspace();
                     if (newCurrentWorkspace != null) {
-                        // 切换环境变量文件
+                        // Chuyển đổi tập tin biến môi trường
                         UiSingletonFactory.getInstance(EnvironmentPanel.class).switchWorkspaceAndRefreshUI(
                                 SystemUtil.getEnvPathForWorkspace(newCurrentWorkspace));
-                        // 切换请求集合文件
+                        // Chuyển tập tin thu thập yêu cầu
                         UiSingletonFactory.getInstance(CollectionTreePanel.class).switchWorkspaceAndRefreshUI(
                                 SystemUtil.getCollectionPathForWorkspace(newCurrentWorkspace), this::refreshExistingWorkspaceScopedPanels);
 
@@ -742,10 +742,10 @@ public class WorkspacePanel extends UiSingletonPanel {
     }
 
     /**
-     * 转换本地工作区为Git工作区
+     * Chuyển đổi không gian làm việc cục bộ sang Gitkhu vực làm việc
      */
     private void convertToGitWorkspace(Workspace workspace) {
-        // 使用自定义对话框，合并分支名输入和确认步骤
+        // Sử dụng hộp thoại tùy chỉnh để kết hợp các bước xác nhận và nhập tên chi nhánh
         ConvertToGitDialog dialog = new ConvertToGitDialog(
                 SwingUtilities.getWindowAncestor(this),
                 workspace
@@ -756,12 +756,12 @@ public class WorkspacePanel extends UiSingletonPanel {
             return;
         }
 
-        // 执行转换
+        // Thực hiện chuyển đổi
         try {
             workspaceService.convertLocalToGit(workspace, dialog.getBranchName());
             refreshWorkspaceList();
 
-            // 如果转换的是当前工作区，需要更新顶部菜单栏
+            // Nếu bạn đang chuyển đổi không gian làm việc hiện tại, bạn cần cập nhật thanh menu trên cùng
             Workspace current = workspaceService.getCurrentWorkspace();
             if (current != null && current.getId().equals(workspace.getId())) {
                 UiSingletonFactory.getInstance(TopMenuBar.class).updateWorkspaceDisplay();
@@ -781,7 +781,7 @@ public class WorkspacePanel extends UiSingletonPanel {
     }
 
     /**
-     * 配置远程仓库
+     * Cấu hình kho từ xa
      */
     private void configureRemoteRepository(Workspace workspace) {
         showWorkspaceTool(new RemoteConfigPanel(workspace, () -> refreshAfterRemoteConfigured(workspace)));
@@ -793,7 +793,7 @@ public class WorkspacePanel extends UiSingletonPanel {
     }
 
     /**
-     * 刷新工作区列表
+     * Làm mới danh sách không gian làm việc
      */
     private void refreshWorkspaceList() {
         try {
@@ -860,7 +860,7 @@ public class WorkspacePanel extends UiSingletonPanel {
     }
 
     /**
-     * 更新信息面板
+     * Bảng thông tin cập nhật
      */
     private void updateInfoPanel() {
         Workspace selected = workspaceList.getSelectedValue();
@@ -933,6 +933,6 @@ public class WorkspacePanel extends UiSingletonPanel {
 
     @Override
     protected void registerListeners() {
-        // 监听器已在initUI中注册
+        // Người nghe đã có mặt rồiinitUIĐăng ký vào
     }
 }

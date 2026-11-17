@@ -23,8 +23,8 @@ import java.util.Set;
 import java.util.function.Supplier;
 
 /**
- * 侧边栏 Tab 枚举
- * 集中管理所有 Tab 的配置信息，避免重复代码
+ * Thanh bên Tab liệt kê
+ * Quản lý mọi thứ một cách tập trung Tab Thông tin cấu hình để tránh trùng lặp mã
  */
 @Getter
 public enum SidebarTab {
@@ -73,10 +73,10 @@ public enum SidebarTab {
     private final String iconPath;
     private final Supplier<JPanel> panelSupplier;
 
-    // 懒加载缓存
+    // Bộ nhớ đệm tải chậm
     private Icon icon;
-    private Icon selectedIcon;  // 展开状态的选中图标
-    private Icon selectedOnPrimaryIcon;  // 蓝色选中背景上的图标
+    private Icon selectedIcon;  // Biểu tượng được chọn ở trạng thái mở rộng
+    private Icon selectedOnPrimaryIcon;  // Biểu tượng trên nền được chọn màu xanh
     private String title;
     private JPanel panel;
 
@@ -87,7 +87,7 @@ public enum SidebarTab {
     }
 
     /**
-     * 获取标题（懒加载，支持国际化）
+     * Lấy tiêu đề (lag tải, hỗ trợ quốc tế hóa)
      */
     public String getTitle() {
         if (title == null) {
@@ -97,14 +97,14 @@ public enum SidebarTab {
     }
 
     /**
-     * 获取当前语言下的标题，不使用缓存，便于设置页和运行时刷新。
+     * Lấy tiêu đề bằng ngôn ngữ hiện tại mà không cần sử dụng bộ đệm, thuận tiện cho việc thiết lập trang và làm mới khi chạy.
      */
     public String getDisplayTitle() {
         return I18nUtil.getMessage(titleKey);
     }
 
     /**
-     * 获取图标（懒加载，避免重复创建）- 普通状态
+     * Nhận biểu tượng (tải chậm để tránh tạo lại)- Trạng thái bình thường
      */
     public Icon getIcon() {
         if (icon == null) {
@@ -130,7 +130,7 @@ public enum SidebarTab {
     }
 
     /**
-     * 获取面板（懒加载）
+     * Lấy bảng điều khiển (tải chậm)
      */
     public JPanel getPanel() {
         if (panel == null) {
@@ -140,7 +140,7 @@ public enum SidebarTab {
     }
 
     /**
-     * 转换为 TabInfo 对象
+     * Chuyển đổi sang  TabInfo đối tượng
      */
     public TabInfo toTabInfo() {
         return new TabInfo(getDisplayTitle(), getIcon(), this::getPanel);

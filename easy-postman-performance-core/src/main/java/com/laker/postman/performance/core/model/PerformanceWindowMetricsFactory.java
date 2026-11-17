@@ -37,7 +37,7 @@ final class PerformanceWindowMetricsFactory {
                 avgDuration = realtimeMetrics.sseActiveSessionDurationMs();
             }
         } else if (protocol == PerformanceProtocol.WEBSOCKET || protocol == PerformanceProtocol.SSE) {
-            // 没有实时计数器时，流式消息总量来自会话结束样本，按会话跨度分摊，避免结束瞬间尖峰。
+            // Khi không có bộ đếm thời gian thực, tổng số tin nhắn phát trực tuyến sẽ đến từ các mẫu cuối phiên, trải đều trong suốt phiên để tránh tăng đột biến vào thời điểm cuối.
             double sessionSeconds = stats.sampleSpanSeconds();
             sentRate = PerformanceMetricMath.rate(stats.sentMessages(), sessionSeconds);
             receivedRate = PerformanceMetricMath.rate(stats.receivedMessages(), sessionSeconds);
@@ -61,7 +61,7 @@ final class PerformanceWindowMetricsFactory {
         );
     }
 
-    // 流式协议的耗时是会话时长，最大值没有诊断意义。
+    // Thời gian tiêu thụ của giao thức truyền phát là thời lượng phiên và giá trị tối đa không có ý nghĩa chẩn đoán.
     private double maxDuration(PerformanceSampleMeterSnapshot stats, PerformanceProtocol protocol) {
         if (protocol == PerformanceProtocol.WEBSOCKET || protocol == PerformanceProtocol.SSE) {
             return Double.NaN;

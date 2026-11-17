@@ -22,7 +22,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.function.Consumer;
 
 /**
- * 响应体下载：选择保存位置、在后台写入原始内容，并在保存期间通知调用方更新按钮状态。
+ * Tải xuống nội dung phản hồi: Chọn vị trí lưu, viết nội dung gốc ở chế độ nền và thông báo cho người gọi để cập nhật trạng thái nút trong quá trình lưu.
  */
 @Slf4j
 final class ResponseBodyDownloader {
@@ -31,7 +31,7 @@ final class ResponseBodyDownloader {
     private boolean saving;
 
     /**
-     * @param savingStateListener 保存开始/结束时回调（EDT），用于禁用/恢复下载按钮
+     * @param savingStateListener Quá trình lưu bắt đầu/Gọi lại khi hoàn tất (EDT），để vô hiệu hóa/Tiếp tục nút tải xuống
      */
     ResponseBodyDownloader(Consumer<Boolean> savingStateListener) {
         this.savingStateListener = savingStateListener;
@@ -42,10 +42,10 @@ final class ResponseBodyDownloader {
     }
 
     /**
-     * 弹出保存对话框，确认后在后台写入；写入成功后在 EDT 回调 {@code onSaved}，失败时弹出错误通知。
+     * Một hộp thoại lưu sẽ bật lên. Sau khi xác nhận, nó sẽ được viết ở chế độ nền; sau khi viết thành công, nó sẽ được viết ở chế độ nền EDT gọi lại {@code onSaved}，Một thông báo lỗi bật lên khi thất bại.
      *
-     * @param source          调用时（EDT）截取的下载来源，写入期间切换响应也不会写错内容
-     * @param defaultFileName 保存对话框默认文件名
+     * @param source          Khi được gọi (EDT）Nguồn tải xuống bị chặn và nội dung sai sẽ không được ghi ngay cả khi phản hồi được chuyển trong khi ghi
+     * @param defaultFileName Lưu tên tệp mặc định của hộp thoại
      */
     void download(Source source, String defaultFileName, Consumer<File> onSaved) {
         if (saving) {
@@ -91,7 +91,7 @@ final class ResponseBodyDownloader {
     }
 
     /**
-     * 默认下载文件名：优先使用响应解析出的文件名（Content-Disposition / URL / 内容识别），否则按 Content-Type 生成。
+     * Tên tệp tải xuống mặc định: Ưu tiên tên tệp được phân tích cú pháp từ phản hồi (Content-Disposition / URL / nhận dạng nội dung), nếu không hãy nhấn Content-Type phát ra.
      */
     static String defaultFileName(HttpResponse response) {
         if (response != null && response.fileName != null && !response.fileName.isBlank()) {
@@ -109,12 +109,12 @@ final class ResponseBodyDownloader {
     }
 
     /**
-     * 下载来源快照。写入优先级：
+     * Tải xuống ảnh chụp nguồn. Ưu tiên viết: .
      * <ol>
-     *     <li>临时文件（大文件或二进制文件）原样复制</li>
-     *     <li>原始响应字节（文件响应、附件或非 UTF-8/无法无损解码的文本）</li>
-     *     <li>响应体文本按 Content-Type 声明的字符集（默认 UTF-8）写入，不受格式化/排序后的编辑器内容影响</li>
-     *     <li>没有响应对象时回退保存编辑器文本</li>
+     *     <li>Các tệp tạm thời (lớn hoặc nhị phân) được sao chép không thay đổi</li>
+     *     <li>Byte phản hồi thô (phản hồi tệp, tệp đính kèm hoặc không UTF-8/Văn bản không thể được giải mã một cách dễ dàng)</li>
+     *     <li>Nội dung phản hồi nhấn văn bản Content-Type Bộ ký tự được khai báo (default UTF-8）Viết, không định dạng/Hiệu ứng của nội dung soạn thảo được sắp xếp</li>
+     *     <li>Dự phòng để lưu văn bản soạn thảo khi không có đối tượng phản hồi nào tồn tại</li>
      * </ol>
      */
     record Source(File file, byte[] bytes, String text) {

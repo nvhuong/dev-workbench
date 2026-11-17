@@ -6,9 +6,9 @@ import javax.swing.*;
 import java.awt.*;
 
 /**
- * 请求编辑器 Tab 删除控制器。
+ * Request an editor Tab Tháo bộ điều khiển.
  * <p>
- * 删除 Tab 时同时负责运行资源释放和临时 Tab 索引修正，避免关闭逻辑散落在面板里。
+ * xóa bỏ Tab Nó cũng chịu trách nhiệm chạy phát hành tài nguyên và tạm thời Tab Chỉnh sửa chỉ mục để tránh logic đóng nằm rải rác trong bảng điều khiển.
  */
 @RequiredArgsConstructor
 final class RequestEditorTabRemovalController {

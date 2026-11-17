@@ -188,7 +188,7 @@ public class EasyComboBoxTest {
         int naturalWidth = comboBox.getPreferredSize().width;
         assertNull(comboBox.getToolTipText());
 
-        // 阈值按实测宽度推算，避免 HiDPI 缩放下固定数值失效
+        // Giá trị ngưỡng được tính dựa trên chiều rộng đo thực tế để tránh HiDPI Các giá trị cố định không hợp lệ khi chia tỷ lệ
         comboBox.setDynamicWidthRange(64, (int) Math.ceil(2.0 * naturalWidth / UIScale.getUserScaleFactor()));
         assertEquals(comboBox.getPreferredSize().width, naturalWidth);
         assertNull(comboBox.getToolTipText());

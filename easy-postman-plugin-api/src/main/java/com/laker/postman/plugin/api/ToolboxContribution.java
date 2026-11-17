@@ -4,7 +4,7 @@ import javax.swing.*;
 import java.util.function.Supplier;
 
 /**
- * 工具箱面板扩展定义。
+ * Định nghĩa phần mở rộng của bảng điều khiển hộp công cụ.
  */
 public record ToolboxContribution(
         String id,

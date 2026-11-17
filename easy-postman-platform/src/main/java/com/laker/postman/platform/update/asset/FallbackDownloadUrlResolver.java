@@ -7,7 +7,7 @@ import com.laker.postman.platform.update.source.UpdateSourceSelector;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * 从备用更新源的真实发布数据中查找同版本、同平台的安装包地址。
+ * Tìm địa chỉ gói cài đặt của cùng phiên bản và nền tảng từ dữ liệu phát hành thực của nguồn cập nhật thay thế.
  */
 @Slf4j
 public class FallbackDownloadUrlResolver {
@@ -26,9 +26,9 @@ public class FallbackDownloadUrlResolver {
     }
 
     /**
-     * 查询备用源中与期望版本完全对应的当前平台安装包。
+     * Truy vấn nguồn thay thế cho gói cài đặt nền tảng hiện tại tương ứng chính xác với phiên bản mong muốn.
      *
-     * @return 备用下载地址；备用源未知、尚未同步或没有当前平台附件时返回 {@code null}
+     * @return Địa chỉ tải xuống thay thế; được trả về khi nguồn thay thế không xác định, chưa được đồng bộ hóa hoặc không có tệp đính kèm cho nền tảng hiện tại {@code null}
      */
     public String resolve(String expectedVersion, String primarySourceName) {
         if (expectedVersion == null || expectedVersion.isBlank()) {

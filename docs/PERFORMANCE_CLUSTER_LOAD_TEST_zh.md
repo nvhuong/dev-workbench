@@ -1,39 +1,39 @@
-# 集群压测使用指南
+# Hướng dẫn sử dụng kiểm tra căng thẳng cụm
 
-本文面向使用者，说明如何把 GUI 中配置好的性能测试计划分发到多台服务器执行。底层行为类似 JMeter 的 master/worker：master 只负责分发、轮询、停止和汇总，真正的请求压力由各 worker 进程产生。
+Bài viết này dành cho người dùng và giải thích cách thực hiện GUI Kế hoạch kiểm tra hiệu suất được định cấu hình sẽ được phân phối đến nhiều máy chủ để thực thi. Hành vi cơ bản là tương tự JMeter của master/worker：master Chỉ chịu trách nhiệm phân phối, bỏ phiếu, dừng và tổng hợp, áp lực yêu cầu thực sự sẽ do mỗi người xử lý worker Quá trình này được tạo ra.
 
-## 核心概念
+## Các khái niệm cốt lõi
 
-- `plan.json`：从 GUI 导出的可执行压测计划。它包含环境变量、全局变量、执行设置、线程组、请求、脚本、断言、CSV inline 数据和外部资产引用。
-- master：GUI 远程模式或 `performance master run` 命令。master 不直接压目标服务，只把计划和分片 assignment 发给 worker。
-- worker：服务器上的 `performance worker` 进程。worker 只在收到 master 分配的 assignment 后执行，避免多台机器各自完整跑一份计划导致总并发放大。
-- 总并发：GUI 中每个 Thread Group 配置的用户数是全局总并发，不是每台 worker 的并发。比如 100 用户、2 台 worker，默认分成 50/50；101 用户、2 台 worker，默认分成 51/50。
-- CSV 分片：CSV Data Set 会跟随虚拟用户全局区间分片，避免所有 worker 都从第 0 行开始读。CSV 行数少于虚拟用户数时，会按全局用户编号循环复用。
+- `plan.json`：Từ GUI Đã xuất kế hoạch kiểm tra căng thẳng có thể thực thi được. Nó chứa các biến môi trường, biến toàn cục, cài đặt thực thi, nhóm luồng, yêu cầu, tập lệnh, xác nhận,CSV inline Tài liệu tham khảo dữ liệu và tài sản bên ngoài.
+- master：GUI Chế độ từ xa hoặc `performance master run` Đặt hàng.master Không trực tiếp nén dịch vụ mục tiêu mà chỉ lập kế hoạch và phân chia nó assignment Đã ban hành worker。
+- worker：trên máy chủ `performance worker` quá trình.worker Chỉ khi nhận được master được giao assignment Thực hiện sau để tránh nhiều máy chạy một kế hoạch hoàn chỉnh, dẫn đến số tiền và phân bổ lớn.
+- Tổng số đồng thời:GUI trong mỗi cái Thread Group Số lượng người dùng được định cấu hình là tổng số lượng người dùng đồng thời trên toàn cầu, không phải của mỗi máy worker của sự đồng thời. Ví dụ 100 Người sử dụng,2 Đài Loan worker，Được chia theo mặc định 50/50；101 Người sử dụng,2 Đài Loan worker，Được chia theo mặc định 51/50。
+- CSV Phân mảnh:CSV Data Set Sẽ theo dõi khoảng thời gian toàn cầu của người dùng ảo để tránh tất cả worker Tất cả từ đầu tiên 0 Dòng bắt đầu đọc.CSV Khi số lượng hàng ít hơn số lượng người dùng ảo, chúng sẽ được tái chế theo số lượng người dùng toàn cầu.
 
-## 什么时候使用集群压测
+## Khi nào nên sử dụng kiểm tra căng thẳng cụm
 
-适合：
+Thích hợp cho:
 
-- 单机 CPU、网络、文件描述符或目标连接数不足，需要多台机器共同施压。
-- 需要在无桌面服务器上长期跑压测。
-- GUI 负责编辑、观察和停止，worker 在专用压测机上执行。
+- Độc lập CPU、Mạng, bộ mô tả tệp hoặc kết nối mục tiêu không đủ yêu cầu nhiều máy phải cùng nhau tạo áp lực.
+- Cần phải chạy các bài kiểm tra căng thẳng trên các máy chủ không có máy tính để bàn trong một thời gian dài.
+- GUI Chịu trách nhiệm chỉnh sửa, quan sát và dừng lại,worker Thực hiện trên máy thử áp suất chuyên dụng.
 
-不适合：
+Không phù hợp với:
 
-- 只需要几百并发的快速验证，单机 GUI 或 CLI 更简单。
-- 需要严格的跨 worker 全局 P99 原始样本合并。目前 master 聚合的是各 worker 的报告结果，失败/慢请求明细按 worker 有界保留后拉回。
+- Chỉ cần vài trăm lần xác minh nhanh đồng thời trên một máy GUI hoặc CLI Đơn giản hơn.
+- Yêu cầu chéo nghiêm ngặt worker Bức tranh lớn P99 Các mẫu ban đầu được sáp nhập. Hiện tại master Mỗi uẩn là gì worker Kết quả báo cáo không thành công/Nhấn chậm để yêu cầu chi tiết worker Kéo trở lại sau khi duy trì giới hạn.
 
-## 准备工作
+## Sự chuẩn bị
 
-1. 所有机器使用相同版本的 EasyPostman JAR 或安装包。
-2. 每台 worker 机器能访问目标 API。
-3. master 能访问每台 worker 的监听端口。
-4. 如果计划引用本地文件，例如 file-source CSV、multipart 文件，请把文件提前放到每台 worker 的相同路径。GUI 不会自动上传本地文件。
-5. 如果 CSV 是在 GUI 中手工创建或导入并内嵌到计划里的，不需要额外上传文件。
+1. Tất cả các máy đều sử dụng cùng một phiên bản EasyPostman JAR hoặc cài đặt gói.
+2. mỗi đơn vị worker Máy có thể truy cập mục tiêu API。
+3. master Có thể truy cập mọi trạm worker cổng nghe.
+4. Nếu bạn định tham chiếu các tệp cục bộ, vd file-source CSV、multipart Các tập tin, vui lòng đặt các tập tin trên mỗi trạm trước worker cùng một con đường.GUI Các tập tin cục bộ sẽ không được tải lên tự động.
+5. nếu CSV Vâng GUI Được tạo hoặc nhập thủ công và nhúng vào kế hoạch, không cần tải thêm tệp nào lên.
 
-## 启动 worker
+## Bắt đầu worker
 
-在每台压测机上启动 worker：
+Bắt đầu trên mỗi máy kiểm tra sức chịu đựng worker：
 
 ```bash
 java -jar easy-postman-5.5.28.jar \
@@ -42,9 +42,9 @@ java -jar easy-postman-5.5.28.jar \
   --port 19090
 ```
 
-`--progress-interval <seconds>` 只控制 worker 控制台多久打印一次进度，例如 users、total、success、failed、qps。它不影响 master 轮询频率，也不影响压测请求执行。默认就是 1 秒，因此一般可以不写。
+`--progress-interval <seconds>` Chỉ cần kiểm soát worker Tần suất bảng điều khiển in tiến trình, ví dụ users、total、success、failed、qps。Nó không ảnh hưởng master Tần suất bỏ phiếu không ảnh hưởng đến việc thực hiện các yêu cầu kiểm tra căng thẳng. Mặc định là 1 Giây, vì vậy nói chung bạn không cần phải viết nó.
 
-关闭控制台进度输出：
+Tắt đầu ra tiến trình của bảng điều khiển: .
 
 ```bash
 java -jar easy-postman-5.5.28.jar \
@@ -54,30 +54,30 @@ java -jar easy-postman-5.5.28.jar \
   --no-progress
 ```
 
-本机验证两个 worker：
+Máy này xác minh cả hai worker：
 
 ```bash
 java -jar easy-postman-5.5.28.jar performance worker --host 127.0.0.1 --port 19090
 java -jar easy-postman-5.5.28.jar performance worker --host 127.0.0.1 --port 19091
 ```
 
-## GUI 远程执行
+## GUI Thực hiện từ xa
 
-1. 在性能测试页面配置一个或多个 Thread Group。
-2. 顶部勾选 `远程`。
-3. 在 `Workers` 输入框填写 worker 列表，支持逗号或空白分隔：
+1. Định cấu hình một hoặc nhiều trên trang kiểm tra hiệu suất Thread Group。
+2. Kiểm tra phần trên cùng `Điều khiển từ xa`。
+3. Vào `Workers` Điền vào hộp đầu vào worker Danh sách, hỗ trợ phân tách bằng dấu phẩy hoặc khoảng trắng:
 
 ```text
 10.0.0.11:19090,10.0.0.12:19090
 ```
 
-4. 点击开始。GUI 会作为 master 生成分片 assignment，并把当前计划发送给各 worker。
-5. 点击停止时，GUI 会向所有 worker 发送 stop。
-6. 结束后，GUI 会拉取每个 worker 的最终 report 并聚合到“报表”；失败/慢请求明细会在合适的收尾阶段拉回到“结果表”。
+4. Nhấp vào Bắt đầu.GUI Sẽ hành động master Tạo các mảnh vỡ assignment，Và gửi kế hoạch hiện tại cho từng người worker。
+5. Khi bấm vào để dừng lại,GUI Sẽ trao cho tất cả worker gửi stop。
+6. Sau khi kết thúc,GUI Sẽ kéo từng cái một worker Sự kết thúc report và tổng hợp thành“Báo cáo”；thất bại/Chi tiết yêu cầu chậm sẽ được kéo trở lại ở giai đoạn đóng thích hợp“Bảng kết quả”。
 
-## CLI master 执行
+## CLI master thực hiện
 
-先从 GUI 导出 `plan.json`，再运行：
+Bắt đầu với GUI Xuất khẩu `plan.json`，Chạy lại: .
 
 ```bash
 java -jar easy-postman-5.5.28.jar \
@@ -87,7 +87,7 @@ java -jar easy-postman-5.5.28.jar \
   --out /tmp/easy-postman-master-result.json
 ```
 
-单机无 GUI 执行同一份计划：
+Không có máy đơn lẻ GUI Thực hiện cùng một kế hoạch:
 
 ```bash
 java -jar easy-postman-5.5.28.jar \
@@ -96,60 +96,60 @@ java -jar easy-postman-5.5.28.jar \
   --out /tmp/easy-postman-result.json
 ```
 
-## 实时刷新如何工作
+## Cách hoạt động của tính năng làm mới theo thời gian thực
 
-单机 `performance run` 和 `performance master run` 都会在控制台打印进度。指定 `--out` 后，输出文件会先变为 `PENDING`，运行中通过同目录临时文件加原子替换持续更新为 `RUNNING` 快照，结束后替换为完整最终报告；失败时也会写入本次 `FAILED` 报告，避免残留上一次结果。两种命令的最终 JSON 均为顶层 `PerformanceJsonReport`，可统一使用 `.summary.totalRequests` 等路径读取。
+Độc lập `performance run` và `performance master run` Tiến trình sẽ được in trên bảng điều khiển. được chỉ định `--out` Sau đó, tập tin đầu ra đầu tiên sẽ trở thành  `PENDING`，Trong quá trình hoạt động, nó được cập nhật liên tục thông qua các tập tin tạm thời trong cùng thư mục và thay thế nguyên tử `RUNNING` Ảnh chụp nhanh được thay thế bằng báo cáo cuối cùng hoàn chỉnh sau khi hoàn thành; nó cũng sẽ được viết lần này trong trường hợp thất bại `FAILED` Báo cáo để tránh giữ lại kết quả cuối cùng. Sự kết thúc của cả hai đơn đặt hàng JSON Tất cả đều ở mức cao nhất `PerformanceJsonReport`，Có thể sử dụng thống nhất `.summary.totalRequests` Đọc đường dẫn bằng nhau.
 
-GUI 远程模式运行时，每 1 秒向每个 worker 查询一次状态：
+GUI Khi chạy ở chế độ từ xa, mỗi 1 giây cho mỗi worker Truy vấn trạng thái một lần:
 
-- 关闭“实时刷新”且关闭“启用趋势”时：请求 `/api/performance/v1/runs/{runId}?report=false`，只拉轻量状态，包含活跃用户数、总用户数、请求数、失败数、QPS 和运行状态。
-- 开启“实时刷新”或“启用趋势”时：请求 `/api/performance/v1/runs/{runId}`，worker 会构建当前聚合 report 快照返回。实时报表用它刷新“报表”页；趋势图用它读取 HTTP/WS/SSE 的协议级累计计数。
-- “启用趋势”使用同一轮状态数据做趋势采样，不额外增加 worker 请求次数；趋势采样间隔取用户设置，最低 1 秒。WS/SSE 的发送消息/秒、接收消息/秒必须依赖聚合 report，否则轻量 status 只能得到总请求数，无法区分协议消息计数。
-- 运行结束后：master 拉取 `/result` 获取最终报告，再拉取 `/details` 获取失败/慢请求明细。
+- Đóng lại“Làm mới trong thời gian thực”và đóng cửa“Kích hoạt xu hướng”Thời gian: Yêu cầu `/api/performance/v1/runs/{runId}?report=false`，Chỉ kéo trạng thái nhẹ, bao gồm số lượng người dùng đang hoạt động, tổng số người dùng, số lượng yêu cầu và số lần thất bại.QPS và trạng thái hoạt động.
+- Bật lên“Làm mới trong thời gian thực”hoặc“Kích hoạt xu hướng”Thời gian: Yêu cầu `/api/performance/v1/runs/{runId}`，worker Tổng hợp hiện tại sẽ được xây dựng report Ảnh chụp nhanh quay trở lại. Báo cáo thời gian thực được làm mới bằng cách sử dụng nó“Báo cáo”trang; sử dụng nó để đọc biểu đồ xu hướng HTTP/WS/SSE Số lượng tích lũy cấp độ giao thức.
+- “Kích hoạt xu hướng”Sử dụng cùng một vòng dữ liệu trạng thái để lấy mẫu xu hướng mà không cần bổ sung thêm worker The number of requests; khoảng thời gian lấy mẫu xu hướng là cài đặt của người dùng, là mức thấp nhất 1 giây.WS/SSE của việc gửi tin nhắn/giây để nhận được tin nhắn/Giây phải phụ thuộc vào tổng hợp report，Nếu không thì nhẹ status Chỉ có thể lấy được tổng số yêu cầu và không thể phân biệt được số lượng thông báo giao thức.
+- Sau khi chạy:master Sự lôi kéo `/result` Nhận báo cáo cuối cùng và kéo nó `/details` Không thể lấy được/Chi tiết yêu cầu chậm.
 
-因此，worker 数越多，master 每秒控制面请求数约为 `worker 数量`。开启实时报表或趋势时，每个响应体更大、worker 需要构建聚合 report 快照，但不会返回失败明细或响应体列表；短压测或极限吞吐压测建议按需关闭实时报表，只看趋势和最终报表。
+Vì vậy,worker Số lượng càng nhiều,master Số lượng yêu cầu mặt phẳng điều khiển mỗi giây là khoảng `worker Số lượng`。Khi bật báo cáo hoặc xu hướng theo thời gian thực, mỗi nội dung phản hồi sẽ lớn hơn.worker Cần xây dựng sự tổng hợp report Ảnh chụp nhanh, nhưng sẽ không trả về chi tiết lỗi hoặc danh sách nội dung phản hồi; bạn nên tắt báo cáo thời gian thực nếu cần đối với các bài kiểm tra sức chịu đựng ngắn hoặc các bài kiểm tra sức chịu đựng thông lượng cực cao và chỉ xem các xu hướng và báo cáo cuối cùng.
 
-## worker 内存和性能边界
+## worker Ranh giới bộ nhớ và hiệu suất
 
-worker 不保存所有请求明细，避免高 QPS 时内存无限增长：
+worker Không lưu tất cả các chi tiết yêu cầu để tránh cao QPS Ký ức thời gian tăng trưởng vô tận:
 
-- 聚合统计使用按 API / 协议维度的统计对象，不按请求数线性保存完整响应。
-- efficient mode 开启时，结果明细只保留失败请求和慢请求，最多保留 1000 条。
-- efficient mode 关闭时，结果明细按“性能结果表行数限制”保留，超过后丢弃最旧明细。
-- 响应体会按预览策略裁剪，结果表渲染不需要的字段会被简化。
-- worker 完成后的 run 状态默认保留 30 分钟，过期后会自动清理，避免 `/result` 和 `/details` 长期占用内存。
+- Thống kê tổng hợp sử dụng báo chí API / Đối tượng thống kê của kích thước giao thức không lưu tuyến tính phản hồi hoàn chỉnh theo số lượng yêu cầu.
+- efficient mode Khi được bật, chi tiết kết quả chỉ giữ lại các yêu cầu không thành công và yêu cầu chậm, ở mức tối đa 1000 dải.
+- efficient mode Khi đóng lại, kết quả được chi tiết bằng cách nhấn“Giới hạn số lượng hàng trong bảng kết quả hiệu suất”Giữ lại, bỏ đi những chi tiết cũ nhất sau khi vượt quá.
+- Nội dung phản hồi sẽ được cắt theo chính sách xem trước và các trường không bắt buộc để hiển thị bảng kết quả sẽ được đơn giản hóa.
+- worker Sau khi hoàn thành run Trạng thái được giữ lại theo mặc định 30 phút, nó sẽ tự động được làm sạch sau khi hết hạn để tránh điều đó `/result` và `/details` Sử dụng bộ nhớ dài hạn.
 
-建议：
+Khuyến nghị:
 
-- 大流量或长时间压测开启 efficient mode。
-- 不需要运行中报表时关闭“实时刷新”。
-- 结果表行数不要设置过大，失败排查通常看最近失败和慢请求即可。
-- 每台 worker 使用独立压测机，避免 GUI、目标服务和 worker 抢同一台机器资源。
+- Kiểm tra lưu lượng lớn hoặc áp suất dài hạn được kích hoạt efficient mode。
+- Đóng khi không cần chạy báo cáo“Làm mới trong thời gian thực”。
+- Không đặt số lượng hàng trong bảng kết quả quá lớn. Khắc phục sự cố lỗi thường chỉ yêu cầu các lỗi gần đây và yêu cầu chậm.
+- mỗi đơn vị worker Sử dụng máy kiểm tra áp suất độc lập để tránh GUI、dịch vụ mục tiêu và worker Lấy tài nguyên của cùng một máy.
 
-## 控制面接口
+## Giao diện mặt phẳng điều khiển
 
-| Method | Path | 说明 |
+| Method | Path | Mô tả |
 |---|---|---|
-| `GET` | `/api/performance/v1/health` | worker 探活。 |
-| `POST` | `/api/performance/v1/runs` | 提交一次运行，body 包含完整 `plan` 和该 worker 的 `assignment`。 |
-| `GET` | `/api/performance/v1/runs/{runId}?report=false` | 轻量状态轮询，关闭实时报表和趋势时使用。 |
-| `GET` | `/api/performance/v1/runs/{runId}` | 带运行中聚合 report 的状态轮询，开启实时报表或趋势时使用。 |
-| `POST` | `/api/performance/v1/runs/{runId}/stop` | 停止指定运行。 |
-| `GET` | `/api/performance/v1/runs/{runId}/result` | 拉取最终 JSON report。 |
-| `GET` | `/api/performance/v1/runs/{runId}/details` | 拉取失败/慢请求明细，用于 GUI 结果表。 |
+| `GET` | `/api/performance/v1/health` | worker Khám phá. |
+| `POST` | `/api/performance/v1/runs` | Gửi một cuộc chạy,body Chứa đầy đủ `plan` và worker của `assignment`。 |
+| `GET` | `/api/performance/v1/runs/{runId}?report=false` | Thăm dò trạng thái nhẹ, được sử dụng khi tắt các báo cáo và xu hướng theo thời gian thực. |
+| `GET` | `/api/performance/v1/runs/{runId}` | Với sự tổng hợp nhanh chóng report Thăm dò trạng thái, được sử dụng khi bật báo cáo hoặc xu hướng theo thời gian thực. |
+| `POST` | `/api/performance/v1/runs/{runId}/stop` | Dừng hoạt động được chỉ định. |
+| `GET` | `/api/performance/v1/runs/{runId}/result` | Kéo cuối cùng JSON report。 |
+| `GET` | `/api/performance/v1/runs/{runId}/details` | Kéo không thành công/Chi tiết yêu cầu chậm cho GUI Bảng kết quả. |
 
-控制面请求不计入压测 report 的请求数和 QPS。
+Các yêu cầu của mặt phẳng điều khiển không được bao gồm trong bài kiểm tra sức chịu đựng report Số lượng yêu cầu và QPS。
 
-## 常见问题
+## Câu hỏi thường gặp
 
-### 为什么两个 worker 不一定比一个 worker 快？
+### Tại sao lại là hai worker Không nhất thiết phải tốt hơn một worker nhanh? .
 
-分布式压测只解决“施压端瓶颈”。如果瓶颈在目标服务、网络回环、master/worker 同机竞争 CPU、短压测初始化开销、脚本执行或 HTTP 连接设置上，多 worker 不一定更快。建议至少跑 30 秒以上，并把 worker 放到独立机器上测试。
+Kiểm tra sức chịu đựng phân tán chỉ giải quyết được vấn đề này“Nút thắt cuối áp lực”。Nếu nút thắt cổ chai nằm ở dịch vụ đích, vòng lặp mạng,master/worker Cạnh tranh với cùng một máy CPU、Chi phí khởi tạo kiểm tra căng thẳng ngắn, thực thi tập lệnh hoặc HTTP Trên cài đặt kết nối, có rất nhiều worker Không nhất thiết phải nhanh hơn. Ít nhất nên chạy 30 giây trở lên và đặt worker Đặt nó trên một máy riêng để kiểm tra.
 
-### `plan.json` 上传时间算不算压测时间？
+### `plan.json` Thời gian tải lên có được tính là thời gian kiểm tra căng thẳng không? .
 
-不算。master 发送 `plan + assignment` 属于控制面分发，不计入最终 report 的 `elapsedTimeMs` 和 QPS。worker 控制台的运行耗时从 worker 异步执行开始计算，可能包含 worker 内部 plan 编译、脚本池初始化和分片应用。
+Không được tính.master gửi `plan + assignment` Nó thuộc về phân bố mặt phẳng điều khiển và không được đưa vào tính toán cuối cùng report của `elapsedTimeMs` và QPS。worker Bảng điều khiển chạy từ  worker Việc thực thi không đồng bộ sẽ bắt đầu quá trình tính toán và có thể chứa worker nội bộ plan Biên dịch, khởi tạo nhóm tập lệnh và ứng dụng phân đoạn.
 
-### worker 是否需要打开 GUI？
+### worker Có cần phải mở nó ra không? GUI？
 
-不需要。`performance worker`、`performance run` 和 `performance master run` 都会走 headless 启动路径，不创建 Swing 主窗口。
+Không cần.`performance worker`、`performance run` và `performance master run` Tất cả sẽ đi headless Đường dẫn khởi động, chưa được tạo Swing Cửa sổ chính.

@@ -16,9 +16,9 @@ import java.util.function.IntConsumer;
 import java.util.function.IntPredicate;
 
 /**
- * 请求编辑器 Tab 关闭控制器。
+ * Request an editor Tab Tắt bộ điều khiển.
  * <p>
- * 关闭前保存确认、批量关闭顺序和删除后的选中恢复都是行为编排，统一放在控制层，面板只暴露入口。
+ * Xác nhận lưu trước khi đóng, trình tự đóng hàng loạt và khôi phục lựa chọn sau khi xóa đều là sự sắp xếp hành vi và được thống nhất trên lớp điều khiển và bảng điều khiển chỉ hiển thị lối vào.
  */
 @RequiredArgsConstructor
 final class RequestEditorTabCloseController {

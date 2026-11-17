@@ -86,7 +86,7 @@ public class PerformanceCorePlanAdapter {
         }
         List<PerformanceThreadGroupPlan> threadGroups = new ArrayList<>();
         for (PerformanceThreadGroupPlan group : corePlan.getThreadGroups()) {
-            // worker 分片后的虚拟用户 offset 必须保留下来，否则 CSV 行会从第 0 行重新分配。
+            // worker Người dùng ảo sau khi sharding offset Phải ở lại, nếu không CSV Bang hội từ số 1 0 Các hàng được phân bổ lại.
             threadGroups.add(new PerformanceThreadGroupPlan(
                     group.getName(),
                     group.getThreadGroupData(),

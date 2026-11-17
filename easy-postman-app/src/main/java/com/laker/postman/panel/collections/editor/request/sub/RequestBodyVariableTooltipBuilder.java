@@ -6,9 +6,9 @@ import com.laker.postman.variable.VariableType;
 import lombok.experimental.UtilityClass;
 
 /**
- * 请求体变量提示内容构建器。
+ * Request body variables prompt content builder.
  * <p>
- * 变量 badge、自动补全列表和悬浮提示都需要 HTML 转义和主题色，集中到这里避免编辑器面板继续膨胀。
+ * các biến badge、Bắt buộc đối với cả danh sách tự động hoàn thành và mẹo di chuột HTML Màu sắc thoát và chủ đề được tập trung ở đây để ngăn bảng soạn thảo tiếp tục mở rộng.
  */
 @UtilityClass
 class RequestBodyVariableTooltipBuilder {

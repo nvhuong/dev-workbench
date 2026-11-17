@@ -4,37 +4,37 @@ import lombok.Data;
 
 import java.io.File;
 
-// Workspace模型类
+// WorkspaceLớp người mẫu
 @Data
 public class Workspace {
     private String id; // UUID
-    private String name; // 工作空间名称
-    private String description; // 工作空间描述
+    private String name; // Tên không gian làm việc
+    private String description; // Mô tả không gian làm việc
     private WorkspaceType type; // LOCAL/GIT
-    private GitRepoSource gitRepoSource; // 仓库来源：INITIALIZED（本地初始化）/ CLONED（远程克隆）
+    private GitRepoSource gitRepoSource; // Nguồn kho:INITIALIZED（khởi tạo cục bộ)/ CLONED（nhân bản từ xa)
 
     /**
-     * 本地路径，末尾始终带 {@link File#separator}。
-     * getter/setter 均做规范化，调用方无需手动处理末尾斜杠。
+     * Đường dẫn cục bộ, luôn có  {@link File#separator}。
+     * getter/setter Tất cả đều được chuẩn hóa và người gọi không cần phải xử lý dấu gạch chéo ở cuối theo cách thủ công.
      */
-    private String path; // 本地路径
+    private String path; // đường đi cục bộ
 
-    private String gitRemoteUrl; // Git远程仓库地址
-    private String currentBranch; // 当前分支名称
-    private String remoteBranch; // 当前跟踪的远程分支名称
-    private String lastCommitId; // 最后提交ID
+    private String gitRemoteUrl; // GitĐịa chỉ kho từ xa
+    private String currentBranch; // Tên chi nhánh hiện tại
+    private String remoteBranch; // Tên của nhánh từ xa hiện được theo dõi
+    private String lastCommitId; // Đệ trình cuối cùngID
     private long createdAt;
     private long updatedAt;
-    private String gitUsername;      // Git 用户名
-    private String gitPassword;      // Git 密码（加密存储）
-    private String gitToken;         // Git 令牌（替代密码，优先使用）
-    private GitAuthType gitAuthType; // 认证类型
-    private String sshPrivateKeyPath; // SSH 私钥文件路径
-    private String sshPassphrase;     // SSH 私钥密码（可选）
+    private String gitUsername;      // Git Tên người dùng
+    private String gitPassword;      // Git Mật khẩu (lưu trữ được mã hóa)
+    private String gitToken;         // Git Mã thông báo (thay thế cho mật khẩu, được ưu tiên)
+    private GitAuthType gitAuthType; // Loại xác thực
+    private String sshPrivateKeyPath; // SSH Đường dẫn tệp khóa riêng
+    private String sshPassphrase;     // SSH Mật khẩu khóa riêng (tùy chọn)
 
     /**
-     * 返回末尾带 {@link File#separator} 的规范路径。
-     * 无论 path 存储时末尾是否有分隔符，此方法总是返回统一格式。
+     * Trở lại ban nhạc cuối {@link File#separator} con đường kinh điển.
+     * Không vấn đề gì path Dù có dấu phân cách ở cuối khi lưu trữ hay không, phương thức này luôn trả về một định dạng thống nhất.
      */
     public String getPath() {
         if (path == null || path.isBlank()) {
@@ -44,7 +44,7 @@ public class Workspace {
     }
 
     /**
-     * 存储前自动规范化末尾分隔符，保持内部一致。
+     * Tự động chuẩn hóa các dấu phân cách ở cuối trước khi lưu trữ để duy trì tính nhất quán bên trong.
      */
     public void setPath(String path) {
         if (path == null || path.isBlank()) {

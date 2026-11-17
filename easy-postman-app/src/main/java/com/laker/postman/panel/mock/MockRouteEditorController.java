@@ -151,7 +151,7 @@ final class MockRouteEditorController {
                 response == null
                         ? I18nUtil.getMessage(MessageKeys.MOCK_SERVER_ROUTE_DEFAULT_RESPONSE_NAME)
                         : response.getName(),
-                // Mock Server 无法以 1xx 作为最终响应，编辑器只允许 200–599
+                // Mock Server Không thể làm như vậy 1xx Như một phản hồi cuối cùng, biên tập viên chỉ cho phép 200–599
                 response == null || response.getCode() < 200 || response.getCode() > 599 ? 200 : response.getCode(),
                 response == null ? 0 : response.getMockDelayMs(),
                 response == null ? java.util.List.of() : response.getHeaders(),
@@ -187,12 +187,12 @@ final class MockRouteEditorController {
     }
 
     /**
-     * 编辑后仍有效的文件信息，按编辑后的响应头更新文件名：
+     * Để thông tin tệp vẫn hợp lệ sau khi chỉnh sửa, hãy cập nhật tên tệp theo tiêu đề phản hồi đã chỉnh sửa:
      * <ul>
-     *     <li>文本附件：正文本就是可编辑文本，只要响应头仍声明 attachment 就保留</li>
-     *     <li>其余文件：正文未改动时保留（只改延迟/脚本不应让“未保存文件内容”的示例变成 0 字节文件），
-     *     手动填写正文，或把响应头改成既非附件也非二进制类型后，按普通文本示例处理</li>
-     *     <li>文件名优先取 Content-Disposition；文本附件未声明文件名时按 Content-Type 更新扩展名</li>
+     *     <li>Tệp đính kèm văn bản: Nội dung văn bản là văn bản có thể chỉnh sửa miễn là tiêu đề phản hồi vẫn được khai báo attachment Cứ giữ nó đi</li>
+     *     <li>Các tệp còn lại: Giữ nguyên văn bản chính (chỉ thay đổi độ trễ/Kịch bản không nên để“Nội dung tập tin không được lưu”Ví dụ trở thành 0 tập tin byte).
+     *     Điền nội dung theo cách thủ công hoặc thay đổi tiêu đề phản hồi thành không phải là tệp đính kèm hay loại nhị phân và xử lý nó như một ví dụ văn bản thông thường</li>
+     *     <li>Tên tập tin được ưu tiên Content-Disposition；Nhấn khi tệp đính kèm văn bản không khai báo tên tệp Content-Type Cập nhật phần mở rộng</li>
      * </ul>
      */
     static SavedResponse.FileInfo fileInfoAfterEdit(SavedResponse existing, String editedBody, List<HttpHeader> editedHeaders) {
@@ -224,8 +224,8 @@ final class MockRouteEditorController {
     }
 
     /**
-     * 用户改动了 Content-Type / Content-Disposition，且新响应头既不是附件也不是二进制类型：不再按文件处理。
-     * 响应头未改动时保留（例如服务端声明 JSON、实际返回 xlsx 的示例）。
+     * Người dùng đã thay đổi Content-Type / Content-Disposition，Và tiêu đề phản hồi mới không phải là tệp đính kèm hay loại nhị phân: nó không còn được xử lý dưới dạng tệp nữa.
+     * Tiêu đề phản hồi được giữ lại khi chúng không thay đổi (chẳng hạn như khai báo máy chủ JSON、lợi nhuận thực tế xlsx ví dụ).
      */
     private static boolean abandonedFileHeaders(SavedResponse existing, List<HttpHeader> editedHeaders) {
         String contentType = header(editedHeaders, "Content-Type");
@@ -245,7 +245,7 @@ final class MockRouteEditorController {
     }
 
     /**
-     * 编辑后的正文大小：正文与字符集都未变，或编辑后仍是未保存内容的文件时沿用原大小；否则按编辑后声明的字符集计算。
+     * Kích thước văn bản sau khi chỉnh sửa: Văn bản và bộ ký tự không thay đổi hoặc nếu file sau khi chỉnh sửa vẫn là file chưa lưu nội dung thì sử dụng kích thước gốc; nếu không, bộ ký tự được khai báo sau khi chỉnh sửa sẽ được sử dụng.
      */
     static long bodySizeAfterEdit(SavedResponse existing, String editedBody, List<HttpHeader> editedHeaders,
                                   SavedResponse.FileInfo editedFile) {
@@ -253,7 +253,7 @@ final class MockRouteEditorController {
         Charset charset = ResponseFiles.charsetOf(header(editedHeaders, "Content-Type"));
         boolean bodyUnchanged = bodyOf(existing).equals(body);
         boolean omittedFile = editedFile != null && !editedFile.isContentInBody();
-        // 原本是未保存内容的文件、编辑后降级为普通文本时，旧大小不再对应正文
+        // Khi một tệp ban đầu có nội dung chưa được lưu bị hạ cấp xuống văn bản bình thường sau khi chỉnh sửa, kích thước cũ không còn tương ứng với văn bản chính
         boolean wasOmittedFile = existing.getFile() != null && !existing.getFile().isContentInBody();
         boolean sameCharset = charset.equals(ResponseFiles.charsetOf(header(existing.getHeaders(), "Content-Type")));
         if (bodyUnchanged && (omittedFile || (!wasOmittedFile && sameCharset))) {

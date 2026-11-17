@@ -39,7 +39,7 @@ public class MockCodeExampleCatalogTest {
         assertEquals(new HashSet<>(examples.stream().map(MockCodeExampleCatalog.Example::category).toList()).size(),
                 MockCodeExampleCatalog.Category.values().length);
 
-        ResourceBundle zh = ResourceBundle.getBundle("messages", Locale.SIMPLIFIED_CHINESE);
+        ResourceBundle zh = ResourceBundle.getBundle("messages", Locale.forLanguageTag("vi"));
         ResourceBundle en = ResourceBundle.getBundle("messages", Locale.ENGLISH);
         for (MockCodeExampleCatalog.Category category : MockCodeExampleCatalog.Category.values()) {
             assertFalse(zh.getString(category.messageKey()).isBlank());

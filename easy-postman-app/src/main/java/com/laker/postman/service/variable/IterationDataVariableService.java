@@ -7,10 +7,10 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * 迭代数据变量提供者。
+ * Nhà cung cấp biến dữ liệu lặp.
  * <p>
- * 保存当前执行上下文的 CSV/JSON 行数据，并在同一执行线程内供
- * pm.iterationData 和 {{variable}} 解析复用。
+ * Lưu bối cảnh thực hiện hiện tại CSV/JSON dữ liệu hàng và được cung cấp trong cùng một luồng thực thi
+ * pm.iterationData và {{variable}} Phân tích tái sử dụng.
  */
 public class IterationDataVariableService implements VariableProvider {
 
@@ -85,9 +85,9 @@ public class IterationDataVariableService implements VariableProvider {
     }
 
     /**
-     * 彻底解绑当前迭代数据上下文。
+     * Hủy liên kết hoàn toàn bối cảnh dữ liệu lặp lại hiện tại.
      * <p>
-     * 由框架层在一次运行结束时调用，避免后续请求复用旧的 CSV/JSON 行数据。
+     * Được lớp khung gọi khi kết thúc quá trình chạy để tránh sử dụng lại lớp khung cũ cho các yêu cầu tiếp theo CSV/JSON dữ liệu hàng.
      */
     public void detachContext() {
         Map<String, String> iterationData = ITERATION_DATA.get();

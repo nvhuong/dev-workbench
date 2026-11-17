@@ -14,14 +14,14 @@ import java.util.List;
 import static com.laker.postman.panel.collections.tree.CollectionTreePanel.*;
 
 /**
- * 树状态辅助类
- * 用于保存和恢复树的展开状态
+ * Lớp trợ giúp trạng thái cây
+ * Dùng để lưu và khôi phục trạng thái mở rộng của cây
  */
 @UtilityClass
 public class TreeStateHelper {
 
     /**
-     * 保存所有展开的路径
+     * Lưu tất cả các đường dẫn mở rộng
      */
     public static List<TreePath> saveExpandedPaths(JTree tree) {
         List<TreePath> expandedPaths = new ArrayList<>();
@@ -36,7 +36,7 @@ public class TreeStateHelper {
     }
 
     /**
-     * 恢复展开的路径
+     * Khôi phục đường dẫn mở rộng
      */
     public static void restoreExpandedPaths(JTree tree, List<TreePath> expandedPaths,
                                             DefaultMutableTreeNode rootNode) {
@@ -53,7 +53,7 @@ public class TreeStateHelper {
     }
 
     /**
-     * 根据旧路径的节点userObject查找匹配的新路径
+     * Nút dựa trên đường dẫn cũuserObjectTìm đường dẫn mới phù hợp
      */
     private static TreePath findMatchingPath(TreePath oldPath, DefaultMutableTreeNode rootNode) {
         Object[] oldNodes = oldPath.getPath();
@@ -65,7 +65,7 @@ public class TreeStateHelper {
         List<DefaultMutableTreeNode> matchedNodes = new ArrayList<>();
         matchedNodes.add(currentNode);
 
-        // 跳过根节点，从第一个子节点开始匹配
+        // Bỏ qua nút gốc và bắt đầu khớp từ nút con đầu tiên
         for (int i = 1; i < oldNodes.length; i++) {
             DefaultMutableTreeNode oldNode = (DefaultMutableTreeNode) oldNodes[i];
             Object oldUserObj = oldNode.getUserObject();
@@ -83,7 +83,7 @@ public class TreeStateHelper {
     }
 
     /**
-     * 在当前节点的子节点中查找匹配的节点
+     * Tìm các nút phù hợp trong số các nút con của nút hiện tại
      */
     private static DefaultMutableTreeNode findMatchingChild(DefaultMutableTreeNode parent, Object targetUserObj) {
         for (int i = 0; i < parent.getChildCount(); i++) {
@@ -96,7 +96,7 @@ public class TreeStateHelper {
     }
 
     /**
-     * 判断两个节点的userObject是否表示同一个节点
+     * Đánh giá hai nútuserObjectCho dù nó đại diện cho cùng một nút
      */
     private static boolean isSameNode(Object obj1, Object obj2) {
         if (obj1 == obj2) {
@@ -106,12 +106,12 @@ public class TreeStateHelper {
             return false;
         }
 
-        // 根节点比较
+        // So sánh nút gốc
         if (ROOT.equals(obj1) && ROOT.equals(obj2)) {
             return true;
         }
 
-        // 数组类型节点比较
+        // So sánh nút kiểu mảng
         if (obj1 instanceof Object[] arr1 && obj2 instanceof Object[] arr2) {
             if (arr1.length < 2 || arr2.length < 2) {
                 return false;
@@ -125,10 +125,10 @@ public class TreeStateHelper {
             }
 
             if (GROUP.equals(type1)) {
-                // 分组节点按名称比较
+                // Các nút được nhóm được so sánh theo tên
                 return arr1[1].equals(arr2[1]);
             } else if (REQUEST.equals(type1)) {
-                // 请求节点按ID比较
+                // Yêu cầu nhấn nútIDSo sánh
                 HttpRequestItem item1 = (HttpRequestItem) arr1[1];
                 HttpRequestItem item2 = (HttpRequestItem) arr2[1];
                 return item1.getId().equals(item2.getId());

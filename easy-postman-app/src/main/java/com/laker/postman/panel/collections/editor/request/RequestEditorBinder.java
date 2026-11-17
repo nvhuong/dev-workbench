@@ -86,7 +86,7 @@ final class RequestEditorBinder {
                                                RequestItemProtocolEnum currentProtocol,
                                                List<SavedResponse> responses,
                                                boolean fromModel) {
-        // fromModel=true 用于脏检查场景，避免 stopCellEditing 打断用户正在编辑表格单元格。
+        // fromModel=true Được sử dụng cho các tình huống kiểm tra bẩn, tránh stopCellEditing Ngăn người dùng chỉnh sửa một ô trong bảng.
         String bodyType = resolveCurrentBodyType();
         HttpRequestSettingsDraft settings = view.requestSettingsPanel.collectSettings();
         return HttpRequestEditorDraft.builder()

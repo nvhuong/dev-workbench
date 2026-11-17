@@ -15,30 +15,30 @@ import java.util.List;
 import java.util.UUID;
 
 /**
- * RequestGroup 类表示一个请求分组的配置项
- * 包含分组的名称、认证、脚本等信息
- * 分组级别的认证和脚本会被其下的请求继承
+ * RequestGroup Lớp đại diện cho một mục cấu hình yêu cầu nhóm
+ * Chứa tên nhóm, xác thực, tập lệnh và thông tin khác
+ * Xác thực cấp nhóm và tập lệnh được kế thừa bởi các yêu cầu bên dưới chúng
  */
 @Getter
 @Setter
 public class RequestGroup implements Serializable {
-    private String id = ""; // 唯一标识符
-    private String name = ""; // 分组名称
-    private String description = ""; // 分组描述
-    private String authType = AuthType.INHERIT.getConstant(); // 认证类型（none/apiKey/basic/bearer/digest/inherit），分组默认继承父级认证
-    private String authUsername = ""; // Basic/Digest用户名
-    private String authPassword = ""; // Basic/Digest密码
+    private String id = ""; // Mã định danh duy nhất
+    private String name = ""; // Tên nhóm
+    private String description = ""; // Mô tả nhóm
+    private String authType = AuthType.INHERIT.getConstant(); // Loại xác thực (none/apiKey/basic/bearer/digest/inherit），Các nhóm kế thừa xác thực gốc theo mặc định
+    private String authUsername = ""; // Basic/DigestTên người dùng
+    private String authPassword = ""; // Basic/Digestmật khẩu
     private String authToken = "";    // Bearer Token
-    private String authApiKeyName = ""; // API Key 名称
-    private String authApiKeyValue = ""; // API Key 值
-    private String authApiKeyPlacement = AuthApiKeyPlacement.HEADER.getConstant(); // API Key 添加位置
-    // 前置脚本（请求前执行）
+    private String authApiKeyName = ""; // API Key tên
+    private String authApiKeyValue = ""; // API Key giá trị
+    private String authApiKeyPlacement = AuthApiKeyPlacement.HEADER.getConstant(); // API Key Thêm vị trí
+    // Pre-script (thực thi trước khi có yêu cầu)
     private String prescript = "";
-    // 后置脚本（响应后执行）
+    // Postscript (được thực hiện sau khi phản hồi)
     private String postscript = "";
-    // 公共请求头（会被子请求继承）
+    // Tiêu đề yêu cầu công khai (sẽ được kế thừa bởi các yêu cầu phụ)
     private List<HttpHeader> headers = new ArrayList<>();
-    // 分组级别的变量（会被子请求继承）
+    // Các biến cấp độ nhóm (sẽ được kế thừa bởi các yêu cầu phụ)
     private List<Variable> variables = new ArrayList<>();
 
     public RequestGroup() {
@@ -51,8 +51,8 @@ public class RequestGroup implements Serializable {
     }
 
     /**
-     * 判断分组是否有认证配置
-     * 需要同时排除 NONE 和 INHERIT 类型，只有配置了实际认证（Basic/Bearer/Digest 等）才返回 true
+     * Xác định xem nhóm có cấu hình xác thực hay không
+     * cần phải được loại trừ cùng một lúc NONE và INHERIT Nhập, chỉ khi xác thực thực tế được định cấu hình (Basic/Bearer/Digest v.v.) trước khi quay lại true
      */
     public boolean hasAuth() {
         return authType != null
@@ -61,28 +61,28 @@ public class RequestGroup implements Serializable {
     }
 
     /**
-     * 判断分组是否有前置脚本
+     * Xác định xem nhóm có kịch bản trước hay không
      */
     public boolean hasPreScript() {
         return prescript != null && !prescript.trim().isEmpty();
     }
 
     /**
-     * 判断分组是否有后置脚本
+     * Xác định xem nhóm có post-script hay không
      */
     public boolean hasPostScript() {
         return postscript != null && !postscript.trim().isEmpty();
     }
 
     /**
-     * 判断分组是否有公共请求头
+     * Xác định xem nhóm có tiêu đề yêu cầu chung hay không
      */
     public boolean hasHeaders() {
         return headers != null && !headers.isEmpty();
     }
 
     /**
-     * 判断分组是否有变量
+     * Xác định xem nhóm có biến hay không
      */
     public boolean hasVariables() {
         return variables != null && !variables.isEmpty();

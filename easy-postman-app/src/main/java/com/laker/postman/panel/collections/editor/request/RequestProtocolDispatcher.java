@@ -31,7 +31,7 @@ final class RequestProtocolDispatcher {
         RequestPreparationNetworkLogPublisher.publish(request);
         ScriptExecutionPipeline pipeline = result.getPipeline();
         SwingWorker<Void, Void> worker;
-        // 这里是协议分发的唯一出口：SSE 作为 HTTP 响应模式由 HTTP 执行器处理。
+        // Đây là lối thoát duy nhất để phân phối giao thức: .SSE như HTTP Mẫu phản hồi bao gồm HTTP Người thực thi xử lý.
         if (protocol.isWebSocketProtocol()) {
             worker = webSocketRequestExecutor.createWorker(request, pipeline);
         } else {
@@ -47,7 +47,7 @@ final class RequestProtocolDispatcher {
         if (request == null) {
             return;
         }
-        // HTTP 执行层只发布 NetworkLogEvent；请求编辑器在这里把事件接回当前响应面板。
+        // HTTP Lớp thực thi chỉ xuất bản NetworkLogEvent；The request editor receives the event back to the current response panel here.
         HttpCaptureProfiles.apply(request, HttpCaptureProfile.COLLECTION_DIAGNOSTIC);
         request.networkLogSink = event -> responsePanel.getNetworkLogPanel().appendLog(event);
         request.lifecycleLogSink = SwingHttpRuntimeInteractionAdapter.lifecycleLogSink();
@@ -57,7 +57,7 @@ final class RequestProtocolDispatcher {
         if (request == null) {
             return;
         }
-        // HTTP 执行层只依赖 UI-neutral sink；Swing 请求编辑器在这里挂接具体交互。
+        // HTTP Lớp thực thi chỉ phụ thuộc vào UI-neutral sink；Swing The request editor hooks up specific interactions here.
         request.downloadProgressSinkFactory = SwingHttpRuntimeInteractionAdapter.downloadProgressSinkFactory();
         request.responseSizeLimitWarningSink = SwingHttpRuntimeInteractionAdapter.responseSizeLimitWarningSink();
         SSLConfigurationUtil.setLifecycleLogSink(request.lifecycleLogSink);

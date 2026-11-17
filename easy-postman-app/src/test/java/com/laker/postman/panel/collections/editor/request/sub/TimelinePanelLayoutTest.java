@@ -28,12 +28,12 @@ public class TimelinePanelLayoutTest extends AbstractSwingUiTest {
     @Test
     public void standardTimelineShouldRemainCompactEnoughForFirstViewport() {
         TimelinePanel panel = new TimelinePanel(List.of(
-                new TimelinePanel.Stage("DNS解析", 0, 148, "DNS"),
-                new TimelinePanel.Stage("建立连接", 148, 375, "Connect"),
-                new TimelinePanel.Stage("SSL握手", 375, 1085, "TLS"),
-                new TimelinePanel.Stage("请求发送", 1085, 1102, "Request"),
-                new TimelinePanel.Stage("等待响应 (TTFB)", 1102, 1591, "TTFB"),
-                new TimelinePanel.Stage("内容下载", 1591, 1592, "Download")
+                new TimelinePanel.Stage("DNSphân tích", 0, 148, "DNS"),
+                new TimelinePanel.Stage("Thiết lập kết nối", 148, 375, "Connect"),
+                new TimelinePanel.Stage("SSLbắt tay", 375, 1085, "TLS"),
+                new TimelinePanel.Stage("Yêu cầu đã được gửi", 1085, 1102, "Request"),
+                new TimelinePanel.Stage("Chờ phản hồi (TTFB)", 1102, 1591, "TTFB"),
+                new TimelinePanel.Stage("Tải xuống nội dung", 1591, 1592, "Download")
         ), new HttpEventInfo());
 
         Dimension preferredSize = panel.getPreferredSize();
@@ -45,7 +45,7 @@ public class TimelinePanelLayoutTest extends AbstractSwingUiTest {
     @Test
     public void certificateWarningShouldUpdatePreferredHeightWhenEventInfoChanges() {
         TimelinePanel panel = new TimelinePanel(List.of(
-                new TimelinePanel.Stage("DNS解析", 0, 148, "DNS")
+                new TimelinePanel.Stage("DNSphân tích", 0, 148, "DNS")
         ), new HttpEventInfo());
         int originalHeight = panel.getPreferredSize().height;
         HttpEventInfo info = new HttpEventInfo();
@@ -60,7 +60,7 @@ public class TimelinePanelLayoutTest extends AbstractSwingUiTest {
     @Test
     public void leftWhitespaceShouldNotTriggerBarHover() {
         TimelinePanel panel = new TimelinePanel(List.of(
-                new TimelinePanel.Stage("DNS解析", 0, 148, "DNS")
+                new TimelinePanel.Stage("DNSphân tích", 0, 148, "DNS")
         ), new HttpEventInfo());
         Dimension preferredSize = panel.getPreferredSize();
         panel.setSize(preferredSize);
@@ -75,7 +75,7 @@ public class TimelinePanelLayoutTest extends AbstractSwingUiTest {
     @Test
     public void zeroDurationStageShouldNotTriggerBarHover() {
         TimelinePanel panel = new TimelinePanel(List.of(
-                new TimelinePanel.Stage("DNS解析", 0, 0, "DNS")
+                new TimelinePanel.Stage("DNSphân tích", 0, 0, "DNS")
         ), new HttpEventInfo());
         Dimension preferredSize = panel.getPreferredSize();
         panel.setSize(preferredSize);
@@ -90,7 +90,7 @@ public class TimelinePanelLayoutTest extends AbstractSwingUiTest {
     @Test
     public void zeroDurationStageShouldUseSameRowHoverBackground() {
         TimelinePanel panel = new TimelinePanel(List.of(
-                new TimelinePanel.Stage("DNS解析", 0, 0, "DNS")
+                new TimelinePanel.Stage("DNSphân tích", 0, 0, "DNS")
         ), new HttpEventInfo());
         Dimension preferredSize = panel.getPreferredSize();
         panel.setSize(preferredSize);
@@ -107,7 +107,7 @@ public class TimelinePanelLayoutTest extends AbstractSwingUiTest {
     @Test
     public void durationStageShouldKeepDefaultCursorBecauseRowsAreTooltipOnly() {
         TimelinePanel panel = new TimelinePanel(List.of(
-                new TimelinePanel.Stage("DNS解析", 0, 148, "DNS")
+                new TimelinePanel.Stage("DNSphân tích", 0, 148, "DNS")
         ), new HttpEventInfo());
         Dimension preferredSize = panel.getPreferredSize();
         panel.setSize(preferredSize);
@@ -121,7 +121,7 @@ public class TimelinePanelLayoutTest extends AbstractSwingUiTest {
 
     @Test
     public void zeroDurationStageRowShouldExplainMissingObservedTiming() {
-        boolean originalChinese = I18nUtil.isChinese();
+        boolean originalVietnamese = I18nUtil.isVietnamese();
         try {
             I18nUtil.setLocale("en");
             TimelinePanel panel = new TimelinePanel(List.of(
@@ -136,13 +136,13 @@ public class TimelinePanelLayoutTest extends AbstractSwingUiTest {
             assertTrue(tooltip.contains("Not recorded"),
                     "Unobserved zero-duration stages should explain why no bar is drawn");
         } finally {
-            I18nUtil.setLocale(originalChinese ? "zh" : "en");
+            I18nUtil.setLocale(originalVietnamese ? "vi" : "en");
         }
     }
 
     @Test
     public void sameMillisecondObservedStageShouldDisplaySubMillisecondDuration() {
-        boolean originalChinese = I18nUtil.isChinese();
+        boolean originalVietnamese = I18nUtil.isVietnamese();
         try {
             I18nUtil.setLocale("en");
             HttpEventInfo info = new HttpEventInfo();
@@ -160,7 +160,7 @@ public class TimelinePanelLayoutTest extends AbstractSwingUiTest {
             assertTrue(tooltip.contains("same millisecond"),
                     "Tooltip should distinguish observed sub-millisecond timing from missing timing");
         } finally {
-            I18nUtil.setLocale(originalChinese ? "zh" : "en");
+            I18nUtil.setLocale(originalVietnamese ? "vi" : "en");
         }
     }
 
@@ -208,7 +208,7 @@ public class TimelinePanelLayoutTest extends AbstractSwingUiTest {
         info.setRemoteAddress("very-long-hostname-for-debugging.example.internal/192.168.100.101:443");
         info.setCipherName("TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256");
         TimelinePanel panel = new TimelinePanel(List.of(
-                new TimelinePanel.Stage("DNS解析", 0, 148, "DNS")
+                new TimelinePanel.Stage("DNSphân tích", 0, 148, "DNS")
         ), info);
         panel.setSize(panel.getPreferredSize());
 
@@ -224,7 +224,7 @@ public class TimelinePanelLayoutTest extends AbstractSwingUiTest {
 
     @Test
     public void englishConnectionInfoLabelsShouldFitNormalSummaryColumns() {
-        boolean originalChinese = I18nUtil.isChinese();
+        boolean originalVietnamese = I18nUtil.isVietnamese();
         try {
             I18nUtil.setLocale("en");
             TimelinePanel panel = new TimelinePanel(List.of(
@@ -251,7 +251,7 @@ public class TimelinePanelLayoutTest extends AbstractSwingUiTest {
             assertTrue(560 - labelWidth >= TimelinePanel.INFO_VALUE_MIN_WIDTH,
                     "Timeline summary values should keep enough space after dynamic label width");
         } finally {
-            I18nUtil.setLocale(originalChinese ? "zh" : "en");
+            I18nUtil.setLocale(originalVietnamese ? "vi" : "en");
         }
     }
 

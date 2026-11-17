@@ -10,8 +10,8 @@ import java.util.Locale;
 import java.util.Set;
 
 /**
- * SQL 格式化工具类。
- * 不引入 Druid 运行时依赖，保留 Druid 风格的常用格式化规则和更强的本地校验。
+ * SQL Lớp công cụ định dạng .
+ * Không được giới thiệu Druid Các phần phụ thuộc vào thời gian chạy, được giữ lại Druid phong cách các quy tắc định dạng chung và xác nhận cục bộ mạnh mẽ hơn.
  */
 @Slf4j
 public final class SqlFormatter {
@@ -87,7 +87,7 @@ public final class SqlFormatter {
     }
 
     /**
-     * 格式化选项。
+     * Tùy chọn định dạng.
      */
     public static class FormatOption {
         private String indent = "  ";
@@ -148,7 +148,7 @@ public final class SqlFormatter {
     }
 
     /**
-     * 标准格式化 SQL。
+     * Định dạng chuẩn SQL。
      */
     public static String format(String sql) {
         return format(sql, new FormatOption());
@@ -159,7 +159,7 @@ public final class SqlFormatter {
     }
 
     /**
-     * 格式化 SQL。
+     * Định dạng SQL。
      */
     public static String format(String sql, FormatOption option) {
         if (sql == null || sql.trim().isEmpty()) {
@@ -201,7 +201,7 @@ public final class SqlFormatter {
     }
 
     /**
-     * 压缩 SQL 为单行。
+     * Nén SQL cho một dòng duy nhất.
      */
     public static String compress(String sql) {
         return compress(sql, SqlDialect.GENERIC);
@@ -252,7 +252,7 @@ public final class SqlFormatter {
     }
 
     /**
-     * 转换关键字大小写。
+     * Chuyển đổi từ khóa thành chữ hoa và chữ thường.
      */
     public static String convertKeywords(String sql, boolean toUppercase) {
         return convertKeywords(sql, toUppercase, SqlDialect.GENERIC);
@@ -301,7 +301,7 @@ public final class SqlFormatter {
     }
 
     /**
-     * SQL 校验。
+     * SQL Kiểm tra.
      */
     public static ValidationResult validate(String sql) {
         return validate(sql, SqlDialect.GENERIC);

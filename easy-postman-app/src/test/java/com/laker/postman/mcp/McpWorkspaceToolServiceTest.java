@@ -119,7 +119,7 @@ public class McpWorkspaceToolServiceTest {
                 .addHeader("X-Auth-Token", "custom-header-secret")
                 .addHeader("Location", "https://callback.test?refresh_token=redirect-secret")
                 .setBody("{\"access_token\":\"one-time-secret\",\"data\":\""
-                        + "好".repeat(600) + "\"}"));
+                        + "Được rồi".repeat(600) + "\"}"));
         Path workspace = Files.createTempDirectory("easy-postman-mcp-run-");
         HttpRequestItem request = request(
                 "request-run",

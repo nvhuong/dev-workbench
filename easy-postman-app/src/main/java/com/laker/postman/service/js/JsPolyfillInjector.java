@@ -13,53 +13,53 @@ import java.util.Base64;
 import java.util.UUID;
 
 /**
- * JS脚本Polyfill注入器
- * 提供常用函数注入（编码、加密、工具函数等）
+ * JSkịch bảnPolyfillĐầu phun
+ * Cung cấp tính năng chèn chức năng chung (mã hóa, mã hóa, chức năng tiện ích, v.v.)
  * <p>
- * 支持的函数：
- * - Base64编解码: btoa, atob
- * - 哈希函数: MD5, SHA1, SHA256, SHA512
- * - 工具函数: uuid, timestamp
+ * Các chức năng hỗ trợ:
+ * - Base64Codec: btoa, atob
+ * - Hàm băm: MD5, SHA1, SHA256, SHA512
+ * - Chức năng công cụ: uuid, timestamp
  */
 @Slf4j
 @UtilityClass
 public class JsPolyfillInjector {
 
     /**
-     * 注入所有常用 polyfill
+     * Tiêm tất cả thông thường polyfill
      */
     public static void injectAll(Context context) {
         log.debug("Injecting JavaScript polyfills...");
 
-        // Base64编解码
+        // Base64Codec
         injectBase64Functions(context);
 
-        // 哈希函数
+        // Hàm băm
         injectHashFunctions(context);
 
-        // 工具函数
+        // Chức năng công cụ
         injectUtilityFunctions(context);
 
-        // URL 编解码函数
+        // URL Chức năng mã hóa và giải mã
         injectUrlEncodingFunctions(context);
 
-        // 外部 JS 库支持
+        // bên ngoài JS Hỗ trợ thư viện
         JsLibraryLoader.injectBuiltinLibraries(context);
 
         log.debug("Polyfills injected successfully");
     }
 
     /**
-     * 注入Base64相关函数
+     * tiêmBase64Các chức năng liên quan
      */
     private static void injectBase64Functions(Context context) {
-        // btoa - 字符串转Base64
+        // btoa - Chuyển đổi chuỗiBase64
         injectFunction(context, "btoa", args -> {
             String str = args[0].asString();
             return Base64.getEncoder().encodeToString(str.getBytes(StandardCharsets.UTF_8));
         });
 
-        // atob - Base64转字符串
+        // atob - Base64Chuyển đổi thành chuỗi
         injectFunction(context, "atob", args -> {
             String str = args[0].asString();
             byte[] decoded = Base64.getDecoder().decode(str);
@@ -68,7 +68,7 @@ public class JsPolyfillInjector {
     }
 
     /**
-     * 注入哈希函数
+     * Tiêm hàm băm
      */
     private static void injectHashFunctions(Context context) {
         // MD5
@@ -97,18 +97,18 @@ public class JsPolyfillInjector {
     }
 
     /**
-     * 注入工具函数
+     * Tiêm các chức năng tiện ích
      */
     private static void injectUtilityFunctions(Context context) {
-        // uuid - 生成UUID
+        // uuid - phát raUUID
         injectFunction(context, "uuid", args -> UUID.randomUUID().toString());
 
-        // timestamp - 获取当前时间戳（毫秒）
+        // timestamp - Lấy dấu thời gian hiện tại (mili giây)
         injectFunction(context, "timestamp", args -> System.currentTimeMillis());
     }
 
     /**
-     * 注入 URL 编解码函数
+     * tiêm URL Chức năng mã hóa và giải mã
      */
     private static void injectUrlEncodingFunctions(Context context) {
         if (hasGlobalFunction(context, "encodeURIComponent")
@@ -119,11 +119,11 @@ public class JsPolyfillInjector {
             return;
         }
 
-        // encodeURIComponent - URL 编码
+        // encodeURIComponent - URL Mã hóa
         injectFunction(context, "encodeURIComponent", args -> {
             String str = args[0].asString();
             return java.net.URLEncoder.encode(str, StandardCharsets.UTF_8)
-                    .replace("+", "%20")  // 空格编码为 %20 而非 +
+                    .replace("+", "%20")  // Dấu cách được mã hóa dưới dạng  %20 Đúng hơn +
                     .replace("%21", "!")
                     .replace("%27", "'")
                     .replace("%28", "(")
@@ -131,13 +131,13 @@ public class JsPolyfillInjector {
                     .replace("%7E", "~");
         });
 
-        // decodeURIComponent - URL 解码
+        // decodeURIComponent - URL giải mã
         injectFunction(context, "decodeURIComponent", args -> {
             String str = args[0].asString();
             return HttpUrlUtil.decodeComponent(str);
         });
 
-        // encodeURI - URL 编码（保留特殊字符）
+        // encodeURI - URL Mã hóa (ký tự đặc biệt dành riêng)
         injectFunction(context, "encodeURI", args -> {
             String str = args[0].asString();
             return java.net.URLEncoder.encode(str, StandardCharsets.UTF_8)
@@ -163,7 +163,7 @@ public class JsPolyfillInjector {
                     .replace("%7E", "~");
         });
 
-        // decodeURI - URL 解码
+        // decodeURI - URL giải mã
         injectFunction(context, "decodeURI", args -> {
             String str = args[0].asString();
             return decodeUriFallback(str);
@@ -204,7 +204,7 @@ public class JsPolyfillInjector {
     }
 
     /**
-     * 注入单个函数
+     * Tiêm một chức năng duy nhất
      */
     private static void injectFunction(Context context, String name, ProxyExecutable function) {
         try {

@@ -82,7 +82,7 @@ public class TreeNodeTransferHandler extends TransferHandler {
         if (!(nodeToRemove.getUserObject() instanceof PerformanceTreeNode)) {
             return false;
         }
-        // 不允许拖到自己或子孙节点
+        // Không được phép kéo đến các nút sở hữu hoặc con cháu
         if (nodeToRemove == targetNode) {
             return false;
         }
@@ -111,13 +111,13 @@ public class TreeNodeTransferHandler extends TransferHandler {
             if (oldParent != null) treeModel.removeNodeFromParent(node);
             int insertIndex = childIndex;
             if (insertIndex == -1) insertIndex = parent.getChildCount();
-            // 允许同级排序
+            // Cho phép anh chị em sắp xếp
             if (oldParent == parent && oldIndex < insertIndex) {
                 insertIndex--;
             }
             treeModel.insertNodeInto(node, parent, insertIndex);
             performanceTree.expandPath(new TreePath(parent.getPath()));
-            performanceTree.updateUI(); // 强制刷新
+            performanceTree.updateUI(); // Buộc làm mới
             return true;
         } catch (UnsupportedFlavorException | IOException ex) {
             log.error(ex.getMessage(), ex);

@@ -9,8 +9,8 @@ import java.awt.*;
 import java.util.function.IntConsumer;
 
 /**
- * Tab栏构建器
- * 负责根据协议类型创建Tab按钮和面板
+ * TabTrình tạo cột
+ * Chịu trách nhiệm tạo dựa trên loại giao thứcTabCác nút và bảng điều khiển
  */
 @UtilityClass
 public class TabBarBuilder {
@@ -26,7 +26,7 @@ public class TabBarBuilder {
     }
 
     /**
-     * Tab配置信息
+     * TabThông tin cấu hình
      */
     public static class TabConfig {
         public final String[] tabNames;
@@ -50,7 +50,7 @@ public class TabBarBuilder {
     }
 
     /**
-     * 为WebSocket协议创建Tab配置
+     * vìWebSocketTạo thỏa thuậnTabcấu hình
      */
     public static TabConfig createWebSocketTabs() {
         Tab[] tabs = new Tab[]{Tab.WEBSOCKET_MESSAGES, Tab.RESPONSE_HEADERS, Tab.NETWORK_LOG};
@@ -63,7 +63,7 @@ public class TabBarBuilder {
     }
 
     /**
-     * 为HTTP协议创建Tab配置
+     * vìHTTPTạo thỏa thuậnTabcấu hình
      */
     public static TabConfig createHttpTabs() {
         Tab[] tabs = new Tab[]{
@@ -79,7 +79,7 @@ public class TabBarBuilder {
                 I18nUtil.getMessage(MessageKeys.TAB_TIMING)
         };
 
-        // HTTP 模式下，默认隐藏事件流标签。
+        // HTTP chế độ này, nhãn luồng sự kiện bị ẩn theo mặc định.
         boolean[] visibility = createAllVisibleArray(names.length);
         visibility[indexOf(tabs, Tab.EVENT_STREAM)] = false;
 
@@ -87,11 +87,11 @@ public class TabBarBuilder {
     }
 
     /**
-     * 创建Tab配置
+     * TạoTabcấu hình
      *
-     * @param names      tab名称数组
-     * @param visibility 可见性数组，null表示全部可见
-     * @return Tab配置对象
+     * @param names      tabMảng tên
+     * @param visibility Mảng hiển thị, .nullCho biết tất cả đều có thể nhìn thấy được
+     * @return TabĐối tượng cấu hình
      */
     private static TabConfig createTabConfig(Tab[] tabs, String[] names, boolean[] visibility) {
         boolean[] vis = visibility != null ? visibility : createAllVisibleArray(names.length);
@@ -116,7 +116,7 @@ public class TabBarBuilder {
     }
 
     /**
-     * 创建全部可见的布尔数组
+     * Tạo một mảng gồm tất cả các boolean có thể nhìn thấy được
      */
     private static boolean[] createAllVisibleArray(int length) {
         boolean[] result = new boolean[length];
@@ -125,11 +125,11 @@ public class TabBarBuilder {
     }
 
     /**
-     * 将Tab按钮添加到tabBar面板
+     * SẽTabnút được thêm vàotabBarbảng điều khiển
      *
-     * @param tabBar     目标面板
-     * @param buttons    按钮数组
-     * @param visibility 可见性数组
+     * @param tabBar     Bảng mục tiêu
+     * @param buttons    Mảng nút
+     * @param visibility Mảng hiển thị
      */
     public static void addButtonsToTabBar(JPanel tabBar, JButton[] buttons, boolean[] visibility) {
         for (int i = 0; i < buttons.length; i++) {
@@ -141,12 +141,12 @@ public class TabBarBuilder {
     }
 
     /**
-     * 为所有tab按钮绑定点击事件
+     * cho tất cảtabSự kiện nhấp chuột ràng buộc nút
      *
-     * @param buttons       按钮数组
-     * @param tabNames      tab名称数组
-     * @param cardPanel     卡片面板
-     * @param onTabSelected tab选中时的回调
+     * @param buttons       Mảng nút
+     * @param tabNames      tabMảng tên
+     * @param cardPanel     Bảng thẻ
+     * @param onTabSelected tabGọi lại khi được chọn
      */
     public static void bindTabActions(JButton[] buttons, String[] tabNames,
                                       JPanel cardPanel, IntConsumer onTabSelected) {

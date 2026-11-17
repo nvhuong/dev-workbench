@@ -6,35 +6,35 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 
 /**
- * Windows 注册表工具类
- * 用于检查应用是否已安装（通过注册表）
+ * Windows Lớp công cụ đăng ký
+ * Được sử dụng để kiểm tra xem ứng dụng đã được cài đặt chưa (thông qua sổ đăng ký)
  */
 @Slf4j
 public class WindowsRegistryChecker {
 
-    // 64位注册表路径（默认）
-    // 注意：Inno Setup 的 AppId=GUID 会生成注册表键 GUID_is1（不带花括号）
+    // 64Đường dẫn đăng ký bit (mặc định)
+    // Lưu ý:Inno Setup của AppId=GUID Một khóa đăng ký sẽ được tạo ra GUID_is1（không có dấu ngoặc nhọn)
     private static final String UNINSTALL_KEY_PATH_64 =
         "HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\8B9C5D6E-7F8A-9B0C-1D2E-3F4A5B6C7D8E_is1";
 
-    // 32位注册表路径（在64位系统上的WOW6432Node）
+    // 32Đường dẫn đăng ký bit (trong 64hệ thống bitWOW6432Node）
     private static final String UNINSTALL_KEY_PATH_32 =
         "HKEY_LOCAL_MACHINE\\SOFTWARE\\WOW6432Node\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\8B9C5D6E-7F8A-9B0C-1D2E-3F4A5B6C7D8E_is1";
 
-    // 用于其他方法的默认路径
+    // Đường dẫn mặc định được sử dụng cho các phương pháp khác
     private static final String UNINSTALL_KEY_PATH = UNINSTALL_KEY_PATH_64;
 
-    // 实际找到的注册表路径（缓存）
+    // Đã tìm thấy đường dẫn đăng ký thực tế (bộ đệm)
     private static String actualKeyPath = null;
 
     /**
-     * 检查应用是否已安装（通过注册表）
-     * 会同时检查64位和32位注册表路径
+     * Kiểm tra xem ứng dụng đã được cài đặt chưa (thông qua sổ đăng ký)
+     * Sẽ kiểm tra cùng một lúc64tổng bit32Đường dẫn đăng ký bit
      *
-     * @return true 如果应用已安装，false 否则
+     * @return true Nếu ứng dụng được cài đặt, .false Ngược lại
      */
     public static boolean isAppInstalled() {
-        // 先检查64位路径
+        // Kiểm tra đầu tiên64đường dẫn bit
         log.info("Checking 64-bit registry path...");
         if (checkRegistryPath(UNINSTALL_KEY_PATH_64)) {
             actualKeyPath = UNINSTALL_KEY_PATH_64;
@@ -42,7 +42,7 @@ public class WindowsRegistryChecker {
             return true;
         }
 
-        // 再检查32位路径
+        // Kiểm tra lại32đường dẫn bit
         log.info("Checking 32-bit registry path (WOW6432Node)...");
         if (checkRegistryPath(UNINSTALL_KEY_PATH_32)) {
             actualKeyPath = UNINSTALL_KEY_PATH_32;
@@ -50,7 +50,7 @@ public class WindowsRegistryChecker {
             return true;
         }
 
-        // 尝试通过搜索 DisplayName 查找应用
+        // Hãy thử tìm kiếm DisplayName Tìm ứng dụng
         log.info("Registry key not found, trying to search by DisplayName...");
         if (findAppByDisplayName()) {
             log.info("✓ App is INSTALLED (found by DisplayName search)");
@@ -62,7 +62,7 @@ public class WindowsRegistryChecker {
     }
 
     /**
-     * 检查指定的注册表路径是否存在
+     * Kiểm tra xem đường dẫn đăng ký đã chỉ định có tồn tại hay không
      */
     private static boolean checkRegistryPath(String keyPath) {
         try {
@@ -71,7 +71,7 @@ public class WindowsRegistryChecker {
 
             Process process = pb.start();
 
-            // 读取输出（用于日志调试）- 使用GBK编码避免中文乱码
+            // Đọc đầu ra (để gỡ lỗi ghi nhật ký)- sử dụngGBKMã hóa để tránh các ký tự bị cắt xén của Trung Quốc
             try (BufferedReader reader = new BufferedReader(
                     new InputStreamReader(process.getInputStream(), "GBK"))) {
                 String line;
@@ -91,10 +91,10 @@ public class WindowsRegistryChecker {
     }
 
     /**
-     * 通过搜索 DisplayName 查找应用
-     * 使用 reg query /s /f 命令高效搜索注册表
+     * Bằng cách tìm kiếm DisplayName Tìm ứng dụng
+     * sử dụng reg query /s /f Lệnh để tìm kiếm sổ đăng ký một cách hiệu quả
      *
-     * @return true 如果找到应用，false 否则
+     * @return true Nếu ứng dụng được tìm thấy, .false Ngược lại
      */
     private static boolean findAppByDisplayName() {
         String[] searchPaths = {
@@ -105,7 +105,7 @@ public class WindowsRegistryChecker {
 
         for (String basePath : searchPaths) {
             try {
-                // 使用 /s 搜索子键, /f 查找指定字符串
+                // sử dụng /s Tìm kiếm các khóa con, /f Tìm chuỗi được chỉ định
                 ProcessBuilder pb = new ProcessBuilder("reg", "query", basePath, "/s", "/f", "EasyPostman");
                 pb.redirectErrorStream(true);
                 Process process = pb.start();
@@ -118,12 +118,12 @@ public class WindowsRegistryChecker {
                         line = line.trim();
                         log.info("  Search output: {}", line);
 
-                        // 找到包含 HKEY 的行（注册表键路径）
+                        // Tìm thấy có chứa HKEY dòng (đường dẫn khóa đăng ký)
                         if (line.startsWith("HKEY_") && line.contains("Uninstall")) {
                             foundKeyPath = line;
                         }
 
-                        // 确认找到的是 DisplayName
+                        // Xác nhận rằng nó đã được tìm thấy DisplayName
                         if (foundKeyPath != null && line.contains("DisplayName") && line.contains("EasyPostman")) {
                             actualKeyPath = foundKeyPath;
                             log.info("✓ Found app at: {}", foundKeyPath);
@@ -144,12 +144,12 @@ public class WindowsRegistryChecker {
 
 
     /**
-     * 获取已安装应用的版本
+     * Tải phiên bản của ứng dụng đã cài đặt
      *
-     * @return 已安装的版本号，如果未安装或查询失败则返回 null
+     * @return Số phiên bản đã cài đặt, được trả về nếu nó chưa được cài đặt hoặc truy vấn không thành công null
      */
     public static String getInstalledVersion() {
-        // 使用实际找到的路径，如果没有则尝试默认路径
+        // Sử dụng đường dẫn thực tế được tìm thấy hoặc thử đường dẫn mặc định nếu không tìm thấy đường dẫn nào
         String keyPath = actualKeyPath != null ? actualKeyPath : UNINSTALL_KEY_PATH;
 
         try {
@@ -164,7 +164,7 @@ public class WindowsRegistryChecker {
                     new InputStreamReader(process.getInputStream(), "GBK"))) {
                 String line;
                 while ((line = reader.readLine()) != null) {
-                    // 解析版本号: DisplayVersion    REG_SZ    4.0.9
+                    // Phân tích số phiên bản: DisplayVersion    REG_SZ    4.0.9
                     if (line.contains("DisplayVersion") && line.contains("REG_SZ")) {
                         String[] parts = line.trim().split("\\s+");
                         if (parts.length >= 3) {

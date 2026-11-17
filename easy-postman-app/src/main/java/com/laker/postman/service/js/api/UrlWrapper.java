@@ -12,14 +12,14 @@ import java.util.Objects;
 import java.util.StringJoiner;
 
 /**
- * URL 包装器 - 用于在 JavaScript 中访问 pm.request.url
+ * URL giấy gói - Được sử dụng trong JavaScript thăm vào pm.request.url
  * <p>
- * 提供对 URL 查询参数的访问，模拟 Postman 的 pm.request.url 对象。
+ * Cung cấp các cặp URL Truy cập tham số, mô phỏng Postman của pm.request.url đối tượng.
  * </p>
  *
- * <h3>使用示例：</h3>
+ * <h3>Ví dụ sử dụng:</h3>
  * <pre>{@code
- * // JavaScript 脚本中
+ * // JavaScript trong kịch bản
  * var password = pm.request.url.query.all()[1].value;
  * pm.request.url.query.all()[1].value = "newValue";
  * }</pre>
@@ -27,7 +27,7 @@ import java.util.StringJoiner;
 public class UrlWrapper {
 
     /**
-     * URL 字符串
+     * URL chuỗi
      */
     public final String url;
 
@@ -35,7 +35,7 @@ public class UrlWrapper {
     private final String fragment;
 
     /**
-     * 查询参数包装器
+     * Trình bao bọc tham số truy vấn
      */
     public final QueryWrapper query;
 
@@ -54,12 +54,12 @@ public class UrlWrapper {
     }
 
     /**
-     * 获取 URL 的路径部分（不包含协议、域名、端口和查询参数）
+     * Lấy URL Phần đường dẫn (không bao gồm các tham số giao thức, tên miền, cổng và truy vấn)
      * <p>
-     * 例如: {@code "https://api.example.com:8080/users/123?id=1" -> "/users/123"}
+     * Ví dụ: {@code "https://api.example.com:8080/users/123?id=1" -> "/users/123"}
      * </p>
      *
-     * @return URL 路径，如果解析失败则返回空字符串
+     * @return URL Đường dẫn hoặc một chuỗi trống nếu phân tích cú pháp không thành công
      */
     public String getPath() {
         if (url == null || url.isEmpty()) {
@@ -89,12 +89,12 @@ public class UrlWrapper {
     }
 
     /**
-     * 获取 URL 的主机名部分（不包含协议和端口）
+     * Lấy URL Phần tên máy chủ (không bao gồm giao thức và cổng)
      * <p>
-     * 例如: {@code "https://api.example.com:8080/users" -> "api.example.com"}
+     * Ví dụ: {@code "https://api.example.com:8080/users" -> "api.example.com"}
      * </p>
      *
-     * @return 主机名，如果解析失败则返回空字符串
+     * @return Tên máy chủ hoặc một chuỗi trống nếu phân tích cú pháp không thành công
      */
     public String getHost() {
         if (url == null || url.isEmpty()) {
@@ -133,12 +133,12 @@ public class UrlWrapper {
     }
 
     /**
-     * 获取查询参数字符串（不包含 '?'）
+     * Lấy chuỗi tham số truy vấn (không bao gồm  '?'）
      * <p>
-     * 例如: {@code "https://api.example.com/users?id=1&name=test" -> "id=1&name=test"}
+     * Ví dụ: {@code "https://api.example.com/users?id=1&name=test" -> "id=1&name=test"}
      * </p>
      *
-     * @return 查询参数字符串，如果没有查询参数则返回空字符串
+     * @return Chuỗi tham số truy vấn hoặc chuỗi trống nếu không có tham số truy vấn
      */
     public String getQueryString() {
         if (url == null || url.isEmpty()) {
@@ -153,12 +153,12 @@ public class UrlWrapper {
     }
 
     /**
-     * 获取路径和查询参数（从第一个 '/' 开始）
+     * Nhận tham số đường dẫn và truy vấn (từ tham số đầu tiên '/' bắt đầu)
      * <p>
-     * 例如: {@code "https://api.example.com/users?id=1" -> "/users?id=1"}
+     * Ví dụ: {@code "https://api.example.com/users?id=1" -> "/users?id=1"}
      * </p>
      *
-     * @return 路径和查询参数，如果解析失败则返回 "/"
+     * @return Các tham số đường dẫn và truy vấn, được trả về nếu phân tích cú pháp không thành công "/"
      */
     public String getPathWithQuery() {
         if (url == null || url.isEmpty()) {
@@ -184,9 +184,9 @@ public class UrlWrapper {
     }
 
     /**
-     * 获取完整的 URL 字符串
+     * Nhận phiên bản đầy đủ URL chuỗi
      *
-     * @return URL 字符串
+     * @return URL chuỗi
      */
     public String toString() {
         String queryString = buildQueryString();
@@ -390,7 +390,7 @@ public class UrlWrapper {
     }
 
     /**
-     * 查询参数包装器类
+     * Lớp trình bao bọc tham số truy vấn
      */
     public static class QueryWrapper {
         private final List<HttpParam> params;
@@ -402,8 +402,8 @@ public class UrlWrapper {
         }
 
         /**
-         * 返回所有查询参数的 JavaScript 友好包装列表
-         * 注意：返回的是缓存的代理列表，对代理字段的修改会保留
+         * Trả về tất cả tham số truy vấn JavaScript Danh sách đóng gói thân thiện
+         * Lưu ý: Những gì được trả về là danh sách proxy được lưu trong bộ nhớ đệm và các sửa đổi đối với trường proxy sẽ được giữ lại
          */
         public List<JsListWrapper.ItemProxy> all() {
             return delegate.all();
@@ -465,7 +465,7 @@ public class UrlWrapper {
         }
 
         /**
-         * 同步所有代理的修改回底层 HttpParam 对象
+         * Đồng bộ hóa tất cả các thay đổi của tác nhân trở lại lớp bên dưới HttpParam đối tượng
          */
         public void sync() {
             delegate.sync();

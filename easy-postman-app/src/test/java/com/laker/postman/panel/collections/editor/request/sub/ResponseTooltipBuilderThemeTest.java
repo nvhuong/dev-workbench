@@ -52,7 +52,7 @@ public class ResponseTooltipBuilderThemeTest extends AbstractSwingUiTest {
     public void sizeTooltipShouldUseCurrentLocaleLabels() {
         Locale previousLocale = I18nUtil.currentLocale();
         try {
-            I18nUtil.setLocale(Locale.CHINESE);
+            I18nUtil.setLocale(Locale.forLanguageTag("vi"));
             HttpEventInfo info = new HttpEventInfo();
             info.setHeaderBytesReceived(181);
             info.setBodyBytesReceived(492);
@@ -62,12 +62,12 @@ public class ResponseTooltipBuilderThemeTest extends AbstractSwingUiTest {
             JPanel tooltip = ResponseTooltipBuilder.buildSizeTooltipPanel(492, info, sizeInfo);
 
             List<String> labels = collectLabels(tooltip);
-            assertTrue(labels.contains("响应"));
-            assertTrue(labels.contains("响应头"));
-            assertTrue(labels.contains("响应体"));
-            assertTrue(labels.contains("请求"));
-            assertTrue(labels.contains("请求头"));
-            assertTrue(labels.contains("请求体"));
+            assertTrue(labels.contains("phản hồi"));
+            assertTrue(labels.contains("tiêu đề phản hồi"));
+            assertTrue(labels.contains("cơ quan phản ứng"));
+            assertTrue(labels.contains("yêu cầu"));
+            assertTrue(labels.contains("Tiêu đề yêu cầu"));
+            assertTrue(labels.contains("Request body"));
         } finally {
             I18nUtil.setLocale(previousLocale);
         }

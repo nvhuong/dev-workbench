@@ -12,7 +12,7 @@ import static org.testng.Assert.assertTrue;
 
 public class DebouncedSaveSupportTest {
 
-    @Test(description = "连续触发保存时应合并为一次执行")
+    @Test(description = "Việc lưu được kích hoạt liên tục phải được kết hợp thành một lần thực thi")
     public void shouldCoalesceRepeatedSaveRequests() throws Exception {
         AtomicInteger saveCount = new AtomicInteger();
         CountDownLatch latch = new CountDownLatch(1);

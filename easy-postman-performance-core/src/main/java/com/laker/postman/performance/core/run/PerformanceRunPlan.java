@@ -13,7 +13,7 @@ import java.util.Map;
 
 @Value
 public class PerformanceRunPlan {
-    // 运行态快照只表达可执行语义，不保存 Swing tree、工作区路径或 GUI 展示开关。
+    // Việc chạy ảnh chụp nhanh chỉ thể hiện ngữ nghĩa thực thi và không được lưu Swing tree、Đường dẫn không gian làm việc hoặc  GUI Hiển thị công tắc.
     String schemaVersion;
     String generatedBy;
     String generatedAt;

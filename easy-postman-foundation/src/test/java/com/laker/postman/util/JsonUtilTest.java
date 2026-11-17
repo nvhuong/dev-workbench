@@ -8,7 +8,7 @@ import static org.testng.Assert.assertTrue;
 
 public class JsonUtilTest {
 
-    @Test(description = "JSON 格式化应保留 JSON5/JSONC 风格注释")
+    @Test(description = "JSON Định dạng nên được giữ nguyên JSON5/JSONC Ghi chú phong cách")
     public void prettyPrintShouldPreserveJsonComments() {
         String formatted = JsonUtil.toJsonPrettyStr("""
                 {
@@ -29,7 +29,7 @@ public class JsonUtilTest {
                 }""");
     }
 
-    @Test(description = "URL 字符串里的双斜杠不应被误认为注释")
+    @Test(description = "URL Dấu gạch chéo kép trong chuỗi không nên nhầm lẫn với nhận xét")
     public void prettyPrintShouldNotTreatUrlStringAsComment() {
         String formatted = JsonUtil.toJsonPrettyStr("""
                 {"url":"https://example.com/a//b"}""");
@@ -40,7 +40,7 @@ public class JsonUtilTest {
                 }""");
     }
 
-    @Test(description = "JSON 结构比较应忽略对象字段顺序，但保留数组顺序")
+    @Test(description = "JSON So sánh cấu trúc nên bỏ qua thứ tự trường đối tượng nhưng giữ nguyên thứ tự mảng")
     public void structurallyEqualShouldCompareParsedJson() {
         assertTrue(JsonUtil.isStructurallyEqual("{\"a\":1,\"b\":[2,3]}", "{\"b\":[2,3],\"a\":1}"));
         assertFalse(JsonUtil.isStructurallyEqual("[1,2]", "[2,1]"));

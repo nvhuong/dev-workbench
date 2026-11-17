@@ -38,7 +38,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * WebSocket 生命周期节点属性面板。
+ * WebSocket Bảng thuộc tính nút vòng đời.
  */
 @Slf4j
 public class WebSocketStagePropertyPanel extends JPanel {
@@ -514,7 +514,7 @@ public class WebSocketStagePropertyPanel extends JPanel {
         }
         area.setText(text == null ? "" : text);
         area.setCaretPosition(0);
-        // 这里是切换性能节点时回填配置，不是用户编辑；清掉 RSTA 记录的加载动作。
+        // Đây là cấu hình chèn lấp khi chuyển đổi các nút hiệu suất, không phải chỉnh sửa của người dùng; xóa nó RSTA Hành động tải được ghi lại.
         area.discardAllEdits();
         if (ac != null) {
             ac.setAutoActivationEnabled(true);

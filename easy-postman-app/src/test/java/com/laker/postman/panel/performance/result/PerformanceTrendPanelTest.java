@@ -211,10 +211,10 @@ public class PerformanceTrendPanelTest extends AbstractSwingUiTest {
 
     @Test
     public void chineseViewModeLabelsShouldStayCompact() {
-        ResourceBundle zh = ResourceBundle.getBundle("messages", Locale.CHINESE);
+        ResourceBundle zh = ResourceBundle.getBundle("messages", Locale.forLanguageTag("vi"));
 
-        assertEquals(zh.getString(MessageKeys.PERFORMANCE_TREND_SEPARATE_CHARTS), "分离");
-        assertEquals(zh.getString(MessageKeys.PERFORMANCE_TREND_COMBINED_CHART), "合并");
+        assertEquals(zh.getString(MessageKeys.PERFORMANCE_TREND_SEPARATE_CHARTS), "sự chia ly");
+        assertEquals(zh.getString(MessageKeys.PERFORMANCE_TREND_COMBINED_CHART), "hợp nhất");
     }
 
     @Test
@@ -546,10 +546,10 @@ public class PerformanceTrendPanelTest extends AbstractSwingUiTest {
 
     @Test
     public void chartPopupMenuShouldFollowEasyPostmanLanguageWhenJFreeChartBundleDiffers() throws Exception {
-        boolean originalChinese = I18nUtil.isChinese();
+        boolean originalVietnamese = I18nUtil.isVietnamese();
         ResourceBundle originalChartBundle = chartPanelLocalizationBundle();
         try {
-            setChartPanelLocalizationBundle(Locale.SIMPLIFIED_CHINESE);
+            setChartPanelLocalizationBundle(Locale.forLanguageTag("vi"));
             clearSingletonInstance(PerformanceTrendPanel.class);
             I18nUtil.setLocale("en");
 
@@ -561,9 +561,9 @@ public class PerformanceTrendPanelTest extends AbstractSwingUiTest {
             assertTrue(hasPopupMenuText(popupMenu, "Save as"));
             assertTrue(hasPopupMenuText(popupMenu, "Zoom In"));
             assertTrue(hasPopupMenuText(popupMenu, "Auto Range"));
-            assertFalse(hasAnyPopupText(popupMenu, "属性", "复制", "另存为", "放大", "自动调整"));
+            assertFalse(hasAnyPopupText(popupMenu, "tài sản", "Sao chép", "Lưu dưới dạng", "phóng to", "Điều chỉnh tự động"));
         } finally {
-            I18nUtil.setLocale(originalChinese ? "zh" : "en");
+            I18nUtil.setLocale(originalVietnamese ? "vi" : "en");
             setChartPanelLocalizationBundle(originalChartBundle);
             clearSingletonInstance(PerformanceTrendPanel.class);
         }
@@ -571,7 +571,7 @@ public class PerformanceTrendPanelTest extends AbstractSwingUiTest {
 
     @Test
     public void chartPopupMenuShouldUseChineseWhenEasyPostmanLanguageIsChinese() throws Exception {
-        boolean originalChinese = I18nUtil.isChinese();
+        boolean originalVietnamese = I18nUtil.isVietnamese();
         ResourceBundle originalChartBundle = chartPanelLocalizationBundle();
         try {
             setChartPanelLocalizationBundle(Locale.ENGLISH);
@@ -581,14 +581,14 @@ public class PerformanceTrendPanelTest extends AbstractSwingUiTest {
             PerformanceTrendPanel panel = UiSingletonFactory.getInstance(PerformanceTrendPanel.class);
             JPopupMenu popupMenu = findFirst(panel, ChartPanel.class).getPopupMenu();
 
-            assertTrue(hasPopupLeafText(popupMenu, "属性"));
-            assertTrue(hasPopupLeafText(popupMenu, "复制"));
-            assertTrue(hasPopupMenuText(popupMenu, "另存为"));
-            assertTrue(hasPopupMenuText(popupMenu, "放大"));
-            assertTrue(hasPopupMenuText(popupMenu, "自动调整"));
+            assertTrue(hasPopupLeafText(popupMenu, "tài sản"));
+            assertTrue(hasPopupLeafText(popupMenu, "Sao chép"));
+            assertTrue(hasPopupMenuText(popupMenu, "Lưu dưới dạng"));
+            assertTrue(hasPopupMenuText(popupMenu, "phóng to"));
+            assertTrue(hasPopupMenuText(popupMenu, "Điều chỉnh tự động"));
             assertFalse(hasAnyPopupText(popupMenu, "Properties...", "Copy", "Save as", "Zoom In", "Auto Range"));
         } finally {
-            I18nUtil.setLocale(originalChinese ? "zh" : "en");
+            I18nUtil.setLocale(originalVietnamese ? "vi" : "en");
             setChartPanelLocalizationBundle(originalChartBundle);
             clearSingletonInstance(PerformanceTrendPanel.class);
         }

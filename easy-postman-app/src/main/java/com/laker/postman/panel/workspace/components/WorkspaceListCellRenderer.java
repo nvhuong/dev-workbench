@@ -15,7 +15,7 @@ import javax.swing.*;
 import java.awt.*;
 
 /**
- * 自定义列表单元格渲染器
+ * Trình kết xuất ô danh sách tùy chỉnh
  */
 public class WorkspaceListCellRenderer extends DefaultListCellRenderer {
     private static final String HTML_START = "<html>";
@@ -58,7 +58,7 @@ public class WorkspaceListCellRenderer extends DefaultListCellRenderer {
         String primaryColor = toHex(ModernColors.getPrimary());
         String secondaryColor = toHex(ModernColors.getTextSecondary());
 
-        // 如果是当前工作区，设置文字颜色为主题色
+        // Nếu đó là không gian làm việc hiện tại, hãy đặt màu văn bản thành màu chủ đề
         if (isCurrent) {
             text.append("<b style='color: ").append(primaryColor).append(";'>").append(workspace.getName()).append("</b>");
         } else {
@@ -67,7 +67,7 @@ public class WorkspaceListCellRenderer extends DefaultListCellRenderer {
 
         text.append("<br>");
 
-        // 描述部分也根据是否为当前工作区设置不同颜色
+        // Phần mô tả cũng có màu khác nhau tùy thuộc vào việc nó có được đặt cho không gian làm việc hiện tại hay không
         if (isCurrent) {
             text.append("<small style='color: ").append(primaryColor).append(";'>");
         } else {
@@ -77,7 +77,7 @@ public class WorkspaceListCellRenderer extends DefaultListCellRenderer {
         text.append(workspace.getType() == WorkspaceType.LOCAL ?
                 I18nUtil.getMessage(MessageKeys.WORKSPACE_TYPE_LOCAL) : I18nUtil.getMessage(MessageKeys.WORKSPACE_TYPE_GIT));
 
-        // 显示描述信息（警告状态已通过橙色图标表示）
+        // Một thông báo mô tả được hiển thị (trạng thái cảnh báo được biểu thị bằng biểu tượng màu cam)
         if (workspace.getDescription() != null && !workspace.getDescription().trim().isEmpty()) {
             text.append(" - ").append(workspace.getDescription());
         }
@@ -90,22 +90,22 @@ public class WorkspaceListCellRenderer extends DefaultListCellRenderer {
 
     private void configureWorkspaceStyle() {
         setFont(FontsUtil.getDefaultFontWithOffset(Font.PLAIN, -1));
-        setIconTextGap(5); // 图标和文字间距
+        setIconTextGap(5); // Khoảng cách biểu tượng và văn bản
     }
 
     /**
-     * 动态计算单元格高度
-     * 基于字体大小和内容（两行文字：名称+描述）
+     * Tự động tính toán chiều cao ô
+     * Dựa trên kích thước phông chữ và nội dung (hai dòng văn bản: name+mô tả)
      */
     public static int calculateCellHeight() {
         Font font = FontsUtil.getDefaultFontWithOffset(Font.PLAIN, -1);
         FontMetrics metrics = new JLabel().getFontMetrics(font);
 
-        // 两行文字的高度 + 上下内边距 + 行间距
+        // Chiều cao của hai dòng văn bản + Đệm trên và dưới + khoảng cách dòng
         int lineHeight = metrics.getHeight();
         int twoLinesHeight = lineHeight * 2;
-        int verticalPadding = 10; // 上下各5像素
-        int lineSpacing = 4; // 行间距
+        int verticalPadding = 10; // Lên và xuống5pixel
+        int lineSpacing = 4; // khoảng cách dòng
 
         return twoLinesHeight + verticalPadding + lineSpacing;
     }

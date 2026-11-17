@@ -14,13 +14,13 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import java.util.UUID;
 
 /**
- * 树节点克隆工具类
+ * Lớp công cụ nhân bản nút cây
  */
 @UtilityClass
 public class TreeNodeCloner {
 
     /**
-     * 深拷贝分组节点及其所有子节点
+     * Sao chép sâu nút được nhóm và tất cả các nút con của nó
      */
     public static DefaultMutableTreeNode deepCopyGroupNode(DefaultMutableTreeNode node) {
         RequestGroup originalGroup = CollectionTreeNodes.group(node)
@@ -38,7 +38,7 @@ public class TreeNodeCloner {
     }
 
     /**
-     * 拷贝子节点
+     * Sao chép các nút con
      */
     private static DefaultMutableTreeNode copyChildNode(DefaultMutableTreeNode child) {
         Object childUserObj = child.getUserObject();
@@ -59,7 +59,7 @@ public class TreeNodeCloner {
     }
 
     /**
-     * 深拷贝请求节点
+     * Nút yêu cầu sao chép sâu
      */
     private static DefaultMutableTreeNode copyRequestNode(DefaultMutableTreeNode child) {
         HttpRequestItem item = CollectionTreeNodes.request(child).orElseThrow();
@@ -67,8 +67,8 @@ public class TreeNodeCloner {
     }
 
     /**
-     * 递归克隆树节点（用于创建选择树）
-     * 会过滤掉 SavedResponse 类型的请求。
+     * Sao chép đệ quy các nút cây (được sử dụng để tạo cây lựa chọn)
+     * sẽ được lọc ra SavedResponse loại yêu cầu.
      */
     public static DefaultMutableTreeNode cloneTreeNode(DefaultMutableTreeNode node) {
         Object userObj = node.getUserObject();
@@ -79,9 +79,9 @@ public class TreeNodeCloner {
         for (int i = 0; i < node.getChildCount(); i++) {
             DefaultMutableTreeNode child = (DefaultMutableTreeNode) node.getChildAt(i);
 
-            // 检查是否需要过滤此节点
+            // Kiểm tra xem nút này có cần được lọc không
             if (shouldFilterNode(child)) {
-                continue; // 跳过 SavedResponse 类型的请求
+                continue; // Bỏ qua SavedResponse loại yêu cầu
             }
 
             copy.add(cloneTreeNode(child));
@@ -91,7 +91,7 @@ public class TreeNodeCloner {
     }
 
     /**
-     * 判断是否应该过滤掉该节点（SavedResponse）
+     * Xác định xem nút có nên được lọc ra (SavedResponse）
      */
     private static boolean shouldFilterNode(DefaultMutableTreeNode node) {
         return CollectionTreeNodes.isSavedResponse(node);

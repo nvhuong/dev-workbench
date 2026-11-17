@@ -44,9 +44,9 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
- * 性能测试结果表
- * - 200ms 增量刷新机制
- * - 支持排序和深度搜索过滤
+ * Bảng kết quả kiểm tra hiệu suất
+ * - 200ms Cơ chế làm mới gia tăng
+ * - Hỗ trợ sắp xếp và lọc tìm kiếm sâu
  */
 @Slf4j
 public class PerformanceResultTablePanel extends JPanel {
@@ -76,10 +76,10 @@ public class PerformanceResultTablePanel extends JPanel {
 
     private static final int BATCH_SIZE = 2000;
 
-    // 搜索防抖定时器（300ms）
+    // Tìm kiếm bộ hẹn giờ chống rung (300ms）
     private Timer searchDebounceTimer;
 
-    // UI 帧刷新定时器（200ms）
+    // UI Bộ hẹn giờ làm mới khung hình (200ms）
     private final Timer uiFrameTimer = new Timer(200, e -> {
 
         flushQueueOnEDT();
@@ -92,7 +92,7 @@ public class PerformanceResultTablePanel extends JPanel {
         uiFrameTimer.start();
     }
 
-    // 批量刷新队列数据到 TableModel
+    // Làm mới dữ liệu hàng đợi theo đợt TableModel
     private void flushQueueOnEDT() {
         List<PendingResult> batch = new ArrayList<>(1024);
         PendingResult pending;
@@ -110,8 +110,8 @@ public class PerformanceResultTablePanel extends JPanel {
     }
 
     /**
-     * 强制刷新所有待处理的结果（测试停止/完成时调用）
-     * 确保 pendingQueue 中的所有数据都显示到表格中
+     * Buộc xóa tất cả các kết quả đang chờ xử lý (kiểm tra đã dừng/được gọi khi hoàn thành)
+     * Hãy chắc chắn pendingQueue Tất cả dữ liệu trong được hiển thị trong bảng
      */
     public void flushPendingResults() {
         if (!SwingUtilities.isEventDispatchThread()) {
@@ -122,7 +122,7 @@ public class PerformanceResultTablePanel extends JPanel {
         List<PendingResult> batch = new ArrayList<>();
         PendingResult pending;
 
-        // 一次性刷新所有待处理的结果
+        // Làm mới tất cả các kết quả đang chờ xử lý cùng một lúc
         while ((pending = pendingQueue.poll()) != null) {
             pendingResultCount.decrementAndGet();
             pendingResultBytes.addAndGet(-pending.estimatedBytes());
@@ -131,7 +131,7 @@ public class PerformanceResultTablePanel extends JPanel {
 
         if (!batch.isEmpty()) {
             tableModel.append(batch);
-            log.debug("强制刷新了 {} 条待处理的结果到结果树", batch.size());
+            log.debug("Buộc làm mới {} Kết quả đang chờ xử lý sẽ được thêm vào cây kết quả", batch.size());
         }
     }
 
@@ -173,7 +173,7 @@ public class PerformanceResultTablePanel extends JPanel {
         table.setGridColor(PerformanceTheme.resultGridColor());
         ResultRowRenderer rowRenderer = new ResultRowRenderer();
         table.setDefaultRenderer(Object.class, rowRenderer);
-        // 数值列也走同一渲染器，否则 JTable 默认 NumberRenderer 会绕过格式化和配色。
+        // Ngược lại, các cột số cũng đi đến cùng một trình kết xuất JTable Mặc định NumberRenderer Việc định dạng và kết hợp màu sắc sẽ bị bỏ qua.
         table.setDefaultRenderer(Number.class, rowRenderer);
 
         rowSorter = new TableRowSorter<>(tableModel);
@@ -190,7 +190,7 @@ public class PerformanceResultTablePanel extends JPanel {
         detailSplit = AppToolWindowChrome.createHorizontalInnerSplitPane(new JPanel(), new JPanel(), 0);
         detailSplit.setResizeWeight(0.5);
 
-        // 默认只显示全宽表格；选中行后才展开右侧详情。
+        // Theo mặc định, chỉ có bảng có chiều rộng đầy đủ được hiển thị; các chi tiết bên phải được mở rộng sau khi hàng được chọn.
         contentHolder = new JPanel(new BorderLayout());
         contentHolder.setOpaque(false);
         contentHolder.add(tableScroll, BorderLayout.CENTER);
@@ -278,11 +278,11 @@ public class PerformanceResultTablePanel extends JPanel {
         contentHolder.repaint();
     }
 
-    // 配置排序比较器
+    // Cấu hình bộ so sánh sắp xếp
     private void configureSorterComparators() {
         rowSorter.setComparator(ResultTableModel.COL_PROTOCOL, Comparator.comparing(String::toString, String.CASE_INSENSITIVE_ORDER));
         rowSorter.setComparator(ResultTableModel.COL_NAME, Comparator.comparing(String::toString, String.CASE_INSENSITIVE_ORDER));
-        // 状态码按数值排序
+        // Mã trạng thái được sắp xếp theo số
         rowSorter.setComparator(ResultTableModel.COL_STATUS, Comparator.comparing((Object o) -> {
             String s = o.toString();
             if ("-".equals(s)) return 0;
@@ -299,7 +299,7 @@ public class PerformanceResultTablePanel extends JPanel {
         rowSorter.setComparator(ResultTableModel.COL_ASSERTION, Comparator.comparing(String::toString));
     }
 
-    // 配置列宽度
+    // Định cấu hình độ rộng cột
     private void configureColumnWidths() {
         configureColumnWidth(ResultTableModel.COL_PROTOCOL, 64, 72, 95);
         configureColumnWidth(ResultTableModel.COL_NAME, 120, 200, Integer.MAX_VALUE);
@@ -313,7 +313,7 @@ public class PerformanceResultTablePanel extends JPanel {
 
     private void configureColumnWidth(int column, int min, int preferred, int max) {
         TableColumn tableColumn = table.getColumnModel().getColumn(column);
-        // 表头文案（尤其英文）不能被截断，最小宽度至少容纳表头。
+        // Không thể cắt bớt bản sao tiêu đề (đặc biệt là bằng tiếng Anh) và độ rộng tối thiểu ít nhất phải vừa với tiêu đề.
         int headerWidth = headerPreferredWidth(tableColumn);
         int effectiveMin = Math.max(min, headerWidth);
         tableColumn.setMinWidth(effectiveMin);
@@ -340,14 +340,14 @@ public class PerformanceResultTablePanel extends JPanel {
     }
 
     private void registerListeners() {
-        // 选择监听器 - 显示详情
+        // Chọn người nghe - Hiển thị chi tiết
         table.getSelectionModel().addListSelectionListener(this::onRowSelected);
         tableModel.addTableModelListener(e -> SwingUtilities.invokeLater(this::updateRowCount));
         rowSorter.addRowSorterListener(e -> updateRowCount());
         failedOnlyCheckBox.addActionListener(e -> doFilter());
 
 
-        // 搜索防抖
+        // Tìm kiếm tính năng ổn định hình ảnh
         searchDebounceTimer = new Timer(300, e -> doFilter());
         searchDebounceTimer.setRepeats(false);
 
@@ -372,7 +372,7 @@ public class PerformanceResultTablePanel extends JPanel {
             }
         });
 
-        // Enter 键立即过滤
+        // Enter phím để lọc ngay lập tức
         searchField.addActionListener(e -> {
             searchDebounceTimer.stop();
             doFilter();
@@ -381,7 +381,7 @@ public class PerformanceResultTablePanel extends JPanel {
 
 
     /**
-     * 执行过滤
+     * Thực hiện lọc
      */
     private void doFilter() {
         String text = searchField.getText();
@@ -395,7 +395,7 @@ public class PerformanceResultTablePanel extends JPanel {
         }
         rowSorter.setRowFilter(filters.isEmpty() ? null
                 : filters.size() == 1 ? filters.get(0) : RowFilter.andFilter(filters));
-        // 关键字过滤后无可见行时变红
+        // Chuyển sang màu đỏ khi không có hàng nào hiển thị sau khi lọc từ khóa
         searchField.setNoResult(!keyword.isEmpty() && table.getRowCount() == 0);
     }
 
@@ -418,7 +418,7 @@ public class PerformanceResultTablePanel extends JPanel {
             return;
         }
 
-        // 转换视图索引到模型索引
+        // Chuyển đổi chỉ mục xem thành chỉ mục mô hình
         int modelRow = table.convertRowIndexToModel(row);
         ResultNodeInfo info = tableModel.getRow(modelRow);
         if (info == null) {
@@ -498,7 +498,7 @@ public class PerformanceResultTablePanel extends JPanel {
 
         int responseTabIndex = -1;
 
-        // 1. Request 标签页（始终显示）
+        // 1. Request Tab (luôn hiển thị)
         if (info.req != null) {
             addTabWithContent(
                     I18nUtil.getMessage(MessageKeys.PERFORMANCE_TAB_REQUEST),
@@ -506,7 +506,7 @@ public class PerformanceResultTablePanel extends JPanel {
             );
         }
 
-        // 2. Response 标签页（始终显示，整合响应数据和错误信息）
+        // 2. Response Tab (luôn hiển thị, tổng hợp dữ liệu phản hồi và thông báo lỗi)
         String responseHtml = HttpHtmlRenderer.renderResponseWithError(info);
         addTabWithContent(
                 I18nUtil.getMessage(MessageKeys.PERFORMANCE_TAB_RESPONSE),
@@ -514,7 +514,7 @@ public class PerformanceResultTablePanel extends JPanel {
         );
         responseTabIndex = detailTabs.getTabCount() - 1;
 
-        // 3. Tests 标签页（仅在有断言结果时显示）
+        // 3. Tests Trang tab (chỉ hiển thị khi có kết quả xác nhận)
         if (info.testResults != null && !info.testResults.isEmpty()) {
             addTabWithContent(
                     I18nUtil.getMessage(MessageKeys.PERFORMANCE_TAB_TESTS),
@@ -522,8 +522,8 @@ public class PerformanceResultTablePanel extends JPanel {
             );
         }
 
-        // 4. Timing 标签页（仅在有事件信息时显示）
-        // 5. Event Info 标签页（仅在有事件信息时显示）
+        // 4. Timing Trang tab (chỉ hiển thị khi có thông tin sự kiện)
+        // 5. Event Info Trang tab (chỉ hiển thị khi có thông tin sự kiện)
         if (info.resp != null && info.resp.httpEventInfo != null) {
             addTabWithContent(
                     I18nUtil.getMessage(MessageKeys.PERFORMANCE_TAB_TIMING),
@@ -535,14 +535,14 @@ public class PerformanceResultTablePanel extends JPanel {
             );
         }
 
-        // 如果有错误信息，自动切换到 Response 标签页
+        // Nếu có thông báo lỗi thì tự động chuyển sang Response trang tab
         if (info.errorMsg != null && !info.errorMsg.isEmpty() && responseTabIndex >= 0) {
             detailTabs.setSelectedIndex(responseTabIndex);
         }
     }
 
     /**
-     * 添加标签页并设置内容
+     * Thêm tab và đặt nội dung
      */
     private void addTabWithContent(String title, String html) {
         JEditorPane pane = new JEditorPane("text/html", "");
@@ -586,7 +586,7 @@ public class PerformanceResultTablePanel extends JPanel {
         detailTabs.removeAll();
     }
 
-    // 资源清理
+    // Dọn dẹp tài nguyên
     public void dispose() {
         uiFrameTimer.stop();
         if (searchDebounceTimer != null) {
@@ -602,7 +602,7 @@ public class PerformanceResultTablePanel extends JPanel {
         }
     }
 
-    // 自定义 RowFilter - 支持深度搜索
+    // Tùy chỉnh RowFilter - Hỗ trợ tìm kiếm sâu
     static class ResultRowFilter extends RowFilter<ResultTableModel, Integer> {
         private final String keyword;
 
@@ -618,35 +618,35 @@ public class PerformanceResultTablePanel extends JPanel {
 
             if (info == null) return false;
 
-            // 1. 检查接口名称
+            // 1. Kiểm tra tên giao diện
             if (info.name != null && info.name.toLowerCase().contains(keyword)) {
                 return true;
             }
 
-            // 2. 检查用户可见错误
+            // 2. Kiểm tra các lỗi mà người dùng có thể nhìn thấy
             if (info.errorMsg != null && info.errorMsg.toLowerCase().contains(keyword)) {
                 return true;
             }
 
-            // 3. 检查请求内容（URL、Headers、Body）
+            // 3. Kiểm tra nội dung yêu cầu (URL、Headers、Body）
             if (matchesRequest(info)) {
                 return true;
             }
 
-            // 4. 检查响应内容（Headers、Body）
+            // 4. Kiểm tra nội dung phản hồi (Headers、Body）
             return matchesResponse(info);
         }
 
-        // 检查请求内容是否匹配关键字
+        // Kiểm tra xem nội dung yêu cầu có khớp với từ khóa hay không
         private boolean matchesRequest(ResultNodeInfo info) {
             if (info.req == null) return false;
 
-            // 检查 URL
+            // nghiên cứu URL
             if (info.req.url != null && info.req.url.toLowerCase().contains(keyword)) {
                 return true;
             }
 
-            // 检查请求 Headers
+            // Kiểm tra yêu cầu Headers
             if (info.req.headersList != null) {
                 for (HttpHeader header : info.req.headersList) {
                     if (!header.isEnabled()) continue;
@@ -657,15 +657,15 @@ public class PerformanceResultTablePanel extends JPanel {
                 }
             }
 
-            // 检查请求 Body
+            // Kiểm tra yêu cầu Body
             return info.req.body != null && info.req.body.toLowerCase().contains(keyword);
         }
 
-        // 检查响应内容是否匹配关键字
+        // Kiểm tra xem nội dung phản hồi có khớp với từ khóa hay không
         private boolean matchesResponse(ResultNodeInfo info) {
             if (info.resp == null) return false;
 
-            // 检查响应 Headers
+            // Kiểm tra phản hồi Headers
             if (info.resp.headers != null) {
                 for (var entry : info.resp.headers.entrySet()) {
                     String key = entry.getKey();
@@ -680,13 +680,13 @@ public class PerformanceResultTablePanel extends JPanel {
                 }
             }
 
-            // 检查响应 Body
+            // Kiểm tra phản hồi Body
             return info.resp.body != null && info.resp.body.toLowerCase().contains(keyword);
         }
 
     }
 
-    // TableModel - 增量刷新优化
+    // TableModel - Tối ưu hóa làm mới gia tăng
     record PendingResult(ResultNodeInfo info, int rowLimit, long estimatedBytes) {
     }
 
@@ -709,7 +709,7 @@ public class PerformanceResultTablePanel extends JPanel {
         private boolean dirty = false;
         private boolean fullRefreshRequired = false;
 
-        // 追踪新增行的起始位置，用于增量刷新
+        // Theo dõi vị trí bắt đầu của các hàng mới để làm mới dần dần
         private int firstNewRow = -1;
 
         ResultTableModel() {
@@ -772,12 +772,12 @@ public class PerformanceResultTablePanel extends JPanel {
             if (r.cancelled) {
                 return "—";
             }
-            // 1. 如果有断言结果
+            // 1. Nếu có kết quả khẳng định
             if (r.testResults != null && !r.testResults.isEmpty()) {
                 return r.hasAssertionFailed() ? "×" : "✓";
             }
 
-            // 2. 无断言测试
+            // 2. Không có kiểm tra khẳng định
             if (!r.isActuallySuccessful()) {
                 return "×";
             }
@@ -809,7 +809,7 @@ public class PerformanceResultTablePanel extends JPanel {
         void append(List<PendingResult> batch) {
             if (batch.isEmpty()) return;
 
-            // 记录新增行的起始位置
+            // Ghi lại vị trí bắt đầu của dòng mới
             if (firstNewRow == -1) {
                 firstNewRow = dataList.size();
             }
@@ -834,11 +834,11 @@ public class PerformanceResultTablePanel extends JPanel {
                 return;
             }
 
-            // 增量刷新：仅通知新增的行
+            // Làm mới tăng dần: Chỉ thông báo các hàng mới
             if (firstNewRow != -1 && firstNewRow < dataList.size()) {
                 int lastRow = dataList.size() - 1;
                 fireTableRowsInserted(firstNewRow, lastRow);
-                firstNewRow = -1; // 重置
+                firstNewRow = -1; // Đặt lại
             }
         }
 
@@ -848,7 +848,7 @@ public class PerformanceResultTablePanel extends JPanel {
             retainedBytes = 0L;
             dirty = false;
             fullRefreshRequired = false;
-            firstNewRow = -1; // 重置
+            firstNewRow = -1; // Đặt lại
             fireTableDataChanged();
         }
 
@@ -874,7 +874,7 @@ public class PerformanceResultTablePanel extends JPanel {
         }
     }
 
-    // 行渲染器 - 设置不同列的对齐方式和颜色
+    // Trình kết xuất hàng - Đặt căn chỉnh và màu sắc của các cột khác nhau
     static class ResultRowRenderer extends DefaultTableCellRenderer {
         private static final DateTimeFormatter START_TIME_FORMATTER =
                 DateTimeFormatter.ofPattern("HH:mm:ss.SSS").withZone(ZoneId.systemDefault());
@@ -888,7 +888,7 @@ public class PerformanceResultTablePanel extends JPanel {
 
             setFont(table.getFont());
 
-            // 获取列索引
+            // Lấy chỉ mục cột
             int modelColumn = table.convertColumnIndexToModel(column);
             ResultNodeInfo info = getRowInfo(table, row);
 
@@ -899,7 +899,7 @@ public class PerformanceResultTablePanel extends JPanel {
                 setForeground(table.getForeground());
             }
 
-            // 设置对齐方式和颜色
+            // Đặt căn chỉnh và màu sắc
             switch (modelColumn) {
                 case ResultTableModel.COL_NAME -> {
                     setHorizontalAlignment(SwingConstants.LEFT);
@@ -991,7 +991,7 @@ public class PerformanceResultTablePanel extends JPanel {
         }
 
         /**
-         * 根据状态码应用颜色 - 参考 FunctionalRunnerTableModel
+         * Áp dụng màu dựa trên mã trạng thái - Tham khảo FunctionalRunnerTableModel
          */
         private void applyStatusColors(Component c, String status) {
             Color foreground = PerformanceTheme.tableForeground();
@@ -1003,21 +1003,21 @@ public class PerformanceResultTablePanel extends JPanel {
             try {
                 int code = Integer.parseInt(status);
                 if (code >= 200 && code < 300) {
-                    // 成功：使用绿色
+                    // Thành công: Sử dụng màu xanh lá cây
                     foreground = PerformanceTheme.resultSuccessForeground();
                 } else if (code >= 400 && code < 500) {
-                    // 客户端错误：使用警告色
+                    // Lỗi máy khách: sử dụng màu cảnh báo
                     foreground = PerformanceTheme.resultWarningForeground();
                 } else if (code >= 500) {
-                    // 服务器错误：使用错误色
+                    // Lỗi máy chủ: Sử dụng sai màu
                     foreground = PerformanceTheme.resultFailureForeground();
                 }
             } catch (NumberFormatException e) {
-                // 非数字状态（如错误消息）
+                // Trạng thái không phải là số (chẳng hạn như thông báo lỗi)
                 foreground = PerformanceTheme.resultFailureForeground();
             }
 
-            // 只设置文字颜色
+            // Chỉ đặt màu văn bản
             c.setForeground(foreground);
         }
 

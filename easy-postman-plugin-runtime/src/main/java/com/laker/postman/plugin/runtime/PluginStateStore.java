@@ -6,10 +6,10 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 
 /**
- * 插件运行时状态存储。
+ * Lưu trữ trạng thái thời gian chạy plug-in.
  * <p>
- * 这里专门管理“禁用”和“待卸载”两类持久化状态，
- * 避免 PluginRuntime 自己同时承担编排和状态读写职责。
+ * Quản lý đặc biệt ở đây“Tàn tật”và“Sẽ được gỡ cài đặt”Hai loại trạng thái liên tục,
+ * tránh PluginRuntime Ông cũng chịu trách nhiệm điều phối và đọc và viết trạng thái.
  * </p>
  */
 @UtilityClass

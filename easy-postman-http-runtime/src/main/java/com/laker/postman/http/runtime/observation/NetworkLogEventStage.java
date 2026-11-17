@@ -1,9 +1,9 @@
 package com.laker.postman.http.runtime.observation;
 
 /**
- * HTTP 执行层产出的网络日志阶段。
+ * HTTP Giai đoạn nhật ký mạng được tạo bởi lớp thực thi.
  * <p>
- * 这里只保留传输语义，不携带颜色、图标等 Swing 展示信息；UI 层负责把这些阶段映射成具体样式。
+ * Ở đây chỉ có ngữ nghĩa truyền tải được giữ lại và màu sắc, biểu tượng, v.v. không được mang theo Swing hiển thị thông tin;UI Lớp này chịu trách nhiệm ánh xạ các giai đoạn này thành các kiểu cụ thể.
  */
 public enum NetworkLogEventStage {
     FAILED,

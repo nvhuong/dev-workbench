@@ -15,7 +15,7 @@ import java.util.List;
 public class SwingCollectionTreeQueries {
 
     /**
-     * 在当前 Swing 树快照里查找请求节点；领域查询不要依赖这个方法。
+     * trong hiện tại Swing Tìm kiếm nút được yêu cầu trong ảnh chụp nhanh cây; không dựa vào phương pháp này cho các truy vấn tên miền.
      */
     public DefaultMutableTreeNode findRequestNodeById(DefaultMutableTreeNode node, String requestId) {
         if (node == null) {
@@ -68,7 +68,7 @@ public class SwingCollectionTreeQueries {
 
         List<HttpRequestItem> restorableItems = new ArrayList<>();
         for (HttpRequestItem item : requestItems) {
-            // 恢复打开标签前先以当前树为准，避免已经删除的请求又被打开。
+            // Trước khi khôi phục các thẻ đang mở, hãy tham khảo cây hiện tại để ngăn các yêu cầu đã xóa được mở lại.
             if (item == null || item.getId() == null || item.getId().isEmpty()) {
                 log.warn("Skip restoring request as it is null or has null/empty ID: {}",
                         item != null ? item.getName() : "null");

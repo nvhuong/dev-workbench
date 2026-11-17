@@ -265,7 +265,7 @@ public class WebDavSnapshotServiceTest {
         Path externalWorkspace = Files.createTempDirectory("webdav-snapshot-preflight-workspace");
         write(externalWorkspace.resolve("large-collection.json"), "12345");
         write(dataRoot.resolve("workspaces.json"), """
-                [{"id":"documents-workspace","name":"Documents 工作区","path":"%s"}]
+                [{"id":"documents-workspace","name":"Documents khu vực làm việc","path":"%s"}]
                 """.formatted(externalWorkspace.toString()));
 
         WebDavSnapshotService service = new WebDavSnapshotService(
@@ -279,7 +279,7 @@ public class WebDavSnapshotServiceTest {
             service.createSnapshot(dataRoot, snapshot);
             fail("Expected oversized external workspace to be rejected");
         } catch (WebDavSnapshotPreflightException exception) {
-            assertEquals(exception.workspaceName(), "Documents 工作区");
+            assertEquals(exception.workspaceName(), "Documents khu vực làm việc");
             assertEquals(exception.workspacePath(), externalWorkspace);
             assertTrue(exception.contentBytes() > exception.maxContentBytes());
             assertEquals(exception.maxFileCount(), 100L);
@@ -401,7 +401,7 @@ public class WebDavSnapshotServiceTest {
         WebDavSnapshotPolicy policy = new WebDavSnapshotPolicy();
 
         assertFalse(policy.shouldRestoreEntry("workspaces/default/a:b.json"));
-        assertFalse(policy.shouldRestoreEntry("workspaces/default/question?.json"));
+        assertFalse(policy.shouldRestoreEntry("workspaces/default/question?json"));
         assertFalse(policy.shouldRestoreEntry("workspaces/default/CON"));
         assertFalse(policy.shouldRestoreEntry("workspaces/default/con.txt"));
         assertFalse(policy.shouldRestoreEntry("workspaces/default/name."));

@@ -204,7 +204,7 @@ public class UpdateDownloader {
         connection.setConnectTimeout(CONNECT_TIMEOUT_MS);
         connection.setReadTimeout(READ_TIMEOUT_MS);
         connection.setInstanceFollowRedirects(true);
-        connection.setRequestProperty("User-Agent", "Mozilla/5.0 (compatible; EasyPostman-Updater)");
+        connection.setRequestProperty("User-Agent", "Mozilla/5.0 (compatible; Dev Workbench-Updater)");
         connection.setRequestProperty("Accept", "*/*");
 
         task.connection = connection;

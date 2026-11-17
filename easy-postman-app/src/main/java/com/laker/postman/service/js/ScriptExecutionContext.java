@@ -7,29 +7,29 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * 脚本执行上下文配置
+ * Cấu hình bối cảnh thực thi tập lệnh
  * <p>
- * 封装脚本执行所需的所有配置信息和运行时数据，包括脚本内容、变量绑定、
- * 脚本类型等。该类作为脚本执行流程中各组件之间传递数据的载体。
+ * Đóng gói tất cả thông tin cấu hình và dữ liệu thời gian chạy cần thiết để thực thi tập lệnh, bao gồm nội dung tập lệnh và các ràng buộc biến.
+ * Loại tập lệnh, v.v. Lớp này đóng vai trò là phương tiện truyền dữ liệu giữa các thành phần trong quá trình thực thi tập lệnh.
  * </p>
  *
- * <h3>主要职责：</h3>
+ * <h3>Trách nhiệm chính:</h3>
  * <ul>
- *   <li>存储脚本内容和类型（前置/后置）</li>
- *   <li>管理脚本执行的变量绑定（例如 pm）</li>
- *   <li>提供构建器模式方便创建实例</li>
+ *   <li>Lưu trữ nội dung và loại tập lệnh (thêm trước/ở phía sau)</li>
+ *   <li>Quản lý các ràng buộc biến để thực thi tập lệnh (ví dụ: pm）</li>
+ *   <li>Chế độ Builder được cung cấp để tạo điều kiện thuận lợi cho việc tạo các phiên bản</li>
  * </ul>
  *
- * <h3>使用示例：</h3>
+ * <h3>Ví dụ sử dụng:</h3>
  * <pre>{@code
- * // 使用构建器创建执行上下文
+ * // Sử dụng trình xây dựng để tạo bối cảnh thực thi
  * ScriptExecutionContext context = ScriptExecutionContext.builder()
  *     .script("pm.environment.set('timestamp', Date.now());")
  *     .scriptType(ScriptType.PRE_REQUEST)
  *     .bindings(bindings)
  *     .build();
  *
- * // 执行脚本
+ * // Thực thi kịch bản
  * JsScriptExecutor.execute(context);
  * }</pre>
  *
@@ -41,22 +41,22 @@ import java.util.Map;
 @Builder
 public class ScriptExecutionContext {
     /**
-     * 脚本内容（JavaScript 代码）
+     * Nội dung tập lệnh (JavaScript mã số)
      */
     private final String script;
 
     /**
-     * 脚本类型（用于日志标识和错误追踪）
+     * Loại tập lệnh (được sử dụng để nhận dạng nhật ký và theo dõi lỗi)
      * @see ScriptType
      */
     private final ScriptType scriptType;
 
     /**
-     * 变量绑定 Map
+     * Ràng buộc biến đổi Map
      * <p>
-     * 包含脚本执行时可访问的所有变量，例如：
+     * Chứa tất cả các biến có thể truy cập được khi tập lệnh được thực thi, ví dụ: .
      * <ul>
-     *   <li>"pm" → PostmanApiContext 实例</li>
+     *   <li>"pm" → PostmanApiContext Ví dụ</li>
      * </ul>
      * </p>
      */
@@ -64,18 +64,18 @@ public class ScriptExecutionContext {
     private final Map<String, Object> bindings = new HashMap<>();
 
     /**
-     * 输出回调
+     * Đầu ra gọi lại
      */
     private final JsScriptExecutor.OutputCallback outputCallback;
 
     /**
-     * 是否在错误时显示对话框
+     * Có hiển thị hộp thoại về lỗi hay không
      */
     @Builder.Default
     private final boolean showErrorDialog = false;
 
     /**
-     * 脚本类型枚举
+     * Kiểu liệt kê tập lệnh
      */
     @Getter
     public enum ScriptType {
@@ -93,14 +93,14 @@ public class ScriptExecutionContext {
     }
 
     /**
-     * 添加绑定变量
+     * Thêm các biến liên kết
      */
     public void addBinding(String name, Object value) {
         bindings.put(name, value);
     }
 
     /**
-     * 批量添加绑定变量
+     * Thêm các biến liên kết theo đợt
      */
     public void addBindings(Map<String, Object> newBindings) {
         if (newBindings != null) {

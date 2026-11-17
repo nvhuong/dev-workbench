@@ -19,9 +19,9 @@ import java.util.concurrent.CompletableFuture;
 import java.util.function.BiFunction;
 
 /**
- * “+ Tab” 的点击控制器。
+ * “+ Tab” Bộ điều khiển nhấp chuột.
  * <p>
- * 新建请求、剪贴板 cURL 识别和导入都属于用户动作编排，不放在 RequestEditorPanel 的布局代码里。
+ * Yêu cầu mới, clipboard cURL Recognition and import both belong to user action choreography and are not included RequestEditorPanel trong mã bố cục.
  */
 @RequiredArgsConstructor
 final class RequestEditorPlusTabController {

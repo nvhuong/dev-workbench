@@ -7,11 +7,11 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
- * Cron表达式工具类
- * 用于解析和计算Cron表达式的下次执行时间
- * 支持:
- * - Spring/Quartz: 6位/7位 (Second Minute Hour Day Month Week [Year])
- * - Linux Crontab: 5位 (Minute Hour Day Month Week)
+ * CronLớp công cụ biểu hiện
+ * Được sử dụng để phân tích và tính toánCronThời gian thực hiện tiếp theo của biểu thức
+ * Hỗ trợ:
+ * - Spring/Quartz: 6Chút/7Chút (Second Minute Hour Day Month Week [Year])
+ * - Linux Crontab: 5Chút (Minute Hour Day Month Week)
  */
 @Slf4j
 @UtilityClass
@@ -23,7 +23,7 @@ public class CronExpressionUtil {
     }
 
     /**
-     * 计算Cron表达式的下N次执行时间（自动检测模式）
+     * Tính toánCronPhần dưới của biểu thứcNthời gian thực hiện (chế độ tự động phát hiện)
      */
     public static List<Date> getNextExecutionTimes(String cronExpression, int count) {
         CronMode mode = detectMode(cronExpression);
@@ -31,12 +31,12 @@ public class CronExpressionUtil {
     }
 
     /**
-     * 计算Cron表达式的下N次执行时间
+     * Tính toánCronPhần dưới của biểu thứcNthời gian thực hiện
      *
-     * @param cronExpression Cron表达式
-     * @param count          计算次数
-     * @param mode           Cron模式
-     * @return 执行时间列表
+     * @param cronExpression Cronbiểu hiện
+     * @param count          Đếm số lần
+     * @param mode           Cronngười mẫu
+     * @return Danh sách thời gian thực hiện
      */
     public static List<Date> getNextExecutionTimes(String cronExpression, int count, CronMode mode) {
         List<Date> times = new ArrayList<>();
@@ -84,7 +84,7 @@ public class CronExpressionUtil {
     }
 
     /**
-     * 自动检测Cron模式
+     * Tự động phát hiệnCronngười mẫu
      */
     public static CronMode detectMode(String cronExpression) {
         if (cronExpression == null) return CronMode.SPRING_QUARTZ;
@@ -93,7 +93,7 @@ public class CronExpressionUtil {
     }
 
     /**
-     * 将Linux 5位crontab转为内部统一的6位格式（补0秒）
+     * SẽLinux 5ChútcrontabTrở nên thống nhất nội bộ6Định dạng bit (bổ sung0giây)
      */
     public static String normalizeCron(String cronExpression, CronMode mode) {
         if (mode == CronMode.LINUX_CRONTAB) {
@@ -107,14 +107,14 @@ public class CronExpressionUtil {
     }
 
     /**
-     * 验证Cron表达式是否有效（自动检测模式）
+     * Xác minhCronBiểu thức có hợp lệ hay không (chế độ tự động phát hiện)
      */
     public static boolean isValid(String cronExpression) {
         return isValid(cronExpression, detectMode(cronExpression));
     }
 
     /**
-     * 验证Cron表达式是否有效
+     * Xác minhCronLiệu biểu thức có hợp lệ hay không
      */
     public static boolean isValid(String cronExpression, CronMode mode) {
         if (cronExpression == null || cronExpression.trim().isEmpty()) {
@@ -142,14 +142,14 @@ public class CronExpressionUtil {
     }
 
     /**
-     * 获取Cron表达式的描述（自动检测模式）
+     * LấyCronMô tả biểu thức (chế độ tự động phát hiện)
      */
     public static String describe(String cronExpression) {
         return describe(cronExpression, detectMode(cronExpression));
     }
 
     /**
-     * 获取Cron表达式的描述
+     * LấyCronMô tả biểu thức
      */
     public static String describe(String cronExpression, CronMode mode) {
         try {
@@ -216,7 +216,7 @@ public class CronExpressionUtil {
     }
 
     /**
-     * 查找下一次执行时间（模式感知版本）
+     * Tìm thời gian thực hiện tiếp theo (phiên bản nhận biết lược đồ)
      */
     private static Date findNextExecution(Calendar from, String[] parts, CronMode mode) {
         try {
@@ -403,7 +403,7 @@ public class CronExpressionUtil {
     }
 
     /**
-     * 格式化日期
+     * Định dạng ngày
      */
     public static String formatDate(Date date) {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss E", Locale.getDefault());

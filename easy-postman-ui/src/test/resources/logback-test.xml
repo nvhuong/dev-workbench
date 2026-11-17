@@ -6,7 +6,7 @@
         </encoder>
     </appender>
 
-    <!-- 测试默认静默，排查时使用 -Dtest.log.level=DEBUG 打开 -->
+    <!-- Theo mặc định, quá trình kiểm tra sẽ ở chế độ im lặng và có thể được sử dụng để khắc phục sự cố -Dtest.log.level=DEBUG Mở -->
     <root level="${test.log.level:-OFF}">
         <appender-ref ref="console"/>
     </root>

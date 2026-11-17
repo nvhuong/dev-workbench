@@ -18,8 +18,8 @@ import java.util.Map;
 import java.util.Properties;
 
 /**
- * 快捷键管理器
- * 管理应用程序的所有快捷键配置，支持用户自定义
+ * Trình quản lý phím tắt
+ * Quản lý toàn bộ cấu hình phím tắt của ứng dụng và hỗ trợ người dùng tùy chỉnh
  */
 @UtilityClass
 public class ShortcutManager {
@@ -27,7 +27,7 @@ public class ShortcutManager {
     private static final Properties props = new Properties();
     private static final Map<String, ShortcutConfig> shortcuts = new HashMap<>();
 
-    // 快捷键ID常量
+    // phím tắtIDkhông thay đổi
     public static final String SEND_REQUEST = "send_request";
     public static final String NEW_REQUEST = "new_request";
     public static final String SAVE_REQUEST = "save_request";
@@ -42,7 +42,7 @@ public class ShortcutManager {
     }
 
     /**
-     * 初始化默认快捷键
+     * Khởi tạo các phím tắt mặc định
      */
     private static void initDefaultShortcuts() {
         int cmdMask = Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx();
@@ -84,14 +84,14 @@ public class ShortcutManager {
     }
 
     /**
-     * 从文件加载快捷键配置
+     * Tải cấu hình phím tắt từ tập tin
      */
     public static void load() {
         File file = new File(SHORTCUT_CONFIG_FILE);
         if (file.exists()) {
             try (FileInputStream fis = new FileInputStream(file)) {
                 props.load(fis);
-                // 应用加载的配置
+                // Áp dụng cấu hình đã tải
                 for (String key : shortcuts.keySet()) {
                     String keyCodeStr = props.getProperty(key + ".keyCode");
                     String modifiersStr = props.getProperty(key + ".modifiers");
@@ -102,18 +102,18 @@ public class ShortcutManager {
                             shortcuts.get(key).setKeyCode(keyCode);
                             shortcuts.get(key).setModifiers(modifiers);
                         } catch (NumberFormatException e) {
-                            // 忽略解析错误，使用默认值
+                            // Bỏ qua các lỗi phân tích cú pháp và sử dụng các giá trị mặc định
                         }
                     }
                 }
             } catch (IOException e) {
-                // 忽略，使用默认配置
+                // Bỏ qua và sử dụng cấu hình mặc định
             }
         }
     }
 
     /**
-     * 保存快捷键配置到文件
+     * Lưu cấu hình phím tắt vào một tập tin
      */
     public static void save() {
         for (Map.Entry<String, ShortcutConfig> entry : shortcuts.entrySet()) {
@@ -126,19 +126,19 @@ public class ShortcutManager {
         try (FileOutputStream fos = new FileOutputStream(SHORTCUT_CONFIG_FILE)) {
             props.store(fos, "EasyPostman Keyboard Shortcuts");
         } catch (IOException e) {
-            // 忽略保存错误
+            // Bỏ qua lỗi lưu
         }
     }
 
     /**
-     * 获取快捷键配置
+     * Nhận cấu hình phím tắt
      */
     public static ShortcutConfig getShortcut(String id) {
         return shortcuts.get(id);
     }
 
     /**
-     * 获取 KeyStroke
+     * Lấy KeyStroke
      */
     public static KeyStroke getKeyStroke(String id) {
         ShortcutConfig config = shortcuts.get(id);
@@ -149,7 +149,7 @@ public class ShortcutManager {
     }
 
     /**
-     * 设置快捷键
+     * Đặt phím tắt
      */
     public static void setShortcut(String id, int keyCode, int modifiers) {
         ShortcutConfig config = shortcuts.get(id);
@@ -160,7 +160,7 @@ public class ShortcutManager {
     }
 
     /**
-     * 清除快捷键（置空），避免与其他软件的全局快捷键冲突
+     * Xóa các phím tắt (để trống) để tránh xung đột với các phím tắt chung của phần mềm khác
      */
     public static void clearShortcut(String id) {
         setShortcut(id, KeyEvent.VK_UNDEFINED, 0);
@@ -172,7 +172,7 @@ public class ShortcutManager {
     }
 
     /**
-     * 获取快捷键的显示文本（根据操作系统），未设置时返回空字符串
+     * Lấy văn bản hiển thị của phím tắt (theo hệ điều hành), trả về chuỗi trống nếu không được đặt
      */
     public static String getShortcutText(String id) {
         ShortcutConfig config = shortcuts.get(id);
@@ -183,7 +183,7 @@ public class ShortcutManager {
     }
 
     /**
-     * 重置为默认快捷键
+     * Đặt lại về phím tắt mặc định
      */
     public static void resetToDefaults() {
         shortcuts.clear();
@@ -192,7 +192,7 @@ public class ShortcutManager {
     }
 
     /**
-     * 检查快捷键是否冲突
+     * Kiểm tra xung đột phím tắt
      */
     public static String checkConflict(String excludeId, int keyCode, int modifiers) {
         if (keyCode == KeyEvent.VK_UNDEFINED) {
@@ -210,7 +210,7 @@ public class ShortcutManager {
     }
 
     /**
-     * 快捷键配置类
+     * Lớp cấu hình phím tắt
      */
     @Getter
     public static class ShortcutConfig {
@@ -238,7 +238,7 @@ public class ShortcutManager {
         }
 
         /**
-         * 获取显示文本（根据操作系统），未设置时返回空字符串
+         * Lấy văn bản hiển thị (tùy thuộc vào hệ điều hành), trả về một chuỗi trống nếu không được đặt
          */
         public String getDisplayText() {
             if (!isAssigned()) {

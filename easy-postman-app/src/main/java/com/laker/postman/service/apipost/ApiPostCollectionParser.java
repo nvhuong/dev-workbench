@@ -31,8 +31,8 @@ import static com.laker.postman.request.model.RequestBodyTypes.BODY_TYPE_FORM_UR
 import static com.laker.postman.request.model.RequestBodyTypes.BODY_TYPE_RAW;
 
 /**
- * ApiPost Collection解析器
- * 负责解析ApiPost导出的JSON格式
+ * ApiPost Collectiontrình phân tích cú pháp
+ * Chịu trách nhiệm phân tíchApiPostĐã xuất khẩuJSONđịnh dạng
  */
 @Slf4j
 @UtilityClass
@@ -62,7 +62,7 @@ public class ApiPostCollectionParser {
                     continue;
                 }
 
-                RequestGroup group = new RequestGroup(api.getStr("name", "未命名文件夹"));
+                RequestGroup group = new RequestGroup(api.getStr("name", "Thư mục không tên"));
                 group.setDescription(api.getStr("description", ""));
                 JSONObject request = api.getJSONObject("request");
                 if (request != null) {
@@ -128,7 +128,7 @@ public class ApiPostCollectionParser {
             parseApiPostEnvironments(global, result, projectName);
             return result;
         } catch (Exception e) {
-            log.error("解析Apipost Collection失败", e);
+            log.error("phân tíchApipost Collectionthất bại", e);
             return null;
         }
     }
@@ -137,7 +137,7 @@ public class ApiPostCollectionParser {
         try {
             HttpRequestItem req = new HttpRequestItem();
             req.setId(UUID.randomUUID().toString());
-            req.setName(api.getStr("name", "未命名接口"));
+            req.setName(api.getStr("name", "Giao diện không tên"));
             req.setMethod(api.getStr("method", "GET"));
             req.setUrl(api.getStr("url", ""));
             req.setDescription(api.getStr("description", ""));
@@ -168,7 +168,7 @@ public class ApiPostCollectionParser {
             }
             return req;
         } catch (Exception e) {
-            log.error("解析Apipost API失败", e);
+            log.error("phân tíchApipost APIthất bại", e);
             return null;
         }
     }
@@ -581,7 +581,7 @@ public class ApiPostCollectionParser {
             savedResponse.setOriginalRequest(origReq);
             return savedResponse;
         } catch (Exception e) {
-            log.error("解析Apipost响应失败", e);
+            log.error("phân tíchApipostPhản hồi không thành công", e);
             return null;
         }
     }

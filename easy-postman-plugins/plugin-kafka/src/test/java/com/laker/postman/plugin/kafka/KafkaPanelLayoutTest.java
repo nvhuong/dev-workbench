@@ -19,7 +19,7 @@ public class KafkaPanelLayoutTest {
     public void sideAndWorkTabsShouldUseCompactLocalizedTitlesAcrossLocales() {
         Locale originalLocale = I18nUtil.currentLocale();
         try {
-            assertTabsUseCompactTitles(Locale.CHINESE);
+            assertTabsUseCompactTitles(Locale.forLanguageTag("vi"));
             assertTabsUseCompactTitles(Locale.ENGLISH);
         } finally {
             I18nUtil.setLocale(originalLocale);

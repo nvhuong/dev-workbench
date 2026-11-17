@@ -16,7 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * 准备好的请求对象，包含请求的所有必要信息以及替换变量后的内容。
+ * Đối tượng yêu cầu được chuẩn bị sẵn chứa tất cả thông tin cần thiết cho yêu cầu và nội dung sau khi thay thế các biến.
  */
 public class PreparedRequest {
     public String id;
@@ -34,43 +34,43 @@ public class PreparedRequest {
     public List<HttpParam> paramsList;
 
     public boolean isMultipart;
-    public boolean followRedirects = true; // 默认自动重定向
-    public boolean cookieJarEnabled = true; // 默认启用 Cookie Jar
-    public HttpRequestProxyPolicy proxyPolicy = HttpRequestProxyPolicy.DEFAULT; // 默认跟随全局代理设置
-    public boolean sslVerificationEnabled = false; // 默认禁用 SSL 校验
-    public String httpVersion = HttpRequestItem.HTTP_VERSION_AUTO; // HTTP 协议偏好
-    public int requestTimeoutMs = 0; // 0 表示不超时
-    public int webSocketPingIntervalMs = HttpRequestItem.DEFAULT_WEBSOCKET_PING_INTERVAL_MS; // 0 表示关闭协议 ping
-    public TransportAuth transportAuth; // 发送阶段需要的传输层认证元数据（例如 Digest challenge 认证）
+    public boolean followRedirects = true; // Tự động chuyển hướng theo mặc định
+    public boolean cookieJarEnabled = true; // Được bật theo mặc định Cookie Jar
+    public HttpRequestProxyPolicy proxyPolicy = HttpRequestProxyPolicy.DEFAULT; // Mặc định tuân theo cài đặt proxy toàn cầu
+    public boolean sslVerificationEnabled = false; // Bị tắt theo mặc định SSL Kiểm tra
+    public String httpVersion = HttpRequestItem.HTTP_VERSION_AUTO; // HTTP Tùy chọn giao thức
+    public int requestTimeoutMs = 0; // 0 Cho biết không có thời gian chờ
+    public int webSocketPingIntervalMs = HttpRequestItem.DEFAULT_WEBSOCKET_PING_INTERVAL_MS; // 0 Cho biết việc kết thúc thỏa thuận ping
+    public TransportAuth transportAuth; // Cần có siêu dữ liệu xác thực lớp vận chuyển trong giai đoạn gửi (ví dụ: Digest challenge chứng nhận)
 
-    // 事件监听控制（精细化控制）
-    public HttpCaptureProfile captureProfile; // 执行场景采集策略；为空时兼容旧布尔字段组合
-    public boolean collectBasicInfo = true; // 收集基本信息（headers、body），默认开启
-    public boolean collectMetricsInfo = false; // 仅采集压测统计需要的轻量指标（时间戳、发送/接收字节）
-    public boolean collectEventInfo = true; // 收集完整事件信息（DNS、连接、SSL等），默认开启
-    public boolean enableNetworkLog = false; // 启用网络日志面板输出，默认关闭
-    public transient NetworkLogSink networkLogSink = NetworkLogSink.noop(); // 网络日志输出端口，由 UI 层按需注入
+    // Kiểm soát giám sát sự kiện (kiểm soát tốt)
+    public HttpCaptureProfile captureProfile; // Thực hiện chiến lược thu thập cảnh; khi trống, nó tương thích với các kết hợp trường Boolean cũ
+    public boolean collectBasicInfo = true; // Thu thập thông tin cơ bản (headers、body），Được bật theo mặc định
+    public boolean collectMetricsInfo = false; // Chỉ các chỉ số nhẹ (dấu thời gian, gửi) cần thiết cho số liệu thống kê kiểm tra sức chịu đựng mới được thu thập/nhận byte)
+    public boolean collectEventInfo = true; // Thu thập thông tin sự kiện đầy đủ (DNS、kết nối,SSLv.v.), được bật theo mặc định
+    public boolean enableNetworkLog = false; // Bật đầu ra bảng nhật ký mạng, tắt theo mặc định
+    public transient NetworkLogSink networkLogSink = NetworkLogSink.noop(); // Cổng đầu ra nhật ký mạng, bởi UI Các lớp được tiêm theo yêu cầu
     public transient HttpLifecycleLogSink lifecycleLogSink = HttpLifecycleLogSink.noop();
     public transient DownloadProgressSinkFactory downloadProgressSinkFactory = DownloadProgressSinkFactory.noop();
     public transient ResponseSizeLimitWarningSink responseSizeLimitWarningSink = ResponseSizeLimitWarningSink.noop();
-    public boolean notifyCookieChanges = true; // 请求完成后是否发布 Cookie 变更事件
+    public boolean notifyCookieChanges = true; // Có xuất bản sau khi yêu cầu được hoàn thành hay không Cookie Thay đổi sự kiện
     public ResponseBodyMode responseBodyMode = ResponseBodyMode.FULL;
     public int responseBodyPreviewLimitBytes = 64 * 1024;
 
-    // 脚本字段（已应用 group 继承）
+    // Trường tập lệnh (được áp dụng group kế thừa)
     public String prescript;
     public String postscript;
 
-    public String sentUrl; // 实际发送的 URL 快照
-    public String sentMethod; // 实际发送的 HTTP 方法快照
-    public List<HttpHeader> sentHeadersList; // 实际发送的请求头快照
-    public String sentRequestBody; // 实际发送的请求体内容
-    public boolean sentRequestBodyReplayable; // 实际请求体快照是否完整且可用于 cURL 复现
-    public transient volatile HttpEventInfo exchangeEventInfo; // 运行期事件信息，仅供 SSE/WS 异步回调读取，不参与持久化
+    public String sentUrl; // thực sự đã được gửi URL Ảnh chụp nhanh
+    public String sentMethod; // thực sự đã được gửi HTTP Ảnh chụp nhanh phương pháp
+    public List<HttpHeader> sentHeadersList; // Ảnh chụp nhanh các tiêu đề yêu cầu thực tế được gửi
+    public String sentRequestBody; // Nội dung nội dung yêu cầu thực tế đã được gửi
+    public boolean sentRequestBodyReplayable; // Liệu ảnh chụp nhanh nội dung yêu cầu thực tế có đầy đủ và khả dụng hay không cURL Tái phát
+    public transient volatile HttpEventInfo exchangeEventInfo; // Chỉ thông tin sự kiện thời gian chạy SSE/WS Việc đọc gọi lại không đồng bộ không tham gia vào quá trình kiên trì
 
     /**
-     * 创建当前对象的浅拷贝
-     * 注意：List 和 Map 对象本身不会被深拷贝，只是引用复制
+     * Tạo một bản sao nông của đối tượng hiện tại
+     * Lưu ý:List và Map Bản thân đối tượng không được sao chép sâu, chỉ sao chép tham chiếu
      */
     public PreparedRequest shallowCopy() {
         PreparedRequest copy = new PreparedRequest();
@@ -81,7 +81,7 @@ public class PreparedRequest {
         copy.sentUrl = this.sentUrl;
         copy.sentMethod = this.sentMethod;
         copy.sentHeadersList = this.sentHeadersList == null ? null : new ArrayList<>(this.sentHeadersList);
-        // 单次发包的运行态 trace 不随请求配置复制，避免重定向/重发带上上一跳连接信息。
+        // Trạng thái chạy của một gói duy nhất trace Không sao chép cấu hình với các yêu cầu để tránh chuyển hướng/Gửi lại thông tin kết nối hop trước đó.
         copy.exchangeEventInfo = null;
         copy.body = this.body;
         copy.bodyType = this.bodyType;
@@ -119,9 +119,9 @@ public class PreparedRequest {
     }
 
     /**
-     * 简化对象，将渲染时不需要的字段置为 null，减少内存占用
-     * 保留的字段：url, method, sentUrl, sentMethod, sentHeadersList, formDataList, urlencodedList, sentRequestBody, sentRequestBodyReplayable
-     * 置为 null 的字段：id, name, body, bodyType, transportAuth, headersList,
+     * Đơn giản hóa đối tượng và đặt các trường không cần thiết trong quá trình kết xuất thành  null，Giảm mức sử dụng bộ nhớ
+     * Các trường dành riêng:url, method, sentUrl, sentMethod, sentHeadersList, formDataList, urlencodedList, sentRequestBody, sentRequestBodyReplayable
+     * Đặt thành null Các trường: .id, name, body, bodyType, transportAuth, headersList,
      * pathVariablesList, paramsList, exchangeEventInfo
      */
     public void simplify() {
@@ -130,11 +130,11 @@ public class PreparedRequest {
         this.body = null;
         this.bodyType = null;
         this.transportAuth = null;
-        this.headersList = null;  // 渲染用的是 sentHeadersList
+        this.headersList = null;  // Việc hiển thị được thực hiện bằng cách sử dụng  sentHeadersList
         this.pathVariablesList = null;
-        this.paramsList = null;   // 渲染时不显示
+        this.paramsList = null;   // Không hiển thị khi kết xuất
         this.exchangeEventInfo = null;
-        // isMultipart, followRedirects 和采集开关是基本类型，不占主要内存
+        // isMultipart, followRedirects và công tắc thu nhận là loại cơ bản và không chiếm bộ nhớ chính
     }
 
     public enum ResponseBodyMode {

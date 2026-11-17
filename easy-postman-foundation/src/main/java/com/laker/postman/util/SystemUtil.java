@@ -16,7 +16,7 @@ import java.nio.file.Paths;
 @UtilityClass
 public class SystemUtil {
     /**
-     * 系统信息
+     * Thông tin hệ thống
      */
     private static final String OS_VERSION = System.getProperty("os.version");
     private static final String OS_ARCH = System.getProperty("os.arch");
@@ -26,13 +26,13 @@ public class SystemUtil {
     private static final String PATH_SEPARATOR = File.pathSeparator;
 
     /**
-     * 缓存的数据目录路径
+     * Đường dẫn thư mục dữ liệu được lưu trong bộ nhớ cache
      */
     private static String cachedDataPath = null;
 
 
     /**
-     * 获取程序所在目录
+     * Lấy thư mục chứa chương trình
      */
     private static String getApplicationDirectory() {
         return AppRuntimeLayout.applicationRootDirectory(SystemUtil.class).toString() + File.separator;
@@ -43,9 +43,9 @@ public class SystemUtil {
     }
 
     /**
-     * 获取数据存储根目录
-     * Portable 模式：程序所在目录/data/
-     * 普通模式：用户主目录/EasyPostman/
+     * Lấy thư mục gốc lưu trữ dữ liệu
+     * Portable Mode: Thư mục chứa chương trình/data/
+     * Chế độ bình thường: thư mục chính của người dùng/EasyPostman/
      */
     public static String getEasyPostmanPath() {
         if (cachedDataPath != null) {
@@ -59,19 +59,19 @@ public class SystemUtil {
         } else {
             dataPath = AppRuntimeLayout.dataRootDirectory(SystemUtil.class).toString() + File.separator;
             if (isPortableMode()) {
-                log.info("运行在 Portable 模式，数据目录: {}", dataPath);
+                log.info("Chạy tiếp Portable Lược đồ, thư mục dữ liệu: {}", dataPath);
             }
         }
 
-        // 确保目录存在
+        // Hãy chắc chắn rằng thư mục tồn tại
         try {
             File dataDir = new File(dataPath);
             if (!dataDir.exists()) {
                 dataDir.mkdirs();
-                log.info("创建数据目录: {}", dataPath);
+                log.info("Tạo một thư mục dữ liệu: {}", dataPath);
             }
         } catch (Exception e) {
-            log.error("创建数据目录失败: {}", dataPath, e);
+            log.error("Không tạo được thư mục dữ liệu: {}", dataPath, e);
         }
 
         cachedDataPath = dataPath;
@@ -79,21 +79,21 @@ public class SystemUtil {
     }
 
     /**
-     * 仅供测试使用，清理静态缓存。
+     * Chỉ nhằm mục đích thử nghiệm, xóa bộ nhớ đệm tĩnh.
      */
     public static void resetForTests() {
         cachedDataPath = null;
     }
 
     /**
-     * 获取当前版本号：优先从 MANIFEST.MF Implementation-Version，若无则尝试读取 pom.xml
+     * Lấy số phiên bản hiện tại: Ưu tiên từ MANIFEST.MF Implementation-Version，Nếu không, hãy cố gắng đọc pom.xml
      */
     public static String getCurrentVersion() {
         String version = null;
         try {
             version = SystemUtil.class.getPackage().getImplementationVersion();
         } catch (Exception ignored) {
-            // 忽略异常，可能是没有 MANIFEST.MF 文件
+            // Bỏ qua ngoại lệ, có thể không có MANIFEST.MF tập tin
         }
         if (version != null && !version.isBlank()) {
             return "v" + version;
@@ -105,7 +105,7 @@ public class SystemUtil {
             }
         } catch (Exception ignored) {
         }
-        return "开发环境";
+        return "môi trường phát triển";
     }
 
     private static String resolveVersionFromPom(Path pom) {
@@ -187,7 +187,7 @@ public class SystemUtil {
     }
 
     /**
-     * 获取操作系统信息
+     * Nhận thông tin hệ điều hành
      */
     public static String getOsInfo() {
         StringBuilder sb = new StringBuilder();

@@ -5,7 +5,7 @@ import java.util.concurrent.CancellationException;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
- * 控制插件安装任务的取消状态，并在取消时主动断开下载连接。
+ * Kiểm soát trạng thái hủy của các tác vụ cài đặt plug-in và chủ động ngắt kết nối tải xuống khi bị hủy.
  */
 public class PluginInstallController {
 

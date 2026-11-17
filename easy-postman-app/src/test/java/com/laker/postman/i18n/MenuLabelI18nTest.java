@@ -11,12 +11,12 @@ import static org.testng.Assert.assertEquals;
 public class MenuLabelI18nTest {
 
     @Test
-    public void chineseNavigationAndCollectionActionLabelsShouldUseTestDomainNames() {
-        ResourceBundle zh = ResourceBundle.getBundle("messages", Locale.SIMPLIFIED_CHINESE);
+    public void vietnameseNavigationAndCollectionActionLabelsShouldUseTestDomainNames() {
+        ResourceBundle vi = ResourceBundle.getBundle("messages", Locale.forLanguageTag("vi"));
 
-        assertEquals(zh.getString(MessageKeys.COLLECTIONS_MENU_ADD_TO_FUNCTIONAL), "功能测试");
-        assertEquals(zh.getString(MessageKeys.MENU_PERFORMANCE), "性能测试");
-        assertEquals(zh.getString(MessageKeys.MENU_MOCK_SERVER), "Mock Server");
+        assertEquals(vi.getString(MessageKeys.COLLECTIONS_MENU_ADD_TO_FUNCTIONAL), "Kiểm tra chức năng");
+        assertEquals(vi.getString(MessageKeys.MENU_PERFORMANCE), "Kiểm thử hiệu năng");
+        assertEquals(vi.getString(MessageKeys.MENU_MOCK_SERVER), "Mock Server");
     }
 
     @Test

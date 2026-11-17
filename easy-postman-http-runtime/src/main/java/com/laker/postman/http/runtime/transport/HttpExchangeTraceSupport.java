@@ -11,10 +11,10 @@ import java.net.InetAddress;
 import java.net.Socket;
 
 /**
- * HTTP 交换链路信息的统一出口。
+ * HTTP Cửa hàng thống nhất để trao đổi thông tin liên kết.
  * <p>
- * EventListener、同步请求和 SSE/WebSocket 回调可能运行在不同线程，
- * 因此链路信息绑定到 PreparedRequest 的 transient 字段，不依赖 ThreadLocal。
+ * EventListener、Yêu cầu đồng bộ và SSE/WebSocket Cuộc gọi lại có thể chạy trên các chủ đề khác nhau.
+ * Vì vậy thông tin liên kết bị ràng buộc PreparedRequest của transient Lĩnh vực, không phụ thuộc ThreadLocal。
  */
 @UtilityClass
 public class HttpExchangeTraceSupport {
@@ -27,7 +27,7 @@ public class HttpExchangeTraceSupport {
         if (httpResponse == null) {
             return;
         }
-        // SSE/WebSocket 的回调可能晚于 OkHttp EventListener 或跨线程触发，响应详情至少要展示当前回调线程。
+        // SSE/WebSocket Cuộc gọi lại có thể muộn hơn OkHttp EventListener Hoặc được kích hoạt trên các luồng, chi tiết phản hồi ít nhất phải hiển thị luồng gọi lại hiện tại.
         String fallbackThreadName = Thread.currentThread().getName();
         if (httpEventInfo != null && isBlank(httpEventInfo.getThreadName())) {
             httpEventInfo.setThreadName(fallbackThreadName);
@@ -54,7 +54,7 @@ public class HttpExchangeTraceSupport {
     }
 
     /**
-     * network interceptor 是能拿到实际连接的最晚请求侧位置，用它补充本地/远端地址和协议信息。
+     * network interceptor Đây là vị trí bên yêu cầu mới nhất có thể có được cho kết nối thực tế và sử dụng nó để bổ sung cho kết nối cục bộ/Thông tin địa chỉ và giao thức từ xa.
      */
     public static void updateFromConnection(PreparedRequest request, Connection connection) {
         HttpEventInfo httpEventInfo = resolveFromRequest(request);
@@ -71,7 +71,7 @@ public class HttpExchangeTraceSupport {
                 httpEventInfo.setRemoteAddress(formatSocketEndpoint(socket.getInetAddress(), socket.getPort()));
             }
         } catch (Exception ignored) {
-            // mock 连接或已释放连接可能无法暴露 socket 细节。
+            // mock Các kết nối hoặc kết nối đã giải phóng có thể không bị lộ socket chi tiết.
         }
     }
 

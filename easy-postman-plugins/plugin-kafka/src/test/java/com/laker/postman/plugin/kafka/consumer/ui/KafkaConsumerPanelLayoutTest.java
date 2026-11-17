@@ -21,7 +21,7 @@ public class KafkaConsumerPanelLayoutTest {
     public void consumeActionsShouldUseShortTextWithFullTooltipsAcrossLocales() {
         Locale originalLocale = I18nUtil.currentLocale();
         try {
-            assertConsumeActionsUseShortText(Locale.CHINESE);
+            assertConsumeActionsUseShortText(Locale.forLanguageTag("vi"));
             assertConsumeActionsUseShortText(Locale.ENGLISH);
         } finally {
             I18nUtil.setLocale(originalLocale);

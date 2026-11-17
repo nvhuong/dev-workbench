@@ -36,27 +36,27 @@ public class ConsolePanel extends UiSingletonPanel {
     private JComboBox<String> logLevelFilter;
     private boolean autoScroll = true;
 
-    // 搜索相关
+    // Tìm kiếm liên quan
     private final transient List<Integer> matchPositions = new ArrayList<>();
     private int currentMatchIndex = -1;
 
-    // 日志过滤相关
+    // Liên quan đến lọc nhật ký
     private String currentFilter = "All";
     private final transient List<LogEntry> allLogs = new ArrayList<>();
-    private static final int MAX_LOG_ENTRIES = 10000; // 最多保存10000条日志，防止内存溢出
-    private static final int MAX_DISPLAY_LINES = 5000; // 最多显示5000行，超过则删除旧行，优化显示性能
+    private static final int MAX_LOG_ENTRIES = 10000; // Tiết kiệm nhiều nhất10000log để tránh tràn bộ nhớ
+    private static final int MAX_DISPLAY_LINES = 5000; // Hiển thị nhiều nhất5000Nếu số lượng hàng vượt quá giới hạn, các hàng cũ sẽ bị xóa để tối ưu hóa hiệu suất hiển thị
     private static final int FILTER_WIDTH = 90;
     private static final int SEARCH_WIDTH = 260;
     private static final int TOOLBAR_CONTROL_HEIGHT = ToolWindowActionToolbar.ACTION_SIZE;
     private static final String TOOL_WINDOW_HIDE_ICON = "icons/tool-window-hide.svg";
     private static final String HIDE_CONSOLE_TOOLTIP = "Hide console";
 
-    // 日志类型
+    // Loại nhật ký
     public enum LogType {
         INFO, ERROR, SUCCESS, WARN, DEBUG, TRACE, CUSTOM
     }
 
-    // 日志条目类
+    // Lớp nhập nhật ký
     private static class LogEntry {
         final String message;
         final LogType type;
@@ -81,13 +81,13 @@ public class ConsolePanel extends UiSingletonPanel {
     }
 
     /**
-     * 更新控制台颜色以适配当前主题
+     * Cập nhật màu bảng điều khiển để phù hợp với chủ đề hiện tại
      */
     private void updateConsoleColors() {
         if (matchCountLabel != null) {
             matchCountLabel.setForeground(ConsoleTheme.matchCountForeground());
         }
-        // 刷新显示的日志以应用新的颜色方案
+        // Làm mới nhật ký được hiển thị để áp dụng bảng màu mới
         if (consoleLogArea != null && !allLogs.isEmpty()) {
             refreshDisplayedLogs();
         }
@@ -95,10 +95,10 @@ public class ConsolePanel extends UiSingletonPanel {
 
     @Override
     protected void registerListeners() {
-        // 搜索框文本变化时重新查找
+        // Tìm kiếm lại khi văn bản hộp tìm kiếm thay đổi
         searchField.addActionListener(e -> performSearch());
 
-        // 实时搜索
+        // Tìm kiếm trong thời gian thực
         searchField.getDocument().addDocumentListener(new DocumentListener() {
             @Override
             public void insertUpdate(DocumentEvent e) {
@@ -116,18 +116,18 @@ public class ConsolePanel extends UiSingletonPanel {
             }
         });
 
-        // 监听大小写敏感和整词匹配选项变化
+        // Theo dõi những thay đổi về độ phân biệt chữ hoa chữ thường và các tùy chọn khớp toàn bộ từ
         searchField.addPropertyChangeListener("caseSensitive", evt -> performSearch());
         searchField.addPropertyChangeListener("wholeWord", evt -> performSearch());
 
         nextBtn.addActionListener(e -> navigateToNextMatch());
         prevBtn.addActionListener(e -> navigateToPreviousMatch());
 
-        // 自动滚动切换
+        // Chuyển đổi cuộn tự động
         autoScrollBtn.addActionListener(e -> {
             autoScroll = autoScrollBtn.isSelected();
             if (autoScroll) {
-                // 如果启用自动滚动，立即滚动到底部
+                // Nếu tính năng tự động cuộn được bật, hãy cuộn xuống phía dưới ngay lập tức
                 SwingUtilities.invokeLater(() -> {
                     try {
                         consoleLogArea.setCaretPosition(consoleDoc.getLength());
@@ -138,7 +138,7 @@ public class ConsolePanel extends UiSingletonPanel {
             }
         });
 
-        // 日志级别过滤
+        // Lọc cấp độ nhật ký
         logLevelFilter.addActionListener(e -> {
             currentFilter = (String) logLevelFilter.getSelectedItem();
             refreshDisplayedLogs();
@@ -148,10 +148,10 @@ public class ConsolePanel extends UiSingletonPanel {
     }
 
     /**
-     * 注册键盘快捷键
+     * Đăng ký phím tắt
      */
     private void registerKeyboardShortcuts() {
-        // 快捷键：Ctrl/Cmd+F 聚焦搜索框
+        // phím tắt:Ctrl/Cmd+F Tập trung vào hộp tìm kiếm
         int modifier = Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx();
         getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(
                 KeyStroke.getKeyStroke(KeyEvent.VK_F, modifier), "focusSearch"
@@ -164,7 +164,7 @@ public class ConsolePanel extends UiSingletonPanel {
             }
         });
 
-        // Esc 清除搜索
+        // Esc Xóa tìm kiếm
         searchField.getInputMap(JComponent.WHEN_FOCUSED).put(
                 KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), "clearSearch"
         );
@@ -177,7 +177,7 @@ public class ConsolePanel extends UiSingletonPanel {
     }
 
     /**
-     * 清除搜索
+     * Xóa tìm kiếm
      */
     private void clearSearch() {
         searchField.setText("");
@@ -188,7 +188,7 @@ public class ConsolePanel extends UiSingletonPanel {
     }
 
     /**
-     * 执行搜索并查找所有匹配项（支持大小写敏感和整词匹配）
+     * Thực hiện tìm kiếm và tìm thấy tất cả các kết quả khớp (hỗ trợ khớp cả chữ và chữ hoa chữ thường)
      */
     private void performSearch() {
         String keyword = searchField.getText();
@@ -206,13 +206,13 @@ public class ConsolePanel extends UiSingletonPanel {
         boolean caseSensitive = searchField.isCaseSensitive();
         boolean wholeWord = searchField.isWholeWord();
 
-        // 准备搜索用的文本和关键词
+        // Chuẩn bị văn bản và từ khóa để tìm kiếm
         String searchText = caseSensitive ? text : text.toLowerCase();
         String searchKeyword = caseSensitive ? keyword : keyword.toLowerCase();
 
         int pos = 0;
         while ((pos = searchText.indexOf(searchKeyword, pos)) != -1) {
-            // 如果启用整词匹配，需要检查边界
+            // Nếu tính năng khớp toàn bộ từ được bật thì cần phải kiểm tra giới hạn
             if (wholeWord) {
                 boolean isWordStart = pos == 0 || !Character.isLetterOrDigit(text.charAt(pos - 1));
                 boolean isWordEnd = (pos + searchKeyword.length() >= text.length()) ||
@@ -233,14 +233,14 @@ public class ConsolePanel extends UiSingletonPanel {
             highlightCurrentMatch(keyword.length());
         }
 
-        // 无匹配时搜索框变红，有匹配时恢复正常
+        // Hộp tìm kiếm chuyển sang màu đỏ khi không có kết quả phù hợp và trở lại bình thường khi có kết quả phù hợp
         searchField.setNoResult(matchPositions.isEmpty());
 
         updateMatchCounter();
     }
 
     /**
-     * 导航到下一个匹配项
+     * Điều hướng đến trận đấu tiếp theo
      */
     private void navigateToNextMatch() {
         if (matchPositions.isEmpty()) return;
@@ -251,7 +251,7 @@ public class ConsolePanel extends UiSingletonPanel {
     }
 
     /**
-     * 导航到上一个匹配项
+     * Điều hướng đến trận đấu trước đó
      */
     private void navigateToPreviousMatch() {
         if (matchPositions.isEmpty()) return;
@@ -262,7 +262,7 @@ public class ConsolePanel extends UiSingletonPanel {
     }
 
     /**
-     * 高亮所有匹配项
+     * Làm nổi bật tất cả các trận đấu
      */
     private void highlightAllMatches(int length) {
         try {
@@ -279,7 +279,7 @@ public class ConsolePanel extends UiSingletonPanel {
     }
 
     /**
-     * 高亮当前匹配项
+     * Làm nổi bật trận đấu hiện tại
      */
     private void highlightCurrentMatch(int length) {
         if (currentMatchIndex < 0 || currentMatchIndex >= matchPositions.size()) return;
@@ -287,7 +287,7 @@ public class ConsolePanel extends UiSingletonPanel {
         try {
             int pos = matchPositions.get(currentMatchIndex);
 
-            // 重新高亮所有匹配项
+            // Làm nổi bật lại tất cả các trận đấu
             consoleLogArea.getHighlighter().removeAllHighlights();
             highlightAllMatches(length);
 
@@ -296,7 +296,7 @@ public class ConsolePanel extends UiSingletonPanel {
                     new DefaultHighlighter.DefaultHighlightPainter(currentHighlightColor);
             consoleLogArea.getHighlighter().addHighlight(pos, pos + length, currentPainter);
 
-            // 滚动到当前匹配项
+            // Di chuyển đến trận đấu hiện tại
             consoleLogArea.setCaretPosition(pos);
         } catch (BadLocationException ex) {
             log.debug("Highlight current match failed", ex);
@@ -304,7 +304,7 @@ public class ConsolePanel extends UiSingletonPanel {
     }
 
     /**
-     * 更新匹配计数器
+     * Cập nhật bộ đếm trận đấu
      */
     private void updateMatchCounter() {
         if (matchPositions.isEmpty()) {
@@ -326,7 +326,7 @@ public class ConsolePanel extends UiSingletonPanel {
         logScroll.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         ToolWindowSurfaceStyle.applyScrollPaneCard(logScroll);
 
-        // 顶部工具栏
+        // Thanh công cụ trên cùng
         JPanel topPanel = new JPanel(new BorderLayout(5, 0)) {
             @Override
             public void updateUI() {
@@ -365,7 +365,7 @@ public class ConsolePanel extends UiSingletonPanel {
                 matchCountLabel
         );
 
-        // 右侧：工具按钮
+        // Bên phải: Các nút công cụ
         autoScrollBtn = new AutoScrollToggleButton();
 
         ClearButton clearBtn = new ClearButton(IconUtil.SIZE_SMALL);
@@ -402,12 +402,12 @@ public class ConsolePanel extends UiSingletonPanel {
     }
 
     /**
-     * 清空控制台
+     * Xóa bảng điều khiển
      */
     private void clearConsole() {
         try {
             consoleDoc.remove(0, consoleDoc.getLength());
-            allLogs.clear(); // 清除所有日志记录
+            allLogs.clear(); // Xóa tất cả nhật ký
             matchPositions.clear();
             currentMatchIndex = -1;
             updateMatchCounter();
@@ -421,16 +421,16 @@ public class ConsolePanel extends UiSingletonPanel {
     }
 
     public synchronized void appendConsoleLog(String msg, LogType type) {
-        // 添加到所有日志列表
+        // Đã thêm vào tất cả danh sách nhật ký
         allLogs.add(new LogEntry(msg, type));
 
-        // 如果超过最大数量，删除最老的日志（FIFO）
+        // Nếu vượt quá số lượng tối đa, nhật ký cũ nhất sẽ bị xóa (FIFO）
         if (allLogs.size() > MAX_LOG_ENTRIES) {
             allLogs.remove(0);
         }
 
         SwingUtilities.invokeLater(() -> {
-            // 检查是否应该显示此日志
+            // Kiểm tra xem nhật ký này có được hiển thị không
             if (!shouldDisplayLog(type)) {
                 return;
             }
@@ -439,31 +439,31 @@ public class ConsolePanel extends UiSingletonPanel {
             applyLogStyle(style, type);
 
             try {
-                // 保存当前的光标位置
+                // Lưu vị trí con trỏ hiện tại
                 int currentCaretPosition = consoleLogArea.getCaretPosition();
 
                 consoleDoc.insertString(consoleDoc.getLength(), msg + "\n", style);
 
-                // 限制显示的行数，避免性能问题
+                // Giới hạn số lượng hàng hiển thị để tránh các vấn đề về hiệu suất
                 limitDisplayLines();
 
-                // 根据自动滚动设置决定光标位置
+                // Vị trí con trỏ được xác định dựa trên cài đặt cuộn tự động
                 if (autoScroll) {
-                    // 滚动到底部
+                    // Cuộn xuống phía dưới
                     consoleLogArea.setCaretPosition(consoleDoc.getLength());
                 } else {
-                    // 保持用户当前的浏览位置，不自动滚动
+                    // Duy trì vị trí duyệt hiện tại của người dùng mà không cần cuộn tự động
                     try {
-                        // 如果原位置仍然有效，恢复到原位置
+                        // Nếu vị trí ban đầu vẫn còn hiệu lực, hãy khôi phục nó về vị trí ban đầu
                         if (currentCaretPosition <= consoleDoc.getLength()) {
                             consoleLogArea.setCaretPosition(currentCaretPosition);
                         }
                     } catch (Exception ex) {
-                        // 如果恢复位置失败，不做处理
+                        // Nếu vị trí khôi phục không thành công thì không có quá trình xử lý nào được thực hiện
                     }
                 }
 
-                // 如果正在搜索，更新搜索结果
+                // Nếu bạn đang tìm kiếm, hãy cập nhật kết quả tìm kiếm
                 if (!searchField.getText().isEmpty()) {
                     performSearch();
                 }
@@ -474,14 +474,14 @@ public class ConsolePanel extends UiSingletonPanel {
     }
 
     /**
-     * 限制显示的行数，删除最老的行
+     * Giới hạn số lượng hàng hiển thị, loại bỏ những hàng cũ nhất
      */
     private void limitDisplayLines() {
         try {
             Element root = consoleDoc.getDefaultRootElement();
             int lineCount = root.getElementCount();
 
-            // 如果超过最大显示行数，删除最老的行
+            // Nếu vượt quá số lượng hàng hiển thị tối đa, hàng cũ nhất sẽ bị xóa
             if (lineCount > MAX_DISPLAY_LINES) {
                 int linesToRemove = lineCount - MAX_DISPLAY_LINES;
                 Element firstLine = root.getElement(linesToRemove - 1);
@@ -494,7 +494,7 @@ public class ConsolePanel extends UiSingletonPanel {
     }
 
     /**
-     * 判断是否应该显示此日志
+     * Xác định xem nhật ký này có nên được hiển thị hay không
      */
     private boolean shouldDisplayLog(LogType type) {
         if ("All".equals(currentFilter)) {
@@ -504,15 +504,15 @@ public class ConsolePanel extends UiSingletonPanel {
     }
 
     /**
-     * 刷新显示的日志（过滤后）
+     * Làm mới nhật ký được hiển thị (sau khi lọc)
      */
     private void refreshDisplayedLogs() {
         SwingUtilities.invokeLater(() -> {
             try {
-                // 清空当前显示
+                // Xóa màn hình hiện tại
                 consoleDoc.remove(0, consoleDoc.getLength());
 
-                // 重新添加符合过滤条件的日志
+                // Thêm lại nhật ký phù hợp với điều kiện lọc
                 for (LogEntry entry : allLogs) {
                     if (shouldDisplayLog(entry.type)) {
                         Style style = consoleLogArea.addStyle("logStyle", null);
@@ -521,12 +521,12 @@ public class ConsolePanel extends UiSingletonPanel {
                     }
                 }
 
-                // 滚动到底部
+                // Cuộn xuống phía dưới
                 if (autoScroll) {
                     consoleLogArea.setCaretPosition(consoleDoc.getLength());
                 }
 
-                // 更新搜索结果
+                // Cập nhật kết quả tìm kiếm
                 if (!searchField.getText().isEmpty()) {
                     performSearch();
                 }
@@ -537,10 +537,10 @@ public class ConsolePanel extends UiSingletonPanel {
     }
 
     /**
-     * 应用日志样式 - 使用统一主题配色
+     * Áp dụng kiểu nhật ký - Sử dụng bảng màu chủ đề thống nhất
      */
     private void applyLogStyle(Style style, LogType type) {
-        // 为所有日志类型设置更大的行间距，提升可读性
+        // Đặt khoảng cách dòng lớn hơn cho tất cả các loại nhật ký để cải thiện khả năng đọc
         StyleConstants.setLineSpacing(style, 0.2f);
         StyleConstants.setForeground(style, ConsoleTheme.logForeground(type));
 
@@ -569,7 +569,7 @@ public class ConsolePanel extends UiSingletonPanel {
         }
     }
 
-    // 静态代理方法，便于外部调用
+    // Phương pháp proxy tĩnh để thực hiện các cuộc gọi bên ngoài dễ dàng
     public static void appendLog(String msg) {
         UiSingletonFactory.getInstance(ConsolePanel.class).appendConsoleLog(msg);
     }

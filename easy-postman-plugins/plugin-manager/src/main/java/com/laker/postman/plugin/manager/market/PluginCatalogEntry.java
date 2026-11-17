@@ -1,12 +1,12 @@
 package com.laker.postman.plugin.manager.market;
 
 /**
- * 插件市场条目。
+ * Gia nhập thị trường plugin.
  *
- * <p>这里是 catalog.json 对外暴露的元数据模型。
- * <p>- resolvedDownloadUrl：解析相对地址后的最终下载地址，优先用于实际安装
- * <p>- min/maxAppVersion：给用户表达“当前 EasyPostman 发行版能不能装”
- * <p>- min/maxPlatformVersion：给运行时表达“当前插件 SPI 能不能装配”
+ * <p>Đây rồi catalog.json Mô hình siêu dữ liệu được hiển thị bên ngoài.
+ * <p>- resolvedDownloadUrl：Địa chỉ tải xuống cuối cùng sau khi phân tích địa chỉ tương đối được ưu tiên cho cài đặt thực tế
+ * <p>- min/maxAppVersion：Cung cấp cho người dùng sự thể hiện“hiện tại EasyPostman Phiên bản phân phối có thể được cài đặt?”
+ * <p>- min/maxPlatformVersion：Cung cấp biểu thức thời gian chạy“Plugin hiện tại SPI Nó có thể được lắp ráp?”
  */
 public record PluginCatalogEntry(
         String id,
@@ -56,7 +56,7 @@ public record PluginCatalogEntry(
         return homepageUrl != null && !homepageUrl.isBlank();
     }
 
-    // 优先使用 catalog 解析后的绝对下载地址，避免相对路径在安装阶段重复处理。
+    // Ưu tiên sử dụng catalog Địa chỉ tải xuống tuyệt đối được giải quyết tránh việc xử lý lặp lại các đường dẫn tương đối trong giai đoạn cài đặt.
     public String installUrl() {
         return resolvedDownloadUrl != null && !resolvedDownloadUrl.isBlank() ? resolvedDownloadUrl : downloadUrl;
     }

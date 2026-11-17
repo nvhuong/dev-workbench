@@ -1,29 +1,29 @@
-# 工作流名称：CodeQL 代码安全分析
-# CodeQL 是什么？
-# - GitHub 的代码安全扫描工具，用于自动检测代码中的安全漏洞和编码错误
-# - 支持多种编程语言（Java、JavaScript、Python、C/C++等）
-# - 可以发现：SQL 注入、XSS、路径遍历、不安全的反序列化等安全问题
+# Tên quy trình làm việc: .CodeQL Phân tích bảo mật mã
+# CodeQL Nó là gì? .
+# - GitHub Công cụ quét bảo mật mã để tự động phát hiện các lỗ hổng bảo mật và lỗi mã hóa trong mã của bạn
+# - Hỗ trợ nhiều ngôn ngữ lập trình (Java、JavaScript、Python、C/C++Chờ đợi)
+# - Có thể tìm thấy tại:SQL tiêm,XSS、Các vấn đề bảo mật như truyền tải đường dẫn và quá trình khử lưu lượng không an toàn
 name: "CodeQL"
 
-# 触发条件
+# Điều kiện kích hoạt
 on:
-  # 当代码推送到 master 分支时触发（检测新代码的安全问题）
+  # Khi mã được đẩy tới master Được kích hoạt khi phân nhánh (để phát hiện các vấn đề bảo mật trong mã mới)
   push:
     branches: [ master ]
-  # 当创建针对 master 分支的 PR 时触发（在合并前发现安全问题）
+  # Khi tạo mục tiêu master Phân nhánh PR Được kích hoạt khi (vấn đề bảo mật được phát hiện trước khi hợp nhất)
   pull_request:
     branches: [ master ]
-  # 定时扫描：每周日 UTC 02:00（北京时间 10:00）运行一次
-  # 作用：即使代码没有变化，也能检测到新发现的安全漏洞模式
+  # Lịch quét: Chủ Nhật hàng tuần UTC 02:00（Giờ Bắc Kinh 10:00）Chạy một lần
+  # Vai trò: Có thể phát hiện các mẫu lỗ hổng bảo mật mới được phát hiện ngay cả khi mã không thay đổi
   schedule:
     - cron: '0 2 * * 0'
 
-# 权限设置：允许将安全问题写入 GitHub Security 标签页
+# Cài đặt quyền: Cho phép viết câu hỏi bảo mật GitHub Security trang tab
 permissions:
   security-events: write
-  # 添加 actions 读取权限（某些环境需要）
+  # Thêm vào actions Quyền đọc (bắt buộc đối với một số môi trường)
   actions: read
-  # 添加内容读取权限
+  # Thêm quyền đọc nội dung
   contents: read
 
 jobs:
@@ -31,11 +31,11 @@ jobs:
     name: Analyze (CodeQL)
     runs-on: ubuntu-latest
 
-    # 超时设置：避免分析任务运行过久
+    # Cài đặt thời gian chờ: Tránh các tác vụ phân tích chạy quá lâu
     timeout-minutes: 360
 
     steps:
-      # 第一步：检出代码仓库
+      # Bước một: Kiểm tra kho lưu trữ mã
       - name: Checkout repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
@@ -45,28 +45,28 @@ jobs:
           distribution: temurin
           java-version: '21'
 
-      # 第二步：初始化 CodeQL 分析环境
+      # Bước 2: Khởi tạo CodeQL Phân tích môi trường
       - name: Initialize CodeQL
         uses: github/codeql-action/init@b96794f015dfd88f77b49b1c93e0fa7110f94c63 # v4
         with:
-          # 指定要分析的编程语言
+          # Chỉ định ngôn ngữ lập trình để phân tích
           languages: java
-          # 查询级别：security-extended（推荐）
-          # - default: 基础安全检查
-          # - security-extended: 扩展安全检查（推荐，覆盖更多安全问题）
-          # - security-and-quality: 安全+代码质量检查（最全面但耗时更长）
+          # Cấp độ truy vấn:security-extended（gợi ý)
+          # - default: Kiểm tra an ninh cơ bản
+          # - security-extended: Kiểm tra bảo mật mở rộng (được khuyến nghị, bao gồm nhiều vấn đề bảo mật hơn)
+          # - security-and-quality: An toàn+Kiểm tra chất lượng mã (toàn diện nhất nhưng dài hơn)
           queries: security-extended
 
-      # 第三步：自动构建项目（CodeQL 需要编译后的代码进行分析）
-      # 对于 Java/Maven 项目，会自动执行 mvn compile
+      # Bước 3: Tự động xây dựng dự án (CodeQL Mã biên dịch là cần thiết để phân tích)
+      # Đối với Java/Maven Dự án sẽ được thực hiện tự động mvn compile
       - name: Autobuild
         uses: github/codeql-action/autobuild@b96794f015dfd88f77b49b1c93e0fa7110f94c63 # v4
 
-      # 第四步：执行 CodeQL 安全分析
+      # Bước 4: Thực hiện CodeQL Phân tích bảo mật
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@b96794f015dfd88f77b49b1c93e0fa7110f94c63 # v4
         with:
-          # 分析类别标识（用于在 Security 标签页中区分不同类型的扫描）
+          # Mã định danh danh mục phân tích (được sử dụng trong  Security để phân biệt giữa các kiểu quét khác nhau)
           category: "security"
-          # 上传结果到 GitHub Security 标签页
-          # 可以在仓库的 Security -> Code scanning alerts 中查看发现的问题
+          # Tải kết quả lên GitHub Security trang tab
+          # Nó có thể ở trong kho Security -> Code scanning alerts Kiểm tra các vấn đề được tìm thấy

@@ -20,7 +20,7 @@ import java.util.Map;
 public class UserPreferencesStore {
     private static final String KEY_WINDOW_WIDTH = "windowWidth";
     private static final String KEY_WINDOW_HEIGHT = "windowHeight";
-    private static final String KEY_WINDOW_EXTENDED_STATE = "windowExtendedState";  // 窗口状态
+    private static final String KEY_WINDOW_EXTENDED_STATE = "windowExtendedState";  // Trạng thái cửa sổ
     private static final String KEY_LANGUAGE = "language";
     private static final String PREFERENCES_PATH = ConfigPathConstants.USER_SETTINGS;
     private static final Object LOCK = new Object();
@@ -42,7 +42,7 @@ public class UserPreferencesStore {
                     preferencesCache = JSONUtil.parseObj(json);
                 }
             } catch (Exception e) {
-                log.warn("读取用户偏好失败", e);
+                log.warn("Không thể đọc tùy chọn của người dùng", e);
                 preferencesCache = new HashMap<>();
             }
             return preferencesCache;
@@ -55,7 +55,7 @@ public class UserPreferencesStore {
                 String json = JSONUtil.toJsonPrettyStr(preferencesCache);
                 FileUtil.writeString(json, new File(PREFERENCES_PATH), StandardCharsets.UTF_8);
             } catch (Exception e) {
-                log.warn("保存用户偏好失败", e);
+                log.warn("Không lưu được tùy chọn của người dùng", e);
             }
         }
     }
@@ -90,7 +90,7 @@ public class UserPreferencesStore {
         if (v instanceof String s) try {
             return Integer.parseInt(s);
         } catch (Exception ignore) {
-            // 忽略转换异常
+            // Bỏ qua các ngoại lệ chuyển đổi
         }
         return null;
     }
@@ -107,7 +107,7 @@ public class UserPreferencesStore {
         return Collections.unmodifiableMap(readPreferences());
     }
 
-    // 窗口状态专用方法
+    // Các phương pháp dành riêng cho trạng thái cửa sổ
     public static void saveWindowState(int width, int height, int extendedState) {
         synchronized (LOCK) {
             readPreferences();
@@ -135,7 +135,7 @@ public class UserPreferencesStore {
         return getWindowWidth() != null && getWindowHeight() != null;
     }
 
-    // 语言设置专用方法
+    // Language setting specific method
     public static void saveLanguage(String language) {
         put(KEY_LANGUAGE, language);
     }

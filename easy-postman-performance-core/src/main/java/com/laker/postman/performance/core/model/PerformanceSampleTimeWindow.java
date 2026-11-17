@@ -3,7 +3,7 @@ package com.laker.postman.performance.core.model;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
- * 样本时间范围。累计报表用完整 sample span，趋势图用外部 step interval，避免两者语义混在一起。
+ * Khoảng thời gian lấy mẫu Báo cáo tích lũy đã hoàn tất sample span，Biểu đồ xu hướng là bên ngoài step interval，Tránh nhầm lẫn giữa hai ngữ nghĩa.
  */
 final class PerformanceSampleTimeWindow {
     private final AtomicLong firstStartMs = new AtomicLong(Long.MAX_VALUE);

@@ -21,7 +21,7 @@ import java.util.Objects;
 import static org.testng.Assert.*;
 
 /**
- * OkHttpRequestBuilder 单元测试
+ * OkHttpRequestBuilder Kiểm tra đơn vị
  */
 public class OkHttpRequestBuilderTest {
 
@@ -35,9 +35,9 @@ public class OkHttpRequestBuilderTest {
         request.headersList = new ArrayList<>();
     }
 
-    // ==================== 基础请求测试 ====================
+    // ==================== Kiểm tra yêu cầu cơ bản ====================
 
-    @Test(description = "测试 GET 请求构建")
+    @Test(description = "Bài kiểm tra GET Yêu cầu xây dựng")
     public void testBuildGetRequest() {
         request.method = "GET";
         request.headersList.add(new HttpHeader(true, "Accept", "application/json"));
@@ -47,11 +47,11 @@ public class OkHttpRequestBuilderTest {
         assertNotNull(okRequest);
         assertEquals(okRequest.url().toString(), request.url);
         assertEquals(okRequest.method(), "GET");
-        assertNull(okRequest.body(), "GET 请求不应该有 body");
+        assertNull(okRequest.body(), "GET The request should not have body");
         assertEquals(okRequest.header("Accept"), "application/json");
     }
 
-    @Test(description = "测试 POST 请求构建")
+    @Test(description = "Bài kiểm tra POST Yêu cầu xây dựng")
     public void testBuildPostRequest() throws IOException {
         request.headersList.add(new HttpHeader(true, "Content-Type", "application/json"));
         request.body = "{\"name\":\"test\"}";
@@ -66,7 +66,7 @@ public class OkHttpRequestBuilderTest {
         assertEquals(bodyContent, "{\"name\":\"test\"}");
     }
 
-    @Test(description = "测试 PUT 请求构建")
+    @Test(description = "Bài kiểm tra PUT Yêu cầu xây dựng")
     public void testBuildPutRequest() {
         request.method = "PUT";
         request.headersList.add(new HttpHeader(true, "Content-Type", "application/json"));
@@ -78,36 +78,36 @@ public class OkHttpRequestBuilderTest {
         assertNotNull(okRequest.body());
     }
 
-    @Test(description = "测试 DELETE 请求构建")
+    @Test(description = "Bài kiểm tra DELETE Yêu cầu xây dựng")
     public void testBuildDeleteRequest() {
         request.method = "DELETE";
 
         Request okRequest = OkHttpRequestBuilder.buildRequest(request);
 
         assertEquals(okRequest.method(), "DELETE");
-        assertNotNull(okRequest.body(), "DELETE 请求应该有空 body");
+        assertNotNull(okRequest.body(), "DELETE Yêu cầu phải có sẵn body");
     }
 
-    @Test(description = "测试 HEAD 请求构建")
+    @Test(description = "Bài kiểm tra HEAD Yêu cầu xây dựng")
     public void testBuildHeadRequest() {
         request.method = "HEAD";
 
         Request okRequest = OkHttpRequestBuilder.buildRequest(request);
 
         assertEquals(okRequest.method(), "HEAD");
-        assertNull(okRequest.body(), "HEAD 请求不应该有 body");
+        assertNull(okRequest.body(), "HEAD The request should not have body");
     }
 
-    // ==================== JSON5 注释去除测试 ====================
+    // ==================== JSON5 Kiểm tra loại bỏ bình luận ====================
 
-    @Test(description = "测试 JSON5 单行注释去除")
+    @Test(description = "Bài kiểm tra JSON5 Đã xóa nhận xét một dòng")
     public void testJson5SingleLineComments() throws IOException {
         request.headersList.add(new HttpHeader(true, "Content-Type", "application/json"));
         request.body = """
                 {
-                  // 这是用户名
+                  // Đây là tên người dùng
                   "username": "test",
-                  // 这是密码
+                  // Đây là mật khẩu
                   "password": "123456"
                 }
                 """;
@@ -115,21 +115,21 @@ public class OkHttpRequestBuilderTest {
         Request okRequest = OkHttpRequestBuilder.buildRequest(request);
         String bodyContent = readRequestBody(okRequest.body());
 
-        assertFalse(bodyContent.contains("//"), "单行注释应该被去除");
-        assertFalse(bodyContent.contains("这是用户名"), "注释内容应该被去除");
-        assertTrue(bodyContent.contains("username"), "字段应该保留");
-        assertTrue(bodyContent.contains("test"), "值应该保留");
+        assertFalse(bodyContent.contains("//"), "Nhận xét một dòng nên được loại bỏ");
+        assertFalse(bodyContent.contains("Đây là tên người dùng"), "Nội dung bình luận nên được loại bỏ");
+        assertTrue(bodyContent.contains("username"), "Các trường nên được giữ lại");
+        assertTrue(bodyContent.contains("test"), "Giá trị nên được giữ lại");
     }
 
-    @Test(description = "测试 JSON5 多行注释去除")
+    @Test(description = "Bài kiểm tra JSON5 Xóa bình luận nhiều dòng")
     public void testJson5MultiLineComments() throws IOException {
         request.headersList.add(new HttpHeader(true, "Content-Type", "application/json"));
         request.body = """
                 {
-                  /* 这是一个
-                     多行注释 */
+                  /* Đây là một
+                     Bình luận nhiều dòng */
                   "name": "John",
-                  /* 年龄信息 */
+                  /* Thông tin về tuổi */
                   "age": 30
                 }
                 """;
@@ -137,29 +137,29 @@ public class OkHttpRequestBuilderTest {
         Request okRequest = OkHttpRequestBuilder.buildRequest(request);
         String bodyContent = readRequestBody(okRequest.body());
 
-        assertFalse(bodyContent.contains("/*"), "多行注释开始符应该被去除");
-        assertFalse(bodyContent.contains("*/"), "多行注释结束符应该被去除");
-        assertFalse(bodyContent.contains("多行注释"), "注释内容应该被去除");
-        assertTrue(bodyContent.contains("name"), "字段应该保留");
-        assertTrue(bodyContent.contains("John"), "值应该保留");
+        assertFalse(bodyContent.contains("/*"), "Những phần bắt đầu bình luận nhiều dòng nên được loại bỏ");
+        assertFalse(bodyContent.contains("*/"), "Các đầu cuối nhận xét nhiều dòng nên được loại bỏ");
+        assertFalse(bodyContent.contains("Bình luận nhiều dòng"), "Nội dung bình luận nên được loại bỏ");
+        assertTrue(bodyContent.contains("name"), "Các trường nên được giữ lại");
+        assertTrue(bodyContent.contains("John"), "Giá trị nên được giữ lại");
     }
 
-    @Test(description = "测试 JSON5 混合注释去除")
+    @Test(description = "Bài kiểm tra JSON5 Loại bỏ chú thích hỗn hợp")
     public void testJson5MixedComments() throws IOException {
         request.headersList.add(new HttpHeader(true, "Content-Type", "application/json"));
         request.body = """
                 {
-                  // 用户信息
+                  // Thông tin người dùng
                   "user": {
-                    /* 姓名 */
+                    /* Tên */
                     "name": "Alice",
-                    // 邮箱
+                    // Email
                     "email": "alice@example.com"
                   },
-                  /* 设置项
-                     包含多个字段 */
+                  /* Thiết lập các mục
+                     Chứa nhiều trường */
                   "settings": {
-                    "theme": "dark" // 主题设置
+                    "theme": "dark" // Cài đặt chủ đề
                   }
                 }
                 """;
@@ -167,19 +167,19 @@ public class OkHttpRequestBuilderTest {
         Request okRequest = OkHttpRequestBuilder.buildRequest(request);
         String bodyContent = readRequestBody(okRequest.body());
 
-        assertFalse(bodyContent.contains("//"), "单行注释应该被去除");
-        assertFalse(bodyContent.contains("/*"), "多行注释应该被去除");
-        assertTrue(bodyContent.contains("user"), "字段应该保留");
-        assertTrue(bodyContent.contains("Alice"), "值应该保留");
-        assertTrue(bodyContent.contains("settings"), "字段应该保留");
+        assertFalse(bodyContent.contains("//"), "Nhận xét một dòng nên được loại bỏ");
+        assertFalse(bodyContent.contains("/*"), "Bình luận nhiều dòng nên được loại bỏ");
+        assertTrue(bodyContent.contains("user"), "Các trường nên được giữ lại");
+        assertTrue(bodyContent.contains("Alice"), "Giá trị nên được giữ lại");
+        assertTrue(bodyContent.contains("settings"), "Các trường nên được giữ lại");
     }
 
-    @Test(description = "测试无 Content-Type 时默认按 JSON 处理并去除注释")
+    @Test(description = "Kiểm tra Không có Content-Type Nhấn theo mặc định JSON Xử lý và xóa nhận xét")
     public void testDefaultJsonWithComments() throws IOException {
-        // 不设置 Content-Type，应该默认为 JSON
+        // Chưa được thiết lập Content-Type，nên mặc định là  JSON
         request.body = """
                 {
-                  // 测试字段
+                  // Trường thử nghiệm
                   "test": "value"
                 }
                 """;
@@ -187,14 +187,14 @@ public class OkHttpRequestBuilderTest {
         Request okRequest = OkHttpRequestBuilder.buildRequest(request);
         String bodyContent = readRequestBody(okRequest.body());
 
-        assertFalse(bodyContent.contains("//"), "默认 JSON 格式应该去除注释");
-        assertTrue(bodyContent.contains("test"), "字段应该保留");
-        assertTrue(bodyContent.contains("value"), "值应该保留");
+        assertFalse(bodyContent.contains("//"), "Mặc định JSON Định dạng nên được loại bỏ các bình luận");
+        assertTrue(bodyContent.contains("test"), "Các trường nên được giữ lại");
+        assertTrue(bodyContent.contains("value"), "Giá trị nên được giữ lại");
         assertNotNull(okRequest.body());
         assertEquals(Objects.requireNonNull(okRequest.body().contentType()).toString(), "application/json; charset=utf-8");
     }
 
-    @Test(description = "测试普通 JSON 不受影响")
+    @Test(description = "Bài kiểm tra ở mức trung bình JSON Không bị ảnh hưởng")
     public void testNormalJsonNotAffected() throws IOException {
         request.headersList.add(new HttpHeader(true, "Content-Type", "application/json"));
         request.body = """
@@ -208,12 +208,12 @@ public class OkHttpRequestBuilderTest {
         Request okRequest = OkHttpRequestBuilder.buildRequest(request);
         String bodyContent = readRequestBody(okRequest.body());
 
-        assertTrue(bodyContent.contains("name"), "字段应该保留");
-        assertTrue(bodyContent.contains("Bob"), "值应该保留");
-        assertTrue(bodyContent.contains("25"), "值应该保留");
+        assertTrue(bodyContent.contains("name"), "Các trường nên được giữ lại");
+        assertTrue(bodyContent.contains("Bob"), "Giá trị nên được giữ lại");
+        assertTrue(bodyContent.contains("25"), "Giá trị nên được giữ lại");
     }
 
-    @Test(description = "测试非 JSON Content-Type 不处理注释")
+    @Test(description = "Kiểm tra thì không JSON Content-Type Bình luận không được xử lý")
     public void testNonJsonContentTypeNotProcessed() throws IOException {
         request.headersList.add(new HttpHeader(true, "Content-Type", "text/plain"));
         request.body = "// This is not JSON\nSome text content";
@@ -221,11 +221,11 @@ public class OkHttpRequestBuilderTest {
         Request okRequest = OkHttpRequestBuilder.buildRequest(request);
         String bodyContent = readRequestBody(okRequest.body());
 
-        assertEquals(bodyContent, request.body, "非 JSON 内容应该保持原样");
-        assertTrue(bodyContent.contains("//"), "非 JSON 内容的注释符不应被去除");
+        assertEquals(bodyContent, request.body, "Không JSON Nội dung nên giữ nguyên như cũ");
+        assertTrue(bodyContent.contains("//"), "Không JSON Nội dung bình luận không nên bị loại bỏ");
     }
 
-    @Test(description = "测试 JSON Content-Type 变体")
+    @Test(description = "Bài kiểm tra JSON Content-Type Các biến thể")
     public void testJsonContentTypeVariants() throws IOException {
         String[] jsonContentTypes = {
                 "application/json",
@@ -247,13 +247,13 @@ public class OkHttpRequestBuilderTest {
             String bodyContent = readRequestBody(okRequest.body());
 
             assertFalse(bodyContent.contains("//"),
-                    "Content-Type: " + contentType + " 应该去除注释");
+                    "Content-Type: " + contentType + " Bình luận nên được loại bỏ");
         }
     }
 
-    // ==================== Headers 测试 ====================
+    // ==================== Headers Bài kiểm tra ====================
 
-    @Test(description = "测试添加多个 Headers")
+    @Test(description = "Kiểm tra việc thêm nhiều Headers")
     public void testMultipleHeaders() {
         request.headersList.add(new HttpHeader(true, "Accept", "application/json"));
         request.headersList.add(new HttpHeader(true, "Authorization", "Bearer token123"));
@@ -266,7 +266,7 @@ public class OkHttpRequestBuilderTest {
         assertEquals(okRequest.header("X-Custom-Header"), "custom-value");
     }
 
-    @Test(description = "测试 null Header 值")
+    @Test(description = "Bài kiểm tra null Header giá trị")
     public void testNullHeaderValue() {
         request.headersList.add(new HttpHeader(true, "X-Test", null));
 
@@ -274,25 +274,25 @@ public class OkHttpRequestBuilderTest {
 
         // OkHttp returns empty string for non-existent headers, and null values are skipped
         String headerValue = okRequest.header("X-Test");
-        assertTrue(headerValue == null || headerValue.isEmpty(), "null 值的 header 应该被跳过或返回空字符串");
+        assertTrue(headerValue == null || headerValue.isEmpty(), "null Đáng giá header Nên bỏ qua hoặc trả về một chuỗi trống");
     }
 
-    @Test(description = "测试非法 Header 名称被跳过")
+    @Test(description = "Việc kiểm tra là bất hợp pháp Header Tên bị bỏ qua")
     public void testInvalidHeaderNames() {
         request.headersList.add(new HttpHeader(true, "Valid-Header", "value1"));
-        request.headersList.add(new HttpHeader(true, "Invalid:Header", "value2")); // 包含冒号，非法
-        request.headersList.add(new HttpHeader(true, "", "value3")); // 空名称，非法
-        request.headersList.add(new HttpHeader(true, null, "value4")); // null 名称，非法
+        request.headersList.add(new HttpHeader(true, "Invalid:Header", "value2")); // Chứa dấu hai chấm, bất hợp pháp
+        request.headersList.add(new HttpHeader(true, "", "value3")); // Tên trống, bất hợp pháp
+        request.headersList.add(new HttpHeader(true, null, "value4")); // null Tên, bất hợp pháp
 
         Request okRequest = OkHttpRequestBuilder.buildRequest(request);
 
         assertEquals(okRequest.header("Valid-Header"), "value1");
-        assertNull(okRequest.header("Invalid:Header"), "非法 header 应该被跳过");
+        assertNull(okRequest.header("Invalid:Header"), "bất hợp pháp header nên được bỏ qua");
     }
 
-    // ==================== 空 Body 测试 ====================
+    // ==================== vô giá trị Body Bài kiểm tra ====================
 
-    @Test(description = "测试空 Body")
+    @Test(description = "Kiểm tra trống rỗng Body")
     public void testEmptyBody() throws IOException {
         request.body = "";
         request.headersList.add(new HttpHeader(true, "Content-Type", "application/json"));
@@ -300,10 +300,10 @@ public class OkHttpRequestBuilderTest {
         Request okRequest = OkHttpRequestBuilder.buildRequest(request);
 
         assertNotNull(okRequest.body());
-        assertEquals(readRequestBody(okRequest.body()), "", "空 body 应该是空字符串");
+        assertEquals(readRequestBody(okRequest.body()), "", "vô giá trị body Phải là một chuỗi trống");
     }
 
-    @Test(description = "测试 null Body")
+    @Test(description = "Bài kiểm tra null Body")
     public void testNullBody() throws IOException {
         request.body = null;
         request.headersList.add(new HttpHeader(true, "Content-Type", "application/json"));
@@ -311,12 +311,12 @@ public class OkHttpRequestBuilderTest {
         Request okRequest = OkHttpRequestBuilder.buildRequest(request);
 
         assertNotNull(okRequest.body());
-        assertEquals(readRequestBody(okRequest.body()), "", "null body 应该是空字符串");
+        assertEquals(readRequestBody(okRequest.body()), "", "null body Phải là một chuỗi trống");
     }
 
-    // ==================== Multipart Form Data 测试 ====================
+    // ==================== Multipart Form Data Bài kiểm tra ====================
 
-    @Test(description = "测试构建 Multipart 请求")
+    @Test(description = "Xây dựng thử nghiệm Multipart yêu cầu")
     public void testBuildMultipartRequest() {
         request.formDataList = new ArrayList<>();
         request.formDataList.add(new HttpFormData(true, "field1", HttpFormData.TYPE_TEXT, "value1"));
@@ -330,7 +330,7 @@ public class OkHttpRequestBuilderTest {
         assertTrue(Objects.requireNonNull(okRequest.body().contentType()).toString().contains("multipart/form-data"));
     }
 
-    @Test(description = "测试 Multipart 空值字段")
+    @Test(description = "Bài kiểm tra Multipart Trường giá trị null")
     public void testMultipartWithNullValue() {
         request.formDataList = new ArrayList<>();
         request.formDataList.add(new HttpFormData(true, "field1", HttpFormData.TYPE_TEXT, null));
@@ -341,7 +341,7 @@ public class OkHttpRequestBuilderTest {
         assertNotNull(okRequest.body());
     }
 
-    @Test(description = "测试 Multipart 空键被跳过")
+    @Test(description = "Bài kiểm tra Multipart Các phím trống được bỏ qua")
     public void testMultipartWithEmptyKey() {
         request.formDataList = new ArrayList<>();
         request.formDataList.add(new HttpFormData(true, "", HttpFormData.TYPE_TEXT, "value1"));
@@ -352,9 +352,9 @@ public class OkHttpRequestBuilderTest {
         assertNotNull(okRequest.body());
     }
 
-    @Test(description = "测试 Multipart 文件上传")
+    @Test(description = "Bài kiểm tra Multipart Tải lên tập tin")
     public void testMultipartWithFiles() throws IOException {
-        // 创建临时测试文件
+        // Tạo tập tin thử nghiệm tạm thời
         File tempFile = Files.createTempFile("test", ".txt").toFile();
         tempFile.deleteOnExit();
         Files.writeString(tempFile.toPath(), "test content");
@@ -368,9 +368,9 @@ public class OkHttpRequestBuilderTest {
         assertTrue(Objects.requireNonNull(okRequest.body().contentType()).toString().contains("multipart/form-data"));
     }
 
-    @Test(description = "测试 Multipart 不存在的文件被忽略")
+    @Test(description = "Bài kiểm tra Multipart Các tập tin không tồn tại sẽ bị bỏ qua")
     public void testMultipartWithNonExistentFile() {
-        // 添加一个有效的表单字段，确保 multipart 有至少一个部分
+        // Hãy đảm bảo thêm trường biểu mẫu hợp lệ multipart Có ít nhất một phần
         request.formDataList = new ArrayList<>();
         request.formDataList.add(new HttpFormData(true, "field1", HttpFormData.TYPE_TEXT, "value1"));
         request.formDataList.add(new HttpFormData(true, "file", HttpFormData.TYPE_FILE, "/path/to/nonexistent/file.txt"));
@@ -378,12 +378,12 @@ public class OkHttpRequestBuilderTest {
         Request okRequest = OkHttpRequestBuilder.buildMultipartRequest(request);
 
         assertNotNull(okRequest.body());
-        // 不存在的文件应该被忽略，但表单数据应该存在
+        // Các tệp không tồn tại sẽ bị bỏ qua nhưng dữ liệu biểu mẫu sẽ tồn tại
     }
 
-    // ==================== URL Encoded Form 测试 ====================
+    // ==================== URL Encoded Form Bài kiểm tra ====================
 
-    @Test(description = "测试构建 URL Encoded Form 请求")
+    @Test(description = "Xây dựng thử nghiệm URL Encoded Form yêu cầu")
     public void testBuildFormRequest() {
         request.urlencodedList = new ArrayList<>();
         request.urlencodedList.add(new HttpFormUrlencoded(true, "username", "test"));
@@ -398,7 +398,7 @@ public class OkHttpRequestBuilderTest {
                 "application/x-www-form-urlencoded; charset=UTF-8");
     }
 
-    @Test(description = "测试 Form 请求保留用户指定的 Content-Type")
+    @Test(description = "Bài kiểm tra Form Yêu cầu vẫn do người dùng chỉ định Content-Type")
     public void testFormRequestWithCustomContentType() {
         request.urlencodedList = new ArrayList<>();
         request.urlencodedList.add(new HttpFormUrlencoded(true, "field", "value"));
@@ -408,10 +408,10 @@ public class OkHttpRequestBuilderTest {
 
         assertEquals(okRequest.header("Content-Type"),
                 "application/x-www-form-urlencoded; charset=ISO-8859-1",
-                "应该保留用户指定的 Content-Type");
+                "Nên được giữ lại theo chỉ định của người dùng Content-Type");
     }
 
-    @Test(description = "测试 Form 请求 null 值处理")
+    @Test(description = "Bài kiểm tra Form yêu cầu null xử lý giá trị")
     public void testFormRequestWithNullValue() {
         request.urlencodedList = new ArrayList<>();
         request.urlencodedList.add(new HttpFormUrlencoded(true, "field1", null));
@@ -422,7 +422,7 @@ public class OkHttpRequestBuilderTest {
         assertNotNull(okRequest.body());
     }
 
-    @Test(description = "测试 Form 请求空键被跳过")
+    @Test(description = "Bài kiểm tra Form Yêu cầu về các phím trống sẽ bị bỏ qua")
     public void testFormRequestWithEmptyKey() {
         request.urlencodedList = new ArrayList<>();
         request.urlencodedList.add(new HttpFormUrlencoded(true, "", "value1"));
@@ -433,9 +433,9 @@ public class OkHttpRequestBuilderTest {
         assertNotNull(okRequest.body());
     }
 
-    // ==================== 边界情况测试 ====================
+    // ==================== Kiểm tra trường hợp ranh giới ====================
 
-    @Test(description = "测试没有 headers 的请求")
+    @Test(description = "Thử nghiệm thì không headers lời yêu cầu")
     public void testRequestWithoutHeaders() {
         request.headersList = null;
         request.body = "{\"test\":\"value\"}";
@@ -443,12 +443,12 @@ public class OkHttpRequestBuilderTest {
         Request okRequest = OkHttpRequestBuilder.buildRequest(request);
 
         assertNotNull(okRequest);
-        // 应该使用默认的 JSON Content-Type
+        // Nên sử dụng mặc định JSON Content-Type
         assertNotNull(okRequest.body());
         assertEquals(Objects.requireNonNull(okRequest.body().contentType()).toString(), "application/json; charset=utf-8");
     }
 
-    @Test(description = "测试空 headers List")
+    @Test(description = "Kiểm tra trống rỗng headers List")
     public void testRequestWithEmptyHeaders() {
         request.headersList = new ArrayList<>();
         request.body = "{\"test\":\"value\"}";
@@ -458,17 +458,17 @@ public class OkHttpRequestBuilderTest {
         assertNotNull(okRequest);
     }
 
-    @Test(description = "测试方法名大小写")
+    @Test(description = "Tên phương pháp thử nghiệm có phân biệt chữ hoa chữ thường")
     public void testMethodCaseInsensitive() {
         request.method = "post";
         request.body = "{\"test\":\"value\"}";
 
         Request okRequest = OkHttpRequestBuilder.buildRequest(request);
 
-        assertEquals(okRequest.method(), "POST", "方法名应该转为大写");
+        assertEquals(okRequest.method(), "POST", "Tên phương thức nên được chuyển đổi thành chữ hoa");
     }
 
-    @Test(description = "测试 PATCH 方法")
+    @Test(description = "Bài kiểm tra PATCH phương pháp")
     public void testPatchMethod() {
         request.method = "PATCH";
         request.headersList.add(new HttpHeader(true, "Content-Type", "application/json"));
@@ -480,7 +480,7 @@ public class OkHttpRequestBuilderTest {
         assertNotNull(okRequest.body());
     }
 
-    @Test(description = "测试 OPTIONS 方法")
+    @Test(description = "Bài kiểm tra OPTIONS phương pháp")
     public void testOptionsMethod() {
         request.method = "OPTIONS";
 
@@ -490,7 +490,7 @@ public class OkHttpRequestBuilderTest {
         assertNotNull(okRequest.body());
     }
 
-    @Test(description = "测试无效 JSON 不会导致崩溃")
+    @Test(description = "Bài kiểm tra không hợp lệ JSON Sẽ không gây ra sự cố")
     public void testInvalidJsonWithComments() throws IOException {
         request.headersList.add(new HttpHeader(true, "Content-Type", "application/json"));
         request.body = "{ // comment\n invalid json here }";
@@ -499,18 +499,18 @@ public class OkHttpRequestBuilderTest {
 
         assertNotNull(okRequest);
         assertNotNull(okRequest.body());
-        // 如果 JSON 无效，应该保留原始内容
+        // nếu JSON Nội dung gốc không hợp lệ nên được giữ lại
         String bodyContent = readRequestBody(okRequest.body());
         assertNotNull(bodyContent);
     }
 
-    @Test(description = "测试特殊字符的 JSON")
+    @Test(description = "Kiểm tra các ký tự đặc biệt JSON")
     public void testJsonWithSpecialCharacters() throws IOException {
         request.headersList.add(new HttpHeader(true, "Content-Type", "application/json"));
         request.body = """
                 {
                   "text": "Hello\\nWorld\\t!",
-                  "unicode": "中文测试",
+                  "unicode": "Bài kiểm tra tiếng Trung",
                   "emoji": "😀"
                 }
                 """;
@@ -519,13 +519,13 @@ public class OkHttpRequestBuilderTest {
 
         assertNotNull(okRequest);
         String bodyContent = readRequestBody(okRequest.body());
-        assertTrue(bodyContent.contains("中文测试"));
+        assertTrue(bodyContent.contains("Bài kiểm tra tiếng Trung"));
     }
 
-    // ==================== 辅助方法 ====================
+    // ==================== Các phương pháp trợ giúp ====================
 
     /**
-     * 读取 RequestBody 内容
+     * Đọc RequestBody nội dung
      */
     private String readRequestBody(RequestBody body) throws IOException {
         if (body == null) {

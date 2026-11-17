@@ -36,7 +36,7 @@ public class ThreadGroupPropertyPanel extends JPanel {
     private PerformanceTreeNode currentNode;
     private boolean updatingPreview;
 
-    // 固定模式面板组件
+    // Thành phần bảng điều khiển chế độ cố định
     private final JPanel fixedPanel;
     private final EasyJSpinner fixedNumThreadsSpinner;
     private final EasyJSpinner fixedLoopsSpinner;
@@ -47,14 +47,14 @@ public class ThreadGroupPropertyPanel extends JPanel {
     private final JLabel maxInFlightWaitLabel;
     private final EasyJSpinner maxInFlightWaitSpinner;
 
-    // 递增模式面板组件
+    // Thành phần bảng chế độ tăng dần
     private final JPanel rampUpPanel;
     private final EasyJSpinner rampUpStartThreadsSpinner;
     private final EasyJSpinner rampUpEndThreadsSpinner;
     private final EasyJSpinner rampUpTimeSpinner;
     private final EasyJSpinner rampUpDurationSpinner;
 
-    // 尖刺模式面板组件
+    // Thành phần bảng điều khiển có gai
     private final JPanel spikePanel;
     private final EasyJSpinner spikeMinThreadsSpinner;
     private final EasyJSpinner spikeMaxThreadsSpinner;
@@ -63,7 +63,7 @@ public class ThreadGroupPropertyPanel extends JPanel {
     private final EasyJSpinner spikeRampDownTimeSpinner;
     private final EasyJSpinner spikeDurationSpinner;
 
-    // 阶梯模式面板组件
+    // Thành phần bảng điều khiển chế độ bậc thang
     private final JPanel stairsPanel;
     private final EasyJSpinner stairsStartThreadsSpinner;
     private final EasyJSpinner stairsEndThreadsSpinner;
@@ -71,7 +71,7 @@ public class ThreadGroupPropertyPanel extends JPanel {
     private final EasyJSpinner stairsHoldTimeSpinner;
     private final EasyJSpinner stairsDurationSpinner;
 
-    // 负载模式预览相关
+    // Tải chế độ xem trước liên quan
     private final ThreadLoadPreviewPanel previewPanel;
 
     public ThreadGroupPropertyPanel() {
@@ -85,7 +85,7 @@ public class ThreadGroupPropertyPanel extends JPanel {
         );
         modeComboBox.setRenderer(new ThreadModeRenderer());
 
-        // 中间部分：左侧配置面板，右侧预览图
+        // Phần giữa: bảng cấu hình bên trái, xem trước bên phải
         JPanel mainPanel = new JPanel(new MigLayout(
                 "insets 0, fillx, novisualpadding, gap 0",
                 "[" + CONFIG_PANEL_WIDTH + "!,left]" + CONFIG_PREVIEW_GAP + "[420::,grow,fill]",
@@ -93,13 +93,13 @@ public class ThreadGroupPropertyPanel extends JPanel {
         ));
         mainPanel.setOpaque(false);
 
-        // 中间卡片布局，用于切换不同模式的配置面板
+        // Bố cục thẻ ở giữa được sử dụng để chuyển đổi bảng cấu hình của các chế độ khác nhau
         cardLayout = new CardLayout();
         cardPanel = new JPanel(cardLayout);
         cardPanel.setOpaque(false);
 
-        // 初始化所有控件和面板
-        // 1. 固定模式面板
+        // Khởi tạo tất cả các điều khiển và bảng điều khiển
+        // 1. Bảng chế độ cố định
         fixedPanel = new JPanel(createFixedModeLayout());
         fixedPanel.setOpaque(false);
         fixedNumThreadsSpinner = standardThreadCountSpinner(1);
@@ -127,7 +127,7 @@ public class ThreadGroupPropertyPanel extends JPanel {
         maxInFlightWaitLabel.setToolTipText(maxInFlightWaitTooltip);
         maxInFlightWaitSpinner.setToolTipText(maxInFlightWaitTooltip);
 
-        // 2. 递增模式面板
+        // 2. Bảng chế độ tăng dần
         rampUpPanel = new JPanel(createValuePairLayout());
         rampUpPanel.setOpaque(false);
         rampUpStartThreadsSpinner = standardThreadCountSpinner(1);
@@ -135,7 +135,7 @@ public class ThreadGroupPropertyPanel extends JPanel {
         rampUpTimeSpinner = standardIntSpinner(30, 1, null, 5);
         rampUpDurationSpinner = standardIntSpinner(120, 1, null, 10);
 
-        // 3. 尖刺模式面板
+        // 3. Bảng điều khiển chế độ tăng đột biến
         spikePanel = new JPanel(createValuePairLayout());
         spikePanel.setOpaque(false);
         spikeMinThreadsSpinner = standardThreadCountSpinner(1);
@@ -145,7 +145,7 @@ public class ThreadGroupPropertyPanel extends JPanel {
         spikeRampDownTimeSpinner = standardIntSpinner(10, 1, null, 1);
         spikeDurationSpinner = standardIntSpinner(120, 1, null, 10);
 
-        // 4. 阶梯模式面板
+        // 4. Bảng chế độ bậc thang
         stairsPanel = new JPanel(createValuePairLayout());
         stairsPanel.setOpaque(false);
         stairsStartThreadsSpinner = standardThreadCountSpinner(1);
@@ -154,22 +154,22 @@ public class ThreadGroupPropertyPanel extends JPanel {
         stairsHoldTimeSpinner = standardIntSpinner(10, 1, null, 1);
         stairsDurationSpinner = standardIntSpinner(240, 1, null, 10);
 
-        // 设置各个面板的布局
+        // Đặt bố cục của từng bảng
         setupFixedPanel();
         setupRampUpPanel();
         setupSpikePanel();
         setupStairsPanel();
 
-        // 添加所有面板到卡片布局
+        // Thêm tất cả các bảng vào bố cục thẻ
         cardPanel.add(fixedPanel, ThreadGroupData.ThreadMode.FIXED.name());
         cardPanel.add(rampUpPanel, ThreadGroupData.ThreadMode.RAMP_UP.name());
         cardPanel.add(spikePanel, ThreadGroupData.ThreadMode.SPIKE.name());
         cardPanel.add(stairsPanel, ThreadGroupData.ThreadMode.STAIRS.name());
 
-        // 默认显示固定模式面板
+        // Bảng chế độ cố định được hiển thị theo mặc định
         showThreadMode(ThreadGroupData.ThreadMode.FIXED);
 
-        // 模式切换监听器
+        // Người nghe chuyển đổi chế độ
         modeComboBox.addActionListener(e -> {
             ThreadGroupData.ThreadMode selectedMode = (ThreadGroupData.ThreadMode) modeComboBox.getSelectedItem();
             if (selectedMode != null) {
@@ -186,14 +186,14 @@ public class ThreadGroupPropertyPanel extends JPanel {
         updateFixedExecutionModeState();
         updateMaxInFlightWaitState();
 
-        // 预览图表区域
+        // Xem trước khu vực biểu đồ
         previewPanel = new ThreadLoadPreviewPanel();
         previewPanel.setPreferredSize(new Dimension(560, PREVIEW_PANEL_HEIGHT));
-        previewPanel.setMinimumSize(new Dimension(380, PREVIEW_PANEL_HEIGHT));  // 设置最小尺寸防止过度压缩
+        previewPanel.setMinimumSize(new Dimension(380, PREVIEW_PANEL_HEIGHT));  // Đặt kích thước tối thiểu để tránh nén quá mức
         previewPanel.setOpaque(false);
         previewPanel.setBorder(BorderFactory.createEmptyBorder(4, 0, 0, 0));
 
-        // 左侧配置区包装在一个面板中，以便控制布局
+        // Khu vực cấu hình bên trái được bao bọc trong một bảng điều khiển để kiểm soát bố cục
         JPanel configPanel = new JPanel(new MigLayout(
                 "insets 0, fillx, novisualpadding, gap 0",
                 "[left]",
@@ -233,14 +233,14 @@ public class ThreadGroupPropertyPanel extends JPanel {
         previewSection.setOpaque(false);
         previewSection.add(previewPanel, "grow");
 
-        // 添加到主面板
+        // Thêm vào bảng điều khiển chính
         mainPanel.add(configPanel, "top, growx");
         mainPanel.add(previewSection, "top, growx, pushx");
 
-        // 整体布局
+        // bố cục tổng thể
         add(mainPanel, BorderLayout.NORTH);
 
-        // 为所有输入组件添加变化监听，刷新预览图
+        // Thêm trình xử lý thay đổi vào tất cả các thành phần đầu vào và làm mới bản xem trước
         addPreviewUpdateListeners();
     }
 
@@ -307,7 +307,7 @@ public class ThreadGroupPropertyPanel extends JPanel {
         return "w " + SPINNER_WIDTH + "!, h " + FORM_CONTROL_HEIGHT + "!";
     }
 
-    // 设置固定模式面板
+    // Đặt bảng chế độ cố định
     private void setupFixedPanel() {
         fixedPanel.add(formLabel(I18nUtil.getMessage(MessageKeys.THREADGROUP_FIXED_USERS)));
         fixedPanel.add(fixedNumThreadsSpinner, spinnerConstraints());
@@ -320,7 +320,7 @@ public class ThreadGroupPropertyPanel extends JPanel {
         fixedPanel.add(durationSpinner, spinnerConstraints());
     }
 
-    // 设置递增模式面板
+    // Đặt bảng chế độ tăng dần
     private void setupRampUpPanel() {
         addValuePairRow(
                 rampUpPanel,
@@ -338,7 +338,7 @@ public class ThreadGroupPropertyPanel extends JPanel {
         );
     }
 
-    // 设置尖刺模式面板
+    // Thiết lập bảng chế độ tăng đột biến
     private void setupSpikePanel() {
         addValuePairRow(
                 spikePanel,
@@ -363,7 +363,7 @@ public class ThreadGroupPropertyPanel extends JPanel {
         );
     }
 
-    // 设置阶梯模式面板
+    // Thiết lập bảng chế độ bậc thang
     private void setupStairsPanel() {
         addValuePairRow(
                 stairsPanel,
@@ -404,20 +404,20 @@ public class ThreadGroupPropertyPanel extends JPanel {
     }
 
     private void addPreviewUpdateListeners() {
-        // 固定模式参数变化监听
+        // Giám sát thay đổi tham số chế độ cố định
         fixedNumThreadsSpinner.addChangeListener(e -> updatePreview());
         fixedLoopsSpinner.addChangeListener(e -> updatePreview());
         useLoopCountButton.addActionListener(e -> updatePreview());
         useTimeCheckBox.addActionListener(e -> updatePreview());
         durationSpinner.addChangeListener(e -> updatePreview());
 
-        // 递增模式参数变化监听
+        // Giám sát thay đổi tham số chế độ tăng dần
         rampUpStartThreadsSpinner.addChangeListener(e -> updatePreview());
         rampUpEndThreadsSpinner.addChangeListener(e -> updatePreview());
         rampUpTimeSpinner.addChangeListener(e -> updatePreview());
         rampUpDurationSpinner.addChangeListener(e -> updatePreview());
 
-        // 尖刺模式参数变化监听
+        // Giám sát thay đổi tham số chế độ tăng đột biến
         spikeMinThreadsSpinner.addChangeListener(e -> updatePreview());
         spikeMaxThreadsSpinner.addChangeListener(e -> updatePreview());
         spikeRampUpTimeSpinner.addChangeListener(e -> updatePreview());
@@ -425,7 +425,7 @@ public class ThreadGroupPropertyPanel extends JPanel {
         spikeRampDownTimeSpinner.addChangeListener(e -> updatePreview());
         spikeDurationSpinner.addChangeListener(e -> updatePreview());
 
-        // 阶梯模式参数变化监听
+        // Giám sát thay đổi tham số chế độ thang
         stairsStartThreadsSpinner.addChangeListener(e -> updatePreview());
         stairsEndThreadsSpinner.addChangeListener(e -> updatePreview());
         stairsStepSpinner.addChangeListener(e -> updatePreview());
@@ -489,7 +489,7 @@ public class ThreadGroupPropertyPanel extends JPanel {
         previewPanel.repaint();
     }
 
-    // 回填数据
+    // Chèn lấp dữ liệu
     public void setThreadGroupData(PerformanceTreeNode node) {
         this.currentNode = node;
         ThreadGroupData data = node.threadGroupData;
@@ -499,11 +499,11 @@ public class ThreadGroupPropertyPanel extends JPanel {
         }
         data.normalize();
 
-        // 设置模式
+        // Đặt chế độ
         modeComboBox.setSelectedItem(data.threadMode);
         cardLayout.show(cardPanel, data.threadMode.name());
 
-        // 设置固定模式参数
+        // Đặt thông số chế độ cố định
         fixedNumThreadsSpinner.setValue(data.numThreads);
         fixedLoopsSpinner.setValue(data.loops);
         useTimeCheckBox.setSelected(data.useTime);
@@ -511,17 +511,17 @@ public class ThreadGroupPropertyPanel extends JPanel {
         durationSpinner.setValue(data.duration);
         maxInFlightWaitSpinner.setValue(data.maxInFlightWaitSeconds);
 
-        // 更新UI状态
+        // đổi mớiUItrạng thái
         updateFixedExecutionModeState();
         updateMaxInFlightWaitState();
 
-        // 设置递增模式参数
+        // Đặt các tham số chế độ tăng
         rampUpStartThreadsSpinner.setValue(data.rampUpStartThreads);
         rampUpEndThreadsSpinner.setValue(data.rampUpEndThreads);
         rampUpTimeSpinner.setValue(data.rampUpTime);
         rampUpDurationSpinner.setValue(data.rampUpDuration);
 
-        // 设置尖刺模式参数
+        // Đặt tham số chế độ tăng đột biến
         spikeMinThreadsSpinner.setValue(data.spikeMinThreads);
         spikeMaxThreadsSpinner.setValue(data.spikeMaxThreads);
         spikeRampUpTimeSpinner.setValue(data.spikeRampUpTime);
@@ -529,20 +529,20 @@ public class ThreadGroupPropertyPanel extends JPanel {
         spikeRampDownTimeSpinner.setValue(data.spikeRampDownTime);
         spikeDurationSpinner.setValue(data.spikeDuration);
 
-        // 设置阶梯模式参数
+        // Thiết lập các thông số chế độ bậc thang
         stairsStartThreadsSpinner.setValue(data.stairsStartThreads);
         stairsEndThreadsSpinner.setValue(data.stairsEndThreads);
         stairsStepSpinner.setValue(data.stairsStep);
         stairsHoldTimeSpinner.setValue(data.stairsHoldTime);
         stairsDurationSpinner.setValue(data.stairsDuration);
 
-        // 更新预览图
+        // Đã cập nhật hình ảnh xem trước
         updatePreview();
     }
 
     /**
-     * 强制提交所有 EasyJSpinner 的值
-     * 用于 Ctrl/Cmd+S 保存时，确保所有输入都已提交
+     * Buộc nộp tất cả EasyJSpinner giá trị
+     * Được sử dụng cho Ctrl/Cmd+S Khi lưu, hãy đảm bảo tất cả thông tin đầu vào đều được gửi
      */
     public void forceCommitAllSpinners() {
         List<EasyJSpinner> allSpinners = Arrays.asList(
@@ -567,23 +567,23 @@ public class ThreadGroupPropertyPanel extends JPanel {
             currentNode.threadGroupData = data;
         }
 
-        // 保存模式
+        // Chế độ lưu
         data.threadMode = (ThreadGroupData.ThreadMode) modeComboBox.getSelectedItem();
 
-        // 保存固定模式参数
+        // Lưu các thông số chế độ cố định
         data.numThreads = fixedNumThreadsSpinner.getCommittedIntValue();
         data.loops = fixedLoopsSpinner.getCommittedIntValue();
         data.useTime = useTimeCheckBox.isSelected();
         data.duration = durationSpinner.getCommittedIntValue();
         data.maxInFlightWaitSeconds = maxInFlightWaitSpinner.getCommittedIntValue();
 
-        // 保存递增模式参数
+        // Lưu các tham số chế độ tăng
         data.rampUpStartThreads = rampUpStartThreadsSpinner.getCommittedIntValue();
         data.rampUpEndThreads = rampUpEndThreadsSpinner.getCommittedIntValue();
         data.rampUpTime = rampUpTimeSpinner.getCommittedIntValue();
         data.rampUpDuration = rampUpDurationSpinner.getCommittedIntValue();
 
-        // 保存尖刺模式参数
+        // Lưu các thông số chế độ tăng đột biến
         data.spikeMinThreads = spikeMinThreadsSpinner.getCommittedIntValue();
         data.spikeMaxThreads = spikeMaxThreadsSpinner.getCommittedIntValue();
         data.spikeRampUpTime = spikeRampUpTimeSpinner.getCommittedIntValue();
@@ -591,7 +591,7 @@ public class ThreadGroupPropertyPanel extends JPanel {
         data.spikeRampDownTime = spikeRampDownTimeSpinner.getCommittedIntValue();
         data.spikeDuration = spikeDurationSpinner.getCommittedIntValue();
 
-        // 保存阶梯模式参数
+        // Lưu các tham số chế độ bậc thang
         data.stairsStartThreads = stairsStartThreadsSpinner.getCommittedIntValue();
         data.stairsEndThreads = stairsEndThreadsSpinner.getCommittedIntValue();
         data.stairsStep = stairsStepSpinner.getCommittedIntValue();
@@ -655,27 +655,27 @@ public class ThreadGroupPropertyPanel extends JPanel {
         return text.replaceAll("[:：]\\s*$", "");
     }
 
-    // 预览数据模型
+    // Xem trước mô hình dữ liệu
     private static class ThreadLoadPreviewData {
         ThreadGroupData.ThreadMode mode;
-        // 固定模式
+        // Mẫu cố định
         int fixedThreads;
         boolean useTime;
         int duration;
         int loops;
-        // 递增模式
+        // Chế độ tăng dần
         int rampUpStartThreads;
         int rampUpEndThreads;
         int rampUpTime;
         int rampUpDuration;
-        // 尖刺模式
+        // Chế độ đột biến
         int spikeMinThreads;
         int spikeMaxThreads;
         int spikeRampUpTime;
         int spikeHoldTime;
         int spikeRampDownTime;
         int spikeDuration;
-        // 阶梯模式
+        // Chế độ thang
         int stairsStartThreads;
         int stairsEndThreads;
         int stairsStep;
@@ -683,7 +683,7 @@ public class ThreadGroupPropertyPanel extends JPanel {
         int stairsDuration;
     }
 
-    // 预览面板实现
+    // Triển khai bảng xem trước
     private static class ThreadLoadPreviewPanel extends JPanel {
         private ThreadLoadPreviewData previewData;
         private static final int PADDING = 40;
@@ -706,22 +706,22 @@ public class ThreadGroupPropertyPanel extends JPanel {
             int width = getWidth() - 2 * PADDING;
             int height = getHeight() - 2 * PADDING;
 
-            // 绘制网格和坐标轴
+            // Vẽ lưới và trục
             drawGrid(g2d, width, height);
 
-            // 根据不同模式绘制曲线
+            // Vẽ đường cong theo các chế độ khác nhau
             drawCurve(g2d, width, height);
 
             g2d.dispose();
         }
 
         /**
-         * 生成优美刻度（nice ticks），如1-2-5-10-20等
+         * Tạo vảy đẹp (nice ticks），Chẳng hạn như1-2-5-10-20Đợi đã
          *
-         * @param min      最小值
-         * @param max      最大值
-         * @param maxTicks 最多刻度数
-         * @return 刻度数组
+         * @param min      giá trị tối thiểu
+         * @param max      giá trị tối đa
+         * @param maxTicks Số lượng dấu tích tối đa
+         * @return đánh dấu mảng
          */
         private static java.util.List<Integer> getNiceTicks(int min, int max, int maxTicks) {
             java.util.List<Integer> ticks = new java.util.ArrayList<>();
@@ -731,7 +731,7 @@ public class ThreadGroupPropertyPanel extends JPanel {
                 ticks.add(min);
                 return ticks;
             }
-            // 计算优美间隔
+            // Tính toán các khoảng thời gian duyên dáng
             double rawStep = (double) range / maxTicks;
             double mag = Math.pow(10, Math.floor(Math.log10(rawStep)));
             double[] niceSteps = {1, 2, 5, 10};
@@ -742,12 +742,12 @@ public class ThreadGroupPropertyPanel extends JPanel {
                     break;
                 }
             }
-            // 防止niceStep为0或过小，避免死循环
+            // ngăn chặnniceStepvì0Hoặc quá nhỏ để tránh vòng lặp vô hạn
             if (niceStep < 1) niceStep = 1;
             int niceStepInt = (int) niceStep; // Convert to int to avoid implicit narrowing in compound assignment
             int niceMin = (int) (Math.floor(min / niceStep) * niceStep);
             int niceMax = (int) (Math.ceil(max / niceStep) * niceStep);
-            int maxLoop = 1000; // 最大循环次数保护
+            int maxLoop = 1000; // Số lượng chu kỳ bảo vệ tối đa
             for (int v = niceMin, count = 0; v <= niceMax && count < maxLoop; v += niceStepInt, count++) {
                 if (v >= min && v <= max) {
                     ticks.add(v);
@@ -765,7 +765,7 @@ public class ThreadGroupPropertyPanel extends JPanel {
             g2d.setColor(gridColor);
             g2d.setStroke(new BasicStroke(0.5f));
 
-            // Y轴优美刻度
+            // YTrục được thu nhỏ đẹp mắt
             int maxThreads = getMaxThreads();
             java.util.List<Integer> yTicks = getNiceTicks(0, maxThreads, 5);
             for (int i = 0; i < yTicks.size(); i++) {
@@ -781,7 +781,7 @@ public class ThreadGroupPropertyPanel extends JPanel {
                 }
             }
 
-            // X轴优美刻度
+            // XTrục được thu nhỏ đẹp mắt
             int duration = getDuration();
             java.util.List<Integer> xTicks = getNiceTicks(0, duration, 10);
             for (int i = 0; i < xTicks.size(); i++) {
@@ -797,23 +797,23 @@ public class ThreadGroupPropertyPanel extends JPanel {
                 }
             }
 
-            // 坐标轴
+            // Trục tọa độ
             g2d.setColor(axisColor);
             g2d.setStroke(new BasicStroke(1.5f));
 
-            // X轴
+            // Xtrục
             g2d.draw(new Line2D.Double(PADDING, PADDING + height, PADDING + width, PADDING + height));
-            // Y轴
+            // Ytrục
             g2d.draw(new Line2D.Double(PADDING, PADDING, PADDING, PADDING + height));
 
-            // 坐标轴标签
+            // Nhãn trục
             g2d.setColor(textColor);
             FontMetrics fm = g2d.getFontMetrics();
             String axisTitle = I18nUtil.getMessage(MessageKeys.THREADGROUP_PREVIEW_TIME_SECONDS);
             g2d.drawString(axisTitle, PADDING + (width - fm.stringWidth(axisTitle)) / 2,
                     PADDING + height + AXIS_LABEL_GAP + fm.getHeight() + fm.getAscent());
 
-            // 在左上角添加模式信息
+            // Thêm thông tin chế độ ở góc trên bên trái
             g2d.drawString(I18nUtil.getMessage(MessageKeys.THREADGROUP_PREVIEW_MODE_PREFIX)
                     + " "
                     + I18nUtil.getMessage(previewData.mode.getMessageKey()), PADDING, PADDING - 10);
@@ -821,7 +821,7 @@ public class ThreadGroupPropertyPanel extends JPanel {
 
         private int getMaxThreads() {
 
-            // 根据当前模式计算实际使用的最大线程数
+            // Tính toán số lượng luồng tối đa thực tế được sử dụng dựa trên chế độ hiện tại
             int actualMax;
             switch (previewData.mode) {
                 case FIXED:
@@ -837,14 +837,14 @@ public class ThreadGroupPropertyPanel extends JPanel {
                     actualMax = previewData.stairsEndThreads;
                     break;
                 default:
-                    actualMax = 20; // 默认值
+                    actualMax = 20; // Giá trị mặc định
             }
-            // 增加50% 的安全余量
+            // tăng lên50% biên độ an toàn
             return (int) (actualMax * 1.5);
         }
 
         private int getDuration() {
-            // 根据当前模式返回持续时间（用于X轴刻度）
+            // Trả về thời lượng dựa trên chế độ hiện tại (đối với Xthang đo trục)
             switch (previewData.mode) {
                 case FIXED:
                     return previewData.useTime ? previewData.duration : 60;
@@ -881,7 +881,7 @@ public class ThreadGroupPropertyPanel extends JPanel {
                     break;
             }
 
-            // 绘制线段
+            // Vẽ các đoạn thẳng
             if (points.size() >= 2) {
                 for (int i = 0; i < points.size() - 1; i++) {
                     Point p1 = points.get(i);
@@ -890,7 +890,7 @@ public class ThreadGroupPropertyPanel extends JPanel {
                 }
             }
 
-            // 绘制点
+            // Vẽ điểm
             Color bgColor = ModernColors.getCardBackgroundColor();
             g2d.setColor(bgColor);
             g2d.setStroke(new BasicStroke(1.0f));
@@ -942,21 +942,21 @@ public class ThreadGroupPropertyPanel extends JPanel {
             if (yMax < PADDING) yMax = PADDING + 5;
 
 
-            // 最小线程
+            // Chủ đề tối thiểu
             points.add(new Point(x, yMin));
 
-            // 计算时间比例
+            // Tỷ lệ thời gian tính toán
             int availWidth = width;
 
-            // 上升
+            // tăng lên
             x = PADDING + (availWidth * previewData.spikeRampUpTime / duration);
             points.add(new Point(x, yMax));
 
-            // 保持
+            // Giữ
             x = PADDING + (availWidth * (previewData.spikeRampUpTime + previewData.spikeHoldTime) / duration);
             points.add(new Point(x, yMax));
 
-            // 下降
+            // sự suy sụp
             x = PADDING + (availWidth * (previewData.spikeRampUpTime + previewData.spikeHoldTime + previewData.spikeRampDownTime) / duration);
             points.add(new Point(x, yMin));
 
@@ -965,7 +965,7 @@ public class ThreadGroupPropertyPanel extends JPanel {
 
         private void drawStairsCurve(List<Point> points, int width, int height) {
             int maxThreads = getMaxThreads();
-            int duration = previewData.stairsDuration; // 总持续时间
+            int duration = previewData.stairsDuration; // Tổng thời lượng
 
             int x = PADDING;
             int startThreads = previewData.stairsStartThreads;
@@ -976,35 +976,35 @@ public class ThreadGroupPropertyPanel extends JPanel {
             int currentThreads = startThreads;
             int time = 0;
 
-            // 计算y坐标
+            // Tính toányđiều phối
             int y = PADDING + height - height * currentThreads / maxThreads;
             if (y < PADDING) y = PADDING + 5;
             points.add(new Point(x, y));
 
             while (time < duration && currentThreads < endThreads) {
-                // 计算下一个阶梯的时间
+                // Tính thời gian cho bước tiếp theo
                 int nextTime = time + holdTime;
                 if (nextTime > duration) nextTime = duration;
 
-                // 计算x坐标
+                // Tính toánxđiều phối
                 int nextX = PADDING + (width * nextTime / duration);
-                // 水平线：用户数不变，x推进
+                // Đường ngang: Số lượng người dùng không thay đổi.xTiến lên
                 points.add(new Point(nextX, y));
 
-                // 竖线：用户数递增
+                // Đường dọc: Số lượng người dùng tăng lên
                 currentThreads += step;
                 if (currentThreads > endThreads) currentThreads = endThreads;
                 int nextY = PADDING + height - height * currentThreads / maxThreads;
                 if (nextY < PADDING) nextY = PADDING + 5;
                 points.add(new Point(nextX, nextY));
 
-                // 推进时间
+                // Thời gian trước
                 time = nextTime;
                 y = nextY;
                 x = nextX;
             }
 
-            // 如果最后一个点未到duration，补一段水平线到结束
+            // Nếu điểm cuối cùng chưa đạt đượcduration，Thêm một đường ngang vào cuối
             int endX = PADDING + width;
             if (x < endX) {
                 points.add(new Point(endX, y));

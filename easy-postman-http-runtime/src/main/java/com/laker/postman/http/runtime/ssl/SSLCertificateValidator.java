@@ -11,17 +11,17 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * SSL 证书验证工具类
- * 职责：证书有效性检查和主机名匹配验证
+ * SSL Certificate verification tool class
+ * Trách nhiệm: Kiểm tra tính hợp lệ của chứng chỉ và xác minh khớp tên máy chủ
  */
 @Slf4j
 public class SSLCertificateValidator {
 
     /**
-     * 验证证书链并返回验证结果
-     * @param certificates 证书链
-     * @param hostname 目标主机名
-     * @return 验证结果对象
+     * Xác minh chuỗi chứng chỉ và trả về kết quả xác minh
+     * @param certificates Certificate chain
+     * @param hostname Tên máy chủ mục tiêu
+     * @return Đối tượng kết quả xác nhận
      */
     public static SSLValidationResult validateCertificates(List<Certificate> certificates, String hostname) {
         if (certificates == null || certificates.isEmpty()) {
@@ -37,25 +37,25 @@ public class SSLCertificateValidator {
         List<String> warnings = new ArrayList<>();
         List<String> errors = new ArrayList<>();
 
-        // 1. 检查证书有效期
+        // 1. Kiểm tra thời hạn hiệu lực của chứng chỉ
         validateCertificateValidity(x509, errors);
 
-        // 2. 检查证书即将过期（30天内）
+        // 2. Kiểm tra xem chứng chỉ sắp hết hạn chưa (30trong vòng vài ngày)
         checkCertificateExpiringSoon(x509, warnings);
 
-        // 3. 检查自签名证书
+        // 3. Kiểm tra chứng chỉ tự ký
         if (isSelfSigned(x509)) {
             warnings.add("Self-signed certificate detected");
         }
 
-        // 4. 检查主机名匹配
+        // 4. Kiểm tra sự trùng khớp của tên máy chủ
         if (hostname != null && !hostname.isEmpty()) {
             if (!isHostnameMatch(x509, hostname)) {
                 errors.add("Hostname mismatch: certificate does not match '" + hostname + "'");
             }
         }
 
-        // 5. 检查证书链完整性
+        // 5. Kiểm tra tính toàn vẹn của chuỗi chứng chỉ
         if (certificates.size() == 1 && !isSelfSigned(x509)) {
             warnings.add("Incomplete certificate chain");
         }
@@ -72,7 +72,7 @@ public class SSLCertificateValidator {
     }
 
     /**
-     * 验证证书有效期
+     * Xác minh tính hợp lệ của chứng chỉ
      */
     private static void validateCertificateValidity(X509Certificate cert,
                                                     List<String> errors) {
@@ -86,7 +86,7 @@ public class SSLCertificateValidator {
     }
 
     /**
-     * 检查证书是否即将过期
+     * Kiểm tra xem chứng chỉ sắp hết hạn chưa
      */
     private static void checkCertificateExpiringSoon(X509Certificate cert, List<String> warnings) {
         Date now = new Date();
@@ -99,7 +99,7 @@ public class SSLCertificateValidator {
     }
 
     /**
-     * 检查证书是否为自签名证书
+     * Kiểm tra xem chứng chỉ có được tự ký hay không
      */
     private static boolean isSelfSigned(X509Certificate cert) {
         try {
@@ -111,25 +111,25 @@ public class SSLCertificateValidator {
     }
 
     /**
-     * 检查主机名是否与证书匹配（公共方法）
+     * Kiểm tra xem tên máy chủ có khớp với chứng chỉ không (phương thức công khai)
      */
     public static boolean isHostnameMatchPublic(X509Certificate cert, String hostname) {
         return isHostnameMatch(cert, hostname);
     }
 
     /**
-     * 检查主机名是否与证书匹配
+     * Kiểm tra xem tên máy chủ có khớp với chứng chỉ không
      */
     private static boolean isHostnameMatch(X509Certificate cert, String hostname) {
         try {
-            // 1. 检查 CN (Common Name)
+            // 1. nghiên cứu CN (Common Name)
             String dn = cert.getSubjectX500Principal().getName();
             String cn = extractCN(dn);
             if (cn != null && hostnameMatches(hostname, cn)) {
                 return true;
             }
 
-            // 2. 检查 Subject Alternative Names (SAN)
+            // 2. nghiên cứu Subject Alternative Names (SAN)
             var altNames = cert.getSubjectAlternativeNames();
             if (altNames != null) {
                 for (List<?> altName : altNames) {
@@ -154,7 +154,7 @@ public class SSLCertificateValidator {
     }
 
     /**
-     * 从 DN 字符串中提取 CN
+     * Từ DN Trích xuất từ chuỗi CN
      */
     private static String extractCN(String dn) {
         if (dn == null) return null;
@@ -170,7 +170,7 @@ public class SSLCertificateValidator {
     }
 
     /**
-     * 检查主机名是否匹配（支持通配符和 www 前缀）
+     * Kiểm tra xem tên máy chủ có khớp không (hỗ trợ ký tự đại diện và  www tiền tố)
      */
     private static boolean hostnameMatches(String hostname, String pattern) {
         if (hostname == null || pattern == null) {
@@ -180,14 +180,14 @@ public class SSLCertificateValidator {
         hostname = hostname.toLowerCase();
         pattern = pattern.toLowerCase();
 
-        // 1. 完全匹配
+        // 1. Một trận đấu chính xác
         if (hostname.equals(pattern)) {
             return true;
         }
 
-        // 2. www 前缀匹配
-        // 允许 csdn.com 匹配证书 CN=www.csdn.com
-        // 允许 www.csdn.com 匹配证书 CN=csdn.com
+        // 2. www Kết hợp tiền tố
+        // Được phép csdn.com Giấy chứng nhận phù hợp CN=www.csdn.com
+        // Được phép www.csdn.com Giấy chứng nhận phù hợp CN=csdn.com
         if (hostname.startsWith("www.") && pattern.equals(hostname.substring(4))) {
             return true;
         }
@@ -195,7 +195,7 @@ public class SSLCertificateValidator {
             return true;
         }
 
-        // 3. 通配符匹配 (*.example.com)
+        // 3. Kết hợp ký tự đại diện (*.example.com)
         if (pattern.startsWith("*.")) {
             String patternSuffix = pattern.substring(1); // .example.com
 
@@ -203,15 +203,15 @@ public class SSLCertificateValidator {
                 return false;
             }
 
-            // 通配符只匹配一级子域名
+            // Ký tự đại diện chỉ khớp với tên miền phụ cấp một
             String prefix = hostname.substring(0, hostname.length() - patternSuffix.length());
 
-            // prefix 不能为空（排除 example.com 匹配 *.example.com）
+            // prefix Không thể để trống (loại trừ example.com cuộc thi đấu *.example.com）
             if (prefix.isEmpty()) {
                 return false;
             }
 
-            // prefix 不能包含点号（排除多级子域名）
+            // prefix Không được chứa dấu chấm (không bao gồm tên miền phụ đa cấp)
             return !prefix.contains(".");
         }
 

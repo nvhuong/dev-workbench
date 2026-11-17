@@ -9,7 +9,7 @@ import java.awt.*;
 
 public class EasyTextFieldCellRenderer extends EasyTextField implements TableCellRenderer {
 
-    // 交替行的微弱斑马纹颜色（相对表格背景稍深/浅）
+    // Màu ngựa vằn nhạt cho các hàng xen kẽ (sậm hơn một chút so với nền bảng/nông)
     private static final float STRIPE_ALPHA = 0.04f;
 
     public EasyTextFieldCellRenderer() {
@@ -26,14 +26,14 @@ public class EasyTextFieldCellRenderer extends EasyTextField implements TableCel
 
     @Override
     public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-        // value 可能为 null，统一转为空字符串
+        // value Có thể null，Chuyển đổi thành chuỗi trống một cách thống nhất
         String text = (value == null) ? "" : value.toString();
 
-        // 动态计算可显示的最大字符数
+        // Tự động tính toán số lượng ký tự tối đa có thể được hiển thị
         int columnWidth = table.getColumnModel().getColumn(column).getWidth();
         int maxDisplayLength = calculateMaxDisplayLength(text, columnWidth);
 
-        // 设置显示文本（如果过长则截断）
+        // Đặt văn bản hiển thị (cắt ngắn nếu quá dài)
         boolean truncated = false;
         if (maxDisplayLength > 0 && text.length() > maxDisplayLength) {
             setText(text.substring(0, maxDisplayLength) + "...");
@@ -42,7 +42,7 @@ public class EasyTextFieldCellRenderer extends EasyTextField implements TableCel
             setText(text);
         }
 
-        // Tooltip：截断时显示完整文本，方便查看
+        // Tooltip：Hiển thị văn bản đầy đủ khi cắt bớt để dễ xem
         setToolTipText(truncated ? text : null);
 
         int hoveredRow = getHoveredRow(table);
@@ -53,8 +53,8 @@ public class EasyTextFieldCellRenderer extends EasyTextField implements TableCel
     }
 
     /**
-     * 从 JTable 向上遍历父容器层级，找到 AbstractTablePanel 并返回 hoveredRow。
-     * 使用循环遍历而非固定深度，适配不同的容器嵌套结构。
+     * Từ JTable Duyệt qua hệ thống phân cấp vùng chứa chính và tìm AbstractTablePanel và quay trở lại hoveredRow。
+     * Sử dụng truyền tải vòng lặp thay vì độ sâu cố định để thích ứng với các cấu trúc lồng nhau của vùng chứa khác nhau.
      */
     private static int getHoveredRow(JTable table) {
         java.awt.Container parent = table.getParent();
@@ -68,11 +68,11 @@ public class EasyTextFieldCellRenderer extends EasyTextField implements TableCel
     }
 
     /**
-     * 混合两种颜色
+     * Trộn hai màu
      *
-     * @param base   基础色
-     * @param blend  混入色
-     * @param alpha  混入比例 0.0–1.0
+     * @param base   Màu cơ bản
+     * @param blend  Trộn màu
+     * @param alpha  Tỷ lệ trộn 0.0–1.0
      */
     private static Color blendColor(Color base, Color blend, float alpha) {
         int r = Math.min(255, Math.max(0, Math.round(base.getRed()   * (1 - alpha) + blend.getRed()   * alpha)));
@@ -86,30 +86,30 @@ public class EasyTextFieldCellRenderer extends EasyTextField implements TableCel
     }
 
     /**
-     * 动态计算基于列宽度和字体的可显示字符数
+     * Tự động tính toán số lượng ký tự có thể hiển thị dựa trên chiều rộng cột và phông chữ
      *
-     * @param text        要显示的文本
-     * @param columnWidth 列宽度（像素）
-     * @return 可显示的最大字符数
+     * @param text        Văn bản cần hiển thị
+     * @param columnWidth Độ rộng cột (pixel)
+     * @return Số lượng ký tự tối đa có thể được hiển thị
      */
     private int calculateMaxDisplayLength(String text, int columnWidth) {
         if (text == null || text.isEmpty() || columnWidth <= 0) {
             return 0;
         }
 
-        // 获取当前字体
+        // Lấy phông chữ hiện tại
         Font font = getFont();
         if (font == null) {
-            return text.length(); // 如果无法获取字体，不截断
+            return text.length(); // Nếu không thể lấy được phông chữ thì việc cắt bớt phông chữ sẽ không được thực hiện
         }
 
-        // 获取 FontMetrics
+        // Lấy FontMetrics
         FontMetrics fm = getFontMetrics(font);
         if (fm == null) {
             return text.length();
         }
 
-        // 预留空间：左右边距 + "..." 的宽度
+        // Không gian dành riêng: lề trái và phải + "..." chiều rộng
         int ellipsisWidth = fm.stringWidth("...");
         int availableWidth = columnWidth - TableUIConstants.PADDING_LEFT - TableUIConstants.PADDING_RIGHT - ellipsisWidth;
 
@@ -117,15 +117,15 @@ public class EasyTextFieldCellRenderer extends EasyTextField implements TableCel
             return 0;
         }
 
-        // 计算文本实际宽度
+        // Tính chiều rộng thực tế của văn bản
         int textWidth = fm.stringWidth(text);
 
-        // 如果文本宽度小于可用宽度，不需要截断
+        // Nếu chiều rộng văn bản nhỏ hơn chiều rộng có sẵn thì không cần cắt bớt
         if (textWidth <= availableWidth) {
             return text.length();
         }
 
-        // 二分查找最佳截断位置
+        // Tìm kiếm nhị phân cho vị trí cắt ngắn tốt nhất
         int left = 0;
         int right = text.length();
         int bestLength = 0;

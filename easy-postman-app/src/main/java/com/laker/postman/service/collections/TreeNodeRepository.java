@@ -4,11 +4,11 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import java.util.Optional;
 
 /**
- * 树节点仓库接口
+ * Giao diện kho nút cây
  * <p>
- * 职责：提供树节点的查找和访问功能，隔离UI层的树结构
+ * Trách nhiệm: Cung cấp chức năng tìm kiếm và truy cập nút cây, cách lyUIcấu trúc cây phân lớp
  * <p>
- * 设计模式：Repository Pattern（仓库模式）
+ * Mẫu thiết kế:Repository Pattern（mô hình kho)
  * <p>
  *
  * @author laker
@@ -17,17 +17,17 @@ import java.util.Optional;
 public interface TreeNodeRepository {
 
     /**
-     * 通过请求ID查找节点
+     * Theo yêu cầuIDTìm các nút
      *
-     * @param requestId 请求ID
-     * @return 节点（如果存在）
+     * @param requestId yêu cầuID
+     * @return nút (nếu có)
      */
     Optional<DefaultMutableTreeNode> findNodeByRequestId(String requestId);
 
     /**
-     * 获取根节点
+     * Lấy nút gốc
      *
-     * @return 根节点
+     * @return nút gốc
      */
     Optional<DefaultMutableTreeNode> getRootNode();
 

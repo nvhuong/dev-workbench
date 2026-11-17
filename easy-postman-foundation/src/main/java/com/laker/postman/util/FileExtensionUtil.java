@@ -6,8 +6,8 @@ import java.util.Locale;
 import java.util.Map;
 
 /**
- * 文件扩展名工具类
- * 统一管理根据 Content-Type 推断文件扩展名的逻辑
+ * Lớp tiện ích mở rộng tập tin
+ * Cơ sở quản lý thống nhất Content-Type Logic để suy ra phần mở rộng tập tin
  */
 @UtilityClass
 public class FileExtensionUtil {
@@ -45,10 +45,10 @@ public class FileExtensionUtil {
             Map.entry("application/x-java-archive", ".jar"));
 
     /**
-     * 根据 Content-Type 推断文件扩展名
+     * theo Content-Type Suy ra phần mở rộng tập tin
      *
-     * @param contentType HTTP Content-Type 头
-     * @return 文件扩展名（包含点），如果无法判断则返回 null
+     * @param contentType HTTP Content-Type cái đầu
+     * @return Phần mở rộng tệp (bao gồm dấu chấm), được trả về nếu không thể xác định được null
      */
     public static String guessExtension(String contentType) {
         if (contentType == null || contentType.isEmpty()) {
@@ -57,11 +57,11 @@ public class FileExtensionUtil {
 
         String ct = mediaType(contentType);
 
-        // 精确匹配的 Office 宏/模板变体、ODF、Java 包（必须先于下面 ms-excel 等宽泛匹配）
+        // Trận đấu chính xác Office Vĩ mô/Các biến thể của mẫu,ODF、Java gói (phải đặt trước bên dưới ms-excel đối sánh rộng)
         String exact = EXACT_MEDIA_TYPES.get(ct);
         if (exact != null) return exact;
 
-        // 文档类型（优先判断，避免被 xml/json 等通用类型误判）
+        // Loại văn bản (ưu tiên xét xử, tránh bị xml/json đánh giá sai các loại phổ biến)
         if (ct.contains("pdf")) return ".pdf";
         if (ct.contains("msword") && !ct.contains("wordprocessingml")) return ".doc";
         if (ct.contains("wordprocessingml.document")) return ".docx";
@@ -70,7 +70,7 @@ public class FileExtensionUtil {
         if (ct.contains("ms-powerpoint") && !ct.contains("presentationml")) return ".ppt";
         if (ct.contains("presentationml.presentation")) return ".pptx";
 
-        // 图片类型（在文本类型之前判断，避免 svg+xml 被 xml 误判）
+        // Loại hình ảnh (đánh giá trước loại văn bản, tránh svg+xml Hãy là xml phán đoán sai)
         if (ct.contains("image/png")) return ".png";
         if (ct.contains("image/jpeg")) return ".jpg";
         if (ct.contains("image/gif")) return ".gif";
@@ -79,7 +79,7 @@ public class FileExtensionUtil {
         if (ct.contains("image/svg")) return ".svg";
         if (ct.contains("image/ico") || ct.contains("image/x-icon")) return ".ico";
 
-        // 文本类型
+        // Kiểu văn bản
         if (ct.contains("json")) return ".json";
         if (ct.contains("xml")) return ".xml";
         if (ct.contains("html")) return ".html";
@@ -89,7 +89,7 @@ public class FileExtensionUtil {
         if (ct.contains("text/plain")) return ".txt";
         if (ct.contains("yaml") || ct.contains("yml")) return ".yaml";
 
-        // 压缩文件
+        // Các tập tin nén
         if (ct.contains("application/zip") || ct.contains("x-zip")) return ".zip";
         if (ct.contains("gzip")) return ".gz";
         if (ct.contains("x-tar")) return ".tar";
@@ -98,7 +98,7 @@ public class FileExtensionUtil {
         if (ct.contains("x-bzip2")) return ".bz2";
         if (ct.contains("x-xz")) return ".xz";
 
-        // 多媒体
+        // đa phương tiện
         if (ct.contains("audio/mpeg") || ct.contains("audio/mp3")) return ".mp3";
         if (ct.contains("audio/wav") || ct.contains("audio/x-wav")) return ".wav";
         if (ct.contains("audio/ogg")) return ".ogg";
@@ -114,7 +114,7 @@ public class FileExtensionUtil {
         if (ct.contains("video/webm")) return ".webm";
         if (ct.contains("video/x-flv")) return ".flv";
 
-        // 其他
+        // khác
         if (ct.contains("apk")) return ".apk";
         if (ct.contains("x-apple-diskimage")) return ".dmg";
         if (ct.contains("x-iso9660-image")) return ".iso";
@@ -127,30 +127,30 @@ public class FileExtensionUtil {
     }
 
     /**
-     * 根据文件扩展名生成智能文件名
+     * Tạo tên tệp thông minh dựa trên phần mở rộng tệp
      *
-     * @param extension 文件扩展名（可以带点或不带点）
-     * @return 智能生成的文件名（包含时间戳）
+     * @param extension Đuôi file (có thể có hoặc không có dấu chấm)
+     * @return Tên tệp được tạo thông minh (bao gồm cả dấu thời gian)
      */
     public static String generateSmartFileName(String extension) {
         if (extension == null || extension.isEmpty()) {
             extension = ".txt";
         }
 
-        // 移除扩展名中的点（如果有）
+        // Xóa dấu chấm khỏi phần mở rộng (nếu có)
         String ext = extension.startsWith(".") ? extension.substring(1) : extension;
         String extLower = ext.toLowerCase();
 
-        // 根据扩展名生成友好的文件名前缀
+        // Tạo tiền tố tên tệp thân thiện dựa trên phần mở rộng
         String prefix = getFilePrefixByExtension(extLower);
 
-        // 使用时间戳确保文件名唯一
+        // Sử dụng dấu thời gian để đảm bảo tên tệp là duy nhất
         long timestamp = System.currentTimeMillis();
         return prefix + "_" + timestamp + "." + ext;
     }
 
     /**
-     * 根据扩展名获取文件前缀
+     * Nhận tiền tố tập tin dựa trên phần mở rộng
      */
     private static String getFilePrefixByExtension(String ext) {
         return switch (ext) {
@@ -172,7 +172,7 @@ public class FileExtensionUtil {
     }
 
     /**
-     * 从 Content-Type 中提取主类型（如 text、image、application 等）
+     * Từ Content-Type Trích xuất loại chính (ví dụ text、image、application Chờ đợi)
      */
     public static String extractMainType(String contentType) {
         if (contentType == null || contentType.isEmpty()) {
@@ -188,7 +188,7 @@ public class FileExtensionUtil {
     }
 
     /**
-     * 检查是否为文本类型的 Content-Type
+     * Kiểm tra xem nó có thuộc loại văn bản không Content-Type
      */
     public static boolean isTextType(String contentType) {
         if (contentType == null || contentType.isEmpty()) {
@@ -197,15 +197,15 @@ public class FileExtensionUtil {
 
         String ct = mediaType(contentType);
 
-        // 明确的文本类型
+        // Loại văn bản rõ ràng
         if (ct.startsWith("text/")) {
             return true;
         }
 
-        // application 下的文本类型
-        // 注意：使用精确匹配避免误判
-        // - "application/xml" 或 "text/xml" 是文本
-        // - 但 "image/svg+xml" 或 "application/vnd...openxmlformats..." 不是文本
+        // application Kiểu văn bản bên dưới
+        // Lưu ý: Hãy sử dụng kết quả khớp chính xác để tránh đánh giá sai
+        // - "application/xml" hoặc "text/xml" là văn bản
+        // - Nhưng "image/svg+xml" hoặc "application/vnd...openxmlformats..." Không phải văn bản
         boolean isXml = ct.equals("application/xml") || ct.equals("text/xml");
 
         return ct.contains("json")
@@ -219,7 +219,7 @@ public class FileExtensionUtil {
     }
 
     /**
-     * 检查是否为二进制类型的 Content-Type
+     * Kiểm tra xem nó có thuộc loại nhị phân không Content-Type
      */
     public static boolean isBinaryType(String contentType) {
         if (contentType == null || contentType.isEmpty()) {
@@ -231,13 +231,13 @@ public class FileExtensionUtil {
             return false;
         }
 
-        // 优先识别结构化文本类型，例如 application/vnd.*+json。
+        // Ưu tiên nhận dạng các loại văn bản có cấu trúc, ví dụ: application/vnd.*+json。
         if (isTextType(contentType)) {
             return false;
         }
 
-        // 检查明确的二进制类型。
-        // 例如：application/vnd.openxmlformats-officedocument.spreadsheetml.sheet 包含 "xml" 但是二进制文件
+        // Kiểm tra loại nhị phân rõ ràng.
+        // Ví dụ:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet Chứa "xml" Nhưng nhị phân
         if (ct.contains("application/octet-stream")
                 || ct.contains("image/")
                 || ct.contains("audio/")
@@ -254,7 +254,7 @@ public class FileExtensionUtil {
     }
 
     /**
-     * 取 Content-Type 的媒体类型部分（小写、去掉参数），避免 {@code ; name=data.json} 之类的参数影响判断。
+     * Lấy Content-Type Phần loại phương tiện (chữ thường, loại bỏ tham số), tránh {@code ; name=data.json} Các thông số như vậy ảnh hưởng đến sự phán đoán.
      */
     private static String mediaType(String contentType) {
         int semicolon = contentType.indexOf(';');

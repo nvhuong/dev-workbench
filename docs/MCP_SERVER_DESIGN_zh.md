@@ -1,45 +1,45 @@
 # EasyPostman MCP Server
 
-EasyPostman 内置标准 MCP stdio Server，让 Codex、Claude Desktop、Cursor 等客户端发现工作区，并在每次工具调用中选择工作区和环境、执行已保存的 HTTP 请求。MCP 直接复用无头执行链，不远程操作 Swing 页面，也不修改桌面端当前选择。实现对应 [Issue #169](https://github.com/lakernote/easy-postman/issues/169)。
+EasyPostman Tiêu chuẩn tích hợp MCP stdio Server，cho phép Codex、Claude Desktop、Cursor Đợi khách hàng khám phá không gian làm việc, chọn không gian làm việc và môi trường, đồng thời thực hiện lệnh đã lưu trên mỗi lệnh gọi công cụ HTTP yêu cầu.MCP Trực tiếp tái sử dụng chuỗi thực thi không đầu mà không cần thao tác từ xa Swing trang, nó cũng không sửa đổi lựa chọn hiện tại trên màn hình nền. Thực hiện trao đổi thư từ [Issue #169](https://github.com/lakernote/easy-postman/issues/169)。
 
-## 安装与配置
+## Cài đặt và cấu hình
 
-### 1. 获取 EasyPostman
+### 1. Lấy EasyPostman
 
-MCP 已包含在主程序中，不发布单独的 MCP 安装包：
+MCP Đã được đưa vào chương trình chính và không được phát hành riêng MCP Gói cài đặt:
 
-| 下载方式 | MCP 使用方式 | 是否需要另装 Java |
+| Phương pháp tải xuống | MCP Cách sử dụng | Bạn có cần phải cài đặt nó một cách riêng biệt? Java |
 |---|---|---|
-| macOS / Windows / Linux 原生安装包 | 使用包内的 `EasyPostmanMCP` 启动器 | 否，已包含 JRE |
-| Windows 便携版 ZIP | 解压后使用 `EasyPostmanMCP.exe` | 否，已包含 JRE |
-| 跨平台 JAR | `java -jar ... mcp serve` | 是，需要 Java 21+ |
+| macOS / Windows / Linux Gói cài đặt gốc | Sử dụng những cái có trong gói `EasyPostmanMCP` launcher | Không, bao gồm JRE |
+| Windows Phiên bản di động ZIP | Sử dụng sau khi giải nén `EasyPostmanMCP.exe` | Không, bao gồm JRE |
+| Đa nền tảng JAR | `java -jar ... mcp serve` | Có, bắt buộc Java 21+ |
 
-推荐从 [GitHub Releases](https://github.com/lakernote/easy-postman/releases) 下载原生包。Windows 便携版无需安装，解压后即可使用桌面端和 MCP。
+Được đề xuất từ [GitHub Releases](https://github.com/lakernote/easy-postman/releases) Tải xuống gói gốc.Windows Phiên bản di động không cần cài đặt và bạn có thể sử dụng phiên bản máy tính để bàn sau khi giải nén MCP。
 
-### 2. 找到原生启动器
+### 2. Tìm trình khởi chạy gốc
 
-| 安装方式 | `command` |
+| Phương pháp cài đặt | `command` |
 |---|---|
 | macOS | `/Applications/EasyPostman.app/Contents/MacOS/EasyPostmanMCP` |
-| Windows 安装版 | `C:\Program Files\EasyPostman\EasyPostmanMCP.exe` |
-| Windows 便携版 | 解压目录中的 `EasyPostmanMCP.exe`，例如 `D:\Tools\EasyPostman\EasyPostmanMCP.exe` |
+| Windows Phiên bản cài đặt | `C:\Program Files\EasyPostman\EasyPostmanMCP.exe` |
+| Windows Phiên bản di động | Giải nén thư mục `EasyPostmanMCP.exe`，Ví dụ `D:\Tools\EasyPostman\EasyPostmanMCP.exe` |
 | Linux DEB / RPM | `/opt/easypostman/bin/EasyPostmanMCP` |
 
-Windows 便携版解压后大致如下。两个 EXE 共享同一个 JAR 和运行时，因此不要只把 `EasyPostmanMCP.exe` 单独复制出去：
+Windows Phiên bản di động đại khái như sau sau khi giải nén. hai EXE chia sẻ cùng một JAR và thời gian chạy, vì vậy đừng chỉ đặt  `EasyPostmanMCP.exe` Sao chép nó một cách riêng biệt:
 
 ```text
 EasyPostman/
-├── EasyPostman.exe          # 桌面应用
-├── EasyPostmanMCP.exe       # MCP stdio 启动器
+├── EasyPostman.exe          # Ứng dụng máy tính để bàn
+├── EasyPostmanMCP.exe       # MCP stdio launcher
 ├── app/
 │   ├── easy-postman.jar
 │   ├── EasyPostman.cfg
 │   └── EasyPostmanMCP.cfg
-├── runtime/                 # 内置 JRE
-└── .portable                # 仅便携版存在
+├── runtime/                 # Tích hợp sẵn JRE
+└── .portable                # Chỉ có một phiên bản di động tồn tại
 ```
 
-macOS 安装包采用同样的共享结构：
+macOS Gói cài đặt sử dụng cùng cấu trúc chia sẻ: .
 
 ```text
 EasyPostman.app/Contents/
@@ -50,9 +50,9 @@ EasyPostman.app/Contents/
 └── runtime/Contents/Home/
 ```
 
-### 3. 配置 MCP 客户端
+### 3. cấu hình MCP khách hàng
 
-原生启动器会自动补上 `mcp serve`，所以默认配置的 `args` 必须为空，不要再写 `"mcp", "serve"`。
+Trình khởi chạy gốc sẽ tự động điền nó vào `mcp serve`，Vì vậy, nó được cấu hình theo mặc định `args` Chắc trống rồi, không viết nữa `"mcp", "serve"`。
 
 Codex CLI：
 
@@ -60,7 +60,7 @@ Codex CLI：
 codex mcp add easy-postman -- /Applications/EasyPostman.app/Contents/MacOS/EasyPostmanMCP
 ```
 
-也可以写入 Codex 的 `config.toml`：
+Cũng có thể được viết Codex của `config.toml`：
 
 ```toml
 [mcp_servers.easy-postman]
@@ -68,7 +68,7 @@ command = "/Applications/EasyPostman.app/Contents/MacOS/EasyPostmanMCP"
 args = []
 ```
 
-Claude Desktop、Claude Code、Cursor 等使用 JSON 的客户端可以配置完整的 `mcpServers` 对象：
+Claude Desktop、Claude Code、Cursor Chờ sử dụng JSON Máy khách có thể được cấu hình hoàn toàn `mcpServers` Sự vật:
 
 ```json
 {
@@ -81,9 +81,9 @@ Claude Desktop、Claude Code、Cursor 等使用 JSON 的客户端可以配置完
 }
 ```
 
-Windows JSON 路径中的反斜杠需要写成双反斜杠，例如 `"D:\\Tools\\EasyPostman\\EasyPostmanMCP.exe"`。
+Windows JSON Dấu gạch chéo ngược trong đường dẫn cần phải được viết dưới dạng dấu gạch chéo ngược kép, ví dụ: `"D:\\Tools\\EasyPostman\\EasyPostmanMCP.exe"`。
 
-Windows 便携版的完整 JSON 示例：
+Windows Phiên bản di động hoàn chỉnh JSON Ví dụ:
 
 ```json
 {
@@ -96,25 +96,25 @@ Windows 便携版的完整 JSON 示例：
 }
 ```
 
-保存后重启客户端并新建对话。建议先做只读验证：
+Sau khi lưu, hãy khởi động lại máy khách và tạo cuộc trò chuyện mới. Trước tiên, bạn nên thực hiện xác minh chỉ đọc:
 
 ```text
-请使用 EasyPostman MCP 列出所有工作区，不要执行任何接口。
+Hãy sử dụng EasyPostman MCP Liệt kê tất cả các không gian làm việc mà không thực hiện bất kỳ giao diện nào.
 ```
 
-Codex、Claude 和 Cursor 的具体配置入口可能随客户端版本变化，请以各自官方文档为准：[Codex MCP](https://developers.openai.com/codex/mcp/)、[Claude MCP](https://docs.anthropic.com/en/docs/claude-code/mcp)、[Cursor MCP](https://docs.cursor.com/context/model-context-protocol)。
+Codex、Claude và Cursor Mục cấu hình cụ thể có thể thay đổi theo phiên bản máy khách, vui lòng tham khảo các tài liệu chính thức tương ứng:[Codex MCP](https://developers.openai.com/codex/mcp/)、[Claude MCP](https://docs.anthropic.com/en/docs/claude-code/mcp)、[Cursor MCP](https://docs.cursor.com/context/model-context-protocol)。
 
-### 4. 默认工作区与进程模型
+### 4. Mô hình quy trình và không gian làm việc mặc định
 
-默认不需要配置工作区目录。MCP 进程会读取 EasyPostman 已登记的工作区，客户端先调用 `list_workspaces`，再为后续 Tool 传入 `workspaceId` 即可选择工作区。
+Theo mặc định, không cần cấu hình thư mục không gian làm việc.MCP Quá trình này sẽ đọc EasyPostman Đối với không gian làm việc đã đăng ký, khách hàng sẽ gọi nó trước `list_workspaces`，Để theo dõi Tool đang đến `workspaceId` Bạn có thể chọn một không gian làm việc.
 
-MCP 客户端为一次连接启动一个 `EasyPostmanMCP` 进程，并在多次 Tool 调用间复用；不是每执行一个请求就重新启动一次。连接结束后 stdin 关闭，MCP 进程随之退出，不需要用户维护常驻服务。
+MCP Máy khách bắt đầu một cho mỗi kết nối `EasyPostmanMCP` quá trình và nhiều lần Tool Tái sử dụng giữa các cuộc gọi; không khởi động lại mỗi khi yêu cầu được thực hiện. Sau khi kết nối hoàn tất stdin đóng cửa,MCP Quá trình kết thúc và không có người dùng nào được yêu cầu duy trì dịch vụ thường trú.
 
-桌面应用和 MCP 是两个独立进程，可以同时运行并读取同一批工作区。MCP 的工作区和环境选择只影响本次 Tool 调用，不会模拟点击页面，也不会改变桌面端当前选择。桌面端新增或移除工作区后，需要重启 MCP 客户端连接以刷新目录。
+ứng dụng máy tính để bàn và MCP là hai quy trình độc lập có thể chạy đồng thời và đọc cùng một loạt không gian làm việc.MCP Các lựa chọn không gian làm việc và môi trường chỉ ảnh hưởng đến thời điểm này Tool Việc gọi điện sẽ không mô phỏng việc nhấp vào trang cũng như không thay đổi lựa chọn hiện tại trên màn hình. Sau khi thêm hoặc xóa không gian làm việc trên màn hình nền, bạn cần khởi động lại MCP Máy khách kết nối để làm mới thư mục.
 
-### 5. 可选：只授权一个工作区
+### 5. Tùy chọn: Chỉ ủy quyền cho một không gian làm việc
 
-如需缩小授权范围，在原生启动器的 `args` 中传入工作区绝对路径：
+Nếu bạn cần thu hẹp phạm vi ủy quyền, hãy chuyển đến trình khởi chạy gốc `args` Truyền vào đường dẫn tuyệt đối của không gian làm việc: .
 
 ```json
 {
@@ -123,11 +123,11 @@ MCP 客户端为一次连接启动一个 `EasyPostmanMCP` 进程，并在多次 
 }
 ```
 
-该目录应包含 `collections.json`，`environments.json` 可选。
+Thư mục này nên chứa `collections.json`，`environments.json` Không bắt buộc.
 
-### 6. 跨平台 JAR 备用方式
+### 6. Đa nền tảng JAR Cách thay thế
 
-只下载 JAR 时仍可使用下面的配置，但需要 Java 21+：
+Chỉ tải xuống JAR Cấu hình bên dưới vẫn có thể được sử dụng nhưng bắt buộc Java 21+：
 
 ```json
 {
@@ -136,43 +136,43 @@ MCP 客户端为一次连接启动一个 `EasyPostmanMCP` 进程，并在多次 
 }
 ```
 
-JAR 方式如需只授权一个工作区，在 `"serve"` 后追加目录。原生启动器路径在应用升级后通常保持不变；版本化 JAR 文件名变化后则需要同步修改客户端配置。
+JAR Để chỉ cho phép một không gian làm việc, trong `"serve"` Thêm thư mục sau. Đường dẫn trình khởi chạy gốc thường không thay đổi sau khi nâng cấp ứng dụng; đã được phiên bản JAR Sau khi tên tệp thay đổi, cấu hình máy khách cần được sửa đổi đồng thời.
 
-可选参数 `--max-response-bytes <n>` 控制一次 Tool 调用返回的响应体总量，默认为 64 KiB，可设置为 1 KiB～10 MiB。原生启动器把它直接放入 `args`；JAR 方式放在 `"serve"` 之后。
+Các thông số tùy chọn `--max-response-bytes <n>` Hãy kiểm soát một lần Tool Tổng số lượng nội dung phản hồi được cuộc gọi trả về, mặc định là 64 KiB，Có thể được đặt thành 1 KiB～10 MiB。Trình khởi chạy gốc sẽ đưa nó vào ngay `args`；JAR cách để đặt `"serve"` sau đó.
 
-### 7. 安装排查
+### 7. Khắc phục sự cố cài đặt
 
-- 先直接运行 `EasyPostmanMCP --help`；能显示帮助信息表示启动器和内置 JRE 完整。
-- 配置中的 `command` 建议使用绝对路径。Windows JSON 路径需要转义反斜杠，命令行中有空格的路径需要加引号。
-- Windows 便携版必须完整解压，不能只复制 EXE；升级或移动解压目录后要同步更新 MCP 配置。
-- Codex 可执行 `codex mcp get easy-postman --json` 检查最终保存的命令；其他客户端使用各自的 MCP Server 状态页检查。
-- 修改配置或桌面端工作区列表后，重启 MCP 客户端或重建对话。正常运行时 stdout 只有 JSON-RPC，常规日志默认关闭；必要错误会脱敏后写入 stderr。
+- Chạy trực tiếp trước `EasyPostmanMCP --help`；Có thể hiển thị thông tin trợ giúp cho trình khởi chạy và phần mềm tích hợp JRE trọn.
+- trong cấu hình `command` Nên sử dụng đường dẫn tuyệt đối.Windows JSON Các đường dẫn cần thoát khỏi dấu gạch chéo ngược và các đường dẫn có dấu cách trong dòng lệnh cần được trích dẫn.
+- Windows Phiên bản di động phải được giải nén hoàn toàn chứ không được chỉ sao chép EXE；Sau khi nâng cấp hoặc di chuyển thư mục giải nén phải cập nhật đồng thời MCP cấu hình.
+- Codex Có thể thực thi được `codex mcp get easy-postman --json` Kiểm tra lệnh đã lưu cuối cùng; các khách hàng khác sử dụng của riêng họ MCP Server Kiểm tra trang trạng thái.
+- Sau khi sửa đổi cấu hình hoặc danh sách không gian làm việc trên màn hình, hãy khởi động lại MCP khách hàng hoặc xây dựng lại cuộc trò chuyện. trong quá trình hoạt động bình thường stdout Chỉ JSON-RPC，Nhật ký thông thường bị tắt theo mặc định; các lỗi cần thiết sẽ được giải mẫn cảm và ghi lại stderr。
 
-## 工具
+## dụng cụ
 
-| Tool | 主要输入 | 用途 |
+| Tool | Đầu vào chính | Mục đích |
 |---|---|---|
-| `list_workspaces` | 无 | 列出本进程已授权的工作区及稳定 ID |
-| `list_collections` | `workspaceId?` | 列出集合、描述和请求数量 |
-| `list_environments` | `workspaceId?` | 列出环境和变量名，不返回变量值 |
-| `list_requests` | `workspaceId?`、`collectionId?`、`query?`、`limit?` | 查找已保存请求 |
-| `run_request` | `workspaceId?`、`requestId`、`environmentId?`、`environmentOverrides?` | 执行一个 HTTP 请求 |
-| `run_collection` | `workspaceId?`、`collectionId`、`environmentId?`、`environmentOverrides?`、`iterations?`、`bail?` | 执行整个集合 |
+| `list_workspaces` | Không | Liệt kê các không gian làm việc được ủy quyền và tính ổn định của quá trình này ID |
+| `list_collections` | `workspaceId?` | Liệt kê bộ sưu tập, mô tả và số lượng được yêu cầu |
+| `list_environments` | `workspaceId?` | Liệt kê tên môi trường và biến, không trả về giá trị biến |
+| `list_requests` | `workspaceId?`、`collectionId?`、`query?`、`limit?` | Tìm các yêu cầu đã lưu |
+| `run_request` | `workspaceId?`、`requestId`、`environmentId?`、`environmentOverrides?` | Thực hiện một HTTP yêu cầu |
+| `run_collection` | `workspaceId?`、`collectionId`、`environmentId?`、`environmentOverrides?`、`iterations?`、`bail?` | Thực hiện toàn bộ bộ sưu tập |
 
-### 工作区和环境选择语义
+### Ngữ nghĩa lựa chọn không gian làm việc và môi trường
 
-这里的“选择”是调用级路由，不是模拟人工点击桌面页面：
+ở đây“Chọn”Đây là định tuyến cấp độ cuộc gọi, không phải mô phỏng các thao tác nhấp chuột thủ công trên trang dành cho máy tính để bàn:
 
-- 传入工作区目录启动时，只授权该目录，所有 Tool 都可以省略 `workspaceId`。
-- 省略启动目录时，MCP 进程在启动时读取 EasyPostman 已登记工作区。客户端先调用 `list_workspaces`，再把返回的 `workspaceId` 传给后续 Tool，即可在不同工作区之间执行请求。
-- 多工作区模式下省略 `workspaceId`，会使用 MCP 进程启动时记录的 EasyPostman 当前工作区；如果不能唯一确定，则要求显式传入 `workspaceId`。
-- 选择 `workspaceId` 不会调用桌面端的“切换工作区”，不会保存新的当前工作区，也不会让已打开的 Swing 页面跟随切换。桌面端新增、移除或切换工作区后，应重启 MCP 客户端进程以刷新目录；始终显式传入 `workspaceId` 最稳定。
-- `list_environments` 用于发现环境；`run_request` / `run_collection` 的 `environmentId` 可以传环境 ID 或精确名称。省略时读取该工作区 `environments.json` 中的激活环境，没有激活项时使用第一项。
-- `environmentId` 只决定本次执行使用哪个环境，不会修改激活状态或保存 `environments.json`。
+- Khi bạn chuyển vào thư mục không gian làm việc khi khởi động, chỉ thư mục đó mới được ủy quyền, tất cả chúng Tool Tất cả đều có thể được bỏ qua `workspaceId`。
+- Khi thư mục khởi động bị bỏ qua, .MCP Quá trình này được đọc khi khởi động EasyPostman Không gian làm việc đã đăng ký. Khách hàng gọi trước `list_workspaces`，Sau đó trả lại nó `workspaceId` Đã chuyển sang theo dõi Tool，Bạn có thể thực hiện các yêu cầu giữa các không gian làm việc khác nhau.
+- Bị bỏ qua trong chế độ nhiều không gian làm việc `workspaceId`，Sẽ sử dụng MCP Được ghi lại khi quá trình bắt đầu EasyPostman Không gian làm việc hiện tại; nếu nó không thể được xác định duy nhất thì cần phải chuyển rõ ràng `workspaceId`。
+- Chọn `workspaceId` Phiên bản dành cho máy tính để bàn sẽ không được gọi“Chuyển đổi không gian làm việc”，Không gian làm việc hiện tại mới sẽ không được lưu và những không gian làm việc đã mở cũng sẽ không được lưu Swing Trang chuyển đổi tương ứng. Sau khi thêm, bớt hoặc chuyển đổi không gian làm việc trên desktop, bạn nên khởi động lại MCP Quá trình khách hàng làm mới thư mục; luôn luôn được thông qua một cách rõ ràng `workspaceId` Ổn định nhất.
+- `list_environments` Được sử dụng để khám phá môi trường;`run_request` / `run_collection` của `environmentId` Bạn có thể vượt qua môi trường ID hoặc tên chính xác. Khi bị bỏ qua, không gian làm việc sẽ được đọc `environments.json` Trong môi trường kích hoạt, vật phẩm đầu tiên được sử dụng khi không có vật phẩm kích hoạt.
+- `environmentId` Nó chỉ xác định môi trường nào sẽ sử dụng cho việc thực thi này và không sửa đổi trạng thái kích hoạt hoặc lưu nó `environments.json`。
 
-Tool 参数不接受任意本机目录作为 `workspaceId`，只接受本 MCP 进程启动时已授权的 ID。
+Tool Tham số không chấp nhận bất kỳ thư mục cục bộ nào làm tham số `workspaceId`，Chỉ chấp nhận điều này MCP Được ủy quyền khi quá trình bắt đầu ID。
 
-`environmentId` 选择保存的环境，省略时使用激活环境。`environmentOverrides` 接收字符串键值，例如：
+`environmentId` Chọn môi trường đã lưu. Nếu bỏ qua, môi trường hoạt động sẽ được sử dụng.`environmentOverrides` Nhận giá trị khóa chuỗi, ví dụ: .
 
 ```json
 {
@@ -184,18 +184,18 @@ Tool 参数不接受任意本机目录作为 `workspaceId`，只接受本 MCP �
 }
 ```
 
-覆盖值只在本次运行的内存环境中生效，不修改 `environments.json`，结果只返回被覆盖的变量名，不回显输入值。
+Giá trị bị ghi đè chỉ có hiệu lực trong môi trường bộ nhớ của lần chạy này và sẽ không bị sửa đổi `environments.json`，Kết quả chỉ trả về tên biến bị ghi đè và không lặp lại giá trị đầu vào.
 
-### 可以调用哪些 API
+### Những cái nào có thể được gọi API
 
-- `list_requests` 可以按 `collectionId` 和关键词查找工作区内已保存的请求；结果包含稳定 `requestId`、method、脱敏 URL 和 protocol。
-- `run_request` 只执行指定 `requestId` 对应的一个已保存 HTTP 请求；不能直接传入任意 URL、method、header 或 body 临时拼装请求。
-- `run_collection` 执行指定顶层集合内的全部已保存请求。MCP v1 只支持 HTTP；单个请求或集合中包含 SSE/WebSocket 等协议时会拒绝执行。
-- 当前授权粒度是“工作区”，不是 collection/request 白名单。只要某个工作区被授权，客户端就可以发现并执行其中任意已保存 HTTP 请求；需要严格限制时，应使用启动参数只授权一个专用工作区，并只在其中保留允许调用的 API。
-- `environmentOverrides` 可能改变 `{{baseUrl}}` 等 URL 变量，因此它不是域名白名单。应只把生产工作区授权给可信 MCP 客户端。
-- binary / multipart 上传只允许读取当前授权工作区内的真实文件；绝对路径、`..` 或符号链接都不能逃逸到工作区之外。
+- `list_requests` Có thể nhấn `collectionId` và tìm kiếm từ khóa cho các yêu cầu đã lưu trong không gian làm việc; kết quả bao gồm ổn định `requestId`、method、Giải mẫn cảm URL và protocol。
+- `run_request` Chỉ thực hiện những gì được chỉ định `requestId` Cái tương ứng đã được lưu HTTP Yêu cầu; không thể được chuyển trực tiếp URL、method、header hoặc body Yêu cầu lắp ráp tạm thời.
+- `run_collection` Thực hiện tất cả các yêu cầu đã lưu trong bộ sưu tập cấp cao nhất được chỉ định.MCP v1 Chỉ được hỗ trợ HTTP；Chứa trong một yêu cầu hoặc bộ sưu tập duy nhất SSE/WebSocket Sẽ từ chối thực hiện trong khi chờ thỏa thuận.
+- Mức độ chi tiết của ủy quyền hiện tại là“khu vực làm việc”，KHÔNG collection/request Danh sách trắng. Miễn là một không gian làm việc được cấp phép, khách hàng có thể khám phá và thực thi bất kỳ không gian làm việc đã lưu nào HTTP Yêu cầu; khi cần có các hạn chế nghiêm ngặt, các tham số khởi chạy chỉ nên được sử dụng để chỉ cấp phép cho một không gian làm việc chuyên dụng và chỉ giữ lại những không gian làm việc được phép gọi đến đó API。
+- `environmentOverrides` Có thể thay đổi `{{baseUrl}}` Đợi đã URL biến, vì vậy nó không phải là danh sách trắng tên miền. Không gian làm việc sản xuất chỉ nên được ủy quyền cho những người đáng tin cậy MCP khách hàng.
+- binary / multipart Việc tải lên chỉ cho phép đọc các tệp thực trong không gian làm việc được ủy quyền hiện tại; những đường dẫn tuyệt đối.`..` Cả liên kết tượng trưng lẫn liên kết tượng trưng đều không thể thoát ra ngoài vùng làm việc.
 
-典型调用链：
+Chuỗi cuộc gọi điển hình:
 
 ```text
 list_workspaces
@@ -204,7 +204,7 @@ list_workspaces
   → run_request / run_collection
 ```
 
-## 架构
+## ngành kiến ​​​​trúc
 
 ```text
 MCP Client
@@ -213,7 +213,7 @@ MCP Client
 easy-postman-mcp
   ├─ official MCP Java SDK
   ├─ stdio lifecycle
-  ├─ 六个 tool schema + annotations
+  ├─ Sáu tool schema + annotations
   └─ EasyPostmanMcpBackend
                 │
                 ▼
@@ -228,33 +228,33 @@ easy-postman-app
        └─ HTTP runtime
 ```
 
-`easy-postman-mcp` 只拥有协议层，不依赖 app、Swing、工作区存储或具体请求执行。app 实现 backend 并复用现有无头执行链，因此不会复制 EasyPostman 的变量、脚本、Cookie、TLS 和 HTTP 语义。本次没有改变插件 SPI，也不需要提升 `plugin.platform.version`。
+`easy-postman-mcp` Chỉ có lớp giao thức, không có lớp phụ thuộc app、Swing、Lưu trữ không gian làm việc hoặc thực hiện các yêu cầu cụ thể.app hoàn thành backend Và tái sử dụng chuỗi thực thi không đầu hiện có nên không có bản sao nào được tạo ra EasyPostman các biến, tập lệnh,Cookie、TLS và HTTP Ngữ nghĩa. Không có plug-in nào được thay đổi lần này SPI，Cũng không cần khuyến mãi `plugin.platform.version`。
 
-## 安全边界
+## Ranh giới an ninh
 
-- 单工作区模式只授权启动参数中的目录；多工作区模式只授权 EasyPostman 注册表中的工作区。
-- MCP v1 不写集合或环境文件，不提供导入、保存和删除工具。
-- 环境值不通过枚举工具返回；一次性覆盖不落盘。但目标 API 可能在响应体中回显输入值，响应体本身也可能包含个人或业务数据，因此只能连接可信 MCP 客户端。
-- 常见认证响应头、自定义 token/key/password/secret 头、URL user-info、敏感查询参数，以及响应体中常见的敏感键值会脱敏；通用脱敏无法识别所有业务字段，不能替代服务端的数据分级和最小权限。
-- 响应体有字节上限，并返回是否截断和原始字节数；每次调用最多返回 100 条请求/响应明细，超出时返回省略数量，汇总计数仍覆盖完整运行。
-- 同一进程内的执行调用串行化；每次 Tool 执行前后清空 MCP 进程 Cookie，集合内部仍可共享 Cookie，但不同调用和工作区之间不会继承会话。
-- stdio 输入遇到 EOF、非法 JSON、超大消息或 I/O 错误时都会结束 MCP 进程，不会留下失去通信能力的挂起进程。
-- stdout 只输出 MCP JSON-RPC。MCP 模式默认关闭应用、插件和 HTTP Logback 日志，仅将必要的 CLI/协议错误写 stderr；排障时可用 JVM 系统属性显式恢复日志级别。
+- Chế độ không gian làm việc đơn chỉ cho phép các thư mục trong tham số khởi động; chế độ đa không gian làm việc chỉ cho phép EasyPostman Không gian làm việc trong sổ đăng ký.
+- MCP v1 Không có tệp bộ sưu tập hoặc môi trường nào được ghi và không có công cụ nhập, lưu và xóa nào được cung cấp.
+- Giá trị môi trường không được trả về thông qua công cụ liệt kê; ghi đè một lần sẽ không được ghi vào đĩa. Nhưng mục tiêu API Các giá trị đầu vào có thể được lặp lại trong nội dung phản hồi, nội dung này có thể chứa dữ liệu cá nhân hoặc doanh nghiệp, do đó chỉ có thể có các kết nối đáng tin cậy MCP khách hàng.
+- Tiêu đề phản hồi xác thực phổ biến, tùy chỉnh token/key/password/secret cái đầu,URL user-info、Các tham số truy vấn nhạy cảm và các giá trị khóa nhạy cảm phổ biến trong nội dung phản hồi sẽ được giải mẫn cảm; giải mẫn cảm chung không thể xác định tất cả các lĩnh vực kinh doanh và không thể thay thế việc phân loại dữ liệu và các quyền tối thiểu ở phía máy chủ.
+- Nội dung phản hồi có giới hạn byte trên và liệu nó có bị cắt bớt và số byte ban đầu được trả về hay không; số lượng tối đa được trả về cho mỗi cuộc gọi là 100 lời yêu cầu/Chi tiết phản hồi, số lượng bị bỏ qua được trả về khi vượt quá, số lượng tóm tắt vẫn bao gồm toàn bộ lần chạy.
+- Các cuộc gọi thực thi trong cùng một quy trình được tuần tự hóa; mỗi lần Tool Rõ ràng trước và sau khi thực hiện MCP quá trình Cookie，Bộ sưu tập vẫn có thể được chia sẻ trong bộ sưu tập Cookie，Tuy nhiên, các phiên không được kế thừa giữa các cuộc gọi và không gian làm việc khác nhau.
+- stdio Nhập gặp phải EOF、bất hợp pháp JSON、Tin nhắn quá khổ hoặc I/O Nó sẽ kết thúc khi có lỗi MCP quá trình và sẽ không để lại một quá trình treo đã mất khả năng giao tiếp.
+- stdout Chỉ đầu ra MCP JSON-RPC。MCP Chế độ đóng ứng dụng, plug-in và  HTTP Logback Chỉ đăng nhập những gì cần thiết CLI/Đã viết lỗi giao thức stderr；Có sẵn để khắc phục sự cố JVM Thuộc tính hệ thống khôi phục rõ ràng mức độ nhật ký.
 
-`run_request` 和 `run_collection` 会访问外部 API，可能产生真实业务副作用，因此 MCP annotations 标记为非只读、可能破坏、开放世界操作。生产工作区只应授权给可信客户端。
+`run_request` và `run_collection` Sẽ truy cập bên ngoài API，Do đó, có thể có những tác dụng phụ thực sự trong kinh doanh MCP annotations Được đánh dấu là hành động thế giới mở không chỉ đọc, có khả năng phá hoại. Không gian làm việc sản xuất chỉ nên được ủy quyền cho các khách hàng đáng tin cậy.
 
-## 构建与验证
+## Xây dựng và xác minh
 
 ```bash
 mvn -pl easy-postman-app -am -DskipTests clean package
 ```
 
-产物：`easy-postman-app/target/easy-postman-{version}.jar`。
+sản phẩm:`easy-postman-app/target/easy-postman-{version}.jar`。
 
-协议模块可独立测试：
+Các mô-đun giao thức có thể được kiểm tra độc lập:
 
 ```bash
 mvn -pl easy-postman-mcp -am test
 ```
 
-参考：[MCP 规范](https://modelcontextprotocol.io/specification/2026-07-28)、[官方 Java SDK](https://github.com/modelcontextprotocol/java-sdk)。
+tham khảo:[MCP đặc điểm kỹ thuật](https://modelcontextprotocol.io/specification/2026-07-28)、[chính thức Java SDK](https://github.com/modelcontextprotocol/java-sdk)。

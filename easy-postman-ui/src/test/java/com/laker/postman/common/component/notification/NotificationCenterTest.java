@@ -54,7 +54,7 @@ public class NotificationCenterTest {
         Font titleFont = new Font(Font.DIALOG, Font.BOLD, 13);
         Font bodyFont = new Font(Font.DIALOG, Font.PLAIN, 13);
 
-        int width = ToastStyle.preferredWidth("成功", "设置保存成功", titleFont, bodyFont);
+        int width = ToastStyle.preferredWidth("thành công", "Đã lưu cài đặt thành công", titleFont, bodyFont);
 
         assertEquals(width, ToastStyle.MIN_WIDTH);
         assertTrue(width < ToastStyle.MAX_WIDTH);
@@ -66,7 +66,7 @@ public class NotificationCenterTest {
         Font bodyFont = new Font(Font.DIALOG, Font.PLAIN, 13);
 
         int width = ToastStyle.preferredWidth(
-                "错误",
+                "sai lầm",
                 "Request execution failed because the upstream service returned an invalid gateway response.",
                 titleFont,
                 bodyFont

@@ -93,7 +93,7 @@ public class CapturePanelTest {
 
     @Test
     public void shouldWrapCaptureFilterTooltipInsteadOfShowingOneLongLine() {
-        String tooltip = CapturePanel.htmlTooltip("过滤语法：method:POST host:api.example.com\n支持 and/or 和括号", 360);
+        String tooltip = CapturePanel.htmlTooltip("Cú pháp lọc:method:POST host:api.example.com\nHỗ trợ and/or và dấu ngoặc", 360);
 
         assertTrue(tooltip.startsWith("<html>"));
         assertTrue(tooltip.contains("width:360px"));

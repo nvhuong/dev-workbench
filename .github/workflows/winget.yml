@@ -1,4 +1,4 @@
-name: Publish WinGet Manifest（提交 WinGet 清单）
+name: Publish WinGet Manifest（nộp WinGet danh sách)
 
 permissions:
   contents: read
@@ -43,15 +43,15 @@ env:
 
 jobs:
   publish-winget:
-    name: Publish WinGet Manifest（提交 WinGet 清单）
+    name: Publish WinGet Manifest（nộp WinGet danh sách)
     runs-on: windows-latest
     timeout-minutes: 120
 
     steps:
-      - name: Checkout EasyPostman（检出 EasyPostman）
+      - name: Checkout EasyPostman（Kiểm tra EasyPostman）
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
-      - name: Resolve release metadata（解析发版元数据）
+      - name: Resolve release metadata（Phân tích siêu dữ liệu phát hành)
         id: meta
         shell: pwsh
         run: |
@@ -123,7 +123,7 @@ jobs:
           Write-Host "Branch: $branchName"
           Write-Host "Submit: $submit"
 
-      - name: Wait for Windows installer asset（等待 Windows 安装包上传）
+      - name: Wait for Windows installer asset（Đợi đã Windows Tải lên gói cài đặt)
         shell: pwsh
         run: |
           $ErrorActionPreference = 'Stop'
@@ -153,7 +153,7 @@ jobs:
 
           throw "Timed out waiting for installer asset: $installerUrl"
 
-      - name: Validate WinGet token（校验 WinGet 提交令牌）
+      - name: Validate WinGet token（Kiểm tra WinGet Gửi mã thông báo)
         if: steps.meta.outputs.submit == 'true'
         shell: pwsh
         env:
@@ -163,7 +163,7 @@ jobs:
             throw 'Missing repository secret WINGET_CREATE_GITHUB_TOKEN. Use a GitHub classic PAT with public_repo access.'
           }
 
-      - name: Download installer and compute hash（下载安装包并计算哈希）
+      - name: Download installer and compute hash（Tải xuống gói cài đặt và tính toán hàm băm)
         id: installer_hash
         if: steps.meta.outputs.mode == 'initial'
         shell: pwsh
@@ -177,7 +177,7 @@ jobs:
           "sha256=$sha256" >> $env:GITHUB_OUTPUT
           Write-Host "Installer SHA256: $sha256"
 
-      - name: Generate initial WinGet manifests（生成首版 WinGet 清单）
+      - name: Generate initial WinGet manifests（Tạo phiên bản đầu tiên WinGet danh sách)
         if: steps.meta.outputs.mode == 'initial'
         shell: pwsh
         run: |
@@ -266,7 +266,7 @@ jobs:
 
           Get-ChildItem -Path $manifestRoot -File | ForEach-Object { Write-Host "Generated $($_.FullName)" }
 
-      - name: Upload initial dry-run manifests（上传首版清单预览）
+      - name: Upload initial dry-run manifests（Tải lên bản xem trước danh sách phiên bản đầu tiên)
         if: steps.meta.outputs.mode == 'initial' && steps.meta.outputs.submit != 'true'
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
@@ -274,7 +274,7 @@ jobs:
           path: winget-manifests
           retention-days: 7
 
-      - name: Checkout winget-pkgs fork（检出 winget-pkgs fork）
+      - name: Checkout winget-pkgs fork（Kiểm tra winget-pkgs fork）
         if: steps.meta.outputs.mode == 'initial' && steps.meta.outputs.submit == 'true'
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -286,7 +286,7 @@ jobs:
           sparse-checkout: |
             manifests/l/Laker/EasyPostman
 
-      - name: Commit and push initial manifest（提交并推送首版清单）
+      - name: Commit and push initial manifest（Gửi và đẩy danh sách phiên bản đầu tiên)
         id: initial_commit
         if: steps.meta.outputs.mode == 'initial' && steps.meta.outputs.submit == 'true'
         shell: pwsh
@@ -321,7 +321,7 @@ jobs:
             "changed=false" >> $env:GITHUB_OUTPUT
           }
 
-      - name: Create initial WinGet PR（创建首版 WinGet PR）
+      - name: Create initial WinGet PR（Tạo phiên bản đầu tiên WinGet PR）
         if: steps.meta.outputs.mode == 'initial' && steps.meta.outputs.submit == 'true' && steps.initial_commit.outputs.changed == 'true'
         shell: pwsh
         env:
@@ -385,13 +385,13 @@ jobs:
 
           Write-Host $createText
 
-      - name: Setup .NET 6 runtime（配置 .NET 6 运行时）
+      - name: Setup .NET 6 runtime（cấu hình .NET 6 thời gian chạy)
         if: steps.meta.outputs.mode == 'update'
         uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0
         with:
           dotnet-version: '6.0.x'
 
-      - name: Download wingetcreate（下载 wingetcreate）
+      - name: Download wingetcreate（tải về wingetcreate）
         if: steps.meta.outputs.mode == 'update'
         shell: pwsh
         run: |
@@ -399,7 +399,7 @@ jobs:
           Invoke-WebRequest -Uri $env:WINGET_CREATE_URL -OutFile wingetcreate.exe -UseBasicParsing
           .\wingetcreate.exe info
 
-      - name: Submit WinGet update PR（提交 WinGet 更新 PR）
+      - name: Submit WinGet update PR（nộp WinGet đổi mới PR）
         if: steps.meta.outputs.mode == 'update' && steps.meta.outputs.submit == 'true'
         shell: pwsh
         env:
@@ -422,7 +422,7 @@ jobs:
             --submit `
             --no-open
 
-      - name: Generate WinGet update dry run（生成 WinGet 更新清单预览）
+      - name: Generate WinGet update dry run（phát ra WinGet Cập nhật xem trước danh sách)
         if: steps.meta.outputs.mode == 'update' && steps.meta.outputs.submit != 'true'
         shell: pwsh
         run: |
@@ -442,7 +442,7 @@ jobs:
             --out winget-manifests `
             --format yaml
 
-      - name: Upload update dry-run manifests（上传更新清单预览）
+      - name: Upload update dry-run manifests（Tải lên bản xem trước bản kê khai cập nhật)
         if: steps.meta.outputs.mode == 'update' && steps.meta.outputs.submit != 'true'
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:

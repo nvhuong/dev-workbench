@@ -23,7 +23,7 @@ import java.util.Date;
 import java.util.Objects;
 
 /**
- * 已保存响应相关的 UI 操作控制器。
+ * Đã lưu phản hồi có liên quan UI Bộ điều khiển hoạt động.
  */
 @Slf4j
 @RequiredArgsConstructor
@@ -48,14 +48,14 @@ final class SavedResponseUiController {
             SavedResponse savedResponse = SavedResponseSnapshotMapper.fromExchange(name, lastRequest, lastResponse);
 
             if (!collectionTreeGateway.saveResponseForRequest(originalRequestItem, savedResponse)) {
-                log.warn("无法找到请求节点，保存响应失败");
+                log.warn("Không thể tìm thấy nút yêu cầu và lưu phản hồi không thành công");
                 NotificationCenter.showWarning(I18nUtil.getMessage(MessageKeys.RESPONSE_SAVE_REQUEST_NOT_FOUND));
                 return;
             }
 
             NotificationCenter.showSuccess(I18nUtil.getMessage(MessageKeys.RESPONSE_SAVE_SUCCESS, name));
         } catch (Exception ex) {
-            log.error("保存响应失败", ex);
+            log.error("Không lưu được câu trả lời", ex);
             NotificationCenter.showError(I18nUtil.getMessage(MessageKeys.RESPONSE_SAVE_ERROR, ex.getMessage()));
         }
     }

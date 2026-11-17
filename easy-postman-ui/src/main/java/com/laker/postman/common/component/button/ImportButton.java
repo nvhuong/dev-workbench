@@ -9,7 +9,7 @@ import javax.swing.*;
 import java.awt.*;
 
 /**
- * 通用导入按钮,带图标和统一样式。
+ * Nút nhập phổ quát,Với các biểu tượng và phong cách thống nhất.
  */
 public class ImportButton extends JButton {
     public ImportButton() {

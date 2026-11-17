@@ -7,7 +7,7 @@ import java.awt.*;
 import java.util.Map;
 
 /**
- * 字体工具类，提供系统默认字体，保留完整的字体降级链以支持 emoji 等特殊字符
+ * Lớp công cụ phông chữ cung cấp phông chữ mặc định của hệ thống và giữ lại chuỗi hạ cấp phông chữ hoàn chỉnh để được hỗ trợ emoji và các ký tự đặc biệt khác
  */
 @UtilityClass
 public class FontsUtil {
@@ -35,34 +35,34 @@ public class FontsUtil {
     }
 
     /**
-     * 获取默认字体，从 UIManager 派生以保留降级链，支持 emoji 等特殊字符
+     * Nhận phông chữ mặc định, từ  UIManager Bắt nguồn từ việc duy trì chuỗi hạ cấp, được hỗ trợ emoji và các ký tự đặc biệt khác
      *
-     * @param style 字体样式 (Font.PLAIN, Font.BOLD, Font.ITALIC)
-     * @param size  字体大小
-     * @return Font 对象，从系统默认字体派生
+     * @param style Kiểu phông chữ (Font.PLAIN, Font.BOLD, Font.ITALIC)
+     * @param size  Cỡ chữ
+     * @return Font Đối tượng, bắt nguồn từ phông chữ mặc định của hệ thống
      */
     private static Font getDefaultFont(int style, int size) {
         return getBaseUiFont().deriveFont(style, (float) size);
     }
 
     /**
-     * 获取默认字体，使用用户设置的字体大小
-     * 从 UIManager 派生以保留降级链，支持 emoji 等特殊字符
+     * Lấy phông chữ mặc định, sử dụng cỡ chữ do người dùng đặt
+     * Từ UIManager Bắt nguồn từ việc duy trì chuỗi hạ cấp, được hỗ trợ emoji và các ký tự đặc biệt khác
      *
-     * @param style 字体样式 (Font.PLAIN, Font.BOLD, Font.ITALIC)
-     * @return Font 对象，使用用户设置的字体大小
+     * @param style Kiểu phông chữ (Font.PLAIN, Font.BOLD, Font.ITALIC)
+     * @return Font Đối tượng, sử dụng cỡ chữ do người dùng đặt
      */
     public static Font getDefaultFont(int style) {
         return getDefaultFont(style, getBaseFontSize());
     }
 
     /**
-     * 获取默认字体，使用相对于用户设置字体大小的偏移
-     * 例如：如果用户设置字体为 14，offset 为 -2，则返回 12 号字体
+     * Lấy phông chữ mặc định, sử dụng độ lệch tương ứng với kích thước phông chữ do người dùng đặt
+     * Ví dụ: Nếu người dùng đặt phông chữ thành  14，offset vì -2，Sau đó quay trở lại 12 cỡ chữ
      *
-     * @param style  字体样式 (Font.PLAIN, Font.BOLD, Font.ITALIC)
-     * @param offset 相对于用户设置字体大小的偏移量（可正可负）
-     * @return Font 对象
+     * @param style  Kiểu phông chữ (Font.PLAIN, Font.BOLD, Font.ITALIC)
+     * @param offset Độ lệch (có thể dương hoặc âm) so với kích thước phông chữ do người dùng đặt
+     * @return Font đối tượng
      */
     public static Font getDefaultFontWithOffset(int style, int offset) {
         int fontSize = getBaseFontSize() + offset;
@@ -71,14 +71,14 @@ public class FontsUtil {
     }
 
     /**
-     * 获取等宽字体，字号跟随用户 UI 字号设置。
+     * Nhận phông chữ có chiều rộng cố định, với kích thước phông chữ theo người dùng UI Cài đặt kích thước phông chữ.
      *
-     * @param style  字体样式 (Font.PLAIN, Font.BOLD, Font.ITALIC)
-     * @param offset 相对于用户设置字体大小的偏移量（可正可负）
-     * @return Font 对象
+     * @param style  Kiểu phông chữ (Font.PLAIN, Font.BOLD, Font.ITALIC)
+     * @param offset Độ lệch (có thể dương hoặc âm) so với kích thước phông chữ do người dùng đặt
+     * @return Font đối tượng
      */
     /**
-     * 自绘文字前调用：沿用系统桌面文字抗锯齿设置（缺省时开启灰度抗锯齿），与 Swing 组件文字渲染保持一致。
+     * Được gọi trước văn bản tự vẽ: Sử dụng cài đặt khử răng cưa cho văn bản trên màn hình hệ thống (khử răng cưa thang độ xám được bật theo mặc định) và Swing Kết xuất văn bản thành phần vẫn nhất quán.
      */
     public static void applyTextRenderingHints(Graphics2D g2) {
         Object desktopHints = Toolkit.getDefaultToolkit().getDesktopProperty("awt.font.desktophints");

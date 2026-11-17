@@ -21,7 +21,7 @@ import static org.testng.Assert.*;
 
 
 /**
- * 测试 PreparedRequestFactory，特别是 Authorization 头的处理
+ * Bài kiểm tra PreparedRequestFactory，Đặc biệt Authorization Xử lý đầu
  */
 public class PreparedRequestFactoryTest {
 
@@ -38,7 +38,7 @@ public class PreparedRequestFactoryTest {
         item.setName("OAuth Token");
         item.setMethod("POST");
         item.setUrl("https://idbrokerbts.webex.com/idb/oauth2/v1/access_token");
-        item.setAuthType("Basic Auth");  // 使用正确的常量
+        item.setAuthType("Basic Auth");  // Sử dụng các hằng số chính xác
         item.setAuthUsername("testuser");
         item.setAuthPassword("testpass");
 
@@ -54,7 +54,7 @@ public class PreparedRequestFactoryTest {
         assertEquals(req.name, "OAuth Token");
         assertNotNull(req.headersList);
 
-        // 验证 Authorization 头被添加
+        // Xác minh Authorization tiêu đề được thêm vào
         boolean hasAuth = false;
         for (HttpHeader header : req.headersList) {
             if ("Authorization".equals(header.getKey()) && header.isEnabled()) {
@@ -74,7 +74,7 @@ public class PreparedRequestFactoryTest {
         item.setId("test-2");
         item.setMethod("GET");
         item.setUrl("https://api.example.com/data");
-        item.setAuthType("Bearer Token");  // 使用正确的常量
+        item.setAuthType("Bearer Token");  // Sử dụng các hằng số chính xác
         item.setAuthToken("my-secret-token");
 
         List<HttpHeader> headers = new ArrayList<>();
@@ -88,7 +88,7 @@ public class PreparedRequestFactoryTest {
         assertNotNull(req);
         assertNotNull(req.headersList);
 
-        // 验证 Authorization 头被添加
+        // Xác minh Authorization tiêu đề được thêm vào
         boolean hasAuth = false;
         for (HttpHeader header : req.headersList) {
             if ("Authorization".equals(header.getKey()) && header.isEnabled()) {
@@ -231,7 +231,7 @@ public class PreparedRequestFactoryTest {
         item.setId("test-3");
         item.setMethod("POST");
         item.setUrl("https://api.example.com/data");
-        item.setAuthType("Basic Auth");  // 使用正确的常量
+        item.setAuthType("Basic Auth");  // Sử dụng các hằng số chính xác
         item.setAuthUsername("testuser");
         item.setAuthPassword("testpass");
 
@@ -247,7 +247,7 @@ public class PreparedRequestFactoryTest {
         assertNotNull(req);
         assertNotNull(req.headersList);
 
-        // 验证原有的 Authorization 头没有被覆盖
+        // Xác minh bản gốc Authorization Đầu không được che chắn
         int authCount = 0;
         for (HttpHeader header : req.headersList) {
             if ("Authorization".equals(header.getKey()) && header.isEnabled()) {
@@ -266,7 +266,7 @@ public class PreparedRequestFactoryTest {
         item.setId("test-4");
         item.setMethod("GET");
         item.setUrl("https://api.example.com/data");
-        // 不设置 authType
+        // Chưa được thiết lập authType
 
         List<HttpHeader> headers = new ArrayList<>();
         headers.add(createHeader("Accept", "application/json", true));
@@ -279,7 +279,7 @@ public class PreparedRequestFactoryTest {
         assertNotNull(req);
         assertNotNull(req.headersList);
 
-        // 验证没有添加 Authorization 头
+        // Xác minh chưa được thêm vào Authorization cái đầu
         for (HttpHeader header : req.headersList) {
             assertNotEquals("Authorization", header.getKey(),
                 "Should not add Authorization header when authType is not set");
@@ -293,7 +293,7 @@ public class PreparedRequestFactoryTest {
         item.setId("test-5");
         item.setMethod("POST");
         item.setUrl("https://api.example.com/data");
-        item.setAuthType("Basic Auth");  // 使用正确的常量
+        item.setAuthType("Basic Auth");  // Sử dụng các hằng số chính xác
         item.setAuthUsername("user");
         item.setAuthPassword("pass");
 
@@ -307,11 +307,11 @@ public class PreparedRequestFactoryTest {
         PreparedRequest req = PreparedRequestFactory.build(item);
 
         // Assert
-        // 原始的 headersList 不应该被修改
+        // Bản gốc headersList không nên sửa đổi
         assertEquals(originalSize, originalHeaders.size(),
             "Original headersList should not be modified");
 
-        // 但 PreparedRequest 的 headersList 应该包含新添加的 Authorization 头
+        // Nhưng PreparedRequest của headersList Những bổ sung mới nên được đưa vào Authorization cái đầu
         assertTrue(req.headersList.size() > originalSize,
             "PreparedRequest headersList should contain additional Authorization header");
     }

@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 响应头面板，只读展示响应头内容
+ * Bảng tiêu đề phản hồi hiển thị nội dung tiêu đề phản hồi ở chế độ chỉ đọc
  */
 public class ResponseHeadersPanel extends JPanel {
     private static final int COLUMN_NAME = 0;

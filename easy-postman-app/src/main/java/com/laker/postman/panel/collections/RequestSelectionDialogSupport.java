@@ -30,7 +30,7 @@ import java.util.function.Consumer;
 public class RequestSelectionDialogSupport {
 
     /**
-     * 弹出多选请求对话框，回调返回选中的HttpRequestItem列表
+     * Hộp thoại yêu cầu nhiều lựa chọn bật lên và lệnh gọi lại sẽ trả về hộp thoại đã chọnHttpRequestItemdanh sách
      */
     public static void showMultiSelectRequestDialog(Consumer<List<HttpRequestItem>> onSelected) {
         CollectionTreePanel requestCollectionsLeftPanel = UiSingletonFactory.getInstance(CollectionTreePanel.class);

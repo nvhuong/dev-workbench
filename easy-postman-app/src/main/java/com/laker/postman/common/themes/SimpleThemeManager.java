@@ -17,8 +17,8 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * 简单主题管理器
- * 支持亮色和暗色两种主题切换
+ * Trình quản lý chủ đề đơn giản
+ * Hỗ trợ chuyển đổi chủ đề sáng và tối
  */
 @Slf4j
 @UtilityClass
@@ -30,10 +30,10 @@ public class SimpleThemeManager {
     private static final Set<String> registeredDefaultsSources = new HashSet<>();
 
     /**
-     * 初始化主题（应用启动时调用）
+     * Khởi tạo chủ đề (được gọi khi ứng dụng khởi động)
      */
     public static void initTheme() {
-        // 从 UserSettings 中读取上次选择的主题
+        // Từ UserSettings để đọc chủ đề được chọn cuối cùng
         String savedTheme = UserPreferencesStore.getString(THEME_SETTING_KEY);
         ThemeDescriptor theme = ThemeRegistry.getOrDefault(savedTheme);
         currentThemeId = theme.id();
@@ -71,9 +71,9 @@ public class SimpleThemeManager {
     }
 
     /**
-     * 使用动画过渡执行主题切换。
-     * 先截取当前界面快照，再通过 invokeLater 在下一帧执行切换，
-     * 保证快照完整渲染后动画才开始，避免 EDT 阻塞导致动画失效。
+     * Thực hiện chuyển đổi chủ đề bằng cách sử dụng chuyển tiếp hoạt hình.
+     * Đầu tiên hãy chụp nhanh giao diện hiện tại rồi chuyển nó invokeLater Việc chuyển đổi được thực hiện ở khung tiếp theo.
+     * Đảm bảo hoạt ảnh bắt đầu sau khi ảnh chụp nhanh được hiển thị hoàn toàn để tránh điều này EDT Việc chặn khiến hoạt ảnh không thành công.
      */
     private static void switchWithAnimation(Runnable themeSwitch) {
         FlatAnimatedLafChange.showSnapshot();
@@ -84,7 +84,7 @@ public class SimpleThemeManager {
     }
 
     /**
-     * 获取当前主题
+     * Lấy chủ đề hiện tại
      */
     public static boolean isDarkTheme() {
         LookAndFeel laf = UIManager.getLookAndFeel();
@@ -95,10 +95,10 @@ public class SimpleThemeManager {
     }
 
     /**
-     * 应用主题
+     * Áp dụng chủ đề
      *
-     * @param theme            主题名称
-     * @param showNotification 是否显示通知
+     * @param theme            Tên chủ đề
+     * @param showNotification Có hiển thị thông báo hay không
      */
     private static void applyTheme(ThemeDescriptor theme, boolean showNotification) {
         try {
@@ -109,7 +109,7 @@ public class SimpleThemeManager {
                 currentThemeId = theme.id();
                 applyEditorThemeResources(theme);
 
-                // Look and Feel 切换会重建 UIDefaults，先恢复用户字体再刷新窗口。
+                // Look and Feel Công tắc sẽ được xây dựng lại UIDefaults，Khôi phục phông chữ của người dùng trước rồi làm mới cửa sổ.
                 FontManager.captureLookAndFeelDefaultFont();
                 FontManager.installSavedFontDefaults();
                 ToolWindowSurfaceStyle.installGlobalDialogWindowChrome();
@@ -118,7 +118,7 @@ public class SimpleThemeManager {
                     UserPreferencesStore.put(THEME_SETTING_KEY, theme.id());
                 }
 
-                // 启动时尚无窗口；仅在运行时切换主题后刷新现有窗口。
+                // Bắt đầu không có cửa sổ; chỉ làm mới các cửa sổ hiện có sau khi chuyển đổi chủ đề trong thời gian chạy.
                 if (showNotification) {
                     updateAllWindows();
                 }
@@ -154,18 +154,18 @@ public class SimpleThemeManager {
     }
 
     /**
-     * 更新所有已打开的窗口
+     * Cập nhật tất cả các cửa sổ đang mở
      */
     private static void updateAllWindows() {
-        // macOS 特殊处理：更新窗口外观模式
+        // macOS Xử lý đặc biệt: Cập nhật chế độ xuất hiện cửa sổ
         if (SystemInfo.isMacOS) {
             for (Window window : Window.getWindows()) {
                 if (window instanceof JFrame frame) {
                     JRootPane rootPane = frame.getRootPane();
 
-                    // 设置 macOS 窗口外观模式：dark 或 light
-                    // NSAppearanceNameVibrantDark: 暗色外观，标题栏文字为白色
-                    // NSAppearanceNameVibrantLight: 亮色外观，标题栏文字为黑色
+                    // cài đặt macOS Chế độ xuất hiện cửa sổ:dark hoặc light
+                    // NSAppearanceNameVibrantDark: Giao diện tối với văn bản trên thanh tiêu đề màu trắng
+                    // NSAppearanceNameVibrantLight: Ngoại hình sáng sủa, văn bản trên thanh tiêu đề có màu đen
                     if (isDarkTheme()) {
                         rootPane.putClientProperty("apple.awt.windowAppearance", "NSAppearanceNameVibrantDark");
                     } else {
@@ -175,7 +175,7 @@ public class SimpleThemeManager {
             }
         }
 
-        // 使用统一的刷新管理器更新所有窗口
+        // Cập nhật tất cả các cửa sổ bằng trình quản lý làm mới thống nhất
         UIRefreshManager.refreshAllWindows();
     }
 }

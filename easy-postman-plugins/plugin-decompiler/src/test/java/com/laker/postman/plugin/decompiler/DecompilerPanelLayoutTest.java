@@ -25,7 +25,7 @@ public class DecompilerPanelLayoutTest {
     public void fileAndCodeActionsShouldAvoidTruncatedTextAcrossLocales() {
         Locale originalLocale = I18nUtil.currentLocale();
         try {
-            assertActionsUseCompactTextAndIconButtons(Locale.CHINESE);
+            assertActionsUseCompactTextAndIconButtons(Locale.forLanguageTag("vi"));
             assertActionsUseCompactTextAndIconButtons(Locale.ENGLISH);
         } finally {
             I18nUtil.setLocale(originalLocale);

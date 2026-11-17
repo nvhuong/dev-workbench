@@ -7,8 +7,8 @@ import javax.swing.*;
 import java.awt.*;
 
 /**
- * 保存响应按钮
- * 用于保存HTTP响应到变量或文件
+ * Nút lưu phản hồi
+ * để tiết kiệmHTTPTrả lời một biến hoặc tập tin
  */
 public class SaveResponseButton extends JButton {
     public SaveResponseButton() {

@@ -37,8 +37,8 @@ public class KafkaSwingSupport {
     }
 
     /**
-     * 工具栏风格的图标切换按钮。选中图标按绘制时主题的 toolbar 选中前景色取色（Easy 亮/暗主题为主色底白图标），
-     * 主题未定义时回退为普通前景色，保证任何主题下都可见。
+     * Nút chuyển đổi biểu tượng kiểu thanh công cụ. Biểu tượng đã chọn được vẽ theo chủ đề toolbar Chọn màu nền trước (Easy Sáng/Chủ đề tối với màu chủ đạo và biểu tượng màu trắng).
+     * Khi chủ đề không được xác định, nó sẽ trở lại màu nền trước bình thường, đảm bảo rằng nó hiển thị theo bất kỳ chủ đề nào.
      */
     public static JToggleButton toolbarToggle(String iconPath, String tooltip) {
         JToggleButton button = new JToggleButton();

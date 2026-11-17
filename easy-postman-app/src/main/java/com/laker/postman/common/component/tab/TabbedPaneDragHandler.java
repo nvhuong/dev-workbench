@@ -12,28 +12,28 @@ import java.util.Comparator;
 import java.util.List;
 
 /**
- * Tab 拖拽排序处理器（IDEA 风格）
+ * Tab Kéo bộ xử lý sắp xếp (IDEA phong cách)
  *
- * <p>由于 {@link ClosableTabComponent} 覆盖了 Tab 头部区域，
- * tabbedPane 本身收不到 mouseDragged 事件，因此监听器必须装在每个 tabComponent 上。
- * 每创建一个 ClosableTabComponent，调用 {@link #attachTo} 注册一次即可。
+ * <p>Bởi vì {@link ClosableTabComponent} Được che phủ Tab Khu vực đầu,
+ * tabbedPane Bản thân tôi không thể nhận được mouseDragged sự kiện, vì vậy trình nghe phải được cài đặt trên mỗi sự kiện tabComponent thượng đẳng.
+ * Mỗi người được tạo ra ClosableTabComponent，gọi {@link #attachTo} Chỉ cần đăng ký một lần.
  *
- * <p>拖拽过程：按下 → 移动超过阈值 → 显示蓝色竖线指示位置 → 松手完成排序。
- * "+" Tab 始终排在最后，不可拖动也不可成为拖入目标。
+ * <p>Quá trình kéo: nhấn → Chuyển động vượt quá ngưỡng → Một đường thẳng đứng màu xanh được hiển thị cho biết vị trí → Hãy đi để hoàn thành việc phân loại.
+ * "+" Tab Luôn xếp cuối cùng, không thể kéo hoặc nhắm mục tiêu.
  */
 @Slf4j
 public class TabbedPaneDragHandler {
 
-    // ── 回调，用于同步 RequestEditorPanel 中的 trackedTabIndex ─────────────────
+    // ── Gọi lại, được sử dụng để đồng bộ hóa RequestEditorPanel trong trackedTabIndex ─────────────────
     public interface IndexGetter { int get(); }
     public interface IndexSetter { void set(int value); }
 
-    // ── 拖拽过程中的瞬态状态（集中管理，方便 reset）────────────────────────
+    // ── Trạng thái thoáng qua trong quá trình kéo (quản lý tập trung, thuận tiện reset）────────────────────────
     private static class DragState {
-        int draggedTabIndex = -1;   // 被拖动的 Tab 索引
-        int dropSlotIndex = -1;     // 当前悬停插入槽位，范围为 0..普通 Tab 数量
-        Point pressPointInPane;     // 按下时在 tabbedPane 坐标系的位置
-        boolean active = false;     // 是否已超过阈值、进入真正拖拽
+        int draggedTabIndex = -1;   // đang bị kéo đi Tab chỉ số
+        int dropSlotIndex = -1;     // Khe chèn di chuột hiện tại nằm trong phạm vi 0..bình thường Tab Số lượng
+        Point pressPointInPane;     // Bật khi nhấn tabbedPane Vị trí của hệ tọa độ
+        boolean active = false;     // Liệu nó đã vượt quá ngưỡng và bước vào trạng thái kéo thực sự hay chưa
 
         boolean isReady() {
             return draggedTabIndex >= 0 && pressPointInPane != null;
@@ -47,7 +47,7 @@ public class TabbedPaneDragHandler {
         }
     }
 
-    private static final int DRAG_THRESHOLD = 5; // 触发拖拽的最小像素位移
+    private static final int DRAG_THRESHOLD = 5; // Độ dịch chuyển pixel tối thiểu kích hoạt thao tác kéo
 
     private final JTabbedPane tabbedPane;
     private final IndexGetter trackedIndexGetter;
@@ -55,11 +55,11 @@ public class TabbedPaneDragHandler {
 
     private final DragState state = new DragState();
 
-    // GlassPane 相关
-    private TabDropIndicator dropIndicator;    // 拖拽指示线
-    private Component savedGlassPane;          // 拖拽结束后恢复
+    // GlassPane Có liên quan
+    private TabDropIndicator dropIndicator;    // Kéo đường chỉ báo
+    private Component savedGlassPane;          // Tiếp tục sau khi kéo
 
-    // ── 工厂方法 ─────────────────────────────────────────────────────────────
+    // ── Phương pháp nhà máy ─────────────────────────────────────────────────────────────
 
     private TabbedPaneDragHandler(JTabbedPane tabbedPane,
                                    IndexGetter trackedIndexGetter,
@@ -69,18 +69,18 @@ public class TabbedPaneDragHandler {
         this.trackedIndexSetter = trackedIndexSetter;
     }
 
-    /** 创建并绑定到指定 tabbedPane */
+    /** Tạo và ràng buộc với quy định tabbedPane */
     public static TabbedPaneDragHandler install(JTabbedPane tabbedPane,
                                                  IndexGetter trackedIndexGetter,
                                                  IndexSetter trackedIndexSetter) {
         return new TabbedPaneDragHandler(tabbedPane, trackedIndexGetter, trackedIndexSetter);
     }
 
-    // ── 公开方法：注册到 tabComponent ────────────────────────────────────────
+    // ── Phương thức công khai: Đăng ký tabComponent ────────────────────────────────────────
 
     /**
-     * 将拖拽监听器绑定到一个 tabComponent。
-     * 在 {@link ClosableTabComponent} 构造器末尾调用。
+     * Liên kết trình nghe kéo với a tabComponent。
+     * Vào {@link ClosableTabComponent} Được gọi ở cuối hàm tạo.
      */
     public void attachTo(Component tabComponent) {
         MouseAdapter adapter = new MouseAdapter() {
@@ -101,11 +101,11 @@ public class TabbedPaneDragHandler {
         tabComponent.addMouseMotionListener(adapter);
     }
 
-    // ── 事件处理（私有）─────────────────────────────────────────────────────
+    // ── Xử lý sự kiện (riêng tư)─────────────────────────────────────────────────────
 
     private void onPress(MouseEvent e, Component tabComponent) {
         if (!SwingUtilities.isLeftMouseButton(e)) return;
-        // 点击关闭按钮时不启动拖拽
+        // Đừng bắt đầu kéo khi nhấp vào nút đóng
         if (tabComponent instanceof ClosableTabComponent ctc && ctc.isInCloseButton(e.getX(), e.getY())) return;
 
         Point panePoint = toPanePoint(e.getPoint(), tabComponent);
@@ -121,7 +121,7 @@ public class TabbedPaneDragHandler {
         if (!state.isReady()) return;
         Point panePoint = toPanePoint(e.getPoint(), tabComponent);
 
-        // 超过阈值才真正进入拖拽
+        // Khi vượt quá ngưỡng, thao tác kéo thực sự được thực hiện
         if (!state.active) {
             if (panePoint.distance(state.pressPointInPane) < DRAG_THRESHOLD) return;
             state.active = true;
@@ -146,28 +146,28 @@ public class TabbedPaneDragHandler {
         }
     }
 
-    // ── 坐标 & 索引工具 ──────────────────────────────────────────────────────
+    // ── điều phối & Công cụ lập chỉ mục ──────────────────────────────────────────────────────
 
-    /** 将 tabComponent 上的点转换到 tabbedPane 坐标系 */
+    /** Sẽ tabComponent Các điểm trên được chuyển đổi thành tabbedPane hệ tọa độ */
     private Point toPanePoint(Point componentPoint, Component tabComponent) {
         return SwingUtilities.convertPoint(tabComponent, componentPoint, tabbedPane);
     }
 
-    /** 根据坐标找 Tab 索引，找不到则用 indexOfTabComponent 兜底 */
+    /** Tìm theo tọa độ Tab Chỉ mục, được sử dụng nếu không tìm thấy indexOfTabComponent Nhận được đáy của nó */
     private int tabIndexAt(Point panePoint, Component tabComponent) {
         int idx = tabbedPane.indexAtLocation(panePoint.x, panePoint.y);
         if (idx < 0) idx = tabbedPane.indexOfTabComponent(tabComponent);
         return idx;
     }
 
-    /** "+" Tab 始终是最后一个，不参与拖拽 */
+    /** "+" Tab Luôn là người cuối cùng và không tham gia kéo */
     private boolean isPlusTab(int idx) {
         return idx == tabbedPane.getTabCount() - 1;
     }
 
     /**
-     * 根据鼠标位置计算插入槽位（不包含 "+" Tab）。
-     * 鼠标在某 Tab 左半部分 → 落在该 Tab 前；右半部分 → 落在该 Tab 后。
+     * Tính toán khe chèn dựa trên vị trí chuột (không bao gồm "+" Tab）。
+     * Con chuột ở đâu đó Tab nửa bên trái → Rơi tại chỗ Tab Mặt trận; nửa bên phải → Rơi tại chỗ Tab mặt sau.
      */
     int dropSlotAt(Point panePoint) {
         int count = normalTabCount();
@@ -228,7 +228,7 @@ public class TabbedPaneDragHandler {
         return Math.max(0, tabbedPane.getTabCount() - 1);
     }
 
-    // ── GlassPane 指示线 ─────────────────────────────────────────────────────
+    // ── GlassPane đường chỉ báo ─────────────────────────────────────────────────────
 
     private void showDropIndicator() {
         JRootPane rootPane = SwingUtilities.getRootPane(tabbedPane);
@@ -287,12 +287,12 @@ public class TabbedPaneDragHandler {
         savedGlassPane = null;
     }
 
-    // ── Tab 移动 ──────────────────────────────────────────────────────────────
+    // ── Tab di chuyển ──────────────────────────────────────────────────────────────
 
     /**
-     * 将 from 位置的 Tab 移动到指定插入槽位。
-     * 完整保留 tabComponent（ClosableTabComponent）、content、title、icon、tooltip、enabled，
-     * 并同步 selectedIndex 与 trackedTabIndex。
+     * Sẽ from vị trí Tab Di chuyển đến khe chèn được chỉ định.
+     * Giữ nó nguyên vẹn tabComponent（ClosableTabComponent）、content、title、icon、tooltip、enabled，
+     * và đồng bộ hóa selectedIndex Và trackedTabIndex。
      */
     void moveTabToSlot(int from, int dropSlot) {
         int normalTabCount = normalTabCount();
@@ -311,7 +311,7 @@ public class TabbedPaneDragHandler {
         int tabCount = tabbedPane.getTabCount();
         if (from == insertAt || from < 0 || insertAt < 0 || from >= tabCount || insertAt >= tabCount) return;
 
-        // 1. 读取 from 位置 Tab 的全部数据
+        // 1. Đọc from vị trí Tab tất cả dữ liệu
         String title      = tabbedPane.getTitleAt(from);
         Icon icon         = tabbedPane.getIconAt(from);
         Component content = tabbedPane.getComponentAt(from);
@@ -321,14 +321,14 @@ public class TabbedPaneDragHandler {
         int selectedIndex = tabbedPane.getSelectedIndex();
         int trackedIdx    = trackedIndexGetter.get();
 
-        // 2. 删除原位置，再插入目标位置
+        // 2. Xóa vị trí ban đầu và chèn nó vào vị trí đích
         tabbedPane.removeTabAt(from);
-        insertAt = Math.min(insertAt, tabbedPane.getTabCount()); // 防止越界
+        insertAt = Math.min(insertAt, tabbedPane.getTabCount()); // Ngăn chặn việc vượt qua ranh giới
         tabbedPane.insertTab(title, icon, content, tooltip, insertAt);
         tabbedPane.setEnabledAt(insertAt, enabled);
         if (tabComp != null) tabbedPane.setTabComponentAt(insertAt, tabComp);
 
-        // 3. 同步 selectedIndex 和 trackedTabIndex（索引因 remove+insert 发生了偏移）
+        // 3. đồng bộ selectedIndex và trackedTabIndex（Nguyên nhân chỉ số remove+insert xảy ra sự bù đắp)
         tabbedPane.setSelectedIndex(recalcIndex(selectedIndex, from, insertAt));
         if (trackedIdx >= 0) trackedIndexSetter.set(recalcIndex(trackedIdx, from, insertAt));
 
@@ -336,19 +336,19 @@ public class TabbedPaneDragHandler {
     }
 
     /**
-     * 计算某个索引在 removeTabAt(from) + insertTab(insertAt) 之后的新位置。
+     * Tính chỉ số tại removeTabAt(from) + insertTab(insertAt) địa điểm mới sau đó.
      */
     private int recalcIndex(int idx, int removedFrom, int insertAt) {
-        if (idx == removedFrom) return insertAt;               // 就是被移动的那个
-        int afterRemove = (idx > removedFrom) ? idx - 1 : idx; // 模拟 remove 后的偏移
-        return (afterRemove >= insertAt) ? afterRemove + 1 : afterRemove; // 模拟 insert 后的偏移
+        if (idx == removedFrom) return insertAt;               // Đó là cái đã được di chuyển
+        int afterRemove = (idx > removedFrom) ? idx - 1 : idx; // mô phỏng remove phần bù tiếp theo
+        return (afterRemove >= insertAt) ? afterRemove + 1 : afterRemove; // mô phỏng insert phần bù tiếp theo
     }
 
-    // ── 内部类：拖拽位置指示线（覆盖在 RootPane GlassPane 上）────────────────
+    // ── Lớp bên trong: Kéo dòng chỉ báo vị trí (được bao phủ trong RootPane GlassPane ở trên)────────────────
 
     /**
-     * 透明面板，绘制一条蓝色竖线 + 上下箭头，指示 Tab 将要插入的位置。
-     * 颜色自动跟随 FlatLaf 主题。
+     * Bảng trong suốt, vẽ một đường thẳng đứng màu xanh + Mũi tên lên xuống, hướng dẫn Tab Vị trí cần chèn.
+     * Màu sắc sẽ tự động theo sau FlatLaf chủ đề.
      */
     static class TabDropIndicator extends JPanel {
 
@@ -358,7 +358,7 @@ public class TabbedPaneDragHandler {
 
         TabDropIndicator() {
             setOpaque(false);
-            setEnabled(false); // 不消费鼠标事件
+            setEnabled(false); // Không sử dụng các sự kiện chuột
         }
 
         void show(int x, int y, int height) {
@@ -378,22 +378,22 @@ public class TabbedPaneDragHandler {
             Graphics2D g2 = (Graphics2D) g.create();
             g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-            // 主题自适应颜色：优先取 FlatLaf 焦点色
+            // Màu sắc thích ứng chủ đề: ưu tiên FlatLaf Màu sắc tập trung
             Color color = UIManager.getColor("Component.focusColor");
             if (color == null) color = UIManager.getColor("TabbedPane.underlineColor");
             if (color == null) color = ModernColors.getPrimary();
             g2.setColor(color);
 
-            // 竖线
+            // Đường dọc
             g2.setStroke(new BasicStroke(2.5f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
             g2.drawLine(lineX, lineY, lineX, lineY + lineHeight);
 
-            // 顶部向下三角
+            // Đỉnh hướng xuống dưới trong một hình tam giác
             int a = 5;
             g2.fillPolygon(
                     new int[]{lineX - a, lineX + a, lineX},
                     new int[]{lineY, lineY, lineY + a * 2}, 3);
-            // 底部向上三角
+            // Tam giác từ dưới lên
             int by = lineY + lineHeight;
             g2.fillPolygon(
                     new int[]{lineX - a, lineX + a, lineX},

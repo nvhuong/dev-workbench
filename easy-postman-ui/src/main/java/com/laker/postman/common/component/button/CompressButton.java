@@ -9,8 +9,8 @@ import javax.swing.*;
 import java.awt.*;
 
 /**
- * 压缩按钮
- * 用于压缩代码或文本内容
+ * Nút nén
+ * Được sử dụng để nén mã hoặc nội dung văn bản
  */
 public class CompressButton extends JButton {
     public CompressButton() {

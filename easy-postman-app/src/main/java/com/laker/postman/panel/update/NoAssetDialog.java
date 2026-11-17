@@ -11,7 +11,7 @@ import javax.swing.border.EmptyBorder;
 import java.awt.*;
 
 /**
- * 有新版本但暂无安装包的提示对话框
+ * Có phiên bản mới nhưng không có hộp thoại nhắc cài đặt gói
  */
 public class NoAssetDialog extends JDialog {
 
@@ -104,7 +104,7 @@ public class NoAssetDialog extends JDialog {
     }
 
     /**
-     * 显示对话框，返回用户是否选择前往 GitHub。
+     * Hiển thị một hộp thoại và trả về việc người dùng có chọn đến đó hay không GitHub。
      */
     public static boolean show(Frame parent, UpdateInfo updateInfo) {
         return new NoAssetDialog(parent, updateInfo).showDialogAndWait();

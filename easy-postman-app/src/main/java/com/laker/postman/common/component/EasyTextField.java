@@ -25,21 +25,21 @@ import java.awt.event.MouseEvent;
 import java.util.List;
 
 /**
- * 1.支持 Postman 风格变量高亮和悬浮提示的文本输入框
- * 变量格式：{{varName}}
- * 已定义的变量显示为蓝色背景，未定义的变量显示为红色背景
- * 鼠标悬浮在变量上时显示变量值的提示
- * 2.支持win和mac下的撤回重做快捷键
- * win：Ctrl+Z 撤回，Ctrl+Y 重做
- * mac：Cmd+Z 撤回，Cmd+Shift+Z 重做
- * 3.支持变量自动补全功能
- * 输入 {{ 时自动弹出变量列表，包括环境变量和内置函数
+ * 1.Hỗ trợ Postman Làm nổi bật biến kiểu và hộp nhập văn bản gợi ý nổi
+ * Dạng biến đổi:{{varName}}
+ * Các biến đã xác định được hiển thị với nền màu xanh lam và các biến không xác định được hiển thị với nền màu đỏ
+ * Hiển thị gợi ý về giá trị của biến khi di chuột qua biến
+ * 2.Hỗ trợwinvàmacCác phím tắt hoàn tác và làm lại bên dưới
+ * win：Ctrl+Z Rút tiền,Ctrl+Y làm lại
+ * mac：Cmd+Z Rút tiền,Cmd+Shift+Z làm lại
+ * 3.Hỗ trợ chức năng tự động hoàn thành biến
+ * Nhập {{ Một danh sách các biến, bao gồm các biến môi trường và các hàm tích hợp, sẽ tự động bật lên
  */
 @Slf4j
 public class EasyTextField extends FlatTextField {
     private final UndoManager undoManager = new UndoManager();
 
-    // 自动补全相关
+    // Tự động hoàn thành có liên quan
     private JWindow autocompleteWindow;
     private JList<VariableInfo> autocompleteList;
     private DefaultListModel<VariableInfo> autocompleteModel;
@@ -48,7 +48,7 @@ public class EasyTextField extends FlatTextField {
     public EasyTextField(int columns) {
         super();
         setColumns(columns);
-        // 启用 ToolTip 支持，必须设置（即使内容为空）
+        // Kích hoạt ToolTip Được hỗ trợ, phải được đặt (ngay cả khi nội dung trống)
         setToolTipText("");
         initUndoRedo();
         initAutocomplete();
@@ -58,7 +58,7 @@ public class EasyTextField extends FlatTextField {
         super();
         setText(text);
         setColumns(columns);
-        // 启用 ToolTip 支持，必须设置（即使内容为空）
+        // Kích hoạt ToolTip Được hỗ trợ, phải được đặt (ngay cả khi nội dung trống)
         setToolTipText("");
         initUndoRedo();
         initAutocomplete();
@@ -69,7 +69,7 @@ public class EasyTextField extends FlatTextField {
         setText(text);
         setColumns(columns);
         setPlaceholderText(placeholderText);
-        // 启用 ToolTip 支持，必须设置（即使内容为空）
+        // Kích hoạt ToolTip Được hỗ trợ, phải được đặt (ngay cả khi nội dung trống)
         setToolTipText("");
         initUndoRedo();
         initAutocomplete();
@@ -77,7 +77,7 @@ public class EasyTextField extends FlatTextField {
 
     @Override
     protected void paintComponent(Graphics g) {
-        // 先绘制文本、光标、选区
+        // Đầu tiên vẽ văn bản, con trỏ và vùng chọn
         super.paintComponent(g);
 
         String value = getText();
@@ -85,10 +85,10 @@ public class EasyTextField extends FlatTextField {
         if (segments.isEmpty()) return;
 
         try {
-            // 添加null检查，防止modelToView2D返回null
+            // Thêm vàonullKiểm tra và ngăn chặnmodelToView2Dtrở lạinull
             var view = modelToView2D(0);
             if (view == null) {
-                return; // 如果view为null，直接返回不绘制变量高亮
+                return; // nếuviewvìnull，Trả về trực tiếp mà không cần tô sáng biến
             }
 
             Rectangle startRect = view.getBounds();
@@ -99,13 +99,13 @@ public class EasyTextField extends FlatTextField {
             int last = 0;
 
             for (VariableSegment seg : segments) {
-                // 计算变量前的文本宽度
+                // Tính chiều rộng văn bản trước biến
                 if (seg.start > last) {
                     String before = value.substring(last, seg.start);
                     int w = fm.stringWidth(before);
                     x += w;
                 }
-                // 判断变量状态：执行上下文变量、环境变量或内置函数
+                // Xác định trạng thái biến: biến ngữ cảnh thực thi, biến môi trường hoặc hàm dựng sẵn
                 boolean isDefined = VariableResolver.isVariableDefined(seg.name);
                 Color bgColor = isDefined
                         ? ModernColors.getDefinedVariableBadgeBackground()
@@ -115,7 +115,7 @@ public class EasyTextField extends FlatTextField {
                         : ModernColors.getUndefinedVariableBadgeBorder();
                 String varText = value.substring(seg.start, seg.end);
                 int varWidth = fm.stringWidth(varText);
-                // 只绘制变量的半透明背景和边框，不绘制文本
+                // Chỉ có nền và đường viền bán trong suốt của biến được vẽ chứ không phải văn bản
                 g.setColor(bgColor);
                 g.fillRoundRect(x, baseY, varWidth, h, 8, 8);
                 g.setColor(borderColor);
@@ -129,7 +129,7 @@ public class EasyTextField extends FlatTextField {
     }
 
     /**
-     * 初始化撤回/重做功能
+     * Đã rút lại quá trình khởi tạo/Làm lại chức năng
      */
     private void initUndoRedo() {
         getDocument().addUndoableEditListener(undoManager);
@@ -162,10 +162,10 @@ public class EasyTextField extends FlatTextField {
     }
 
     /**
-     * 初始化自动补全功能
+     * Khởi tạo chức năng tự động hoàn thành
      */
     private void initAutocomplete() {
-        // 创建弹出窗口（使用JWindow替代JPopupMenu以获得更好的控制）
+        // Tạo một cửa sổ bật lên (sử dụng JWindowthay thếJPopupMenuđể kiểm soát tốt hơn)
         autocompleteWindow = new JWindow(SwingUtilities.getWindowAncestor(this));
         autocompleteWindow.setFocusableWindowState(false);
 
@@ -177,10 +177,10 @@ public class EasyTextField extends FlatTextField {
         autocompleteList.setSelectionBackground(ModernColors.getSelectionBackgroundColor());
         autocompleteList.setSelectionForeground(ModernColors.getTextPrimary());
         autocompleteList.setFont(getFont());
-        // 固定列表宽度，防止内容过长导致横向滚动
-        autocompleteList.setFixedCellWidth(384); // 400 - 边框和内边距
+        // Đã sửa lỗi chiều rộng danh sách để ngăn cuộn ngang do nội dung quá nhiều
+        autocompleteList.setFixedCellWidth(384); // 400 - Đường viền và phần đệm
 
-        // 自定义列表渲染器
+        // Trình kết xuất danh sách tùy chỉnh
         autocompleteList.setCellRenderer(new DefaultListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(JList<?> list, Object value,
@@ -188,7 +188,7 @@ public class EasyTextField extends FlatTextField {
                 JPanel panel = new JPanel(new BorderLayout(8, 0));
                 panel.setOpaque(true);
                 panel.setBorder(new EmptyBorder(4, 8, 4, 8));
-                // 设置固定大小，防止横向滚动
+                // Đặt kích thước cố định để tránh cuộn ngang
                 panel.setPreferredSize(new Dimension(384, 32));
                 panel.setMaximumSize(new Dimension(384, 32));
 
@@ -205,7 +205,7 @@ public class EasyTextField extends FlatTextField {
                     Color labelColor = varType.getColor();
                     String symbol = varType.getIconSymbol();
 
-                    // 使用彩色圆点代替 Emoji（更好的跨平台表现）
+                    // Thay vào đó hãy sử dụng các chấm màu Emoji（hiệu suất đa nền tảng tốt hơn)
                     JPanel iconPanel = new JPanel() {
                         @Override
                         protected void paintComponent(Graphics g) {
@@ -214,26 +214,26 @@ public class EasyTextField extends FlatTextField {
                             g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
                             FontsUtil.applyTextRenderingHints(g2d);
 
-                            // 获取字体度量信息以实现垂直对齐
+                            // Nhận thông tin số liệu phông chữ để căn chỉnh theo chiều dọc
                             int panelHeight = getHeight();
 
-                            // 计算圆点垂直居中位置
+                            // Tính tọa độ tâm thẳng đứng của đường tròn
                             int circleSize = 12;
                             int circleY = (panelHeight - circleSize) / 2;
 
-                            // 绘制圆形图标
+                            // Vẽ biểu tượng vòng tròn
                             g2d.setColor(varType.getColor());
                             g2d.fillOval(2, circleY, circleSize, circleSize);
 
                             g2d.setColor(ModernColors.getTextInverse());
-                            g2d.setFont(FontsUtil.getDefaultFontWithOffset(Font.BOLD, -2)); // 比标准字体小2号
+                            g2d.setFont(FontsUtil.getDefaultFontWithOffset(Font.BOLD, -2)); // Nhỏ hơn kích thước phông chữ tiêu chuẩn2Không
                             FontMetrics symbolFm = g2d.getFontMetrics();
                             int symbolWidth = symbolFm.stringWidth(symbol);
                             int symbolAscent = symbolFm.getAscent();
                             int symbolDescent = symbolFm.getDescent();
                             int symbolHeight = symbolAscent + symbolDescent;
 
-                            // 符号在圆点内垂直居中
+                            // Biểu tượng được căn giữa theo chiều dọc trong dấu chấm
                             int symbolX = 2 + (circleSize - symbolWidth) / 2;
                             int symbolY = circleY + (circleSize - symbolHeight) / 2 + symbolAscent;
                             g2d.drawString(symbol, symbolX, symbolY);
@@ -249,18 +249,18 @@ public class EasyTextField extends FlatTextField {
                     iconPanel.setOpaque(false);
                     panel.add(iconPanel, BorderLayout.WEST);
 
-                    // 中间区域：使用固定宽度的面板容纳name和value，让它们各占一半空间
+                    // Khu vực giữa: Được bố trí bằng các tấm có chiều rộng cố địnhnamevàvalue，Hãy để mỗi người chiếm một nửa không gian
                     JPanel contentPanel = new JPanel(new GridLayout(1, 2, 8, 0));
                     contentPanel.setOpaque(false);
 
-                    // 左侧：变量名（占一半空间）
+                    // Bên trái: tên biến (nửa khoảng trắng)
                     JPanel namePanel = new JPanel(new BorderLayout());
                     namePanel.setOpaque(false);
 
                     String displayName = varName;
                     String fullName = varName;
 
-                    // 变量名最大长度（约占一半宽度）
+                    // Độ dài tối đa của tên biến (khoảng một nửa chiều rộng)
                     int maxNameLength = 25;
                     if (varName.length() > maxNameLength) {
                         displayName = varName.substring(0, maxNameLength - 3) + "...";
@@ -270,7 +270,7 @@ public class EasyTextField extends FlatTextField {
                     nameLabel.setFont(getFont().deriveFont(Font.BOLD));
                     nameLabel.setForeground(labelColor);
 
-                    // 为变量名添加工具提示
+                    // Thêm chú giải công cụ cho tên biến
                     if (!displayName.equals(fullName)) {
                         nameLabel.setToolTipText(fullName);
                     }
@@ -278,7 +278,7 @@ public class EasyTextField extends FlatTextField {
                     namePanel.add(nameLabel, BorderLayout.WEST);
                     contentPanel.add(namePanel);
 
-                    // 右侧：变量值或描述（占一半空间）
+                    // Bên phải: giá trị biến hoặc mô tả (nửa khoảng trắng)
                     JPanel valuePanel = new JPanel(new BorderLayout());
                     valuePanel.setOpaque(false);
 
@@ -286,7 +286,7 @@ public class EasyTextField extends FlatTextField {
                         String displayValue = varValue;
                         String fullValue = varValue;
 
-                        // 变量值最大长度（约占一半宽度）
+                        // Độ dài tối đa của giá trị biến (khoảng một nửa chiều rộng)
                         int maxValueLength = 25;
                         if (varValue.length() > maxValueLength) {
                             displayValue = varValue.substring(0, maxValueLength - 3) + "...";
@@ -296,9 +296,9 @@ public class EasyTextField extends FlatTextField {
                         valueLabel.setFont(getFont().deriveFont(Font.PLAIN, getFont().getSize() - 1));
                         valueLabel.setForeground(ModernColors.getTextSecondary());
 
-                        // 为值添加工具提示（显示完整内容）
+                        // Thêm chú giải công cụ cho giá trị (hiển thị nội dung đầy đủ)
                         if (!displayValue.equals(fullValue) || fullValue.length() > 20) {
-                            // 格式化工具提示，支持换行
+                            // Chú giải công cụ định dạng có hỗ trợ ngắt dòng
                             String tooltipText = formatTooltipText(fullValue, 60);
                             valueLabel.setToolTipText("<html>" + tooltipText + "</html>");
                         }
@@ -309,7 +309,7 @@ public class EasyTextField extends FlatTextField {
 
                     panel.add(contentPanel, BorderLayout.CENTER);
 
-                    // 为整个面板添加工具提示
+                    // Thêm chú giải công cụ vào toàn bộ bảng điều khiển
                     StringBuilder tooltipBuilder = new StringBuilder("<html>");
                     tooltipBuilder.append("<b>").append(escapeHtml(varName)).append("</b>");
                     tooltipBuilder.append(" <span style='color:")
@@ -327,7 +327,7 @@ public class EasyTextField extends FlatTextField {
         });
 
         JScrollPane scrollPane = new JScrollPane(autocompleteList);
-        // 禁用横向滚动条，只保留纵向滚动
+        // Vô hiệu hóa thanh cuộn ngang, chỉ để lại thanh cuộn dọc
         scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
         scrollPane.setBorder(BorderFactory.createCompoundBorder(
@@ -336,7 +336,7 @@ public class EasyTextField extends FlatTextField {
         ));
         autocompleteWindow.add(scrollPane);
 
-        // 监听文档变化
+        // Theo dõi những thay đổi của tài liệu
         getDocument().addDocumentListener(new DocumentListener() {
             @Override
             public void insertUpdate(DocumentEvent e) {
@@ -354,7 +354,7 @@ public class EasyTextField extends FlatTextField {
             }
         });
 
-        // 列表鼠标点击事件
+        // Liệt kê sự kiện click chuột
         autocompleteList.addMouseListener(new java.awt.event.MouseAdapter() {
             @Override
             public void mouseClicked(java.awt.event.MouseEvent e) {
@@ -364,7 +364,7 @@ public class EasyTextField extends FlatTextField {
             }
         });
 
-        // 文本框键盘事件
+        // Sự kiện bàn phím hộp văn bản
         addKeyListener(new KeyAdapter() {
             @Override
             public void keyPressed(KeyEvent e) {
@@ -373,7 +373,7 @@ public class EasyTextField extends FlatTextField {
                         case KeyEvent.VK_DOWN:
                             int currentIndex = autocompleteList.getSelectedIndex();
                             int nextIndex = currentIndex + 1;
-                            // 循环导航：到达最后一个后返回第一个
+                            // Điều hướng vòng tròn: Quay lại phần đầu tiên sau khi đến phần cuối cùng
                             if (nextIndex >= autocompleteModel.getSize()) {
                                 nextIndex = 0;
                             }
@@ -384,7 +384,7 @@ public class EasyTextField extends FlatTextField {
                         case KeyEvent.VK_UP:
                             int currentUpIndex = autocompleteList.getSelectedIndex();
                             int prevIndex = currentUpIndex - 1;
-                            // 循环导航：在第一个选项前跳到最后一个
+                            // Điều hướng vòng tròn: chuyển đến tùy chọn cuối cùng trước tùy chọn đầu tiên
                             if (prevIndex < 0) {
                                 prevIndex = autocompleteModel.getSize() - 1;
                             }
@@ -408,11 +408,11 @@ public class EasyTextField extends FlatTextField {
             }
         });
 
-        // 失去焦点时隐藏
+        // Ẩn khi mất tiêu điểm
         addFocusListener(new java.awt.event.FocusAdapter() {
             @Override
             public void focusLost(java.awt.event.FocusEvent e) {
-                // 延迟隐藏，允许点击列表项
+                // Trì hoãn việc ẩn, cho phép nhấp vào các mục trong danh sách
                 SwingUtilities.invokeLater(() -> {
                     if (!autocompleteList.hasFocus()) {
                         hideAutocomplete();
@@ -423,7 +423,7 @@ public class EasyTextField extends FlatTextField {
     }
 
     /**
-     * 格式化工具提示文本，自动换行
+     * Định dạng văn bản chú giải công cụ với tính năng ngắt dòng tự động
      */
     private String formatTooltipText(String text, int maxLineLength) {
         if (text == null || text.length() <= maxLineLength) {
@@ -434,7 +434,7 @@ public class EasyTextField extends FlatTextField {
         int start = 0;
         while (start < text.length()) {
             int end = Math.min(start + maxLineLength, text.length());
-            // 尝试在空格处断行
+            // Hãy thử ngắt dòng ở khoảng trắng
             if (end < text.length()) {
                 int lastSpace = text.lastIndexOf(' ', end);
                 if (lastSpace > start && lastSpace - start > maxLineLength / 2) {
@@ -451,7 +451,7 @@ public class EasyTextField extends FlatTextField {
     }
 
     /**
-     * HTML转义，防止特殊字符破坏工具提示
+     * HTMLThoát để ngăn các ký tự đặc biệt phá vỡ chú giải công cụ
      */
     private String escapeHtml(String text) {
         if (text == null) return "";
@@ -463,7 +463,7 @@ public class EasyTextField extends FlatTextField {
     }
 
     /**
-     * 检查是否需要显示自动补全
+     * Kiểm tra xem có cần hiển thị tính năng tự động hoàn thành hay không
      */
     private void checkForAutocomplete() {
         String text = getText();
@@ -474,24 +474,24 @@ public class EasyTextField extends FlatTextField {
             return;
         }
 
-        // 查找光标前最近的 {{
+        // Tìm cái gần con trỏ nhất {{
         int openBracePos = text.lastIndexOf("{{", caretPos - 1);
         if (openBracePos == -1) {
             hideAutocomplete();
             return;
         }
 
-        // 检查 {{ 之后是否有 }}
+        // nghiên cứu {{ Có sau này không }}
         int closeBracePos = text.indexOf("}}", openBracePos);
         if (closeBracePos != -1 && closeBracePos < caretPos) {
             hideAutocomplete();
             return;
         }
 
-        // 获取 {{ 之后的文本作为过滤前缀
+        // Lấy {{ Văn bản sau đây đóng vai trò là tiền tố bộ lọc
         String prefix = text.substring(openBracePos + 2, caretPos);
 
-        // 过滤变量列表
+        // Lọc danh sách biến
         List<VariableInfo> filteredVariables = VariableResolver.filterVariablesWithType(prefix);
 
         if (filteredVariables.isEmpty()) {
@@ -499,47 +499,47 @@ public class EasyTextField extends FlatTextField {
             return;
         }
 
-        // 更新列表
+        // Cập nhật danh sách
         autocompleteStartPos = openBracePos + 2;
         autocompleteModel.clear();
         for (VariableInfo varInfo : filteredVariables) {
             autocompleteModel.addElement(varInfo);
         }
 
-        // 默认选中第一项
+        // Mục đầu tiên được chọn theo mặc định
         if (autocompleteModel.getSize() > 0) {
             autocompleteList.setSelectedIndex(0);
             autocompleteList.ensureIndexIsVisible(0);
         }
 
-        // 显示弹出菜单
+        // Hiển thị menu bật lên
         showAutocomplete();
     }
 
     /**
-     * 显示自动补全弹出窗口
+     * Hiển thị cửa sổ bật lên tự động hoàn thành
      */
     private void showAutocomplete() {
         if (autocompleteModel.getSize() == 0) {
             return;
         }
 
-        // 检查组件是否在屏幕上显示
+        // Kiểm tra xem thành phần có được hiển thị trên màn hình hay không
         if (!isShowing()) {
             return;
         }
 
         try {
-            // 获取光标位置
+            // Lấy vị trí con trỏ
             Rectangle rect = modelToView2D(getCaretPosition()).getBounds();
             Point screenPos = getLocationOnScreen();
 
-            // 计算弹出窗口大小 - 固定宽度为400
-            int itemHeight = 32; // 每项高度
+            // Tính kích thước cửa sổ bật lên - Chiều rộng cố định là 400
+            int itemHeight = 32; // chiều cao của từng hạng mục
             int popupWidth = 400;
             int popupHeight = Math.min(autocompleteModel.getSize() * itemHeight + 10, 320);
 
-            // 设置窗口大小和位置
+            // Đặt kích thước và vị trí cửa sổ
             autocompleteWindow.setSize(popupWidth, popupHeight);
             autocompleteWindow.setLocation(
                     screenPos.x + rect.x,
@@ -555,7 +555,7 @@ public class EasyTextField extends FlatTextField {
     }
 
     /**
-     * 隐藏自动补全弹出窗口
+     * Ẩn cửa sổ bật lên tự động hoàn thành
      */
     private void hideAutocomplete() {
         if (autocompleteWindow != null && autocompleteWindow.isVisible()) {
@@ -565,7 +565,7 @@ public class EasyTextField extends FlatTextField {
     }
 
     /**
-     * 插入选中的变量
+     * Chèn biến đã chọn
      */
     private void insertSelectedVariable() {
         VariableInfo selected = autocompleteList.getSelectedValue();
@@ -577,29 +577,29 @@ public class EasyTextField extends FlatTextField {
             String text = getText();
             int caretPos = getCaretPosition();
 
-            // 找到 {{ 的位置
+            // xuất hiện {{ vị trí
             int openBracePos = text.lastIndexOf("{{", caretPos - 1);
             if (openBracePos == -1) {
                 return;
             }
 
-            // 替换 {{ 到光标位置的文本为 {{selected}}
+            // thay thế {{ Văn bản đến vị trí con trỏ là {{selected}}
             String before = text.substring(0, openBracePos);
             String after = text.substring(caretPos);
 
-            // 检查后面是否已经有 }}，如果有则跳过，避免重复
+            // Kiểm tra xem đã có cái nào ở phía sau chưa }}，Nếu có thì bỏ qua để tránh trùng lặp
             String closingBraces = "}}";
             String varName = selected.getName();
             if (after.startsWith(closingBraces)) {
-                // 后面已经有 }}，不再添加
+                // Đã có một cái ở phía sau rồi }}，Không có thêm bổ sung
                 String newText = before + "{{" + varName + after;
                 setText(newText);
-                setCaretPosition(openBracePos + varName.length() + 4); // 光标放在 }} 之后
+                setCaretPosition(openBracePos + varName.length() + 4); // Con trỏ được đặt trên  }} sau đó
             } else {
-                // 后面没有 }}，正常添加
+                // Không có gì ở phía sau }}，Thêm bình thường
                 String newText = before + "{{" + varName + "}}" + after;
                 setText(newText);
-                setCaretPosition(openBracePos + varName.length() + 4); // 光标放在 }} 之后
+                setCaretPosition(openBracePos + varName.length() + 4); // Con trỏ được đặt trên  }} sau đó
             }
 
             hideAutocomplete();
@@ -635,18 +635,18 @@ public class EasyTextField extends FlatTextField {
                 String varText = value.substring(seg.start, seg.end);
                 int varWidth = fm.stringWidth(varText);
                 if (mouseX >= x && mouseX <= x + varWidth) {
-                    // 鼠标悬浮在变量上
+                    // Di chuột qua biến
                     String varName = seg.name;
 
-                    // 获取变量类型和值
+                    // Nhận loại và giá trị biến
                     VariableType varType = VariableResolver.getVariableType(varName);
                     String varValue = VariableResolver.resolveVariable(varName);
 
                     if (varType != null && varValue != null) {
-                        // 变量已定义
+                        // Biến được xác định
                         return VariableTooltipHtmlBuilder.variableTooltip(varName, varValue, varType);
                     } else {
-                        // 变量未定义
+                        // Biến không được xác định
                         return VariableTooltipHtmlBuilder.undefinedVariableTooltip(varName);
                     }
                 }

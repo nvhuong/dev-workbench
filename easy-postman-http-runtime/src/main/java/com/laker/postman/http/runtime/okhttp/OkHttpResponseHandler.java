@@ -37,25 +37,25 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * OkHttp 响应处理工具类
+ * OkHttp Lớp công cụ xử lý phản hồi
  * <p>
- * 负责处理 HTTP 响应，包括：
- * - 区分文本和二进制响应
- * - 处理大文件下载
- * - 解析文件名
- * - 字符集检测
- * - 临时文件管理
+ * Chịu trách nhiệm xử lý HTTP Phản hồi, bao gồm: .
+ * - Phân biệt giữa phản hồi văn bản và nhị phân
+ * - Xử lý tải tập tin lớn
+ * - Phân tích tên tập tin
+ * - Phát hiện bộ ký tự
+ * - Quản lý tập tin tạm thời
  * </p>
  */
 @Slf4j
 public class OkHttpResponseHandler {
 
-    // 常量定义
+    // Định nghĩa hằng số
     private static final String CONTENT_TYPE_HEADER = "Content-Type";
     private static final String SSE_CONTENT_TYPE = "text/event-stream";
 
     /**
-     * 私有构造函数，防止实例化
+     * Nhà xây dựng riêng để ngăn chặn việc khởi tạo
      */
     private static final String UNKNOWN_BINARY_EXTENSION = ".bin";
     private static final Set<String> IMAGE_EXTENSIONS = Set.of(".png", ".jpg", ".gif", ".webp");
@@ -65,25 +65,25 @@ public class OkHttpResponseHandler {
     }
 
     /**
-     * 获取最大响应体大小设置（字节）
+     * Nhận cài đặt kích thước nội dung phản hồi tối đa (tính bằng byte)
      */
     private static int getMaxBodySize() {
         return HttpRuntimeSettingsProvider.get().getMaxBodySize();
     }
 
     /**
-     * 获取最大下载大小设置（字节）
+     * Nhận cài đặt kích thước tải xuống tối đa (tính bằng byte)
      */
     private static int getMaxDownloadSize() {
         return HttpRuntimeSettingsProvider.get().getMaxDownloadSize();
     }
 
     /**
-     * 处理 HTTP 响应，将 OkHttp Response 转换为内部 HttpResponse 对象
+     * xử lý HTTP Phản ứng, sẽ OkHttp Response Chuyển đổi sang nội bộ HttpResponse đối tượng
      *
-     * @param okResponse OkHttp 的响应对象
-     * @param response   内部响应对象（用于填充数据）
-     * @throws IOException 读取响应体时可能抛出的异常
+     * @param okResponse OkHttp đối tượng phản hồi
+     * @param response   Đối tượng phản hồi nội bộ (được sử dụng để điền dữ liệu)
+     * @throws IOException Các ngoại lệ có thể được đưa ra khi đọc nội dung phản hồi
      */
     public static void handleResponse(Response okResponse, HttpResponse response, SseResponseCallback callback) throws IOException {
         handleResponse(okResponse, response, callback, PreparedRequest.ResponseBodyMode.FULL, 64 * 1024);
@@ -145,7 +145,7 @@ public class OkHttpResponseHandler {
         response.code = okResponse.code();
         response.headers = new LinkedHashMap<>();
         for (String name : okResponse.headers().names()) {
-            // 使用 headers(name) 获取所有同名的 header 值（例如多个 Set-Cookie）
+            // sử dụng headers(name) Nhận tất cả có cùng tên header giá trị (ví dụ: bội số Set-Cookie）
             List<String> values = okResponse.headers(name);
             if (!values.isEmpty()) {
                 response.addHeader(name, values);
@@ -167,7 +167,7 @@ public class OkHttpResponseHandler {
                     var reader = new SseEventReader(body.source(), callback);
                     try {
                         while (reader.processNextEvent()) {
-                            // 持续读取直到流结束
+                            // Tiếp tục đọc cho đến hết dòng
                         }
                     } catch (RuntimeException ex) {
                         failed = true;
@@ -278,39 +278,39 @@ public class OkHttpResponseHandler {
     }
 
     /**
-     * 处理 SSE（Server-Sent Events）类型的响应
-     * SSE 是流式响应，不读取完整内容
+     * xử lý SSE（Server-Sent Events）loại phản ứng
+     * SSE là phản hồi trực tuyến và không đọc toàn bộ nội dung
      *
-     * @param response 内部响应对象
+     * @param response Đối tượng phản hồi nội bộ
      */
     private static void handleSseResponse(HttpResponse response) {
         response.body = I18nUtil.getMessage(MessageKeys.SSE_STREAM_UNSUPPORTED);
         response.bodySize = 0;
         response.isSse = true;
-        // 不在这里关闭，统一在 handleResponse 方法中关闭
+        // Không đóng cửa ở đây, thống nhất ở đây handleResponse Đóng trong phương pháp
     }
 
     /**
-     * 解析 Content-Length 响应头
+     * phân tích Content-Length tiêu đề phản hồi
      *
-     * @param contentLengthStr Content-Length 响应头的值
-     * @return 内容长度（字节），如果无法解析则返回 -1
+     * @param contentLengthStr Content-Length Giá trị của tiêu đề phản hồi
+     * @return Độ dài nội dung (byte), được trả về nếu không thể phân tích cú pháp -1
      */
     private static int parseContentLength(String contentLengthStr) {
         if (contentLengthStr != null) {
             try {
                 return Integer.parseInt(contentLengthStr);
             } catch (NumberFormatException ignore) {
-                // 忽略解析失败，返回-1表示未知长度
+                // Bỏ qua lỗi phân tích cú pháp và quay lại-1Đại diện cho một chiều dài không xác định
             }
         }
         return -1;
     }
 
     /**
-     * 读取响应中的内容长度：
-     * 优先读 Content-Length，若被 CompressionDecompressNetworkInterceptor 移除则
-     * 回退到 Easy-Content-Length（存储的是压缩前的原始大小，可作为近似估算）
+     * Đọc độ dài nội dung trong phản hồi: .
+     * Đọc đầu tiên Content-Length，Nếu bằng CompressionDecompressNetworkInterceptor Hãy loại bỏ sau đó
+     * Dự phòng cho Easy-Content-Length（Những gì được lưu trữ là kích thước ban đầu trước khi nén và có thể được sử dụng làm ước tính gần đúng)
      */
     private static int parseContentLength(Response okResponse) {
         String contentLength = okResponse.header(HttpHeaderConstants.CONTENT_LENGTH);
@@ -321,10 +321,10 @@ public class OkHttpResponseHandler {
     }
 
     /**
-     * 判断是否为 SSE（Server-Sent Events）类型的响应
+     * Xác định xem có phải như vậy không SSE（Server-Sent Events）loại phản ứng
      *
-     * @param contentType Content-Type 响应头的值
-     * @return 如果是 SSE 类型返回 true，否则返回 false
+     * @param contentType Content-Type Giá trị của tiêu đề phản hồi
+     * @return trong trường hợp SSE Gõ trả về true，Còn không thì quay lại false
      */
     private static boolean isSSEContent(String contentType) {
         if (contentType == null) return false;
@@ -349,18 +349,18 @@ public class OkHttpResponseHandler {
 
 
     /**
-     * 保存输入流到临时文件，返回文件对象和写入的字节数
+     * Lưu luồng đầu vào vào một tệp tạm thời, trả về đối tượng tệp và số byte được ghi
      * <p>
-     * 该方法会显示下载进度对话框，支持用户取消下载。
-     * 如果下载被取消或发生异常，会自动删除临时文件。
+     * This method will display the download progress dialog box and allow the user to cancel the download.
+     * Nếu quá trình tải xuống bị hủy hoặc xảy ra ngoại lệ, các tệp tạm thời sẽ tự động bị xóa.
      * </p>
      *
-     * @param is                  输入流
-     * @param prefix              临时文件名前缀
-     * @param suffix              临时文件名后缀（扩展名）
-     * @param contentLengthHeader Content-Length 响应头的值（用于显示进度）
-     * @return FileAndSize 对象，包含临时文件和实际写入的字节数
-     * @throws IOException 读写文件时可能抛出的异常
+     * @param is                  luồng đầu vào
+     * @param prefix              Tiền tố tên tệp tạm thời
+     * @param suffix              Hậu tố tên tệp tạm thời (phần mở rộng)
+     * @param contentLengthHeader Content-Length Giá trị của tiêu đề phản hồi (được sử dụng để hiển thị tiến trình)
+     * @return FileAndSize Đối tượng chứa tệp tạm thời và số byte thực tế được ghi
+     * @throws IOException Các ngoại lệ có thể được đưa ra khi đọc và ghi tệp
      */
     private static FileAndSize saveInputStreamToTempFile(InputStream is,
                                                          String prefix,
@@ -430,33 +430,33 @@ public class OkHttpResponseHandler {
     }
 
     /**
-     * 安全删除临时文件
+     * Xóa các tập tin tạm thời một cách an toàn
      *
-     * @param tempFile 要删除的临时文件
+     * @param tempFile Tập tin tạm thời để xóa
      */
     private static void deleteTempFile(File tempFile) {
         if (tempFile != null && tempFile.exists()) {
             boolean deleted = tempFile.delete();
             if (!deleted) {
                 log.warn("Failed to delete temp file: {}", tempFile.getAbsolutePath());
-                // 标记为退出时删除
+                // Được đánh dấu để loại bỏ khi thoát
                 tempFile.deleteOnExit();
             }
         }
     }
 
     /**
-     * 处理二进制类型的响应（图片、PDF、压缩包等）
+     * Xử lý các phản hồi thuộc loại nhị phân (hình ảnh, .PDF、gói nén, v.v.)
      * <p>
-     * 二进制响应会被保存到临时文件，文件名按以下优先级获取：
-     * 1. Content-Disposition 响应头中的文件名
-     * 2. URL 路径中的文件名
-     * 3. 根据 Content-Type 智能生成
+     * Phản hồi nhị phân sẽ được lưu vào một tệp tạm thời và tên tệp sẽ được lấy theo mức độ ưu tiên sau: .
+     * 1. Content-Disposition Tên tệp trong tiêu đề phản hồi
+     * 2. URL Tên tập tin trong đường dẫn
+     * 3. theo Content-Type Thế hệ thông minh
      * </p>
      *
-     * @param okResponse OkHttp 的响应对象
-     * @param response   内部响应对象
-     * @throws IOException 读取响应体时可能抛出的异常
+     * @param okResponse OkHttp đối tượng phản hồi
+     * @param response   Đối tượng phản hồi nội bộ
+     * @throws IOException Các ngoại lệ có thể được đưa ra khi đọc nội dung phản hồi
      */
     private static void handleBinaryResponse(Response okResponse,
                                              HttpResponse response,
@@ -469,7 +469,7 @@ public class OkHttpResponseHandler {
         String contentDisposition = ResponseFileNames.getContentDisposition(response.headers);
         response.fileAttachment = ResponseFileNames.isAttachment(contentDisposition);
 
-        // 检查文件大小限制
+        // Kiểm tra giới hạn kích thước tập tin
         int maxDownloadSize = getMaxDownloadSize();
         int contentLengthHeader = parseContentLength(okResponse);
         if (maxDownloadSize > 0 && contentLengthHeader > maxDownloadSize) {
@@ -497,9 +497,9 @@ public class OkHttpResponseHandler {
                 response.body = I18nUtil.getMessage(MessageKeys.BINARY_SAVED_TEMP_FILE);
                 response.bodySize = fs.size;
                 applyDetectedBinaryType(okResponse, response, fs.file, ext);
-                // 标记是否为图片类型，供 UI 层预览使用
+                // Liệu thẻ có phải là loại hình ảnh hay không, được cung cấp UI Sử dụng xem trước lớp
                 String ct = okResponse.header(CONTENT_TYPE_HEADER, "");
-                // 内容与声明冲突时以识别结果为准，避免把声明为 image/png 的 PDF 当作图片预览
+                // Khi nội dung mâu thuẫn với nội dung khai báo thì kết quả nhận dạng sẽ được ưu tiên áp dụng và tránh khai báo là image/png của PDF Như một bản xem trước hình ảnh
                 response.isImage = response.detectedFileExtension != null
                         ? IMAGE_EXTENSIONS.contains(response.detectedFileExtension)
                         : ct.toLowerCase(Locale.ROOT).startsWith("image/");
@@ -514,7 +514,7 @@ public class OkHttpResponseHandler {
                 if (!isIncompleteResponseBodyError(e)) {
                     throw e;
                 }
-                // 处理下载过程中连接中断的情况
+                // Xử lý tình trạng gián đoạn kết nối trong quá trình tải xuống
                 log.error("Failed to download complete binary response: {}", e.getMessage());
                 response.body = I18nUtil.getMessage(MessageKeys.RESPONSE_INCOMPLETE, e.getMessage());
                 response.bodyIncomplete = true;
@@ -529,9 +529,9 @@ public class OkHttpResponseHandler {
 
 
     /**
-     * 所有二进制响应都检查文件头：声明笼统（application/octet-stream）时采用识别结果；
-     * 声明具体但与内容冲突（application/vnd.ms-excel 实际是 xlsx）时以内容为准并提示；
-     * 一致或声明更具体（声明 .xlsm、文件头只能确定 .xlsx）时以声明为准。识别结果同时用于纠正 URL 中错误的后缀。
+     * Tất cả các phản hồi nhị phân đều kiểm tra tiêu đề tệp: khai báo chung (application/octet-stream）Kết quả nhận dạng được sử dụng khi;
+     * Tuyên bố này cụ thể nhưng mâu thuẫn với nội dung (application/vnd.ms-excel Trên thực tế là có xlsx）Nội dung sẽ chiếm ưu thế và nhanh chóng;
+     * Đồng ý hoặc tuyên bố cụ thể hơn (tuyên bố .xlsm、Tiêu đề tập tin chỉ có thể được xác định .xlsx）Tuyên bố sẽ được ưu tiên áp dụng. Kết quả nhận dạng cũng được sử dụng để hiệu chỉnh URL Hậu tố sai trong .
      */
     private static void applyDetectedBinaryType(Response okResponse, HttpResponse response, File file, String declaredExtension) {
         ResponseFileTypeDetector.Detection detection = ResponseFileTypeDetector.detect(file.toPath());
@@ -540,15 +540,15 @@ public class OkHttpResponseHandler {
         }
         String detected = detection.extension();
         String contentType = okResponse.header(CONTENT_TYPE_HEADER, "");
-        // application/zip 同样只说明是容器，docx/jar 等基于 ZIP 的具体格式不算类型冲突
+        // application/zip Nó cũng chỉ chỉ ra rằng nó là một thùng chứa.docx/jar v.v. dựa trên ZIP Định dạng cụ thể không được tính là xung đột loại
         boolean genericDeclared = contentType.isBlank() || ".zip".equals(declaredExtension)
                 || ResponseFiles.isGenericBinaryContentType(contentType);
         if (!genericDeclared && declaredExtension == null && ResponseFileTypeDetector.isGenericContainer(detected)) {
-            // 具体但没有扩展名映射的 MIME（如 APK 的 application/vnd.android.package-archive），只识别到容器时信任声明
+            // Cụ thể nhưng không có bản đồ mở rộng MIME（Chẳng hạn như APK của application/vnd.android.package-archive），Chỉ tin cậy vào xác nhận quyền sở hữu khi vùng chứa được nhận dạng
             return;
         }
         String naming = genericDeclared ? detected : ResponseFileTypeDetector.reconcile(declaredExtension, detection);
-        // 只有内容与声明不一致时才提示：application/pdf + PDF、application/zip + ZIP/docx/jar 都不提示
+        // Chỉ khi nội dung không nhất quán với câu phát biểu thì mới nhắc:application/pdf + PDF、application/zip + ZIP/docx/jar Không có lời nhắc nào cả
         boolean consistent = naming.equalsIgnoreCase(String.valueOf(declaredExtension))
                 || (".zip".equals(declaredExtension) && ResponseFileTypeDetector.reconcile(naming, ".zip").equals(naming));
         if (!consistent) {
@@ -569,18 +569,18 @@ public class OkHttpResponseHandler {
     }
 
     /**
-     * 处理文本类型的响应（JSON、XML、HTML、纯文本等）
+     * Xử lý các phản hồi của loại văn bản (JSON、XML、HTML、văn bản thuần túy, v.v.)
      * <p>
-     * 文本响应的处理策略：
-     * 1. 如果内容超过最大下载大小限制，显示警告并拒绝加载
-     * 2. 如果内容超过最大显示大小限制，保存到临时文件
-     * 3. 否则直接显示在编辑器中
+     * Các chiến lược xử lý phản hồi văn bản:
+     * 1. Nếu nội dung vượt quá giới hạn kích thước tải xuống tối đa, hãy hiển thị cảnh báo và từ chối tải
+     * 2. Nếu nội dung vượt quá giới hạn kích thước hiển thị tối đa, nó sẽ được lưu vào một tệp tạm thời
+     * 3. Nếu không nó sẽ được hiển thị trực tiếp trong trình chỉnh sửa
      * </p>
      *
-     * @param okResponse          OkHttp 的响应对象
-     * @param response            内部响应对象
-     * @param contentLengthHeader Content-Length 响应头的值
-     * @throws IOException 读取响应体时可能抛出的异常
+     * @param okResponse          OkHttp đối tượng phản hồi
+     * @param response            Đối tượng phản hồi nội bộ
+     * @param contentLengthHeader Content-Length Giá trị của tiêu đề phản hồi
+     * @throws IOException Các ngoại lệ có thể được đưa ra khi đọc nội dung phản hồi
      */
     private static void handleTextResponse(Response okResponse,
                                            HttpResponse response,
@@ -592,7 +592,7 @@ public class OkHttpResponseHandler {
         int maxDownloadSize = getMaxDownloadSize();
         ResponseBody body = okResponse.body();
 
-        // 检查是否超过最大下载大小
+        // Kiểm tra xem kích thước tải xuống tối đa có vượt quá không
         if (maxDownloadSize > 0 && contentLengthHeader > maxDownloadSize) {
             if (body != null) body.close();
             warnResponseTooLarge(responseSizeLimitWarningSink,
@@ -615,7 +615,7 @@ public class OkHttpResponseHandler {
                     response.filePath = null;
                     return;
                 }
-                // 处理其他 IO 异常
+                // Xử lý những người khác IO bất thường
                 log.error("Error reading response body: {}", e.getMessage(), e);
                 throw e;
             }
@@ -629,7 +629,7 @@ public class OkHttpResponseHandler {
             }
             response.bodySize = bytes.length;
             String extension = applyFileMetadata(okResponse, response, bytes, ext);
-            if (bytes.length > getMaxBodySize()) { // 如果解压后内容超过设置值，保存为临时文件
+            if (bytes.length > getMaxBodySize()) { // Nếu nội dung giải nén vượt quá giá trị đã đặt, nó sẽ được lưu dưới dạng tệp tạm thời
                 FileAndSize fs = saveInputStreamToTempFile(
                         new ByteArrayInputStream(bytes),
                         "easyPostman_text_download_",
@@ -655,8 +655,8 @@ public class OkHttpResponseHandler {
     }
 
     /**
-     * 根据内容识别文件格式与附件声明，填充文件元信息并返回保存用扩展名。
-     * 普通文本接口保持智能文件名；只有明确的文件响应才从 Content-Disposition / URL 推导文件名。
+     * Xác định định dạng tệp và khai báo tệp đính kèm dựa trên nội dung, điền thông tin meta tệp và trả về phần mở rộng để lưu.
+     * Giao diện văn bản đơn giản giữ tên tệp thông minh; chỉ có các phản hồi tệp rõ ràng mới được tuân theo Content-Disposition / URL Tên tập tin được suy ra.
      */
     private static String applyFileMetadata(Response okResponse, HttpResponse response, byte[] bytes, String contentTypeExtension) {
         ResponseFileTypeDetector.Detection signature = ResponseFileTypeDetector.detect(bytes);
@@ -664,7 +664,7 @@ public class OkHttpResponseHandler {
         if (detectedExtension == null
                 && mayBeUnlabeledBinary(okResponse.header(CONTENT_TYPE_HEADER, ""), ResponseFiles.declaredCharset(response))
                 && ResponseFileTypeDetector.looksBinary(bytes)) {
-            // 未声明类型（或声明为 text/plain）却含有文本中不会出现的控制字节：按未知二进制文件处理
+            // Loại không được khai báo (hoặc được khai báo là text/plain）nhưng chứa các byte điều khiển không xuất hiện trong văn bản: được coi là nhị phân không xác định
             detectedExtension = UNKNOWN_BINARY_EXTENSION;
         }
         response.detectedFileExtension = detectedExtension;
@@ -680,10 +680,10 @@ public class OkHttpResponseHandler {
     }
 
     /**
-     * 解码内存中的响应体；仅在文本无法无损还原原始字节或响应是文件时保留原始字节，避免普通 UTF-8 文本内存翻倍。
+     * Giải mã nội dung phản hồi trong bộ nhớ; chỉ giữ các byte gốc nếu văn bản không thể được khôi phục một cách dễ dàng hoặc phản hồi là một tệp, tránh thông thường UTF-8 Bộ nhớ văn bản tăng gấp đôi.
      */
     /**
-     * 控制字节判定只适用于 ASCII 兼容的编码；UTF-16/UTF-32 文本本身就含有大量 0x00，不能按此判断。
+     * Phán quyết byte điều khiển chỉ áp dụng cho  ASCII Mã hóa tương thích;UTF-16/UTF-32 Bản thân văn bản chứa rất nhiều 0x00，Nó không thể được đánh giá dựa trên điều này.
      */
     private static boolean mayBeUnlabeledBinary(String contentType, Charset declaredCharset) {
         String mediaType = contentType == null ? "" : contentType.split(";", 2)[0].trim();
@@ -739,24 +739,24 @@ public class OkHttpResponseHandler {
     }
 
     /**
-     * 文件和大小的简单封装类
-     * 用于 saveInputStreamToTempFile 方法的返回值
+     * Lớp trình bao bọc đơn giản cho các tệp và kích thước
+     * Được sử dụng cho saveInputStreamToTempFile Giá trị trả về của phương thức
      */
     private static class FileAndSize {
         /**
-         * 临时文件
+         * Các tập tin tạm thời
          */
         final File file;
         /**
-         * 实际写入的字节数
+         * Số byte thực tế được ghi
          */
         final long size;
 
         /**
-         * 构造函数
+         * Người xây dựng
          *
-         * @param file 临时文件
-         * @param size 实际写入的字节数
+         * @param file Các tập tin tạm thời
+         * @param size Số byte thực tế được ghi
          */
         FileAndSize(File file, long size) {
             this.file = file;

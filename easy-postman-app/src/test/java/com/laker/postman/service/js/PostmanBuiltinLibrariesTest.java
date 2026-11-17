@@ -24,10 +24,10 @@ import java.nio.file.Path;
 import static org.testng.Assert.*;
 
 /**
- * Postman 内置库完整测试套件
+ * Postman Bộ thử nghiệm hoàn chỉnh của các thư viện tích hợp
  * <p>
- * 测试所有内置 JavaScript 库的功能，确保与 Postman 风格
- * 包括: CryptoJS, Lodash, Moment, atob/btoa
+ * Kiểm tra tất cả các tích hợp JavaScript Chức năng của thư viện được đảm bảo với  Postman phong cách
+ * bao gồm: CryptoJS, Lodash, Moment, atob/btoa
  * </p>
  *
  * @author laker
@@ -73,7 +73,7 @@ public class PostmanBuiltinLibrariesTest {
 
     @BeforeMethod
     public void setUp() {
-        log.info("初始化 JavaScript 执行环境...");
+        log.info("khởi tạo JavaScript môi trường thực thi...");
         resetScriptSettingsToDefaults();
         context = Context.newBuilder("js")
                 .allowHostAccess(HostAccess.ALL)
@@ -81,10 +81,10 @@ public class PostmanBuiltinLibrariesTest {
                 .option("engine.WarnInterpreterOnly", "false")
                 .build();
 
-        // 注入所有 polyfill（包括 Java 实现的 atob, btoa 等函数）
+        // Tiêm tất cả polyfill（bao gồm Java nhận ra atob, btoa chức năng)
         JsPolyfillInjector.injectAll(context);
 
-        log.info("所有内置库加载完成");
+        log.info("Tất cả các thư viện tích hợp đều được tải");
     }
 
     @AfterMethod
@@ -92,36 +92,36 @@ public class PostmanBuiltinLibrariesTest {
         stopHttpServer();
         if (context != null) {
             context.close();
-            log.info("JavaScript 执行环境已关闭");
+            log.info("JavaScript Môi trường thực thi đã bị tắt");
         }
 
         JsLibraryLoader.clearCache();
         restoreScriptSettings();
     }
 
-    // ==================== CryptoJS 测试 ====================
+    // ==================== CryptoJS Bài kiểm tra ====================
 
-    @Test(description = "测试 CryptoJS - MD5 哈希")
+    @Test(description = "Bài kiểm tra CryptoJS - MD5 Băm")
     public void testCryptoJS_MD5() {
         String script = "CryptoJS.MD5('Hello World').toString();";
         Value result = context.eval("js", script);
 
         String hash = result.asString();
-        assertEquals(hash, "b10a8db164e0754105b7a99be72e3fe5", "MD5 哈希值不正确");
-        log.info("✓ CryptoJS MD5 测试通过: {}", hash);
+        assertEquals(hash, "b10a8db164e0754105b7a99be72e3fe5", "MD5 Giá trị băm không chính xác");
+        log.info("✓ CryptoJS MD5 Thử nghiệm đã trôi qua: {}", hash);
     }
 
-    @Test(description = "测试 CryptoJS - SHA256 哈希")
+    @Test(description = "Bài kiểm tra CryptoJS - SHA256 Băm")
     public void testCryptoJS_SHA256() {
         String script = "CryptoJS.SHA256('Hello World').toString();";
         Value result = context.eval("js", script);
 
         String hash = result.asString();
         assertEquals(hash, "a591a6d40bf420404a011733cfb7b190d62c65bf0bcda32b57b277d9ad9f146e");
-        log.info("✓ CryptoJS SHA256 测试通过");
+        log.info("✓ CryptoJS SHA256 Thử nghiệm đã trôi qua");
     }
 
-    @Test(description = "测试 CryptoJS - AES 加密解密")
+    @Test(description = "Bài kiểm tra CryptoJS - AES Mã hóa và giải mã")
     public void testCryptoJS_AES() {
         String script = """
                 var message = 'Secret Message';
@@ -134,12 +134,12 @@ public class PostmanBuiltinLibrariesTest {
         Value result = context.eval("js", script);
         String json = result.asString();
 
-        assertTrue(json.contains("\"match\":true"), "AES 加密解密失败");
-        assertTrue(json.contains("\"decrypted\":\"Secret Message\""), "解密后的消息不匹配");
-        log.info("✓ CryptoJS AES 加密解密测试通过");
+        assertTrue(json.contains("\"match\":true"), "AES Mã hóa và giải mã không thành công");
+        assertTrue(json.contains("\"decrypted\":\"Secret Message\""), "Tin nhắn được giải mã không khớp");
+        log.info("✓ CryptoJS AES Quá trình kiểm tra mã hóa và giải mã đã vượt qua");
     }
 
-    @Test(description = "测试 CryptoJS - HMAC-SHA256 签名")
+    @Test(description = "Bài kiểm tra CryptoJS - HMAC-SHA256 dấu hiệu")
     public void testCryptoJS_HMAC() {
         String script = """
                 var message = 'POST/api/users{"userId":123}';
@@ -152,11 +152,11 @@ public class PostmanBuiltinLibrariesTest {
         String signature = result.asString();
 
         assertNotNull(signature);
-        assertEquals(signature.length(), 64, "HMAC-SHA256 签名长度应为 64");
-        log.info("✓ CryptoJS HMAC-SHA256 测试通过: {}", signature);
+        assertEquals(signature.length(), 64, "HMAC-SHA256 Độ dài chữ ký phải là  64");
+        log.info("✓ CryptoJS HMAC-SHA256 Thử nghiệm đã trôi qua: {}", signature);
     }
 
-    @Test(description = "测试 CryptoJS - Base64 编码")
+    @Test(description = "Bài kiểm tra CryptoJS - Base64 Mã hóa")
     public void testCryptoJS_Base64() {
         String script = """
                 var text = 'Hello, World!';
@@ -170,12 +170,12 @@ public class PostmanBuiltinLibrariesTest {
 
         assertTrue(json.contains("\"match\":true"));
         assertTrue(json.contains("SGVsbG8sIFdvcmxkIQ=="));
-        log.info("✓ CryptoJS Base64 测试通过");
+        log.info("✓ CryptoJS Base64 Thử nghiệm đã trôi qua");
     }
 
-    // ==================== Lodash 测试 ====================
+    // ==================== Lodash Bài kiểm tra ====================
 
-    @Test(description = "测试 Lodash - 数组去重")
+    @Test(description = "Bài kiểm tra Lodash - Chống trùng lặp mảng")
     public void testLodash_Uniq() {
         String script = """
                 var arr = [1, 2, 2, 3, 3, 3, 4, 5];
@@ -185,10 +185,10 @@ public class PostmanBuiltinLibrariesTest {
 
         Value result = context.eval("js", script);
         assertEquals(result.asString(), "[1,2,3,4,5]");
-        log.info("✓ Lodash uniq 测试通过");
+        log.info("✓ Lodash uniq Thử nghiệm đã trôi qua");
     }
 
-    @Test(description = "测试 Lodash - 数组过滤")
+    @Test(description = "Bài kiểm tra Lodash - Lọc mảng")
     public void testLodash_Filter() {
         String script = """
                 var numbers = [1, 2, 3, 4, 5, 6];
@@ -198,10 +198,10 @@ public class PostmanBuiltinLibrariesTest {
 
         Value result = context.eval("js", script);
         assertEquals(result.asString(), "[2,4,6]");
-        log.info("✓ Lodash filter 测试通过");
+        log.info("✓ Lodash filter Thử nghiệm đã trôi qua");
     }
 
-    @Test(description = "测试 Lodash - 数组映射")
+    @Test(description = "Bài kiểm tra Lodash - Ánh xạ mảng")
     public void testLodash_Map() {
         String script = """
                 var numbers = [1, 2, 3];
@@ -211,10 +211,10 @@ public class PostmanBuiltinLibrariesTest {
 
         Value result = context.eval("js", script);
         assertEquals(result.asString(), "[2,4,6]");
-        log.info("✓ Lodash map 测试通过");
+        log.info("✓ Lodash map Thử nghiệm đã trôi qua");
     }
 
-    @Test(description = "测试 Lodash - 对象操作")
+    @Test(description = "Bài kiểm tra Lodash - Hoạt động đối tượng")
     public void testLodash_Pick() {
         String script = """
                 var obj = { name: 'John', age: 30, city: 'NY', country: 'USA' };
@@ -228,10 +228,10 @@ public class PostmanBuiltinLibrariesTest {
         assertTrue(json.contains("\"name\":\"John\""));
         assertTrue(json.contains("\"age\":30"));
         assertFalse(json.contains("city"));
-        log.info("✓ Lodash pick 测试通过");
+        log.info("✓ Lodash pick Thử nghiệm đã trôi qua");
     }
 
-    @Test(description = "测试 Lodash - 数组分组")
+    @Test(description = "Bài kiểm tra Lodash - Nhóm mảng")
     public void testLodash_GroupBy() {
         String script = """
                 var numbers = [6.1, 4.2, 6.3, 4.5];
@@ -244,12 +244,12 @@ public class PostmanBuiltinLibrariesTest {
 
         assertTrue(json.contains("\"4\""));
         assertTrue(json.contains("\"6\""));
-        log.info("✓ Lodash groupBy 测试通过");
+        log.info("✓ Lodash groupBy Thử nghiệm đã trôi qua");
     }
 
-    // ==================== Moment 测试 ====================
+    // ==================== Moment Bài kiểm tra ====================
 
-    @Test(description = "测试 Moment - 日期格式化")
+    @Test(description = "Bài kiểm tra Moment - Định dạng ngày")
     public void testMoment_Format() {
         String script = """
                 var date = moment('2024-01-15 10:30:45');
@@ -259,10 +259,10 @@ public class PostmanBuiltinLibrariesTest {
 
         Value result = context.eval("js", script);
         assertEquals(result.asString(), "2024-01-15 10:30:45");
-        log.info("✓ Moment 格式化测试通过");
+        log.info("✓ Moment Đã vượt qua bài kiểm tra định dạng");
     }
 
-    @Test(description = "测试 Moment - 日期加减")
+    @Test(description = "Bài kiểm tra Moment - Phép cộng và phép trừ ngày tháng")
     public void testMoment_Add() {
         String script = """
                 var date = moment('2024-01-15');
@@ -272,10 +272,10 @@ public class PostmanBuiltinLibrariesTest {
 
         Value result = context.eval("js", script);
         assertEquals(result.asString(), "2024-01-22");
-        log.info("✓ Moment 日期加减测试通过");
+        log.info("✓ Moment Ngày kiểm tra phép cộng và trừ đã được thông qua");
     }
 
-    @Test(description = "测试 Moment - 日期减法")
+    @Test(description = "Bài kiểm tra Moment - Phép trừ ngày")
     public void testMoment_Subtract() {
         String script = """
                 var date = moment('2024-01-15');
@@ -285,10 +285,10 @@ public class PostmanBuiltinLibrariesTest {
 
         Value result = context.eval("js", script);
         assertEquals(result.asString(), "2023-12-15");
-        log.info("✓ Moment 日期减法测试通过");
+        log.info("✓ Moment Đã vượt qua bài kiểm tra phép trừ ngày");
     }
 
-    @Test(description = "测试 Moment - 日期比较")
+    @Test(description = "Bài kiểm tra Moment - So sánh ngày")
     public void testMoment_Compare() {
         String script = """
                 var date1 = moment('2024-01-01');
@@ -303,10 +303,10 @@ public class PostmanBuiltinLibrariesTest {
 
         assertTrue(json.contains("\"isBefore\":true"));
         assertTrue(json.contains("\"isAfter\":false"));
-        log.info("✓ Moment 日期比较测试通过");
+        log.info("✓ Moment Kiểm tra so sánh ngày đã vượt qua");
     }
 
-    @Test(description = "测试 Moment - 日期解析")
+    @Test(description = "Bài kiểm tra Moment - Phân tích ngày")
     public void testMoment_Parse() {
         String script = """
                 var date = moment('15/01/2024', 'DD/MM/YYYY');
@@ -316,31 +316,31 @@ public class PostmanBuiltinLibrariesTest {
 
         Value result = context.eval("js", script);
         assertEquals(result.asString(), "2024-01-15");
-        log.info("✓ Moment 日期解析测试通过");
+        log.info("✓ Moment Kiểm tra phân tích ngày vượt qua");
     }
 
 
-    // ==================== atob/btoa 测试（Java 实现）====================
+    // ==================== atob/btoa kiểm tra (Java đã nhận ra)====================
 
-    @Test(description = "测试 btoa - Base64 编码（Java 实现）")
+    @Test(description = "Bài kiểm tra btoa - Base64 mã hóa (Java đã nhận ra)")
     public void testBtoa_Encode() {
         String script = "btoa('Hello, World!');";
         Value result = context.eval("js", script);
 
         assertEquals(result.asString(), "SGVsbG8sIFdvcmxkIQ==");
-        log.info("✓ btoa 编码测试通过");
+        log.info("✓ btoa Đã vượt qua bài kiểm tra mã hóa");
     }
 
-    @Test(description = "测试 atob - Base64 解码")
+    @Test(description = "Bài kiểm tra atob - Base64 giải mã")
     public void testAtob_Decode() {
         String script = "atob('SGVsbG8sIFdvcmxkIQ==');";
         Value result = context.eval("js", script);
 
         assertEquals(result.asString(), "Hello, World!");
-        log.info("✓ atob 解码测试通过");
+        log.info("✓ atob Đã vượt qua thử nghiệm giải mã");
     }
 
-    @Test(description = "测试 atob/btoa - 往返编解码")
+    @Test(description = "Bài kiểm tra atob/btoa - Mã hóa và giải mã chuyến đi khứ hồi")
     public void testAtobBtoa_RoundTrip() {
         String script = """
                 var original = 'The quick brown fox jumps over the lazy dog';
@@ -353,12 +353,12 @@ public class PostmanBuiltinLibrariesTest {
         String json = result.asString();
 
         assertTrue(json.contains("\"match\":true"));
-        log.info("✓ atob/btoa 往返测试通过");
+        log.info("✓ atob/btoa Đã vượt qua bài kiểm tra chuyến đi khứ hồi");
     }
 
-    // ==================== require() 测试 ====================
+    // ==================== require() Bài kiểm tra ====================
 
-    @Test(description = "测试 require() - 加载 CryptoJS")
+    @Test(description = "Bài kiểm tra require() - trọng tải CryptoJS")
     public void testRequire_CryptoJS() {
         String script = """
                 var CryptoJS = require('crypto-js');
@@ -368,10 +368,10 @@ public class PostmanBuiltinLibrariesTest {
 
         Value result = context.eval("js", script);
         assertEquals(result.asString(), "098f6bcd4621d373cade4e832627b4f6");
-        log.info("✓ require('crypto-js') 测试通过");
+        log.info("✓ require('crypto-js') Thử nghiệm đã trôi qua");
     }
 
-    @Test(description = "测试 require() - 加载 Lodash")
+    @Test(description = "Bài kiểm tra require() - trọng tải Lodash")
     public void testRequire_Lodash() {
         String script = """
                 var _ = require('lodash');
@@ -381,10 +381,10 @@ public class PostmanBuiltinLibrariesTest {
 
         Value result = context.eval("js", script);
         assertEquals(result.asString(), "[1,2,3]");
-        log.info("✓ require('lodash') 测试通过");
+        log.info("✓ require('lodash') Thử nghiệm đã trôi qua");
     }
 
-    @Test(description = "测试 require() - 加载 Moment")
+    @Test(description = "Bài kiểm tra require() - trọng tải Moment")
     public void testRequire_Moment() {
         String script = """
                 var moment = require('moment');
@@ -394,10 +394,10 @@ public class PostmanBuiltinLibrariesTest {
 
         Value result = context.eval("js", script);
         assertEquals(result.asString(), "2024-01-15");
-        log.info("✓ require('moment') 测试通过");
+        log.info("✓ require('moment') Thử nghiệm đã trôi qua");
     }
 
-    @Test(description = "测试 require() - 加载本地绝对路径脚本")
+    @Test(description = "Bài kiểm tra require() - Tải tập lệnh đường dẫn tuyệt đối cục bộ")
     public void testRequire_LocalFile() throws IOException {
         Path scriptFile = Files.createTempFile("easy-postman-local-lib-", ".js");
         Files.writeString(scriptFile, """
@@ -413,7 +413,7 @@ public class PostmanBuiltinLibrariesTest {
         assertEquals(result.asString(), "token-signed");
     }
 
-    @Test(description = "测试 require() - 本地脚本内部支持相对路径依赖")
+    @Test(description = "Bài kiểm tra require() - Các tập lệnh cục bộ hỗ trợ nội bộ các phụ thuộc đường dẫn tương đối")
     public void testRequire_LocalFileRelativeDependency() throws IOException {
         Path tempDir = Files.createTempDirectory("easy-postman-local-module-");
         Path childModule = tempDir.resolve("child.js");
@@ -429,7 +429,7 @@ public class PostmanBuiltinLibrariesTest {
         assertEquals(result.asString(), "parent:child-module");
     }
 
-    @Test(description = "测试 require() - 远程脚本默认禁用")
+    @Test(description = "Bài kiểm tra require() - Tập lệnh từ xa bị tắt theo mặc định")
     public void testRequire_RemoteDisabledByDefault() {
         Value result = context.eval("js", """
                 try {
@@ -442,7 +442,7 @@ public class PostmanBuiltinLibrariesTest {
         assertTrue(result.asString().contains("Remote JavaScript require() is disabled"));
     }
 
-    @Test(description = "测试 require() - 远程脚本启用后可加载")
+    @Test(description = "Bài kiểm tra require() - Các tập lệnh từ xa có thể được tải khi được bật")
     public void testRequire_RemoteEnabledWithExplicitOptIn() throws Exception {
         httpServer = HttpServer.create(new InetSocketAddress(0), 0);
         httpServer.createContext("/remote-lib.js", exchange -> {
@@ -465,7 +465,7 @@ public class PostmanBuiltinLibrariesTest {
         assertEquals(result.asString(), "remote-ok");
     }
 
-    @Test(description = "测试 Context 池复用时 require() 缓存会在每次执行后清空")
+    @Test(description = "Bài kiểm tra Context Khi hồ bơi được tái sử dụng require() Bộ đệm sẽ bị xóa sau mỗi lần thực hiện")
     public void testContextPoolClearsRequireCacheBetweenRuns() throws Exception {
         Path scriptFile = Files.createTempFile("easy-postman-cache-reset-", ".js");
         Files.writeString(scriptFile, "module.exports = { version: 'v1' };", StandardCharsets.UTF_8);
@@ -489,35 +489,35 @@ public class PostmanBuiltinLibrariesTest {
         }
     }
 
-    // ==================== 综合场景测试 ====================
+    // ==================== Kiểm tra kịch bản toàn diện ====================
 
-    @Test(description = "Postman 典型场景 - API 请求签名")
+    @Test(description = "Postman Kịch bản điển hình - API Request signature")
     public void testPostmanScenario_APISignature() {
         String script = """
-                // 1. 生成请求 ID（使用随机数）
+                // 1. Tạo yêu cầu ID（sử dụng số ngẫu nhiên)
                 var requestId = 'req_' + Math.random().toString(36).substring(2, 15);
-                
-                // 2. 获取时间戳
+
+                // 2. Nhận dấu thời gian
                 var timestamp = moment().unix();
-                
-                // 3. 构造签名数据
+
+                // 3. Xây dựng dữ liệu chữ ký
                 var signData = {
                     requestId: requestId,
                     timestamp: timestamp,
                     method: 'POST',
                     path: '/api/users'
                 };
-                
-                // 4. 使用 Lodash 排序并拼接
+
+                // 4. sử dụng Lodash Sắp xếp và ghép nối
                 var signString = _.map(
                     _.sortBy(_.toPairs(signData), 0),
                     pair => pair[0] + '=' + pair[1]
                 ).join('&');
-                
-                // 5. 生成 HMAC-SHA256 签名
+
+                // 5. phát ra HMAC-SHA256 dấu hiệu
                 var signature = CryptoJS.HmacSHA256(signString, 'api-secret').toString();
-                
-                // 6. 返回结果
+
+                // 6. Trả về kết quả
                 JSON.stringify({
                     requestId: requestId,
                     timestamp: timestamp,
@@ -532,13 +532,13 @@ public class PostmanBuiltinLibrariesTest {
 
         assertTrue(json.contains("\"hasValidRequestId\":true"));
         assertTrue(json.contains("\"hasValidSignature\":true"));
-        log.info("✓ API 签名场景测试通过");
+        log.info("✓ API Bài kiểm tra kịch bản chữ ký đã thông qua");
     }
 
-    @Test(description = "Postman 典型场景 - 响应验证")
+    @Test(description = "Postman Kịch bản điển hình - Xác minh phản hồi")
     public void testPostmanScenario_ResponseValidation() {
         String script = """
-                // 模拟 API 响应数据
+                // mô phỏng API dữ liệu phản hồi
                 var response = {
                     status: 'success',
                     data: {
@@ -549,20 +549,20 @@ public class PostmanBuiltinLibrariesTest {
                         roles: ['user', 'admin']
                     }
                 };
-                
-                // 使用 Lodash 验证必需字段
+
+                // sử dụng Lodash Xác thực các trường bắt buộc
                 var requiredFields = ['userId', 'username', 'email'];
                 var hasAllFields = _.every(requiredFields, field => _.has(response.data, field));
-                
-                // 使用 Moment 验证时间
+
+                // sử dụng Moment Thời gian xác minh
                 var createdDate = moment(response.data.createdAt);
                 var isValidDate = createdDate.isValid();
-                
-                // 验证基本类型
+
+                // Xác thực các loại cơ bản
                 var isValidStatus = response.status === 'success';
                 var isValidUserId = typeof response.data.userId === 'number';
                 var isValidRoles = Array.isArray(response.data.roles) && response.data.roles.length === 2;
-                
+
                 JSON.stringify({
                     hasAllFields: hasAllFields,
                     isValidDate: isValidDate,
@@ -577,50 +577,50 @@ public class PostmanBuiltinLibrariesTest {
         String json = result.asString();
 
         assertTrue(json.contains("\"allPassed\":true"));
-        log.info("✓ 响应验证场景测试通过");
+        log.info("✓ Đã vượt qua thử nghiệm kịch bản xác minh phản hồi");
     }
 
-    @Test(description = "综合测试 - 所有库可用性检查")
+    @Test(description = "Kiểm tra toàn diện - Tất cả các kiểm tra tính sẵn có của thư viện")
     public void testAllLibrariesAvailable() {
         String script = """
                 var libraries = {
-                    // JavaScript 库
+                    // JavaScript thư viện
                     cryptojs: typeof CryptoJS !== 'undefined',
                     lodash: typeof _ !== 'undefined',
                     moment: typeof moment !== 'undefined',
-                
-                    // Java 实现的函数
+
+                    // Java chức năng được thực hiện
                     atob: typeof atob === 'function',
                     btoa: typeof btoa === 'function',
                     MD5: typeof MD5 === 'function',
                     SHA256: typeof SHA256 === 'function',
                     timestamp: typeof timestamp === 'function',
-                
-                    // 其他
+
+                    // khác
                     require: typeof require === 'function'
                 };
-                
+
                 JSON.stringify(libraries);
                 """;
 
         Value result = context.eval("js", script);
         String json = result.asString();
 
-        // 验证所有库都已加载
-        assertTrue(json.contains("\"cryptojs\":true"), "CryptoJS 未加载");
-        assertTrue(json.contains("\"lodash\":true"), "Lodash 未加载");
-        assertTrue(json.contains("\"moment\":true"), "Moment 未加载");
-        assertTrue(json.contains("\"atob\":true"), "atob 未加载");
-        assertTrue(json.contains("\"btoa\":true"), "btoa 未加载");
-        assertTrue(json.contains("\"MD5\":true"), "MD5 未加载");
-        assertTrue(json.contains("\"SHA256\":true"), "SHA256 未加载");
-        assertTrue(json.contains("\"timestamp\":true"), "timestamp 未加载");
-        assertTrue(json.contains("\"require\":true"), "require 未加载");
+        // Xác minh rằng tất cả các thư viện đã được tải
+        assertTrue(json.contains("\"cryptojs\":true"), "CryptoJS Không được tải");
+        assertTrue(json.contains("\"lodash\":true"), "Lodash Không được tải");
+        assertTrue(json.contains("\"moment\":true"), "Moment Không được tải");
+        assertTrue(json.contains("\"atob\":true"), "atob Không được tải");
+        assertTrue(json.contains("\"btoa\":true"), "btoa Không được tải");
+        assertTrue(json.contains("\"MD5\":true"), "MD5 Không được tải");
+        assertTrue(json.contains("\"SHA256\":true"), "SHA256 Không được tải");
+        assertTrue(json.contains("\"timestamp\":true"), "timestamp Không được tải");
+        assertTrue(json.contains("\"require\":true"), "require Không được tải");
 
-        log.info("✓ 所有库可用性检查通过: {}", json);
+        log.info("✓ Tất cả các cuộc kiểm tra tính khả dụng của thư viện đều vượt qua: {}", json);
     }
 
-    @Test(description = "性能测试 - 库加载时间")
+    @Test(description = "Kiểm tra hiệu suất - Thời gian tải thư viện")
     public void testLibraryLoadingPerformance() {
         long startTime = System.currentTimeMillis();
 
@@ -636,8 +636,8 @@ public class PostmanBuiltinLibrariesTest {
         long loadTime = System.currentTimeMillis() - startTime;
         testContext.close();
 
-        assertTrue(loadTime < 1000, "库加载时间过长: " + loadTime + "ms");
-        log.info("✓ 库加载性能测试通过，耗时: {}ms", loadTime);
+        assertTrue(loadTime < 1000, "Tải thư viện mất quá nhiều thời gian: " + loadTime + "ms");
+        log.info("✓ Bài kiểm tra hiệu suất tải thư viện đã vượt qua nhưng tốn nhiều thời gian: {}ms", loadTime);
     }
 
     private void stopHttpServer() {

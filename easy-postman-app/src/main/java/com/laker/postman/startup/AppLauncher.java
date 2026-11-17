@@ -19,7 +19,7 @@ import java.io.IOException;
 import java.util.OptionalInt;
 
 /**
- * 应用启动器：负责主入口之后的启动编排。
+ * Trình khởi chạy ứng dụng: Chịu trách nhiệm điều phối khởi động sau cổng chính.
  */
 @Slf4j
 @UtilityClass
@@ -53,7 +53,7 @@ public class AppLauncher {
         if (singleInstanceExitCode.isPresent()) {
             return singleInstanceExitCode.getAsInt();
         }
-        // 先完成平台和主题配置，再把组件创建切到 EDT。
+        // Trước tiên hãy hoàn thành cấu hình nền tảng và chủ đề, sau đó chuyển sang tạo thành phần EDT。
         configurePlatformWindowDecorations();
         StartupCoordinator startupCoordinator = new StartupCoordinator(launchStartedAt);
         startupCoordinator.startHostIocInitialization();
@@ -85,7 +85,7 @@ public class AppLauncher {
         }
         if (result.status() == SingleInstanceCoordinator.LaunchStatus.EXISTING_INSTANCE_NOTIFIED) {
             skipHostRuntimeShutdown = true;
-            log.info("Activated the existing EasyPostman GUI instance");
+            log.info("Activated the existing Dev Workbench GUI instance");
             return OptionalInt.of(0);
         }
 
@@ -95,7 +95,7 @@ public class AppLauncher {
     }
 
     private void configureBaseRuntimeEnvironment() {
-        // 这些配置对 GUI 和 headless CLI 都有效，且不应触发 Swing 初始化。
+        // Các cặp cấu hình này GUI và headless CLI là hợp lệ và không nên kích hoạt Swing khởi tạo.
         Thread.setDefaultUncaughtExceptionHandler(new AppUncaughtExceptionHandler());
         System.setProperty("java.net.useSystemProxies", "true");
         // Must precede any HTTP client creation: clients capture ProxySelector.getDefault() when built.
@@ -119,7 +119,7 @@ public class AppLauncher {
     }
 
     /**
-     * Look and feel 必须在 Swing 组件创建前完成，否则首屏组件会混用旧 UI defaults。
+     * Look and feel Phải ở đó Swing Hoàn thành trước khi tạo thành phần, nếu không các thành phần màn hình đầu tiên sẽ bị trộn lẫn với thành phần cũ UI defaults。
      */
     private void initializeLookAndFeel() {
         log.info("Initializing application look and feel");
@@ -131,11 +131,11 @@ public class AppLauncher {
         boolean splashEnabled = SettingManager.isStartupSplashEnabled();
         log.info("Starting main frame initialization: splashEnabled={}", splashEnabled);
         if (splashEnabled) {
-            // Splash 模式下先显示轻量过渡窗口，主窗口 shell 准备完成后再切换。
+            // Splash Ở chế độ này, cửa sổ chuyển tiếp nhẹ và cửa sổ chính được hiển thị đầu tiên shell Chuyển đổi sau khi chuẩn bị xong.
             startWithSplash(startupCoordinator);
             return;
         }
-        // IOC 与主题并行初始化；插件就绪后再创建并显示主窗口。
+        // IOC Khởi tạo song song với chủ đề; cửa sổ chính được tạo và hiển thị sau khi plugin sẵn sàng.
         new NoSplashStartupWorker(startupCoordinator).start();
     }
 
@@ -150,14 +150,14 @@ public class AppLauncher {
             try {
                 log.info("JVM shutdown hook started: lastStartupCheckpoint={}", startupCheckpoint);
                 if (!skipHostRuntimeShutdown) {
-                    // 退出时先关闭插件运行时，再销毁宿主 IOC，避免插件回调访问已释放的 Bean。
+                    // Khi thoát, trước tiên hãy đóng thời gian chạy của trình cắm rồi hủy máy chủ IOC，Ngăn chặn các cuộc gọi lại trình cắm truy cập vào các cuộc gọi lại đã phát hành Bean。
                     runShutdownStep("plugin runtime", PluginRuntime::shutdown);
                     runShutdownStep("host IOC container", BeanFactory::destroy);
                 }
                 runShutdownStep("single-instance coordinator", AppLauncher::closeSingleInstanceCoordinator);
                 log.info("Application shutdown completed");
             } finally {
-                // 最后停止日志上下文，触发 AsyncAppender 的有界 flush，保留关闭阶段日志。
+                // Cuối cùng dừng bối cảnh nhật ký và kích hoạt AsyncAppender bị giới hạn flush，Giữ nhật ký giai đoạn tắt máy.
                 if (LoggerFactory.getILoggerFactory() instanceof LoggerContext loggerContext) {
                     loggerContext.stop();
                 }

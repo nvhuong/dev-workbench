@@ -1322,9 +1322,9 @@ public class ModuleArchitectureBoundaryTest {
     public void uiModuleOwnsReusableUiResources() {
         Path root = repositoryRoot();
         assertTrue(Files.isRegularFile(root.resolve("easy-postman-foundation/src/main/resources/common-messages.properties")));
-        assertTrue(Files.isRegularFile(root.resolve("easy-postman-foundation/src/main/resources/common-messages_zh.properties")));
+        assertTrue(Files.isRegularFile(root.resolve("easy-postman-foundation/src/main/resources/common-messages_vi.properties")));
         assertTrue(Files.isRegularFile(root.resolve("easy-postman-ui/src/main/resources/ui-messages.properties")));
-        assertTrue(Files.isRegularFile(root.resolve("easy-postman-ui/src/main/resources/ui-messages_zh.properties")));
+        assertTrue(Files.isRegularFile(root.resolve("easy-postman-ui/src/main/resources/ui-messages_vi.properties")));
         assertTrue(Files.isRegularFile(root.resolve("easy-postman-ui/src/main/resources/themes/easypostman-light.xml")));
         assertTrue(Files.isRegularFile(root.resolve("easy-postman-ui/src/main/resources/themes/easypostman-dark.xml")));
         assertFalse(Files.exists(root.resolve("easy-postman-app/src/main/resources/themes/easypostman-light.xml")));
@@ -1427,7 +1427,7 @@ public class ModuleArchitectureBoundaryTest {
 
         List<String> appBundleViolations = Stream.of(
                         root.resolve("easy-postman-app/src/main/resources/messages_en.properties"),
-                        root.resolve("easy-postman-app/src/main/resources/messages_zh.properties")
+                        root.resolve("easy-postman-app/src/main/resources/messages_vi.properties")
                 )
                 .flatMap(file -> resourceBundleOwnerViolations(file, "table.", "notification.").stream())
                 .toList();
@@ -1440,13 +1440,13 @@ public class ModuleArchitectureBoundaryTest {
     public void officialPluginMessagesStayWithPluginModules() throws IOException {
         Path root = repositoryRoot();
         assertTrue(Files.isRegularFile(root.resolve("easy-postman-plugins/plugin-decompiler/src/main/resources/decompiler-messages.properties")));
-        assertTrue(Files.isRegularFile(root.resolve("easy-postman-plugins/plugin-decompiler/src/main/resources/decompiler-messages_zh.properties")));
+        assertTrue(Files.isRegularFile(root.resolve("easy-postman-plugins/plugin-decompiler/src/main/resources/decompiler-messages_vi.properties")));
         assertTrue(Files.isRegularFile(root.resolve("easy-postman-plugins/plugin-client-cert/src/main/resources/client-cert-messages.properties")));
-        assertTrue(Files.isRegularFile(root.resolve("easy-postman-plugins/plugin-client-cert/src/main/resources/client-cert-messages_zh.properties")));
+        assertTrue(Files.isRegularFile(root.resolve("easy-postman-plugins/plugin-client-cert/src/main/resources/client-cert-messages_vi.properties")));
 
         List<String> appBundleViolations = Stream.of(
                         root.resolve("easy-postman-app/src/main/resources/messages_en.properties"),
-                        root.resolve("easy-postman-app/src/main/resources/messages_zh.properties")
+                        root.resolve("easy-postman-app/src/main/resources/messages_vi.properties")
                 )
                 .flatMap(file -> resourceBundleOwnerViolations(file, "toolbox.decompiler").stream())
                 .toList();
@@ -1508,7 +1508,7 @@ public class ModuleArchitectureBoundaryTest {
         try (Stream<Path> files = Files.walk(root)) {
             metadataFiles = files
                     .filter(path -> path.getFileName().toString().equals(".DS_Store"))
-                    // 只检查会被打包的源码目录；仓库根目录等处的 Finder 文件已被 .gitignore 忽略，不影响产物
+                    // Chỉ kiểm tra thư mục mã nguồn sẽ được đóng gói; thư mục gốc của kho, v.v Finder Tập tin đã bị xóa .gitignore Bỏ qua, nó sẽ không ảnh hưởng đến sản phẩm
                     .filter(path -> path.toString().contains("/src/"))
                     .filter(path -> !path.toString().contains("/.git/"))
                     .filter(path -> !path.toString().contains("/target/"))

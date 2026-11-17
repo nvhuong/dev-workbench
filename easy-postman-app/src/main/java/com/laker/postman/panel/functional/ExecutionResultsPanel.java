@@ -26,7 +26,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 /**
- * 执行结果展示面板 - 类似 Postman 的 Runner Results
+ * Bảng hiển thị kết quả thực hiện - Tương tự Postman của Runner Results
  */
 public class ExecutionResultsPanel extends JPanel {
     public static final String TEXT_HTML = "text/html";
@@ -36,9 +36,9 @@ public class ExecutionResultsPanel extends JPanel {
     private DefaultTreeModel treeModel;
     private JPanel detailPanel;
     private JTabbedPane detailTabs;
-    private transient BatchExecutionHistory executionHistory; // 当前执行历史记录
-    private TreePath lastSelectedPath; // 保存最后选中的路径
-    private int lastSelectedRequestDetailTabIndex = 0; // 记住用户在RequestDetail中选择的tab索引
+    private transient BatchExecutionHistory executionHistory; // Lịch sử thực hiện hiện tại
+    private TreePath lastSelectedPath; // Lưu đường dẫn đã chọn cuối cùng
+    private int lastSelectedRequestDetailTabIndex = 0; // Hãy nhớ người dùng đang ở đóRequestDetailđã chọntabchỉ số
 
     public ExecutionResultsPanel() {
         initUI();
@@ -46,10 +46,10 @@ public class ExecutionResultsPanel extends JPanel {
     }
 
     /**
-     * 格式化时间戳为 HH:mm:ss 格式
+     * Định dạng dấu thời gian dưới dạng HH:mm:ss định dạng
      */
     private String formatTimestamp(long timestamp) {
-        // 日期格式化器
+        // Trình định dạng ngày
         SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
         return dateFormat.format(new Date(timestamp));
     }
@@ -59,7 +59,7 @@ public class ExecutionResultsPanel extends JPanel {
         ToolWindowSurfaceStyle.applyCard(this);
         setBorder(BorderFactory.createEmptyBorder(8, 8, 8, 8));
 
-        // 创建分割面板
+        // Tạo bảng phân chia
         createResultsTree();
         createDetailPanel();
         JSplitPane splitPane = AppToolWindowChrome.createHorizontalInnerSplitPane(
@@ -83,7 +83,7 @@ public class ExecutionResultsPanel extends JPanel {
         resultsTree.setRowHeight(26);
         resultsTree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
 
-        // 启用工具提示
+        // Bật chú giải công cụ
         ToolTipManager.sharedInstance().registerComponent(resultsTree);
     }
 
@@ -92,7 +92,7 @@ public class ExecutionResultsPanel extends JPanel {
         ToolWindowSurfaceStyle.applyCard(treePanel);
         treePanel.setBorder(BorderFactory.createEmptyBorder(8, 10, 8, 10));
 
-        // 添加标题栏（包含标题和工具按钮）
+        // Thêm thanh tiêu đề (chứa các nút tiêu đề và công cụ)
         JPanel headerPanel = createTreeHeaderPanel();
         treePanel.add(headerPanel, BorderLayout.NORTH);
 
@@ -110,12 +110,12 @@ public class ExecutionResultsPanel extends JPanel {
         ToolWindowSurfaceStyle.applyCard(headerPanel);
         headerPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 5, 0));
 
-        // 左侧标题
+        // Tiêu đề bên trái
         JLabel titleLabel = new JLabel(I18nUtil.getMessage(MessageKeys.FUNCTIONAL_EXECUTION_HISTORY));
         titleLabel.setFont(FontsUtil.getDefaultFontWithOffset(Font.BOLD, 1));
         headerPanel.add(titleLabel, BorderLayout.WEST);
 
-        // 右侧工具按钮
+        // Các nút công cụ ở bên phải
         JPanel toolBar = createToolBar();
         headerPanel.add(toolBar, BorderLayout.EAST);
 
@@ -123,7 +123,7 @@ public class ExecutionResultsPanel extends JPanel {
     }
 
     private JPanel createToolBar() {
-        // 只使用图标按钮，更简洁
+        // Chỉ sử dụng các nút biểu tượng để đơn giản
         JButton expandAllBtn = createIconButton("icons/expand.svg",
                 I18nUtil.getMessage(MessageKeys.FUNCTIONAL_TOOLTIP_EXPAND_ALL));
         expandAllBtn.addActionListener(e -> expandAll());
@@ -155,13 +155,13 @@ public class ExecutionResultsPanel extends JPanel {
         ToolWindowSurfaceStyle.applyCard(detailPanel);
         detailPanel.setBorder(BorderFactory.createEmptyBorder(0, 8, 0, 0));
 
-        // 创建详情选项卡
+        // Tạo một tab chi tiết
         detailTabs = new JTabbedPane();
         ToolWindowSurfaceStyle.applyTabbedPaneCard(detailTabs);
         detailTabs.setFont(FontsUtil.getDefaultFont(Font.PLAIN));
         detailTabs.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
 
-        // 默认显示欢迎页面
+        // Trang chào mừng được hiển thị theo mặc định
         showWelcomePanel();
         detailPanel.add(detailTabs, BorderLayout.CENTER);
 
@@ -169,7 +169,7 @@ public class ExecutionResultsPanel extends JPanel {
         detailTabs.addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
-                // 根据鼠标点击位置确定点击的标签页索引，而不是使用getSelectedIndex() 因为切换后可能不准了
+                // Xác định chỉ số tab đã nhấp dựa trên vị trí click chuột chứ không phải sử dụnggetSelectedIndex() Bởi vì nó có thể không chính xác sau khi chuyển đổi
                 int clickedTabIndex = detailTabs.indexAtLocation(e.getX(), e.getY());
                 if (clickedTabIndex >= 0 && clickedTabIndex < detailTabs.getTabCount()) {
                     lastSelectedRequestDetailTabIndex = clickedTabIndex;
@@ -181,7 +181,7 @@ public class ExecutionResultsPanel extends JPanel {
 
 
     private void registerListeners() {
-        // 鼠标事件 - 优化灵敏度
+        // Sự kiện chuột - Tối ưu hóa độ nhạy
         resultsTree.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
@@ -190,7 +190,7 @@ public class ExecutionResultsPanel extends JPanel {
 
             @Override
             public void mousePressed(MouseEvent e) {
-                // 鼠标按下时立即处理选择，提高响应速度
+                // Xử lý các lựa chọn ngay lập tức khi nhấn chuột, cải thiện khả năng phản hồi
                 TreePath path = resultsTree.getPathForLocation(e.getX(), e.getY());
                 if (path != null) {
                     resultsTree.setSelectionPath(path);
@@ -199,7 +199,7 @@ public class ExecutionResultsPanel extends JPanel {
             }
         });
 
-        // 键盘事件 - 改善键盘导航
+        // Sự kiện bàn phím - Cải thiện điều hướng bàn phím
         resultsTree.addKeyListener(new KeyAdapter() {
             @Override
             public void keyPressed(KeyEvent e) {
@@ -207,12 +207,12 @@ public class ExecutionResultsPanel extends JPanel {
             }
         });
 
-        // 树选择事件 - 主要的内容显示逻辑
+        // Sự kiện chọn cây - Nội dung chính thể hiện logic
         resultsTree.addTreeSelectionListener(e -> {
             TreePath newPath = e.getNewLeadSelectionPath();
             if (newPath != null) {
                 lastSelectedPath = newPath;
-                // 延迟显示详情，避免频繁刷新
+                // Trì hoãn hiển thị chi tiết để tránh làm mới thường xuyên
                 SwingUtilities.invokeLater(() -> {
                     DefaultMutableTreeNode node = (DefaultMutableTreeNode) newPath.getLastPathComponent();
                     showNodeDetail(node);
@@ -227,7 +227,7 @@ public class ExecutionResultsPanel extends JPanel {
             return;
         }
 
-        // 确保路径被选中
+        // Hãy chắc chắn rằng đường dẫn được chọn
         if (!resultsTree.isPathSelected(path)) {
             resultsTree.setSelectionPath(path);
         }
@@ -252,7 +252,7 @@ public class ExecutionResultsPanel extends JPanel {
                 }
                 break;
             default:
-                // 不需要处理其他按键
+                // Không có tổ hợp phím bổ sung cần phải được xử lý
                 break;
         }
     }
@@ -267,12 +267,12 @@ public class ExecutionResultsPanel extends JPanel {
 
 
     /**
-     * 更新执行历史数据
+     * Cập nhật dữ liệu lịch sử thực hiện
      */
     public void updateExecutionHistory(BatchExecutionHistory history) {
         SwingUtilities.invokeLater(() -> {
             this.executionHistory = history;
-            // 重置tab索引为第一个，因为这是新的执行历史数据
+            // Đặt lạitabChỉ mục này đứng đầu vì đây là dữ liệu lịch sử thực thi mới
             lastSelectedRequestDetailTabIndex = 0;
             rebuildTree();
         });
@@ -289,18 +289,18 @@ public class ExecutionResultsPanel extends JPanel {
             return;
         }
 
-        // 设置根节点信息
+        // Đặt thông tin nút gốc
         long totalTime = executionHistory.getExecutionTime();
         int totalIterations = executionHistory.getIterations().size();
         root.setUserObject(I18nUtil.getMessage(MessageKeys.FUNCTIONAL_EXECUTION_RESULTS_SUMMARY,
                 totalIterations, TimeDisplayUtil.formatElapsedTime(totalTime)));
 
-        // 添加迭代节点
+        // Thêm một nút lặp
         for (IterationResult iteration : executionHistory.getIterations()) {
             DefaultMutableTreeNode iterationNode = new DefaultMutableTreeNode(
                     new IterationNodeData(iteration));
 
-            // 添加请求节点
+            // Thêm nút yêu cầu
             for (RequestResult request : iteration.getRequestResults()) {
                 DefaultMutableTreeNode requestNode = new DefaultMutableTreeNode(
                         new RequestNodeData(request));
@@ -311,24 +311,24 @@ public class ExecutionResultsPanel extends JPanel {
         }
 
         treeModel.nodeStructureChanged(root);
-        expandAll(); // 默认展开所有节点
+        expandAll(); // Tất cả các nút được mở rộng theo mặc định
 
-        // 尝试恢复之前的选中状态
+        // Cố gắng khôi phục trạng thái đã chọn trước đó
         restoreSelection();
     }
 
     /**
-     * 选择根节点（执行结果摘要）并展开详细信息
-     * 用于执行完成后自动显示结果
+     * Chọn nút gốc (tóm tắt kết quả thực hiện) và mở rộng chi tiết
+     * Được sử dụng để tự động hiển thị kết quả sau khi thực hiện xong
      */
     public void selectFirstIteration() {
         SwingUtilities.invokeLater(() -> {
             DefaultMutableTreeNode root = (DefaultMutableTreeNode) treeModel.getRoot();
             if (root.getChildCount() > 0) {
-                // 选中根节点（显示总耗时、迭代数等摘要信息）
+                // Chọn nút gốc (hiển thị thông tin tóm tắt như tổng thời gian thực hiện, số lần lặp, v.v.)
                 TreePath rootPath = new TreePath(root);
 
-                // 选中并展开根节点
+                // Chọn và mở rộng nút gốc
                 resultsTree.setSelectionPath(rootPath);
                 resultsTree.scrollPathToVisible(rootPath);
                 resultsTree.expandPath(rootPath);
@@ -338,7 +338,7 @@ public class ExecutionResultsPanel extends JPanel {
 
     private void restoreSelection() {
         if (lastSelectedPath != null) {
-            // 尝试找到相同的节点路径并选中
+            // Cố gắng tìm đường dẫn nút tương tự và chọn nó
             SwingUtilities.invokeLater(() -> {
                 TreePath newPath = findSimilarPath();
                 resultsTree.setSelectionPath(newPath);
@@ -348,7 +348,7 @@ public class ExecutionResultsPanel extends JPanel {
     }
 
     private TreePath findSimilarPath() {
-        // 简单实现：尝试选中根节点下的第一个子节点
+        // Cách thực hiện đơn giản: cố gắng chọn nút con đầu tiên bên dưới nút gốc
         DefaultMutableTreeNode root = (DefaultMutableTreeNode) treeModel.getRoot();
         if (root.getChildCount() > 0) {
             DefaultMutableTreeNode firstChild = (DefaultMutableTreeNode) root.getChildAt(0);
@@ -385,8 +385,8 @@ public class ExecutionResultsPanel extends JPanel {
             showOverviewDetail();
         }
 
-        detailTabs.revalidate(); // 重新验证布局
-        detailTabs.repaint(); // 重绘选项卡面板
+        detailTabs.revalidate(); // Xác nhận lại bố cục
+        detailTabs.repaint(); // Vẽ lại bảng tab
     }
 
     private void showOverviewDetail() {
@@ -399,11 +399,11 @@ public class ExecutionResultsPanel extends JPanel {
         ToolWindowSurfaceStyle.applyCard(overviewPanel);
         overviewPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
-        // 创建统计信息
+        // Tạo số liệu thống kê
         JPanel statsPanel = createStatsPanel();
         overviewPanel.add(statsPanel, BorderLayout.NORTH);
 
-        // 创建汇总表格
+        // Tạo một bảng tóm tắt
         JTable summaryTable = createSummaryTable();
         JScrollPane scrollPane = new JScrollPane(summaryTable);
         scrollPane.setPreferredSize(new Dimension(0, 200));
@@ -420,7 +420,7 @@ public class ExecutionResultsPanel extends JPanel {
         ToolWindowSurfaceStyle.applyCard(iterationPanel);
         iterationPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
-        // 迭代信息 - 改用 GridBagLayout 精确控制 key/value 对齐
+        // Lặp lại thông tin - Sử dụng thay thế GridBagLayout Kiểm soát chính xác key/value Căn chỉnh
         JPanel infoPanel = new JPanel(new GridBagLayout());
         infoPanel.setOpaque(false);
         infoPanel.setBorder(BorderFactory.createEmptyBorder(4, 8, 12, 8));
@@ -459,14 +459,14 @@ public class ExecutionResultsPanel extends JPanel {
             vc.gridx = 1;
             infoPanel.add(valLabel, vc);
         }
-        // 底部弹性填充
+        // Đệm đàn hồi ở phía dưới
         GridBagConstraints filler = new GridBagConstraints();
         filler.weighty = 1.0; filler.gridwidth = GridBagConstraints.REMAINDER;
         infoPanel.add(new JLabel(), filler);
 
         iterationPanel.add(infoPanel, BorderLayout.NORTH);
 
-        // CSV 数据（如果有）
+        // CSV Dữ liệu (nếu có)
         if (iteration.getCsvData() != null && !iteration.getCsvData().isEmpty()) {
             JPanel csvPanel = createCsvDataPanel(iteration.getCsvData());
             iterationPanel.add(csvPanel, BorderLayout.CENTER);
@@ -477,7 +477,7 @@ public class ExecutionResultsPanel extends JPanel {
 
     private void showRequestDetail(RequestNodeData requestData) {
         RequestResult request = requestData.request;
-        // 请求信息
+        // Yêu cầu thông tin
         JEditorPane reqPane = new JEditorPane();
         reqPane.setContentType(TEXT_HTML);
         reqPane.setEditable(false);
@@ -485,7 +485,7 @@ public class ExecutionResultsPanel extends JPanel {
         reqPane.setCaretPosition(0);
         detailTabs.addTab(I18nUtil.getMessage(MessageKeys.TAB_REQUEST), createHtmlDetailScrollPane(reqPane));
 
-        // 响应信息
+        // Thông tin phản hồi
         JEditorPane respPane = new JEditorPane();
         respPane.setContentType(TEXT_HTML);
         respPane.setEditable(false);
@@ -520,7 +520,7 @@ public class ExecutionResultsPanel extends JPanel {
             detailTabs.addTab(I18nUtil.getMessage(MessageKeys.TAB_TESTS), createHtmlDetailScrollPane(testsPane));
         }
 
-        // 恢复上次选中的 tab
+        // Khôi phục lựa chọn cuối cùng tab
         if (lastSelectedRequestDetailTabIndex >= detailTabs.getTabCount()) {
             lastSelectedRequestDetailTabIndex = 0;
         }
@@ -539,7 +539,7 @@ public class ExecutionResultsPanel extends JPanel {
         }
     }
 
-    // 树节点数据类
+    // Lớp dữ liệu nút cây
     private static class IterationNodeData {
         final IterationResult iteration;
 
@@ -576,7 +576,7 @@ public class ExecutionResultsPanel extends JPanel {
         }
     }
 
-    // 自定义树渲染器
+    // Trình kết xuất cây tùy chỉnh
     private static class ExecutionResultTreeCellRenderer extends DefaultTreeCellRenderer {
         @Override
         public Component getTreeCellRendererComponent(JTree tree, Object value,
@@ -591,7 +591,7 @@ public class ExecutionResultsPanel extends JPanel {
             } else if (userObject instanceof RequestNodeData requestData) {
                 renderRequestNode(requestData, sel);
             } else {
-                // 根节点
+                // nút gốc
                 setIcon(IconUtil.createThemed("icons/history.svg", 16, 16));
             }
 
@@ -606,19 +606,19 @@ public class ExecutionResultsPanel extends JPanel {
                     .anyMatch(req -> !AssertionResult.NO_TESTS.equals(req.getAssertion()));
 
             if (hasFailures) {
-                // 有失败：红色图标和文字
+                // Có lỗi: biểu tượng và văn bản màu đỏ
                 setIcon(new FlatSVGIcon("icons/fail.svg", 16, 16));
                 if (!selected) {
                     setForeground(ModernColors.getErrorDark());
                 }
             } else if (hasTests) {
-                // 全部通过：绿色图标和文字
+                // Tất cả đều đạt: biểu tượng và văn bản màu xanh lá cây
                 setIcon(new FlatSVGIcon("icons/pass.svg", 16, 16));
                 if (!selected) {
                     setForeground(ModernColors.getSuccessDark());
                 }
             } else {
-                // 无测试：默认图标
+                // Không kiểm tra: biểu tượng mặc định
                 setIcon(IconUtil.createThemed("icons/functional.svg", 16, 16));
                 if (!selected) {
                     setForeground(ModernColors.getTextSecondary());
@@ -631,24 +631,24 @@ public class ExecutionResultsPanel extends JPanel {
             String status = requestData.request.getStatus();
 
             if (assertion == null) {
-                // 未执行：灰色图标和文字
+                // Không được thực thi: biểu tượng và văn bản màu xám
                 setIcon(new FlatSVGIcon(ExecutionResultsPanel.ICON_HTTP, 16, 16));
                 setForegroundIfNotSelected(ModernColors.getTextDisabled(), selected);
             } else if (AssertionResult.FAIL.equals(assertion) || FunctionalPanel.ERROR.equals(status)) {
-                // 失败：红色图标和文字
+                // Lỗi: biểu tượng và văn bản màu đỏ
                 setIcon(new FlatSVGIcon("icons/fail.svg", 16, 16));
                 setForegroundIfNotSelected(ModernColors.getErrorDark(), selected);
             } else if (AssertionResult.NO_TESTS.equals(assertion)) {
-                // 无测试：蓝色图标和文字
+                // Không kiểm tra: biểu tượng và văn bản màu xanh
                 setIcon(IconUtil.createThemed("icons/nocheck.svg", 16, 16));
                 setForegroundIfNotSelected(ModernColors.getTextSecondary(), selected);
             } else if (AssertionResult.PASS.equals(assertion)) {
-                // 通过：绿色图标和文字
+                // Qua: biểu tượng và văn bản màu xanh lá cây
                 setIcon(new FlatSVGIcon("icons/pass.svg", 16, 16));
                 setForegroundIfNotSelected(ModernColors.getSuccessDark(), selected);
 
             } else {
-                // 其他状态：默认图标
+                // Các trạng thái khác: Biểu tượng mặc định
                 setIcon(new FlatSVGIcon(ExecutionResultsPanel.ICON_HTTP, 16, 16));
                 setForegroundIfNotSelected(ModernColors.getTextSecondary(), selected);
             }
@@ -668,13 +668,13 @@ public class ExecutionResultsPanel extends JPanel {
         inner.setLayout(new BoxLayout(inner, BoxLayout.Y_AXIS));
         inner.setOpaque(false);
 
-        // 大图标
+        // Biểu tượng lớn
         JLabel iconLabel = new JLabel(IconUtil.createThemed("icons/functional.svg", 48, 48));
         iconLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
         inner.add(iconLabel);
         inner.add(Box.createVerticalStrut(16));
 
-        // 主提示文字 - 跟随主题颜色
+        // Văn bản nhắc nhở chính - Thực hiện theo các màu sắc chủ đề
         JLabel titleLabel = new JLabel(I18nUtil.getMessage(MessageKeys.FUNCTIONAL_DETAIL_WELCOME_MESSAGE));
         titleLabel.setFont(FontsUtil.getDefaultFontWithOffset(Font.BOLD, +2));
         titleLabel.setForeground(ModernColors.getTextPrimary());
@@ -682,7 +682,7 @@ public class ExecutionResultsPanel extends JPanel {
         inner.add(titleLabel);
         inner.add(Box.createVerticalStrut(8));
 
-        // 副提示文字
+        // Văn bản nhắc nhở phụ
         JLabel subtitleLabel = new JLabel(I18nUtil.getMessage(MessageKeys.FUNCTIONAL_DETAIL_WELCOME_SUBTITLE));
         subtitleLabel.setFont(FontsUtil.getDefaultFontWithOffset(Font.PLAIN, -1));
         subtitleLabel.setForeground(ModernColors.getTextHint());
@@ -694,7 +694,7 @@ public class ExecutionResultsPanel extends JPanel {
     }
 
     private JPanel createStatsPanel() {
-        // 计算统计数据
+        // Tính toán thống kê
         int totalIterations = executionHistory.getIterations().size();
         int totalRequests = executionHistory.getIterations().stream()
                 .mapToInt(iter -> iter.getRequestResults().size())
@@ -717,12 +717,12 @@ public class ExecutionResultsPanel extends JPanel {
         double successRate = totalTestsWithAssertions > 0 ? (double) passedTests / totalTestsWithAssertions * 100 : 0;
         long avgTime = totalRequests > 0 ? totalTime / totalRequests : 0;
 
-        // 使用 GridBagLayout 实现4列卡片，自适应宽度
+        // sử dụng GridBagLayout hoàn thành4Thẻ cột, chiều rộng thích ứng
         JPanel statsPanel = new JPanel(new GridBagLayout());
         statsPanel.setOpaque(false);
         statsPanel.setBorder(BorderFactory.createEmptyBorder(4, 8, 14, 8));
 
-        // 定义卡片数据：[数值, 标签, 颜色(null=主色)]
+        // Xác định dữ liệu thẻ:[giá trị số, Nhãn, màu sắc(null=Màu chính)]
         Object[][] cards = {
                 {String.valueOf(totalIterations), I18nUtil.getMessage(MessageKeys.FUNCTIONAL_STATS_TOTAL_ITERATIONS), null},
                 {String.valueOf(totalRequests), I18nUtil.getMessage(MessageKeys.FUNCTIONAL_STATS_TOTAL_REQUESTS), null},
@@ -751,7 +751,7 @@ public class ExecutionResultsPanel extends JPanel {
     }
 
     /**
-     * 创建单个统计卡片：数值大号粗体在上，标签小号灰色在下
+     * Tạo một thẻ thống kê duy nhất: các giá trị lớn và đậm ở trên cùng, còn các nhãn nhỏ và màu xám ở dưới cùng
      */
     private JPanel createStatCard(String value, String label, Color valueColor) {
         JPanel card = new JPanel();
@@ -792,7 +792,7 @@ public class ExecutionResultsPanel extends JPanel {
                         request.getRequestName(),
                         request.getMethod(),
                         request.getStatus(),
-                        request.getCost(), // 保存原始数值，渲染器会格式化
+                        request.getCost(), // Lưu giá trị ban đầu và trình kết xuất sẽ định dạng nó
                         request.getAssertion()
                 };
                 tableData.add(row);
@@ -803,20 +803,20 @@ public class ExecutionResultsPanel extends JPanel {
         JTable table = new JTable(data, columnNames) {
             @Override
             public boolean isCellEditable(int row, int column) {
-                return false; // 所有单元格都不可编辑
+                return false; // Tất cả các ô đều không thể chỉnh sửa được
             }
         };
 
-        // 应用 ModernColors 配色方案
+        // ứng dụng ModernColors Cách phối màu
         table.setFont(FontsUtil.getDefaultFont(Font.PLAIN));
         table.getTableHeader().setFont(FontsUtil.getDefaultFont(Font.BOLD));
         table.setRowHeight(28);
         table.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
 
-        // 设置列宽
+        // Đặt chiều rộng cột
         setTableColumnWidths(table);
 
-        // 设置渲染器
+        // Thiết lập trình kết xuất
         setTableRenderers(table);
 
         return table;
@@ -824,31 +824,31 @@ public class ExecutionResultsPanel extends JPanel {
 
     private void setTableColumnWidths(JTable table) {
         if (table.getColumnModel().getColumnCount() > 0) {
-            // Iteration 列 - 需要显示 "Iteration"（9个字符）+ "#1"
+            // Iteration cột - Cần phải được hiển thị "Iteration"（9ký tự)+ "#1"
             table.getColumnModel().getColumn(0).setMinWidth(75);
             table.getColumnModel().getColumn(0).setMaxWidth(90);
             table.getColumnModel().getColumn(0).setPreferredWidth(80);
 
-            // Request Name 列 - 可以较宽，显示完整请求名称
+            // Request Name cột - Có thể rộng hơn để hiển thị tên yêu cầu đầy đủ
             table.getColumnModel().getColumn(1).setMinWidth(150);
             table.getColumnModel().getColumn(1).setPreferredWidth(200);
 
-            // Method 列 - 需要显示 "Method"（6个字符）+ "DELETE"（7个字符）
+            // Method cột - Cần phải được hiển thị "Method"（6ký tự)+ "DELETE"（7ký tự)
             table.getColumnModel().getColumn(2).setMinWidth(75);
             table.getColumnModel().getColumn(2).setMaxWidth(90);
             table.getColumnModel().getColumn(2).setPreferredWidth(80);
 
-            // Status 列 - 需要显示 "Status"（6个字符）+ 状态码（3位数）
+            // Status cột - Cần phải được hiển thị "Status"（6ký tự)+ Mã trạng thái (3số chữ số)
             table.getColumnModel().getColumn(3).setMinWidth(70);
             table.getColumnModel().getColumn(3).setMaxWidth(85);
             table.getColumnModel().getColumn(3).setPreferredWidth(75);
 
-            // Time 列 - 需要显示 "Time"（4个字符）+ 时间（如 "123 ms"）
+            // Time cột - Cần phải được hiển thị "Time"（4ký tự)+ thời gian (ví dụ: "123 ms"）
             table.getColumnModel().getColumn(4).setMinWidth(75);
             table.getColumnModel().getColumn(4).setMaxWidth(100);
             table.getColumnModel().getColumn(4).setPreferredWidth(85);
 
-            // Result 列 - 需要显示 "Result"（6个字符）+ emoji/状态
+            // Result cột - Cần phải được hiển thị "Result"（6ký tự)+ emoji/trạng thái
             table.getColumnModel().getColumn(5).setMinWidth(65);
             table.getColumnModel().getColumn(5).setMaxWidth(80);
             table.getColumnModel().getColumn(5).setPreferredWidth(70);
@@ -856,13 +856,13 @@ public class ExecutionResultsPanel extends JPanel {
     }
 
     private void setTableRenderers(JTable table) {
-        // 方法列渲染器
+        // Trình kết xuất cột phương thức
         table.getColumnModel().getColumn(2).setCellRenderer(createMethodRenderer());
-        // 状态列渲染器
+        // Trình kết xuất cột trạng thái
         table.getColumnModel().getColumn(3).setCellRenderer(createStatusRenderer());
-        // 耗时列渲染器
+        // Trình kết xuất cột tốn thời gian
         table.getColumnModel().getColumn(4).setCellRenderer(createTimeRenderer());
-        // 结果列渲染器
+        // Trình kết xuất cột kết quả
         table.getColumnModel().getColumn(5).setCellRenderer(createResultRenderer());
     }
 
@@ -899,7 +899,7 @@ public class ExecutionResultsPanel extends JPanel {
     private void applyStatusColors(java.awt.Component c, String status) {
         java.awt.Color foreground = ModernColors.getTextPrimary();
 
-        // 检查是否是"跳过"状态
+        // Kiểm tra xem có"Bỏ qua"trạng thái
         String skippedText = I18nUtil.getMessage(MessageKeys.FUNCTIONAL_STATUS_SKIPPED);
         if (skippedText.equals(status)) {
             foreground = ModernColors.getTextHint();
@@ -944,7 +944,7 @@ public class ExecutionResultsPanel extends JPanel {
                 setHorizontalAlignment(CENTER);
 
                 String skippedText = I18nUtil.getMessage(MessageKeys.FUNCTIONAL_STATUS_SKIPPED);
-                // 取 Status 列值判断是否跳过
+                // Lấy Status Giá trị cột xác định có nên bỏ qua hay không
                 String status = "";
                 try {
                     Object sv = table.getValueAt(row, 3);
@@ -990,8 +990,8 @@ public class ExecutionResultsPanel extends JPanel {
         }
 
         csvTable.setModel(new DefaultTableModel(data, headers));
-        csvTable.setFont(FontsUtil.getDefaultFontWithOffset(Font.PLAIN, -1)); // 比标准字体小1号
-        csvTable.getTableHeader().setFont(FontsUtil.getDefaultFontWithOffset(Font.BOLD, -1)); // 比标准字体小1号（粗体）
+        csvTable.setFont(FontsUtil.getDefaultFontWithOffset(Font.PLAIN, -1)); // Nhỏ hơn kích thước phông chữ tiêu chuẩn1Không
+        csvTable.getTableHeader().setFont(FontsUtil.getDefaultFontWithOffset(Font.BOLD, -1)); // Nhỏ hơn kích thước phông chữ tiêu chuẩn1số (in đậm)
         csvTable.setRowHeight(20);
 
         JScrollPane csvScrollPane = new JScrollPane(csvTable);

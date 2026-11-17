@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 单次迭代的执行结果
+ * Kết quả thực hiện của một lần lặp duy nhất
  */
 public class IterationResult {
     @Getter

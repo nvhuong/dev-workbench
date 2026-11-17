@@ -37,7 +37,7 @@ public class PerformanceIterationContextFactoryTest {
         assertEquals(contexts.get(0).getIterationData().get("user"), "group-0");
     }
 
-    @Test(description = "每个 Thread Group 使用自己的 CSV Data Set，虚拟用户索引按组从 0 开始")
+    @Test(description = "Mỗi Thread Group Sử dụng của riêng bạn CSV Data Set，Chỉ mục người dùng ảo theo nhóm 0 bắt đầu")
     public void shouldBindCsvRowsByThreadGroupLocalVirtualUser() {
         PerformanceVirtualUserCoordinator virtualUsers = new PerformanceVirtualUserCoordinator();
         PerformanceIterationContextFactory factory = new PerformanceIterationContextFactory(virtualUsers);

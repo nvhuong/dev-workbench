@@ -16,13 +16,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Json 工具类
+ * Json Công cụ
  */
 @UtilityClass
 public class JsonUtil {
     /**
-     * JsonMapper 自定义 json 美化格式，4 个空格缩进，属性名后不加空格，属性值前加空格
-     * 支持解析带注释的 JSON（JSON5）
+     * JsonMapper Tùy chỉnh json Làm đẹp hình thức.4 Dấu cách được thụt lề, không có dấu cách nào được thêm sau tên thuộc tính và dấu cách được thêm trước giá trị thuộc tính
+     * Hỗ trợ chú thích phân tích cú pháp JSON（JSON5）
      */
     private static final DefaultIndenter DEFAULT_INDENTER = new DefaultIndenter("    ", "\n");
     private static final DefaultPrettyPrinter DEFAULT_PRETTY_PRINTER = new DefaultPrettyPrinter(
@@ -35,7 +35,7 @@ public class JsonUtil {
             .build();
 
     /**
-     * 创建 ObjectNode
+     * Tạo ObjectNode
      *
      * @return ObjectNode
      */
@@ -44,7 +44,7 @@ public class JsonUtil {
     }
 
     /**
-     * 创建 ArrayNode
+     * Tạo ArrayNode
      *
      * @return ArrayNode
      */
@@ -53,9 +53,9 @@ public class JsonUtil {
     }
 
     /**
-     * 对象转json
+     * Chuyển đối tượngjson
      *
-     * @param object 待转换的对象
+     * @param object Đối tượng cần chuyển đổi
      * @return json
      */
     public static String toJsonStr(Object object) {
@@ -63,10 +63,10 @@ public class JsonUtil {
     }
 
     /**
-     * 将普通文本转成可嵌入 JSON 字符串内容的转义文本，不包含外层双引号
+     * Chuyển đổi văn bản bình thường thành có thể nhúng JSON Văn bản thoát của nội dung chuỗi, không bao gồm dấu ngoặc kép bên ngoài
      *
-     * @param text 原始文本
-     * @return 转义后的文本内容
+     * @param text Văn bản gốc
+     * @return Nội dung văn bản đã thoát
      */
     public static String escapeJsonStringContent(String text) {
         if (text == null) {
@@ -77,10 +77,10 @@ public class JsonUtil {
     }
 
     /**
-     * 对 JSON 字符串内容做单层反转义，不要求包含外层双引号
+     * Vâng JSON Nội dung chuỗi được thoát trong một lớp duy nhất và không yêu cầu dấu ngoặc kép bên ngoài
      *
-     * @param text 被转义的文本内容
-     * @return 反转义后的文本
+     * @param text Nội dung văn bản đã thoát
+     * @return Văn bản không thoát
      */
     public static String unescapeJsonStringContent(String text) {
         if (text == null || text.isEmpty()) {
@@ -129,7 +129,7 @@ public class JsonUtil {
                             i += 4;
                             break;
                         } catch (NumberFormatException ignored) {
-                            // 保留原样
+                            // Để nguyên như vậy
                         }
                     }
                     sb.append('\\').append('u');
@@ -143,9 +143,9 @@ public class JsonUtil {
     }
 
     /**
-     * json 字符串美化
+     * json Làm đẹp dây
      *
-     * @param json 待转换的 json 字符串
+     * @param json Để được chuyển đổi json chuỗi
      * @return json
      */
     public static String toJsonPrettyStr(String json) {
@@ -157,9 +157,9 @@ public class JsonUtil {
     }
 
     /**
-     * json对象美化
+     * jsonLàm đẹp đồ vật
      *
-     * @param object 待转换的对象
+     * @param object Đối tượng cần chuyển đổi
      * @return json
      */
     public static String toJsonPrettyStr(Object object) {
@@ -167,10 +167,10 @@ public class JsonUtil {
     }
 
     /**
-     * 清理 json 注释（去除注释后返回纯 JSON）
+     * Dọn dẹp json Chú thích (trả về đơn giản sau khi xóa chú thích JSON）
      *
-     * @param json 待清理的 json
-     * @return 清理后的 json
+     * @param json Để được làm sạch json
+     * @return Sau khi làm sạch json
      */
     public static String cleanJsonComments(String json) {
         return mapper.readTree(json).toString();
@@ -178,16 +178,16 @@ public class JsonUtil {
 
 
     /**
-     * 判断字符串是否为有效的 JSON（支持带注释的 JSON5）
+     * Xác định xem chuỗi có hợp lệ hay không JSON（Chú thích được hỗ trợ JSON5）
      *
-     * @param json 待判断的字符串
-     * @return 是否为有效的 JSON/JSON5
+     * @param json Chuỗi để được đánh giá
+     * @return Nó có hợp lệ không? JSON/JSON5
      */
     public static boolean isTypeJSON(String json) {
         if (CharSequenceUtil.isBlank(json)) return false;
         try {
             JsonNode rootNode = mapper.readTree(json);
-            // 严格校验：只有是JSON对象或JSON数组时才返回true
+            // Xác nhận nghiêm ngặt: chỉ cóJSONđối tượng hoặcJSONMảng được trả vềtrue
             return rootNode.isObject() || rootNode.isArray();
         } catch (JacksonException e) {
             return false;
@@ -211,9 +211,9 @@ public class JsonUtil {
     }
 
     /**
-     * 读取 json
+     * Đọc json
      *
-     * @param json 待读取的 json
+     * @param json Để được đọc json
      * @return JsonNode
      */
     public static JsonNode readTree(String json) {
@@ -221,12 +221,12 @@ public class JsonUtil {
     }
 
     /**
-     * 深度拷贝
+     * Bản sao sâu sắc
      *
-     * @param object 待拷贝的对象
-     * @param clazz  目标对象类型
-     * @param <T>    目标对象类型
-     * @return 拷贝后的对象
+     * @param object Đối tượng cần sao chép
+     * @param clazz  Loại đối tượng mục tiêu
+     * @param <T>    Loại đối tượng mục tiêu
+     * @return Đối tượng được sao chép
      */
     public static <T> T deepCopy(T object, Class<T> clazz) {
         if (object == null) {
@@ -236,12 +236,12 @@ public class JsonUtil {
     }
 
     /**
-     * 类型转换
+     * Chuyển đổi kiểu
      *
-     * @param fromValue   来源对象
-     * @param toValueType 转换的类型
-     * @param <T>         泛型标记
-     * @return 转换结果
+     * @param fromValue   đối tượng nguồn
+     * @param toValueType Loại chuyển đổi
+     * @param <T>         Thẻ chung
+     * @return Kết quả chuyển đổi
      */
     public static <T> T convertValue(Object fromValue, Class<T> toValueType) {
         return mapper.convertValue(fromValue, toValueType);

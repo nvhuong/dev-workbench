@@ -250,7 +250,7 @@ See the [MCP Server guide](MCP_SERVER_DESIGN_zh.md) for installation and complet
 - ✅ Search and replace
 
 ### Internationalization
-- ✅ Simplified Chinese (简体中文)
+- ✅ Simplified Chinese (Tiếng Trung giản thể)
 - ✅ English
 - 🚧 More languages coming soon
 

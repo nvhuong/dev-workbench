@@ -3,20 +3,20 @@ package com.laker.postman.panel.collections.editor.request.sub;
 import java.awt.*;
 
 /**
- * 响应卡片遮罩布局。
+ * Bố cục mặt nạ thẻ đáp ứng.
  * <p>
- * cardPanel 和 loadingOverlay 需要完全重叠，独立布局类比嵌在 ResponsePanel 里更容易复用和理解。
+ * cardPanel và loadingOverlay Yêu cầu chồng chéo hoàn toàn, nhúng tương tự bố cục độc lập ResponsePanel Nó dễ dàng hơn để sử dụng lại và hiểu.
  */
 final class ResponseCardOverlayLayout implements LayoutManager2 {
 
     @Override
     public void addLayoutComponent(String name, Component comp) {
-        // 此布局不需要根据名称添加组件。
+        // Bố cục này không yêu cầu thêm các thành phần dựa trên tên của chúng.
     }
 
     @Override
     public void removeLayoutComponent(Component comp) {
-        // 此布局不需要移除组件逻辑。
+        // Bố cục này không yêu cầu loại bỏ logic thành phần.
     }
 
     @Override
@@ -42,7 +42,7 @@ final class ResponseCardOverlayLayout implements LayoutManager2 {
 
     @Override
     public void addLayoutComponent(Component comp, Object constraints) {
-        // 此布局不需要约束条件。
+        // Bố cục này không yêu cầu ràng buộc.
     }
 
     @Override
@@ -62,6 +62,6 @@ final class ResponseCardOverlayLayout implements LayoutManager2 {
 
     @Override
     public void invalidateLayout(Container target) {
-        // 此布局不需要缓存，无需失效逻辑。
+        // Bố cục này không yêu cầu bộ nhớ đệm và không có logic vô hiệu.
     }
 }

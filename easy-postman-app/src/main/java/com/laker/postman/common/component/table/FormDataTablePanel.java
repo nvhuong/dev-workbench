@@ -19,9 +19,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Form-Data 表格面板组件
- * 专门用于处理 form-data 类型的请求体数据
- * 支持 Enable、Key、Type(Text/File)、Value 和 Delete 列结构
+ * Form-Data Thành phần bảng điều khiển
+ * Được thiết kế đặc biệt để xử lý form-data Loại dữ liệu nội dung yêu cầu
+ * Hỗ trợ Enable、Key、Type(Text/File)、Value và Delete cấu trúc cột
  */
 @Slf4j
 public class FormDataTablePanel extends AbstractTablePanel<HttpFormData> {
@@ -38,17 +38,17 @@ public class FormDataTablePanel extends AbstractTablePanel<HttpFormData> {
     private static final int TYPE_COLUMN_WIDTH = 64;
 
     /**
-     * 构造函数，创建默认的 Form-Data 表格面板
+     * Trình xây dựng, tạo cái mặc định Form-Data Bảng điều khiển
      */
     public FormDataTablePanel() {
         this(true, true);
     }
 
     /**
-     * 构造函数，支持自定义配置
+     * Trình xây dựng, hỗ trợ cấu hình tùy chỉnh
      *
-     * @param popupMenuEnabled     是否启用右键菜单
-     * @param autoAppendRowEnabled 是否启用自动补空行
+     * @param popupMenuEnabled     Có bật menu chuột phải hay không
+     * @param autoAppendRowEnabled Có bật tự động điền dòng trống hay không
      */
     public FormDataTablePanel(boolean popupMenuEnabled, boolean autoAppendRowEnabled) {
         super(new String[]{
@@ -75,7 +75,7 @@ public class FormDataTablePanel extends AbstractTablePanel<HttpFormData> {
         addRow();
     }
 
-    // ========== 实现抽象方法 ==========
+    // ========== Thực hiện các phương pháp trừu tượng ==========
 
     @Override
     protected int getEnabledColumnIndex() {
@@ -122,13 +122,13 @@ public class FormDataTablePanel extends AbstractTablePanel<HttpFormData> {
         return new Object[]{true, "", HttpFormData.TYPE_TEXT, "", "", ""};
     }
 
-    // ========== 初始化方法 ==========
+    // ========== Phương pháp khởi tạo ==========
     @Override
     protected void initializeTableUI() {
-        // 调用父类的通用UI配置
+        // Gọi hàm chung của lớp chaUIcấu hình
         super.initializeTableUI();
 
-        // 设置列宽
+        // Đặt chiều rộng cột
         setEnabledColumnWidth(40);
 
         setFlexibleColumnWidth(COL_KEY, 260, 140);
@@ -198,7 +198,7 @@ public class FormDataTablePanel extends AbstractTablePanel<HttpFormData> {
         comboBox.setMaximumRowCount(TYPE_OPTIONS.length);
         comboBox.setBorder(BorderFactory.createEmptyBorder());
 
-        // 自定义下拉列表的渲染器
+        // Trình kết xuất cho danh sách thả xuống tùy chỉnh
         comboBox.setRenderer(new DefaultListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(JList<?> list, Object value,
@@ -244,7 +244,7 @@ public class FormDataTablePanel extends AbstractTablePanel<HttpFormData> {
     }
 
     /**
-     * Type列的自定义渲染器，显示紧凑的 Text/File 下拉入口
+     * TypeTrình kết xuất tùy chỉnh cho các cột, hiển thị nhỏ gọn Text/File Mục nhập thả xuống
      */
     private class TypeColumnRenderer extends JPanel implements TableCellRenderer {
         private final JLabel textLabel;
@@ -255,9 +255,9 @@ public class FormDataTablePanel extends AbstractTablePanel<HttpFormData> {
             setOpaque(true);
             setBorder(BorderFactory.createEmptyBorder(0, 6, 0, 4));
 
-            // 创建文本标签
+            // Tạo nhãn văn bản
             textLabel = new JLabel();
-            textLabel.setFont(FontsUtil.getDefaultFontWithOffset(Font.PLAIN, -1)); // 比标准字体小1号
+            textLabel.setFont(FontsUtil.getDefaultFontWithOffset(Font.PLAIN, -1)); // Nhỏ hơn kích thước phông chữ tiêu chuẩn1Không
             textLabel.setVerticalAlignment(SwingConstants.CENTER);
             textLabel.setOpaque(false);
 
@@ -265,7 +265,7 @@ public class FormDataTablePanel extends AbstractTablePanel<HttpFormData> {
             arrowLabel.setHorizontalAlignment(SwingConstants.RIGHT);
             arrowLabel.setOpaque(false);
 
-            // 添加组件
+            // Thêm thành phần
             add(textLabel, BorderLayout.CENTER);
             add(arrowLabel, BorderLayout.EAST);
 
@@ -281,7 +281,7 @@ public class FormDataTablePanel extends AbstractTablePanel<HttpFormData> {
             textLabel.setForeground(foreground);
             arrowLabel.setForeground(foreground);
 
-            // 根据类型设置图标和文本
+            // Đặt biểu tượng và văn bản theo loại
             if (HttpFormData.TYPE_FILE.equalsIgnoreCase(typeValue)) {
                 textLabel.setText("File");
             } else {
@@ -320,8 +320,8 @@ public class FormDataTablePanel extends AbstractTablePanel<HttpFormData> {
 
 
     /**
-     * 从 tableModel 直接读取，不停止单元格编辑。
-     * 用于 tab 指示器等后台场景，避免打断用户正在进行的输入（如 Tab 导航）。
+     * Từ tableModel Đọc trực tiếp mà không dừng chỉnh sửa ô.
+     * Được sử dụng cho tab Các cảnh nền như chỉ báo để tránh làm gián đoạn quá trình nhập liệu đang diễn ra của người dùng (ví dụ: Tab điều hướng).
      */
     public List<HttpFormData> getFormDataListFromModel() {
         List<HttpFormData> dataList = new ArrayList<>();

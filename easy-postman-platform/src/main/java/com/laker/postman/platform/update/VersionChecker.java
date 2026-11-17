@@ -14,9 +14,9 @@ import com.laker.postman.util.SystemUtil;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * 版本检查器 - 负责检查远程版本信息
+ * Trình kiểm tra phiên bản - Chịu trách nhiệm kiểm tra thông tin phiên bản từ xa
  *
- * <p>重构后的版本：使用策略模式分离不同更新源的实现，提高代码可维护性和可扩展性。</p>
+ * <p>Phiên bản được tái cấu trúc: Sử dụng mẫu chiến lược để phân tách việc triển khai các nguồn cập nhật khác nhau nhằm cải thiện khả năng bảo trì và mở rộng mã.</p>
  */
 @Slf4j
 public class VersionChecker {
@@ -34,18 +34,18 @@ public class VersionChecker {
     }
 
     /**
-     * 检查更新信息
+     * Kiểm tra thông tin cập nhật
      */
     public UpdateInfo checkForUpdate() {
         try {
             String currentVersion = SystemUtil.getCurrentVersion();
 
-            // 选择最佳更新源
+            // Chọn nguồn cập nhật tốt nhất
             UpdateSource primarySource = sourceSelector.selectBestSource();
             JSONObject releaseInfo = primarySource.fetchLatestReleaseInfo();
 
             if (releaseInfo == null) {
-                // 尝试备用源
+                // Hãy thử một nguồn thay thế
                 UpdateSource fallbackSource = sourceSelector.getFallbackSource(primarySource);
                 log.info("Primary source failed, trying fallback source: {}", fallbackSource.getName());
                 releaseInfo = fallbackSource.fetchLatestReleaseInfo();
@@ -68,7 +68,7 @@ public class VersionChecker {
                 if (CharSequenceUtil.isNotBlank(downloadUrl)) {
                     return UpdateInfo.updateAvailable(currentVersion, latestVersion, releaseInfo);
                 } else {
-                    // 有新版本，但当前平台没有对应的安装包（可能还在上传中）
+                    // Đã có phiên bản mới nhưng chưa có gói cài đặt tương ứng cho nền tảng hiện tại (có thể vẫn tải lên được)
                     log.info("Newer version {} found, but no download asset available for current platform", latestVersion);
                     return UpdateInfo.updateAvailableNoAsset(currentVersion, latestVersion, releaseInfo);
                 }
@@ -83,7 +83,7 @@ public class VersionChecker {
     }
 
     /**
-     * 获取下载链接
+     * Nhận liên kết tải xuống
      */
     public String getDownloadUrl(JSONObject releaseInfo) {
         if (releaseInfo == null) {

@@ -33,7 +33,7 @@ public class PerformanceTreeCellRenderer extends DefaultTreeCellRenderer {
                 return label;
             }
 
-            // 设置图标
+            // Biểu tượng cài đặt
             switch (nodeData.type) {
                 case THREAD_GROUP -> label.setIcon(IconUtil.createThemed("icons/user-group.svg", SIZE, SIZE));
                 case CSV_DATA_SET -> label.setIcon(IconUtil.createThemed("icons/csv.svg", SIZE, SIZE));
@@ -62,7 +62,7 @@ public class PerformanceTreeCellRenderer extends DefaultTreeCellRenderer {
                 label.setFont(FontsUtil.getDefaultFont(Font.ITALIC));
                 label.setText("<html><strike>" + text + "</strike></html>");
             } else {
-                // 启用状态：恢复正常样式
+                // Trạng thái kích hoạt: Trở về kiểu bình thường
                 label.setFont(FontsUtil.getDefaultFont(Font.PLAIN));
                 label.setText(text);
             }

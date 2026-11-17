@@ -27,7 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * 自定义受信任证书 / truststore 设置面板。
+ * Chứng chỉ tin cậy tùy chỉnh / truststore Bảng cài đặt.
  */
 public class TrustedCertificatesSettingsPanelModern extends ModernSettingsPanel {
     private static final int SECTION_SPACING = 12;

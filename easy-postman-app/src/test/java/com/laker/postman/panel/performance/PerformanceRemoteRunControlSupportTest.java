@@ -294,7 +294,7 @@ public class PerformanceRemoteRunControlSupportTest {
                 assertTrue(ex.getMessage().contains("protocol"), ex.getMessage());
             }
 
-            assertEquals(server.requestCount().get(), 1, "旧 worker 应在 health 阶段被拦截，不能继续 POST /runs");
+            assertEquals(server.requestCount().get(), 1, "cũ worker Đáng lẽ phải ở đó health Sân khấu bị chặn và không thể tiếp tục POST /runs");
         }
     }
 

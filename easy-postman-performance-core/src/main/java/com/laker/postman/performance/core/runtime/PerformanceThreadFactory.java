@@ -40,7 +40,7 @@ public final class PerformanceThreadFactory implements ThreadFactory {
     private static Thread configureThread(Thread thread, boolean daemon) {
         thread.setDaemon(daemon);
         thread.setUncaughtExceptionHandler((failedThread, error) ->
-                log.error("性能测试后台线程异常: {}", failedThread.getName(), error));
+                log.error("Ngoại lệ của luồng nền kiểm tra hiệu suất: {}", failedThread.getName(), error));
         return thread;
     }
 }

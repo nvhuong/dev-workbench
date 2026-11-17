@@ -50,7 +50,7 @@ final class PerformanceRequestSyncSupport {
         saveAllPropertyPanelDataAction.run();
 
         clearCachedResultAction.run();
-        // 这里只释放压测结果引用；不要主动 System.gc()，避免刷新集合时触发全局停顿。
+        // Chỉ có các tài liệu tham khảo về kết quả kiểm tra căng thẳng được đưa ra ở đây; đừng chủ động System.gc()，Tránh kích hoạt tạm dừng chung khi làm mới bộ sưu tập.
 
         List<DefaultMutableTreeNode> nodesToRemove = new ArrayList<>();
         DefaultMutableTreeNode root = (DefaultMutableTreeNode) treeModel.getRoot();
@@ -164,13 +164,13 @@ final class PerformanceRequestSyncSupport {
                 && requestNodeData.httpRequestItem != null) {
             String requestId = requestNodeData.httpRequestItem.getId();
             if (requestId == null || requestId.trim().isEmpty()) {
-                log.warn("刷新集合请求时发现请求节点 id 为空，已移除: {}", requestNodeData.name);
+                log.warn("Nút yêu cầu được phát hiện khi làm mới yêu cầu thu thập id Trống rỗng và loại bỏ: {}", requestNodeData.name);
                 nodesToRemove.add(treeNode);
             } else {
                 HttpRequestItem latestRequestItem = CollectionRequestItemResolver.resolveCurrentRequest(requestId)
                         .orElse(null);
                 if (latestRequestItem == null) {
-                    log.warn("刷新集合请求时找不到 requestId={}，已移除: {}", requestId, requestNodeData.name);
+                    log.warn("Không tìm thấy khi làm mới yêu cầu thu thập requestId={}，LOẠI BỎ: {}", requestId, requestNodeData.name);
                     nodesToRemove.add(treeNode);
                 } else {
                     PerformanceRequestNodeStateSynchronizer.replaceRequestItem(requestNodeData, latestRequestItem);

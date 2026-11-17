@@ -11,7 +11,7 @@ import java.awt.GraphicsEnvironment;
 import java.util.concurrent.ExecutionException;
 
 /**
- * 启动失败的统一出口：记录错误、提示用户并退出进程。
+ * Lối thoát thống nhất khi khởi động không thành công: ghi lại lỗi, nhắc nhở người dùng và thoát khỏi quy trình.
  */
 @Slf4j
 @UtilityClass

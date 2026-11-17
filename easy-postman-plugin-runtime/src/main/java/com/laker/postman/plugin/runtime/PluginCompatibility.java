@@ -1,7 +1,7 @@
 package com.laker.postman.plugin.runtime;
 
 /**
- * 插件兼容性判定结果。
+ * Kết quả xác định tính tương thích của plug-in.
  */
 public record PluginCompatibility(
         boolean compatible,

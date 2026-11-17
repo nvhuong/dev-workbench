@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Git 操作结果封装。
+ * Git Đóng gói kết quả hoạt động.
  */
 public class GitOperationResult {
     public boolean success = false;

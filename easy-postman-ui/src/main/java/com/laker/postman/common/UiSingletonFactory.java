@@ -12,9 +12,9 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicReference;
 
 /**
- * UI 单例工厂，仅用于创建和管理主窗口、单例面板和单例菜单栏。
+ * UI Singleton Factory, chỉ dùng để tạo và quản lý cửa sổ chính, bảng điều khiển singleton và thanh menu singleton.
  * <p>
- * 业务 Service/Repository 应通过 IOC 容器获取，不应放入该工厂。
+ * kinh doanh Service/Repository nên vượt qua IOC Container lấy được thì không nên đưa vào nhà máy này.
  */
 @Slf4j
 public class UiSingletonFactory {
@@ -23,13 +23,13 @@ public class UiSingletonFactory {
     private static final Object CREATION_LOCK = new Object();
 
     private UiSingletonFactory() {
-        // 私有构造函数，防止实例化
+        // Nhà xây dựng riêng để ngăn chặn việc khởi tạo
     }
 
     /**
-     * 获取无参构造的单例实例
-     * 首次创建统一在 EDT 上完成，避免 Swing 组件在后台线程初始化。
-     * 如果 UI 单例初始化阶段发生环形依赖，直接失败并提示调整设计，不暴露半成品对象。
+     * Nhận một cá thể đơn được xây dựng không có tham số
+     * Unity được tạo ra lần đầu tiên EDT Xong rồi, tránh ra Swing Các thành phần được khởi tạo trên một luồng nền.
+     * nếu UI Nếu sự phụ thuộc vòng tròn xảy ra trong giai đoạn khởi tạo đơn lẻ, nó sẽ trực tiếp bị lỗi và nhắc bạn điều chỉnh thiết kế để không để lộ các đối tượng bán thành phẩm.
      */
     public static <T> T getInstance(Class<T> clazz) {
         if (clazz == null) {
@@ -68,10 +68,10 @@ public class UiSingletonFactory {
             });
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-            throw new GetInstanceException("创建单例失败: " + clazz.getName(), e);
+            throw new GetInstanceException("Không tạo được singleton: " + clazz.getName(), e);
         } catch (InvocationTargetException e) {
             Throwable cause = e.getCause() != null ? e.getCause() : e;
-            throw new GetInstanceException("创建单例失败: " + clazz.getName(), cause);
+            throw new GetInstanceException("Không tạo được singleton: " + clazz.getName(), cause);
         }
 
         if (errorRef.get() != null) {
@@ -107,7 +107,7 @@ public class UiSingletonFactory {
         boolean isUiSingletonPanel = UiSingletonPanel.class.isAssignableFrom(clazz);
         boolean isUiSingletonMenuBar = UiSingletonMenuBar.class.isAssignableFrom(clazz);
         try {
-            // 对于UiSingletonPanel类型，设置创建标志
+            // Đối vớiUiSingletonPanelNhập, đặt cờ tạo
             if (isUiSingletonPanel) {
                 UiSingletonPanel.setFactoryCreationAllowed(true);
             }
@@ -130,8 +130,8 @@ public class UiSingletonFactory {
         } catch (GetInstanceException e) {
             throw e;
         } catch (Exception e) {
-            log.error("创建单例失败: {}", clazz.getName(), e);
-            throw new GetInstanceException("创建单例失败: " + clazz.getName(), e);
+            log.error("Không tạo được singleton: {}", clazz.getName(), e);
+            throw new GetInstanceException("Không tạo được singleton: " + clazz.getName(), e);
         } finally {
             if (UiSingletonPanel.class.isAssignableFrom(clazz)) {
                 UiSingletonPanel.setFactoryCreationAllowed(false);

@@ -13,7 +13,7 @@ import java.awt.GraphicsEnvironment;
 import java.awt.Window;
 
 /**
- * 统一处理未捕获异常，避免入口类直接依赖通知 UI 细节。
+ * Các trường hợp ngoại lệ chưa được nắm bắt được xử lý thống nhất để ngăn các lớp đầu vào dựa trực tiếp vào thông báo UI chi tiết.
  */
 @Slf4j
 class AppUncaughtExceptionHandler implements Thread.UncaughtExceptionHandler {

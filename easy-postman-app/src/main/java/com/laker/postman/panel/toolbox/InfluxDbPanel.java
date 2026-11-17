@@ -310,7 +310,7 @@ public class InfluxDbPanel extends JPanel {
         ToolWindowSidebarHeader titleBar = new ToolWindowSidebarHeader(
                 I18nUtil.getMessage(MessageKeys.TOOLBOX_INFLUX_MEASUREMENT_MANAGEMENT), refreshMeasurementsBtn);
 
-        // 搜索框：仅做名称包含过滤，不需要大小写/整词等选项
+        // Hộp tìm kiếm: Chỉ thực hiện lọc bao gồm tên, không yêu cầu viết hoa chữ thường/Toàn bộ từ và các tùy chọn khác
         measurementSearchField = new SearchTextField();
         measurementSearchField.putClientProperty(FlatClientProperties.TEXT_FIELD_TRAILING_COMPONENT, null);
         measurementSearchField.putClientProperty(FlatClientProperties.PLACEHOLDER_TEXT,
@@ -521,17 +521,17 @@ public class InfluxDbPanel extends JPanel {
 
     private void applyHistory(HistoryEntry entry) {
         if (entry == null) return;
-        // suppressModeSwitch 防止 setSelectedItem 触发 switchMode 重置连接状态
+        // suppressModeSwitch ngăn chặn setSelectedItem kích hoạt switchMode Đặt lại trạng thái kết nối
         suppressModeSwitch = true;
         modeCombo.setSelectedItem(entry.mode);
         suppressModeSwitch = false;
-        // 只更新 UI 外观，不碰连接状态
+        // Chỉ cập nhật UI Ngoại hình, không chạm vào trạng thái kết nối
         updateModeUI(entry.mode);
         if (entry.mode == QueryMode.INFLUXQL_V1) {
             setComboEditorText(dbCombo, entry.db);
             setComboEditorText(measurementCombo, entry.measurement);
             if (!entry.db.isBlank() && connected) {
-                // fromHistory=true：跳过 measurementCombo model 替换（防闪烁）和模板刷新（防覆盖 query）
+                // fromHistory=true：Bỏ qua measurementCombo model Replacement (anti-flicker) and template refresh (anti-overwrite) query）
                 loadMeasurements(entry.db, true);
             }
         } else {
@@ -632,7 +632,7 @@ public class InfluxDbPanel extends JPanel {
             return;
         }
 
-        // 双击即查询：优先沿用当前模板并注入 measurement；无模板时回退到默认查询
+        // Bấm đúp để truy vấn: mẫu hiện tại sẽ được sử dụng trước và được chèn vào measurement；Quay lại truy vấn mặc định khi không có mẫu
         if (templateCombo != null && templateCombo.getSelectedIndex() >= 0) {
             loadTemplate();
         } else {
@@ -865,7 +865,7 @@ public class InfluxDbPanel extends JPanel {
 
         buildModeFields();
 
-        // 与 Kafka/Redis 一致：两行共用同一网格（配置 | 地址 | 模式 | 操作），第 2 行按模式切换 V1/V2 字段。
+        // Và Kafka/Redis Nhất quán: Cả hai hàng đều có chung một lưới (configure | địa chỉ | người mẫu | hoạt động), trang 2 Chuyển đổi chế độ nhấn hàng V1/V2 lĩnh vực.
         connectionForm = new JPanel(new MigLayout(
                 "insets 0, novisualpadding, gapy 4, hidemode 3",
                 growFieldColumns(PROFILE_GROUP_MIN_WIDTH, PROFILE_GROUP_PREF_WIDTH) + GROUP_GAP
@@ -885,7 +885,7 @@ public class InfluxDbPanel extends JPanel {
         connectionForm.add(modeCombo, "cell 5 0, " + controlHeight);
         connectionForm.add(actions, "cell 6 0, right");
 
-        // 第 2 行 V1：用户 | 密码 | 数据库（含刷新元数据，跨列与操作区右对齐）
+        // KHÔNG.  2 Được rồi V1：Người dùng | mật khẩu | Cơ sở dữ liệu (bao gồm siêu dữ liệu làm mới, căn phải theo các cột và vùng vận hành)
         JLabel userLabel = ConnectionToolbarUi.label(I18nUtil.getMessage(MessageKeys.TOOLBOX_INFLUX_USER));
         JLabel passLabel = ConnectionToolbarUi.label(I18nUtil.getMessage(MessageKeys.TOOLBOX_INFLUX_PASS));
         JLabel dbLabel = ConnectionToolbarUi.label(I18nUtil.getMessage(MessageKeys.TOOLBOX_INFLUX_DB));
@@ -905,7 +905,7 @@ public class InfluxDbPanel extends JPanel {
         connectionForm.add(dbGroup, "cell 5 1 2 1, growx, " + controlHeight);
         v1Components = new JComponent[]{userLabel, userField, passLabel, passwordField, dbLabel, dbGroup};
 
-        // 第 2 行 V2：Token（跨配置/地址列） | 组织（与模式列对齐，跨列到右边缘）
+        // KHÔNG.  2 Được rồi V2：Token（Trên khắp các cấu hình/cột địa chỉ) | Tổ chức (căn chỉnh với cột mẫu, cột kéo dài sang cạnh phải)
         JLabel tokenLabel = ConnectionToolbarUi.label(I18nUtil.getMessage(MessageKeys.TOOLBOX_INFLUX_TOKEN));
         JLabel orgLabel = ConnectionToolbarUi.label(I18nUtil.getMessage(MessageKeys.TOOLBOX_INFLUX_ORG));
         connectionForm.add(tokenLabel, "cell 0 1");
@@ -925,7 +925,7 @@ public class InfluxDbPanel extends JPanel {
     }
 
     /**
-     * 标签列按本列最长标签自适应；字段列窄窗口可压缩到 min，宽窗口均分多余空间，最多拉伸到 2 倍。
+     * Cột nhãn thích ứng theo nhãn dài nhất trong cột; cửa sổ hẹp của cột trường có thể được nén thành min，Cửa sổ rộng chia đều không gian thừa, kéo dài tới 2 lần.
      */
     private static String growFieldColumns(int minWidth, int prefWidth) {
         return "[pref!,right]4[" + minWidth + ":" + prefWidth + ":" + (prefWidth * 2) + ",fill,grow,shrink]";
@@ -1270,7 +1270,7 @@ public class InfluxDbPanel extends JPanel {
         panel.setOpaque(false);
         panel.setBorder(BorderFactory.createEmptyBorder(4, 0, 0, 0));
 
-        // ---- 工具栏（MigLayout）----
+        // ---- thanh công cụ (MigLayout）----
         JPanel toolbar = new JPanel(new MigLayout("insets 4, fillx", "[][][]8[][][]push", "[]"));
         ToolWindowSurfaceStyle.applySectionHeader(toolbar);
 
@@ -1315,10 +1315,10 @@ public class InfluxDbPanel extends JPanel {
 
         panel.add(topArea, BorderLayout.NORTH);
 
-        // 查询编辑器 - 参考 RequestBodyPanel，可编辑，用 SearchableTextArea 包装（启用搜索替换）
+        // Trình soạn thảo truy vấn - Tham khảo RequestBodyPanel，Có thể chỉnh sửa, sử dụng SearchableTextArea Gói (cho phép tìm kiếm và thay thế)
         JPanel queryPanel = new JPanel(new BorderLayout());
         queryPanel.setOpaque(false);
-        // 查询编辑器顶部标题 + 工具按钮（MigLayout）
+        // Tiêu đề ở đầu trình soạn thảo truy vấn + Nút công cụ (MigLayout）
         JPanel queryHeaderBar = new JPanel(new MigLayout("insets 2 4 2 4, fillx", "[]push", "[]"));
         ToolWindowSurfaceStyle.applySectionHeader(queryHeaderBar);
         queryLabel = new JLabel(I18nUtil.getMessage(MessageKeys.TOOLBOX_INFLUX_QUERY_TITLE));
@@ -1327,15 +1327,15 @@ public class InfluxDbPanel extends JPanel {
 
         queryEditor = createQueryEditor();
         registerCtrlEnterShortcut(executeBtn);
-        // 参考 RequestBodyPanel：可编辑编辑器使用 SearchableTextArea(area) 包装（启用搜索替换）
+        // Tham khảo RequestBodyPanel：Có thể sử dụng trình soạn thảo có thể chỉnh sửa SearchableTextArea(area) Gói (cho phép tìm kiếm và thay thế)
         searchableQueryArea = new SearchableTextArea(queryEditor);
         queryPanel.add(queryHeaderBar, BorderLayout.NORTH);
         queryPanel.add(searchableQueryArea, BorderLayout.CENTER);
 
-        // 结果区
+        // Khu vực kết quả
         JPanel resultPanel = new JPanel(new BorderLayout());
         resultPanel.setOpaque(false);
-        // 响应标题栏（MigLayout）
+        // Thanh tiêu đề đáp ứng (MigLayout）
         JPanel respHeader = new JPanel(new MigLayout("insets 2 4 2 4, fillx", "[]push[]", "[]"));
         ToolWindowSurfaceStyle.applySectionHeader(respHeader);
         JLabel respLabel = new JLabel(I18nUtil.getMessage(MessageKeys.TOOLBOX_INFLUX_RESPONSE_TITLE));
@@ -1346,7 +1346,7 @@ public class InfluxDbPanel extends JPanel {
         respHeader.add(respLabel);
         respHeader.add(respStatusLabel);
 
-        // 参考 ResponseBodyPanel：不可编辑编辑器使用 SearchableTextArea(area, false) 包装（仅搜索）
+        // Tham khảo ResponseBodyPanel：Không có sẵn để sử dụng biên tập chỉnh sửa SearchableTextArea(area, false) Bao bì (chỉ tìm kiếm)
         resultArea = createResponseEditor();
         searchableResultArea = new SearchableTextArea(resultArea, false);
         resultTablePanel = new EnhancedTablePanel(new String[]{});
@@ -1379,14 +1379,14 @@ public class InfluxDbPanel extends JPanel {
         wrapper.add(measurementCombo);
         wrapper.add(new JSeparator(SwingConstants.VERTICAL), "growy, gap 2 2");
 
-        // Fields 只读浏览
+        // Fields Duyệt chỉ đọc
         fieldCombo = new EasyComboBox<>(EasyComboBox.WidthMode.DYNAMIC);
         wrapper.add(new JLabel(I18nUtil.getMessage(MessageKeys.TOOLBOX_INFLUX_FIELD)));
         wrapper.add(fieldCombo);
 
         wrapper.add(new JSeparator(SwingConstants.VERTICAL), "growy, gap 2 2");
 
-        // Tag 浏览区
+        // Tag Duyệt khu vực
         wrapper.add(new JLabel(I18nUtil.getMessage(MessageKeys.TOOLBOX_INFLUX_TAGS)));
         tagRowsPanel = new JPanel(new MigLayout("insets 0, fillx", "[][fill][]", "[]"));
         tagRowsPanel.setOpaque(false);
@@ -1550,7 +1550,7 @@ public class InfluxDbPanel extends JPanel {
     }
 
     /**
-     * InfluxQL(V1) 探测 /ping，Flux(V2) 探测 /health；非 2xx 视为失败。仅使用传入地址，不修改当前连接状态。
+     * InfluxQL(V1) phát hiện /ping，Flux(V2) phát hiện /health；Không 2xx Được coi là một thất bại. Chỉ địa chỉ đến được sử dụng và trạng thái kết nối hiện tại không được sửa đổi.
      */
     private HttpResult probeServer(String targetBaseUrl, QueryMode mode) throws IOException {
         HttpResult result = mode == QueryMode.INFLUXQL_V1
@@ -1581,7 +1581,7 @@ public class InfluxDbPanel extends JPanel {
     }
 
     /**
-     * 仅验证当前表单配置能否连通，不加载元数据、不改变已连接状态。
+     * Nó chỉ xác minh xem cấu hình biểu mẫu hiện tại có thể được kết nối hay không mà không cần tải siêu dữ liệu hoặc thay đổi trạng thái được kết nối.
      */
     private void testConnection() {
         String targetBaseUrl = readTargetBaseUrl();
@@ -1616,7 +1616,7 @@ public class InfluxDbPanel extends JPanel {
     }
 
     /**
-     * 连接/测试连接进行中时互斥，避免重复点击触发并发连接。
+     * kết nối/Loại trừ lẫn nhau khi kết nối thử nghiệm đang diễn ra, để tránh các lần nhấp chuột lặp lại kích hoạt các kết nối đồng thời.
      */
     private void setConnectionBusy(boolean busy) {
         connectBtn.setEnabled(!busy);
@@ -1847,12 +1847,12 @@ public class InfluxDbPanel extends JPanel {
                     if (result.code() >= 200 && result.code() < 300) {
                         List<String> measurements = parseInfluxColumnValues(result.body(), 0);
                         if (!fromHistory) {
-                            // 正常场景：同步更新 measurementCombo 的下拉选项
+                            // Kịch bản bình thường: cập nhật đồng bộ measurementCombo các tùy chọn thả xuống
                             String previous = getSelectedMeasurement();
                             setComboOptions(measurementCombo, measurements, previous);
                         }
-                        // 历史回填场景：跳过 setComboOptions 避免 model 替换导致下拉框闪烁
-                        // 左侧列表始终刷新
+                        // Kịch bản chèn lấp lịch sử: bị bỏ qua setComboOptions tránh model Việc thay thế khiến hộp thả xuống nhấp nháy
+                        // Danh sách bên trái luôn được làm mới
                         updateMeasurementList(measurements, getSelectedMeasurement());
 
                         String measurement = getSelectedMeasurement();
@@ -1860,7 +1860,7 @@ public class InfluxDbPanel extends JPanel {
                             loadFieldKeys(db, measurement);
                             loadTagKeys(db, measurement);
                         }
-                        // 历史回填时跳过 loadTemplate，避免覆盖回填的 query
+                        // Bỏ qua khi chèn lấp lịch sử loadTemplate，Tránh ghi đè chèn lấp query
                         if (!fromHistory) loadTemplate();
                     }
                 } catch (InterruptedException ex) {
@@ -2034,7 +2034,7 @@ public class InfluxDbPanel extends JPanel {
                 }
             }
         } catch (Exception ignored) {
-            // 非 JSON 或解析失败时忽略
+            // Không JSON Hoặc bị bỏ qua nếu phân tích cú pháp thất bại
         }
         return "";
     }

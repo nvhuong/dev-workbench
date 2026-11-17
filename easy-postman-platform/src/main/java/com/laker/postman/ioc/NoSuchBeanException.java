@@ -1,7 +1,7 @@
 package com.laker.postman.ioc;
 
 /**
- * Bean未找到异常
+ * BeanKhông tìm thấy ngoại lệ
  */
 public class NoSuchBeanException extends BeanException {
 

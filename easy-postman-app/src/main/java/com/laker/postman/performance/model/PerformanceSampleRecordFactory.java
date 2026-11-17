@@ -22,7 +22,7 @@ public class PerformanceSampleRecordFactory {
         PerformanceProtocol protocol = executionResult.protocol == null
                 ? PerformanceProtocol.HTTP
                 : executionResult.protocol;
-        // 热路径只生成轻量统计记录，UI 明细对象由结果表/详情面板按需懒加载。
+        // Đường dẫn nóng chỉ tạo ra các bản ghi thống kê nhẹ.UI Đối tượng chi tiết bao gồm bảng kết quả/Details panel is loaded lazily on demand.
         return PerformanceSampleRecord.builder()
                 .apiId(executionResult.apiId)
                 .apiName(executionResult.apiName)

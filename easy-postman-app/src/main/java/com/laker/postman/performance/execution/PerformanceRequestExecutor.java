@@ -171,7 +171,7 @@ public class PerformanceRequestExecutor {
         ScriptExecutionResult preResult = scriptRuntime.executePreScript();
         boolean preOk = preResult.isSuccess();
         if (!preOk) {
-            log.error("前置脚本: {}", preResult.getErrorMessage());
+            log.error("Kịch bản trước: {}", preResult.getErrorMessage());
             errorMsg = I18nUtil.getMessage(MessageKeys.PERFORMANCE_MSG_PRE_SCRIPT_FAILED, preResult.getErrorMessage());
             executionFailed = true;
         }
@@ -252,14 +252,14 @@ public class PerformanceRequestExecutor {
                 }
             } catch (Exception ex) {
                 if (cancelledChecker.test(ex)) {
-                    log.debug("请求被取消/中断（压测已停止）: {}", ex.getMessage());
+                    log.debug("Yêu cầu đã bị hủy/Bị gián đoạn (kiểm tra căng thẳng đã dừng lại): {}", ex.getMessage());
                     errorMsg = I18nUtil.getMessage(
                             MessageKeys.PERFORMANCE_MSG_EXECUTION_INTERRUPTED,
                             "Client stopped HTTP request before completion"
                     );
                     interrupted = true;
                 } else {
-                    log.error("请求执行失败: {}", ex.getMessage(), ex);
+                    log.error("Thực hiện yêu cầu không thành công: {}", ex.getMessage(), ex);
                     errorMsg = I18nUtil.getMessage(MessageKeys.PERFORMANCE_MSG_REQUEST_FAILED, ex.getMessage());
                     executionFailed = true;
                 }

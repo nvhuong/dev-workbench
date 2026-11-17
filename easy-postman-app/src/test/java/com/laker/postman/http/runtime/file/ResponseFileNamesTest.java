@@ -39,32 +39,32 @@ public class ResponseFileNamesTest {
         assertEquals(ResponseFileNames.parseFileNameFromContentDisposition("attachment; filename=report.csv; size=1"),
                 "report.csv");
         assertEquals(ResponseFileNames.parseFileNameFromContentDisposition(
-                "attachment; filename*=UTF-8''%E6%B5%8B%E8%AF%95.txt"), "测试.txt");
+                "attachment; filename*=UTF-8''%E6%B5%8B%E8%AF%95.txt"), "Bài kiểm tra.txt");
         assertNull(ResponseFileNames.parseFileNameFromContentDisposition("attachment"));
         assertNull(ResponseFileNames.parseFileNameFromContentDisposition(null));
     }
 
     @Test
     public void shouldFollowRfc6266FileNamePrecedenceAndDecoding() {
-        // filename* 优先于 filename，无论出现顺序
+        // filename* được ưu tiên hơn filename，Không có vấn đề thứ tự xuất hiện
         assertEquals(ResponseFileNames.parseFileNameFromContentDisposition(
-                "attachment; filename=\"fallback.xlsx\"; filename*=UTF-8''%E6%8A%A5%E8%A1%A8.xlsx"), "报表.xlsx");
+                "attachment; filename=\"fallback.xlsx\"; filename*=UTF-8''%E6%8A%A5%E8%A1%A8.xlsx"), "Báo cáo.xlsx");
         assertEquals(ResponseFileNames.parseFileNameFromContentDisposition(
-                "attachment; filename*=utf-8'zh-CN'%E6%8A%A5%E8%A1%A8.xlsx; filename=fallback.xlsx"), "报表.xlsx");
+                "attachment; filename*=utf-8'zh-CN'%E6%8A%A5%E8%A1%A8.xlsx; filename=fallback.xlsx"), "Báo cáo.xlsx");
         assertEquals(ResponseFileNames.parseFileNameFromContentDisposition(
                 "attachment; filename*=ISO-8859-1''na%EFve.txt"), "naïve.txt");
-        // filename* 无效时退回 filename
+        // filename* Trả lại nếu không hợp lệ filename
         assertEquals(ResponseFileNames.parseFileNameFromContentDisposition(
                 "attachment; filename*=UNKNOWN-CHARSET''x.txt; filename=\"ok.txt\""), "ok.txt");
-        // 常见的非标准写法：URLEncoder 编码、RFC 2047 编码字、省略类型、引号内转义
+        // Các phương pháp viết không chuẩn phổ biến:URLEncoder Mã hóa,RFC 2047 Các từ được mã hóa, loại bỏ qua, thoát trong dấu ngoặc kép
         assertEquals(ResponseFileNames.parseFileNameFromContentDisposition(
-                "attachment;filename=%E6%8A%A5%E8%A1%A8.xlsx"), "报表.xlsx");
+                "attachment;filename=%E6%8A%A5%E8%A1%A8.xlsx"), "Báo cáo.xlsx");
         assertEquals(ResponseFileNames.parseFileNameFromContentDisposition(
-                "attachment; filename=\"=?UTF-8?B?5oql6KGoLnhsc3g=?=\""), "报表.xlsx");
+                "attachment; filename=\"=?UTF-8?B?5oql6KGoLnhsc3g=?=\""), "Báo cáo.xlsx");
         assertEquals(ResponseFileNames.parseFileNameFromContentDisposition("filename=report.xlsx"), "report.xlsx");
         assertEquals(ResponseFileNames.parseFileNameFromContentDisposition(
                 "attachment; filename=\"a \\\"quoted\\\" name; v2.txt\""), "a _quoted_ name; v2.txt");
-        // 不是合法百分号编码时保持原样
+        // Hãy để nguyên như vậy nếu nó không phải là mã hóa phần trăm hợp pháp
         assertEquals(ResponseFileNames.parseFileNameFromContentDisposition(
                 "attachment; filename=\"100%.txt\""), "100%.txt");
     }
@@ -87,7 +87,7 @@ public class ResponseFileNamesTest {
 
     @Test
     public void shouldDecodeUrlFileName() {
-        assertEquals(ResponseFileNames.resolve(null, "/files/%E6%8A%A5%E8%A1%A8.xlsx", ".xlsx"), "报表.xlsx");
+        assertEquals(ResponseFileNames.resolve(null, "/files/%E6%8A%A5%E8%A1%A8.xlsx", ".xlsx"), "Báo cáo.xlsx");
         assertEquals(ResponseFileNames.resolve(null, "/files/a%2F..%2Fb.pdf", ".pdf"), "b.pdf");
     }
 
@@ -96,7 +96,7 @@ public class ResponseFileNamesTest {
         assertTrue(ResponseFileNames.isAttachment("attachment"));
         assertTrue(ResponseFileNames.isAttachment(" Attachment; filename=a.xlsx"));
         assertFalse(ResponseFileNames.isAttachment("inline; filename=\"a.pdf\""));
-        assertFalse(ResponseFileNames.isAttachment("inline;filename=f.txt"), "Spring RFD 防护头不代表文件下载");
+        assertFalse(ResponseFileNames.isAttachment("inline;filename=f.txt"), "Spring RFD Tiêu đề bảo vệ không đại diện cho việc tải xuống tệp");
         assertFalse(ResponseFileNames.isAttachment("attachmentish"));
         assertFalse(ResponseFileNames.isAttachment("inline"));
         assertFalse(ResponseFileNames.isAttachment(" "));
@@ -121,12 +121,12 @@ public class ResponseFileNamesTest {
 
     @Test
     public void shouldKeepRealUrlExtensionAndReplaceOnlyRouteOrTextSuffix() {
-        // URL 中的文件类后缀保留（含 .jar/.xlsm/.msg 等文件头无法区分的子类型）
+        // URL Hậu tố lớp tệp được bảo lưu (inclusive .jar/.xlsm/.msg các kiểu con không thể phân biệt được bằng tiêu đề tệp)
         assertEquals(ResponseFileNames.resolve(null, "/files/app.jar", ".zip"), "app.jar");
         assertEquals(ResponseFileNames.resolve(null, "/download/report.xlsm", ".xlsx"), "report.xlsm");
         assertEquals(ResponseFileNames.resolve(null, "/mail/message.msg", ".bin"), "message.msg");
         assertEquals(ResponseFileNames.resolve(null, "/file.dat", ".zip"), "file.dat");
-        // 接口路由和文本类后缀按内容替换
+        // Hậu tố lớp văn bản và định tuyến giao diện được thay thế bằng nội dung
         assertEquals(ResponseFileNames.resolve(null, "/api/export.action", ".pdf"), "export.pdf");
         assertEquals(ResponseFileNames.resolve(null, "/api/data.json", ".bin"), "data.bin");
         assertEquals(ResponseFileNames.resolve(null, "/api/export.do", ".zip"), "export.zip");
@@ -164,7 +164,7 @@ public class ResponseFileNamesTest {
         assertEquals(ResponseFileNames.resolve(null, "/movie.mp4", ".zip", ".zip"), "movie.zip");
         assertEquals(ResponseFileNames.resolve(null, "/report.xlsx", ".xlsm", ".xlsm"), "report.xlsm");
         assertEquals(ResponseFileNames.resolve(null, "/export.do", ".xlsm", ".xlsx"), "export.xlsm",
-                "接口路由后缀按调和后的扩展名替换");
+                "Hậu tố tuyến giao diện được thay thế bằng phần mở rộng được điều chỉnh");
     }
 
     @Test

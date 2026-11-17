@@ -9,28 +9,28 @@ import javax.swing.*;
 import java.awt.*;
 
 /**
- * 清空按钮
- * 用于清空控制台或其他内容
+ * Nút xóa
+ * Được sử dụng để xóa bảng điều khiển hoặc nội dung khác
  */
 public class ClearButton extends JButton {
     /**
-     * 默认构造函数：使用 SMALL 图标
+     * Hàm tạo mặc định: đã sử dụng SMALL biểu tượng
      */
     public ClearButton() {
         this(IconUtil.SIZE_MEDIUM);
     }
 
     /**
-     * 自定义构造函数
+     * Trình xây dựng tùy chỉnh
      *
-     * @param iconSize 图标大小
+     * @param iconSize Kích thước biểu tượng
      */
     public ClearButton(int iconSize) {
         super();
         setIcon(IconUtil.createThemed("icons/clear.svg", iconSize, iconSize));
         setToolTipText(CommonI18n.get(CommonMessageKeys.BUTTON_CLEAR));
-        // 扁平化设计
-        setFocusable(false);// 去掉按钮的焦点边框
+        // Thiết kế phẳng
+        setFocusable(false);// Xóa đường viền tiêu điểm của nút
         setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         putClientProperty(FlatClientProperties.BUTTON_TYPE, FlatClientProperties.BUTTON_TYPE_TOOLBAR_BUTTON);
     }

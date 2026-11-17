@@ -19,7 +19,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * 响应下载文件名解析：Content-Disposition、URL 路径与内容识别结果之间的取舍规则集中在这里。
+ * Phản hồi độ phân giải tên tệp tải xuống:Content-Disposition、URL Các quy tắc lựa chọn giữa kết quả nhận dạng đường dẫn và nội dung được tập trung ở đây.
  */
 @UtilityClass
 public class ResponseFileNames {
@@ -27,17 +27,17 @@ public class ResponseFileNames {
     public static final String CONTENT_DISPOSITION_HEADER = "Content-Disposition";
 
     /**
-     * 从响应头中提取 Content-Disposition（大小写不敏感），不存在时返回 {@code null}。
+     * Trích xuất từ ​​tiêu đề phản hồi Content-Disposition（Không phân biệt chữ hoa chữ thường), được trả về nếu nó không tồn tại {@code null}。
      */
     public static String getContentDisposition(Map<String, List<String>> headers) {
         return ResponseFiles.firstHeader(headers, CONTENT_DISPOSITION_HEADER);
     }
 
     /**
-     * Content-Disposition 为 attachment 时，服务端明确希望以文件方式下载。
+     * Content-Disposition vì attachment , máy chủ rõ ràng muốn tải xuống dưới dạng tệp.
      * <p>
-     * {@code inline; filename=...} 不算：例如 Spring MVC 会给 {@code /list.do} 的 JSON 响应加上
-     * {@code inline;filename=f.txt} 以防 RFD 攻击，这类响应仍应按普通文本展示。
+     * {@code inline; filename=...} Không tính: ví dụ: Spring MVC Sẽ cho {@code /list.do} của JSON Phản hồi cộng
+     * {@code inline;filename=f.txt} Chỉ trong trường hợp RFD tấn công, những phản hồi như vậy vẫn phải được hiển thị dưới dạng văn bản thuần túy.
      * </p>
      */
     public static boolean isAttachment(String contentDisposition) {
@@ -49,14 +49,14 @@ public class ResponseFileNames {
     }
 
     /**
-     * 按 RFC 6266 从 Content-Disposition 中解析文件名，结果已去掉路径并替换掉文件系统不允许的字符。
+     * Nhấn RFC 6266 Từ Content-Disposition Tên tệp được phân tích cú pháp và đường dẫn bị xóa và các ký tự không được hệ thống tệp cho phép sẽ được thay thế.
      * <ol>
-     *     <li>{@code filename*}（RFC 5987，如 {@code UTF-8''%E6%8A%A5%E8%A1%A8.xlsx}）优先，按声明的字符集解码</li>
-     *     <li>否则使用 {@code filename}；兼容浏览器的常见做法，解码其中合法的 UTF-8 百分号编码
-     *     （很多服务端用 {@code URLEncoder} 编码中文文件名）和 RFC 2047 编码字（{@code =?UTF-8?B?...?=}）</li>
+     *     <li>{@code filename*}（RFC 5987，Chẳng hạn như {@code UTF-8''%E6%8A%A5%E8%A1%A8.xlsx}）Ưu tiên giải mã theo bộ ký tự được khai báo</li>
+     *     <li>Nếu không thì sử dụng {@code filename}；Tương thích với các thông lệ trình duyệt phổ biến và giải mã các thông lệ hợp pháp UTF-8 Mã hóa phần trăm
+     *     （Được sử dụng bởi nhiều máy chủ {@code URLEncoder} tên tệp tiếng Trung được mã hóa) và RFC 2047 Từ được mã hóa ({@code =?UTF-8?B?..?=}）</li>
      * </ol>
      *
-     * @return 解析出的文件名，无法解析时返回 {@code null}
+     * @return Tên tệp được phân tích cú pháp được trả về khi không thể phân tích cú pháp được {@code null}
      */
     public static String parseFileNameFromContentDisposition(String contentDisposition) {
         if (contentDisposition == null || contentDisposition.isBlank()) {
@@ -73,10 +73,10 @@ public class ResponseFileNames {
     }
 
     /**
-     * 把服务端或 URL 给出的名字变成可以安全用作默认保存名的文件名：
-     * 去掉目录部分（RFC 6266 要求），替换控制字符和 Windows 不允许的字符，去掉首尾空白和末尾的点。
+     * Đặt máy chủ hoặc URL Tên đã cho sẽ trở thành tên tệp an toàn để sử dụng làm tên lưu mặc định: .
+     * Xóa phần thư mục (RFC 6266 bắt buộc), thay thế các ký tự điều khiển và Windows Đối với các ký tự không được phép, khoảng trắng ở đầu và cuối cũng như dấu chấm ở cuối sẽ bị xóa.
      *
-     * @return 处理后的文件名；没有可用字符时返回 {@code null}
+     * @return Tên tệp được xử lý; được trả về nếu không có ký tự nào {@code null}
      */
     public static String sanitize(String name) {
         if (name == null) {
@@ -118,7 +118,7 @@ public class ResponseFileNames {
     }
 
     /**
-     * 解析 disposition 参数（名称小写），支持带引号和反斜杠转义的值；同名参数以第一个为准。
+     * phân tích disposition Các tham số (tên viết thường), hỗ trợ các giá trị được trích dẫn và thoát dấu gạch chéo ngược; tham số đầu tiên có cùng tên sẽ được ưu tiên áp dụng.
      */
     private static Map<String, String> dispositionParameters(String contentDisposition) {
         Map<String, String> parameters = new HashMap<>();
@@ -126,7 +126,7 @@ public class ResponseFileNames {
         int i = contentDisposition.indexOf(';');
         String dispositionType = contentDisposition.substring(0, i < 0 ? length : i);
         if (dispositionType.contains("=")) {
-            // 不规范地省略了 disposition 类型，例如 "filename=report.xlsx"
+            // Bị bỏ qua một cách bất thường disposition Nhập, ví dụ "filename=report.xlsx"
             i = -1;
         } else if (i < 0) {
             return parameters;
@@ -172,7 +172,7 @@ public class ResponseFileNames {
     }
 
     /**
-     * 解码 RFC 5987 扩展值 {@code charset'language'percent-encoded}，格式或字符集无效时返回 {@code null}。
+     * giải mã RFC 5987 giá trị mở rộng {@code charset'language'percent-encoded}，Trả về nếu định dạng hoặc bộ ký tự không hợp lệ {@code null}。
      */
     private static String decodeExtendedValue(String value) {
         if (value == null) {
@@ -193,7 +193,7 @@ public class ResponseFileNames {
     }
 
     /**
-     * 只有存在百分号编码、且解码结果是合法 UTF-8 时才解码，避免把普通文件名里的 % 弄坏。
+     * Chỉ mã hóa phần trăm tồn tại và kết quả giải mã là hợp pháp UTF-8 Chỉ giải mã khi cần thiết để tránh đặt chúng vào tên tệp thông thường % Vỡ.
      */
     private static String percentDecodeUtf8(String value) {
         if (value.indexOf('%') < 0) {
@@ -230,7 +230,7 @@ public class ResponseFileNames {
             Pattern.compile("=\\?([^?]+)\\?([BbQq])\\?([^?]*)\\?=");
 
     /**
-     * 解码 RFC 2047 编码字（部分服务端沿用邮件的写法，如 {@code =?UTF-8?B?5oql6KGoLnhsc3g=?=}）。
+     * giải mã RFC 2047 Các từ được mã hóa (một số máy chủ tuân theo phương pháp viết email, chẳng hạn như {@code =?UTF-8?B?5oql6KGoLnhsc3g=?=}）。
      */
     private static String decodeEncodedWords(String value) {
         if (!value.contains("=?")) {
@@ -269,7 +269,7 @@ public class ResponseFileNames {
     }
 
     /**
-     * 解析下载文件名，内容无法通过文件头识别时使用。
+     * Phân tích tên tệp đã tải xuống và sử dụng nó khi không thể xác định được nội dung thông qua tiêu đề tệp.
      *
      * @see #resolve(String, String, String, String)
      */
@@ -278,19 +278,19 @@ public class ResponseFileNames {
     }
 
     /**
-     * 解析下载文件名。
+     * Phân tích tên tệp đã tải xuống.
      * <ol>
-     *     <li>Content-Disposition 携带文件名时优先使用，缺少扩展名时补上 {@code extension}</li>
-     *     <li>否则使用 URL 最后一段：没有扩展名时补上 {@code extension}；
-     *     接口路由或文本类后缀（/export.do、/download.json）替换为 {@code extension}；
-     *     其余后缀与文件头识别结果冲突时按 {@link ResponseFileTypeDetector#reconcile} 纠正（/photo.png 实际是 PDF → photo.pdf）</li>
-     *     <li>都没有时生成带时间戳的智能文件名</li>
+     *     <li>Content-Disposition Khi mang tên tệp, nó được sử dụng trước và khi thiếu phần mở rộng, nó sẽ được thêm vào {@code extension}</li>
+     *     <li>Nếu không thì sử dụng URL Đoạn cuối: thêm nếu không có phần mở rộng {@code extension}；
+     *     Tuyến giao diện hoặc hậu tố lớp văn bản (/export.do、/download.json）Thay thế bằng  {@code extension}；
+     *     Nhấn khi các hậu tố khác xung đột với kết quả nhận dạng tiêu đề tệp {@link ResponseFileTypeDetector#reconcile} Đúng(/photo.png Trên thực tế là có PDF → photo.pdf）</li>
+     *     <li>Tạo tên tệp thông minh được đánh dấu thời gian khi không có sẵn</li>
      * </ol>
      *
-     * @param contentDisposition Content-Disposition 响应头，可为空
-     * @param urlEncodedPath     请求 URL 的 path，可为空
-     * @param extension          内容对应的扩展名（含点），可为空
-     * @param detectedExtension  文件头识别出的扩展名（含点），可为空
+     * @param contentDisposition Content-Disposition Tiêu đề phản hồi, có thể trống
+     * @param urlEncodedPath     yêu cầu URL của path，Có thể trống
+     * @param extension          Phần mở rộng tương ứng với nội dung (bao gồm cả dấu chấm) có thể để trống
+     * @param detectedExtension  Phần mở rộng được nhận dạng bởi tiêu đề tệp (bao gồm cả dấu chấm), có thể trống
      */
     public static String resolve(String contentDisposition,
                                  String urlEncodedPath,
@@ -301,7 +301,7 @@ public class ResponseFileNames {
     }
 
     /**
-     * 同 {@link #resolve(String, String, String, String)}，使用带确认信息的识别结果调和 URL 后缀。
+     * Giống nhau {@link #resolve(String, String, String, String)}，Đối chiếu bằng cách sử dụng kết quả nhận dạng với thông báo xác nhận URL hậu tố.
      */
     public static String resolve(String contentDisposition,
                                  String urlEncodedPath,
@@ -335,7 +335,7 @@ public class ResponseFileNames {
     }
 
     /**
-     * 取 URL path 的最后一段作为文件名，去掉 {@code ! ? #} 之后的部分；path 以 / 结尾时返回 {@code null}。
+     * Lấy URL path Đoạn cuối cùng được sử dụng làm tên tệp và bị xóa {@code ! ? #} Phần sau;path qua / Trở lại vào cuối {@code null}。
      */
     public static String fileNameFromUrlPath(String path) {
         if (path == null) {
@@ -357,7 +357,7 @@ public class ResponseFileNames {
     }
 
     /**
-     * 返回文件名中的扩展名（含点），没有扩展名时返回 {@code null}。
+     * Trả về phần mở rộng (bao gồm dấu chấm) trong tên tệp hoặc trả về nếu không có phần mở rộng {@code null}。
      */
     public static String extensionOf(String fileName) {
         if (fileName == null || fileName.isBlank()) {
@@ -367,7 +367,7 @@ public class ResponseFileNames {
         return dot >= 0 && dot < fileName.length() - 1 ? fileName.substring(dot) : null;
     }
 
-    /** 接口路由后缀和文本类后缀：不代表下载文件的真实类型，可以按内容替换。 */
+    /** Hậu tố định tuyến giao diện và hậu tố lớp văn bản: không thể hiện loại tệp thực tế được tải xuống và có thể được thay thế bằng nội dung. */
     private static final Set<String> REPLACEABLE_URL_EXTENSIONS = Set.of(
             ".do", ".action", ".php", ".jsp", ".jspx", ".asp", ".aspx", ".ashx", ".cgi", ".pl", ".py",
             ".rb", ".cfm", ".json", ".txt", ".html", ".htm", ".xhtml", ".xml", ".csv", ".js");

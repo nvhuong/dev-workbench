@@ -59,10 +59,10 @@ public class PerformanceStatisticsCoordinatorAsyncTimestampTest {
             });
 
             assertTrue(realtimeSamplerNow.get() >= releaseTimeMs,
-                    "趋势窗口应使用实际 drain 时间采样，realtimeSamplerNow=" + realtimeSamplerNow.get()
+                    "Cửa sổ xu hướng nên được sử dụng thực tế drain thời gian lấy mẫu,realtimeSamplerNow=" + realtimeSamplerNow.get()
                             + ", releaseTimeMs=" + releaseTimeMs);
             assertTrue(trendView.period.getFirstMillisecond() >= releaseTimeMs,
-                    "趋势图 X 轴应使用实际 drain 时间，period=" + trendView.period.getFirstMillisecond()
+                    "Biểu đồ xu hướng X Trục nên được sử dụng thực tế drain thời gian,period=" + trendView.period.getFirstMillisecond()
                             + ", releaseTimeMs=" + releaseTimeMs);
         } finally {
             coordinator.dispose();

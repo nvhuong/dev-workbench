@@ -10,10 +10,10 @@ import javax.swing.tree.TreeNode;
 import java.util.Optional;
 
 /**
- * 树节点仓库默认实现。
+ * Kho nút cây được triển khai theo mặc định.
  * <p>
- * 通过 CollectionTreeRootRegistry 读取当前 UI 已注册的 collection 树根节点，
- * service 层不直接创建或查找 Swing panel。
+ * vượt qua CollectionTreeRootRegistry Đọc hiện tại UI Đăng ký collection nút gốc cây,
+ * service Các lớp không được tạo hoặc tìm thấy trực tiếp Swing panel。
  */
 @Slf4j
 public class ActiveCollectionTreeNodeRepository implements TreeNodeRepository {
@@ -26,7 +26,7 @@ public class ActiveCollectionTreeNodeRepository implements TreeNodeRepository {
 
         Optional<DefaultMutableTreeNode> rootOpt = getRootNode();
         if (rootOpt.isEmpty()) {
-            log.trace("根节点为空，无法查找节点: {}", requestId);
+            log.trace("Nút gốc trống và không thể tìm thấy nút đó: {}", requestId);
             return Optional.empty();
         }
 
@@ -49,7 +49,7 @@ public class ActiveCollectionTreeNodeRepository implements TreeNodeRepository {
         Optional<HttpRequestItem> request = CollectionTreeNodes.request(root);
         if (request.isPresent() && requestId.equals(request.get().getId())) {
 
-            log.trace("找到节点: {}", requestId);
+            log.trace("Tìm nút: {}", requestId);
             return Optional.of(root);
         }
 

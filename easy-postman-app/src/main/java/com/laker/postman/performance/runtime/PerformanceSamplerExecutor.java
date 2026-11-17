@@ -89,7 +89,7 @@ public final class PerformanceSamplerExecutor {
         }
         resultCollector.collect(executionResult, efficientModeSupplier.getAsBoolean(), currentResultSink());
         if (executionResult.interrupted) {
-            log.debug("请求在停止时被中断: {}", requestSampler.getName());
+            log.debug("Yêu cầu đã bị gián đoạn khi dừng: {}", requestSampler.getName());
         }
         return executionResult;
     }
@@ -128,7 +128,7 @@ public final class PerformanceSamplerExecutor {
         long now = System.currentTimeMillis();
         long last = lastFailureLogTime.get();
         if (now - last >= FAILURE_LOG_INTERVAL_MS && lastFailureLogTime.compareAndSet(last, now)) {
-            log.warn("压测请求执行异常，已记为失败样本: {}（期间另有 {} 次异常被抑制）",
+            log.warn("Yêu cầu stress test được thực hiện một cách bất thường và được ghi lại là mẫu không thành công: {}（Có những thời điểm khác trong thời gian này {} ngoại lệ bị loại bỏ)",
                     requestSampler.getName(), suppressedFailureLogs.getAndSet(0L), ex);
         } else {
             suppressedFailureLogs.incrementAndGet();

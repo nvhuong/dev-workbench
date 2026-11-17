@@ -1,12 +1,12 @@
 package com.laker.postman.plugin.api;
 
 /**
- * 插件元数据。
+ * Siêu dữ liệu plugin.
  *
- * <p>字段语义约定：
- * <p>- min/maxAppVersion：约束宿主发行版范围，只有插件依赖某个宿主功能时才建议填写
- * <p>- min/maxPlatformVersion：约束插件平台 SPI 范围，属于插件机制内部兼容边界
- * <p>- 运行时会同时检查 app + platform，两者都满足才允许加载
+ * <p>Quy ước ngữ nghĩa trường:
+ * <p>- min/maxAppVersion：Hạn chế phạm vi phát hành máy chủ. Bạn chỉ nên điền khi plug-in phụ thuộc vào một chức năng máy chủ nhất định
+ * <p>- min/maxPlatformVersion：Nền tảng plugin hạn chế SPI Phạm vi, thuộc ranh giới tương thích nội bộ của cơ chế trình cắm
+ * <p>- Nó sẽ được kiểm tra khi chạy app + platform，Việc tải chỉ được phép nếu cả hai đều hài lòng
  */
 public record PluginDescriptor(
         String id,

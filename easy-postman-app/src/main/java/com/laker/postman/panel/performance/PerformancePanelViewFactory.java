@@ -326,7 +326,7 @@ final class PerformancePanelViewFactory {
                 () -> syncWorkerEndpointsState(remoteModeCheckBox, workerEndpointsField, workerEndpointRow)
         );
         workerEndpointRow.add(workerEndpointsLabel);
-        // Remote worker 地址是辅助配置，限制宽度避免焦点框横向铺满工具栏。
+        // Remote worker Địa chỉ là một cấu hình phụ và chiều rộng được giới hạn để ngăn hộp tiêu điểm lấp đầy thanh công cụ theo chiều ngang.
         workerEndpointRow.add(workerEndpointsField, "w "
                 + WORKER_ENDPOINT_FIELD_MIN_WIDTH
                 + ":" + WORKER_ENDPOINT_FIELD_PREFERRED_WIDTH

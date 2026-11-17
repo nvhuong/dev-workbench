@@ -15,7 +15,7 @@ import static org.testng.Assert.*;
 
 
 /**
- * 测试 pm.cookies.get() 能够正确获取响应中的 Cookie
+ * Bài kiểm tra pm.cookies.get() Có thể nhận được phản hồi chính xác Cookie
  */
 public class CookieGetTest {
 
@@ -39,7 +39,7 @@ public class CookieGetTest {
 
     @Test
     public void testGetResponseCookieWorks() {
-        // 创建包含 Set-Cookie 头的响应
+        // Tạo bao gồm Set-Cookie phản hồi tiêu đề
         HttpResponse response = new HttpResponse();
         response.code = 200;
         response.headers = new HashMap<>();
@@ -48,10 +48,10 @@ public class CookieGetTest {
                 "token=XYZ789; Domain=example.com; Secure"
         ));
 
-        // 设置响应
+        // Đặt phản hồi
         pm.setResponse(response);
 
-        // 测试 pm.getResponseCookie() - 应该可以工作
+        // Bài kiểm tra pm.getResponseCookie() - Nó sẽ hoạt động
         Cookie jsessionId = pm.getResponseCookie("JSESSIONID");
         assertNotNull(jsessionId, "pm.getResponseCookie('JSESSIONID') should return a Cookie");
         assertEquals("JSESSIONID", jsessionId.name);
@@ -69,7 +69,7 @@ public class CookieGetTest {
 
     @Test
     public void testCookiesGetNowWorks() {
-        // 创建包含 Set-Cookie 头的响应
+        // Tạo bao gồm Set-Cookie phản hồi tiêu đề
         HttpResponse response = new HttpResponse();
         response.code = 200;
         response.headers = new HashMap<>();
@@ -78,10 +78,10 @@ public class CookieGetTest {
                 "token=XYZ789; Domain=example.com; Secure"
         ));
 
-        // 设置响应（会自动填充 cookies）
+        // Đặt phản hồi (sẽ được tự động điền cookies）
         pm.setResponse(response);
 
-        // 测试 pm.cookies.get() - 现在应该可以工作了！
+        // Bài kiểm tra pm.cookies.get() - Nó sẽ hoạt động ngay bây giờ! .
         Cookie jsessionId = pm.cookies.get("JSESSIONID");
         assertNotNull(jsessionId, "pm.cookies.get('JSESSIONID') should now return a Cookie after fix");
         assertEquals("JSESSIONID", jsessionId.name);
@@ -95,7 +95,7 @@ public class CookieGetTest {
 
     @Test
     public void testCookiesAllWorks() {
-        // 创建包含多个 Cookie 的响应
+        // Tạo có chứa nhiều Cookie phản hồi
         HttpResponse response = new HttpResponse();
         response.code = 200;
         response.headers = new HashMap<>();
@@ -107,12 +107,12 @@ public class CookieGetTest {
 
         pm.setResponse(response);
 
-        // 测试 pm.cookies.getAll()
+        // Bài kiểm tra pm.cookies.getAll()
         java.util.List<Cookie> allCookies = pm.cookies.getAll();
         assertNotNull(allCookies);
         assertEquals(3, allCookies.size(), "Should have 3 cookies");
 
-        // 验证所有 Cookie 都被填充了
+        // Xác minh tất cả Cookie Tất cả đều được lấp đầy
         Set<String> cookieNames = new HashSet<>();
         for (Cookie cookie : allCookies) {
             cookieNames.add(cookie.name);
@@ -124,7 +124,7 @@ public class CookieGetTest {
 
     @Test
     public void testCookiesHasWorks() {
-        // 创建响应
+        // Tạo phản hồi
         HttpResponse response = new HttpResponse();
         response.code = 200;
         response.headers = new HashMap<>();
@@ -132,14 +132,14 @@ public class CookieGetTest {
 
         pm.setResponse(response);
 
-        // 测试 pm.cookies.has()
+        // Bài kiểm tra pm.cookies.has()
         assertTrue(pm.cookies.has("JSESSIONID"), "pm.cookies.has('JSESSIONID') should return true");
         assertFalse(pm.cookies.has("nonexistent"), "pm.cookies.has('nonexistent') should return false");
     }
 
     @Test
     public void testJavaScriptCookiesGet() {
-        // 创建响应
+        // Tạo phản hồi
         HttpResponse response = new HttpResponse();
         response.code = 200;
         response.headers = new HashMap<>();
@@ -150,10 +150,10 @@ public class CookieGetTest {
 
         pm.setResponse(response);
 
-        // 在 JavaScript 中测试
+        // Vào JavaScript bài kiểm tra giữa kỳ
         context.getBindings("js").putMember("pm", pm);
 
-        // 测试 pm.cookies.get()
+        // Bài kiểm tra pm.cookies.get()
         Value result = context.eval("js",
                 "var cookie = pm.cookies.get('JSESSIONID');" +
                         "cookie ? cookie.value : null"
@@ -162,21 +162,21 @@ public class CookieGetTest {
         assertFalse(result.isNull(), "pm.cookies.get('JSESSIONID') should return a valid cookie");
         assertEquals("ABC123", result.asString());
 
-        // 测试 pm.cookies.getAll()
+        // Bài kiểm tra pm.cookies.getAll()
         Value allResult = context.eval("js",
                 "var allCookies = pm.cookies.getAll();" +
                         "allCookies.length"
         );
         assertEquals(2, allResult.asInt(), "Should have 2 cookies");
 
-        // 测试 pm.cookies.has()
+        // Bài kiểm tra pm.cookies.has()
         Value hasResult = context.eval("js", "pm.cookies.has('JSESSIONID')");
         assertTrue(hasResult.asBoolean());
     }
 
     @Test
     public void testScriptComparison() {
-        // 模拟用户报告的场景
+        // Mô phỏng các tình huống do người dùng báo cáo
         HttpResponse response = new HttpResponse();
         response.code = 200;
         response.headers = new HashMap<>();
@@ -185,7 +185,7 @@ public class CookieGetTest {
         pm.setResponse(response);
         context.getBindings("js").putMember("pm", pm);
 
-        // 方法1: pm.getResponseCookie() - 一直可以工作
+        // phương pháp1: pm.getResponseCookie() - Luôn luôn làm việc
         Value method1 = context.eval("js",
                 "var jsessionId = pm.getResponseCookie('JSESSIONID');" +
                         "jsessionId ? jsessionId.value : null"
@@ -193,7 +193,7 @@ public class CookieGetTest {
         assertNotNull(method1);
         assertEquals("SESSION123", method1.asString(), "pm.getResponseCookie() should work");
 
-        // 方法2: pm.cookies.get() - 现在也应该可以工作了
+        // phương pháp2: pm.cookies.get() - Nó cũng sẽ hoạt động ngay bây giờ
         Value method2 = context.eval("js",
                 "var cookie = pm.cookies.get('JSESSIONID');" +
                         "cookie ? cookie.value : null"
@@ -201,7 +201,7 @@ public class CookieGetTest {
         assertNotNull(method2);
         assertEquals("SESSION123", method2.asString(), "pm.cookies.get() should now work after fix");
 
-        // 两种方法应该返回相同的值
+        // Cả hai phương pháp sẽ trả về cùng một giá trị
         assertEquals(method1.asString(), method2.asString(),
                 "Both methods should return the same cookie value");
     }

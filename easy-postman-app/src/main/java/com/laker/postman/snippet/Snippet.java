@@ -4,7 +4,7 @@ import com.laker.postman.plugin.api.SnippetDefinition;
 import com.laker.postman.util.I18nUtil;
 
 /**
- * 代码片段数据结构
+ * Cấu trúc dữ liệu đoạn mã
  */
 public class Snippet {
     public String title;

@@ -34,14 +34,14 @@ public class PerformanceWorkerReportCollector {
         String error = result.getError();
 
         if (!hasReportData(report)) {
-            // worker 已到终态时，最终 result 理论上应包含 report；这里再查 status，避免控制面竞态导致 master 收到空最终报表。
+            // worker Cuối cùng, khi đã đạt đến trạng thái cuối cùng result Về lý thuyết thì nên đưa vào report；Kiểm tra lại ở đây status，Tránh kiểm soát các điều kiện đua trên bề mặt master Đã nhận được báo cáo cuối cùng trống.
             try {
                 PerformanceWorkerRunStatusResponse status = timeout == null
                         ? workerClient.status(endpoint, runId, true)
                         : workerClient.status(endpoint, runId, true, timeout);
                 if (hasReportData(status.getReport())) {
                     report = status.getReport();
-                    log.debug("使用 worker status report 兜底最终结果: worker={}, runId={}",
+                    log.debug("sử dụng worker status report Biết kết quả cuối cùng: worker={}, runId={}",
                             endpointLabel(endpoint), runId);
                 }
                 if ((error == null || error.isBlank()) && status.getError() != null && !status.getError().isBlank()) {
@@ -50,7 +50,7 @@ public class PerformanceWorkerReportCollector {
             } catch (IOException | InterruptedException ex) {
                 throw ex;
             } catch (RuntimeException ex) {
-                log.warn("读取 worker status report 兜底失败: worker={}, runId={}",
+                log.warn("Đọc worker status report Một sự thất bại hoàn toàn: worker={}, runId={}",
                         endpointLabel(endpoint), runId, ex);
             }
         }

@@ -15,7 +15,7 @@ import java.awt.*;
 import java.awt.event.KeyEvent;
 
 /**
- * 转换为Git工作区对话框
+ * Chuyển đổi sang GitHộp thoại không gian làm việc
  */
 public class ConvertToGitDialog extends JDialog {
 
@@ -41,7 +41,7 @@ public class ConvertToGitDialog extends JDialog {
         branchField.setFont(FontsUtil.getDefaultFont(Font.PLAIN));
         SettingsInputStyle.apply(branchField);
 
-        // 添加回车键确认支持
+        // Đã thêm hỗ trợ xác nhận khóa nhập
         branchField.addActionListener(e -> onConfirm());
     }
 
@@ -52,7 +52,7 @@ public class ConvertToGitDialog extends JDialog {
         setLocationRelativeTo(getParent());
         setResizable(false);
 
-        // 设置焦点到输入框并全选文本，方便用户快速修改
+        // Đặt tiêu điểm vào hộp nhập và chọn tất cả văn bản để người dùng có thể sửa đổi nhanh chóng
         SwingUtilities.invokeLater(() -> {
             branchField.requestFocusInWindow();
             branchField.selectAll();
@@ -60,17 +60,17 @@ public class ConvertToGitDialog extends JDialog {
     }
 
     /**
-     * 设置快捷键绑定
+     * Đặt ràng buộc phím tắt
      */
     private void setupKeyBindings() {
-        // ESC键取消
+        // ESCphím để hủy bỏ
         getRootPane().registerKeyboardAction(
                 e -> dispose(),
                 KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
                 JComponent.WHEN_IN_FOCUSED_WINDOW
         );
 
-        // 设置默认按钮（回车键确认）
+        // Đặt nút mặc định (Nhập phím để xác nhận)
         getRootPane().setDefaultButton(confirmButton);
     }
 
@@ -85,16 +85,16 @@ public class ConvertToGitDialog extends JDialog {
         ToolWindowSurfaceStyle.applyDialogSurface(contentPanel);
         contentPanel.setBorder(new EmptyBorder(16, 18, 16, 18));
 
-        // 顶部信息区域
+        // Khu vực thông tin hàng đầu
         JPanel topPanel = createTopPanel();
         contentPanel.add(topPanel, BorderLayout.NORTH);
 
-        // 中间输入区域
+        // Khu vực đầu vào ở giữa
         JPanel centerPanel = createCenterPanel();
         contentPanel.add(centerPanel, BorderLayout.CENTER);
         mainPanel.add(contentPanel, BorderLayout.CENTER);
 
-        // 底部按钮区域
+        // Khu vực nút dưới cùng
         JPanel buttonPanel = createButtonPanel();
         mainPanel.add(buttonPanel, BorderLayout.SOUTH);
 
@@ -102,19 +102,19 @@ public class ConvertToGitDialog extends JDialog {
     }
 
     /**
-     * 创建顶部信息面板
+     * Tạo bảng thông tin hàng đầu
      */
     private JPanel createTopPanel() {
         JPanel panel = new JPanel(new BorderLayout(10, 0));
         panel.setOpaque(false);
         panel.setBorder(new EmptyBorder(0, 0, 4, 0));
 
-        // 左侧图标
+        // biểu tượng ở bên trái
         JLabel iconLabel = new JLabel(com.laker.postman.util.IconUtil.create(
                 "icons/git.svg", 24, 24));
         panel.add(iconLabel, BorderLayout.WEST);
 
-        // 右侧信息
+        // Thông tin bên phải
         JPanel infoPanel = new JPanel(new GridLayout(3, 1, 0, 3));
         infoPanel.setOpaque(false);
 
@@ -126,7 +126,7 @@ public class ConvertToGitDialog extends JDialog {
         workspaceLabel.setFont(FontsUtil.getDefaultFontWithOffset(Font.PLAIN, -1));
         infoPanel.add(workspaceLabel);
 
-        // 添加提示信息
+        // Thêm thông tin kịp thời
         JLabel tipLabel = new JLabel("<html><i>" + I18nUtil.getMessage(MessageKeys.WORKSPACE_CONVERT_SUCCESS_TIP) + "</i></html>");
         tipLabel.setFont(FontsUtil.getDefaultFontWithOffset(Font.PLAIN, -1));
         infoPanel.add(tipLabel);
@@ -137,18 +137,18 @@ public class ConvertToGitDialog extends JDialog {
     }
 
     /**
-     * 创建中间输入面板
+     * Tạo một bảng điều khiển đầu vào ở giữa
      */
     private JPanel createCenterPanel() {
         JPanel panel = new JPanel(new BorderLayout(0, 8));
         ToolWindowSurfaceStyle.applyDialogTopSeparator(panel, 10, 0, 0, 0);
 
-        // 分支名称标签
+        // Nhãn tên chi nhánh
         JLabel branchLabel = new JLabel(I18nUtil.getMessage(MessageKeys.WORKSPACE_CONVERT_BRANCH_PROMPT) + ":");
         branchLabel.setFont(FontsUtil.getDefaultFontWithOffset(Font.PLAIN, -1));
         panel.add(branchLabel, BorderLayout.NORTH);
 
-        // 分支输入框
+        // Hộp nhập chi nhánh
         branchField.setPreferredSize(new Dimension(320, branchField.getPreferredSize().height));
         panel.add(branchField, BorderLayout.CENTER);
 
@@ -157,7 +157,7 @@ public class ConvertToGitDialog extends JDialog {
     }
 
     /**
-     * 创建底部按钮面板
+     * Tạo một bảng điều khiển nút dưới cùng
      */
     private JPanel createButtonPanel() {
         JPanel panel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 0));
@@ -176,17 +176,17 @@ public class ConvertToGitDialog extends JDialog {
     }
 
     private void onConfirm() {
-        // 验证分支名称
+        // Xác minh tên chi nhánh
         branchName = branchField.getText().trim();
 
-        // 检查是否为空
+        // Kiểm tra xem nó có trống không
         if (branchName.isEmpty()) {
             showError(I18nUtil.getMessage(MessageKeys.WORKSPACE_VALIDATION_GIT_BRANCH_INVALID));
             branchField.requestFocusInWindow();
             return;
         }
 
-        // 检查Git分支名格式（基本规则）
+        // nghiên cứuGitĐịnh dạng tên chi nhánh (quy tắc cơ bản)
         if (!isValidGitBranchName(branchName)) {
             showError(I18nUtil.getMessage(MessageKeys.WORKSPACE_VALIDATION_GIT_BRANCH_FORMAT));
             branchField.requestFocusInWindow();
@@ -200,31 +200,31 @@ public class ConvertToGitDialog extends JDialog {
 
 
     /**
-     * 验证Git分支名是否合法
-     * 基于Git分支命名规则的简化验证
+     * Xác minhGitTên chi nhánh có hợp pháp không?
+     * dựa trênGitĐơn giản hóa việc xác minh các quy tắc đặt tên chi nhánh
      */
     private boolean isValidGitBranchName(String name) {
-        // 不能包含空格
+        // Không thể chứa dấu cách
         if (name.contains(" ")) {
             return false;
         }
 
-        // 不能以 . 或 / 开头
+        // không thể . hoặc / Bắt đầu
         if (name.startsWith(".") || name.startsWith("/")) {
             return false;
         }
 
-        // 不能以 / 结尾
+        // không thể / Sự kết thúc
         if (name.endsWith("/")) {
             return false;
         }
 
-        // 不能包含连续的斜杠 //
+        // Không thể chứa dấu gạch chéo liên tiếp //
         if (name.contains("//")) {
             return false;
         }
 
-        // 不能包含特殊字符
+        // Không thể chứa các ký tự đặc biệt
         String[] invalidChars = {"~", "^", ":", "?", "*", "[", "@{", ".."};
         for (String invalidChar : invalidChars) {
             if (name.contains(invalidChar)) {

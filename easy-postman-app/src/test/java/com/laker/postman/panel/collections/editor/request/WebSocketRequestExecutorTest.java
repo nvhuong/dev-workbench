@@ -32,7 +32,7 @@ import static org.testng.Assert.assertTrue;
 
 public class WebSocketRequestExecutorTest {
 
-    @Test(description = "WebSocket 发送应打开握手请求快照和网络日志，和 HTTP/SSE 保持一致")
+    @Test(description = "WebSocket Quá trình gửi sẽ mở ra ảnh chụp nhanh yêu cầu bắt tay và nhật ký mạng, v.v HTTP/SSE Hãy nhất quán")
     public void shouldEnableNetworkCaptureForWebSocketRequests() {
         PreparedRequest request = new PreparedRequest();
 
@@ -51,7 +51,7 @@ public class WebSocketRequestExecutorTest {
         assertTrue(request.enableNetworkLog);
     }
 
-    @Test(description = "远端发起关闭时应结束 WebSocket 会话并把顶部按钮恢复为连接")
+    @Test(description = "Nó sẽ kết thúc khi đầu từ xa bắt đầu tắt máy WebSocket phiên và trả nút trên cùng về Kết nối")
     public void shouldResetConnectButtonWhenRemotePeerStartsClosing() throws Exception {
         RequestExecutionState requestState = new RequestExecutionState();
         ResponsePanel responsePanel = new ResponsePanel(RequestItemProtocolEnum.WEBSOCKET, false);

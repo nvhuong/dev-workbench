@@ -1,106 +1,106 @@
-## OkHttpClient 连接池和并发参数说明
+## OkHttpClient Nhóm kết nối và mô tả tham số đồng thời
 
-在 Easy Postman 的 OkHttpClientManager 中，使用如下方式为每个 baseUri 配置连接池和 Dispatcher：
+Vào Easy Postman của OkHttpClientManager , hãy sử dụng phương pháp sau cho mỗi trường hợp baseUri Định cấu hình kết nối tổng hợp và Dispatcher：
 
 ```java
-// 连接池配置
+// Cấu hình nhóm kết nối
 .connectionPool(new ConnectionPool(maxIdleConnections, keepAliveDuration, TimeUnit.SECONDS))
 
-// Dispatcher 并发配置
+// Dispatcher Cấu hình đồng thời
 Dispatcher dispatcher = new Dispatcher();
 dispatcher.setMaxRequests(maxRequests);
 dispatcher.setMaxRequestsPerHost(maxRequestsPerHost);
 .dispatcher(dispatcher)
 ```
 
-### 参数解释
+### Giải thích tham số
 
-#### 连接池参数
-- **maxIdleConnections**：最大空闲连接数。表示连接池中允许保持空闲状态的最大连接数量。
-- **keepAliveDuration**：空闲连接的最大存活时间（单位由第三个参数指定）。超过该时间未被使用的空闲连接将被关闭。
-- **TimeUnit.SECONDS**：指定 keepAliveDuration 的时间单位为秒。
+#### Thông số nhóm kết nối
+- **maxIdleConnections**：Số lượng kết nối nhàn rỗi tối đa. Cho biết số lượng kết nối tối đa được phép ở trạng thái rảnh trong nhóm kết nối.
+- **keepAliveDuration**：Thời gian tồn tại tối đa của kết nối không hoạt động (đơn vị được chỉ định bởi tham số thứ ba). Các kết nối không hoạt động không được sử dụng quá thời gian này sẽ bị đóng.
+- **TimeUnit.SECONDS**：được chỉ định keepAliveDuration Đơn vị thời gian là giây.
 
-#### Dispatcher 并发参数（⚠️ 压测关键参数）
-- **maxRequests**：最大并发请求数（所有主机总和）。默认64，压测时建议设置为并发用户数的2-4倍。
-- **maxRequestsPerHost**：单个主机最大并发请求数。默认5，**这是导致压测排队的主要原因**！压测时建议设置为并发用户数。
+#### Dispatcher Các tham số đồng thời (⚠️ Các thông số chính của kiểm tra áp suất)
+- **maxRequests**：Số lượng yêu cầu đồng thời tối đa (tổng của tất cả các máy chủ). Mặc định64，Bạn nên đặt nó theo số lượng người dùng đồng thời trong quá trình kiểm tra căng thẳng2-4lần.
+- **maxRequestsPerHost**：Số lượng yêu cầu đồng thời tối đa cho một máy chủ. mặc định5，**Đây là lý do chính cho hàng đợi kiểm tra căng thẳng**！Bạn nên đặt nó theo số lượng người dùng đồng thời trong quá trình kiểm tra căng thẳng.
 
-### ⚠️ 压测性能问题排查
+### ⚠️ Khắc phục sự cố về hiệu suất của stress test
 
-如果你在压测时发现 **Stalled** 时间异常长（例如几十秒），说明请求在队列中等待，原因是 **maxRequestsPerHost** 限制了并发数。
+Nếu bạn phát hiện ra trong quá trình kiểm tra căng thẳng **Stalled** Nguyên nhân là do thời gian dài bất thường (ví dụ hàng chục giây), cho thấy yêu cầu đang chờ trong hàng đợi **maxRequestsPerHost** Số lượng đồng thời bị hạn chế.
 
-#### 问题示例
+#### Ví dụ vấn đề
 ```
-DnsStart 14:21:35.808 
-DnsEnd 14:21:36.424 (DNS查询正常，616ms)
-ConnectStart 14:22:51.429 ⚠️ 75秒延迟！
+DnsStart 14:21:35.808
+DnsEnd 14:21:36.424 (DNSTruy vấn là bình thường.616ms)
+ConnectStart 14:22:51.429 ⚠️ 75Trì hoãn lần thứ hai! .
 
-Stalled: 75621 ms ← 这就是请求排队时间
+Stalled: 75621 ms ← Đây là thời gian xếp hàng yêu cầu
 ```
 
-**原因**：OkHttp 默认 `maxRequestsPerHost=5`，如果并发数超过5，多余的请求会在队列中等待。
+**lý do**：OkHttp Mặc định `maxRequestsPerHost=5`，Nếu số lượng đồng thời vượt quá5，Yêu cầu bổ sung sẽ chờ trong hàng đợi.
 
-**解决方案**：在压测设置中增大以下参数：
-- **最大并发请求数**：建议设置为并发用户数的2-4倍（如100并发用户 → 设置为 200-400）
-- **单主机最大并发数**：建议设置为并发用户数（如100并发用户 → 设置为 100-200）
+**giải pháp**：Tăng các thông số sau trong cài đặt kiểm tra sức chịu đựng:
+- **Số lượng yêu cầu đồng thời tối đa**：Nên đặt nó theo số lượng người dùng đồng thời2-4lần (ví dụ:100Người dùng đồng thời → Đặt thành  200-400）
+- **Số lượng đồng thời tối đa trên một máy chủ**：Nên đặt nó theo số lượng người dùng đồng thời (ví dụ:100Người dùng đồng thời → Đặt thành  100-200）
 
-在 Easy Postman 中，进入 **设置 → 压力测试**，调整：
-- 最大并发请求数 (Max Concurrent Requests)
-- 单主机最大并发数 (Max Concurrent Requests Per Host)
+Vào Easy Postman Vào, vào **cài đặt → Kiểm tra căng thẳng**，Điều chỉnh:
+- Số lượng yêu cầu đồng thời tối đa (Max Concurrent Requests)
+- Số lượng đồng thời tối đa trên một máy chủ (Max Concurrent Requests Per Host)
 
-### maxIdleConnections 详解
-maxIdleConnections 控制同一主机（baseUri）下，连接池中最多可以有多少个空闲连接被复用。
+### maxIdleConnections Detailed explanation
+maxIdleConnections Kiểm soát cùng một máy chủ (baseUri）Bên dưới là số lượng kết nối nhàn rỗi tối đa có thể được sử dụng lại trong nhóm kết nối.
 
-#### 举例说明
-假设 maxIdleConnections 设置为 6：
-- 如果你对同一个服务端（如 https://api.example.com）并发发起 10 个请求，连接池最多只会保留 6 个空闲连接。
-- 其余的连接在空闲后会被关闭，避免资源浪费。
-- 这样可以提升高并发下的性能，同时防止过多无用连接占用系统资源。
+#### Đưa ra ví dụ
+Giả định maxIdleConnections Đặt thành  6：
+- Nếu bạn đang nhắm mục tiêu cùng một máy chủ (ví dụ: https://api.example.com）Đồng loạt khởi xướng 10 yêu cầu, nhóm kết nối sẽ chỉ giữ lại nhiều nhất 6 kết nối nhàn rỗi.
+- Các kết nối còn lại sẽ bị đóng sau khi không hoạt động để tránh lãng phí tài nguyên.
+- Điều này có thể cải thiện hiệu suất trong điều kiện đồng thời cao và ngăn chặn quá nhiều kết nối vô dụng chiếm tài nguyên hệ thống.
 
-#### 适用场景
-- **接口调试/开发环境**：通常 6 足够。
-- **性能压测/高并发场景**：压测运行态使用独立的 `HttpClientRuntimeConfig` 控制连接池与并发参数，避免修改桌面调试链路的全局 OkHttpClient。
+#### Các tình huống áp dụng
+- **Gỡ lỗi giao diện/môi trường phát triển**：nói chung là 6 đủ.
+- **Kiểm tra căng thẳng hiệu suất/Kịch bản đồng thời cao**：Trạng thái chạy stress test sử dụng độc lập `HttpClientRuntimeConfig` Kiểm soát nhóm kết nối và các tham số đồng thời để tránh sửa đổi liên kết gỡ lỗi chung trên máy tính để bàn OkHttpClient。
 
-### maxIdleConnections 详解（更详细流程说明）
+### maxIdleConnections Giải thích chi tiết (mô tả quy trình chi tiết hơn)
 
-假设 maxIdleConnections 设置为 6，keepAliveDuration 设置为 90 秒，场景如下：
+Giả định maxIdleConnections Đặt thành  6，keepAliveDuration Đặt thành  90 Giây tiếp theo, khung cảnh như sau:
 
-#### 并发发起 10 个请求的全过程
+#### Đồng loạt khởi xướng 10 toàn bộ quá trình của một yêu cầu
 
-1. **请求发起阶段**  
-   客户端（如 Easy Postman）同时向同一服务端（如 https://api.example.com）并发发起 10 个 HTTP 请求。
-   OkHttp 会为每个请求分配一个连接（如果连接池中有可用空闲连接，则复用，否则新建连接）。
+1. **Yêu cầu giai đoạn bắt đầu**
+   khách hàng (ví dụ: Easy Postman）Đồng thời đến cùng một máy chủ (ví dụ https://api.example.com）Đồng loạt khởi xướng 10 cá nhân HTTP yêu cầu.
+   OkHttp Một kết nối sẽ được phân bổ cho mỗi yêu cầu (nếu có một kết nối nhàn rỗi trong nhóm kết nối, nó sẽ được sử dụng lại, nếu không một kết nối mới sẽ được tạo).
 
-2. **请求处理与连接归还**  
-   10 个请求处理完毕后，这 10 个连接会被归还到连接池。
-   连接池会检查当前空闲连接数是否超过 maxIdleConnections（本例为 6）。
+2. **Yêu cầu xử lý và trả lại kết nối**
+   10 Sau khi yêu cầu được xử lý, điều này 10 Kết nối sẽ được trả về nhóm kết nối.
+   Nhóm kết nối sẽ kiểm tra xem số lượng kết nối nhàn rỗi hiện tại có bị vượt quá hay không maxIdleConnections（Trong trường hợp này 6）。
 
-3. **空闲连接管理**  
-   如果归还后空闲连接数超过 6，连接池会立即关闭多余的空闲连接，只保留 6 个。
-   哪些连接被保留、哪些被关闭由 OkHttp 内部策略决定（通常是最近最活跃的连接被保留）。
+3. **Quản lý kết nối nhàn rỗi**
+   Nếu số lượng kết nối nhàn rỗi vượt quá sau khi quay trở lại 6，Nhóm kết nối sẽ ngay lập tức đóng các kết nối nhàn rỗi dư thừa và chỉ giữ lại chúng 6 cá nhân.
+   Những kết nối nào được giữ lại và những kết nối nào bị đóng OkHttp Quyết định chính sách nội bộ (thường kết nối hoạt động gần đây nhất được giữ lại).
 
-4. **keepAliveDuration 的作用**  
-   被保留的 6 个空闲连接会在连接池中等待复用。
-   如果在 keepAliveDuration（如 90 秒）内没有新的请求复用这些连接，这些空闲连接会被自动关闭，释放资源。
-   也就是说，**maxIdleConnections** 决定了“最多能保留多少个空闲连接”，**keepAliveDuration** 决定了“空闲连接最多能保留多久”。
+4. **keepAliveDuration vai trò**
+   dành riêng 6 Các kết nối không hoạt động sẽ chờ để sử dụng lại trong nhóm kết nối.
+   Nếu vào keepAliveDuration（Chẳng hạn như 90 giây), các kết nối không hoạt động này sẽ tự động bị đóng để giải phóng tài nguyên.
+   Tức là,**maxIdleConnections** Nó đã được quyết định“Số lượng kết nối nhàn rỗi tối đa có thể được giữ lại”，**keepAliveDuration** Nó đã được quyết định“Khoảng thời gian tối đa mà một kết nối không hoạt động có thể được duy trì”。
 
-#### 关键参数的作用
+#### Vai trò của các thông số chính
 
-- **maxIdleConnections**：决定连接池中最多能保留多少个空闲连接。超过这个数，多余的空闲连接会被立即关闭。
-- **keepAliveDuration**：决定空闲连接最多能保留多长时间。超过这个时间未被复用的空闲连接会被自动关闭。
+- **maxIdleConnections**：Xác định số lượng kết nối nhàn rỗi tối đa có thể được giữ lại trong nhóm kết nối. Ngoài con số này, các kết nối nhàn rỗi dư thừa sẽ bị đóng ngay lập tức.
+- **keepAliveDuration**：Xác định khoảng thời gian tối đa mà một kết nối không hoạt động có thể duy trì ở trạng thái không hoạt động. Các kết nối không hoạt động không được sử dụng lại quá thời gian này sẽ tự động bị đóng.
 
-#### 过程示意
+#### Chỉ báo quá trình
 
-1. 并发 10 个请求，建立 10 个连接。
-2. 请求结束，10 个连接归还到连接池。
-3. 连接池只保留 6 个空闲连接，立即关闭多余的 4 个。
-4. 这 6 个空闲连接在 90 秒内如果没有被新请求复用，也会被自动关闭。
+1. đồng thời 10 yêu cầu, tạo ra 10 kết nối.
+2. Yêu cầu kết thúc.10 các kết nối được trả về nhóm kết nối.
+3. Kết nối tổng hợp chỉ được bảo lưu 6 những kết nối không hoạt động, hãy đóng những kết nối dư thừa ngay lập tức 4 cá nhân.
+4. Cái này 6 Có kết nối miễn phí 90 Nếu nó không được sử dụng lại bởi các yêu cầu mới trong vòng vài giây, nó sẽ tự động bị đóng.
 
-#### 这样做的好处
+#### Lợi ích của việc làm này
 
-- 避免了大量无用连接长期占用系统资源。
-- 保证高并发下的性能和资源利用率。
-- 连接池参数可根据实际并发量灵活调整。
+- Tránh tình trạng số lượng lớn các kết nối vô dụng chiếm tài nguyên hệ thống trong thời gian dài.
+- Đảm bảo hiệu suất và sử dụng tài nguyên ở mức độ đồng thời cao.
+- Các thông số của nhóm kết nối có thể được điều chỉnh linh hoạt theo sự đồng thời thực tế.
 
-### 参考
-- OkHttp 官方文档：[ConnectionPool](https://square.github.io/okhttp/4.x/okhttp/okhttp3/-connection-pool/)
-- Chrome 浏览器默认每 host 6 个连接，Easy Postman 默认采用相同策略。
+### Tham khảo
+- OkHttp Tài liệu chính thức: .[ConnectionPool](https://square.github.io/okhttp/4.x/okhttp/okhttp3/-connection-pool/)
+- Chrome Mặc định của trình duyệt cho mỗi host 6 kết nối,Easy Postman Mặc định là chính sách tương tự.

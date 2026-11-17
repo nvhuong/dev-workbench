@@ -6,7 +6,7 @@ import static org.testng.Assert.assertEquals;
 
 public class JsonUtilTest {
 
-    @Test(description = "转义和反转义应保持多行文本内容不变")
+    @Test(description = "Việc thoát và thoát phải giữ nguyên nội dung văn bản nhiều dòng")
     public void testEscapeAndUnescapeJsonStringContent_RoundTrip() {
         String original = "{\n  \"name\": \"demo\",\n  \"enabled\": true\n}";
 
@@ -16,7 +16,7 @@ public class JsonUtilTest {
         assertEquals(unescaped, original);
     }
 
-    @Test(description = "反转义不应把路径中的字面量 n 和 t 误转成换行或制表符")
+    @Test(description = "Chống thoát không nên đặt chữ trong đường dẫn n và t Chuyển đổi không chính xác thành ký tự dòng mới hoặc tab")
     public void testUnescapeJsonStringContent_PathLikeText() {
         String escaped = "C:\\\\new\\\\temp\\\\tab";
 
@@ -25,7 +25,7 @@ public class JsonUtilTest {
         assertEquals(unescaped, "C:\\new\\temp\\tab");
     }
 
-    @Test(description = "反转义应正确处理字面量反斜杠加控制字符")
+    @Test(description = "Tính năng chống thoát phải xử lý chính xác dấu gạch chéo ngược theo nghĩa đen cộng với các ký tự điều khiển")
     public void testUnescapeJsonStringContent_LiteralEscapedSequences() {
         String escaped = "\\\\n \\\\t \\\\r";
 
@@ -34,12 +34,12 @@ public class JsonUtilTest {
         assertEquals(unescaped, "\\n \\t \\r");
     }
 
-    @Test(description = "反转义应支持 unicode 序列")
+    @Test(description = "Chống thoát hiểm nên được hỗ trợ unicode sự liên tiếp")
     public void testUnescapeJsonStringContent_Unicode() {
         String escaped = "\\u4f60\\u597d";
 
         String unescaped = JsonUtil.unescapeJsonStringContent(escaped);
 
-        assertEquals(unescaped, "你好");
+        assertEquals(unescaped, "Xin chào");
     }
 }

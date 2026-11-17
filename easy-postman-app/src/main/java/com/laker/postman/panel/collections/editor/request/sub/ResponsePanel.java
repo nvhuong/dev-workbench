@@ -21,7 +21,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 
 /**
- * 响应部分面板，包含响应体、响应头、测试结果、网络日志、耗时等
+ * Bảng phản hồi bao gồm nội dung phản hồi, tiêu đề phản hồi, kết quả kiểm tra, nhật ký mạng, mức tiêu thụ thời gian, v.v
  */
 public class ResponsePanel extends JPanel {
 
@@ -33,8 +33,8 @@ public class ResponsePanel extends JPanel {
     private final TimelinePanel timelinePanel;
     private final JEditorPane testsPane;
     private final JButton[] tabButtons;
-    private final JPanel tabBar; // 保存tabBar引用，用于切换
-    private final JPanel topResponseBar; // 保存topResponseBar引用
+    private final JPanel tabBar; // cứutabBarTài liệu tham khảo, được sử dụng để chuyển đổi
+    private final JPanel topResponseBar; // cứutopResponseBarTrích dẫn
     private final JPanel cardPanel;
     private final String[] tabNames;
     private final ResponseTabBadgeController tabBadgeController;
@@ -57,9 +57,9 @@ public class ResponsePanel extends JPanel {
         statusBar = new ResponseStatusBar();
         TabBarBuilder.TabConfig tabConfig;
 
-        // 根据协议类型初始化相应的面板（使用TabBarBuilder简化）
+        // Khởi tạo bảng tương ứng theo loại giao thức (sử dụng TabBarBuilderđơn giản hóa)
         if (protocol.isWebSocketProtocol()) {
-            // WebSocket 专用布局
+            // WebSocket Bố cục chuyên dụng
             tabConfig = TabBarBuilder.createWebSocketTabs();
             tabNames = tabConfig.tabNames;
             tabButtons = TabBarBuilder.createModernTabButtons(tabNames);
@@ -80,7 +80,7 @@ public class ResponsePanel extends JPanel {
             testsPane = null;
             sseResponsePanel = null;
         } else {
-            // HTTP 普通请求
+            // HTTP Yêu cầu chung
             tabConfig = TabBarBuilder.createHttpTabs();
             tabNames = tabConfig.tabNames;
             tabButtons = TabBarBuilder.createModernTabButtons(tabNames);
@@ -90,13 +90,13 @@ public class ResponsePanel extends JPanel {
             topResponseBar.add(tabBar, BorderLayout.WEST);
             topResponseBar.add(statusBar, BorderLayout.EAST);
             cardPanel = createCardPanel();
-            responseBodyPanel = new ResponseBodyPanel(enableSaveButton); // 根据参数决定是否启用保存按钮
+            responseBodyPanel = new ResponseBodyPanel(enableSaveButton); // Xác định xem có bật nút lưu hay không dựa trên các tham số
             responseBodyPanel.setEnabled(false);
             responseBodyPanel.setBodyText(null);
             responseHeadersPanel = new ResponseHeadersPanel();
             JPanel testsPanel = new JPanel(new BorderLayout());
             ToolWindowSurfaceStyle.applyCard(testsPanel);
-            // 设置边框
+            // Đặt đường viền
             testsPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
             testsPane = new JEditorPane();
             testsPane.setContentType("text/html");
@@ -109,9 +109,9 @@ public class ResponsePanel extends JPanel {
             timelinePanel = new TimelinePanel(new ArrayList<>(), null);
             JScrollPane timelineScrollPanel = new JScrollPane(timelinePanel);
             ToolWindowSurfaceStyle.applyScrollPaneCard(timelineScrollPanel);
-            // 设置边框
+            // Đặt đường viền
             timelineScrollPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
-            // 按照指定顺序添加到 cardPanel。切到事件流模式后，隐藏响应体，事件流成为首个标签。
+            // Thêm vào theo thứ tự đã chỉ định cardPanel。Sau khi chuyển sang chế độ luồng sự kiện, nội dung phản hồi sẽ bị ẩn và luồng sự kiện trở thành nhãn đầu tiên.
             cardPanel.add(responseBodyPanel, tabNames[tabConfig.indexOf(TabBarBuilder.Tab.RESPONSE_BODY)]);
             sseResponsePanel = new SSEResponsePanel();
             cardPanel.add(sseResponsePanel, tabNames[tabConfig.indexOf(TabBarBuilder.Tab.EVENT_STREAM)]);
@@ -134,21 +134,21 @@ public class ResponsePanel extends JPanel {
         );
         tabNavigationController.initializeFirstVisibleTab();
 
-        // 检查初始布局状态，决定使用 tabBar 还是下拉框
+        // Kiểm tra trạng thái bố cục ban đầu và quyết định sử dụng nó tabBar Hoặc một hộp thả xuống
         boolean isVertical = SettingManager.isLayoutVertical();
         tabNavigationController.installInitialLayout(!isVertical);
 
-        // 使用TabBarBuilder绑定tab事件
+        // sử dụngTabBarBuilderRàng buộctabsự kiện
         tabNavigationController.bindTabActions();
 
-        // 默认所有按钮不可用
+        // Tất cả các nút đều bị tắt theo mặc định
         setResponseTabButtonsEnable(false);
 
-        // 初始化加载遮罩层
+        // Bắt đầu tải lớp mặt nạ
         loadingOverlay = new LoadingOverlay();
 
-        // loading overlay 只覆盖 cardPanel，不遮顶部 tab/status bar。
-        // 这样请求执行中仍然可以切换响应标签、查看状态信息。
+        // loading overlay Chỉ che cardPanel，Để lại phần trên không được che phủ tab/status bar。
+        // Bằng cách này, bạn vẫn có thể chuyển đổi thẻ phản hồi và xem thông tin trạng thái trong quá trình thực hiện yêu cầu.
         JLayeredPane cardLayeredPane = new JLayeredPane();
         ToolWindowSurfaceStyle.applyCard(cardLayeredPane);
         cardLayeredPane.setLayout(new ResponseCardOverlayLayout());
@@ -184,7 +184,7 @@ public class ResponsePanel extends JPanel {
 
     public void setResponseBody(HttpResponse resp) {
         if (protocol.isWebSocketProtocol()) {
-            // WebSocket 响应由专门的面板维护。
+            // WebSocket Phản hồi được duy trì bởi các bảng chuyên dụng.
             return;
         }
         responseBodyPanel.setBodyText(resp);
@@ -208,9 +208,9 @@ public class ResponsePanel extends JPanel {
     }
 
     /**
-     * 设置响应状态码
+     * Đặt mã trạng thái phản hồi
      *
-     * @param code HTTP 状态码（如 200, 404, 500）；传 0 或负数表示清空状态码
+     * @param code HTTP mã trạng thái (ví dụ 200, 404, 500）；vượt qua 0 Hoặc số âm biểu thị mã trạng thái rõ ràng
      */
     public void setStatus(int code) {
         statusBar.setStatus(code);
@@ -221,14 +221,14 @@ public class ResponsePanel extends JPanel {
     }
 
     /**
-     * 设置响应大小显示（带完整响应对象，可读取 Content-Encoding）
+     * Đặt hiển thị kích thước phản hồi (với đối tượng phản hồi hoàn chỉnh, có thể đọc được Content-Encoding）
      */
     public void setResponseSize(long bytes, HttpResponse httpResponse) {
         statusBar.setResponseSize(bytes, httpResponse);
     }
 
     public void setTestResults(List<TestResult> testResults) {
-        if (testsPane == null) return; // 防止 NPE
+        if (testsPane == null) return; // ngăn chặn NPE
         String html = HttpHtmlRenderer.renderTestResults(testResults);
         testsPane.setText(html);
         testsPane.setCaretPosition(0);
@@ -237,7 +237,7 @@ public class ResponsePanel extends JPanel {
 
     public void clearAll() {
         hasResponseData = false;
-        // 清空状态栏
+        // Xóa thanh trạng thái
         statusBar.clear();
 
         responseHeadersPanel.setHeaders(new LinkedHashMap<>());
@@ -284,7 +284,7 @@ public class ResponsePanel extends JPanel {
     }
 
     /**
-     * 根据实际响应类型显示普通 HTTP 响应或事件流视图。
+     * Hiển thị bình thường dựa trên loại phản hồi thực tế HTTP Chế độ xem luồng phản hồi hoặc sự kiện.
      */
     public void showHttpResponseView(boolean eventStream) {
         if (!SwingUtilities.isEventDispatchThread()) {
@@ -306,7 +306,7 @@ public class ResponsePanel extends JPanel {
     }
 
     /**
-     * 显示加载遮罩
+     * Hiển thị mặt nạ tải
      */
     public void showLoadingOverlay() {
         if (loadingOverlay == null) {
@@ -320,15 +320,15 @@ public class ResponsePanel extends JPanel {
     }
 
     /**
-     * 隐藏加载遮罩
+     * Ẩn mặt nạ tải
      */
     public void hideLoadingOverlay() {
         if (loadingOverlay == null) {
             return;
         }
         if (SwingUtilities.isEventDispatchThread()) {
-            // 请求完成后的 UI 刷新本来就在 EDT 上。
-            // 这里必须立即隐藏，否则会被排到大响应渲染之后，看起来像“转圈卡住不转”。
+            // sau khi yêu cầu được hoàn thành UI Làm mới đã có sẵn EDT thượng đẳng.
+            // Điều này phải được ẩn ngay lập tức, nếu không nó sẽ được xếp hàng đợi sau khi hiển thị phản hồi lớn“Vòng tròn bị kẹt và không quay được”。
             loadingOverlay.hideLoading();
         } else {
             SwingUtilities.invokeLater(loadingOverlay::hideLoading);
@@ -336,8 +336,8 @@ public class ResponsePanel extends JPanel {
     }
 
     /**
-     * 获取保存响应按钮
-     * 代理到 ResponseBodyPanel 的保存按钮
+     * Nhận nút lưu phản hồi
+     * Đại lý đến ResponseBodyPanel nút lưu
      */
     public JButton getSaveResponseButton() {
         if (responseBodyPanel != null) {
@@ -347,7 +347,7 @@ public class ResponsePanel extends JPanel {
     }
 
     /**
-     * 设置响应体面板的启用状态
+     * Đặt trạng thái kích hoạt của bảng nội dung phản hồi
      */
     public void setResponseBodyEnabled(boolean enabled) {
         if (responseBodyPanel != null) {
@@ -356,9 +356,9 @@ public class ResponsePanel extends JPanel {
     }
 
     /**
-     * 切换到指定索引的 tab
+     * Chuyển sang chỉ mục được chỉ định tab
      *
-     * @param tabIndex tab 索引（0-based）
+     * @param tabIndex tab chỉ mục(0-based）
      */
     public void switchToTab(int tabIndex) {
         tabNavigationController.switchToTab(tabIndex);
@@ -366,7 +366,7 @@ public class ResponsePanel extends JPanel {
 
 
     /**
-     * 更新请求详情（委托给 NetworkLogPanel）
+     * Cập nhật chi tiết yêu cầu (được ủy quyền cho NetworkLogPanel）
      */
     public void setRequestDetails(PreparedRequest request) {
         if (networkLogPanel != null) {
@@ -375,7 +375,7 @@ public class ResponsePanel extends JPanel {
     }
 
     /**
-     * 更新响应详情（委托给 NetworkLogPanel）
+     * Cập nhật chi tiết phản hồi (được ủy quyền cho NetworkLogPanel）
      */
     public void setResponseDetails(HttpResponse response) {
         if (networkLogPanel != null) {
@@ -384,9 +384,9 @@ public class ResponsePanel extends JPanel {
     }
 
     /**
-     * 根据布局方向切换Tab显示方式
+     * Chuyển đổi dựa trên hướng bố tríTabChế độ hiển thị
      *
-     * @param isVertical true=垂直布局（上下），false=水平布局（左右）
+     * @param isVertical true=Bố cục dọc (trên và dưới).false=Bố cục ngang (trái và phải)
      */
     public void updateLayoutOrientation(boolean isVertical) {
         tabNavigationController.updateLayoutOrientation(isVertical);

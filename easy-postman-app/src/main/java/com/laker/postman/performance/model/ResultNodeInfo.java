@@ -12,51 +12,51 @@ import java.util.List;
 public class ResultNodeInfo {
 
     /**
-     * 接口名称
+     * Tên giao diện
      */
     public final String name;
 
     /**
-     * 错误信息
+     * thông báo lỗi
      */
     public final String errorMsg;
 
     /**
-     * 请求
+     * yêu cầu
      */
     public final PreparedRequest req;
 
     /**
-     * 响应
+     * phản hồi
      */
     public final HttpResponse resp;
 
     /**
-     * 断言结果
+     * Khẳng định kết quả
      */
     public final List<TestResult> testResults;
 
     public final PerformanceProtocol protocol;
 
     /**
-     * 耗时（毫秒）——在构造时就算好
+     * Thời gian thực hiện (mili giây) - Điều này tốt cho thời gian xây dựng
      */
     public final int costMs;
 
     /**
-     * HTTP响应状态码
+     * HTTPMã trạng thái phản hồi
      */
     public final int responseCode;
 
     /**
-     * 执行层面是否明确失败（前置脚本崩溃 / HTTP 请求异常 / 后置脚本崩溃）。
-     * 与断言失败区分：断言失败由 testResults 体现，执行失败由此字段体现。
+     * Liệu mức độ thực thi có thất bại rõ ràng hay không (sự cố tiền tập lệnh / HTTP Yêu cầu ngoại lệ / Sự cố của phần tái bút).
+     * Phân biệt với lỗi khẳng định: lỗi khẳng định là do testResults Được phản ánh, lỗi thực thi được phản ánh trong trường này.
      */
     public final boolean executionFailed;
     public final boolean cancelled;
 
     /**
-     * 开始时间、首字节、连接耗时，构造时从响应事件提取，避免展示精简后丢失。
+     * Thời gian bắt đầu, byte đầu tiên và thời gian kết nối được trích xuất từ ​​sự kiện phản hồi trong quá trình xây dựng để tránh mất mát sau khi đơn giản hóa hiển thị.
      */
     public final ResultTiming timing;
 
@@ -114,15 +114,15 @@ public class ResultNodeInfo {
         this.protocol = protocol == null ? PerformanceProtocol.HTTP : protocol;
         this.timing = timing == null ? ResultTiming.EMPTY : timing;
 
-        // ✅ 统一在这里算 ms（不依赖 costNs）
+        // ✅ Sự đoàn kết được tính ở đây ms（Không phụ thuộc costNs）
         this.costMs = resp != null ? (int) resp.costMs : 0;
 
-        // 提取响应码
+        // Trích xuất mã phản hồi
         this.responseCode = resp != null ? resp.code : 0;
     }
 
     /**
-     * 是否有断言失败
+     * Cho dù bất kỳ xác nhận nào không thành công
      */
     public boolean hasAssertionFailed() {
         if (testResults == null) return false;
@@ -133,21 +133,21 @@ public class ResultNodeInfo {
     }
 
     /**
-     * 统一的成功/失败判断，三处（趋势图、报表、结果表格）共用：
-     * 1. 执行层面明确失败（前置脚本崩溃、HTTP异常、后置脚本崩溃）→ false
-     * 2. 有断言结果 → 以断言为准（断言全通过才算成功）
-     * 3. 无断言 → 以 HTTP 状态码为准（2xx/3xx 为成功）
-     * 4. 无响应 → false
+     * Thống nhất thành công/Đánh giá thất bại được chia sẻ ở ba vị trí (biểu đồ xu hướng, báo cáo và bảng kết quả):
+     * 1. Lỗi rõ ràng ở cấp độ thực thi (tập lệnh trước bị lỗi, .HTTPNgoại lệ, sự cố sau tập lệnh)→ false
+     * 2. Có kết quả khẳng định → Tùy thuộc vào các xác nhận (thành công chỉ đạt được nếu tất cả các xác nhận đều vượt qua)
+     * 3. Không có khẳng định → qua HTTP Mã trạng thái sẽ chiếm ưu thế (2xx/3xx để thành công)
+     * 4. Không có phản hồi → false
      */
     public boolean isActuallySuccessful() {
-        // 与采样记录一致：被取消的请求不算成功（即使 WebSocket 已握手 101）
+        // Phù hợp với hồ sơ lấy mẫu: yêu cầu bị hủy không được coi là thành công (ngay cả khi  WebSocket Bắt tay 101）
         return !cancelled && isActuallySuccessful(executionFailed, resp, testResults);
     }
 
     public static boolean isActuallySuccessful(boolean executionFailed,
                                                HttpResponse resp,
                                                List<TestResult> testResults) {
-        // 1. 执行层面明确失败，直接返回 false
+        // 1. Mức độ thực thi rõ ràng không thành công và trả về trực tiếp false
         if (executionFailed) {
             return false;
         }
@@ -155,7 +155,7 @@ public class ResultNodeInfo {
             return false;
         }
 
-        // 2. 如果有断言结果，以断言为准
+        // 2. Nếu có kết quả khẳng định thì khẳng định đó sẽ được ưu tiên áp dụng
         if (testResults != null && !testResults.isEmpty()) {
             for (TestResult result : testResults) {
                 if (!result.passed) {
@@ -165,12 +165,12 @@ public class ResultNodeInfo {
             return true;
         }
 
-        // 3. 如果没有断言，以 HTTP 状态码为准
+        // 3. Nếu không có xác nhận, hãy sử dụng  HTTP Mã trạng thái sẽ được ưu tiên áp dụng
         if (resp != null && resp.code > 0) {
             return resp.code == 101 || (resp.code >= 200 && resp.code < 400);
         }
 
-        // 4. 兜底：没有响应则返回 false
+        // 4. Tóm lại: Quay lại nếu không có phản hồi false
         return false;
     }
 }

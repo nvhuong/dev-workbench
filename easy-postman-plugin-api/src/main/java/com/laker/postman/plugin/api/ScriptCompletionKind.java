@@ -1,7 +1,7 @@
 package com.laker.postman.plugin.api;
 
 /**
- * 脚本补全项类型。
+ * Kiểu hoàn thành kịch bản.
  */
 public enum ScriptCompletionKind {
     BASIC,

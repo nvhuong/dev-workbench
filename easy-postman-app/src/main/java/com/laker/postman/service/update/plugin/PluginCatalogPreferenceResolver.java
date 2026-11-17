@@ -9,7 +9,7 @@ import lombok.experimental.UtilityClass;
 import java.util.Locale;
 
 /**
- * 根据自动更新设置解析插件市场目录地址。
+ * Giải quyết địa chỉ thư mục thị trường plug-in theo cài đặt cập nhật tự động.
  */
 @UtilityClass
 public class PluginCatalogPreferenceResolver {

@@ -20,7 +20,7 @@ public class KafkaProducerPanelLayoutTest {
     public void sendActionShouldUseSharedCompactPrimaryButtonAcrossLocales() {
         Locale originalLocale = I18nUtil.currentLocale();
         try {
-            assertSendActionUsesSharedCompactPrimaryButton(Locale.CHINESE);
+            assertSendActionUsesSharedCompactPrimaryButton(Locale.forLanguageTag("vi"));
             assertSendActionUsesSharedCompactPrimaryButton(Locale.ENGLISH);
         } finally {
             I18nUtil.setLocale(originalLocale);

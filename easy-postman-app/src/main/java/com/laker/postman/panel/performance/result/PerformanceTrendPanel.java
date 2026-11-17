@@ -467,7 +467,7 @@ public class PerformanceTrendPanel extends UiSingletonPanel implements Performan
     }
 
     private static ResourceBundle chartPopupResourceBundle() {
-        Locale locale = I18nUtil.isChinese() ? Locale.SIMPLIFIED_CHINESE : Locale.ENGLISH;
+        Locale locale = I18nUtil.isVietnamese() ? Locale.forLanguageTag("vi") : Locale.ENGLISH;
         return ResourceBundle.getBundle(JFREE_CHART_BUNDLE, locale);
     }
 
@@ -630,7 +630,7 @@ public class PerformanceTrendPanel extends UiSingletonPanel implements Performan
         if (period.getFirstMillisecond() >= minTerminalTimeMs) {
             return period;
         }
-        // 极短压测中 active=0 和最后 active>0 可能挤在同一毫秒，才额外拉开一点距离。
+        // Đang tiến hành thử nghiệm áp suất rất ngắn active=0 và cuối cùng active>0 Nó có thể được nén vào cùng một phần nghìn giây để tạo thêm một chút khoảng cách.
         return new Millisecond(new Date(minTerminalTimeMs));
     }
 
@@ -686,7 +686,7 @@ public class PerformanceTrendPanel extends UiSingletonPanel implements Performan
         trendDomainStartMs = trendDomainStartMs == null ? periodStart : Math.min(trendDomainStartMs, periodStart);
         trendDomainEndMs = trendDomainEndMs == null ? periodEnd : Math.max(trendDomainEndMs, periodEnd);
 
-        // 同一次压测的分离图必须共享 X 轴，否则空值较多的指标会自动裁剪到不同时间范围。
+        // Sơ đồ phân tách của cùng một bài kiểm tra căng thẳng phải được chia sẻ X trục, nếu không, các chỉ báo có nhiều giá trị null hơn sẽ tự động được cắt bớt theo các phạm vi thời gian khác nhau.
         long end = trendDomainEndMs;
         long visibleDurationMs = end - trendDomainStartMs;
         long rightPaddingMs = PerformanceTrendAxisConfigurer.domainRightPaddingMs(visibleDurationMs);

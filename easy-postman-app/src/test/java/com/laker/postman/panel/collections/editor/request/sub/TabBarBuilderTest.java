@@ -10,7 +10,7 @@ import static org.testng.Assert.assertTrue;
 
 public class TabBarBuilderTest {
 
-    @Test(description = "WebSocket 响应区域应显示网络日志标签，用于查看握手请求")
+    @Test(description = "WebSocket Vùng phản hồi sẽ hiển thị nhãn nhật ký mạng để xem các yêu cầu bắt tay")
     public void shouldIncludeNetworkLogTabForWebSocketResponses() {
         TabBarBuilder.TabConfig config = TabBarBuilder.createWebSocketTabs();
 

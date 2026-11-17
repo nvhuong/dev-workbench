@@ -34,15 +34,15 @@ import static com.laker.postman.request.model.RequestBodyTypes.BODY_TYPE_FORM_UR
 import static com.laker.postman.request.model.RequestBodyTypes.BODY_TYPE_RAW;
 
 /**
- * Postman Collection解析器
- * 负责解析Postman Collection格式的请求（v2.1格式）
- * 此类只负责解析，不涉及 UI 层的 TreeNode 组装
+ * Postman Collectiontrình phân tích cú pháp
+ * Chịu trách nhiệm phân tíchPostman CollectionYêu cầu định dạng (v2.1định dạng)
+ * Lớp này chỉ chịu trách nhiệm phân tích cú pháp và không liên quan UI lớp TreeNode Lắp ráp
  */
 @Slf4j
 @UtilityClass
 public class PostmanCollectionParser {
 
-    // 常量定义
+    // Định nghĩa hằng số
     private static final String KEY_EVENT = "event";
     private static final String KEY_DISABLED = "disabled";
     private static final String KEY_VALUE = "value";
@@ -52,37 +52,37 @@ public class PostmanCollectionParser {
 
 
     /**
-     * 解析完整的 Postman Collection JSON，返回解析结果
+     * Phân tích hoàn tất Postman Collection JSON，Trả về kết quả phân tích cú pháp
      *
-     * @param json Postman Collection JSON 字符串
-     * @return 解析结果，如果解析失败返回 null
+     * @param json Postman Collection JSON chuỗi
+     * @return Kết quả phân tích cú pháp, được trả về nếu phân tích cú pháp thất bại null
      */
     public static CollectionParseResult parsePostmanCollection(String json) {
         try {
             JSONObject postmanRoot = JSONUtil.parseObj(json);
             if (postmanRoot.containsKey("info") && postmanRoot.containsKey("item")) {
-                // 解析 collection 名称和描述
+                // phân tích collection Tên và mô tả
                 JSONObject info = postmanRoot.getJSONObject("info");
                 String collectionName = info.getStr("name", "Postman");
                 RequestGroup collectionGroup = new RequestGroup(collectionName);
 
-                // 解析集合描述
+                // Phân tích mô tả bộ sưu tập
                 String description = extractDescription(info.get("description"));
                 if (description != null && !description.isEmpty()) {
                     collectionGroup.setDescription(description);
                 }
 
-                // 解析集合级别的认证
+                // Phân tích xác thực cấp độ bộ sưu tập
                 if (postmanRoot.containsKey("auth")) {
                     AuthParserUtil.parsePostmanAuthToGroup(postmanRoot.getJSONObject("auth"), collectionGroup);
                 }
 
-                // 解析集合级别的脚本
+                // Tập lệnh phân tích cấp độ bộ sưu tập
                 if (postmanRoot.containsKey(KEY_EVENT)) {
                     parseEventsToGroup(postmanRoot.getJSONArray(KEY_EVENT), collectionGroup);
                 }
 
-                // 解析集合级别的变量
+                // Phân tích các biến cấp độ bộ sưu tập
                 if (postmanRoot.containsKey("variable")) {
                     collectionGroup.setVariables(parseVariables(postmanRoot.getJSONArray("variable")));
                 }
@@ -90,7 +90,7 @@ public class PostmanCollectionParser {
                 JSONArray items = postmanRoot.getJSONArray("item");
                 CollectionParseResult result = new CollectionParseResult(collectionGroup);
 
-                // 递归解析树结构
+                // Cấu trúc cây phân tích đệ quy
                 List<CollectionNode> children = parsePostmanItems(items);
                 for (CollectionNode child : children) {
                     result.addChild(child);
@@ -98,33 +98,33 @@ public class PostmanCollectionParser {
                 return result;
             }
         } catch (Exception e) {
-            // 返回 null 表示解析失败
-            log.error("解析Postman Collection失败", e);
+            // trở lại null Cho biết phân tích cú pháp thất bại
+            log.error("phân tíchPostman Collectionthất bại", e);
             return null;
         }
         return null;
     }
 
     /**
-     * 递归解析Postman集合，返回节点列表
+     * Phân tích đệ quyPostmanBộ sưu tập, trả về danh sách các nút
      *
-     * @param items Postman collection 的 item 数组
-     * @return 节点列表
+     * @param items Postman collection của item mảng
+     * @return Danh sách nút
      */
     private static List<CollectionNode> parsePostmanItems(JSONArray items) {
         List<CollectionNode> nodeList = new ArrayList<>();
         for (Object obj : items) {
             JSONObject item = (JSONObject) obj;
 
-            // 判断是文件夹还是请求
-            // 文件夹：有 item 字段
-            // 请求：有 request 字段
+            // Xác định xem đó là một thư mục hay một yêu cầu
+            // Thư mục: Có item lĩnh vực
+            // Yêu cầu: Có request lĩnh vực
             if (item.containsKey("item")) {
-                // 文件夹节点
+                // Nút thư mục
                 String folderName = item.getStr("name", "default group");
                 RequestGroup group = new RequestGroup(folderName);
 
-                // 解析文件夹描述
+                // Phân tích mô tả thư mục
                 String description = extractDescription(item.get("description"));
                 if (description != null && !description.isEmpty()) {
                     group.setDescription(description);
@@ -134,13 +134,13 @@ public class PostmanCollectionParser {
                     group.setVariables(parseVariables(item.getJSONArray("variable")));
                 }
 
-                // 解析分组级别的认证
+                // Phân tích xác thực cấp nhóm
                 JSONObject auth = item.getJSONObject("auth");
                 if (auth != null) {
                     AuthParserUtil.parsePostmanAuthToGroup(auth, group);
                 }
 
-                // 解析分组级别的脚本
+                // Tập lệnh để phân tích cấp độ nhóm
                 JSONArray events = item.getJSONArray("event");
                 if (events != null && !events.isEmpty()) {
                     parseEventsToGroup(events, group);
@@ -148,7 +148,7 @@ public class PostmanCollectionParser {
 
                 CollectionNode folderNode = new CollectionNode(CollectionNodeType.GROUP, group);
 
-                // 递归处理子节点
+                // Xử lý các nút con theo cách đệ quy
                 JSONArray children = item.getJSONArray("item");
                 List<CollectionNode> childNodes = parsePostmanItems(children);
                 for (CollectionNode child : childNodes) {
@@ -156,7 +156,7 @@ public class PostmanCollectionParser {
                 }
                 nodeList.add(folderNode);
             } else if (item.containsKey("request")) {
-                // 纯请求节点
+                // Nút yêu cầu thuần túy
                 HttpRequestItem req = parsePostmanSingleItem(item);
                 CollectionNode requestNode = new CollectionNode(CollectionNodeType.REQUEST, req);
 
@@ -168,7 +168,7 @@ public class PostmanCollectionParser {
 
 
     /**
-     * 解析Postman的events到RequestGroup
+     * phân tíchPostmancủaeventsĐếnRequestGroup
      */
     private static void parseEventsToGroup(JSONArray events, RequestGroup group) {
         if (events == null || events.isEmpty()) {
@@ -185,7 +185,7 @@ public class PostmanCollectionParser {
     }
 
     /**
-     * 从events数组中解析前置和后置脚本
+     * TừeventsPhân tích các tập lệnh trước và sau trong mảng
      */
     private static ScriptPair parseEventScripts(JSONArray events) {
         StringBuilder testScript = new StringBuilder();
@@ -222,7 +222,7 @@ public class PostmanCollectionParser {
     }
 
     /**
-     * 脚本对，包含前置和后置脚本
+     * Cặp tập lệnh, chứa tập lệnh trước và sau
      */
     private static class ScriptPair {
         final String preScript;
@@ -235,7 +235,7 @@ public class PostmanCollectionParser {
     }
 
     /**
-     * 解析Postman的query参数数组
+     * phân tíchPostmancủaqueryMảng tham số
      */
     private static List<HttpParam> parseQueryParams(JSONArray queryArr) {
         if (queryArr == null || queryArr.isEmpty()) {
@@ -282,7 +282,7 @@ public class PostmanCollectionParser {
     }
 
     /**
-     * 解析Postman的header数组
+     * phân tíchPostmancủaheadermảng
      */
     private static List<HttpHeader> parseHeaders(JSONArray headers) {
         if (headers == null || headers.isEmpty()) {
@@ -304,7 +304,7 @@ public class PostmanCollectionParser {
     }
 
     /**
-     * 解析 Postman 的 header 原始字符串
+     * phân tích Postman của header Chuỗi thô
      */
     private static List<HttpHeader> parseHeaders(String rawHeaders) {
         if (rawHeaders == null || rawHeaders.isBlank()) {
@@ -328,7 +328,7 @@ public class PostmanCollectionParser {
     }
 
     /**
-     * 解析Postman的variable数组
+     * phân tíchPostmancủavariablemảng
      */
     private static List<Variable> parseVariables(JSONArray variables) {
         if (variables == null || variables.isEmpty()) {
@@ -347,7 +347,7 @@ public class PostmanCollectionParser {
     }
 
     /**
-     * 解析Postman的formdata数组
+     * phân tíchPostmancủaformdatamảng
      */
     private static List<HttpFormData> parseFormData(JSONArray arr) {
         if (arr == null || arr.isEmpty()) {
@@ -391,7 +391,7 @@ public class PostmanCollectionParser {
     }
 
     /**
-     * 解析Postman的urlencoded数组
+     * phân tíchPostmancủaurlencodedmảng
      */
     private static List<HttpFormUrlencoded> parseUrlencoded(JSONArray arr) {
         if (arr == null || arr.isEmpty()) {
@@ -413,18 +413,18 @@ public class PostmanCollectionParser {
     }
 
     /**
-     * 解析单个Postman请求item为HttpRequestItem
+     * Phân tích một đơnPostmanyêu cầuitemvìHttpRequestItem
      */
     private static HttpRequestItem parsePostmanSingleItem(JSONObject item) {
         HttpRequestItem req = new HttpRequestItem();
         req.setId(UUID.randomUUID().toString());
-        req.setName(item.getStr("name", "未命名请求"));
+        req.setName(item.getStr("name", "Yêu cầu không tên"));
         Object requestObj = item.get("request");
         if (requestObj instanceof String requestUrl) {
             req.setMethod("GET");
             req.setUrl(requestUrl);
         } else if (requestObj instanceof JSONObject request) {
-            // 解析请求描述
+            // Phân tích mô tả yêu cầu
             String description = extractDescription(request.get("description"));
             if (description != null && !description.isEmpty()) {
                 req.setDescription(description);
@@ -439,7 +439,7 @@ public class PostmanCollectionParser {
                 if (!pathVariables.isEmpty()) {
                     req.setPathVariablesList(pathVariables);
                 }
-                // 解析query参数
+                // phân tíchquerycác thông số
                 JSONArray queryArr = urlJson.getJSONArray("query");
                 List<HttpParam> params = parseQueryParams(queryArr);
                 if (!params.isEmpty()) {
@@ -549,7 +549,7 @@ public class PostmanCollectionParser {
                 }
             }
         }
-        // event（如test脚本、pre-request脚本）
+        // event（Chẳng hạn nhưtestkịch bản,pre-requestkịch bản)
         JSONArray events = item.getJSONArray("event");
         if (events != null && !events.isEmpty()) {
             ScriptPair scripts = parseEventScripts(events);
@@ -561,7 +561,7 @@ public class PostmanCollectionParser {
             }
         }
 
-        // 解析 response（Postman 的 Examples/Saved Responses）
+        // phân tích response（Postman của Examples/Saved Responses）
         JSONArray responses = item.getJSONArray("response");
         if (responses != null && !responses.isEmpty()) {
             List<SavedResponse> savedResponsesList = new ArrayList<>();
@@ -664,38 +664,38 @@ public class PostmanCollectionParser {
     }
 
     /**
-     * 解析 Postman 的单个响应（Example/Saved Response）
+     * phân tích Postman Một phản hồi duy nhất (Example/Saved Response）
      */
     private static SavedResponse parsePostmanResponse(JSONObject respJson) {
         SavedResponse savedResponse = new SavedResponse();
 
-        // 基本信息
+        // Thông tin cơ bản
         savedResponse.setId(UUID.randomUUID().toString());
         savedResponse.setName(respJson.getStr("name", "Response"));
         savedResponse.setTimestamp(System.currentTimeMillis());
 
-        // 状态信息
+        // thông tin trạng thái
         savedResponse.setCode(respJson.getInt("code", 200));
         savedResponse.setStatus(respJson.getStr("status", "OK"));
         savedResponse.setPreviewLanguage(respJson.getStr("_postman_previewlanguage", "text"));
 
-        // 响应头
+        // tiêu đề phản hồi
         JSONArray headers = respJson.getJSONArray(KEY_HEADER);
         List<HttpHeader> headersList = parseHeaders(headers);
         if (!headersList.isEmpty()) {
             savedResponse.setHeaders(headersList);
         }
 
-        // 响应体
+        // cơ quan phản ứng
         savedResponse.setBody(respJson.getStr("body", ""));
 
-        // 原始请求信息
+        // Thông tin yêu cầu ban đầu
         JSONObject originalRequest = respJson.getJSONObject("originalRequest");
         if (originalRequest != null) {
             SavedResponse.OriginalRequest origReq = new SavedResponse.OriginalRequest();
             origReq.setMethod(originalRequest.getStr("method", "GET"));
 
-            // 解析 URL
+            // phân tích URL
             Object urlObj = originalRequest.get("url");
             if (urlObj instanceof JSONObject urlJson) {
                 origReq.setUrl(urlJson.getStr("raw", ""));
@@ -705,7 +705,7 @@ public class PostmanCollectionParser {
                     origReq.setPathVariables(pathVariables);
                 }
 
-                // 解析 query 参数
+                // phân tích query các thông số
                 List<HttpParam> params = parseQueryParams(urlJson.getJSONArray("query"));
                 if (!params.isEmpty()) {
                     origReq.setParams(params);
@@ -714,13 +714,13 @@ public class PostmanCollectionParser {
                 origReq.setUrl(urlStr);
             }
 
-            // 解析请求头
+            // Phân tích tiêu đề yêu cầu
             List<HttpHeader> reqHeaders = parseHeaders(originalRequest.getJSONArray(KEY_HEADER));
             if (!reqHeaders.isEmpty()) {
                 origReq.setHeaders(reqHeaders);
             }
 
-            // 解析请求体
+            // Phân tích nội dung yêu cầu
             JSONObject body = originalRequest.getJSONObject("body");
             if (body != null) {
                 String mode = body.getStr("mode", "");

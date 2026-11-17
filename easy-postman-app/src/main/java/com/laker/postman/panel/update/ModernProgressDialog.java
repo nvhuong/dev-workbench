@@ -18,7 +18,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
 /**
- * 现代化下载进度对话框 - 简洁直观的进度显示
+ * Hộp thoại tiến trình tải xuống hiện đại - Hiển thị tiến trình đơn giản và trực quan
  */
 @Slf4j
 public class ModernProgressDialog {
@@ -42,7 +42,7 @@ public class ModernProgressDialog {
         dialog = new JDialog(parent, I18nUtil.getMessage(MessageKeys.UPDATE_DOWNLOADING), true);
         ToolWindowSurfaceStyle.applyDialogWindowChrome(dialog);
         dialog.setResizable(false);
-        // 点窗口 × 等价于点"取消下载"，而不是 DO_NOTHING
+        // Bấm vào cửa sổ × Tương đương với điểm"Hủy tải xuống"，Thay vào đó DO_NOTHING
         dialog.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
         dialog.addWindowListener(new WindowAdapter() {
             @Override
@@ -72,26 +72,26 @@ public class ModernProgressDialog {
         contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.Y_AXIS));
         ToolWindowSurfaceStyle.applyDialogSurface(contentPanel);
 
-        // 图标
+        // biểu tượng
         JLabel iconLabel = new JLabel(IconUtil.createThemed("icons/download.svg", 48, 48));
         iconLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
         contentPanel.add(iconLabel);
         contentPanel.add(Box.createVerticalStrut(16));
 
-        // 状态文本
+        // Văn bản trạng thái
         statusLabel.setFont(FontsUtil.getDefaultFontWithOffset(Font.BOLD, 4));
         statusLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
         contentPanel.add(statusLabel);
         contentPanel.add(Box.createVerticalStrut(20));
 
-        // 百分比
+        // Tỷ lệ phần trăm
         percentLabel.setFont(FontsUtil.getDefaultFontWithOffset(Font.BOLD, 20));
         percentLabel.setForeground(ModernColors.getPrimary());
         percentLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
         contentPanel.add(percentLabel);
         contentPanel.add(Box.createVerticalStrut(12));
 
-        // 进度条（跟随 FlatLaf 主题，不硬设背景色）
+        // thanh tiến trình (theo dõi FlatLaf chủ đề, không có màu nền cố định)
         progressBar.setPreferredSize(new Dimension(400, 8));
         progressBar.setMaximumSize(new Dimension(400, 8));
         progressBar.setStringPainted(false);
@@ -100,7 +100,7 @@ public class ModernProgressDialog {
         contentPanel.add(progressBar);
         contentPanel.add(Box.createVerticalStrut(20));
 
-        // 详细信息
+        // Chi tiết
         JPanel detailsPanel = createDetailsPanel();
         detailsPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
         contentPanel.add(detailsPanel);
@@ -153,11 +153,11 @@ public class ModernProgressDialog {
     }
 
     /**
-     * 触发取消（× 按钮和取消按钮共用同一逻辑）
-     * 先隐藏对话框，再通知下载器取消，避免对话框卡住
+     * triggerHủy(× nút và nút hủy có cùng logic)
+     * Trước tiên hãy ẩn hộp thoại đi rồi thông báo cho người tải xuống hủy để tránh trường hợp hộp thoại bị kẹt
      */
     public void triggerCancel() {
-        // 先让对话框消失，不要等下载线程响应
+        // Để hộp thoại biến mất trước, đừng đợi luồng tải xuống phản hồi
         hideNow();
         if (onCancelListener != null) {
             onCancelListener.run();
@@ -195,13 +195,13 @@ public class ModernProgressDialog {
     }
 
     /**
-     * 显示对话框。
-     * 注意：必须在 EDT 上调用（modal dialog 的 setVisible(true) 会阻塞 EDT）。
-     * 调用方应通过 SwingUtilities.invokeLater / invokeAndWait 确保在 EDT 上执行，
-     * 并且在 show() 之前先通过 setOnCancelListener 注册好取消回调、启动下载任务。
+     * Hiển thị hộp thoại.
+     * Lưu ý: Phải có mặt EDT gọi(modal dialog của setVisible(true) sẽ chặn EDT）。
+     * Người gọi nên vượt qua SwingUtilities.invokeLater / invokeAndWait Hãy chắc chắn rằng bạn có mặt ở đó EDT Khi thực hiện,
+     * Và trong show() Vượt qua trước setOnCancelListener Đăng ký gọi lại hủy và bắt đầu tác vụ tải xuống.
      */
     public void show() {
-        // 必须在 EDT 上调用，不再内部包 invokeLater（否则 modal setVisible 排在下载回调之后）
+        // Phải ở đó EDT Đã gọi, không còn là gói nội bộ nữa invokeLater（Ngược lại modal setVisible xếp hàng sau khi gọi lại tải xuống)
         if (!SwingUtilities.isEventDispatchThread()) {
             log.warn("ModernProgressDialog.show() called off EDT, using invokeAndWait");
             try {
@@ -221,11 +221,11 @@ public class ModernProgressDialog {
         statusLabel.setText(I18nUtil.getMessage(MessageKeys.UPDATE_CONNECTING));
         sizeLabel.setText("-- / -- MB");
         speedLabel.setText("-- KB/s");
-        dialog.setVisible(true); // modal — 阻塞在这里直到 hide() 被调用
+        dialog.setVisible(true); // modal — Chặn ở đây cho đến khi hide() được gọi
     }
 
     /**
-     * 隐藏并销毁对话框（线程安全，可在任意线程调用）
+     * Ẩn và hủy hộp thoại (luồng an toàn, có thể được gọi từ bất kỳ luồng nào)
      */
     public void hide() {
         hideNow();

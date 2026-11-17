@@ -35,8 +35,8 @@ public final class SyntaxSchemeDemo extends JFrame implements ActionListener {
 
       textArea = new RSyntaxTextArea(20, 60);
       textArea.setSyntaxEditingStyle(SyntaxConstants.SYNTAX_STYLE_JAVA);
-      textArea.setCodeFoldingEnabled(true);   // 代码折叠
-      textArea.setAntiAliasingEnabled(true);  // 抗锯齿
+      textArea.setCodeFoldingEnabled(true);   // Gấp mã
+      textArea.setAntiAliasingEnabled(true);  // Khử răng cưa
       RTextScrollPane sp = new RTextScrollPane(textArea);
       cp.add(sp);
 

@@ -7,7 +7,7 @@ import java.net.URLConnection;
 import java.nio.file.Files;
 
 /**
- * 文件 MIME 类型检测工具类。
+ * tập tin MIME Lớp công cụ phát hiện loại.
  */
 @UtilityClass
 public class FileMimeTypeUtil {

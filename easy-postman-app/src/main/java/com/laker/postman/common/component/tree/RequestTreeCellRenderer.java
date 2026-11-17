@@ -22,16 +22,16 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 /**
- * 自定义树节点渲染器，用于美化 JTree 的节点显示
- * 当鼠标悬浮在 GROUP 节点时，右侧显示 "+" 图标（类似 Postman）
- * 所有节点 hover 时整行显示背景色高亮
+ * Trình kết xuất nút cây tùy chỉnh để làm đẹp JTree các nút được hiển thị
+ * Khi chuột di chuột qua GROUP Nút được hiển thị ở bên phải "+" biểu tượng (tương tự như  Postman）
+ * Tất cả các nút hover Toàn bộ hàng được đánh dấu bằng màu nền
  */
 public class RequestTreeCellRenderer extends DefaultTreeCellRenderer {
 
     private static final int ICON_SIZE = 18;
 
     /**
-     * 当前鼠标悬浮的行号，-1 表示无悬浮；由外部（MouseMotionListener）更新
+     * Số dòng hiện tại mà chuột đang di chuột qua.-1 Cho biết không có sự đình chỉ; từ bên ngoài (MouseMotionListener）đổi mới
      */
     private int hoveredRow = -1;
 
@@ -44,29 +44,29 @@ public class RequestTreeCellRenderer extends DefaultTreeCellRenderer {
     }
 
     /**
-     * "+" 图标区域宽度，距右边缘偏移：more(20) + plus(20) = 右侧40px内
+     * "+" Chiều rộng vùng biểu tượng, khoảng cách từ cạnh phải: .more(20) + plus(20) = bên phải40pxbên trong
      */
     public static final int ADD_BUTTON_WIDTH = 20;
     /**
-     * "⋯" more 图标紧贴右边缘，宽度 20px
+     * "⋯" more Icon ôm sát mép phải, rộng 20px
      */
     public static final int MORE_BUTTON_WIDTH = 20;
 
     /**
-     * 当前渲染行是否需要显示 "+" 图标（GROUP 节点 hover 时）
+     * Liệu dòng kết xuất hiện tại có cần được hiển thị hay không "+" biểu tượng(GROUP nút hover thời gian)
      */
     private boolean showAddButton = false;
     /**
-     * 当前渲染行是否需要显示 "⋯" more 图标（GROUP 节点 hover 时）
+     * Liệu dòng kết xuất hiện tại có cần được hiển thị hay không "⋯" more biểu tượng(GROUP nút hover thời gian)
      */
     private boolean showMoreButton = false;
 
     /**
-     * plus.svg 图标，主题适配，懒加载
+     * plus.svg Biểu tượng, chuyển thể chủ đề, lười tải
      */
     private transient Icon plusIcon = null;
     /**
-     * more.svg 图标，主题适配，懒加载
+     * more.svg Biểu tượng, chuyển thể chủ đề, lười tải
      */
     private transient Icon moreIcon = null;
 
@@ -105,7 +105,7 @@ public class RequestTreeCellRenderer extends DefaultTreeCellRenderer {
     }
 
     /**
-     * 两个图标总宽 + 间距，hover 时为文字预留的右侧空白
+     * Tổng chiều rộng của cả hai biểu tượng + khoảng cách,hover Lề phải dành riêng cho văn bản
      */
     private static final int BUTTONS_RESERVED_WIDTH = ADD_BUTTON_WIDTH + MORE_BUTTON_WIDTH + 4;
 
@@ -123,7 +123,7 @@ public class RequestTreeCellRenderer extends DefaultTreeCellRenderer {
         }
 
         if (isHover) {
-            // hover 时用纯文本，JLabel 能自动省略超长文字
+            // hover Khi sử dụng văn bản thuần túy,JLabel Văn bản rất dài có thể được tự động bỏ qua
             setText(groupName);
         } else {
             String nameColor = toHex(ModernColors.getTextPrimary());
@@ -134,15 +134,15 @@ public class RequestTreeCellRenderer extends DefaultTreeCellRenderer {
         if (isHover) {
             showAddButton = true;
             showMoreButton = true;
-            // 右侧加 padding，JLabel 省略号截断超长文字，为两个图标留出空间
+            // Thêm vào bên phải padding，JLabel Hình elip cắt bớt văn bản rất dài để nhường chỗ cho hai biểu tượng
             setBorder(BorderFactory.createEmptyBorder(0, 0, 0, BUTTONS_RESERVED_WIDTH));
         }
     }
 
     /**
-     * 绘制右侧 "+" 和 "⋯" 图标（GROUP hover 时）。
-     * 布局（从右到左）：| more(20px) | plus(20px) |
-     * 整行 hover 背景色由 JTree.paint() 统一绘制。
+     * Vẽ phía bên phải "+" và "⋯" biểu tượng(GROUP hover giờ).
+     * Bố cục (từ phải sang trái):| more(20px) | plus(20px) |
+     * Toàn bộ hàng hover Màu nền được cho bởi  JTree.paint() Vẽ đồng đều.
      */
     @Override
     protected void paintComponent(Graphics g) {
@@ -152,7 +152,7 @@ public class RequestTreeCellRenderer extends DefaultTreeCellRenderer {
         int w = getWidth();
         int h = getHeight();
 
-        // more 图标：贴右边缘
+        // more Biểu tượng: dán vào cạnh phải
         if (showMoreButton) {
             Icon more = getMoreIcon();
             int x = w - more.getIconWidth() - 2;
@@ -160,7 +160,7 @@ public class RequestTreeCellRenderer extends DefaultTreeCellRenderer {
             more.paintIcon(this, g, x, y);
         }
 
-        // plus 图标：在 more 左边
+        // plus Biểu tượng: trong more trái
         if (showAddButton) {
             Icon plus = getPlusIcon();
             int x = w - MORE_BUTTON_WIDTH - plus.getIconWidth() - 2;

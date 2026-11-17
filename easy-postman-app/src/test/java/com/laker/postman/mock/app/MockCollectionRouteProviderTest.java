@@ -171,7 +171,7 @@ public class MockCollectionRouteProviderTest {
         SavedResponse gbkExample = new SavedResponse();
         gbkExample.setId("gbk");
         gbkExample.setCode(200);
-        gbkExample.setBody("名称,数量\n");
+        gbkExample.setBody("tên,Số lượng\n");
         gbkExample.setHeaders(List.of(new HttpHeader(true, "Content-Type", "text/csv; charset=GBK")));
         request.setResponse(List.of(gbkExample));
 
@@ -180,7 +180,7 @@ public class MockCollectionRouteProviderTest {
                 .get(0);
 
         assertEquals(route.response().getHeader("Content-Type"), "text/csv; charset=GBK");
-        assertEquals(route.response().getBody(), "名称,数量\n");
+        assertEquals(route.response().getBody(), "tên,Số lượng\n");
     }
 
     @Test
@@ -198,7 +198,7 @@ public class MockCollectionRouteProviderTest {
         assertFalse(MockCollectionRouteProvider.isFileContentUnavailable(example, "GET", 304));
 
         example.setBodySize(0);
-        assertFalse(MockCollectionRouteProvider.isFileContentUnavailable(example, "GET", 200), "零字节文件无需内容");
+        assertFalse(MockCollectionRouteProvider.isFileContentUnavailable(example, "GET", 200), "Các tệp 0 byte không yêu cầu nội dung");
     }
 
     @Test

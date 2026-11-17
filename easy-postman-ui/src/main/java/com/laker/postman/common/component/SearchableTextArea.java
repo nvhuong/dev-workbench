@@ -21,28 +21,28 @@ import java.awt.event.MouseEvent;
 import java.util.Locale;
 
 /**
- * 带搜索替换功能的文本编辑器容器
+ * Vùng chứa trình soạn thảo văn bản có chức năng tìm kiếm và thay thế
  * <p>
- * 将 RSyntaxTextArea 和 SearchReplacePanel 组合在一起，
- * 实现类似 Postman 的搜索功能（Cmd+F 呼出，浮动在右上角）
+ * Sẽ RSyntaxTextArea và SearchReplacePanel Kết hợp với nhau,
+ * Việc thực hiện cũng tương tự Postman Chức năng tìm kiếm (Cmd+F thở ra, lơ lửng ở góc trên bên phải)
  * </p>
  *
- * <h2>使用示例</h2>
+ * <h2>Ví dụ sử dụng</h2>
  * <pre>{@code
- * // 创建带搜索替换功能的文本编辑器（默认启用替换功能）
+ * // Tạo trình soạn thảo văn bản có chức năng tìm kiếm và thay thế (chức năng thay thế được bật theo mặc định)
  * SearchableTextArea searchableArea = new SearchableTextArea(textArea);
  *
- * // 创建仅搜索功能的文本编辑器（禁用替换功能）
+ * // Tạo trình soạn thảo văn bản chỉ tìm kiếm (đã tắt chức năng thay thế)
  * SearchableTextArea searchOnlyArea = new SearchableTextArea(textArea, false);
  *
- * // 配置文本编辑器
+ * // Cấu hình trình soạn thảo văn bản
  * textArea.setSyntaxEditingStyle(SyntaxConstants.SYNTAX_STYLE_JAVASCRIPT);
  *
- * // 将容器添加到界面
+ * // Thêm vùng chứa vào giao diện
  * panel.add(searchableArea, BorderLayout.CENTER);
  *
- * // Cmd+F / Ctrl+F 会自动触发搜索
- * // Cmd+Shift+F / Ctrl+Shift+F 会自动触发替换（仅在启用替换功能时可用）
+ * // Cmd+F / Ctrl+F Một tìm kiếm sẽ được kích hoạt tự động
+ * // Cmd+Shift+F / Ctrl+Shift+F Việc thay thế được kích hoạt tự động (chỉ khả dụng khi tính năng Thay thế được bật)
  * }</pre>
  */
 public class SearchableTextArea extends JPanel {
@@ -59,17 +59,17 @@ public class SearchableTextArea extends JPanel {
     private int jsonContextPopupOffset = -1;
 
     /**
-     * 创建带搜索替换功能的文本编辑器（默认启用替换功能）
+     * Tạo trình soạn thảo văn bản có chức năng tìm kiếm và thay thế (chức năng thay thế được bật theo mặc định)
      */
     public SearchableTextArea(RSyntaxTextArea textArea) {
         this(textArea, true);
     }
 
     /**
-     * 创建带搜索功能的文本编辑器
+     * Tạo một trình soạn thảo văn bản với khả năng tìm kiếm
      *
-     * @param textArea      文本编辑器
-     * @param enableReplace 是否启用替换功能
+     * @param textArea      Trình soạn thảo văn bản
+     * @param enableReplace Có bật chức năng thay thế hay không
      */
     public SearchableTextArea(RSyntaxTextArea textArea, boolean enableReplace) {
         this.textArea = textArea;
@@ -79,10 +79,10 @@ public class SearchableTextArea extends JPanel {
 
         scrollPane = new SyntaxEditorScrollPane(textArea);
 
-        // 创建搜索替换面板
+        // Tạo bảng tìm kiếm và thay thế
         searchPanel = new SearchReplacePanel(textArea, enableReplace);
 
-        // 监听搜索面板大小变化，自动更新位置
+        // Theo dõi sự thay đổi kích thước của bảng tìm kiếm và tự động cập nhật vị trí
         searchPanel.addComponentListener(new ComponentAdapter() {
             @Override
             public void componentResized(ComponentEvent e) {
@@ -90,21 +90,21 @@ public class SearchableTextArea extends JPanel {
             }
         });
 
-        // 创建 overlay 面板用于浮动搜索框
+        // Tạo overlay Bảng điều khiển cho hộp tìm kiếm nổi
         overlayPanel = new JPanel(null) {
             @Override
             public boolean isOptimizedDrawingEnabled() {
-                return false; // 允许组件重叠
+                return false; // Cho phép các thành phần chồng lên nhau
             }
         };
         overlayPanel.setOpaque(false);
 
-        // 使用 JLayeredPane 实现浮动效果
+        // sử dụng JLayeredPane Đạt được hiệu ứng nổi
         JLayeredPane layeredPane = new JLayeredPane() {
             @Override
             public void doLayout() {
                 super.doLayout();
-                // 确保滚动面板填充整个 layeredPane
+                // Đảm bảo bảng cuộn lấp đầy toàn bộ layeredPane
                 if (getComponentCount() > 0) {
                     scrollPane.setBounds(0, 0, getWidth(), getHeight());
                     overlayPanel.setBounds(0, 0, getWidth(), getHeight());
@@ -112,10 +112,10 @@ public class SearchableTextArea extends JPanel {
             }
         };
 
-        // 底层：文本编辑器
+        // Lớp dưới cùng: soạn thảo văn bản
         layeredPane.add(scrollPane, JLayeredPane.DEFAULT_LAYER);
 
-        // 上层：搜索面板（浮动在右上角）
+        // Lớp trên: Bảng tìm kiếm (nổi ở góc trên bên phải)
         layeredPane.add(overlayPanel, JLayeredPane.PALETTE_LAYER);
         overlayPanel.add(searchPanel);
 
@@ -124,7 +124,7 @@ public class SearchableTextArea extends JPanel {
         installLineNavigationKeyBindings();
         installEditorShortcutHints();
 
-        // 监听大小变化，调整搜索面板位置
+        // Theo dõi sự thay đổi kích thước và điều chỉnh vị trí bảng tìm kiếm
         layeredPane.addComponentListener(new ComponentAdapter() {
             @Override
             public void componentResized(ComponentEvent e) {
@@ -132,15 +132,15 @@ public class SearchableTextArea extends JPanel {
             }
         });
 
-        // 注册快捷键
+        // Đăng ký phím tắt
         registerKeyBindings();
     }
 
     /**
-     * 注册快捷键
+     * Đăng ký phím tắt
      */
     private void registerKeyBindings() {
-        // Cmd+F / Ctrl+F - 显示搜索
+        // Cmd+F / Ctrl+F - Hiển thị tìm kiếm
         KeyStroke findKey = KeyStroke.getKeyStroke(KeyEvent.VK_F, menuShortcutMask());
         textArea.getInputMap(JComponent.WHEN_FOCUSED).put(findKey, "showSearch");
         textArea.getActionMap().put("showSearch", new AbstractAction() {
@@ -151,7 +151,7 @@ public class SearchableTextArea extends JPanel {
             }
         });
 
-        // Cmd+Shift+F / Ctrl+Shift+F - 显示替换（仅在启用替换功能时注册）
+        // Cmd+Shift+F / Ctrl+Shift+F - Hiển thị các thay thế (chỉ được đăng ký khi tính năng thay thế được bật)
         if (enableReplace) {
             KeyStroke replaceKey = KeyStroke.getKeyStroke(KeyEvent.VK_F,
                     menuShortcutMask() | java.awt.event.InputEvent.SHIFT_DOWN_MASK);
@@ -454,26 +454,26 @@ public class SearchableTextArea extends JPanel {
     }
 
     /**
-     * 更新搜索面板位置（右上角）
+     * Đã cập nhật vị trí bảng tìm kiếm (góc trên bên phải)
      */
     private void updateSearchPanelPosition() {
         if (!searchPanel.isVisible()) {
             return;
         }
 
-        // 先让面板自行计算最佳尺寸
+        // Trước tiên hãy để bảng tính toán kích thước tối ưu
         searchPanel.revalidate();
         Dimension panelSize = searchPanel.getPreferredSize();
 
-        // 确保面板有足够的宽度和高度
-        int panelWidth = Math.max(panelSize.width, 250);  // 最小宽度 250px
+        // Đảm bảo các tấm có đủ chiều rộng và chiều cao
+        int panelWidth = Math.max(panelSize.width, 250);  // Chiều rộng tối thiểu 250px
         int panelHeight = panelSize.height;
 
-        // 计算右上角位置
+        // Tính vị trí của góc trên bên phải
         int x = Math.max(10, overlayPanel.getWidth() - panelWidth - 10);
         int y = 5;
 
-        // 设置面板位置和大小
+        // Đặt vị trí và kích thước của bảng điều khiển
         searchPanel.setBounds(x, y, panelWidth, panelHeight);
         overlayPanel.setSize(overlayPanel.getParent().getSize());
         overlayPanel.revalidate();
@@ -481,7 +481,7 @@ public class SearchableTextArea extends JPanel {
     }
 
     /**
-     * 显示搜索面板
+     * Hiển thị bảng tìm kiếm
      */
     public void showSearch() {
         searchPanel.showSearch();
@@ -489,7 +489,7 @@ public class SearchableTextArea extends JPanel {
     }
 
     /**
-     * 显示替换面板
+     * Hiển thị bảng thay thế
      */
     public void showReplace() {
         searchPanel.showReplace();
@@ -497,7 +497,7 @@ public class SearchableTextArea extends JPanel {
     }
 
     /**
-     * 配置是否显示行号，便于保留原始编辑器体验
+     * Định cấu hình có hiển thị số dòng để duy trì trải nghiệm soạn thảo gốc hay không
      */
     public void setLineNumbersEnabled(boolean enabled) {
         scrollPane.setLineNumbersEnabled(enabled);

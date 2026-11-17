@@ -112,9 +112,9 @@ public class PerformanceJsonReportMapperTest {
     @Test
     public void shouldPreserveFirstSeenApiOrderInJsonReport() {
         PerformanceStatsCollector collector = new PerformanceStatsCollector();
-        collector.record(new RequestResult(1_000, 1_010, true, "2", "2-商品详情", PerformanceProtocol.HTTP));
-        collector.record(new RequestResult(1_010, 1_020, true, "10", "10-订单管理列表", PerformanceProtocol.HTTP));
-        collector.record(new RequestResult(1_020, 1_030, true, "1", "1-商品列表查询", PerformanceProtocol.HTTP));
+        collector.record(new RequestResult(1_000, 1_010, true, "2", "2-Chi tiết sản phẩm", PerformanceProtocol.HTTP));
+        collector.record(new RequestResult(1_010, 1_020, true, "10", "10-Danh sách quản lý đơn hàng", PerformanceProtocol.HTTP));
+        collector.record(new RequestResult(1_020, 1_030, true, "1", "1-Truy vấn danh sách sản phẩm", PerformanceProtocol.HTTP));
 
         PerformanceJsonReport report = PerformanceJsonReportMapper.fromStatsSnapshot(
                 PerformanceJsonReportMetadata.builder().source("local").status("SUCCESS").build(),
@@ -125,7 +125,7 @@ public class PerformanceJsonReportMapperTest {
                 .map(PerformanceJsonReportApi::getName)
                 .toList();
 
-        assertEquals(names, List.of("2-商品详情", "10-订单管理列表", "1-商品列表查询"));
+        assertEquals(names, List.of("2-Chi tiết sản phẩm", "10-Danh sách quản lý đơn hàng", "1-Truy vấn danh sách sản phẩm"));
     }
 
     @Test

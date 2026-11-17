@@ -5,50 +5,50 @@ import lombok.Data;
 import java.io.Serializable;
 
 /**
- * 客户端证书配置
- * 用于支持 mTLS (mutual TLS) 认证
+ * Cấu hình chứng chỉ ứng dụng khách
+ * để được hỗ trợ mTLS (mutual TLS) Chứng nhận
  */
 @Data
 public class ClientCertificate implements Serializable {
-    private String id; // 唯一标识符
-    private String name; // 证书配置名称（可选）
-    private String host; // 主机名或域名匹配模式（支持通配符，如 *.example.com）
-    private int port; // 端口号，0 表示匹配所有端口
-    private String certPath; // 证书文件路径（PFX/P12 或 PEM 格式）
-    private String certType; // 证书类型：PFX, PEM
-    private String certPassword; // 证书密码（用于 PFX/P12）
-    private String keyPath; // 私钥文件路径（PEM 格式时使用）
-    private String keyPassword; // 私钥密码（可选）
-    private boolean enabled; // 是否启用此证书配置
-    private long createdAt; // 创建时间
-    private long updatedAt; // 更新时间
+    private String id; // Mã định danh duy nhất
+    private String name; // Certificate configuration name (optional)
+    private String host; // Mẫu khớp tên máy chủ hoặc tên miền (được hỗ trợ ký tự đại diện, ví dụ: *.example.com）
+    private int port; // Số cổng,0 Cho biết phù hợp với tất cả các cổng
+    private String certPath; // Certificate file path (PFX/P12 hoặc PEM định dạng)
+    private String certType; // Certificate type:PFX, PEM
+    private String certPassword; // Certificate password (for PFX/P12）
+    private String keyPath; // Đường dẫn tệp khóa riêng (PEM định dạng)
+    private String keyPassword; // Mật khẩu khóa riêng (tùy chọn)
+    private boolean enabled; // Có bật cấu hình chứng chỉ này hay không
+    private long createdAt; // Thời gian sáng tạo
+    private long updatedAt; // Cập nhật thời gian
 
-    // 证书类型常量
+    // Certificate type constant
     public static final String CERT_TYPE_PFX = "PFX";
     public static final String CERT_TYPE_PEM = "PEM";
 
     public ClientCertificate() {
         this.enabled = true;
-        this.port = 0; // 默认匹配所有端口
+        this.port = 0; // Mặc định khớp với tất cả các cổng
         this.certType = CERT_TYPE_PFX;
         this.createdAt = System.currentTimeMillis();
         this.updatedAt = System.currentTimeMillis();
     }
 
     /**
-     * 检查此证书是否匹配指定的主机和端口
+     * Kiểm tra xem chứng chỉ này có khớp với máy chủ và cổng được chỉ định hay không
      */
     public boolean matches(String targetHost, int targetPort) {
         if (!enabled) {
             return false;
         }
 
-        // 检查端口匹配
+        // Kiểm tra kết nối cổng
         if (port != 0 && port != targetPort) {
             return false;
         }
 
-        // 检查主机名匹配
+        // Kiểm tra sự trùng khớp của tên máy chủ
         if (host == null || host.trim().isEmpty()) {
             return false;
         }
@@ -56,14 +56,14 @@ public class ClientCertificate implements Serializable {
         String pattern = host.trim().toLowerCase();
         String target = targetHost.toLowerCase();
 
-        // 支持通配符匹配
+        // Kết hợp ký tự đại diện được hỗ trợ
         if (pattern.startsWith("*.")) {
             String domain = pattern.substring(2);
-            // 匹配 "api.example.com" 或 "example.com" 本身
+            // cuộc thi đấu "api.example.com" hoặc "example.com" chính nó
             return target.endsWith("." + domain) || target.equals(domain);
         }
 
-        // 精确匹配
+        // Trận đấu chính xác
         return pattern.equals(target);
     }
 }

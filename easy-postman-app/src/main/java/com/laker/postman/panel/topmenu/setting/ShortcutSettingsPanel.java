@@ -24,7 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * 快捷键设置面板
+ * Bảng cài đặt phím tắt
  */
 public class ShortcutSettingsPanel extends JPanel {
     private JTable shortcutTable;
@@ -35,7 +35,7 @@ public class ShortcutSettingsPanel extends JPanel {
         setBorder(new EmptyBorder(20, 20, 20, 20));
         ToolWindowSurfaceStyle.applyDialogSurface(this);
 
-        // 标题面板
+        // Bảng tiêu đề
         JPanel titlePanel = new JPanel(new BorderLayout());
         ToolWindowSurfaceStyle.applyDialogSurface(titlePanel);
         titlePanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 10, 0));
@@ -44,7 +44,7 @@ public class ShortcutSettingsPanel extends JPanel {
         titleLabel.setFont(FontsUtil.getDefaultFontWithOffset(Font.BOLD, 3));
         titlePanel.add(titleLabel, BorderLayout.NORTH);
 
-        // 添加双击编辑提示
+        // Đã thêm lời nhắc chỉnh sửa nhấp đúp
         JLabel hintLabel = new JLabel(I18nUtil.getMessage(MessageKeys.SHORTCUT_DOUBLE_CLICK_HINT));
         hintLabel.setFont(FontsUtil.getDefaultFontWithOffset(Font.PLAIN, -1));
         hintLabel.setForeground(ModernColors.getTextSecondary());
@@ -52,7 +52,7 @@ public class ShortcutSettingsPanel extends JPanel {
 
         add(titlePanel, BorderLayout.NORTH);
 
-        // 创建表格
+        // Tạo một bảng
         tableModel = new ShortcutTableModel();
         shortcutTable = new JTable(tableModel);
         ToolWindowSurfaceStyle.applyTableCard(shortcutTable);
@@ -60,16 +60,16 @@ public class ShortcutSettingsPanel extends JPanel {
         shortcutTable.setFocusable(false);
         shortcutTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
-        // 设置列宽（只有2列）
+        // Đặt chiều rộng cột (chỉ2cột)
         shortcutTable.getColumnModel().getColumn(0).setPreferredWidth(300);
         shortcutTable.getColumnModel().getColumn(1).setPreferredWidth(200);
 
-        // 设置渲染器
+        // Thiết lập trình kết xuất
         DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
         centerRenderer.setHorizontalAlignment(SwingConstants.CENTER);
         shortcutTable.getColumnModel().getColumn(1).setCellRenderer(centerRenderer);
 
-        // 添加双击编辑功能
+        // Đã thêm chức năng chỉnh sửa nhấp đúp
         shortcutTable.addMouseListener(new java.awt.event.MouseAdapter() {
             @Override
             public void mouseClicked(java.awt.event.MouseEvent e) {
@@ -83,7 +83,7 @@ public class ShortcutSettingsPanel extends JPanel {
         ToolWindowSurfaceStyle.applyTableScrollPaneCard(scrollPane, shortcutTable);
         add(scrollPane, BorderLayout.CENTER);
 
-        // 底部按钮面板
+        // Bảng nút dưới cùng
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 0));
         ToolWindowSurfaceStyle.applyDialogSurface(buttonPanel);
 
@@ -100,7 +100,7 @@ public class ShortcutSettingsPanel extends JPanel {
     }
 
     /**
-     * 编辑快捷键
+     * Chỉnh sửa phím tắt
      */
     private void editShortcut() {
         int selectedRow = shortcutTable.getSelectedRow();
@@ -119,13 +119,13 @@ public class ShortcutSettingsPanel extends JPanel {
 
         if (dialog.isConfirmed()) {
             tableModel.fireTableRowsUpdated(selectedRow, selectedRow);
-            // 立即应用更改
+            // Áp dụng thay đổi ngay lập tức
             applySettings();
         }
     }
 
     /**
-     * 重置为默认值
+     * Đặt lại về giá trị mặc định
      */
     private void resetToDefaults() {
         int result = JOptionPane.showConfirmDialog(this,
@@ -137,7 +137,7 @@ public class ShortcutSettingsPanel extends JPanel {
         if (result == JOptionPane.YES_OPTION) {
             ShortcutManager.resetToDefaults();
             tableModel.refresh();
-            // 立即应用更改
+            // Áp dụng thay đổi ngay lập tức
             applySettings();
             JOptionPane.showMessageDialog(this,
                     I18nUtil.getMessage(MessageKeys.SHORTCUT_RESET_SUCCESS),
@@ -147,29 +147,29 @@ public class ShortcutSettingsPanel extends JPanel {
     }
 
     /**
-     * 应用设置
+     * Áp dụng cài đặt
      */
     public void applySettings() {
         ShortcutManager.save();
-        // 通知需要重新注册快捷键
+        // Thông báo các phím tắt cần phải đăng ký lại
         notifyShortcutChanged();
     }
 
     /**
-     * 通知快捷键已更改，需要重新注册
+     * Phím tắt thông báo đã được thay đổi và cần phải đăng ký lại
      */
     private void notifyShortcutChanged() {
-        // 重新注册 RequestEditorPanel 的快捷键
+        // Đăng ký lại RequestEditorPanel phím tắt
         UiSingletonFactory.getInstance(
                 RequestEditorPanel.class).reloadShortcuts();
 
-        // 重新加载菜单栏（包括快捷键和 Git 工具栏等所有组件）
+        // Tải lại thanh menu (bao gồm phím tắt và  Git tất cả các thành phần bao gồm cả thanh công cụ)
         UiSingletonFactory.getInstance(
                 TopMenuBar.class).refresh();
     }
 
     /**
-     * 快捷键表格模型
+     * Mô hình bảng phím tắt
      */
     private static class ShortcutTableModel extends AbstractTableModel {
         private final List<ShortcutItem> shortcuts;
@@ -244,7 +244,7 @@ public class ShortcutSettingsPanel extends JPanel {
     }
 
     /**
-     * 快捷键项
+     * Các mục phím tắt
      */
     static class ShortcutItem {
         private final String id;
@@ -265,7 +265,7 @@ public class ShortcutSettingsPanel extends JPanel {
     }
 
     /**
-     * 快捷键编辑对话框
+     * Hộp thoại chỉnh sửa phím tắt
      */
     private static class ShortcutEditDialog extends JDialog {
         private final ShortcutItem item;
@@ -285,7 +285,7 @@ public class ShortcutSettingsPanel extends JPanel {
             ((JPanel) getContentPane()).setBorder(new EmptyBorder(20, 20, 20, 20));
             ToolWindowSurfaceStyle.applyDialogSurface((JPanel) getContentPane());
 
-            // 中心面板
+            // Bảng điều khiển trung tâm
             JPanel centerPanel = new JPanel(new GridLayout(3, 2, 10, 10));
             ToolWindowSurfaceStyle.applyDialogSurface(centerPanel);
 
@@ -304,7 +304,7 @@ public class ShortcutSettingsPanel extends JPanel {
             keyInputField.addKeyListener(new KeyListener() {
                 @Override
                 public void keyTyped(KeyEvent e) {
-                    // 不处理
+                    // Không được xử lý
                 }
 
                 @Override
@@ -314,14 +314,14 @@ public class ShortcutSettingsPanel extends JPanel {
 
                 @Override
                 public void keyReleased(KeyEvent e) {
-                    // 不处理
+                    // Không được xử lý
                 }
             });
             centerPanel.add(keyInputField);
 
             add(centerPanel, BorderLayout.CENTER);
 
-            // 按钮面板
+            // Bảng nút
             JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 0));
             ToolWindowSurfaceStyle.applyDialogFooter(buttonPanel);
 
@@ -350,13 +350,13 @@ public class ShortcutSettingsPanel extends JPanel {
             int keyCode = e.getKeyCode();
             int modifiers = e.getModifiersEx();
 
-            // 忽略纯修饰键
+            // Các phím bổ trợ thuần túy bị bỏ qua
             if (keyCode == KeyEvent.VK_SHIFT || keyCode == KeyEvent.VK_CONTROL ||
                     keyCode == KeyEvent.VK_ALT || keyCode == KeyEvent.VK_META) {
                 return;
             }
 
-            // 检查冲突
+            // Kiểm tra xung đột
             String conflict = ShortcutManager.checkConflict(item.getId(), keyCode, modifiers);
             if (conflict != null) {
                 keyInputField.setText(I18nUtil.getMessage(MessageKeys.SHORTCUT_CONFLICT) + ": " + conflict);
@@ -366,7 +366,7 @@ public class ShortcutSettingsPanel extends JPanel {
             this.newKeyCode = keyCode;
             this.newModifiers = modifiers;
 
-            // 显示新快捷键
+            // Hiển thị các phím tắt mới
             ShortcutManager.ShortcutConfig tempConfig = new ShortcutManager.ShortcutConfig(
                     "", "", keyCode, modifiers, "", "");
             keyInputField.setText(tempConfig.getDisplayText());

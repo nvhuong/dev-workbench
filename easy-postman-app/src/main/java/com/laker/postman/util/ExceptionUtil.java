@@ -3,19 +3,19 @@ package com.laker.postman.util;
 import lombok.experimental.UtilityClass;
 
 /**
- * 全局未捕获异常过滤器的判断逻辑。
+ * Logic phán đoán của bộ lọc ngoại lệ chưa được nắm bắt toàn cầu.
  */
 @UtilityClass
 public class ExceptionUtil {
 
     /**
-     * 检查异常是否应该被忽略（不展示给用户）
+     * Kiểm tra xem có nên bỏ qua ngoại lệ hay không (không hiển thị cho người dùng)
      * <p>
-     * 此方法用于过滤掉那些不影响用户操作、由第三方库内部清理过程产生的无害异常。
+     * Phương pháp này được sử dụng để lọc ra các ngoại lệ vô hại, không ảnh hưởng đến hoạt động của người dùng và được tạo ra bởi quá trình dọn dẹp nội bộ của thư viện bên thứ ba.
      * </p>
      *
-     * @param throwable 要检查的异常
-     * @return 如果异常应该被忽略返回true，否则返回false
+     * @param throwable Ngoại lệ để kiểm tra
+     * @return Trả về nếu ngoại lệ bị bỏ quatrue，Còn không thì quay lạifalse
      */
     public static boolean shouldIgnoreException(Throwable throwable) {
         if (throwable == null) {
@@ -26,17 +26,17 @@ public class ExceptionUtil {
     }
 
     /**
-     * 检查是否是SSH executor shutdown错误
+     * Kiểm tra xem cóSSH executor shutdownsai lầm
      * <p>
-     * 这些错误通常发生在Git SSH操作完成后，异步IO操作尝试使用已关闭的executor。
-     * 这是Apache SSHD + JGit的已知行为，不影响实际功能。
+     * Những lỗi này thường xảy raGit SSHSau khi hoạt động hoàn tất, không đồng bộIOHoạt động đã cố gắng sử dụng một hoạt động đã đóngexecutor。
+     * Đây làApache SSHD + JGitHành vi đã biết và không ảnh hưởng đến chức năng thực tế.
      * </p>
      *
-     * @param throwable 要检查的异常
-     * @return 如果是SSH shutdown错误返回true，否则返回false
+     * @param throwable Ngoại lệ để kiểm tra
+     * @return trong trường hợpSSH shutdownLỗi được trả vềtrue，Còn không thì quay lạifalse
      */
     private static boolean isSshExecutorShutdownError(Throwable throwable) {
-        // 检查是否是 IllegalStateException 且消息包含特定内容
+        // Kiểm tra xem có IllegalStateException và tin nhắn chứa nội dung cụ thể
         if (!(throwable instanceof IllegalStateException)) {
             return false;
         }
@@ -46,7 +46,7 @@ public class ExceptionUtil {
             return false;
         }
 
-        // 检查调用栈是否包含SSH相关的类
+        // Kiểm tra xem ngăn xếp cuộc gọi có chứaSSHCác lớp liên quan
         return stackTraceContains(throwable,
                 "org.apache.sshd",
                 "NoCloseExecutor",
@@ -56,11 +56,11 @@ public class ExceptionUtil {
 
 
     /**
-     * 检查异常的调用栈中是否包含指定的类名片段
+     * Kiểm tra xem ngăn xếp cuộc gọi của ngoại lệ có chứa đoạn tên lớp được chỉ định hay không
      *
-     * @param throwable      要检查的异常
-     * @param classNameParts 类名片段（可变参数）
-     * @return 如果调用栈中包含任一指定的类名片段返回true
+     * @param throwable      Ngoại lệ để kiểm tra
+     * @param classNameParts Đoạn tên lớp (varargs)
+     * @return Trả về nếu ngăn xếp cuộc gọi chứa bất kỳ đoạn nào của tên lớp đã chỉ địnhtrue
      */
     private static boolean stackTraceContains(Throwable throwable, String... classNameParts) {
         if (throwable == null || classNameParts == null || classNameParts.length == 0) {

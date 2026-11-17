@@ -21,9 +21,9 @@ public class PerformanceSampleRecord {
     int sentMessages;
     int receivedMessages;
     int matchedMessages;
-    // 发送字节数：请求头 + 请求体，worker/master 合并时直接求和
+    // Số byte được gửi: tiêu đề yêu cầu + Yêu cầu cơ thể,worker/master Tính tổng trực tiếp khi hợp nhất
     long sentBytes;
-    // 接收字节数：响应头 + 响应体，worker/master 合并时直接求和
+    // Số byte nhận được: tiêu đề phản hồi + cơ quan phản ứng,worker/master Tính tổng trực tiếp khi hợp nhất
     long receivedBytes;
     long firstMessageLatencyMs;
     boolean successful;

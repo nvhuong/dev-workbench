@@ -1,6 +1,6 @@
 package com.laker.postman.performance.core.model;
 
-// 节点类型定义
+// Định nghĩa loại nút
 public enum NodeType {
     ROOT,
     THREAD_GROUP,

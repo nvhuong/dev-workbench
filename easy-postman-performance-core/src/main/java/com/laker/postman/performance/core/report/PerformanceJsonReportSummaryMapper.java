@@ -313,7 +313,7 @@ public class PerformanceJsonReportSummaryMapper {
                 min = min == 0 ? duration.getMin() : Math.min(min, duration.getMin());
             }
             max = Math.max(max, duration.getMax());
-            // 目前 report JSON 未携带直方图 bucket，master 只能用各 worker 分位值的最大值做保守近似。
+            // hiện tại report JSON Biểu đồ không được thực hiện bucket，master Bạn chỉ có thể sử dụng từng cái worker Giá trị tối đa của giá trị lượng tử được xấp xỉ một cách thận trọng.
             p90 = Math.max(p90, duration.getP90());
             p95 = Math.max(p95, duration.getP95());
             p99 = Math.max(p99, duration.getP99());

@@ -37,7 +37,7 @@ public class FileResponseModelTest {
         assertEquals(model.fileType(), "XLSX");
         assertEquals(model.detectedFileType(), "XLSX");
         assertEquals(model.declaredContentType(), "application/json;charset=UTF-8");
-        assertFalse(model.canViewAsText(), "识别出的二进制格式按文本查看只有乱码");
+        assertFalse(model.canViewAsText(), "The recognized binary format is only garbled when viewed as text");
         assertTrue(model.contentAvailable());
     }
 

@@ -112,7 +112,7 @@ public class ScriptKafkaApi {
 
         return KafkaClassLoaderSupport.withPluginContextClassLoader(() -> {
             try (KafkaConsumer<String, String> consumer = new KafkaConsumer<>(props)) {
-                // 在分区分配回调中定位起始位置，避免预热 poll 拉到的消息被丢弃，或分配较慢时起始位置被跳过
+                // Định vị vị trí bắt đầu trong lệnh gọi lại phân bổ phân vùng để tránh khởi động poll Các tin nhắn đã kéo sẽ bị loại bỏ hoặc vị trí bắt đầu bị bỏ qua khi phân bổ chậm
                 consumer.subscribe(Collections.singletonList(topic), new ConsumerRebalanceListener() {
                     @Override
                     public void onPartitionsRevoked(Collection<TopicPartition> partitions) {

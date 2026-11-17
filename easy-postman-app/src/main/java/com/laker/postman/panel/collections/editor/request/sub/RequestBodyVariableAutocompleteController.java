@@ -19,9 +19,9 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
 /**
- * 请求体变量自动补全控制器。
+ * Request body variable auto-completion controller.
  * <p>
- * 负责 {{...}} 触发、变量过滤、弹窗定位、键盘导航和插入变量，避免 RequestBodyPanel 承担弹窗状态。
+ * Chịu trách nhiệm {{...}} Tránh kích hoạt, lọc biến, định vị cửa sổ bật lên, điều hướng bàn phím và chèn biến RequestBodyPanel Giả sử trạng thái bật lên.
  */
 @Slf4j
 @RequiredArgsConstructor

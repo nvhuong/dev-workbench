@@ -13,7 +13,7 @@ import static org.testng.Assert.assertFalse;
 
 public class ConnectionProfilePersistenceBehaviorTest {
 
-    @Test(description = "数据库工具连接成功不应自动保存连接配置，必须由用户点击保存触发")
+    @Test(description = "Kết nối thành công với công cụ cơ sở dữ liệu sẽ không tự động lưu cấu hình kết nối mà phải được kích hoạt khi người dùng nhấp vào Lưu")
     public void successfulConnectShouldNotPersistConnectionProfiles() throws Exception {
         String redisPanel = source("easy-postman-plugins/plugin-redis/src/main/java/com/laker/postman/plugin/redis/RedisPanel.java");
         String kafkaPanel = source("easy-postman-plugins/plugin-kafka/src/main/java/com/laker/postman/plugin/kafka/KafkaPanel.java");
@@ -26,16 +26,16 @@ public class ConnectionProfilePersistenceBehaviorTest {
         assertFalse(influxDbPanel.contains("saveConnectionProfile(finalBaseUrl, false);"));
     }
 
-    @Test(description = "连接后断开按钮使用短文案，避免工具栏按钮被截断")
-    public void disconnectButtonLabelsShouldBeShortInChinese() throws Exception {
-        Properties appMessages = properties("easy-postman-app/src/main/resources/messages_zh.properties");
-        Properties redisMessages = properties("easy-postman-plugins/plugin-redis/src/main/resources/redis-messages_zh.properties");
-        Properties kafkaMessages = properties("easy-postman-plugins/plugin-kafka/src/main/resources/kafka-messages_zh.properties");
+    @Test(description = "Sử dụng bản sao ngắn cho nút ngắt kết nối sau khi kết nối để tránh các nút trên thanh công cụ bị cắt bớt")
+    public void disconnectButtonLabelsShouldBeShortInVietnamese() throws Exception {
+        Properties appMessages = properties("easy-postman-app/src/main/resources/messages_vi.properties");
+        Properties redisMessages = properties("easy-postman-plugins/plugin-redis/src/main/resources/redis-messages_vi.properties");
+        Properties kafkaMessages = properties("easy-postman-plugins/plugin-kafka/src/main/resources/kafka-messages_vi.properties");
 
-        assertEquals(appMessages.getProperty("toolbox.es.disconnect"), "断开");
-        assertEquals(appMessages.getProperty("toolbox.influx.disconnect"), "断开");
-        assertEquals(redisMessages.getProperty("toolbox.redis.disconnect"), "断开");
-        assertEquals(kafkaMessages.getProperty("toolbox.kafka.disconnect"), "断开");
+        assertEquals(appMessages.getProperty("toolbox.es.disconnect"), "Ngắt kết nối");
+        assertEquals(appMessages.getProperty("toolbox.influx.disconnect"), "Ngắt kết nối");
+        assertEquals(redisMessages.getProperty("toolbox.redis.disconnect"), "Ngắt kết nối");
+        assertEquals(kafkaMessages.getProperty("toolbox.kafka.disconnect"), "Ngắt kết nối");
     }
 
     private static String source(String relativePath) throws IOException {

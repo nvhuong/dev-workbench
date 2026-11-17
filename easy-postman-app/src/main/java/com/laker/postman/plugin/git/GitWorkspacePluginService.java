@@ -1647,7 +1647,7 @@ public class GitWorkspacePluginService implements GitPluginService {
         Path readmePath = Paths.get(workspace.getPath(), "README.md");
         Files.write(readmePath, String.format("# %s\n\n%s",
                 workspace.getName(),
-                workspace.getDescription() != null ? workspace.getDescription() : "EasyPostman Workspace").getBytes());
+                workspace.getDescription() != null ? workspace.getDescription() : "Dev Workbench Workspace").getBytes());
         git.add().addFilepattern(".").call();
         git.commit().setMessage("Initial commit").call();
         workspace.setLastCommitId(getLastCommitId(git));
@@ -1656,7 +1656,7 @@ public class GitWorkspacePluginService implements GitPluginService {
     private void createGitignore(Workspace workspace) throws IOException {
         Path gitignorePath = Paths.get(workspace.getPath(), ".gitignore");
         List<String> ignorePatterns = new ArrayList<>();
-        ignorePatterns.add("# EasyPostman Workspace");
+        ignorePatterns.add("# Dev Workbench Workspace");
         ignorePatterns.add("");
         ignorePatterns.add("# Temporary files");
         ignorePatterns.add("*.tmp");

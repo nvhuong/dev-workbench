@@ -19,31 +19,31 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * SSL配置工具类
- * 职责：为OkHttpClient配置SSL设置，支持严格模式和宽松模式，以及客户端证书（mTLS）
+ * SSLLớp công cụ cấu hình
+ * Trách nhiệm: choOkHttpClientcấu hìnhSSLcài đặt, hỗ trợ chế độ nghiêm ngặt và chế độ thoải mái, cũng như chứng chỉ ứng dụng khách (mTLS）
  */
 @Slf4j
 public class SSLConfigurationUtil {
 
     /**
-     * SSL验证模式
+     * SSLChế độ xác thực
      */
     public enum SSLVerificationMode {
         /**
-         * 严格模式：完全验证证书
+         * Chế độ nghiêm ngặt: Xác thực đầy đủ chứng chỉ
          */
         STRICT,
         /**
-         * 宽松模式：验证但不阻止连接
+         * Chế độ thư giãn: xác thực nhưng không chặn kết nối
          */
         LENIENT,
         /**
-         * 信任所有：完全跳过验证（不推荐）
+         * Tin cậy tất cả: Bỏ qua hoàn toàn việc xác minh (không khuyến nghị)
          */
         TRUST_ALL
     }
 
-    // 存储最近的SSL验证结果，按线程区分
+    // Lưu trữ gần đây nhấtSSLKết quả xác minh, được phân biệt theo chủ đề
     private static final ThreadLocal<SSLValidationResult> lastValidationResult = new ThreadLocal<>();
     private static volatile HttpLifecycleLogSink lifecycleLogSink = HttpLifecycleLogSink.noop();
     private static volatile ClientCertificateProvider clientCertificateProvider = ClientCertificateProvider.noop();
@@ -57,36 +57,36 @@ public class SSLConfigurationUtil {
     }
 
     /**
-     * 获取当前线程的SSL验证结果
+     * Lấy chủ đề hiện tạiSSLXác minh kết quả
      */
     public static SSLValidationResult getLastValidationResult() {
         return lastValidationResult.get();
     }
 
     /**
-     * 清除当前线程的SSL验证结果
+     * Xóa chủ đề hiện tạiSSLXác minh kết quả
      */
     public static void clearValidationResult() {
         lastValidationResult.remove();
     }
 
     /**
-     * 为OkHttpClient配置SSL设置（推荐使用此方法）
+     * vìOkHttpClientcấu hìnhSSLcài đặt (phương pháp này được khuyến khích)
      *
-     * @param builder OkHttpClient构建器
-     * @param mode    SSL验证模式
+     * @param builder OkHttpClientngười xây dựng
+     * @param mode    SSLChế độ xác thực
      */
     public static void configureSSL(OkHttpClient.Builder builder, SSLVerificationMode mode) {
         configureSSL(builder, mode, null, 0);
     }
 
     /**
-     * 为OkHttpClient配置SSL设置，支持客户端证书（mTLS）
+     * vìOkHttpClientcấu hìnhSSLCài đặt để hỗ trợ chứng chỉ ứng dụng khách (mTLS）
      *
-     * @param builder OkHttpClient构建器
-     * @param mode    SSL验证模式
-     * @param host    目标主机名（用于匹配客户端证书）
-     * @param port    目标端口（用于匹配客户端证书）
+     * @param builder OkHttpClientngười xây dựng
+     * @param mode    SSLChế độ xác thực
+     * @param host    Tên máy chủ đích (được sử dụng để khớp với chứng chỉ ứng dụng khách)
+     * @param port    Cổng đích (để khớp với chứng chỉ ứng dụng khách)
      */
     public static void configureSSL(OkHttpClient.Builder builder, SSLVerificationMode mode,
                                     String host, int port) {
@@ -109,26 +109,26 @@ public class SSLConfigurationUtil {
                                     HttpLifecycleLogSink logSink) {
         try {
             host = HttpUrlUtil.normalizeHost(host);
-            // 查找并加载匹配的客户端证书
+            // Tìm và tải chứng chỉ ứng dụng khách phù hợp
             KeyManager[] keyManagers = loadClientCertificate(host, port, logSink);
 
-            // 配置 TrustManager
+            // cấu hình TrustManager
             X509TrustManager trustManager = configureTrustManager(mode, keyManagers);
 
             applyHostnameVerifier(builder, mode);
 
-            // 严格模式且没有客户端证书：使用默认配置
+            // Chế độ nghiêm ngặt và không có chứng chỉ ứng dụng khách: Sử dụng cấu hình mặc định
             if (trustManager == null) {
                 return;
             }
 
-            // 初始化 SSL 上下文
+            // khởi tạo SSL bối cảnh
             SSLContext sslContext = SSLContext.getInstance("TLS");
-            // 当 keyManagers 为空数组时，传递 null 更合适
+            // Khi nào keyManagers Đã vượt qua khi nó là một mảng trống null Phù hợp hơn
             KeyManager[] kms = (keyManagers != null && keyManagers.length > 0) ? keyManagers : null;
             sslContext.init(kms, new TrustManager[]{trustManager}, new java.security.SecureRandom());
 
-            // 使用自定义的 SSLSocketFactory 来捕获证书信息
+            // Sử dụng tùy chỉnh SSLSocketFactory để nắm bắt thông tin chứng chỉ
             CertificateCapturingSSLSocketFactory socketFactory =
                     new CertificateCapturingSSLSocketFactory(sslContext);
 
@@ -146,7 +146,7 @@ public class SSLConfigurationUtil {
     }
 
     /**
-     * 加载客户端证书
+     * Tải chứng chỉ ứng dụng khách
      */
     private static KeyManager[] loadClientCertificate(String host, int port, HttpLifecycleLogSink logSink) {
         if (host == null || host.isEmpty()) {
@@ -191,27 +191,27 @@ public class SSLConfigurationUtil {
     }
 
     /**
-     * 配置 TrustManager
+     * cấu hình TrustManager
      *
-     * @return TrustManager 或 null（表示使用默认配置）
+     * @return TrustManager hoặc null（có nghĩa là sử dụng cấu hình mặc định)
      */
     private static X509TrustManager configureTrustManager(SSLVerificationMode mode, KeyManager[] keyManagers)
             throws SSLConfigurationException {
         boolean hasCustomTrustMaterial = hasCustomTrustMaterial();
         if (mode == SSLVerificationMode.STRICT) {
-            // 严格模式：无客户端证书且无自定义 trust material 时直接使用平台默认配置
+            // Chế độ nghiêm ngặt: Không có chứng chỉ ứng dụng khách và không có tùy chỉnh trust material Cấu hình mặc định của nền tảng được sử dụng trực tiếp
             if ((keyManagers == null || keyManagers.length == 0) && !hasCustomTrustMaterial) {
                 return null;
             }
             return buildEffectiveTrustManager(true);
         }
 
-        // 宽松模式或信任所有模式
+        // Chế độ thư giãn hoặc tin tưởng tất cả chế độ
         return createTrustManager(mode);
     }
 
     /**
-     * 创建TrustManager
+     * TạoTrustManager
      */
     private static X509TrustManager createTrustManager(SSLVerificationMode mode) {
         try {
@@ -228,7 +228,7 @@ public class SSLConfigurationUtil {
     }
 
     /**
-     * 获取系统默认的TrustManager
+     * Lấy mặc định của hệ thốngTrustManager
      */
     private static X509TrustManager getDefaultTrustManager() throws SSLConfigurationException {
         try {
@@ -342,7 +342,7 @@ public class SSLConfigurationUtil {
     }
 
     /**
-     * 创建HostnameVerifier
+     * TạoHostnameVerifier
      */
     private static HostnameVerifier createHostnameVerifier(SSLVerificationMode mode) {
         if (mode == SSLVerificationMode.TRUST_ALL) {
@@ -362,7 +362,7 @@ public class SSLConfigurationUtil {
     }
 
     /**
-     * 宽松的TrustManager：先验证，记录错误，但允许连接继续
+     * Lỏng lẻoTrustManager：Xác thực trước, ghi lại lỗi nhưng cho phép kết nối tiếp tục
      */
     private static class LenientTrustManager implements X509TrustManager {
         private final X509TrustManager defaultTrustManager;
@@ -393,18 +393,18 @@ public class SSLConfigurationUtil {
                     serverCert.getSubjectX500Principal().getName(),
                     serverCert.getIssuerX500Principal().getName());
 
-            // 尝试用默认TrustManager进行真实验证
+            // Hãy thử sử dụng mặc địnhTrustManagerNhận xác minh thực sự
             try {
                 defaultTrustManager.checkServerTrusted(chain, authType);
-                lastValidationResult.remove(); // 验证通过，清除错误
+                lastValidationResult.remove(); // Xác minh đã được thông qua và lỗi đã được xóa
                 log.debug("✅ Certificate validation passed");
             } catch (CertificateException e) {
-                // 验证失败，记录但不抛出异常
+                // Nếu xác thực không thành công, một ngoại lệ sẽ được ghi lại nhưng không được ném ra
                 String errorMessage = CertificateErrorParser.extractUserFriendlyMessage(e);
 
                 log.warn("⚠️ Certificate validation failed (allowing anyway): {}", errorMessage);
 
-                // 保存验证结果供后续使用
+                // Lưu kết quả xác minh để sử dụng sau
                 lastValidationResult.set(SSLValidationResult.failure(
                         java.util.Collections.singletonList(errorMessage)));
             }
@@ -419,7 +419,7 @@ public class SSLConfigurationUtil {
     }
 
     /**
-     * 信任所有证书的TrustManager（不推荐使用）
+     * Tin tưởng tất cả các chứng chỉTrustManager（Không được khuyến khích)
      */
     private static class TrustAllManager implements X509TrustManager {
         @Override
@@ -442,7 +442,7 @@ public class SSLConfigurationUtil {
     }
 
     /**
-     * 宽松的HostnameVerifier：验证主机名，但允许不匹配的连接
+     * Lỏng lẻoHostnameVerifier：Xác minh tên máy chủ nhưng cho phép kết nối không khớp
      */
     private static class LenientHostnameVerifier implements HostnameVerifier {
         @Override
@@ -458,7 +458,7 @@ public class SSLConfigurationUtil {
                             log.warn("⚠️ Hostname verification failed (allowing anyway): " +
                                     "Certificate does not match hostname '{}'", hostname);
 
-                            // 将主机名错误追加到现有验证结果
+                            // Thêm lỗi tên máy chủ vào kết quả xác minh hiện có
                             SSLValidationResult existing = lastValidationResult.get();
                             String hostnameError = "Hostname mismatch: certificate does not match '" + hostname + "'";
 
@@ -479,13 +479,13 @@ public class SSLConfigurationUtil {
                 log.debug("Error during hostname verification: {}", e.getMessage());
             }
 
-            // 总是返回 true，允许连接继续
+            // luôn quay trở lại true，Cho phép kết nối tiếp tục
             return true;
         }
     }
 
     /**
-     * SSL配置异常
+     * SSLNgoại lệ cấu hình
      */
     private static class SSLConfigurationException extends RuntimeException {
         public SSLConfigurationException(String message) {

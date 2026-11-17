@@ -8,54 +8,54 @@ import lombok.Getter;
 import java.awt.*;
 
 /**
- * 变量类型枚举
+ * Kiểu liệt kê biến
  * <p>
- * 定义了不同类型的变量源及其在UI中的展示样式
+ * Các loại nguồn biến đổi khác nhau và vị trí của chúng được xác địnhUIKiểu hiển thị trong
  */
 @Getter
 public enum VariableType {
     /**
-     * 执行上下文变量 - 优先级最高，在当前请求或当前运行上下文中有效
+     * Các biến bối cảnh thực thi - Nó có mức độ ưu tiên cao nhất và hợp lệ trong yêu cầu hiện tại hoặc bối cảnh đang chạy hiện tại
      */
     VARIABLE(MessageKeys.VARIABLE_TYPE_VARIABLE, "V", 1),
 
     /**
-     * 迭代数据变量 - 当前 CSV/JSON 行数据
+     * Lặp lại các biến dữ liệu - hiện tại CSV/JSON dữ liệu hàng
      */
     ITERATION_DATA(MessageKeys.VARIABLE_TYPE_ITERATION_DATA, "D", 2),
 
     /**
-     * 分组变量 - 从请求所在分组继承的变量
+     * Nhóm các biến - Các biến được kế thừa từ nhóm mà yêu cầu được thực hiện
      */
     GROUP(MessageKeys.VARIABLE_TYPE_GROUP, "C", 3),
 
     /**
-     * 环境变量 - 从当前激活的环境中获取
+     * các biến môi trường - Thu được từ môi trường hiện đang hoạt động
      */
     ENVIRONMENT(MessageKeys.VARIABLE_TYPE_ENVIRONMENT, "E", 5),
 
     /**
-     * 全局变量 - 应用级共享变量
+     * Các biến toàn cầu - Các biến chia sẻ ở cấp độ ứng dụng
      */
     GLOBAL(MessageKeys.VARIABLE_TYPE_GLOBAL, "G", 8),
 
     /**
-     * 内置函数 - 动态函数，如 $guid, $timestamp 等
+     * Các chức năng tích hợp - Các chức năng động như $guid, $timestamp Đợi đã
      */
     BUILT_IN(MessageKeys.VARIABLE_TYPE_BUILT_IN, "$", 10);
 
     /**
-     * 变量类型的国际化消息键
+     * Khóa thông báo được quốc tế hóa cho loại biến
      */
     private final String displayNameKey;
 
     /**
-     * UI渲染时使用的图标符号
+     * UIBiểu tượng biểu tượng được sử dụng khi kết xuất
      */
     private final String iconSymbol;
 
     /**
-     * 优先级（数值越小优先级越高）
+     * Ưu tiên (giá trị càng nhỏ thì mức độ ưu tiên càng cao)
      */
     private final int priority;
 
@@ -66,7 +66,7 @@ public enum VariableType {
     }
 
     /**
-     * UI渲染时使用的主题自适应颜色。
+     * UIMàu sắc thích ứng theo chủ đề để sử dụng khi kết xuất.
      */
     public Color getColor() {
         return switch (this) {
@@ -80,9 +80,9 @@ public enum VariableType {
     }
 
     /**
-     * 获取国际化后的显示名称
+     * Lấy tên hiển thị được quốc tế hóa
      *
-     * @return 根据当前语言环境返回的显示名称
+     * @return Tên hiển thị được trả về dựa trên ngôn ngữ hiện tại
      */
     public String getDisplayName() {
         return I18nUtil.getMessage(displayNameKey);

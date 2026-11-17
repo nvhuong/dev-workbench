@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * 管理主窗口尺寸和最大化状态的保存与恢复，并记录位置及跨屏诊断信息。
+ * Quản lý việc lưu và khôi phục kích thước cửa sổ chính và trạng thái tối đa cũng như ghi lại thông tin chẩn đoán vị trí và màn hình chéo.
  */
 @Slf4j
 class MainWindowStateController {
@@ -72,7 +72,7 @@ class MainWindowStateController {
         if (MainWindowSizePolicy.shouldStartMaximized(usableArea.getWidth())) {
             frame.setExtendedState(Frame.MAXIMIZED_BOTH);
         }
-        log.info("主窗口使用初始状态: size={}, state={}, display={}",
+        log.info("Cửa sổ chính sử dụng trạng thái ban đầu: size={}, state={}, display={}",
                 initialSize, describeState(frame.getExtendedState()), currentDisplaySnapshot());
     }
 
@@ -86,7 +86,7 @@ class MainWindowStateController {
             @Override
             public void windowStateChanged(WindowEvent e) {
                 logDisplayChangeIfNeeded();
-                log.info("主窗口状态变化: oldState={}, newState={}, frameBounds={}, display={}",
+                log.info("Trạng thái của cửa sổ chính thay đổi: oldState={}, newState={}, frameBounds={}, display={}",
                         describeState(e.getOldState()), describeState(e.getNewState()),
                         frame.getBounds(), currentDisplaySnapshot());
                 scheduleSaveWindowState();
@@ -135,13 +135,13 @@ class MainWindowStateController {
             int extendedState = frame.getExtendedState();
             UserPreferencesStore.saveWindowState(width, height, extendedState);
             if (log.isDebugEnabled()) {
-                log.debug("主窗口状态快照已保存: persistedNormalSize={}x{}, frameBounds={}, state={}, "
+                log.debug("Đã lưu ảnh chụp nhanh trạng thái cửa sổ chính: persistedNormalSize={}x{}, frameBounds={}, state={}, "
                                 + "minimumSize={}, display={}",
                         width, height, frame.getBounds(), describeState(extendedState),
                         minSize, currentDisplaySnapshot());
             }
         } catch (Exception e) {
-            log.warn("保存窗口状态失败", e);
+            log.warn("Không lưu được trạng thái cửa sổ", e);
         }
     }
 
@@ -209,10 +209,10 @@ class MainWindowStateController {
                 frame.setExtendedState(actualState);
             }
 
-            log.info("主窗口状态已恢复: savedSize={}, actualSize={}, state={}, display={}",
+            log.info("Trạng thái cửa sổ chính đã được khôi phục: savedSize={}, actualSize={}, state={}, display={}",
                     requestedSize, actualSize, describeState(actualState), currentDisplaySnapshot());
         } catch (Exception e) {
-            log.warn("恢复窗口状态失败", e);
+            log.warn("Không thể khôi phục trạng thái cửa sổ", e);
         }
     }
 
@@ -224,7 +224,7 @@ class MainWindowStateController {
                 .toArray(Dimension[]::new);
         Dimension minimumSize = MainWindowSizePolicy.minimumSizeForDisplayAreas(usableDisplayAreas);
         if (!minimumSize.equals(cachedMinWindowSize)) {
-            log.info("主窗口最小尺寸已更新: previous={}, current={}, displays={}",
+            log.info("Kích thước tối thiểu của cửa sổ chính đã được cập nhật: previous={}, current={}, displays={}",
                     cachedMinWindowSize, minimumSize, displays);
         }
         cachedMinWindowSize = minimumSize;
@@ -239,11 +239,11 @@ class MainWindowStateController {
                 try {
                     displays.add(displaySnapshot(screenDevice.getDefaultConfiguration()));
                 } catch (RuntimeException e) {
-                    log.debug("读取显示器信息失败: display={}", screenDevice.getIDstring(), e);
+                    log.debug("Không đọc được thông tin hiển thị: display={}", screenDevice.getIDstring(), e);
                 }
             }
         } catch (RuntimeException e) {
-            log.debug("读取多显示器可用区域失败，使用默认屏幕尺寸", e);
+            log.debug("Không thể đọc vùng có sẵn trên nhiều màn hình, sử dụng kích thước màn hình mặc định", e);
         }
 
         if (displays.isEmpty()) {
@@ -266,7 +266,7 @@ class MainWindowStateController {
             }
             return displaySnapshot(graphicsConfiguration);
         } catch (RuntimeException e) {
-            log.debug("读取默认显示器可用区域失败，使用默认屏幕尺寸", e);
+            log.debug("Không thể đọc vùng màn hình mặc định có sẵn, sử dụng kích thước màn hình mặc định", e);
             return fallbackDisplaySnapshot();
         }
     }
@@ -303,7 +303,7 @@ class MainWindowStateController {
             return;
         }
         DisplaySnapshot display = displaySnapshot(graphicsConfiguration);
-        log.info("主窗口切换显示器: from={}, to={}, frameBounds={}, display={}",
+        log.info("Cửa sổ chính chuyển màn hình: from={}, to={}, frameBounds={}, display={}",
                 lastDisplayId, display.id(), frame.getBounds(), display);
         lastDisplayId = display.id();
     }

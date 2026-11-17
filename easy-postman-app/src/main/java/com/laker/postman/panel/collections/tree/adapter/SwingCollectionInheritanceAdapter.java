@@ -15,20 +15,20 @@ import java.util.List;
 
 
 /**
- * Swing collection tree 继承上下文适配器。
+ * Swing collection tree Kế thừa bộ chuyển đổi bối cảnh.
  * <p>
- * 这里只负责从 Swing tree node 提取 groupChain 和分组变量；认证、脚本、请求头等合并规则由
- * collection-core 的 {@link CollectionInheritance} 统一处理。
+ * Chỉ chịu trách nhiệm ở đây Swing tree node chiết xuất groupChain và nhóm các biến; xác thực, tập lệnh, tiêu đề yêu cầu, v.v. hợp nhất các quy tắc theo
+ * collection-core của {@link CollectionInheritance} Xử lý thống nhất .
  */
 @UtilityClass
 public class SwingCollectionInheritanceAdapter {
 
     /**
-     * 收集分组链（从外到内）
+     * Thu thập chuỗi nhóm (từ ngoài vào trong)
      * <p>
-     * 优化点：
-     * - 使用迭代代替递归，避免栈溢出
-     * - 直接向上遍历，性能为 O(h)，h 为树的高度
+     * Điểm tối ưu hóa:
+     * - Sử dụng phép lặp thay vì đệ quy để tránh tràn ngăn xếp
+     * - Đi thẳng lên trên, hiệu suất là O(h)，h là chiều cao của cây
      */
     public static List<RequestGroup> collectGroupChain(DefaultMutableTreeNode startNode) {
         List<RequestGroup> groupChain = new ArrayList<>();
@@ -37,20 +37,20 @@ public class SwingCollectionInheritanceAdapter {
             return groupChain;
         }
 
-        TreeNode currentNode = startNode.getParent(); // 从父节点开始
+        TreeNode currentNode = startNode.getParent(); // Bắt đầu từ nút cha
 
         while (currentNode != null) {
             if (!(currentNode instanceof DefaultMutableTreeNode treeNode)) {
                 break;
             }
 
-            // 检查是否是根节点
+            // Kiểm tra xem nó có phải là nút gốc không
             if (treeNode.getUserObject() == null || "root".equals(String.valueOf(treeNode.getUserObject()))) {
                 break;
             }
 
             CollectionTreeNodes.group(treeNode)
-                    .ifPresent(group -> groupChain.add(0, group)); // 插入到列表头部，保持外层到内层的顺序
+                    .ifPresent(group -> groupChain.add(0, group)); // Chèn vào đầu danh sách, giữ nguyên thứ tự từ ngoài vào trong
 
             currentNode = currentNode.getParent();
         }
@@ -59,13 +59,13 @@ public class SwingCollectionInheritanceAdapter {
     }
 
     /**
-     * 获取合并后的分组级别变量
+     * Lấy các biến cấp độ nhóm đã hợp nhất
      * <p>
-     * 用于变量解析器获取当前请求所继承的所有分组变量
-     * 变量优先级：内层分组覆盖外层分组
+     * Được sử dụng bởi trình phân giải biến để thu được tất cả các biến nhóm được kế thừa bởi yêu cầu hiện tại
+     * Mức độ ưu tiên thay đổi: nhóm bên trong ghi đè nhóm bên ngoài
      *
-     * @param requestNode 请求在树中的节点
-     * @return 合并后的变量列表，按优先级排序（内层优先）
+     * @param requestNode Yêu cầu nút trong cây
+     * @return Danh sách biến đã hợp nhất được sắp xếp theo mức độ ưu tiên (lớp bên trong trước)
      */
     public static List<Variable> getMergedGroupVariables(DefaultMutableTreeNode requestNode) {
         if (requestNode == null) {

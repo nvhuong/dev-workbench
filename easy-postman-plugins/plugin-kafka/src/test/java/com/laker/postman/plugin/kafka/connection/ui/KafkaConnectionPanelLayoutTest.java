@@ -133,7 +133,7 @@ public class KafkaConnectionPanelLayoutTest {
     public void connectionActionsShouldUseLabeledButtons() {
         Locale originalLocale = I18nUtil.currentLocale();
         try {
-            assertConnectionActionsUseLabeledButtons(Locale.CHINESE);
+            assertConnectionActionsUseLabeledButtons(Locale.forLanguageTag("vi"));
             assertConnectionActionsUseLabeledButtons(Locale.ENGLISH);
         } finally {
             I18nUtil.setLocale(originalLocale);
@@ -144,7 +144,7 @@ public class KafkaConnectionPanelLayoutTest {
     public void connectionRowsShouldAlignAcrossLocales() {
         Locale originalLocale = I18nUtil.currentLocale();
         try {
-            assertConnectionRowsAlign(Locale.CHINESE);
+            assertConnectionRowsAlign(Locale.forLanguageTag("vi"));
             assertConnectionRowsAlign(Locale.ENGLISH);
         } finally {
             I18nUtil.setLocale(originalLocale);
@@ -155,7 +155,7 @@ public class KafkaConnectionPanelLayoutTest {
     public void securityLabelsShouldUseShortTextWithFullTooltipsAcrossLocales() {
         Locale originalLocale = I18nUtil.currentLocale();
         try {
-            assertSecurityLabelsUseShortTextWithFullTooltips(Locale.CHINESE, "协议:", "SASL:");
+            assertSecurityLabelsUseShortTextWithFullTooltips(Locale.forLanguageTag("vi"), "thỏa thuận:", "SASL:");
             assertSecurityLabelsUseShortTextWithFullTooltips(Locale.ENGLISH, "Proto:", "SASL:");
         } finally {
             I18nUtil.setLocale(originalLocale);

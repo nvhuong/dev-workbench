@@ -49,7 +49,7 @@ class PerformanceTrendAxisConfigurer {
         axis.setAutoRangeMinimumSize(1.0);
         axis.setUpperMargin(0.2);
         axis.setAutoRangeIncludesZero(true);
-        // 趋势指标都不为负；否则全 0 序列会以 0 为中心显示成 -0.4..0.4。
+        // Không có chỉ báo xu hướng nào là tiêu cực; nếu không thì tất cả đều như vậy 0 Trình tự sẽ kết thúc bằng  0 Hiển thị ở vị trí trung tâm -0.4..0.4。
         axis.setRangeType(RangeType.POSITIVE);
     }
 
@@ -57,7 +57,7 @@ class PerformanceTrendAxisConfigurer {
         if (axis == null) {
             return;
         }
-        // 整数指标必须使用整数刻度，不能只把小数刻度格式化成整数，否则 0.5/1.5 会显示成重复的 0/2。
+        // Các chỉ báo số nguyên phải sử dụng thang số nguyên và không thể chỉ định dạng thang thập phân thành số nguyên 0.5/1.5 sẽ xuất hiện dưới dạng trùng lặp 0/2。
         axis.setStandardTickUnits(NumberAxis.createIntegerTickUnits());
         axis.setNumberFormatOverride(NumberFormat.getIntegerInstance());
     }
@@ -67,7 +67,7 @@ class PerformanceTrendAxisConfigurer {
             return;
         }
         DateTickUnit tickUnit = selectTimeTickUnit(visibleDurationMs);
-        // TickUnit 自带 formatter，与 JFreeChart 标准 DateAxis 的做法一致；关闭 auto 保证多张分离图刻度一致。
+        // TickUnit Mang theo của riêng bạn formatter，Và JFreeChart tiêu chuẩn DateAxis Cách tiếp cận tương tự; đóng lại auto Đảm bảo rằng tỷ lệ của nhiều hình ảnh riêng biệt là nhất quán.
         axis.setDateFormatOverride(null);
         axis.setTickUnit(tickUnit, false, true);
     }
@@ -83,7 +83,7 @@ class PerformanceTrendAxisConfigurer {
     }
 
     long domainRightPaddingMs(long visibleDurationMs) {
-        // 最后一个 tick 如果刚好落在绘图区右边界，JFreeChart 容易裁掉标签；保留少量空间即可，不能多出整段空白。
+        // Cái cuối cùng tick Nếu nó chỉ rơi vào cạnh phải của vùng vẽ, .JFreeChart Nhãn dễ cắt; chỉ để lại một khoảng trống nhỏ chứ không phải cả đoạn văn.
         long durationMs = normalizeDurationMs(visibleDurationMs);
         long tickMs = tickUnitMillis(selectTimeTickUnit(durationMs));
         long labelPaddingMs = Math.max(500L, tickMs / 4);

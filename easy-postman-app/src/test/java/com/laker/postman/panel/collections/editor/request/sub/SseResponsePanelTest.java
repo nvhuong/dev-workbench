@@ -124,7 +124,7 @@ public class SseResponsePanelTest extends AbstractSwingUiTest {
                 () -> formatted
         );
         JButton copyButton = StreamMessageContentDialog.createFooterButton(
-                "复制",
+                "Sao chép",
                 false,
                 StreamMessageContentDialog.FooterAction.COPY
         );

@@ -17,7 +17,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 /**
- * 环境变量管理服务，负责环境变量的持久化、加载和管理
+ * Dịch vụ quản lý biến môi trường chịu trách nhiệm về tính bền vững, tải và quản lý các biến môi trường
  */
 @Slf4j
 @UtilityClass
@@ -29,7 +29,7 @@ public class EnvironmentService {
     private static Environment activeEnvironment = null;
 
 
-    // 当前数据文件路径
+    // Đường dẫn tệp dữ liệu hiện tại
     private static String currentDataFilePath;
 
     static {
@@ -37,19 +37,19 @@ public class EnvironmentService {
     }
 
     /**
-     * 获取当前数据文件路径
+     * Lấy đường dẫn tệp dữ liệu hiện tại
      */
     public static String getDataFilePath() {
         if (currentDataFilePath != null) {
             return currentDataFilePath;
         }
-        // 如果没有设置，返回当前工作区的环境文件路径
+        // Nếu không được đặt, sẽ trả về đường dẫn tệp môi trường của không gian làm việc hiện tại
         Workspace currentWorkspace = WorkspaceService.getInstance().getCurrentWorkspace();
         return SystemUtil.getEnvPathForWorkspace(currentWorkspace);
     }
 
     /**
-     * 切换环境变量数据文件路径，并重新加载
+     * Chuyển đổi đường dẫn tệp dữ liệu biến môi trường và tải lại
      */
     public static void setDataFilePath(String path) {
         if (path == null || path.isBlank()) return;
@@ -58,12 +58,12 @@ public class EnvironmentService {
     }
 
     /**
-     * 从指定路径加载环境变量
+     * Tải các biến môi trường từ đường dẫn đã chỉ định
      */
     private static void loadEnvironmentsFromPath(String filePath) {
         File file = new File(filePath);
         if (!file.exists()) {
-            log.info("环境变量文件不存在: {}, 将创建默认环境", filePath);
+            log.info("Tệp biến môi trường không tồn tại: {}, Một môi trường mặc định sẽ được tạo", filePath);
             createDefaultEnvironments();
             return;
         }
@@ -80,20 +80,20 @@ public class EnvironmentService {
             }
 
             if (activeEnvironment == null && !environments.isEmpty()) {
-                // 如果没有激活的环境，激活第一个
+                // Nếu không có môi trường hoạt động, hãy kích hoạt môi trường đầu tiên
                 Environment firstEnv = environments.values().iterator().next();
                 firstEnv.setActive(true);
                 activeEnvironment = firstEnv;
                 saveEnvironments();
             }
         } catch (Exception e) {
-            log.error("加载环境变量失败: {}", filePath, e);
+            log.error("Không thể tải các biến môi trường: {}", filePath, e);
             createDefaultEnvironments();
         }
     }
 
     /**
-     * 加载所有环境变量
+     * Tải tất cả các biến môi trường
      */
     public static void loadEnvironments() {
         if (currentDataFilePath != null) {
@@ -106,7 +106,7 @@ public class EnvironmentService {
     }
 
     /**
-     * 创建默认环境
+     * Tạo môi trường mặc định
      */
     private static void createDefaultEnvironments() {
         environments.clear();
@@ -132,7 +132,7 @@ public class EnvironmentService {
     }
 
     /**
-     * 保存所有环境变量
+     * Lưu tất cả các biến môi trường
      */
     public static void saveEnvironments() {
         try {
@@ -154,17 +154,17 @@ public class EnvironmentService {
             String jsonStr = JSONUtil.toJsonPrettyStr(envList);
 
             FileUtil.writeString(jsonStr, file, StandardCharsets.UTF_8);
-            log.debug("环境变量已保存到: {}", filePath);
+            log.debug("Các biến môi trường được lưu vào: {}", filePath);
         } catch (Exception e) {
-            log.error("保存环境变量失败", e);
+            log.error("Không thể lưu các biến môi trường", e);
         }
     }
 
     /**
-     * 添加或更新环境
+     * Thêm hoặc cập nhật môi trường
      */
     public static void saveEnvironment(Environment environment) {
-        // 如果环境没有 ID，自动生成一个
+        // Nếu môi trường không ID，Tự động tạo một
         if (environment.getId() == null) {
             environment.setId("env-" + IdUtil.simpleUUID());
         }
@@ -180,12 +180,12 @@ public class EnvironmentService {
     }
 
     /**
-     * 删除环境
+     * Xóa môi trường
      */
     public static void deleteEnvironment(String id) {
         Environment env = environments.remove(id);
         if (env != null && env.isActive() && !environments.isEmpty()) {
-            // 如果删除的是当前激活的环境，激活第一个环境
+            // Nếu môi trường hiện đang kích hoạt bị xóa thì môi trường đầu tiên sẽ được kích hoạt
             Environment firstEnv = environments.values().iterator().next();
             firstEnv.setActive(true);
             activeEnvironment = firstEnv;
@@ -198,14 +198,14 @@ public class EnvironmentService {
     }
 
     /**
-     * 获取所有环境
+     * Nhận tất cả các môi trường
      */
     public static List<Environment> getAllEnvironments() {
         return new ArrayList<>(environments.values());
     }
 
     /**
-     * 设置激活的环境
+     * Thiết lập môi trường kích hoạt
      */
     public static void setActiveEnvironment(String id) {
         if (activeEnvironment != null) {
@@ -221,7 +221,7 @@ public class EnvironmentService {
     }
 
     /**
-     * 根据指定的id顺序重排environments并持久化
+     * Như đã chỉ địnhidSắp xếp lại thứ tựenvironmentsvà kiên trì
      */
     public static void saveEnvironmentOrder(List<String> idOrder) {
         synchronized (environments) {
@@ -232,7 +232,7 @@ public class EnvironmentService {
                     newOrder.put(id, env);
                 }
             }
-            // 补充未在idOrder中的环境（防止遗漏）
+            // Phần bổ sung không có ở đóidOrdermôi trường (để tránh thiếu sót)
             for (Map.Entry<String, Environment> entry : environments.entrySet()) {
                 if (!newOrder.containsKey(entry.getKey())) {
                     newOrder.put(entry.getKey(), entry.getValue());

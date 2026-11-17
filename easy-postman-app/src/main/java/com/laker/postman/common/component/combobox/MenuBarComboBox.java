@@ -8,7 +8,7 @@ import javax.swing.border.EmptyBorder;
 import java.awt.*;
 
 /**
- * 顶部菜单栏下拉框基类：宽度随选中项自适应，无边框，背景与菜单栏融为一体。
+ * Lớp cơ sở hộp thả xuống thanh menu trên cùng: chiều rộng thích ứng theo các mục đã chọn, không có viền và nền được tích hợp với thanh menu.
  */
 abstract class MenuBarComboBox<E> extends EasyComboBox<E> {
     private static final int MIN_WIDTH = 64;
@@ -16,7 +16,7 @@ abstract class MenuBarComboBox<E> extends EasyComboBox<E> {
     private static final int HEIGHT = 28;
 
     protected MenuBarComboBox() {
-        // FlatLaf 默认最小宽度（ComboBox.minimumWidth=72）大于菜单栏所需，显式下调
+        // FlatLaf Chiều rộng tối thiểu mặc định (ComboBox.minimumWidth=72）Lớn hơn yêu cầu đối với thanh menu, hãy hạ thấp nó một cách rõ ràng
         putClientProperty(FlatClientProperties.MINIMUM_WIDTH, MIN_WIDTH);
         setDynamicWidthRange(MIN_WIDTH, MAX_WIDTH);
         setFixedHeight(HEIGHT);
@@ -26,7 +26,7 @@ abstract class MenuBarComboBox<E> extends EasyComboBox<E> {
     @Override
     public void updateUI() {
         super.updateUI();
-        // 主题切换后重新应用菜单栏背景色
+        // Áp dụng lại màu nền của thanh menu sau khi chuyển đổi chủ đề
         Color background = UIManager.getColor("MenuBar.background");
         if (background != null) {
             String hex = String.format("#%02x%02x%02x", background.getRed(), background.getGreen(), background.getBlue());

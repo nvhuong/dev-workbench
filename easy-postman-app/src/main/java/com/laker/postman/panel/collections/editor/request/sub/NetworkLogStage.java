@@ -11,20 +11,20 @@ import java.util.Locale;
 import java.util.function.Supplier;
 
 /**
- * 网络日志阶段枚举
- * 统一管理日志阶段的默认图标、颜色和标题强调。
- * HTTP 结果和重试判定的颜色由日志面板根据事件内容补充。
+ * Bảng liệt kê giai đoạn nhật ký mạng
+ * Quản lý thống nhất các biểu tượng, màu sắc và điểm nhấn tiêu đề mặc định cho các giai đoạn nhật ký.
+ * HTTP Màu sắc của kết quả và quyết định thử lại được bảng nhật ký bổ sung dựa trên nội dung sự kiện.
  */
 @Getter
 public enum NetworkLogStage {
-    // ==================== 错误和失败（红色系，粗体）====================
+    // ==================== Lỗi và thất bại (đỏ, đậm)====================
     FAILED("Failed", "❌", ModernColors::getError, true),
     CALL_FAILED("CallFailed", "❌", ModernColors::getError, true),
     REQUEST_FAILED("RequestFailed", "❌", ModernColors::getError, true),
     RESPONSE_FAILED("ResponseFailed", "❌", ModernColors::getError, true),
     CANCELED("Canceled", "⏹", ModernColors::getTextSecondary, true),
 
-    // ==================== 请求生命周期和诊断 ====================
+    // ==================== Yêu cầu vòng đời và chẩn đoán ====================
     CALL_START("RequestStart", "▶", ModernColors::getPrimary, true),
     CALL_END("RequestEnd", "■", ModernColors::getTextSecondary, true),
     REQUEST_COMPLETE("RequestComplete", "■", ModernColors::getTextSecondary, true),
@@ -42,7 +42,7 @@ public enum NetworkLogStage {
     SECURE_CONNECT_START("TLSHandshakeStart", "🔒", ModernColors::getTextSecondary, false),
     SECURE_CONNECT_END("TLSHandshakeEnd", "🔒", ModernColors::getTextSecondary, false),
 
-    // ==================== 连接 ====================
+    // ==================== kết nối ====================
     CONNECT_START("ConnectStart", "🔌", ModernColors::getTextSecondary, false),
     // A failed route can be followed by another successful route; terminal errors use CALL_FAILED.
     CONNECT_FAILED("ConnectFailed", "⚠️", ModernColors::getWarning, true),
@@ -55,28 +55,28 @@ public enum NetworkLogStage {
     DNS_START("DNSStart", "🔍", ModernColors::getTextSecondary, false),
     DNS_END("DNSEnd", "📍", ModernColors::getTextSecondary, false),
 
-    // ==================== 代理 ====================
+    // ==================== đại lý ====================
     PROXY_SELECT("ProxySelect", "🌐", ModernColors::getTextSecondary, false),
     PROXY_SELECT_START("ProxySelectStart", "🌐", ModernColors::getTextSecondary, false),
     PROXY_SELECT_END("ProxySelectEnd", "🌐", ModernColors::getTextSecondary, false),
 
-    // ==================== 请求发送 ====================
+    // ==================== Yêu cầu đã được gửi ====================
     REQUEST_HEADERS_START("RequestHeadersStart", "↑", ModernColors::getTextSecondary, false),
     REQUEST_HEADERS_END("RequestHeadersEnd", "↑", ModernColors::getTextSecondary, false),
     REQUEST_BODY_START("RequestBodyStart", "↑", ModernColors::getTextSecondary, false),
     REQUEST_BODY_END("RequestBodyEnd", "↑", ModernColors::getTextSecondary, false),
 
-    // ==================== 响应接收 ====================
+    // ==================== Đã nhận được phản hồi ====================
     RESPONSE_HEADERS_START("ResponseHeadersStart", "↓", ModernColors::getTextSecondary, false),
     RESPONSE_HEADERS_END("ResponseHeadersEnd", "↓", ModernColors::getTextSecondary, false),
     RESPONSE_HEADERS_END_REDIRECT("ResponseHeadersEnd:Redirect", "↓", ModernColors::getTextSecondary, false),
     RESPONSE_BODY_START("ResponseBodyStart", "↓", ModernColors::getTextSecondary, false),
     RESPONSE_BODY_END("ResponseBodyEnd", "↓", ModernColors::getTextSecondary, false),
 
-    // ==================== 重定向 ====================
+    // ==================== Chuyển hướng ====================
     REDIRECT("Redirect", "↪", ModernColors::getPrimary, true),
 
-    // ==================== 默认 ====================
+    // ==================== Mặc định ====================
     DEFAULT("Default", "", ModernColors::getTextPrimary, false);
 
     private final String stageName;
@@ -92,15 +92,15 @@ public enum NetworkLogStage {
     }
 
     /**
-     * 获取当前主题适配的颜色
+     * Lấy màu phù hợp với chủ đề hiện tại
      */
     public Color getColor() {
         return colorProvider.get();
     }
 
     /**
-     * 获取当前语言的用户可读阶段名称。技术标识仍由 {@link #getStageName()} 保留，
-     * 便于开发者在日志中定位底层事件。
+     * Lấy tên sân khấu mà người dùng có thể đọc được cho ngôn ngữ hiện tại. Nhận dạng kỹ thuật vẫn còn {@link #getStageName()} Bảo lưu,
+     * Sẽ rất thuận tiện cho các nhà phát triển trong việc xác định vị trí các sự kiện cơ bản trong nhật ký.
      */
     public String getDisplayName() {
         return I18nUtil.getMessage(MessageKeys.NETWORK_LOG_STAGE_PREFIX
@@ -108,7 +108,7 @@ public enum NetworkLogStage {
     }
 
     /**
-     * 判断是否为失败或错误类型
+     * Xác định xem đó là lỗi hay loại lỗi
      */
     public boolean isError() {
         return this == FAILED || this == CALL_FAILED || this == REQUEST_FAILED
@@ -116,16 +116,16 @@ public enum NetworkLogStage {
     }
 
     /**
-     * 判断是否为可能展示成功结果的阶段；实际结果由响应状态决定。
+     * Xác định xem đây có phải là giai đoạn mà kết quả thành công có thể được chứng minh hay không; kết quả thực tế được xác định bởi trạng thái phản hồi.
      */
     public boolean isSuccess() {
         return this == REQUEST_COMPLETE;
     }
 
     /**
-     * 将 HTTP 执行层的日志阶段映射成 UI 渲染阶段。
+     * Sẽ HTTP Giai đoạn nhật ký của lớp thực thi được ánh xạ tới UI Giai đoạn kết xuất.
      * <p>
-     * 这里是 service 层事件和 Swing 展示样式之间的唯一转换点，避免执行层反向依赖 UI 枚举。
+     * Đây rồi service sự kiện lớp và Swing Hiển thị điểm chuyển tiếp duy nhất giữa các kiểu để tránh sự phụ thuộc ngược vào lớp thực thi UI liệt kê.
      */
     public static NetworkLogStage fromEventStage(NetworkLogEventStage stage) {
         if (stage == null) {

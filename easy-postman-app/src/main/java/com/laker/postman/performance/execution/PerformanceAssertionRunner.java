@@ -120,7 +120,7 @@ public final class PerformanceAssertionRunner {
                         pass = compareNumber(resp.code, expect, operator);
                     }
                 } catch (Exception ignored) {
-                    log.warn("断言响应码格式错误: {}", value);
+                    log.warn("Khẳng định rằng mã phản hồi không đúng định dạng: {}", value);
                 }
             }
             case RESPONSE_TIME -> pass = resp != null && compareLong(resp.costMs, parseLong(value, Long.MIN_VALUE), operator);
@@ -139,7 +139,7 @@ public final class PerformanceAssertionRunner {
                             && CharSequenceUtil.isNotBlank(pattern)
                             && PerformanceRegexPatternCache.compileDotAll(pattern).matcher(responseBody).find();
                 } catch (Exception e) {
-                    log.debug("断言正则格式错误: {}", pattern);
+                    log.debug("Khẳng định lỗi định dạng thông thường: {}", pattern);
                 }
             }
             case HEADER_EXISTS -> pass = findHeader(resp == null ? null : resp.headers, content) != null;

@@ -30,10 +30,10 @@ public class RequestPreparationNetworkLogPublisherTest {
                         "Query parameters: 1 enabled / 2 total", "Path variables: 1 enabled / 1 total",
                         "Form-data rows: 1 enabled / 2 total", "Urlencoded rows: 0 enabled / 1 total",
                         "Pre-request script: present", "TLS verification: Disabled", "HTTP preference: Automatic negotiation"},
-                {Locale.CHINESE, "配置请求头：启用 1 / 共 2",
-                        "查询参数：启用 1 / 共 2", "路径变量：启用 1 / 共 1",
-                        "Form-data 行：启用 1 / 共 2", "Urlencoded 行：启用 0 / 共 1",
-                        "前置脚本：已配置", "TLS 证书校验：禁用", "HTTP 协议偏好：自动协商"}
+                {Locale.forLanguageTag("vi"), "Định cấu hình tiêu đề yêu cầu: đã bật 1 / Tổng cộng 2",
+                        "Tham số truy vấn: đã bật 1 / Tổng cộng 2", "Biến đường dẫn: đã bật 1 / Tổng cộng 1",
+                        "Form-data Được: đã bật 1 / Tổng cộng 2", "Urlencoded Được: đã bật 0 / Tổng cộng 1",
+                        "Kịch bản trước: đã được định cấu hình", "TLS Certificate verification: disabled", "HTTP Tùy chọn giao thức: Tự động đàm phán"}
         };
     }
 
@@ -55,7 +55,7 @@ public class RequestPreparationNetworkLogPublisherTest {
                 assertFalse(message.contains(repeatedOrPrivate), message);
             }
             assertFalse(message.contains("Post-response script"), message);
-            assertFalse(message.contains("后置脚本"), message);
+            assertFalse(message.contains("Tái bút"), message);
             assertFalse(message.contains("+0ms"), message);
         } finally {
             I18nUtil.setLocale(originalLocale);

@@ -1,7 +1,7 @@
 package com.laker.postman.platform.update.source;
 
 /**
- * Gitee 更新源实现
+ * Gitee Cập nhật triển khai nguồn
  */
 public class GiteeUpdateSource extends AbstractUpdateSource {
 

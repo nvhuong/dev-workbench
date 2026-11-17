@@ -7,7 +7,7 @@ import static org.testng.Assert.assertTrue;
 
 public class WebSocketExecutionStateTest {
 
-    @Test(description = "正常 close 后应允许写入 history")
+    @Test(description = "Bình thường close Viết sau đó nên được cho phép history")
     public void testShouldSaveHistoryAfterClose() {
         WebSocketExecutionState state = new WebSocketExecutionState("conn-1");
 
@@ -17,7 +17,7 @@ public class WebSocketExecutionStateTest {
         assertTrue(state.shouldSaveHistory(false));
     }
 
-    @Test(description = "failure 后应允许写入 history")
+    @Test(description = "failure Viết sau đó nên được cho phép history")
     public void testShouldSaveHistoryAfterFailure() {
         WebSocketExecutionState state = new WebSocketExecutionState("conn-1");
 
@@ -25,7 +25,7 @@ public class WebSocketExecutionStateTest {
         assertTrue(state.shouldSaveHistory(false));
     }
 
-    @Test(description = "连接终态后 history 判定不应依赖 current connection id")
+    @Test(description = "Sau khi kết nối xong history Sự phán xét không nên dựa vào current connection id")
     public void testShouldSaveHistoryAfterReconnect() {
         WebSocketExecutionState state = new WebSocketExecutionState("conn-1");
 
@@ -37,7 +37,7 @@ public class WebSocketExecutionStateTest {
         assertTrue(state.shouldSaveHistory(false));
     }
 
-    @Test(description = "disposed 面板不应写入 history")
+    @Test(description = "disposed Bảng điều khiển không nên được ghi vào history")
     public void testShouldNotSaveHistoryWhenDisposed() {
         WebSocketExecutionState state = new WebSocketExecutionState("conn-1");
 

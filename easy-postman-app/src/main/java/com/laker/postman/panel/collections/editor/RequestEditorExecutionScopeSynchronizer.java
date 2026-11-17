@@ -3,9 +3,9 @@ package com.laker.postman.panel.collections.editor;
 import com.laker.postman.service.collections.CollectionRequestExecutionScopeResolver;
 
 /**
- * 请求编辑器变量作用域同步器。
+ * Yêu cầu đồng bộ hóa phạm vi biến của trình soạn thảo.
  * <p>
- * 打开集合里的请求时，需要把所在分组的继承变量写入当前执行上下文。该逻辑依赖集合树，不属于面板布局。
+ * Khi mở một yêu cầu trong bộ sưu tập, bạn cần ghi các biến kế thừa của nhóm vào ngữ cảnh thực thi hiện tại. Logic này dựa trên cây bộ sưu tập và không thuộc về bố cục bảng điều khiển.
  */
 final class RequestEditorExecutionScopeSynchronizer {
 

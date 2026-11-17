@@ -13,9 +13,9 @@ import java.util.function.Consumer;
 import java.util.function.IntPredicate;
 
 /**
- * 请求编辑器临时 Tab 管理器。
+ * Yêu cầu biên tập tạm thời Tab giám đốc.
  * <p>
- * 临时 Tab 由单击树节点创建，可被下一次单击复用；保存、发送、双击或编辑后会 pin 为普通 Tab。
+ * tạm thời Tab Được tạo bằng cách nhấp vào nút cây và có thể được sử dụng lại bằng lần nhấp tiếp theo; đã lưu, gửi, nhấp đúp hoặc chỉnh sửa pin Đối với bình thường Tab。
  */
 @RequiredArgsConstructor
 final class RequestEditorTransientTabManager {

@@ -73,13 +73,13 @@ public class RequestBodyPanelTest extends AbstractSwingUiTest {
 
         SwingUtilities.invokeAndWait(() -> {
             holder[0] = new RequestBodyPanel(RequestItemProtocolEnum.WEBSOCKET);
-            holder[0].setRawBodyText("请问答复");
+            holder[0].setRawBodyText("Hãy trả lời");
             bodyType[0] = holder[0].getBodyType();
             bodyContent[0] = holder[0].getBodyContent(bodyType[0]);
         });
 
         assertEquals(bodyType[0], RequestBodyPanel.BODY_TYPE_RAW);
-        assertEquals(bodyContent[0], "请问答复");
+        assertEquals(bodyContent[0], "Hãy trả lời");
     }
 
     @Test

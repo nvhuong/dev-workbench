@@ -8,7 +8,7 @@ import com.laker.postman.request.model.HttpFormUrlencoded;
 import java.util.List;
 
 /**
- * 临时数据结构，用于解析 curl 命令
+ * Cấu trúc dữ liệu tạm thời, được sử dụng để phân tích cú pháp curl Đặt hàng
  */
 public class CurlRequest {
     public String url;
@@ -17,11 +17,11 @@ public class CurlRequest {
     public String body;
     public boolean binaryBody;
     public List<HttpParam> paramsList;
-    // 用于存储解析出的表单数据 (multipart/form-data)
+    // Được sử dụng để lưu trữ dữ liệu biểu mẫu được phân tích cú pháp (multipart/form-data)
     public List<HttpFormData> formDataList;
-    // 用于存储 application/x-www-form-urlencoded 类型的数据
+    // để lưu trữ application/x-www-form-urlencoded loại dữ liệu
     public List<HttpFormUrlencoded> urlencodedList;
-    public boolean followRedirects = false; // 是否跟随重定向
+    public boolean followRedirects = false; // Có nên theo chuyển hướng hay không
     public String authType;
     public String authUsername;
     public String authPassword;

@@ -3,7 +3,7 @@ package com.laker.postman.service.js;
 import lombok.Getter;
 
 /**
- * 脚本执行异常
+ * Ngoại lệ thực thi tập lệnh
  */
 @Getter
 public class ScriptExecutionException extends RuntimeException {

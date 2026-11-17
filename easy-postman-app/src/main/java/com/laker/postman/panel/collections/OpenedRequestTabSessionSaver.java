@@ -23,7 +23,7 @@ import java.util.List;
 public class OpenedRequestTabSessionSaver {
 
     public static void saveOpenTabsOnExit() {
-        // 启动壳显示期间请求编辑器尚未创建，不能为了退出而创建空编辑器并覆盖上次会话。
+        // Trình chỉnh sửa được yêu cầu vẫn chưa được tạo trong quá trình hiển thị shell khởi động và không thể tạo trình chỉnh sửa trống và ghi đè phiên cuối cùng để thoát.
         RequestEditorPanel editPanel = UiSingletonFactory.getExistingInstance(RequestEditorPanel.class).orElse(null);
         if (editPanel == null) {
             return;
@@ -45,7 +45,7 @@ public class OpenedRequestTabSessionSaver {
 
         List<HttpRequestItem> openedRequestItems =
                 OpenedRequestTabSnapshotCollector.collectOpenedRequestItems(tabbedPane, saveAll);
-        // 集合加载完成前，旧会话仍留在磁盘上。先保留它，再合并用户刚打开的标签。
+        // Phiên cũ vẫn còn trên đĩa cho đến khi bộ sưu tập được tải. Giữ nó trước khi hợp nhất các tab người dùng vừa mở.
         if (new File(OpenedRequestTabsStore.PATHNAME).isFile()) {
             if (openedRequestItems.isEmpty()) {
                 return;
@@ -91,7 +91,7 @@ public class OpenedRequestTabSessionSaver {
         for (Integer i : unsavedTabs) {
             tabbedPane.setSelectedIndex(i);
             if (!editPanel.saveCurrentRequest()) {
-                // 保留失败或取消保存的标签供用户继续编辑，不能将其视为已保存后退出。
+                // Những thẻ bị lỗi hoặc chưa được lưu sẽ được giữ lại để người dùng tiếp tục chỉnh sửa và không thể coi là đã lưu rồi thoát ra.
                 throw new CancelException();
             }
         }

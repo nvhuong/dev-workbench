@@ -22,8 +22,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 
 /**
- * 应用更新检查协调器。
- * 每次程序启动时检查，根据配置频率和上次检查时间决定是否执行检查。
+ * Điều phối viên kiểm tra cập nhật ứng dụng.
+ * Kiểm tra mỗi khi chương trình khởi động và quyết định có thực hiện kiểm tra hay không dựa trên tần suất đã định cấu hình và thời gian kiểm tra gần đây nhất.
  */
 @Slf4j
 @Component
@@ -34,7 +34,7 @@ public class AppUpdateCheckCoordinator {
     private final UpdateCenter updateCenter;
 
     /**
-     * 专用于更新检查的线程池（单线程，确保更新检查串行执行）
+     * Nhóm luồng dành riêng cho kiểm tra cập nhật (đơn luồng, đảm bảo kiểm tra cập nhật được thực hiện tuần tự)
      */
     private static final ScheduledExecutorService UPDATE_EXECUTOR = Executors.newSingleThreadScheduledExecutor(r -> {
         Thread thread = new Thread(r, "UpdateChecker");
@@ -61,8 +61,8 @@ public class AppUpdateCheckCoordinator {
     }
 
     /**
-     * 启动自动更新检查（应用启动时调用）
-     * 根据上次检查时间和配置的频率决定是否需要检查更新
+     * Bắt đầu kiểm tra cập nhật tự động (được gọi khi ứng dụng khởi động)
+     * Xác định xem bạn có cần kiểm tra các bản cập nhật hay không dựa trên thời gian kiểm tra gần đây nhất và tần suất được định cấu hình
      */
     public void startBackgroundCheck() {
         String currentVersion = SystemUtil.getCurrentVersion();
@@ -84,10 +84,10 @@ public class AppUpdateCheckCoordinator {
         log.info("Update check frequency: {}, last check time: {}",
                 policy.frequency().getCode(), lastCheckTime > 0 ? new Date(lastCheckTime) : "never");
 
-        // 判断是否需要检查更新
+        // Xác định xem bạn có cần kiểm tra các bản cập nhật hay không
         if (updateCenter.shouldCheck(UpdateTarget.APP, currentTime)) {
             log.info("Scheduling startup update check...");
-            // 使用线程池异步执行，避免阻塞调用线程
+            // Sử dụng nhóm luồng để thực thi không đồng bộ nhằm tránh chặn luồng đang gọi
             UPDATE_EXECUTOR.submit(() -> {
                 try {
                     performUpdateCheck();
@@ -101,28 +101,28 @@ public class AppUpdateCheckCoordinator {
     }
 
     /**
-     * 手动检查更新（从菜单触发）
-     * 注意：手动检查也会更新"上次检查时间"
+     * Kiểm tra cập nhật theo cách thủ công (được kích hoạt từ menu)
+     * LƯU Ý: Kiểm tra thủ công cũng được cập nhật"Lần kiểm tra cuối cùng"
      */
     public CompletableFuture<UpdateInfo> checkForUpdateManually() {
         return CompletableFuture.supplyAsync(() -> {
             log.info("Manual update check initiated");
             UpdateInfo updateInfo = versionChecker.checkForUpdate();
-            // 手动检查也记录时间
+            // Kiểm tra thủ công cũng ghi lại thời gian
             updateCenter.recordCheck(UpdateTarget.APP, System.currentTimeMillis());
             log.info("Manual update check completed, timestamp recorded");
             return updateInfo;
-        }, UPDATE_EXECUTOR); // 使用统一的更新检查线程池
+        }, UPDATE_EXECUTOR); // Sử dụng nhóm luồng kiểm tra cập nhật thống nhất
     }
 
     /**
-     * 执行更新检查的核心逻辑
+     * Logic cốt lõi thực hiện kiểm tra cập nhật
      */
     private void performUpdateCheck() {
         log.debug("Starting update check task...");
         try {
             UpdateInfo updateInfo = versionChecker.checkForUpdate();
-            // 记录检查时间
+            // Ghi lại thời gian kiểm tra
             updateCenter.recordCheck(UpdateTarget.APP, System.currentTimeMillis());
             log.info("Update check completed successfully, timestamp recorded");
 
@@ -130,16 +130,16 @@ public class AppUpdateCheckCoordinator {
 
         } catch (Exception e) {
             log.warn("Update check failed: {}", e.getMessage(), e);
-            // 即使失败也记录检查时间，避免频繁重试
+            // Ghi lại thời gian kiểm tra ngay cả khi không tránh được việc phải thử lại thường xuyên
             updateCenter.recordCheck(UpdateTarget.APP, System.currentTimeMillis());
         }
     }
 
     /**
-     * 处理更新检查结果
+     * Kết quả kiểm tra cập nhật quá trình
      *
-     * @param updateInfo 更新信息
-     * @param isManual   是否是手动检查
+     * @param updateInfo Cập nhật thông tin
+     * @param isManual   Cho dù đó là kiểm tra thủ công
      */
     public void handleUpdateCheckResult(UpdateInfo updateInfo, boolean isManual) {
         if (updateInfo == null) {
@@ -158,10 +158,10 @@ public class AppUpdateCheckCoordinator {
                             updateInfo.getCurrentVersion(), updateInfo.getLatestVersion());
 
                     if (isManual) {
-                        // 手动检查直接显示对话框
+                        // Kiểm tra thủ công hiển thị hộp thoại trực tiếp
                         uiController.showUpdateDialog(updateInfo, () -> rememberIgnoredMarker(updateInfo));
                     } else {
-                        // 后台检查显示通知
+                        // Kiểm tra lý lịch hiển thị thông báo
                         uiController.showUpdateNotification(updateInfo, () -> rememberIgnoredMarker(updateInfo));
                     }
                 }
@@ -169,23 +169,23 @@ public class AppUpdateCheckCoordinator {
                     log.info("Update available but no asset for current platform: {} -> {}",
                             updateInfo.getCurrentVersion(), updateInfo.getLatestVersion());
                     if (isManual) {
-                        // 手动检查：直接显示 NoAsset 对话框
+                        // Kiểm tra thủ công: hiển thị trực tiếp NoAsset hộp thoại
                         uiController.showNoAssetDialog(updateInfo);
                     } else {
-                        // 后台检查：先显示右下角 toast，点击后再弹对话框
+                        // Kiểm tra lý lịch: hiển thị góc dưới bên phải trước toast，Bấm vào và hộp thoại sẽ bật lên
                         uiController.showNoAssetNotification(updateInfo);
                     }
                 }
                 case NO_UPDATE -> {
                     if (isManual) {
-                        // 只有手动检查时才显示"已是最新版本"
+                        // Chỉ hiển thị khi được kiểm tra thủ công"Đã là phiên bản mới nhất"
                         showNoUpdateMessage(updateInfo);
                     }
                     log.debug("No update available: {}", updateInfo.getMessage());
                 }
                 case CHECK_FAILED -> {
                     if (isManual) {
-                        // 只有手动检查时才显示错误信息
+                        // Thông báo lỗi chỉ được hiển thị khi kiểm tra thủ công
                         showCheckFailedMessage(updateInfo);
                     }
                     log.debug("Update check failed: {}", updateInfo.getMessage());
@@ -220,14 +220,14 @@ public class AppUpdateCheckCoordinator {
     }
 
     /**
-     * 显示无更新消息
+     * Không có thông báo cập nhật được hiển thị
      */
     private void showNoUpdateMessage(UpdateInfo updateInfo) {
         NotificationCenter.showInfo(updateInfo.getMessage());
     }
 
     /**
-     * 显示检查失败消息
+     * Một thông báo kiểm tra lỗi được hiển thị
      */
     private void showCheckFailedMessage(UpdateInfo updateInfo) {
         NotificationCenter.showError(I18nUtil.getMessage(MessageKeys.ERROR_UPDATE_FAILED, updateInfo.getMessage()));

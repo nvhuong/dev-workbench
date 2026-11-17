@@ -18,8 +18,8 @@ import java.util.Objects;
 import java.util.function.Supplier;
 
 /**
- * 请求编辑器命令控制器。
- * 负责发送态命令、协议切换和输入辅助，不承载布局初始化。
+ * Yêu cầu bộ điều khiển lệnh soạn thảo.
+ * Chịu trách nhiệm gửi lệnh trạng thái, chuyển đổi giao thức và hỗ trợ đầu vào và không thực hiện khởi tạo bố cục.
  */
 @RequiredArgsConstructor
 final class RequestEditorCommandController {

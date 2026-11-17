@@ -9,8 +9,8 @@ import javax.swing.*;
 import java.awt.*;
 
 /**
- * 自动换行切换按钮
- * 用于切换文本编辑器的自动换行功能
+ * Nút chuyển đổi ngắt dòng tự động
+ * Được sử dụng để chuyển đổi chức năng gói từ tự động của trình soạn thảo văn bản
  */
 public class WrapToggleButton extends JToggleButton {
 
@@ -24,14 +24,14 @@ public class WrapToggleButton extends JToggleButton {
         setSelected(false);
         updateIcon(false);
 
-        // 添加状态改变监听器，动态更新图标颜色
+        // Thêm trình xử lý thay đổi trạng thái để tự động cập nhật màu biểu tượng
         addItemListener(e -> updateIcon(isSelected()));
     }
 
     /**
-     * 根据按钮选中状态更新图标颜色
+     * Cập nhật màu biểu tượng dựa trên trạng thái đã chọn của nút
      *
-     * @param selected 是否选中
+     * @param selected Đã kiểm tra hay chưa
      */
     private void updateIcon(boolean selected) {
         if (selected) {

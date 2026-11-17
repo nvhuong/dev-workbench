@@ -6,7 +6,7 @@ import static org.testng.Assert.assertEquals;
 
 public class CsvDataUtilTest {
 
-    @Test(description = "标准 CSV 应支持双引号字段中的换行")
+    @Test(description = "tiêu chuẩn CSV Cần hỗ trợ ngắt dòng trong các trường được trích dẫn kép")
     public void shouldParseQuotedMultilineField() {
         CsvDataUtil.CsvTextData csvTextData = CsvDataUtil.parseCsvText(
                 "name,comment\n" +
@@ -18,7 +18,7 @@ public class CsvDataUtilTest {
         assertEquals(csvTextData.rows().get(0).get(1), "line1\nline2");
     }
 
-    @Test(description = "标准 CSV 不应无条件裁剪字段前后空格")
+    @Test(description = "tiêu chuẩn CSV Khoảng trắng trước và sau các trường không được cắt bớt vô điều kiện")
     public void shouldPreserveFieldWhitespace() {
         CsvDataUtil.CsvTextData csvTextData = CsvDataUtil.parseCsvText(
                 "name,value\n" +

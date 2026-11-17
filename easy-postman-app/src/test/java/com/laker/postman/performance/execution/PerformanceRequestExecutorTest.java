@@ -435,7 +435,7 @@ public class PerformanceRequestExecutorTest {
         }
     }
 
-    @Test(description = "WebSocket 请求缺少启用的 Connect 阶段时不应真实发起连接")
+    @Test(description = "WebSocket Yêu cầu bị thiếu kích hoạt Connect Kết nối không thực sự được bắt đầu trong giai đoạn này")
     public void shouldNotOpenWebSocketWhenConnectStageIsMissing() throws Exception {
         try (MockWebServer server = new MockWebServer()) {
             server.enqueue(new MockResponse().withWebSocketUpgrade(new WebSocketListener() {
@@ -472,7 +472,7 @@ public class PerformanceRequestExecutorTest {
         }
     }
 
-    @Test(description = "SSE 请求缺少启用的 Connect 或 Receive 阶段时不应真实发起连接")
+    @Test(description = "SSE Yêu cầu bị thiếu kích hoạt Connect hoặc Receive Kết nối không thực sự được bắt đầu trong giai đoạn này")
     public void shouldNotOpenSseWhenRequiredStagesAreMissing() throws Exception {
         try (MockWebServer server = new MockWebServer()) {
             server.enqueue(new MockResponse()

@@ -9,27 +9,27 @@ import javax.swing.*;
 import java.awt.*;
 
 /**
- * 加号按钮
- * 用于新建、添加等操作
+ * Nút cộng
+ * Được sử dụng cho các hoạt động như tạo và bổ sung mới
  */
 public class PlusButton extends JButton {
     /**
-     * 默认构造函数：使用 MEDIUM 尺寸图标
+     * Hàm tạo mặc định: đã sử dụng MEDIUM Biểu tượng kích thước
      */
     public PlusButton() {
         this(IconUtil.SIZE_MEDIUM);
     }
 
     /**
-     * 自定义构造函数
+     * Trình xây dựng tùy chỉnh
      *
-     * @param iconSize 图标大小
+     * @param iconSize Kích thước biểu tượng
      */
     public PlusButton(int iconSize) {
         setIcon(IconUtil.createThemed("icons/plus.svg", iconSize, iconSize));
         setToolTipText(CommonI18n.get(CommonMessageKeys.BUTTON_ADD));
-        // 扁平化设计
-        setFocusable(false);// 去掉按钮的焦点边框
+        // Thiết kế phẳng
+        setFocusable(false);// Xóa đường viền tiêu điểm của nút
         setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         putClientProperty(FlatClientProperties.BUTTON_TYPE, FlatClientProperties.BUTTON_TYPE_TOOLBAR_BUTTON);
     }

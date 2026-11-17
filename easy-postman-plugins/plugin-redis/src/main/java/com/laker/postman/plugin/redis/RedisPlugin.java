@@ -7,7 +7,7 @@ import com.laker.postman.plugin.api.PluginContext;
 import static com.laker.postman.plugin.redis.RedisI18n.t;
 
 /**
- * Redis 官方插件。
+ * Redis Plugin chính thức.
  */
 public class RedisPlugin implements EasyPostmanPlugin {
 
@@ -57,13 +57,13 @@ public class RedisPlugin implements EasyPostmanPlugin {
                 context,
                 t(MessageKeys.SNIPPET_EXAMPLE_REDIS_ASSERT_TITLE),
                 t(MessageKeys.SNIPPET_EXAMPLE_REDIS_ASSERT_DESC),
-                "// Redis 查询 + 断言\nvar redis = pm.plugin('redis');\nvar redisResult = redis.execute({\n    host: pm.environment.get('redisHost') || 'localhost',\n    port: parseInt(pm.environment.get('redisPort') || '6379', 10),\n    db: parseInt(pm.environment.get('redisDb') || '0', 10),\n    password: pm.environment.get('redisPassword') || '',\n    command: 'GET',\n    key: pm.environment.get('redisKey') || 'user:1'\n});\n\npm.test('Redis key exists', function () {\n    pm.expect(redisResult).to.exist();\n});\n\nconsole.log('Redis query result:', redisResult);"
+                "// Redis Truy vấn + khẳng định\nvar redis = pm.plugin('redis');\nvar redisResult = redis.execute({\n    host: pm.environment.get('redisHost') || 'localhost',\n    port: parseInt(pm.environment.get('redisPort') || '6379', 10),\n    db: parseInt(pm.environment.get('redisDb') || '0', 10),\n    password: pm.environment.get('redisPassword') || '',\n    command: 'GET',\n    key: pm.environment.get('redisKey') || 'user:1'\n});\n\npm.test('Redis key exists', function () {\n    pm.expect(redisResult).to.exist();\n});\n\nconsole.log('Redis query result:', redisResult);"
         );
         PluginContributionSupport.registerExampleSnippet(
                 context,
                 t(MessageKeys.SNIPPET_EXAMPLE_REDIS_WRITE_ASSERT_TITLE),
                 t(MessageKeys.SNIPPET_EXAMPLE_REDIS_WRITE_ASSERT_DESC),
-                "// Redis 写入 + 断言\nvar redis = pm.plugin('redis');\nvar redisKey = pm.environment.get('redisKey') || 'order:1001';\nvar redisWriteResp = redis.execute({\n    host: pm.environment.get('redisHost') || 'localhost',\n    port: parseInt(pm.environment.get('redisPort') || '6379', 10),\n    db: parseInt(pm.environment.get('redisDb') || '0', 10),\n    password: pm.environment.get('redisPassword') || '',\n    command: 'SET',\n    key: redisKey,\n    value: JSON.stringify({ id: 1001, status: 'CREATED', source: 'easy-postman' })\n});\n\nvar redisValue = redis.query({\n    host: pm.environment.get('redisHost') || 'localhost',\n    port: parseInt(pm.environment.get('redisPort') || '6379', 10),\n    db: parseInt(pm.environment.get('redisDb') || '0', 10),\n    password: pm.environment.get('redisPassword') || '',\n    command: 'GET',\n    key: redisKey\n});\n\npm.test('Redis write success', function () {\n    pm.expect(redisWriteResp).to.equal('OK');\n    pm.expect(redisValue).to.include('CREATED');\n});\n\nconsole.log('Redis write result:', redisWriteResp);\nconsole.log('Redis read back value:', redisValue);"
+                "// Redis Viết + khẳng định\nvar redis = pm.plugin('redis');\nvar redisKey = pm.environment.get('redisKey') || 'order:1001';\nvar redisWriteResp = redis.execute({\n    host: pm.environment.get('redisHost') || 'localhost',\n    port: parseInt(pm.environment.get('redisPort') || '6379', 10),\n    db: parseInt(pm.environment.get('redisDb') || '0', 10),\n    password: pm.environment.get('redisPassword') || '',\n    command: 'SET',\n    key: redisKey,\n    value: JSON.stringify({ id: 1001, status: 'CREATED', source: 'easy-postman' })\n});\n\nvar redisValue = redis.query({\n    host: pm.environment.get('redisHost') || 'localhost',\n    port: parseInt(pm.environment.get('redisPort') || '6379', 10),\n    db: parseInt(pm.environment.get('redisDb') || '0', 10),\n    password: pm.environment.get('redisPassword') || '',\n    command: 'GET',\n    key: redisKey\n});\n\npm.test('Redis write success', function () {\n    pm.expect(redisWriteResp).to.equal('OK');\n    pm.expect(redisValue).to.include('CREATED');\n});\n\nconsole.log('Redis write result:', redisWriteResp);\nconsole.log('Redis read back value:', redisValue);"
         );
     }
 }

@@ -8,38 +8,38 @@ import java.util.concurrent.*;
 import java.util.function.Consumer;
 
 /**
- * 异步任务执行器
+ * Người thực thi nhiệm vụ không đồng bộ
  * <p>
- * 用于在后台线程执行耗时操作（如IO、网络请求等），然后在EDT线程中更新UI。
- * 避免在EDT中执行耗时操作导致界面卡顿。
+ * Được sử dụng để thực hiện các thao tác tốn thời gian trên một luồng nền (ví dụ:IO、yêu cầu mạng, v.v.) rồi vàoEDTĐã cập nhật trong chủ đềUI。
+ * Tránh vàoEDTViệc thực hiện các thao tác tốn thời gian trên màn hình khiến giao diện bị đơ.
  * </p>
  *
- * <h3>使用示例：</h3>
+ * <h3>Ví dụ sử dụng:</h3>
  * <pre>{@code
- * // 示例1：简单的后台任务 + UI更新
+ * // Ví dụ1：Nhiệm vụ nền đơn giản + UIđổi mới
  * AsyncTaskExecutor.execute(
  *     () -> {
- *         // 后台线程：执行耗时的IO操作
+ *         // Chủ đề nền: thực hiện tốn thời gianIOhoạt động
  *         return loadDataFromFile();
  *     },
  *     result -> {
- *         // EDT线程：使用加载结果更新UI
+ *         // EDTChủ đề: đã cập nhật kết quả tảiUI
  *         updateUIWithData(result);
  *     },
  *     error -> {
- *         // EDT线程：处理错误
+ *         // EDTChủ đề: xử lý lỗi
  *         showErrorMessage(error.getMessage());
  *     }
  * );
  *
- * // 示例2：只执行后台任务，不需要返回值
+ * // Ví dụ2：Chỉ các tác vụ nền được thực thi và không yêu cầu giá trị trả về
  * AsyncTaskExecutor.execute(
  *     () -> saveDataToFile(data),
  *     () -> showSuccessMessage(),
  *     error -> showErrorMessage(error.getMessage())
  * );
  *
- * // 示例3：使用自定义线程池和线程名
+ * // Ví dụ3：Sử dụng nhóm chủ đề tùy chỉnh và tên chủ đề
  * AsyncTaskExecutor.builder()
  *     .threadName("CustomTask")
  *     .backgroundTask(() -> heavyComputation())
@@ -58,8 +58,8 @@ public class EasyTaskExecutor {
     private static final String ERROR_MESSAGE = "Error executing async task";
 
     /**
-     * 默认线程池：用于执行异步任务
-     * 核心线程数为CPU核心数，最大线程数为CPU核心数的2倍
+     * Nhóm luồng mặc định: được sử dụng để thực hiện các tác vụ không đồng bộ
+     * Số lượng chủ đề cốt lõi làCPUSố lượng lõi và số lượng luồng tối đa làCPUSố lượng lõi2lần
      */
     private static final ExecutorService DEFAULT_EXECUTOR = new ThreadPoolExecutor(
             Runtime.getRuntime().availableProcessors(),
@@ -80,11 +80,11 @@ public class EasyTaskExecutor {
     );
 
     /**
-     * 执行异步任务（无返回值）
+     * Thực hiện một tác vụ không đồng bộ (không có giá trị trả về)
      *
-     * @param backgroundTask 后台任务（在后台线程执行）
-     * @param onSuccess      成功回调（在EDT线程执行）
-     * @param onError        错误回调（在EDT线程执行）
+     * @param backgroundTask Tác vụ nền (được thực thi trên các luồng nền)
+     * @param onSuccess      gọi lại thành công(inEDTthực thi luồng)
+     * @param onError        Lỗi gọi lại (trong EDTthực thi luồng)
      */
     public static void execute(
             Runnable backgroundTask,
@@ -95,12 +95,12 @@ public class EasyTaskExecutor {
     }
 
     /**
-     * 执行异步任务（无返回值，带线程名）
+     * Thực thi các tác vụ không đồng bộ (không có giá trị trả về, có tên luồng)
      *
-     * @param backgroundTask 后台任务（在后台线程执行）
-     * @param onSuccess      成功回调（在EDT线程执行）
-     * @param onError        错误回调（在EDT线程执行）
-     * @param threadName     线程名称
+     * @param backgroundTask Tác vụ nền (được thực thi trên các luồng nền)
+     * @param onSuccess      gọi lại thành công(inEDTthực thi luồng)
+     * @param onError        Lỗi gọi lại (trong EDTthực thi luồng)
+     * @param threadName     Tên chủ đề
      */
     public static void execute(
             Runnable backgroundTask,
@@ -124,12 +124,12 @@ public class EasyTaskExecutor {
     }
 
     /**
-     * 执行异步任务（有返回值）
+     * Thực hiện các tác vụ không đồng bộ (có giá trị trả về)
      *
-     * @param backgroundTask 后台任务（在后台线程执行）
-     * @param onSuccess      成功回调（在EDT线程执行）
-     * @param onError        错误回调（在EDT线程执行）
-     * @param <T>            返回值类型
+     * @param backgroundTask Tác vụ nền (được thực thi trên các luồng nền)
+     * @param onSuccess      gọi lại thành công(inEDTthực thi luồng)
+     * @param onError        Lỗi gọi lại (trong EDTthực thi luồng)
+     * @param <T>            Kiểu giá trị trả về
      */
     public static <T> void execute(
             Callable<T> backgroundTask,
@@ -140,13 +140,13 @@ public class EasyTaskExecutor {
     }
 
     /**
-     * 执行异步任务（有返回值，带线程名）
+     * Thực thi các tác vụ không đồng bộ (với giá trị trả về và tên luồng)
      *
-     * @param backgroundTask 后台任务（在后台线程执行）
-     * @param onSuccess      成功回调（在EDT线程执行）
-     * @param onError        错误回调（在EDT线程执行）
-     * @param threadName     线程名称
-     * @param <T>            返回值类型
+     * @param backgroundTask Tác vụ nền (được thực thi trên các luồng nền)
+     * @param onSuccess      gọi lại thành công(inEDTthực thi luồng)
+     * @param onError        Lỗi gọi lại (trong EDTthực thi luồng)
+     * @param threadName     Tên chủ đề
+     * @param <T>            Kiểu giá trị trả về
      */
     public static <T> void execute(
             Callable<T> backgroundTask,
@@ -170,11 +170,11 @@ public class EasyTaskExecutor {
     }
 
     /**
-     * 使用线程池执行异步任务（无返回值）
+     * Sử dụng nhóm luồng để thực thi các tác vụ không đồng bộ (không có giá trị trả về)
      *
-     * @param backgroundTask 后台任务
-     * @param onSuccess      成功回调
-     * @param onError        错误回调
+     * @param backgroundTask Nhiệm vụ nền
+     * @param onSuccess      Gọi lại thành công
+     * @param onError        Lỗi gọi lại
      */
     public static void executeWithPool(
             Runnable backgroundTask,
@@ -197,13 +197,13 @@ public class EasyTaskExecutor {
     }
 
     /**
-     * 使用线程池执行异步任务（有返回值）
+     * Sử dụng nhóm luồng để thực thi các tác vụ không đồng bộ (có giá trị trả về)
      *
-     * @param backgroundTask 后台任务
-     * @param onSuccess      成功回调
-     * @param onError        错误回调
-     * @param <T>            返回值类型
-     * @return Future对象，可用于取消任务或获取结果
+     * @param backgroundTask Nhiệm vụ nền
+     * @param onSuccess      Gọi lại thành công
+     * @param onError        Lỗi gọi lại
+     * @param <T>            Kiểu giá trị trả về
+     * @return FutureĐối tượng có thể được sử dụng để hủy nhiệm vụ hoặc nhận kết quả
      */
     public static <T> Future<T> executeWithPool(
             Callable<T> backgroundTask,
@@ -228,17 +228,17 @@ public class EasyTaskExecutor {
     }
 
     /**
-     * 创建异步任务构建器
+     * Tạo một trình tạo tác vụ không đồng bộ
      *
-     * @param <T> 返回值类型
-     * @return 构建器实例
+     * @param <T> Kiểu giá trị trả về
+     * @return Ví dụ về người xây dựng
      */
     public static <T> Builder<T> builder() {
         return new Builder<>();
     }
 
     /**
-     * 关闭默认线程池（应用退出时调用）
+     * Đóng nhóm luồng mặc định (được gọi khi ứng dụng thoát)
      */
     public static void shutdown() {
         DEFAULT_EXECUTOR.shutdown();
@@ -253,12 +253,12 @@ public class EasyTaskExecutor {
     }
 
     /**
-     * 异步任务构建器
+     * Trình tạo tác vụ không đồng bộ
      * <p>
-     * 提供更灵活的方式构建异步任务
+     * Cung cấp một cách linh hoạt hơn để xây dựng các tác vụ không đồng bộ
      * </p>
      *
-     * @param <T> 返回值类型
+     * @param <T> Kiểu giá trị trả về
      */
     public static class Builder<T> {
         private Callable<T> backgroundTask;
@@ -269,7 +269,7 @@ public class EasyTaskExecutor {
         private boolean useThreadPool = false;
 
         /**
-         * 设置后台任务
+         * Thiết lập các tác vụ nền
          */
         public Builder<T> backgroundTask(Callable<T> task) {
             this.backgroundTask = task;
@@ -277,7 +277,7 @@ public class EasyTaskExecutor {
         }
 
         /**
-         * 设置后台任务（无返回值）
+         * Thiết lập tác vụ nền (không có giá trị trả về)
          */
         public Builder<T> backgroundTask(Runnable task) {
             this.backgroundTask = () -> {
@@ -288,7 +288,7 @@ public class EasyTaskExecutor {
         }
 
         /**
-         * 设置成功回调
+         * Đặt gọi lại thành công
          */
         public Builder<T> onSuccess(Consumer<T> callback) {
             this.onSuccess = callback;
@@ -296,7 +296,7 @@ public class EasyTaskExecutor {
         }
 
         /**
-         * 设置成功回调（无参数）
+         * Đặt gọi lại thành công (không có tham số)
          */
         public Builder<T> onSuccess(Runnable callback) {
             this.onSuccess = result -> callback.run();
@@ -304,7 +304,7 @@ public class EasyTaskExecutor {
         }
 
         /**
-         * 设置错误回调
+         * Đặt gọi lại lỗi
          */
         public Builder<T> onError(Consumer<Exception> callback) {
             this.onError = callback;
@@ -312,7 +312,7 @@ public class EasyTaskExecutor {
         }
 
         /**
-         * 设置最终回调（无论成功或失败都会执行）
+         * Đặt lệnh gọi lại cuối cùng (được thực hiện bất kể thành công hay thất bại)
          */
         public Builder<T> onFinally(Runnable callback) {
             this.onFinally = callback;
@@ -320,7 +320,7 @@ public class EasyTaskExecutor {
         }
 
         /**
-         * 设置线程名称
+         * Đặt tên chủ đề
          */
         public Builder<T> threadName(String name) {
             this.threadName = name;
@@ -328,7 +328,7 @@ public class EasyTaskExecutor {
         }
 
         /**
-         * 使用线程池执行
+         * Thực thi bằng cách sử dụng nhóm luồng
          */
         public Builder<T> useThreadPool() {
             this.useThreadPool = true;
@@ -336,7 +336,7 @@ public class EasyTaskExecutor {
         }
 
         /**
-         * 执行任务
+         * Thực hiện nhiệm vụ
          */
         public void execute() {
             if (backgroundTask == null) {
@@ -351,7 +351,7 @@ public class EasyTaskExecutor {
         }
 
         /**
-         * 执行任务并返回Future（仅在使用线程池时有效）
+         * Thực hiện nhiệm vụ và trở vềFuture（Chỉ hợp lệ khi sử dụng nhóm luồng)
          */
         public Future<T> submit() {
             if (backgroundTask == null) {

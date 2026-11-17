@@ -28,15 +28,15 @@ import java.nio.file.Files;
 import java.util.function.Consumer;
 
 /**
- * 响应体面板，展示 HTTP 响应体内容
+ * Bảng điều khiển phản hồi, màn hình hiển thị HTTP Nội dung nội dung phản hồi
  * <p>
- * 主要功能：
- * - 语法高亮显示（JSON、XML、HTML、JavaScript、CSS 等）
- * - 自动/手动格式化
- * - 文本搜索
- * - 自动换行控制
- * - 下载响应内容
- * - 大文件优化处理
+ * Chức năng chính:
+ * - Syntax highlighting (JSON、XML、HTML、JavaScript、CSS Chờ đợi)
+ * - tự động/Định dạng thủ công
+ * - Tìm kiếm văn bản
+ * - Kiểm soát gói dòng tự động
+ * - Tải xuống nội dung phản hồi
+ * - Tối ưu hóa xử lý các tập tin lớn
  * </p>
  */
 public class ResponseBodyPanel extends JPanel {
@@ -44,8 +44,8 @@ public class ResponseBodyPanel extends JPanel {
     private final RSyntaxTextArea responseBodyPane;
     private final DownloadButton downloadButton;
     @Getter
-    private SaveResponseButton saveResponseButton; // 保存响应按钮（仅HTTP请求）
-    private final SearchButton searchButton; // 搜索按钮
+    private SaveResponseButton saveResponseButton; // Nút lưu phản hồi (chỉHTTPyêu cầu)
+    private final SearchButton searchButton; // Nút tìm kiếm
     private HttpResponse currentResponse;
     private final ResponseBodyDownloader downloader;
     private final EasyComboBox<String> syntaxComboBox;
@@ -54,20 +54,20 @@ public class ResponseBodyPanel extends JPanel {
     private final CopyButton copyButton;
     private final GenerateModelButton generateModelButton;
     private final WrapToggleButton wrapButton;
-    private final SearchableTextArea searchableTextArea; // 带搜索功能的文本编辑器
+    private final SearchableTextArea searchableTextArea; // Trình soạn thảo văn bản có chức năng tìm kiếm
     private final JPanel centerPanel;
     private final FileResponsePanel fileResponsePanel;
     private final JButton fileOverviewButton;
     private boolean fileRawPreviewActive;
 
-    // 常量定义
+    // Định nghĩa hằng số
     private static final int LARGE_RESPONSE_THRESHOLD = 500 * 1024; // 500KB threshold
     private static final String CARD_TEXT = "TEXT";
     private static final String CARD_IMAGE = "IMAGE";
     private static final String CARD_MEDIA = "MEDIA";
     private static final String CARD_FILE = "FILE";
 
-    // 图片预览组件
+    // Thành phần xem trước hình ảnh
     private final JLabel imagePreviewLabel;
     private final MediaResponsePanel mediaResponsePanel;
 
@@ -77,23 +77,23 @@ public class ResponseBodyPanel extends JPanel {
     public ResponseBodyPanel(boolean enableSaveButton) {
         setLayout(new BorderLayout());
         ToolWindowSurfaceStyle.applyCard(this);
-        // 设置边距
+        // Đặt lề
         setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
         responseBodyPane = new FallbackAwareRSyntaxTextArea();
         responseBodyPane.setEditable(false);
         responseBodyPane.setCodeFoldingEnabled(true);
-        responseBodyPane.setLineWrap(false); // 禁用自动换行以提升大文本性能
-        responseBodyPane.setHighlightCurrentLine(false); // 关闭选中行高亮
-        // 关闭括号匹配的小浮层提示，避免响应体中长 JSON 滚动查看时遮挡内容
+        responseBodyPane.setLineWrap(false); // Tắt tính năng ngắt dòng để cải thiện hiệu suất văn bản lớn
+        responseBodyPane.setHighlightCurrentLine(false); // Tắt đánh dấu hàng đã chọn
+        // Tắt lời nhắc lớp nổi nhỏ để khớp khung để tránh phần nội dung phản hồi quá dài JSON Loại bỏ nội dung khi cuộn
         responseBodyPane.setShowMatchedBracketPopup(false);
-        // 统一加载主题、编辑器字体和缺字回退绘制
+        // Tải thống nhất các chủ đề, phông chữ soạn thảo và bản vẽ dự phòng cho các ký tự bị thiếu
         EditorThemeUtil.loadTheme(responseBodyPane);
         EditorThemeUtil.installViewportClippedTokenPainter(responseBodyPane);
 
-        // 使用 SearchableTextArea 包装，禁用替换功能（仅搜索）
+        // sử dụng SearchableTextArea Wrapper, tắt chức năng thay thế (chỉ tìm kiếm)
         searchableTextArea = new SearchableTextArea(responseBodyPane, false);
 
-        // 图片预览组件
+        // Thành phần xem trước hình ảnh
         imagePreviewLabel = new JLabel();
         imagePreviewLabel.setHorizontalAlignment(SwingConstants.CENTER);
         imagePreviewLabel.setVerticalAlignment(SwingConstants.CENTER);
@@ -105,7 +105,7 @@ public class ResponseBodyPanel extends JPanel {
         fileResponsePanel = new FileResponsePanel(this::downloadFromFileOverview, this::showFileRawPreview);
         downloader = new ResponseBodyDownloader(this::onSavingChanged);
 
-        // 使用 CardLayout 在文本、图片、媒体和文件概览之间切换
+        // sử dụng CardLayout Chuyển đổi giữa tổng quan về văn bản, hình ảnh, phương tiện và tập tin
         centerPanel = new JPanel(new CardLayout());
         ToolWindowSurfaceStyle.applyCard(centerPanel);
         centerPanel.add(searchableTextArea, CARD_TEXT);
@@ -119,13 +119,13 @@ public class ResponseBodyPanel extends JPanel {
         toolBarPanel.setLayout(new BoxLayout(toolBarPanel, BoxLayout.X_AXIS));
         toolBarPanel.setBorder(BorderFactory.createEmptyBorder(2, 0, 2, 0));
 
-        // 语法选择下拉框
+        // Grammar selection drop-down box
         syntaxComboBox = new EasyComboBox<>(SyntaxType.getDisplayNames(), EasyComboBox.WidthMode.DYNAMIC);
         syntaxComboBox.setFocusable(false);
         toolBarPanel.add(syntaxComboBox);
-        toolBarPanel.add(Box.createHorizontalStrut(4)); // 间隔
+        toolBarPanel.add(Box.createHorizontalStrut(4)); // khoảng thời gian
 
-        // 添加大小提示标签
+        // Thêm nhãn nhắc nhở kích thước
         sizeWarningLabel = new JLabel();
         sizeWarningLabel.setForeground(ModernColors.getWarningDark());
         sizeWarningLabel.setMinimumSize(new Dimension(
@@ -133,7 +133,7 @@ public class ResponseBodyPanel extends JPanel {
         sizeWarningLabel.setVisible(false);
         toolBarPanel.add(sizeWarningLabel);
 
-        // 弹性空间，将右侧控件推到右边
+        // Không gian linh hoạt, đẩy điều khiển bên phải sang bên phải
         toolBarPanel.add(Box.createHorizontalGlue());
 
         fileOverviewButton = new JButton();
@@ -152,16 +152,16 @@ public class ResponseBodyPanel extends JPanel {
         toolBarPanel.add(fileOverviewButton);
         toolBarPanel.add(Box.createHorizontalStrut(1));
 
-        // 搜索按钮
+        // Nút tìm kiếm
         searchButton = new SearchButton();
         searchButton.addActionListener(e -> {
             responseBodyPane.requestFocusInWindow();
             searchableTextArea.showSearch();
         });
         toolBarPanel.add(searchButton);
-        toolBarPanel.add(Box.createHorizontalStrut(1)); // 间隔
+        toolBarPanel.add(Box.createHorizontalStrut(1)); // khoảng thời gian
 
-        // Key 排序切换按钮，沿用自动换行工具按钮的选中态视觉
+        // Key Nút chuyển đổi sắp xếp tuân theo hình ảnh trạng thái đã chọn của nút công cụ ngắt dòng
         autoSortJsonKeysButton = new JToggleButton();
         autoSortJsonKeysButton.setToolTipText(
                 I18nUtil.getMessage(MessageKeys.RESPONSE_BODY_AUTO_SORT_JSON_KEYS_TOOLTIP));
@@ -177,17 +177,17 @@ public class ResponseBodyPanel extends JPanel {
         toolBarPanel.add(autoSortJsonKeysButton);
         toolBarPanel.add(Box.createHorizontalStrut(1));
 
-        // 换行按钮
+        // Nút ngắt dòng
         wrapButton = new WrapToggleButton();
         toolBarPanel.add(wrapButton);
         toolBarPanel.add(Box.createHorizontalStrut(1));
 
-        // 格式化按钮
+        // Nút định dạng
         formatButton = new FormatButton();
         toolBarPanel.add(formatButton);
         toolBarPanel.add(Box.createHorizontalStrut(1));
 
-        // 复制按钮
+        // Nút sao chép
         copyButton = new CopyButton();
         toolBarPanel.add(copyButton);
         toolBarPanel.add(Box.createHorizontalStrut(1));
@@ -197,11 +197,11 @@ public class ResponseBodyPanel extends JPanel {
         toolBarPanel.add(generateModelButton);
         toolBarPanel.add(Box.createHorizontalStrut(1));
 
-        // 下载按钮
+        // Nút tải xuống
         downloadButton = new DownloadButton();
         toolBarPanel.add(downloadButton);
 
-        // 只有 HTTP 请求才显示保存响应按钮
+        // Chỉ HTTP Nút lưu phản hồi chỉ được hiển thị theo yêu cầu
         if (enableSaveButton) {
             toolBarPanel.add(Box.createHorizontalStrut(1));
             saveResponseButton = new SaveResponseButton();
@@ -224,8 +224,8 @@ public class ResponseBodyPanel extends JPanel {
     }
 
     /**
-     * 语法类型下拉框改变事件处理
-     * 根据用户选择的语法类型更新编辑器的语法高亮
+     * Syntax type drop-down box change event handling
+     * Cập nhật tính năng tô sáng cú pháp của trình soạn thảo dựa trên loại cú pháp do người dùng chọn
      */
     private void onSyntaxComboChanged() {
         int idx = syntaxComboBox.getSelectedIndex();
@@ -233,10 +233,10 @@ public class ResponseBodyPanel extends JPanel {
 
         String syntax;
         if (syntaxType == SyntaxType.AUTO_DETECT) {
-            // 自动检测语法类型
+            // Tự động phát hiện các loại cú pháp
             syntax = detectResponseSyntax(responseBodyPane.getText(), currentContentType());
         } else {
-            // 使用用户选择的语法类型
+            // Sử dụng loại cú pháp do người dùng chọn
             syntax = syntaxType.getSyntaxStyle();
         }
 
@@ -244,7 +244,7 @@ public class ResponseBodyPanel extends JPanel {
     }
 
     /**
-     * 切换自动换行状态
+     * Chuyển đổi trạng thái ngắt dòng tự động
      */
     private void toggleLineWrap() {
         boolean isWrapEnabled = wrapButton.isSelected();
@@ -253,8 +253,8 @@ public class ResponseBodyPanel extends JPanel {
 
 
     /**
-     * 工具栏下载（文本预览中）：保存成功后以通知提示；若当前响应有文件概览，同步显示保存位置，
-     * 返回概览时不会看到过期的路径。
+     * Tải xuống thanh công cụ (ở dạng xem trước văn bản): thông báo sẽ được nhắc sau khi lưu thành công; nếu phản hồi hiện tại có tổng quan về tệp thì vị trí lưu sẽ được hiển thị đồng thời.
+     * Bạn sẽ không thấy đường dẫn đã hết hạn khi quay lại phần tổng quan.
      */
     private void downloadFromToolbar() {
         HttpResponse responseAtStart = currentResponse;
@@ -267,12 +267,12 @@ public class ResponseBodyPanel extends JPanel {
     }
 
     /**
-     * 文件概览下载：保存成功后在概览中显示保存位置及打开入口。
+     * Tải xuống tổng quan về tệp: Sau khi lưu thành công, vị trí lưu sẽ được hiển thị trong phần tổng quan và lối vào sẽ được mở.
      */
     private void downloadFromFileOverview() {
         HttpResponse responseAtStart = currentResponse;
         startDownload(savedFile -> {
-            // 保存期间已切换到其他响应时，不能把结果显示在新响应的概览上
+            // Khi bạn đã chuyển sang phản hồi khác trong khi lưu, kết quả không thể hiển thị trong phần tổng quan về phản hồi mới
             if (currentResponse == responseAtStart) {
                 fileResponsePanel.showSavedFile(savedFile);
             } else {
@@ -291,7 +291,7 @@ public class ResponseBodyPanel extends JPanel {
     }
 
     /**
-     * 将当前响应体同步写入目标文件，写入规则见 {@link ResponseBodyDownloader.Source}。
+     * Ghi đồng bộ nội dung phản hồi hiện tại vào tệp đích. Xem quy tắc viết {@link ResponseBodyDownloader.Source}。
      */
     void writeResponseBody(File destFile) throws IOException {
         currentBodySource().writeTo(destFile);
@@ -302,8 +302,8 @@ public class ResponseBodyPanel extends JPanel {
     }
 
     /**
-     * 格式化内容
-     * 根据 Content-Type 对 JSON 或 XML 进行格式化美化
+     * Định dạng nội dung
+     * theo Content-Type Vâng JSON hoặc XML Định dạng và làm đẹp
      */
     private void formatContent() {
         String text = responseBodyPane.getText();
@@ -331,8 +331,8 @@ public class ResponseBodyPanel extends JPanel {
     }
 
     /**
-     * 复制内容到剪贴板
-     * 将响应体内容复制到系统剪贴板
+     * Sao chép nội dung vào clipboard
+     * Sao chép nội dung nội dung phản hồi vào bảng nhớ tạm của hệ thống
      */
     private void copyToClipboard() {
         String text = responseBodyPane.getText();
@@ -358,15 +358,15 @@ public class ResponseBodyPanel extends JPanel {
     }
 
     /**
-     * 设置响应体内容
+     * Đặt nội dung nội dung phản hồi
      * <p>
-     * 该方法会：
-     * 1. 自动检测语法类型并设置高亮
-     * 2. 显示文件大小警告（如果超过阈值）
-     * 3. 根据设置决定是否自动格式化
+     * Phương pháp này sẽ:
+     * 1. Tự động phát hiện các loại cú pháp và thiết lập đánh dấu
+     * 2. Hiển thị cảnh báo kích thước tệp nếu vượt quá ngưỡng
+     * 3. Xác định xem có tự động định dạng hay không dựa trên cài đặt
      * </p>
      *
-     * @param resp HTTP 响应对象
+     * @param resp HTTP đối tượng phản hồi
      */
     public void setBodyText(HttpResponse resp) {
         if (resp == null) {
@@ -384,7 +384,7 @@ public class ResponseBodyPanel extends JPanel {
         boolean isAudio = "audio".equalsIgnoreCase(mainContentType);
         boolean isVideo = "video".equalsIgnoreCase(mainContentType);
 
-        // Java Sound 原生支持的音频内置播放；其他音频编码和视频交给系统播放器。
+        // Java Sound Tích hợp tính năng phát lại âm thanh được hỗ trợ nguyên bản; mã hóa âm thanh và video khác được để lại cho trình phát hệ thống.
         if ((isAudio || isVideo) && resp.filePath != null && !resp.filePath.isEmpty()) {
             generateModelButton.setEnabled(false);
             imagePreviewLabel.setIcon(null);
@@ -401,7 +401,7 @@ public class ResponseBodyPanel extends JPanel {
 
         mediaResponsePanel.clear();
 
-        // 图片预览
+        // Xem trước hình ảnh
         if (resp.isImage && resp.filePath != null && !resp.filePath.isEmpty()) {
             generateModelButton.setEnabled(false);
             showImagePreview(resp.filePath, resp.bodySize);
@@ -413,29 +413,29 @@ public class ResponseBodyPanel extends JPanel {
             return;
         }
 
-        // 切换回文本视图
+        // Chuyển về chế độ xem văn bản
         switchCard(CARD_TEXT);
         String text = resp.body;
 
         int textSize = text != null ? text.getBytes().length : 0;
         boolean isLargeResponse = textSize > LARGE_RESPONSE_THRESHOLD;
 
-        // 显示大小信息
+        // Hiển thị thông tin kích thước
         updateSizeWarning(textSize, isLargeResponse);
 
-        // 动态选择高亮类型
+        // Tự động chọn loại đánh dấu
         String syntax = detectResponseSyntax(text, contentType);
 
-        // 自动匹配下拉框选项
+        // Tự động khớp các tùy chọn hộp thả xuống
         int syntaxIndex = SyntaxType.getBySyntaxStyle(syntax).getIndex();
         syntaxComboBox.setSelectedIndex(syntaxIndex);
 
-        // 设置语法高亮和文本
+        // Đặt đánh dấu cú pháp và văn bản
         responseBodyPane.setSyntaxEditingStyle(syntax);
         responseBodyPane.setText(text);
         updateGenerateModelButtonState();
 
-        // 根据设置和大小决定是否自动格式化
+        // Xác định xem có tự động định dạng hay không dựa trên cài đặt và kích thước
         boolean shouldAutoFormat = SettingManager.isAutoFormatResponse();
         boolean shouldAutoSortKeys = autoSortJsonKeysButton.isSelected();
         if (shouldAutoFormat || shouldAutoSortKeys) {
@@ -452,7 +452,7 @@ public class ResponseBodyPanel extends JPanel {
 
     private void showFileResponse(HttpResponse response) {
         responseBodyPane.setSyntaxEditingStyle(SyntaxConstants.SYNTAX_STYLE_NONE);
-        // 文件概览不展示编辑器，二进制文本延迟到“按文本查看”时再加载，避免在 EDT 上渲染大段乱码
+        // Tổng quan về tệp không hiển thị trình chỉnh sửa, văn bản nhị phân được trì hoãn“Xem bằng văn bản”để tránh tải lại EDT Một đoạn mã lớn bị cắt xén được hiển thị trên màn hình
         responseBodyPane.setText("");
         syntaxComboBox.setSelectedIndex(SyntaxType.PLAIN_TEXT.getIndex());
         sizeWarningLabel.setVisible(false);
@@ -489,7 +489,7 @@ public class ResponseBodyPanel extends JPanel {
     }
 
     /**
-     * 二进制响应在文本视图中展示的是接收提示，不是原始响应内容。
+     * Phản hồi nhị phân hiển thị trong chế độ xem văn bản là lời nhắc nhận, không phải nội dung phản hồi ban đầu.
      */
     private String detectResponseSyntax(String text, String contentType) {
         if (currentResponse != null
@@ -501,16 +501,16 @@ public class ResponseBodyPanel extends JPanel {
     }
 
     /**
-     * 动态检测语法类型
+     * Tự động phát hiện các loại cú pháp
      * <p>
-     * 检测策略：
-     * 1. 优先根据 Content-Type 响应头判断
-     * 2. 其次根据内容特征判断（如 JSON 的 {} 或 []，XML 的 < >）
+     * Chiến lược phát hiện:
+     * 1. Cơ sở ưu tiên Content-Type Đánh giá tiêu đề phản hồi
+     * 2. Thứ hai, nó được đánh giá dựa trên đặc điểm nội dung (chẳng hạn như JSON của {} hoặc []，XML của < >）
      * </p>
      *
-     * @param text        文本内容
-     * @param contentType Content-Type 响应头
-     * @return 语法类型常量（来自 SyntaxConstants）
+     * @param text        Nội dung văn bản
+     * @param contentType Content-Type tiêu đề phản hồi
+     * @return Syntax type constant (from  SyntaxConstants）
      */
     private String detectSyntax(String text, String contentType) {
         if (contentType != null) contentType = contentType.toLowerCase();
@@ -525,7 +525,7 @@ public class ResponseBodyPanel extends JPanel {
             if (contentType.contains("css")) return SyntaxConstants.SYNTAX_STYLE_CSS;
             if (contentType.contains("text")) return SyntaxConstants.SYNTAX_STYLE_NONE;
         }
-        // 内容自动识别
+        // Nhận dạng nội dung tự động
         if (text == null || text.isEmpty()) return SyntaxConstants.SYNTAX_STYLE_NONE;
         String t = text.trim();
         if ((t.startsWith("{") && t.endsWith("}")) || (t.startsWith("[") && t.endsWith("]"))) {
@@ -539,13 +539,13 @@ public class ResponseBodyPanel extends JPanel {
     }
 
     /**
-     * 自动格式化内容（如果可能）
+     * Tự động định dạng nội dung (nếu có thể)
      * <p>
-     * 对小于等于 500KB 的响应按用户设置处理 JSON/XML；key 排序只作用于 JSON。
+     * Cho ít hơn hoặc bằng 500KB Phản hồi được xử lý theo cài đặt của người dùng JSON/XML；key Sắp xếp chỉ hoạt động trên  JSON。
      * </p>
      *
-     * @param text        文本内容
-     * @param contentType Content-Type 响应头
+     * @param text        Nội dung văn bản
+     * @param contentType Content-Type tiêu đề phản hồi
      */
     private void autoFormatIfPossible(String text, String contentType,
                                       boolean autoFormat, boolean sortJsonKeys) {
@@ -562,7 +562,7 @@ public class ResponseBodyPanel extends JPanel {
                 responseBodyPane.setText(XmlUtil.format(text));
             }
         } catch (Exception ex) {
-            // 格式化或排序失败时保留原始响应内容。
+            // Giữ nguyên nội dung phản hồi gốc khi định dạng hoặc sắp xếp không thành công.
         }
     }
 
@@ -630,10 +630,10 @@ public class ResponseBodyPanel extends JPanel {
         generateModelButton.setEnabled(isEnabled() && JsonUtil.isTypeJSON(responseBodyPane.getText()));
     }
 
-    // ========== 辅助方法 ==========
+    // ========== Các phương pháp trợ giúp ==========
 
     /**
-     * 切换中心区域显示的响应卡片。
+     * Chuyển đổi các thẻ phản hồi được hiển thị ở khu vực trung tâm.
      */
     private void switchCard(String cardName) {
         boolean fileCard = CARD_FILE.equals(cardName);
@@ -641,7 +641,7 @@ public class ResponseBodyPanel extends JPanel {
 
         syntaxComboBox.setVisible(CARD_TEXT.equals(cardName) && !fileRawPreview);
         fileOverviewButton.setVisible(fileRawPreview);
-        // 文件概览卡片自带下载按钮，隐藏工具栏下载按钮避免重复
+        // Thẻ tổng quan về tệp có nút tải xuống riêng và nút tải xuống trên thanh công cụ được ẩn để tránh trùng lặp
         downloadButton.setVisible(!fileCard);
         searchButton.setVisible(!fileCard);
         wrapButton.setVisible(!fileCard);
@@ -656,23 +656,23 @@ public class ResponseBodyPanel extends JPanel {
     }
 
     /**
-     * 加载图片并切换到图片预览卡片
+     * Load hình ảnh và chuyển sang thẻ xem trước hình ảnh
      * <p>
-     * - GIF  → ImageIcon(URL)（Swing 内置动图支持，保留动画）
-     * - WebP → TwelveMonkeys ImageIO 自动注册后 ImageIO.read() 可解码
-     * - SVG  → 降级：直接用文本编辑器显示原始 XML 内容
-     * - 其他 → ImageIO.read() + ImageIcon
+     * - GIF  → ImageIcon(URL)（Swing Hỗ trợ hoạt ảnh tích hợp, bảo tồn hoạt ảnh)
+     * - WebP → TwelveMonkeys ImageIO Sau khi đăng ký tự động ImageIO.read() Có thể giải mã được
+     * - SVG  → Hạ cấp: hiển thị bản gốc trực tiếp bằng trình soạn thảo văn bản XML nội dung
+     * - khác → ImageIO.read() + ImageIcon
      * </p>
      *
-     * @param filePath 临时文件路径
-     * @param bodySize 图片字节数
+     * @param filePath Đường dẫn tập tin tạm thời
+     * @param bodySize Số byte trong hình ảnh
      */
     private void showImagePreview(String filePath, long bodySize) {
         File file = new File(filePath);
         String nameLower = file.getName().toLowerCase();
 
         try {
-            // ── GIF 动图：使用 ImageIcon(URL) 保留动画 ──────────────────────
+            // ── GIF GIF: Sử dụng ImageIcon(URL) Bảo tồn hình ảnh động ──────────────────────
             if (nameLower.endsWith(".gif")) {
                 ImageIcon gifIcon = new ImageIcon(file.toURI().toURL());
                 sizeWarningLabel.setText(String.format("  %d×%d  [%.2f KB]",
@@ -684,12 +684,12 @@ public class ResponseBodyPanel extends JPanel {
                 return;
             }
 
-            // ── WebP / PNG / JPG / BMP / 其他（含 SVG 降级）────────────────
-            // TwelveMonkeys 已通过 SPI 自动注册 WebP reader，ImageIO.read() 直接支持
-            // SVG 无法被 ImageIO 解码（返回 null），会进入 showImageError 降级处理
+            // ── WebP / PNG / JPG / BMP / Những người khác (bao gồm SVG hạ cấp)────────────────
+            // TwelveMonkeys Đi qua SPI Đăng ký tự động WebP reader，ImageIO.read() Hỗ trợ trực tiếp
+            // SVG Không thể được ImageIO giải mã(return null），sẽ vào showImageError Xử lý hạ cấp
             BufferedImage img = ImageIO.read(file);
             if (img == null) {
-                // SVG 或其他无法解码的格式：读取文件文本内容显示在编辑器中
+                // SVG hoặc các định dạng không thể giải mã khác: đọc nội dung văn bản tệp và hiển thị nó trong trình chỉnh sửa
                 if (nameLower.endsWith(".svg")) {
                     String svgText = Files.readString(file.toPath());
                     responseBodyPane.setText(svgText);
@@ -716,7 +716,7 @@ public class ResponseBodyPanel extends JPanel {
         }
     }
 
-    /** 图片加载失败时回退到文本卡片显示错误信息 */
+    /** Khi hình ảnh không tải được sẽ rơi trở lại thẻ văn bản hiển thị thông báo lỗi */
     private void showImageError(String message, long bodySize) {
         responseBodyPane.setText(message);
         syntaxComboBox.setSelectedIndex(SyntaxType.PLAIN_TEXT.getIndex());
@@ -727,7 +727,7 @@ public class ResponseBodyPanel extends JPanel {
     }
 
     /**
-     * 清空响应体内容
+     * Xóa nội dung nội dung phản hồi
      */
     private void clearResponseBody() {
         responseBodyPane.setText("");
@@ -747,7 +747,7 @@ public class ResponseBodyPanel extends JPanel {
     }
 
     /**
-     * 更新大小警告标签
+     * Nhãn cảnh báo kích thước được cập nhật
      */
     private void updateSizeWarning(int textSize, boolean isLargeResponse) {
         if (isLargeResponse) {

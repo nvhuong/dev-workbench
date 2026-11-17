@@ -52,7 +52,7 @@ public class CollectionRunCliCommand {
 
     static void printUsage(PrintStream out) {
         out.println("Usage: collection run <workspace-directory> [options]");
-        out.println("Pass the EasyPostman workspace directory; use . at a checked-out Git workspace root.");
+        out.println("Pass the Dev Workbench workspace directory; use . at a checked-out Git workspace root.");
         out.println("Options:");
         out.println("  -w, --workspace <directory>      Alternative to the positional workspace directory");
         out.println("  -c, --collection <name>          Repeat to select collections; defaults to all");
@@ -64,7 +64,7 @@ public class CollectionRunCliCommand {
         out.println("      --out <result.json>");
         out.println("      --bail                       Stop after the first failed request/test");
         out.println("  -h, --help                       Show this help");
-        out.println("Collections, environments, and globals use EasyPostman's native workspace data.");
+        out.println("Collections, environments, and globals use Dev Workbench's native workspace data.");
         out.println("Relative iteration-data and upload paths resolve from the workspace directory.");
     }
 

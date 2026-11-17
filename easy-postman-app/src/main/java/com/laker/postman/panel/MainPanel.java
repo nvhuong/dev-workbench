@@ -8,7 +8,7 @@ import com.laker.postman.panel.sidebar.SidebarTabPanel;
 import java.awt.*;
 
 /**
- * 主工作区容器，当前承载侧边栏标签页及其对应内容区。
+ * Vùng chứa không gian làm việc chính hiện lưu trữ các tab thanh bên và vùng nội dung tương ứng của chúng.
  */
 public class MainPanel extends UiSingletonPanel {
 

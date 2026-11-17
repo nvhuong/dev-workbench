@@ -12,11 +12,11 @@ import java.awt.event.MouseEvent;
 import java.io.File;
 
 /**
- * 文件选择单元格编辑器
- * 增强版：支持文件预览、文件类型过滤、最近路径记忆
+ * Trình chỉnh sửa ô chọn tập tin
+ * Phiên bản nâng cao: hỗ trợ xem trước tệp, lọc loại tệp và bộ nhớ đường dẫn gần đây
  */
 public class FileCellEditor extends DefaultCellEditor {
-    private static final String BUTTON_BASE_BACKGROUND_PROPERTY = "EasyPostman.fileCellEditor.buttonBaseBackground";
+    private static final String BUTTON_BASE_BACKGROUND_PROPERTY = "Dev Workbench.fileCellEditor.buttonBaseBackground";
 
     private final JPanel editorPanel;
     private final JButton browseButton;
@@ -24,28 +24,28 @@ public class FileCellEditor extends DefaultCellEditor {
     private String filePath;
     private final Component parentComponent;
 
-    // 记住最近打开的目录
+    // Ghi nhớ các thư mục đã mở gần đây
     private File lastDirectory = null;
 
-    // 可选的文件类型过滤器
+    // Bộ lọc loại tệp tùy chọn
     private transient SystemFileChooser.FileNameExtensionFilter fileFilter = null;
 
     public FileCellEditor(Component parentComponent) {
         super(new JCheckBox());
         this.parentComponent = parentComponent;
 
-        // 创建面板，使用BorderLayout
+        // Tạo một bảng điều khiển và sử dụng nóBorderLayout
         editorPanel = new JPanel(new BorderLayout(5, 0));
         final Color tableBackground = ModernColors.getCardBackgroundColor();
         editorPanel.setBackground(tableBackground);
 
-        // 创建文本字段显示路径
+        // Tạo một trường văn bản để hiển thị đường dẫn
         pathField = new JTextField();
         pathField.setBorder(BorderFactory.createEmptyBorder(2, 5, 2, 5));
 
-        // 创建浏览按钮
+        // Tạo nút duyệt
         browseButton = new JButton();
-        // 创建图标并设置颜色过滤器以适配主题
+        // Tạo biểu tượng và đặt bộ lọc màu phù hợp với chủ đề
         FlatSVGIcon fileIcon = new FlatSVGIcon("icons/file.svg", TableUIConstants.ICON_SIZE, TableUIConstants.ICON_SIZE);
         fileIcon.setColorFilter(new FlatSVGIcon.ColorFilter(color -> ModernColors.getTextPrimary()));
         browseButton.setIcon(fileIcon);
@@ -58,7 +58,7 @@ public class FileCellEditor extends DefaultCellEditor {
         browseButton.setBorder(TableUIConstants.createButtonBorder());
         browseButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 
-        // 为浏览按钮添加悬停效果
+        // Thêm hiệu ứng di chuột vào nút duyệt
         browseButton.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseEntered(MouseEvent e) {
@@ -71,10 +71,10 @@ public class FileCellEditor extends DefaultCellEditor {
             }
         });
 
-        // 设置按钮点击事件
+        // Đặt sự kiện bấm nút
         browseButton.addActionListener(e -> openFileChooser());
 
-        // 也可以通过双击文本框选择文件
+        // Bạn cũng có thể chọn tệp bằng cách bấm đúp vào hộp văn bản
         pathField.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
@@ -84,16 +84,16 @@ public class FileCellEditor extends DefaultCellEditor {
             }
         });
 
-        // 将组件添加到面板
+        // Thêm các thành phần vào bảng điều khiển
         editorPanel.add(pathField, BorderLayout.CENTER);
         editorPanel.add(browseButton, BorderLayout.EAST);
     }
 
     /**
-     * 设置文件类型过滤器
+     * Đặt bộ lọc loại tệp
      *
-     * @param description 过滤器描述
-     * @param extensions  文件扩展名，如 "json", "txt"
+     * @param description Lọc mô tả
+     * @param extensions  Phần mở rộng tệp, chẳng hạn như  "json", "txt"
      */
     public void setFileFilter(String description, String... extensions) {
         if (extensions != null && extensions.length > 0) {
@@ -104,24 +104,24 @@ public class FileCellEditor extends DefaultCellEditor {
     }
 
     /**
-     * 打开文件选择对话框
+     * Mở hộp thoại chọn tập tin
      */
     private void openFileChooser() {
         SystemFileChooser fileChooser = FileChooserUtil.createOpenFileChooser(
                 "table.fileCellEditor.open",
                 TableUIConstants.SELECT_FILE_TEXT);
 
-        // 应用文件过滤器
+        // Áp dụng bộ lọc tập tin
         if (fileFilter != null) {
             fileChooser.setFileFilter(fileFilter);
         }
 
-        // 使用最近的目录
+        // Sử dụng thư mục gần đây nhất
         if (lastDirectory != null && lastDirectory.exists()) {
             fileChooser.setCurrentDirectory(lastDirectory);
         }
 
-        // 如果已有文件路径，预选该文件
+        // Nếu đường dẫn tệp đã tồn tại, hãy chọn trước tệp
         if (filePath != null && !filePath.isEmpty() && !TableUIConstants.SELECT_FILE_TEXT.equals(filePath)) {
             File currentFile = new File(filePath);
             if (currentFile.exists()) {
@@ -129,7 +129,7 @@ public class FileCellEditor extends DefaultCellEditor {
             }
         }
 
-        // 显示文件选择器
+        // Hiển thị bộ chọn tập tin
         int result = fileChooser.showOpenDialog(parentComponent);
         if (result == SystemFileChooser.APPROVE_OPTION) {
             File selectedFile = fileChooser.getSelectedFile();
@@ -137,7 +137,7 @@ public class FileCellEditor extends DefaultCellEditor {
             pathField.setText(filePath);
             lastDirectory = selectedFile.getParentFile();
 
-            // 自动提交编辑
+            // Tự động gửi chỉnh sửa
             SwingUtilities.invokeLater(this::stopCellEditing);
         }
     }
@@ -175,7 +175,7 @@ public class FileCellEditor extends DefaultCellEditor {
     }
 
     /**
-     * 获取选中的文件对象
+     * Lấy đối tượng tập tin đã chọn
      */
     public File getSelectedFile() {
         if (filePath == null || filePath.isEmpty() || TableUIConstants.SELECT_FILE_TEXT.equals(filePath)) {

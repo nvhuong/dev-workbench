@@ -23,7 +23,7 @@ import java.awt.event.KeyEvent;
 import static com.laker.postman.panel.collections.tree.CollectionTreePanel.*;
 
 /**
- * 请求树右键弹出菜单
+ * Request tree right-click popup menu
  */
 public class RequestTreePopupMenu {
     private final JTree requestTree;
@@ -41,7 +41,7 @@ public class RequestTreePopupMenu {
     }
 
     /**
-     * 显示弹出菜单
+     * Hiển thị menu bật lên
      */
     public void show(int x, int y) {
         JPopupMenu menu = new JPopupMenu();
@@ -56,29 +56,29 @@ public class RequestTreePopupMenu {
             return;
         }
 
-        // 分组节点菜单
+        // Menu nút nhóm
         if (CollectionTreeNodes.isGroup(selectedNode)) {
             addGroupMenuItems(menu, selectedNode, isMultipleSelection);
         }
 
-        // 请求节点菜单
+        // Menu nút yêu cầu
         if (CollectionTreeNodes.isRequest(selectedNode)) {
             addRequestMenuItems(menu, selectedNode, isMultipleSelection);
         }
 
-        // 保存的响应节点菜单 - 只显示重命名和删除，不显示粘贴等其他选项
+        // Menu nút phản hồi đã lưu - Chỉ đổi tên và xóa được hiển thị và các tùy chọn khác như dán không được hiển thị
         if (CollectionTreeNodes.isSavedResponse(selectedNode)) {
             addRenameAndDeleteMenuItems(menu, isMultipleSelection);
             menu.show(requestTree, x, y);
             return;
         }
 
-        // 粘贴选项
+        // Tùy chọn dán
         if (!coordinator.isCopiedRequestsEmpty()) {
             addPasteMenuItem(menu);
         }
 
-        // 重命名和删除（非根节点）
+        // Đổi tên và xóa (các nút không phải gốc)
         if (selectedNode != leftPanel.getRootTreeNode()) {
             addRenameAndDeleteMenuItems(menu, isMultipleSelection);
         }
@@ -88,11 +88,11 @@ public class RequestTreePopupMenu {
 
 
     /**
-     * 添加分组相关菜单项
+     * Thêm nhóm các mục menu liên quan
      */
     private void addGroupMenuItems(JPopupMenu menu, DefaultMutableTreeNode selectedNode, boolean isMultipleSelection) {
 
-        // 添加到功能测试
+        // Đã thêm vào các bài kiểm tra chức năng
         JMenuItem addToFunctional = createMenuItem(
                 MessageKeys.COLLECTIONS_MENU_ADD_TO_FUNCTIONAL,
                 "icons/functional.svg",
@@ -109,7 +109,7 @@ public class RequestTreePopupMenu {
         menu.add(createMockServer);
         menu.addSeparator();
 
-        // 新增请求
+        // Thêm yêu cầu mới
         JMenuItem addRequest = createMenuItem(
                 MessageKeys.COLLECTIONS_MENU_ADD_REQUEST,
                 "icons/request.svg",
@@ -118,7 +118,7 @@ public class RequestTreePopupMenu {
         addRequest.setEnabled(!isMultipleSelection);
         menu.add(addRequest);
 
-        // 新增分组
+        // Thêm nhóm mới
         JMenuItem addGroup = createMenuItem(
                 MessageKeys.COLLECTIONS_MENU_ADD_GROUP,
                 "icons/group.svg",
@@ -127,7 +127,7 @@ public class RequestTreePopupMenu {
         addGroup.setEnabled(!isMultipleSelection);
         menu.add(addGroup);
 
-        // 复制分组
+        // Sao chép nhóm
         JMenuItem duplicate = createMenuItem(
                 MessageKeys.COLLECTIONS_MENU_DUPLICATE,
                 "icons/duplicate.svg",
@@ -146,7 +146,7 @@ public class RequestTreePopupMenu {
         importCurl.setEnabled(!isMultipleSelection);
         menu.add(importCurl);
 
-        // 导出为 Postman
+        // Xuất dưới dạng Postman
         JMenuItem exportPostman = createMenuItem(
                 MessageKeys.COLLECTIONS_MENU_EXPORT_POSTMAN,
                 "icons/postman.svg",
@@ -155,7 +155,7 @@ public class RequestTreePopupMenu {
         exportPostman.setEnabled(!isMultipleSelection);
         menu.add(exportPostman);
 
-        // 转移到其他工作区
+        // Di chuyển đến không gian làm việc khác
         JMenuItem moveToWorkspace = createMenuItem(
                 MessageKeys.WORKSPACE_TRANSFER_MENU_ITEM,
                 "icons/workspace.svg",
@@ -168,10 +168,10 @@ public class RequestTreePopupMenu {
     }
 
     /**
-     * 添加请求相关菜单项
+     * Thêm các mục menu liên quan đến yêu cầu
      */
     private void addRequestMenuItems(JPopupMenu menu, DefaultMutableTreeNode selectedNode, boolean isMultipleSelection) {
-        // 添加到功能测试
+        // Đã thêm vào các bài kiểm tra chức năng
         JMenuItem addToFunctional = createMenuItem(
                 MessageKeys.COLLECTIONS_MENU_ADD_TO_FUNCTIONAL,
                 "icons/functional.svg",
@@ -188,7 +188,7 @@ public class RequestTreePopupMenu {
         menu.add(addMockResponse);
         menu.addSeparator();
 
-        // 新增请求（在同级分组下）
+        // Thêm yêu cầu mới (thuộc nhóm anh chị em)
         DefaultMutableTreeNode parentGroup = (DefaultMutableTreeNode) selectedNode.getParent();
         if (parentGroup != null) {
             JMenuItem addRequest = createMenuItem(
@@ -200,7 +200,7 @@ public class RequestTreePopupMenu {
             menu.add(addRequest);
         }
 
-        // 复制（创建副本）
+        // Sao chép (tạo một bản sao)
         JMenuItem duplicate = createMenuItem(
                 MessageKeys.COLLECTIONS_MENU_DUPLICATE,
                 "icons/duplicate.svg",
@@ -208,7 +208,7 @@ public class RequestTreePopupMenu {
         );
         menu.add(duplicate);
 
-        // 复制到剪贴板
+        // Sao chép vào clipboard
         JMenuItem copy = createMenuItem(
                 MessageKeys.COLLECTIONS_MENU_COPY,
                 "icons/copy.svg",
@@ -218,7 +218,7 @@ public class RequestTreePopupMenu {
         copy.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, cmdMask));
         menu.add(copy);
 
-        // 复制为 cURL
+        // Sao chép dưới dạng cURL
         JMenuItem copyAsCurl = createMenuItem(
                 MessageKeys.COLLECTIONS_MENU_COPY_CURL,
                 "icons/curl.svg",
@@ -231,7 +231,7 @@ public class RequestTreePopupMenu {
 
 
     /**
-     * 添加粘贴菜单项
+     * Đã thêm mục menu Dán
      */
     private void addPasteMenuItem(JPopupMenu menu) {
         JMenuItem paste = createMenuItem(
@@ -246,10 +246,10 @@ public class RequestTreePopupMenu {
     }
 
     /**
-     * 添加重命名和删除菜单项
+     * Đã thêm đổi tên và xóa các mục menu
      */
     private void addRenameAndDeleteMenuItems(JPopupMenu menu, boolean isMultipleSelection) {
-        // 重命名
+        // Đổi tên
         JMenuItem rename = createMenuItem(
                 MessageKeys.COLLECTIONS_MENU_RENAME,
                 "icons/edit.svg",
@@ -259,7 +259,7 @@ public class RequestTreePopupMenu {
         rename.setEnabled(!isMultipleSelection);
         menu.add(rename);
 
-        // 删除（显示选中数量）
+        // Xóa (hiển thị số lượng đã chọn)
         TreePath[] selectedPaths = requestTree.getSelectionPaths();
         int selectedCount = selectedPaths != null ? selectedPaths.length : 0;
 
@@ -276,13 +276,13 @@ public class RequestTreePopupMenu {
     }
 
     /**
-     * 创建菜单项的辅助方法（主题适配）
+     * Phương pháp trợ giúp để tạo các mục menu (điều chỉnh chủ đề)
      */
     private JMenuItem createMenuItem(String messageKey, String iconPath, java.awt.event.ActionListener listener) {
-        // 彩色图标列表：这些图标本身有品牌色或渐变色，不应该跟随主题变化
-        // - postman.svg: Postman 品牌橙色
-        // - group.svg: 蓝色文件夹 (#007AFF)
-        // - curl.svg: cURL 命令行图标，深蓝终端搭配绿色命令提示符
+        // Danh sách biểu tượng màu: Bản thân các biểu tượng này có màu thương hiệu hoặc màu chuyển sắc và không được tuân theo các thay đổi về chủ đề
+        // - postman.svg: Postman Thương hiệu màu cam
+        // - group.svg: Thư mục màu xanh (#007AFF)
+        // - curl.svg: cURL Biểu tượng dòng lệnh, thiết bị đầu cuối màu xanh đậm với dấu nhắc lệnh màu xanh lá cây
         boolean isColoredIcon = iconPath.contains("postman.svg")
                              || iconPath.contains("group.svg")
                              || iconPath.contains("curl.svg");

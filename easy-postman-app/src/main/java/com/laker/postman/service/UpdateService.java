@@ -15,7 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 import java.util.concurrent.CompletableFuture;
 
 /**
- * 版本更新服务
+ * Dịch vụ cập nhật phiên bản
  */
 @Slf4j
 @Component
@@ -28,16 +28,16 @@ public class UpdateService {
     private PluginUpdateCheckCoordinator pluginUpdateCheckCoordinator;
 
     /**
-     * 启动时异步检查更新
+     * Kiểm tra các bản cập nhật không đồng bộ khi khởi động
      */
     public void checkUpdateOnStartup() {
-        // 启动后台更新检查
+        // Bắt đầu kiểm tra cập nhật nền
         appUpdateCheckCoordinator.startBackgroundCheck();
         pluginUpdateCheckCoordinator.startBackgroundCheck();
     }
 
     /**
-     * 手动检查更新（用于菜单调用）
+     * Kiểm tra cập nhật theo cách thủ công (đối với các lệnh gọi menu)
      */
     public void checkUpdateManually() {
         CompletableFuture<PluginUpdateCheckResult> pluginUpdateFuture = pluginUpdateCheckCoordinator.checkForUpdateManually();

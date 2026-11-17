@@ -18,20 +18,20 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Supplier;
 
 /**
- * 运行时扩展注册表。
+ * Sổ đăng ký mở rộng thời gian chạy.
  * <p>
- * 可以把它理解为“插件加载后的能力汇总表”：
- * 插件 onLoad 时往里注册，宿主在运行时再从这里读取。
+ * Có thể hiểu là“Bảng tóm tắt các khả năng sau khi tải plug-in”：
+ * plugin onLoad Đăng ký nó khi máy chủ đang chạy và máy chủ sẽ đọc nó từ đây khi nó đang chạy.
  * </p>
  */
 @Slf4j
 public class PluginRegistry {
 
-    // alias -> 工厂，用于延迟创建 pm.xxx 类型的脚本 API 对象
+    // alias -> Nhà máy, dành cho sự sáng tạo lười biếng pm.xxx loại kịch bản API đối tượng
     private final Map<String, ScriptApiRegistration> scriptApiFactories = new ConcurrentHashMap<>();
-    // type -> service，供宿主桥接层按类型取服务
+    // type -> service，Để lớp cầu nối máy chủ nhận được các dịch vụ theo loại
     private final Map<Class<?>, ServiceRegistration> services = new ConcurrentHashMap<>();
-    // Toolbox / 自动补全 / Snippet 都是 UI 侧可扩展点
+    // Toolbox / Tự động hoàn thành / Snippet Tất cả UI Điểm có thể mở rộng bên
     private final List<ToolboxContribution> toolboxContributions = new CopyOnWriteArrayList<>();
     private final List<PluginMenuContribution> menuContributions = new CopyOnWriteArrayList<>();
     private final List<PluginSettingsContribution> settingsContributions = new CopyOnWriteArrayList<>();
@@ -59,9 +59,9 @@ public class PluginRegistry {
         Map<String, Object> apis = new LinkedHashMap<>();
         for (Map.Entry<String, ScriptApiRegistration> entry : scriptApiFactories.entrySet()) {
             try {
-                // 这里延迟实例化，而不是插件加载时立即 new。
-                // 好处是脚本环境真正需要时才创建，插件加载更轻，也减少启动阶段失败面。
-                // 某个插件 API 初始化失败时，只跳过当前插件，避免拖垮整个脚本环境
+                // Quá trình khởi tạo này bị trì hoãn thay vì ngay lập tức khi plugin được tải new。
+                // Ưu điểm là môi trường tập lệnh được tạo khi thực sự cần thiết, tải plug-in nhẹ hơn và bề mặt lỗi trong giai đoạn khởi động được giảm bớt.
+                // Một plug-in nhất định API Khi quá trình khởi tạo không thành công, chỉ phần bổ trợ hiện tại bị bỏ qua để tránh làm hỏng toàn bộ môi trường tập lệnh
                 Object api = entry.getValue().factory().get();
                 if (api != null) {
                     apis.put(entry.getKey(), api);
@@ -193,7 +193,7 @@ public class PluginRegistry {
     }
 
     public void clear() {
-        // 应用退出或运行时重置时清空，避免跨会话残留旧插件状态
+        // Bị xóa khi ứng dụng thoát hoặc được đặt lại trong thời gian chạy để tránh giữ lại trạng thái plug-in cũ trong các phiên
         scriptApiFactories.clear();
         services.clear();
         toolboxContributions.clear();

@@ -17,8 +17,8 @@ import java.awt.event.KeyEvent;
 import static com.laker.postman.panel.collections.tree.CollectionTreePanel.*;
 
 /**
- * 请求树键盘事件处理器
- * 负责处理 F2 重命名、Delete 删除、Ctrl+C 复制、Ctrl+V 粘贴等快捷键
+ * Yêu cầu xử lý sự kiện bàn phím cây
+ * Chịu trách nhiệm xử lý F2 Đổi tên,Delete xóa bỏ,Ctrl+C Sao chép,Ctrl+V Dán và các phím tắt khác
  */
 public class RequestTreeKeyboardHandler extends KeyAdapter {
     private final JTree requestTree;
@@ -52,14 +52,14 @@ public class RequestTreeKeyboardHandler extends KeyAdapter {
 
         int cmdMask = java.awt.Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx();
 
-        // Ctrl+C / Cmd+C 复制
+        // Ctrl+C / Cmd+C Sao chép
         if (isKeyWithModifier(e, KeyEvent.VK_C, cmdMask)) {
             coordinator.copySelectedRequests();
             e.consume();
             return;
         }
 
-        // Ctrl+V / Cmd+V 粘贴
+        // Ctrl+V / Cmd+V Dán
         if (isKeyWithModifier(e, KeyEvent.VK_V, cmdMask)) {
             coordinator.pasteRequests();
             e.consume();
@@ -73,16 +73,16 @@ public class RequestTreeKeyboardHandler extends KeyAdapter {
 
         boolean isMultipleSelection = hasMultipleSelection();
 
-        // Enter 键：模拟单击事件，临时打开请求或分组（仅单选）
+        // Enter Phím: Mô phỏng sự kiện nhấp chuột để tạm thời mở một yêu cầu hoặc nhóm (chỉ lựa chọn radio)
         if (e.getKeyCode() == KeyEvent.VK_ENTER && !isMultipleSelection) {
             handleEnterKey();
             e.consume();
         }
-        // F2 重命名（仅单选）
+        // F2 Đổi tên (chỉ một lựa chọn)
         else if (e.getKeyCode() == KeyEvent.VK_F2 && !isMultipleSelection) {
             coordinator.renameSelectedItem();
         }
-        // Delete 或 Backspace 删除（支持多选）
+        // Delete hoặc Backspace Xóa (hỗ trợ nhiều lựa chọn)
         else if (e.getKeyCode() == KeyEvent.VK_DELETE || e.getKeyCode() == KeyEvent.VK_BACK_SPACE) {
             coordinator.deleteSelectedItem();
         }
@@ -106,7 +106,7 @@ public class RequestTreeKeyboardHandler extends KeyAdapter {
     }
 
     /**
-     * 处理 Enter 键：模拟单击事件，临时打开请求或分组
+     * xử lý Enter Phím: Mô phỏng sự kiện nhấp chuột để tạm thời mở một yêu cầu hoặc nhóm
      */
     private void handleEnterKey() {
         DefaultMutableTreeNode selectedNode = getSelectedNode();
@@ -122,7 +122,7 @@ public class RequestTreeKeyboardHandler extends KeyAdapter {
     }
 
     /**
-     * 处理分组 Enter 键事件：临时打开分组
+     * Nhóm quy trình Enter Sự kiện chính: Tạm thời mở nhóm
      */
     private void handleGroupEnter(DefaultMutableTreeNode node) {
         RequestGroup group = CollectionTreeNodes.group(node).orElse(null);
@@ -133,14 +133,14 @@ public class RequestTreeKeyboardHandler extends KeyAdapter {
     }
 
     /**
-     * 处理请求 Enter 键事件：临时打开请求
+     * Xử lý yêu cầu Enter Sự kiện chính: Tạm thời mở một yêu cầu
      */
     private void handleRequestEnter(HttpRequestItem item) {
         openActions.openTransientRequest(item);
     }
 
     /**
-     * 处理保存的响应 Enter 键事件：临时打开响应
+     * Xử lý phản hồi đã lưu Enter Sự kiện chính: Tạm thời mở phản hồi
      */
     private void handleSavedResponseEnter(SavedResponse savedResponse) {
         openActions.openTransientSavedResponse(savedResponse);

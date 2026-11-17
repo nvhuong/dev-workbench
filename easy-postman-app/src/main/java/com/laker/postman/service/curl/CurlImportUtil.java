@@ -12,17 +12,17 @@ import com.laker.postman.request.util.HttpUrlUtil;
 import lombok.experimental.UtilityClass;
 
 /**
- * cURL 导入工具类
- * 提供 cURL 命令解析和转换为 HttpRequestItem 的功能
+ * cURL Nhập lớp công cụ
+ * cung cấp cURL Các lệnh được phân tích cú pháp và chuyển đổi thành  HttpRequestItem chức năng
  */
 @UtilityClass
 public class CurlImportUtil {
 
     /**
-     * 解析 cURL 命令并转换为 HttpRequestItem
+     * phân tích cURL lệnh và chuyển đổi thành HttpRequestItem
      *
-     * @param curlText cURL 命令文本（可以是 cURL 命令字符串或已解析的 CurlRequest 对象）
-     * @return 解析后的 HttpRequestItem，如果解析失败返回 null
+     * @param curlText cURL Văn bản lệnh (có thể là  cURL Chuỗi lệnh hoặc được phân tích cú pháp CurlRequest đối tượng)
+     * @return Sau khi phân tích HttpRequestItem，Trả về nếu phân tích cú pháp không thành công null
      */
     public static HttpRequestItem fromCurl(String curlText) {
         if (CharSequenceUtil.isBlank(curlText)) {
@@ -38,10 +38,10 @@ public class CurlImportUtil {
     }
 
     /**
-     * 将 CurlRequest 转换为 HttpRequestItem
+     * Sẽ CurlRequest Chuyển đổi sang  HttpRequestItem
      *
-     * @param curlRequest 已解析的 cURL 请求对象
-     * @return HttpRequestItem 对象，如果 curlRequest 无效返回 null
+     * @param curlRequest Đã phân tích cú pháp cURL đối tượng yêu cầu
+     * @return HttpRequestItem Đối tượng nếu curlRequest Trả lại không hợp lệ null
      */
     public static HttpRequestItem fromCurlRequest(CurlRequest curlRequest) {
         if (curlRequest == null || curlRequest.url == null) {
@@ -94,7 +94,7 @@ public class CurlImportUtil {
             item.setAuthPassword(curlRequest.authPassword != null ? curlRequest.authPassword : "");
         }
 
-        // 智能判断协议类型
+        // Xác định loại giao thức một cách thông minh
         if (HttpRequestProtocol.isWebSocketUrl(item.getUrl())) {
             item.setProtocol(RequestItemProtocolEnum.WEBSOCKET);
         } else {

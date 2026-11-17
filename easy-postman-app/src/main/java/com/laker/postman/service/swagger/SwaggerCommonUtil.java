@@ -17,14 +17,14 @@ import java.util.Locale;
 import java.util.Set;
 
 /**
- * Swagger/OpenAPI 共享工具类
- * 提供各版本解析器通用的工具方法
+ * Swagger/OpenAPI Lớp công cụ được chia sẻ
+ * Cung cấp các công cụ và phương pháp chung cho tất cả các phiên bản của trình phân tích cú pháp
  */
 @UtilityClass
 class SwaggerCommonUtil {
 
     /**
-     * 判断是否不是 HTTP 方法
+     * Xác định xem có phải không HTTP phương pháp
      */
     static boolean isNotHttpMethod(String method) {
         return !"get".equalsIgnoreCase(method) &&
@@ -37,14 +37,14 @@ class SwaggerCommonUtil {
     }
 
     /**
-     * 从 schema 生成示例 JSON
+     * Từ schema Tạo các ví dụ JSON
      */
     static String generateExampleFromSchema(JSONObject schema) {
         return generateExampleFromSchema(null, schema);
     }
 
     /**
-     * 从 schema 生成示例 JSON，支持本地 $ref
+     * Từ schema Tạo các ví dụ JSON，Hỗ trợ địa phương $ref
      */
     static String generateExampleFromSchema(JSONObject root, JSONObject schema) {
         if (schema == null) {
@@ -54,14 +54,14 @@ class SwaggerCommonUtil {
     }
 
     /**
-     * 生成示例值
+     * Tạo các giá trị mẫu
      */
     static Object generateExampleValue(JSONObject schema) {
         return generateExampleValue(null, schema);
     }
 
     /**
-     * 生成示例值，支持本地 $ref
+     * Tạo giá trị mẫu, hỗ trợ địa phương $ref
      */
     static Object generateExampleValue(JSONObject root, JSONObject schema) {
         return generateExampleValue(root, schema, new HashSet<>());
@@ -176,7 +176,7 @@ class SwaggerCommonUtil {
     }
 
     /**
-     * 获取 schema 类型（支持 OpenAPI 3.1 的 type 数组）
+     * Lấy schema Loại (được hỗ trợ OpenAPI 3.1 của type mảng)
      */
     static String getSchemaType(JSONObject schema) {
         if (schema == null) {
@@ -209,7 +209,7 @@ class SwaggerCommonUtil {
     }
 
     /**
-     * 获取示例（优先 examples，再 fallback 到 example）
+     * Lấy ví dụ (ưu tiên examples，Lại fallback Đến example）
      */
     static Object getExampleValue(JSONObject schema) {
         if (schema == null) {

@@ -48,7 +48,7 @@ import static org.testng.Assert.assertFalse;
 
 public class PerformancePanelSaveTest extends AbstractSwingUiTest {
 
-    @Test(description = "显式保存性能配置时应先提交仍在编辑中的 spinner 文本")
+    @Test(description = "Khi lưu cấu hình hiệu suất một cách rõ ràng, trước tiên bạn nên gửi cấu hình vẫn đang được chỉnh sửa spinner văn bản")
     public void shouldCommitEditedSpinnerTextBeforeExplicitSave() throws Exception {
         runOnEdtAndWait(() -> {
             PerformancePanel panel = newPanelWithoutInit();
@@ -84,7 +84,7 @@ public class PerformancePanelSaveTest extends AbstractSwingUiTest {
         });
     }
 
-    @Test(description = "启动压测前应先提交仍在编辑中的线程组 spinner 文本")
+    @Test(description = "Trước khi bắt đầu bài kiểm tra căng thẳng, bạn nên gửi nhóm chủ đề vẫn đang được chỉnh sửa spinner văn bản")
     public void saveThreadGroupDataShouldCommitEditedSpinnerText() throws Exception {
         runOnEdtAndWait(() -> {
             ThreadGroupData threadGroupData = new ThreadGroupData();
@@ -103,7 +103,7 @@ public class PerformancePanelSaveTest extends AbstractSwingUiTest {
         });
     }
 
-    @Test(description = "线程组固定用户数不应被固定上限截断")
+    @Test(description = "Số lượng người dùng cố định cho một nhóm chuỗi không được cắt bớt bởi giới hạn cố định")
     public void threadGroupFixedUsersShouldAcceptLargeUserInput() throws Exception {
         runOnEdtAndWait(() -> {
             ThreadGroupData threadGroupData = new ThreadGroupData();
@@ -122,7 +122,7 @@ public class PerformancePanelSaveTest extends AbstractSwingUiTest {
         });
     }
 
-    @Test(description = "阶梯预览应使用正在编辑但尚未提交的 spinner 文本")
+    @Test(description = "Bản xem trước bậc thang nên sử dụng bản đang được chỉnh sửa nhưng chưa được gửi spinner văn bản")
     public void stairsPreviewShouldUseEditedSpinnerTextBeforeCommit() throws Exception {
         runOnEdtAndWait(() -> {
             ThreadGroupData threadGroupData = new ThreadGroupData();
@@ -147,7 +147,7 @@ public class PerformancePanelSaveTest extends AbstractSwingUiTest {
         });
     }
 
-    @Test(description = "PerformancePanel cleanup 应释放结果表的 Swing Timer")
+    @Test(description = "PerformancePanel cleanup Bảng kết quả sẽ được phát hành Swing Timer")
     public void cleanupShouldDisposeResultTablePanelTimer() throws Exception {
         runOnEdtAndWait(() -> {
             PerformancePanel panel = newPanelWithoutInit();
@@ -160,7 +160,7 @@ public class PerformancePanelSaveTest extends AbstractSwingUiTest {
         });
     }
 
-    @Test(description = "导入的压测计划应追加到当前工作区计划列表并选中第一个新计划")
+    @Test(description = "Kế hoạch kiểm tra sức chịu đựng đã nhập phải được thêm vào danh sách kế hoạch không gian làm việc hiện tại với kế hoạch mới đầu tiên được chọn")
     @SuppressWarnings("unchecked")
     public void importedPlansShouldAppendWithUniqueNamesAndSelectFirstImportedPlan() throws Exception {
         runOnEdtAndWait(() -> {

@@ -104,9 +104,9 @@ public class PerformanceReportPanelTest extends AbstractSwingUiTest {
         String markdown = panel.buildMarkdownReport();
 
         assertEquals(model.getColumnCount(), 14);
-        assertFalse(hasColumn(model, "平均接收字节"));
+        assertFalse(hasColumn(model, "Số byte trung bình nhận được"));
         assertFalse(hasColumn(model, "Avg Received Bytes"));
-        assertFalse(markdown.contains("平均接收字节"));
+        assertFalse(markdown.contains("Số byte trung bình nhận được"));
         assertFalse(markdown.contains("Avg Received Bytes"));
     }
 
@@ -238,11 +238,11 @@ public class PerformanceReportPanelTest extends AbstractSwingUiTest {
 
         assertEquals(webSocketModel.getColumnCount(), 13);
         assertEquals(sseModel.getColumnCount(), 15);
-        assertFalse(hasColumn(webSocketModel, "完成原因"));
+        assertFalse(hasColumn(webSocketModel, "Lý do hoàn thành"));
         assertFalse(hasColumn(webSocketModel, "Completion"));
-        assertFalse(hasColumn(sseModel, "完成原因"));
+        assertFalse(hasColumn(sseModel, "Lý do hoàn thành"));
         assertFalse(hasColumn(sseModel, "Completion"));
-        assertFalse(panel.buildMarkdownReport().contains("完成原因"));
+        assertFalse(panel.buildMarkdownReport().contains("Lý do hoàn thành"));
         assertFalse(panel.buildMarkdownReport().contains("| Completion |"));
     }
 
@@ -266,16 +266,16 @@ public class PerformanceReportPanelTest extends AbstractSwingUiTest {
 
     @Test
     public void shouldDescribeStreamReportDurationAsSampleDuration() {
-        ResourceBundle zh = ResourceBundle.getBundle("messages", Locale.CHINESE);
-        assertEquals(zh.getString(MessageKeys.PERFORMANCE_REPORT_COLUMN_AVG_SESSION), "平均样本耗时");
-        assertEquals(zh.getString(MessageKeys.PERFORMANCE_REPORT_COLUMN_AVG_STREAM), "平均样本耗时");
-        assertEquals(zh.getString(MessageKeys.PERFORMANCE_REPORT_COLUMN_P95_SESSION), "P95 样本耗时");
-        assertEquals(zh.getString(MessageKeys.PERFORMANCE_REPORT_COLUMN_P95_STREAM), "P95 样本耗时");
-        assertEquals(zh.getString(MessageKeys.PERFORMANCE_REPORT_COLUMN_SENT_KB_PER_SEC), "发送 KB/s");
-        assertEquals(zh.getString(MessageKeys.PERFORMANCE_REPORT_COLUMN_RECEIVED_KB_PER_SEC), "接收 KB/s");
-        assertEquals(zh.getString(MessageKeys.PERFORMANCE_TREND_SESSION_DURATION_MS), "活跃会话时长 (ms)");
-        assertEquals(zh.getString(MessageKeys.PERFORMANCE_TREND_STREAM_DURATION_MS), "活跃流时长 (ms)");
-        assertEquals(zh.getString(MessageKeys.PERFORMANCE_TREND_ACTIVE_WS), "会话数");
+        ResourceBundle zh = ResourceBundle.getBundle("messages", Locale.forLanguageTag("vi"));
+        assertEquals(zh.getString(MessageKeys.PERFORMANCE_REPORT_COLUMN_AVG_SESSION), "Thời gian lấy mẫu trung bình");
+        assertEquals(zh.getString(MessageKeys.PERFORMANCE_REPORT_COLUMN_AVG_STREAM), "Thời gian lấy mẫu trung bình");
+        assertEquals(zh.getString(MessageKeys.PERFORMANCE_REPORT_COLUMN_P95_SESSION), "P95 Lấy mẫu tốn thời gian");
+        assertEquals(zh.getString(MessageKeys.PERFORMANCE_REPORT_COLUMN_P95_STREAM), "P95 Lấy mẫu tốn thời gian");
+        assertEquals(zh.getString(MessageKeys.PERFORMANCE_REPORT_COLUMN_SENT_KB_PER_SEC), "gửi KB/s");
+        assertEquals(zh.getString(MessageKeys.PERFORMANCE_REPORT_COLUMN_RECEIVED_KB_PER_SEC), "nhận KB/s");
+        assertEquals(zh.getString(MessageKeys.PERFORMANCE_TREND_SESSION_DURATION_MS), "Thời lượng phiên hoạt động (ms)");
+        assertEquals(zh.getString(MessageKeys.PERFORMANCE_TREND_STREAM_DURATION_MS), "Thời lượng luồng hoạt động (ms)");
+        assertEquals(zh.getString(MessageKeys.PERFORMANCE_TREND_ACTIVE_WS), "Số lượng phiên");
 
         ResourceBundle en = ResourceBundle.getBundle("messages", Locale.ENGLISH);
         assertEquals(en.getString(MessageKeys.PERFORMANCE_REPORT_COLUMN_AVG_SESSION), "Avg Sample Duration");

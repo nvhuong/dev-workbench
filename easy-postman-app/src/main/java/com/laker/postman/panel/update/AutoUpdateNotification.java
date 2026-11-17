@@ -13,17 +13,17 @@ import java.awt.event.MouseEvent;
 import java.util.function.Consumer;
 
 /**
- * 自动更新通知弹窗 - 位于主窗口右下角，自动淡入淡出
- * <p>支持两种模式：</p>
+ * Tự động cập nhật cửa sổ bật lên thông báo - Nằm ở góc dưới bên phải của cửa sổ chính, nó tự động mờ dần
+ * <p>Hai chế độ được hỗ trợ:</p>
  * <ul>
- *   <li>NORMAL  - 蓝色左侧条，info 图标，「查看详情」→ ModernUpdateDialog</li>
- *   <li>NO_ASSET - 橙色左侧条，warning 图标，「前往 GitHub」→ NoAssetDialog</li>
+ *   <li>NORMAL  - Thanh bên trái màu xanh, .info biểu tượng "Xem chi tiết"→ ModernUpdateDialog</li>
+ *   <li>NO_ASSET - Thanh bên trái màu cam,warning biểu tượng "Đi GitHub」→ NoAssetDialog</li>
  * </ul>
  */
 @Slf4j
 public class AutoUpdateNotification {
 
-    /** 通知变体 */
+    /** Biến thể thông báo */
     public enum Variant { NORMAL, NO_ASSET }
 
     private static final int DISPLAY_DURATION = 6000;
@@ -39,12 +39,12 @@ public class AutoUpdateNotification {
 
     // ─── Public factory methods ───────────────────────────────────────────────
 
-    /** 普通更新通知（蓝色） */
+    /** Thông báo cập nhật bình thường (màu xanh) */
     public static void show(JFrame parent, UpdateInfo updateInfo, Consumer<UpdateInfo> onViewDetails) {
         showInternal(parent, updateInfo, onViewDetails, Variant.NORMAL);
     }
 
-    /** 有新版本但无安装包通知（橙色） */
+    /** Có phiên bản mới nhưng không có thông báo gói cài đặt (màu cam) */
     public static void showNoAsset(JFrame parent, UpdateInfo updateInfo, Consumer<UpdateInfo> onAction) {
         showInternal(parent, updateInfo, onAction, Variant.NO_ASSET);
     }

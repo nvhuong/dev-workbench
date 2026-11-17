@@ -110,7 +110,7 @@ public class FunctionalRunnerTableModel extends AbstractTableModel {
     }
 
     /**
-     * 删除指定行
+     * Xóa hàng được chỉ định
      */
     public synchronized void removeRow(int rowIndex) {
         if (rowIndex >= 0 && rowIndex < rows.size()) {
@@ -120,9 +120,9 @@ public class FunctionalRunnerTableModel extends AbstractTableModel {
     }
 
     /**
-     * 删除选中的所有行
+     * Xóa tất cả các hàng đã chọn
      *
-     * @return 删除的行数
+     * @return Số hàng cần xóa
      */
     public synchronized int removeSelectedRows() {
         List<RunnerRowData> toRemove = new ArrayList<>();
@@ -139,7 +139,7 @@ public class FunctionalRunnerTableModel extends AbstractTableModel {
     }
 
     /**
-     * 设置所有行的选中状态
+     * Đặt trạng thái đã chọn của tất cả các hàng
      */
     public synchronized void setAllSelected(boolean selected) {
         for (RunnerRowData row : rows) {
@@ -149,21 +149,21 @@ public class FunctionalRunnerTableModel extends AbstractTableModel {
     }
 
     /**
-     * 获取选中的请求数量
+     * Lấy số lượng yêu cầu đã chọn
      */
     public synchronized int getSelectedCount() {
         return (int) rows.stream().filter(row -> row.selected).count();
     }
 
     /**
-     * 获取所有行数据（用于保存测试集）
+     * Nhận tất cả dữ liệu hàng (được sử dụng để lưu bộ kiểm tra)
      */
     public synchronized List<RunnerRowData> getAllRows() {
         return new ArrayList<>(rows);
     }
 
     /**
-     * 检查是否有选中的行
+     * Kiểm tra xem có hàng được chọn hay không
      */
     public synchronized boolean hasSelectedRows() {
         return rows.stream().anyMatch(row -> row.selected);

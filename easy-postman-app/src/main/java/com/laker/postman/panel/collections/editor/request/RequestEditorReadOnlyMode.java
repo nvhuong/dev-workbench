@@ -3,9 +3,9 @@ package com.laker.postman.panel.collections.editor.request;
 import lombok.experimental.UtilityClass;
 
 /**
- * 请求编辑器只读态控制。
+ * Yêu cầu kiểm soát chỉ đọc của trình chỉnh sửa.
  * <p>
- * 性能快照和保存响应不能回写集合数据，所有输入组件统一在这里切换只读，避免面板初始化分支散落。
+ * Ảnh chụp nhanh hiệu suất và phản hồi đã lưu không thể ghi lại dữ liệu thu thập. Tất cả các thành phần đầu vào được chuyển thống nhất sang chỉ đọc ở đây để tránh sự phân tán của các nhánh khởi tạo bảng điều khiển.
  */
 @UtilityClass
 class RequestEditorReadOnlyMode {

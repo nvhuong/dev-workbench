@@ -8,7 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import javax.swing.Timer;
 
 /**
- * 主窗口可见后的启动更新检查调度。
+ * Bắt đầu lịch kiểm tra cập nhật sau khi cửa sổ chính hiển thị.
  */
 @Slf4j
 @UtilityClass

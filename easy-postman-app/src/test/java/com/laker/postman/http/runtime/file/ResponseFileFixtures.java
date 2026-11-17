@@ -7,7 +7,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 /**
- * 构造最小可识别的 Office Open XML 文件，用于响应文件识别相关测试。
+ * Xây dựng một nhận dạng nhỏ nhất Office Open XML Tệp, được sử dụng để đáp ứng các bài kiểm tra liên quan đến nhận dạng tệp.
  */
 public final class ResponseFileFixtures {
 
@@ -23,7 +23,7 @@ public final class ResponseFileFixtures {
     }
 
     /**
-     * @param mainContentType 主部件的内容类型（如宏/模板变体），为空时不声明
+     * @param mainContentType Loại nội dung của tiện ích chính (chẳng hạn như macro/Biến thể mẫu), không được khai báo khi trống
      */
     public static byte[] ooxml(String mainPartName, String mainContentType) throws IOException {
         String types = mainContentType == null ? "<Types/>"
@@ -34,7 +34,7 @@ public final class ResponseFileFixtures {
             zip.write(types.getBytes(StandardCharsets.UTF_8));
             zip.closeEntry();
             zip.putNextEntry(new ZipEntry(mainPartName));
-            // 包含无法按 UTF-8 解码的字节，模拟真实二进制内容
+            // Chứa không thể nhấn được UTF-8 Các byte được giải mã, mô phỏng nội dung nhị phân thực
             zip.write(new byte[]{(byte) 0xC3, (byte) 0x28, 0x00, (byte) 0xFF});
             zip.closeEntry();
         }

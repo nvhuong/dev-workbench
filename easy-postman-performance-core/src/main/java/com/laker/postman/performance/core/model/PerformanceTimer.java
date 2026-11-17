@@ -3,7 +3,7 @@ package com.laker.postman.performance.core.model;
 import java.util.concurrent.atomic.LongAdder;
 
 /**
- * 耗时计量器，对应 Micrometer Timer 语义：记录次数、总耗时和分布快照。
+ * Máy đo tốn thời gian, tương ứng Micrometer Timer Ngữ nghĩa: số lượng bản ghi, tổng thời gian thực hiện và ảnh chụp nhanh phân phối.
  */
 final class PerformanceTimer {
     private final DurationStatsHistogram histogram = new DurationStatsHistogram();

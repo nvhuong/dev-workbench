@@ -201,7 +201,7 @@ public final class FunctionalRequestExecutor {
                     assertion = postResult.allTestsPassed() ? AssertionResult.PASS : AssertionResult.FAIL;
                 }
             } catch (Exception ex) {
-                log.error("请求执行失败", ex);
+                log.error("Thực hiện yêu cầu không thành công", ex);
                 if (requestErrorConsumer != null) {
                     requestErrorConsumer.accept(ex.getMessage());
                 }

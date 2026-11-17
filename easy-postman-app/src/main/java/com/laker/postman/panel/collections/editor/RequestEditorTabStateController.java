@@ -11,9 +11,9 @@ import java.awt.*;
 import java.util.function.Consumer;
 
 /**
- * 请求编辑器 Tab 状态控制器。
+ * Request an editor Tab Bộ điều khiển nhà nước.
  * <p>
- * 标题、协议标识、红点、保存事件同步属于 Tab 状态维护，集中在这里，避免面板类继续膨胀。
+ * Tiêu đề, nhận dạng giao thức, chấm đỏ, lưu đồng bộ hóa sự kiện Tab Việc bảo trì trạng thái được tập trung ở đây để ngăn lớp bảng điều khiển tiếp tục mở rộng.
  */
 final class RequestEditorTabStateController {
     private final JTabbedPane tabbedPane;

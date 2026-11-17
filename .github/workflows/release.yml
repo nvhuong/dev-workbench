@@ -1,41 +1,41 @@
-name: Release Build（发布构建）
+name: Release Build（bản phát hành)
 
 permissions:
   contents: write
 
 on:
   release:
-    types: [ created ]  # 当创建新的 Release 时触发
-  workflow_dispatch: { }  # 支持手动触发
+    types: [ created ]  # Khi tạo cái mới Release được kích hoạt khi nào
+  workflow_dispatch: { }  # Hỗ trợ kích hoạt thủ công
 
 env:
   JAVA_VERSION: '21'
-  JAVA_DISTRIBUTION: 'jetbrains'  # 使用 JetBrains Runtime（JBR），为 Swing 应用优化
+  JAVA_DISTRIBUTION: 'jetbrains'  # sử dụng JetBrains Runtime（JBR），vì Swing Tối ưu hóa ứng dụng
   JLINK_MODULES: 'java.base,java.desktop,java.logging,jdk.unsupported,java.naming,java.net.http,jdk.httpserver,java.prefs,java.sql,java.security.sasl,java.security.jgss,jdk.crypto.ec,java.management,java.management.rmi,jdk.crypto.cryptoki'
-  # 通用 Java 选项（所有平台共享）
+  # Phổ quát Java Tùy chọn (được chia sẻ bởi tất cả các nền tảng)
   JAVA_OPTIONS_COMMON: '-Xms256m|-Xmx1g|-XX:MaxMetaspaceSize=256m|-XX:MetaspaceSize=128m|-XX:MaxDirectMemorySize=256m|-XX:+UseG1GC|-XX:MaxGCPauseMillis=200|-XX:InitiatingHeapOccupancyPercent=45|-XX:+UseStringDeduplication|-XX:+HeapDumpOnOutOfMemoryError|-XX:HeapDumpPath=./dumps|-Dfile.encoding=UTF-8|-Dswing.aatext=true|-Dhttp.keepAlive=true'
-  # Windows 特定选项
+  # Windows Tùy chọn cụ thể
   JAVA_OPTIONS_WINDOWS: '-Djavax.accessibility.assistive_technologies='
-  # macOS 特定选项
+  # macOS Tùy chọn cụ thể
   JAVA_OPTIONS_MACOS: '-Dsun.java2d.metal=false|-Dapple.awt.application.appearance=system|--add-opens java.desktop/java.awt=ALL-UNNAMED|--add-opens java.desktop/sun.lwawt=ALL-UNNAMED|--add-opens java.desktop/sun.lwawt.macosx=ALL-UNNAMED|--add-exports java.desktop/com.apple.eawt=ALL-UNNAMED'
-  # Linux 特定选项
+  # Linux Tùy chọn cụ thể
   JAVA_OPTIONS_LINUX: '-Dawt.useSystemAAFontSettings=on|--add-opens=java.desktop/sun.awt.X11=ALL-UNNAMED'
 
 jobs:
-  # 提取版本号，供所有 job 复用
+  # Trích xuất số phiên bản cho tất cả job Tái sử dụng
   get-version:
-    name: Get Version（获取版本号）
+    name: Get Version（Lấy số phiên bản)
     runs-on: ubuntu-latest
     if: github.event_name != 'release' || startsWith(github.event.release.tag_name || '', 'v')
     outputs:
       version: ${{ steps.extract_version.outputs.version }}
     steps:
-      - name: Checkout（检出代码）
+      - name: Checkout（Kiểm tra mã)
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           ref: ${{ github.event_name == 'release' && github.event.release.tag_name || github.ref_name }}
 
-      - name: Setup Java（配置 Java）
+      - name: Setup Java（cấu hình Java）
         uses: actions/setup-java@de7274f081f381c8f8158605e0321c36c376e2e6 # v6.0.1
         with:
           distribution: ${{ env.JAVA_DISTRIBUTION }}
@@ -45,14 +45,14 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Extract version（提取版本号）
+      - name: Extract version（Trích xuất số phiên bản)
         id: extract_version
         run: |
           VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
           echo "Version: $VERSION"
           echo "version=$VERSION" >> $GITHUB_OUTPUT
 
-      - name: Validate release source and version（校验默认分支与版本一致性）
+      - name: Validate release source and version（Xác minh tính nhất quán của nhánh và phiên bản mặc định)
         shell: bash
         run: |
           set -euo pipefail
@@ -82,17 +82,17 @@ jobs:
             fi
           fi
 
-  # 构建 Fat JAR（跨平台），供所有平台复用
+  # Xây dựng Fat JAR（Đa nền tảng) để tái sử dụng trên tất cả các nền tảng
   build-jar-artifact:
-    name: Build Fat JAR（构建跨平台 JAR）
+    name: Build Fat JAR（Xây dựng đa nền tảng JAR）
     runs-on: ubuntu-latest
     needs: [ get-version ]
     if: github.event_name != 'release' || startsWith(github.event.release.tag_name || '', 'v')
     steps:
-      - name: Checkout（检出代码）
+      - name: Checkout（Kiểm tra mã)
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
-      - name: Setup Java（配置 Java）
+      - name: Setup Java（cấu hình Java）
         uses: actions/setup-java@de7274f081f381c8f8158605e0321c36c376e2e6 # v6.0.1
         with:
           distribution: ${{ env.JAVA_DISTRIBUTION }}
@@ -102,10 +102,10 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build with Maven（使用 Maven 构建 Fat JAR）
+      - name: Build with Maven（sử dụng Maven Xây dựng Fat JAR）
         run: mvn -B clean package -DskipTests
 
-      - name: Upload JAR for reuse（上传 JAR 供其他 job 复用）
+      - name: Upload JAR for reuse（Tải lên JAR cho người khác job tái sử dụng)
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: app-jar
@@ -114,16 +114,16 @@ jobs:
 
 
   build-windows-portable:
-    name: Build Windows Portable（构建 Windows 绿色版）
+    name: Build Windows Portable（Xây dựng Windows phiên bản màu xanh lá cây)
     runs-on: windows-latest
     needs: [ get-version, build-jar-artifact ]
     if: github.event_name != 'release' || startsWith(github.event.release.tag_name || '', 'v')
 
     steps:
-      - name: Checkout（检出代码）
+      - name: Checkout（Kiểm tra mã)
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
-      - name: Setup Java（配置 Java）
+      - name: Setup Java（cấu hình Java）
         uses: actions/setup-java@de7274f081f381c8f8158605e0321c36c376e2e6 # v6.0.1
         with:
           distribution: ${{ env.JAVA_DISTRIBUTION }}
@@ -132,18 +132,18 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Download Fat JAR（下载跨平台 Fat JAR）
+      - name: Download Fat JAR（Tải xuống đa nền tảng Fat JAR）
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
           name: app-jar
           path: target
 
-      - name: Create runtime with jlink（使用 jlink 创建 Windows 精简 JRE）
+      - name: Create runtime with jlink（sử dụng jlink Tạo Windows tinh giản JRE）
         shell: pwsh
         run: |
           $runtimeDir = "target\runtime"
           if (Test-Path $runtimeDir) { Remove-Item -Recurse -Force $runtimeDir }
-          
+
           jlink `
             --add-modules "$env:JLINK_MODULES,jdk.crypto.mscapi" `
             --strip-java-debug-attributes `
@@ -154,38 +154,38 @@ jobs:
             --compress=2 `
             --verbose `
             --output $runtimeDir
-          
-          # 验证 JRE 大小
-          $size = (Get-ChildItem -Path $runtimeDir -Recurse | Measure-Object -Property Length -Sum).Sum / 1MB
-          Write-Host "✅ JRE 创建成功，大小: $([math]::Round($size, 2)) MB"
 
-      - name: Prepare dist-input（准备打包输入目录）
+          # Xác minh JRE kích thước
+          $size = (Get-ChildItem -Path $runtimeDir -Recurse | Measure-Object -Property Length -Sum).Sum / 1MB
+          Write-Host "✅ JRE Tạo thành công, kích thước: $([math]::Round($size, 2)) MB"
+
+      - name: Prepare dist-input（Chuẩn bị thư mục đầu vào bao bì)
         shell: pwsh
         run: |
           $version = "${{ needs.get-version.outputs.version }}"
           $jarNameWithVersion = "easy-postman-$version.jar"
           $jarName = "easy-postman.jar"
-          
+
           $distInputDir = "target\dist-input"
           if (Test-Path $distInputDir) { Remove-Item -Recurse -Force $distInputDir }
           New-Item -ItemType Directory -Path $distInputDir | Out-Null
           Copy-Item "target\$jarNameWithVersion" -Destination "$distInputDir\$jarName"
 
-      - name: Create app-image with jpackage（创建应用镜像，免安装）
+      - name: Create app-image with jpackage（Tạo hình ảnh ứng dụng, không cần cài đặt)
         shell: pwsh
         run: |
           $version = "${{ needs.get-version.outputs.version }}"
           $jarName = "easy-postman.jar"
           $appImageDir = "target\app-image"
-          
+
           if (Test-Path $appImageDir) { Remove-Item -Recurse -Force $appImageDir }
-          
-          # 解析通用 Java 选项
+
+          # Phân tích chung Java tùy chọn
           $javaOptsCommon = $env:JAVA_OPTIONS_COMMON -split '\|'
-          # 解析 Windows 特定选项
+          # phân tích Windows Tùy chọn cụ thể
           $javaOptsWindows = $env:JAVA_OPTIONS_WINDOWS -split '\|'
-          
-          # 构建 jpackage 参数列表
+
+          # Xây dựng jpackage Danh sách tham số
           $jpackageArgs = @(
             '--type', 'app-image',
             '--input', 'target\dist-input',
@@ -200,48 +200,48 @@ jobs:
             '--vendor', 'Laker',
             '--copyright', '© 2025 Laker'
           )
-          
-          # 添加通用 Java 选项
+
+          # Đã thêm phổ quát Java tùy chọn
           foreach ($opt in $javaOptsCommon) {
             $jpackageArgs += '--java-options'
             $jpackageArgs += $opt
           }
-          
-          # 添加 Windows 特定选项
+
+          # Thêm vào Windows Tùy chọn cụ thể
           foreach ($opt in $javaOptsWindows) {
             if ($opt -ne '') {
               $jpackageArgs += '--java-options'
               $jpackageArgs += $opt
             }
           }
-          
-          # 执行 jpackage
+
+          # thực hiện jpackage
           & jpackage @jpackageArgs
 
           if (-not (Test-Path "target\EasyPostman\EasyPostmanMCP.exe")) {
             throw "MCP launcher was not created"
           }
 
-      - name: Package portable version（打包绿色版为 ZIP）
+      - name: Package portable version（Phiên bản màu xanh lá cây được đóng gói dưới dạng ZIP）
         shell: pwsh
         run: |
           $version = "${{ needs.get-version.outputs.version }}"
           $appImageDir = "target\EasyPostman"
           $zipName = "EasyPostman-$version-windows-x64-portable.zip"
-          
+
           if (-not (Test-Path "dist")) { New-Item -ItemType Directory -Path "dist" | Out-Null }
-          
-          # 创建 .portable 标识文件，用于运行时检测便携版
+
+          # Tạo .portable Tệp nhận dạng được sử dụng để phát hiện các phiên bản di động khi chạy
           $portableMarker = Join-Path $appImageDir ".portable"
           "This is a portable version" | Out-File -FilePath $portableMarker -Encoding UTF8
           Write-Host "Created .portable marker file"
-          
-          # 压缩为 ZIP
+
+          # Đã nén thành  ZIP
           Compress-Archive -Path $appImageDir -DestinationPath "dist\$zipName" -Force
-          
+
           Write-Host "✅ Created portable version: $zipName"
 
-      - name: Upload as Artifact（上传为构建产物）
+      - name: Upload as Artifact（Tải lên dưới dạng sản phẩm xây dựng)
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: EasyPostman-Windows-Portable
@@ -250,16 +250,16 @@ jobs:
 
 
   build-windows-exe:
-    name: Build Windows EXE Installer（构建 Windows EXE 安装程序）
+    name: Build Windows EXE Installer（Xây dựng Windows EXE trình cài đặt)
     runs-on: windows-latest
     needs: [ get-version, build-jar-artifact ]
     if: github.event_name != 'release' || startsWith(github.event.release.tag_name || '', 'v')
 
     steps:
-      - name: Checkout（检出代码）
+      - name: Checkout（Kiểm tra mã)
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
-      - name: Setup Java（配置 Java）
+      - name: Setup Java（cấu hình Java）
         uses: actions/setup-java@de7274f081f381c8f8158605e0321c36c376e2e6 # v6.0.1
         with:
           distribution: ${{ env.JAVA_DISTRIBUTION }}
@@ -268,38 +268,38 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Download Fat JAR（下载跨平台 Fat JAR）
+      - name: Download Fat JAR（Tải xuống đa nền tảng Fat JAR）
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
           name: app-jar
           path: target
 
-      - name: Install Inno Setup（安装 Inno Setup）
+      - name: Install Inno Setup（Cài đặt Inno Setup）
         shell: pwsh
         run: |
           Write-Host "📦 Installing Inno Setup..."
           choco install innosetup -y --no-progress
-          
-          # 刷新环境变量
+
+          # Làm mới các biến môi trường
           $env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User")
-          
-          # 验证安装
+
+          # Xác minh cài đặt
           $iscc = Get-Command iscc -ErrorAction SilentlyContinue
           if ($iscc) {
             Write-Host "✅ Inno Setup installed: $($iscc.Source)"
-            # 显示版本信息（iscc 不带参数会显示版本和帮助）
+            # Hiển thị thông tin phiên bản (iscc Nếu không có tham số, phiên bản và trợ giúp sẽ được hiển thị)
             & iscc 2>&1 | Select-Object -First 5
           } else {
             Write-Error "❌ Inno Setup installation failed"
             exit 1
           }
 
-      - name: Create runtime with jlink（使用 jlink 创建 Windows 精简 JRE）
+      - name: Create runtime with jlink（sử dụng jlink Tạo Windows tinh giản JRE）
         shell: pwsh
         run: |
           $runtimeDir = "target\runtime"
           if (Test-Path $runtimeDir) { Remove-Item -Recurse -Force $runtimeDir }
-          
+
           jlink `
             --add-modules "$env:JLINK_MODULES,jdk.crypto.mscapi" `
             --strip-java-debug-attributes `
@@ -310,35 +310,35 @@ jobs:
             --compress=2 `
             --verbose `
             --output $runtimeDir
-          
-          # 验证 JRE 大小
-          $size = (Get-ChildItem -Path $runtimeDir -Recurse | Measure-Object -Property Length -Sum).Sum / 1MB
-          Write-Host "✅ JRE 创建成功，大小: $([math]::Round($size, 2)) MB"
 
-      - name: Prepare dist-input（准备打包输入目录）
+          # Xác minh JRE kích thước
+          $size = (Get-ChildItem -Path $runtimeDir -Recurse | Measure-Object -Property Length -Sum).Sum / 1MB
+          Write-Host "✅ JRE Tạo thành công, kích thước: $([math]::Round($size, 2)) MB"
+
+      - name: Prepare dist-input（Chuẩn bị thư mục đầu vào bao bì)
         shell: pwsh
         run: |
           $version = "${{ needs.get-version.outputs.version }}"
           $jarNameWithVersion = "easy-postman-$version.jar"
           $jarName = "easy-postman.jar"
-          
+
           $distInputDir = "target\dist-input"
           if (Test-Path $distInputDir) { Remove-Item -Recurse -Force $distInputDir }
           New-Item -ItemType Directory -Path $distInputDir | Out-Null
           Copy-Item "target\$jarNameWithVersion" -Destination "$distInputDir\$jarName"
 
-      - name: Create app-image with jpackage（创建应用镜像）
+      - name: Create app-image with jpackage（Tạo một hình ảnh ứng dụng)
         shell: pwsh
         run: |
           $version = "${{ needs.get-version.outputs.version }}"
           $jarName = "easy-postman.jar"
-          
-          # 解析通用 Java 选项
+
+          # Phân tích chung Java tùy chọn
           $javaOptsCommon = $env:JAVA_OPTIONS_COMMON -split '\|'
-          # 解析 Windows 特定选项
+          # phân tích Windows Tùy chọn cụ thể
           $javaOptsWindows = $env:JAVA_OPTIONS_WINDOWS -split '\|'
-          
-          # 构建 jpackage 参数列表
+
+          # Xây dựng jpackage Danh sách tham số
           $jpackageArgs = @(
             '--type', 'app-image',
             '--input', 'target\dist-input',
@@ -353,79 +353,79 @@ jobs:
             '--vendor', 'Laker',
             '--copyright', '© 2025 Laker'
           )
-          
-          # 添加通用 Java 选项
+
+          # Đã thêm phổ quát Java tùy chọn
           foreach ($opt in $javaOptsCommon) {
             $jpackageArgs += '--java-options'
             $jpackageArgs += $opt
           }
-          
-          # 添加 Windows 特定选项
+
+          # Thêm vào Windows Tùy chọn cụ thể
           foreach ($opt in $javaOptsWindows) {
             if ($opt -ne '') {
               $jpackageArgs += '--java-options'
               $jpackageArgs += $opt
             }
           }
-          
-          # 执行 jpackage
+
+          # thực hiện jpackage
           & jpackage @jpackageArgs
 
           if (-not (Test-Path "target\EasyPostman\EasyPostmanMCP.exe")) {
             throw "MCP launcher was not created"
           }
-          
+
           Write-Host "✅ App image created at: target\EasyPostman"
 
-      - name: Verify Windows single-instance behavior（验证 Windows 单实例与强杀恢复）
+      - name: Verify Windows single-instance behavior（Xác minh Windows Trường hợp đơn lẻ và phục hồi bắt buộc)
         shell: pwsh
         timeout-minutes: 2
         run: |
           .\build\verify-windows-single-instance.ps1 `
             -AppExe "target\EasyPostman\EasyPostman.exe"
 
-      - name: Create EXE with Inno Setup（使用 Inno Setup 创建 EXE 安装程序）
+      - name: Create EXE with Inno Setup（sử dụng Inno Setup Tạo EXE trình cài đặt)
         shell: pwsh
         run: |
           $version = "${{ needs.get-version.outputs.version }}"
           $issScript = "build\easy-postman.iss"
-          $arch = "x64"  # 当前构建为 x64，未来可扩展为 arm64
-          
-          # 确保输出目录存在
-          if (-not (Test-Path "dist")) { 
-            New-Item -ItemType Directory -Path "dist" | Out-Null 
+          $arch = "x64"  # Hiện nay được xây dựng như x64，Nó có thể được mở rộng trong tương lai arm64
+
+          # Hãy chắc chắn rằng thư mục đầu ra tồn tại
+          if (-not (Test-Path "dist")) {
+            New-Item -ItemType Directory -Path "dist" | Out-Null
           }
-          
+
           Write-Host "🔨 Building EXE installer with Inno Setup..."
           Write-Host "   Version: $version"
           Write-Host "   Architecture: $arch"
           Write-Host "   Script: $issScript"
           Write-Host "   Source: target\EasyPostman"
-          
-          # 验证源目录存在
+
+          # Xác minh rằng thư mục nguồn tồn tại
           if (-not (Test-Path "target\EasyPostman")) {
             Write-Error "❌ Source directory not found: target\EasyPostman"
             exit 1
           }
-          
-          # 运行 Inno Setup 编译器
-          # 注意：路径相对于 ISS 脚本位置（build 目录），所以需要 ..\
+
+          # chạy Inno Setup trình biên dịch
+          # LƯU Ý: Đường dẫn có liên quan đến  ISS vị trí tập lệnh (build thư mục), vì vậy cần thiết ..\
           & iscc `
             "/DMyAppVersion=$version" `
             "/DMyAppSourceDir=..\target\EasyPostman" `
             "/DMyOutputDir=..\dist" `
             "/DMyArch=$arch" `
             $issScript
-          
+
           if ($LASTEXITCODE -ne 0) {
             Write-Error "❌ Inno Setup compilation failed with exit code: $LASTEXITCODE"
             exit 1
           }
-          
-          # 验证 EXE 文件
+
+          # Xác minh EXE tập tin
           $expectedExeName = "EasyPostman-$version-windows-$arch.exe"
           $exeFile = Get-Item "dist\$expectedExeName" -ErrorAction SilentlyContinue
-          
+
           if ($exeFile) {
             Write-Host "✅ EXE installer created successfully!"
             Write-Host "   File: $($exeFile.Name)"
@@ -438,7 +438,7 @@ jobs:
             exit 1
           }
 
-      - name: Upload as Artifact（上传为构建产物）
+      - name: Upload as Artifact（Tải lên dưới dạng sản phẩm xây dựng)
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: EasyPostman-Windows-EXE
@@ -446,16 +446,16 @@ jobs:
           retention-days: 7
 
   build-macos-intel:
-    name: Build macOS Intel DMG（构建 macOS Intel 版安装包）
+    name: Build macOS Intel DMG（Xây dựng macOS Intel gói cài đặt phiên bản)
     runs-on: macos-15-intel  # Intel x86_64
     needs: [ get-version, build-jar-artifact ]
     if: github.event_name != 'release' || startsWith(github.event.release.tag_name || '', 'v')
 
     steps:
-      - name: Checkout（检出代码）
+      - name: Checkout（Kiểm tra mã)
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
-      - name: Setup Java（配置 Java）
+      - name: Setup Java（cấu hình Java）
         uses: actions/setup-java@de7274f081f381c8f8158605e0321c36c376e2e6 # v6.0.1
         with:
           distribution: ${{ env.JAVA_DISTRIBUTION }}
@@ -464,16 +464,16 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Download Fat JAR（下载跨平台 Fat JAR）
+      - name: Download Fat JAR（Tải xuống đa nền tảng Fat JAR）
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
           name: app-jar
           path: target
 
-      - name: Create runtime with jlink（使用 jlink 创建 macOS Intel 精简 JRE）
+      - name: Create runtime with jlink（sử dụng jlink Tạo macOS Intel tinh giản JRE）
         run: |
           rm -rf target/runtime
-          # 创建 macOS Intel 平台的 JRE
+          # Tạo macOS Intel nền tảng JRE
           jlink \
             --add-modules ${{ env.JLINK_MODULES }} \
             --strip-java-debug-attributes \
@@ -484,28 +484,28 @@ jobs:
             --compress=2 \
             --verbose \
             --output target/runtime
-          
-          # 验证 JRE 大小
-          echo "✅ JRE 创建成功，大小: $(du -sh target/runtime | cut -f1)"
 
-      - name: Prepare dist-input（准备打包输入目录）
+          # Xác minh JRE kích thước
+          echo "✅ JRE Tạo thành công, kích thước: $(du -sh target/runtime | cut -f1)"
+
+      - name: Prepare dist-input（Chuẩn bị thư mục đầu vào bao bì)
         run: |
           VERSION="${{ needs.get-version.outputs.version }}"
           rm -rf target/dist-input
           mkdir -p target/dist-input
           cp target/easy-postman-$VERSION.jar target/dist-input/easy-postman.jar
 
-      - name: Create DMG with jpackage（使用 jpackage 创建 DMG 镜像）
+      - name: Create DMG with jpackage（sử dụng jpackage Tạo DMG gương)
         run: |
           VERSION="${{ needs.get-version.outputs.version }}"
           mkdir -p dist
-          
-          # 解析通用 Java 选项
+
+          # Phân tích chung Java tùy chọn
           IFS='|' read -ra JAVA_OPTS_COMMON <<< "${{ env.JAVA_OPTIONS_COMMON }}"
-          # 解析 macOS 特定选项
+          # phân tích macOS Tùy chọn cụ thể
           IFS='|' read -ra JAVA_OPTS_MACOS <<< "${{ env.JAVA_OPTIONS_MACOS }}"
-          
-          # 构建 jpackage 参数数组
+
+          # Xây dựng jpackage Mảng tham số
           JPACKAGE_ARGS=(
             --input target/dist-input
             --main-jar "easy-postman.jar"
@@ -520,27 +520,27 @@ jobs:
             --vendor "Laker"
             --copyright "© 2025 Laker"
           )
-          
-          # 添加通用 Java 选项
+
+          # Đã thêm phổ quát Java tùy chọn
           for opt in "${JAVA_OPTS_COMMON[@]}"; do
             JPACKAGE_ARGS+=(--java-options "$opt")
           done
-          
-          # 添加 macOS 特定选项
+
+          # Thêm vào macOS Tùy chọn cụ thể
           for opt in "${JAVA_OPTS_MACOS[@]}"; do
             if [ -n "$opt" ]; then
               JPACKAGE_ARGS+=(--java-options "$opt")
             fi
           done
-          
-          # 执行 jpackage
+
+          # thực hiện jpackage
           jpackage "${JPACKAGE_ARGS[@]}"
-          
-          # 重命名为 Intel 版本（使用标准架构标识）
+
+          # Đổi tên thành  Intel Phiên bản (sử dụng nhận dạng lược đồ tiêu chuẩn)
           mv dist/EasyPostman-$VERSION.dmg dist/EasyPostman-$VERSION-macos-x86_64.dmg
           echo "✅ Created: EasyPostman-$VERSION-macos-x86_64.dmg"
 
-      - name: Upload as Artifact（上传为构建产物）
+      - name: Upload as Artifact（Tải lên dưới dạng sản phẩm xây dựng)
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: EasyPostman-macOS-Intel-DMG
@@ -548,16 +548,16 @@ jobs:
           retention-days: 7
 
   build-macos-arm:
-    name: Build macOS Apple Silicon DMG（构建 macOS Apple Silicon 版安装包）
+    name: Build macOS Apple Silicon DMG（Xây dựng macOS Apple Silicon gói cài đặt phiên bản)
     runs-on: macos-latest  # Apple Silicon (M1/M2/M3/M4)
     needs: [ get-version, build-jar-artifact ]
     if: github.event_name != 'release' || startsWith(github.event.release.tag_name || '', 'v')
 
     steps:
-      - name: Checkout（检出代码）
+      - name: Checkout（Kiểm tra mã)
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
-      - name: Setup Java（配置 Java）
+      - name: Setup Java（cấu hình Java）
         uses: actions/setup-java@de7274f081f381c8f8158605e0321c36c376e2e6 # v6.0.1
         with:
           distribution: ${{ env.JAVA_DISTRIBUTION }}
@@ -566,16 +566,16 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Download Fat JAR（下载跨平台 Fat JAR）
+      - name: Download Fat JAR（Tải xuống đa nền tảng Fat JAR）
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
           name: app-jar
           path: target
 
-      - name: Create runtime with jlink（使用 jlink 创建 macOS ARM 精简 JRE）
+      - name: Create runtime with jlink（sử dụng jlink Tạo macOS ARM tinh giản JRE）
         run: |
           rm -rf target/runtime
-          # 创建 macOS ARM 平台的 JRE
+          # Tạo macOS ARM nền tảng JRE
           jlink \
             --add-modules ${{ env.JLINK_MODULES }} \
             --strip-java-debug-attributes \
@@ -586,28 +586,28 @@ jobs:
             --compress=2 \
             --verbose \
             --output target/runtime
-          
-          # 验证 JRE 大小
-          echo "✅ JRE 创建成功，大小: $(du -sh target/runtime | cut -f1)"
 
-      - name: Prepare dist-input（准备打包输入目录）
+          # Xác minh JRE kích thước
+          echo "✅ JRE Tạo thành công, kích thước: $(du -sh target/runtime | cut -f1)"
+
+      - name: Prepare dist-input（Chuẩn bị thư mục đầu vào bao bì)
         run: |
           VERSION="${{ needs.get-version.outputs.version }}"
           rm -rf target/dist-input
           mkdir -p target/dist-input
           cp target/easy-postman-$VERSION.jar target/dist-input/easy-postman.jar
 
-      - name: Create DMG with jpackage（使用 jpackage 创建 DMG 镜像）
+      - name: Create DMG with jpackage（sử dụng jpackage Tạo DMG gương)
         run: |
           VERSION="${{ needs.get-version.outputs.version }}"
           mkdir -p dist
-          
-          # 解析通用 Java 选项
+
+          # Phân tích chung Java tùy chọn
           IFS='|' read -ra JAVA_OPTS_COMMON <<< "${{ env.JAVA_OPTIONS_COMMON }}"
-          # 解析 macOS 特定选项
+          # phân tích macOS Tùy chọn cụ thể
           IFS='|' read -ra JAVA_OPTS_MACOS <<< "${{ env.JAVA_OPTIONS_MACOS }}"
-          
-          # 构建 jpackage 参数数组
+
+          # Xây dựng jpackage Mảng tham số
           JPACKAGE_ARGS=(
             --input target/dist-input
             --main-jar "easy-postman.jar"
@@ -622,27 +622,27 @@ jobs:
             --vendor "Laker"
             --copyright "© 2025 Laker"
           )
-          
-          # 添加通用 Java 选项
+
+          # Đã thêm phổ quát Java tùy chọn
           for opt in "${JAVA_OPTS_COMMON[@]}"; do
             JPACKAGE_ARGS+=(--java-options "$opt")
           done
-          
-          # 添加 macOS 特定选项
+
+          # Thêm vào macOS Tùy chọn cụ thể
           for opt in "${JAVA_OPTS_MACOS[@]}"; do
             if [ -n "$opt" ]; then
               JPACKAGE_ARGS+=(--java-options "$opt")
             fi
           done
-          
-          # 执行 jpackage
+
+          # thực hiện jpackage
           jpackage "${JPACKAGE_ARGS[@]}"
-          
-          # 重命名为 ARM 版本（使用标准架构标识）
+
+          # Đổi tên thành  ARM Phiên bản (sử dụng nhận dạng lược đồ tiêu chuẩn)
           mv dist/EasyPostman-$VERSION.dmg dist/EasyPostman-$VERSION-macos-arm64.dmg
           echo "✅ Created: EasyPostman-$VERSION-macos-arm64.dmg"
 
-      - name: Upload as Artifact（上传为构建产物）
+      - name: Upload as Artifact（Tải lên dưới dạng sản phẩm xây dựng)
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: EasyPostman-macOS-ARM-DMG
@@ -650,19 +650,19 @@ jobs:
           retention-days: 7
 
   build-jar:
-    name: Build Standalone JAR（构建独立 JAR 包）
+    name: Build Standalone JAR（Xây dựng sự độc lập JAR gói)
     runs-on: ubuntu-latest
     needs: [ get-version, build-jar-artifact ]
     if: github.event_name != 'release' || startsWith(github.event.release.tag_name || '', 'v')
 
     steps:
-      - name: Download JAR artifact（下载已构建的 JAR）
+      - name: Download JAR artifact（Tải xuống bản dựng sẵn JAR）
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
           name: app-jar
           path: dist
 
-      - name: Upload as Artifact（上传为构建产物）
+      - name: Upload as Artifact（Tải lên dưới dạng sản phẩm xây dựng)
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: EasyPostman-Standalone-JAR
@@ -670,16 +670,16 @@ jobs:
           retention-days: 7
 
   build-ubuntu-amd64:
-    name: Build Ubuntu DEB amd64（构建 Ubuntu x64 安装包）
+    name: Build Ubuntu DEB amd64（Xây dựng Ubuntu x64 gói cài đặt)
     runs-on: ubuntu-22.04
     needs: [ get-version, build-jar-artifact ]
     if: github.event_name != 'release' || startsWith(github.event.release.tag_name || '', 'v')
 
     steps:
-      - name: Checkout（检出代码）
+      - name: Checkout（Kiểm tra mã)
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
-      - name: Setup Java（配置 Java）
+      - name: Setup Java（cấu hình Java）
         uses: actions/setup-java@de7274f081f381c8f8158605e0321c36c376e2e6 # v6.0.1
         with:
           distribution: ${{ env.JAVA_DISTRIBUTION }}
@@ -688,22 +688,22 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Download Fat JAR（下载跨平台 Fat JAR）
+      - name: Download Fat JAR（Tải xuống đa nền tảng Fat JAR）
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
           name: app-jar
           path: target
 
-      - name: Install dependencies（安装系统依赖）
+      - name: Install dependencies（Cài đặt phụ thuộc hệ thống)
         run: |
           sudo apt-get update
-          # 安装 GTK3、WebKit、打包工具，以及 DEB 兼容重打包所需压缩工具
+          # Cài đặt GTK3、WebKit、Dụng cụ đóng gói cũng vậy DEB Tương thích với các công cụ nén cần thiết để đóng gói lại
           sudo apt-get install -y libgtk-3-dev libwebkit2gtk-4.0-dev binutils zstd xz-utils
 
-      - name: Create runtime with jlink（使用 jlink 创建 Linux 精简 JRE）
+      - name: Create runtime with jlink（sử dụng jlink Tạo Linux tinh giản JRE）
         run: |
           rm -rf target/runtime
-          # 创建 Linux 平台的 JRE
+          # Tạo Linux nền tảng JRE
           jlink \
             --add-modules ${{ env.JLINK_MODULES }} \
             --strip-debug \
@@ -712,24 +712,24 @@ jobs:
             --compress=2 \
             --output target/runtime
 
-      - name: Prepare dist-input（准备打包输入目录）
+      - name: Prepare dist-input（Chuẩn bị thư mục đầu vào bao bì)
         run: |
           VERSION="${{ needs.get-version.outputs.version }}"
           rm -rf target/dist-input
           mkdir -p target/dist-input
           cp target/easy-postman-$VERSION.jar target/dist-input/easy-postman.jar
 
-      - name: Create DEB with jpackage（使用 jpackage 创建 DEB 安装包）
+      - name: Create DEB with jpackage（sử dụng jpackage Tạo DEB gói cài đặt)
         run: |
           VERSION="${{ needs.get-version.outputs.version }}"
           mkdir -p dist
-          
-          # 解析通用 Java 选项
+
+          # Phân tích chung Java tùy chọn
           IFS='|' read -ra JAVA_OPTS_COMMON <<< "${{ env.JAVA_OPTIONS_COMMON }}"
-          # 解析 Linux 特定选项
+          # phân tích Linux Tùy chọn cụ thể
           IFS='|' read -ra JAVA_OPTS_LINUX <<< "${{ env.JAVA_OPTIONS_LINUX }}"
-          
-          # 构建 jpackage 参数数组
+
+          # Xây dựng jpackage Mảng tham số
           JPACKAGE_ARGS=(
             --input target/dist-input
             --main-jar "easy-postman.jar"
@@ -747,23 +747,23 @@ jobs:
             --linux-menu-group "Development"
             --linux-app-category "Development"
           )
-          
-          # 添加通用 Java 选项
+
+          # Đã thêm phổ quát Java tùy chọn
           for opt in "${JAVA_OPTS_COMMON[@]}"; do
             JPACKAGE_ARGS+=(--java-options "$opt")
           done
-          
-          # 添加 Linux 特定选项
+
+          # Thêm vào Linux Tùy chọn cụ thể
           for opt in "${JAVA_OPTS_LINUX[@]}"; do
             if [ -n "$opt" ]; then
               JPACKAGE_ARGS+=(--java-options "$opt")
             fi
           done
-          
-          # 执行 jpackage
+
+          # thực hiện jpackage
           jpackage "${JPACKAGE_ARGS[@]}"
 
-      - name: Rename amd64 DEB to stable release name（统一 amd64 包名）
+      - name: Rename amd64 DEB to stable release name（thống nhất amd64 tên gói)
         run: |
           VERSION="${{ needs.get-version.outputs.version }}"
           ORIGINAL_DEB=$(find dist -maxdepth 1 -type f -name "*.deb" | sort | tail -n 1)
@@ -778,7 +778,7 @@ jobs:
           echo "Generated amd64 DEB:"
           ls -1 "$TARGET_DEB"
 
-      - name: Upload as Artifact（上传为构建产物）
+      - name: Upload as Artifact（Tải lên dưới dạng sản phẩm xây dựng)
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: EasyPostman-Ubuntu-DEB-amd64
@@ -786,16 +786,16 @@ jobs:
           retention-days: 7
 
   build-ubuntu-arm64:
-    name: Build Ubuntu DEB arm64（构建 Ubuntu ARM64 安装包）
+    name: Build Ubuntu DEB arm64（Xây dựng Ubuntu ARM64 gói cài đặt)
     runs-on: ubuntu-22.04-arm
     needs: [ get-version, build-jar-artifact ]
     if: github.event_name != 'release' || startsWith(github.event.release.tag_name || '', 'v')
 
     steps:
-      - name: Checkout（检出代码）
+      - name: Checkout（Kiểm tra mã)
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
-      - name: Setup Java（配置 Java）
+      - name: Setup Java（cấu hình Java）
         uses: actions/setup-java@de7274f081f381c8f8158605e0321c36c376e2e6 # v6.0.1
         with:
           distribution: ${{ env.JAVA_DISTRIBUTION }}
@@ -804,22 +804,22 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Download Fat JAR（下载跨平台 Fat JAR）
+      - name: Download Fat JAR（Tải xuống đa nền tảng Fat JAR）
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
           name: app-jar
           path: target
 
-      - name: Install dependencies（安装系统依赖）
+      - name: Install dependencies（Cài đặt phụ thuộc hệ thống)
         run: |
           sudo apt-get update
-          # 安装 GTK3、WebKit 和打包工具
+          # Cài đặt GTK3、WebKit và dụng cụ đóng gói
           sudo apt-get install -y libgtk-3-dev libwebkit2gtk-4.0-dev binutils
 
-      - name: Create runtime with jlink（使用 jlink 创建 Linux 精简 JRE）
+      - name: Create runtime with jlink（sử dụng jlink Tạo Linux tinh giản JRE）
         run: |
           rm -rf target/runtime
-          # 创建 Linux 平台的 JRE
+          # Tạo Linux nền tảng JRE
           jlink \
             --add-modules ${{ env.JLINK_MODULES }} \
             --strip-debug \
@@ -828,24 +828,24 @@ jobs:
             --compress=2 \
             --output target/runtime
 
-      - name: Prepare dist-input（准备打包输入目录）
+      - name: Prepare dist-input（Chuẩn bị thư mục đầu vào bao bì)
         run: |
           VERSION="${{ needs.get-version.outputs.version }}"
           rm -rf target/dist-input
           mkdir -p target/dist-input
           cp target/easy-postman-$VERSION.jar target/dist-input/easy-postman.jar
 
-      - name: Create DEB with jpackage（使用 jpackage 创建 DEB 安装包）
+      - name: Create DEB with jpackage（sử dụng jpackage Tạo DEB gói cài đặt)
         run: |
           VERSION="${{ needs.get-version.outputs.version }}"
           mkdir -p dist
-          
-          # 解析通用 Java 选项
+
+          # Phân tích chung Java tùy chọn
           IFS='|' read -ra JAVA_OPTS_COMMON <<< "${{ env.JAVA_OPTIONS_COMMON }}"
-          # 解析 Linux 特定选项
+          # phân tích Linux Tùy chọn cụ thể
           IFS='|' read -ra JAVA_OPTS_LINUX <<< "${{ env.JAVA_OPTIONS_LINUX }}"
-          
-          # 构建 jpackage 参数数组
+
+          # Xây dựng jpackage Mảng tham số
           JPACKAGE_ARGS=(
             --input target/dist-input
             --main-jar "easy-postman.jar"
@@ -863,23 +863,23 @@ jobs:
             --linux-menu-group "Development"
             --linux-app-category "Development"
           )
-          
-          # 添加通用 Java 选项
+
+          # Đã thêm phổ quát Java tùy chọn
           for opt in "${JAVA_OPTS_COMMON[@]}"; do
             JPACKAGE_ARGS+=(--java-options "$opt")
           done
-          
-          # 添加 Linux 特定选项
+
+          # Thêm vào Linux Tùy chọn cụ thể
           for opt in "${JAVA_OPTS_LINUX[@]}"; do
             if [ -n "$opt" ]; then
               JPACKAGE_ARGS+=(--java-options "$opt")
             fi
           done
-          
-          # 执行 jpackage
+
+          # thực hiện jpackage
           jpackage "${JPACKAGE_ARGS[@]}"
 
-      - name: Create generic and compatibility ARM64 variants（生成通用 ARM64 和兼容版安装包）
+      - name: Create generic and compatibility ARM64 variants（Tạo ra phổ quát ARM64 và gói cài đặt phiên bản tương thích)
         run: |
           VERSION="${{ needs.get-version.outputs.version }}"
           ORIGINAL_DEB=$(find dist -maxdepth 1 -type f -name "*.deb" | sort | tail -n 1)
@@ -901,7 +901,7 @@ jobs:
           echo "Compatibility package members:"
           ar t "$COMPAT_DEB"
 
-      - name: Upload as Artifact（上传为构建产物）
+      - name: Upload as Artifact（Tải lên dưới dạng sản phẩm xây dựng)
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: EasyPostman-Ubuntu-DEB-arm64
@@ -911,16 +911,16 @@ jobs:
           retention-days: 7
 
   build-rpm-amd64:
-    name: Build RPM amd64（构建 RPM x64 安装包）
+    name: Build RPM amd64（Xây dựng RPM x64 gói cài đặt)
     runs-on: ubuntu-22.04
     needs: [ get-version, build-jar-artifact ]
     if: github.event_name != 'release' || startsWith(github.event.release.tag_name || '', 'v')
 
     steps:
-      - name: Checkout（检出代码）
+      - name: Checkout（Kiểm tra mã)
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
-      - name: Setup Java（配置 Java）
+      - name: Setup Java（cấu hình Java）
         uses: actions/setup-java@de7274f081f381c8f8158605e0321c36c376e2e6 # v6.0.1
         with:
           distribution: ${{ env.JAVA_DISTRIBUTION }}
@@ -929,18 +929,18 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Download Fat JAR（下载跨平台 Fat JAR）
+      - name: Download Fat JAR（Tải xuống đa nền tảng Fat JAR）
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
           name: app-jar
           path: target
 
-      - name: Install dependencies（安装系统依赖）
+      - name: Install dependencies（Cài đặt phụ thuộc hệ thống)
         run: |
           sudo apt-get update
           sudo apt-get install -y libgtk-3-dev libwebkit2gtk-4.0-dev binutils rpm
 
-      - name: Create runtime with jlink（使用 jlink 创建 Linux 精简 JRE）
+      - name: Create runtime with jlink（sử dụng jlink Tạo Linux tinh giản JRE）
         run: |
           rm -rf target/runtime
           jlink \
@@ -951,21 +951,21 @@ jobs:
             --compress=2 \
             --output target/runtime
 
-      - name: Prepare dist-input（准备打包输入目录）
+      - name: Prepare dist-input（Chuẩn bị thư mục đầu vào bao bì)
         run: |
           VERSION="${{ needs.get-version.outputs.version }}"
           rm -rf target/dist-input
           mkdir -p target/dist-input
           cp target/easy-postman-$VERSION.jar target/dist-input/easy-postman.jar
 
-      - name: Create RPM with jpackage（使用 jpackage 创建 RPM 安装包）
+      - name: Create RPM with jpackage（sử dụng jpackage Tạo RPM gói cài đặt)
         run: |
           VERSION="${{ needs.get-version.outputs.version }}"
           mkdir -p dist
-          
+
           IFS='|' read -ra JAVA_OPTS_COMMON <<< "${{ env.JAVA_OPTIONS_COMMON }}"
           IFS='|' read -ra JAVA_OPTS_LINUX <<< "${{ env.JAVA_OPTIONS_LINUX }}"
-          
+
           JPACKAGE_ARGS=(
             --input target/dist-input
             --main-jar "easy-postman.jar"
@@ -984,20 +984,20 @@ jobs:
             --linux-app-category "Development"
             --linux-rpm-license-type "MIT"
           )
-          
+
           for opt in "${JAVA_OPTS_COMMON[@]}"; do
             JPACKAGE_ARGS+=(--java-options "$opt")
           done
-          
+
           for opt in "${JAVA_OPTS_LINUX[@]}"; do
             if [ -n "$opt" ]; then
               JPACKAGE_ARGS+=(--java-options "$opt")
             fi
           done
-          
+
           jpackage "${JPACKAGE_ARGS[@]}"
 
-      - name: Upload as Artifact（上传为构建产物）
+      - name: Upload as Artifact（Tải lên dưới dạng sản phẩm xây dựng)
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: EasyPostman-RPM-amd64
@@ -1005,16 +1005,16 @@ jobs:
           retention-days: 7
 
   build-rpm-arm64:
-    name: Build RPM arm64（构建 RPM ARM64 安装包）
+    name: Build RPM arm64（Xây dựng RPM ARM64 gói cài đặt)
     runs-on: ubuntu-22.04-arm
     needs: [ get-version, build-jar-artifact ]
     if: github.event_name != 'release' || startsWith(github.event.release.tag_name || '', 'v')
 
     steps:
-      - name: Checkout（检出代码）
+      - name: Checkout（Kiểm tra mã)
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
-      - name: Setup Java（配置 Java）
+      - name: Setup Java（cấu hình Java）
         uses: actions/setup-java@de7274f081f381c8f8158605e0321c36c376e2e6 # v6.0.1
         with:
           distribution: ${{ env.JAVA_DISTRIBUTION }}
@@ -1023,18 +1023,18 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Download Fat JAR（下载跨平台 Fat JAR）
+      - name: Download Fat JAR（Tải xuống đa nền tảng Fat JAR）
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
           name: app-jar
           path: target
 
-      - name: Install dependencies（安装系统依赖）
+      - name: Install dependencies（Cài đặt phụ thuộc hệ thống)
         run: |
           sudo apt-get update
           sudo apt-get install -y libgtk-3-dev libwebkit2gtk-4.0-dev binutils rpm
 
-      - name: Create runtime with jlink（使用 jlink 创建 Linux 精简 JRE）
+      - name: Create runtime with jlink（sử dụng jlink Tạo Linux tinh giản JRE）
         run: |
           rm -rf target/runtime
           jlink \
@@ -1045,21 +1045,21 @@ jobs:
             --compress=2 \
             --output target/runtime
 
-      - name: Prepare dist-input（准备打包输入目录）
+      - name: Prepare dist-input（Chuẩn bị thư mục đầu vào bao bì)
         run: |
           VERSION="${{ needs.get-version.outputs.version }}"
           rm -rf target/dist-input
           mkdir -p target/dist-input
           cp target/easy-postman-$VERSION.jar target/dist-input/easy-postman.jar
 
-      - name: Create RPM with jpackage（使用 jpackage 创建 RPM 安装包）
+      - name: Create RPM with jpackage（sử dụng jpackage Tạo RPM gói cài đặt)
         run: |
           VERSION="${{ needs.get-version.outputs.version }}"
           mkdir -p dist
-          
+
           IFS='|' read -ra JAVA_OPTS_COMMON <<< "${{ env.JAVA_OPTIONS_COMMON }}"
           IFS='|' read -ra JAVA_OPTS_LINUX <<< "${{ env.JAVA_OPTIONS_LINUX }}"
-          
+
           JPACKAGE_ARGS=(
             --input target/dist-input
             --main-jar "easy-postman.jar"
@@ -1078,20 +1078,20 @@ jobs:
             --linux-app-category "Development"
             --linux-rpm-license-type "MIT"
           )
-          
+
           for opt in "${JAVA_OPTS_COMMON[@]}"; do
             JPACKAGE_ARGS+=(--java-options "$opt")
           done
-          
+
           for opt in "${JAVA_OPTS_LINUX[@]}"; do
             if [ -n "$opt" ]; then
               JPACKAGE_ARGS+=(--java-options "$opt")
             fi
           done
-          
+
           jpackage "${JPACKAGE_ARGS[@]}"
 
-      - name: Upload as Artifact（上传为构建产物）
+      - name: Upload as Artifact（Tải lên dưới dạng sản phẩm xây dựng)
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: EasyPostman-RPM-arm64
@@ -1099,29 +1099,29 @@ jobs:
           retention-days: 7
 
   # ============================================================
-  # 统一上传所有平台文件到 GitHub Release
-  # 使用 softprops/action-gh-release@v2，触发条件：release 事件
-  # always() 保证即使部分构建失败也能上传成功的文件
+  # Tải tất cả các tập tin nền tảng lên GitHub Release
+  # sử dụng softprops/action-gh-release@v2，Điều kiện kích hoạt:release sự kiện
+  # always() Đảm bảo tải lên các tệp thành công ngay cả khi một phần của quá trình xây dựng không thành công
   # ============================================================
   upload-to-github-release:
-    name: Upload All to GitHub Release（统一上传到 GitHub Release）
+    name: Upload All to GitHub Release（Tải lên  GitHub Release）
     if: always() && (github.event_name != 'release' || startsWith(github.event.release.tag_name || '', 'v')) && github.event_name == 'release'
     needs: [ build-windows-portable, build-windows-exe, build-macos-intel, build-macos-arm, build-jar, build-ubuntu-amd64, build-ubuntu-arm64, build-rpm-amd64, build-rpm-arm64 ]
     runs-on: ubuntu-latest
     steps:
-      - name: Download all release artifacts（下载所有平台构建产物）
+      - name: Download all release artifacts（Tải xuống tất cả các bản dựng nền tảng)
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
           path: all-artifacts
           pattern: EasyPostman-*
           merge-multiple: true
 
-      - name: List downloaded files（列出所有下载文件）
+      - name: List downloaded files（Liệt kê tất cả các tập tin đã tải xuống)
         run: |
           echo "📦 Downloaded artifacts:"
           find all-artifacts -type f | sort
 
-      - name: Upload all files to GitHub Release（上传所有文件到 Release）
+      - name: Upload all files to GitHub Release（Tải tất cả các tập tin lên Release）
         uses: softprops/action-gh-release@efb35369e0ad2afab669f228072c1b0d510eae64 # v3.0.3
         with:
           tag_name: ${{ github.event.release.tag_name }}
@@ -1139,10 +1139,10 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   # ============================================================
-  # 检查是否至少有一个构建成功（用于 Gitee 同步前置判断）
+  # Kiểm tra xem ít nhất một bản dựng có thành công hay không (đối với  Gitee Đánh giá đồng bộ)
   # ============================================================
   check-any-build-success:
-    name: Check Any Build Success（检查至少一个构建成功）
+    name: Check Any Build Success（Kiểm tra xem ít nhất một bản dựng đã thành công)
     if: |
       (github.event_name != 'release' || startsWith(github.event.release.tag_name || '', 'v')) &&
       github.event_name == 'release' &&
@@ -1153,67 +1153,67 @@ jobs:
       should_create_release: ${{ steps.check.outputs.should_create }}
 
     steps:
-      - name: Check if any build succeeded（检查是否有任何构建成功）
+      - name: Check if any build succeeded（Kiểm tra xem có bản dựng nào thành công không)
         id: check
         run: |
-          echo "📊 检查构建状态..."
+          echo "📊 Kiểm tra trạng thái xây dựng..."
           echo "  Standalone JAR: ${{ needs.build-jar.result }}"
           echo "  Windows Portable: ${{ needs.build-windows-portable.result }}"
           echo "  Windows EXE: ${{ needs.build-windows-exe.result }}"
           echo "  macOS ARM: ${{ needs.build-macos-arm.result }}"
-          
-          # 只要有一个成功就创建 Release
+
+          # Tạo miễn là một người thành công Release
           if [ "${{ needs.build-jar.result }}" == "success" ] || \
              [ "${{ needs.build-windows-portable.result }}" == "success" ] || \
              [ "${{ needs.build-windows-exe.result }}" == "success" ] || \
              [ "${{ needs.build-macos-arm.result }}" == "success" ]; then
-            echo "✅ 至少有一个构建成功，可以创建 Gitee Release"
+            echo "✅ Ít nhất một bản dựng đã thành công và có thể được tạo Gitee Release"
             echo "should_create=true" >> $GITHUB_OUTPUT
           else
-            echo "❌ 所有构建都失败，跳过创建 Gitee Release"
+            echo "❌ Tất cả các bản dựng đều thất bại, quá trình tạo bị bỏ qua Gitee Release"
             echo "should_create=false" >> $GITHUB_OUTPUT
             exit 1
           fi
 
   # ============================================================
-  # 校验 Gitee 附件大小（超过 100MB 直接失败）
+  # Kiểm tra Gitee Kích thước tệp đính kèm (vượt quá  100MB trực tiếp thất bại)
   # ============================================================
   verify-gitee-assets:
-    name: Verify Gitee Assets（校验 Gitee 附件大小）
+    name: Verify Gitee Assets（Kiểm tra Gitee kích thước tệp đính kèm)
     if: (github.event_name != 'release' || startsWith(github.event.release.tag_name || '', 'v')) && github.event_name == 'release' && needs.check-any-build-success.outputs.should_create_release == 'true'
     needs: [ check-any-build-success, build-jar, build-windows-portable, build-windows-exe, build-macos-arm ]
     runs-on: ubuntu-latest
 
     steps:
-      - name: Download standalone JAR artifact（下载独立 JAR 产物）
+      - name: Download standalone JAR artifact（Tải xuống độc lập JAR sản phẩm)
         if: needs.build-jar.result == 'success'
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
           name: EasyPostman-Standalone-JAR
           path: verify/jar
 
-      - name: Download Windows Portable artifact（下载 Windows 绿色版产物）
+      - name: Download Windows Portable artifact（tải về Windows Sản phẩm phiên bản xanh)
         if: needs.build-windows-portable.result == 'success'
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
           name: EasyPostman-Windows-Portable
           path: verify/windows-portable
 
-      - name: Download Windows EXE artifact（下载 Windows EXE 产物）
+      - name: Download Windows EXE artifact（tải về Windows EXE sản phẩm)
         if: needs.build-windows-exe.result == 'success'
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
           name: EasyPostman-Windows-EXE
           path: verify/windows-exe
 
-      - name: Download macOS ARM artifact（下载 macOS ARM 产物）
+      - name: Download macOS ARM artifact（tải về macOS ARM sản phẩm)
         if: needs.build-macos-arm.result == 'success'
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
           name: EasyPostman-macOS-ARM-DMG
           path: verify/macos-arm
 
-      - name: Validate asset size（校验附件大小）
+      - name: Validate asset size（Xác minh kích thước tệp đính kèm)
         run: |
           validate_file() {
             FILE="$1"
@@ -1250,10 +1250,10 @@ jobs:
           fi
 
   # ============================================================
-  # 创建 Gitee Release
+  # Tạo Gitee Release
   # ============================================================
   create-gitee-release:
-    name: Create Gitee Release（创建 Gitee Release）
+    name: Create Gitee Release（Tạo Gitee Release）
     if: (github.event_name != 'release' || startsWith(github.event.release.tag_name || '', 'v')) && github.event_name == 'release' && needs.check-any-build-success.outputs.should_create_release == 'true'
     needs: [ get-version, check-any-build-success, verify-gitee-assets ]
     runs-on: ubuntu-latest
@@ -1262,7 +1262,7 @@ jobs:
       tag_name: ${{ steps.get_version.outputs.tag }}
 
     steps:
-      - name: Get version from tag（从标签获取版本号）
+      - name: Get version from tag（Lấy số phiên bản từ thẻ)
         id: get_version
         run: |
           TAG_NAME="${{ github.event.release.tag_name }}"
@@ -1270,7 +1270,7 @@ jobs:
           echo "version=$VERSION" >> $GITHUB_OUTPUT
           echo "tag=$TAG_NAME" >> $GITHUB_OUTPUT
 
-      - name: Create Gitee Release（创建 Gitee Release）
+      - name: Create Gitee Release（Tạo Gitee Release）
         id: gitee_release
         env:
           GITEE_TOKEN: ${{ secrets.GITEE_TOKEN }}
@@ -1278,12 +1278,12 @@ jobs:
           VERSION="${{ steps.get_version.outputs.version }}"
           TAG_NAME="${{ steps.get_version.outputs.tag }}"
           RELEASE_BODY="${{ github.event.release.body }}"
-          
+
           if [ -z "$RELEASE_BODY" ]; then
-            RELEASE_BODY="EasyPostman ${VERSION} 发布版本，支持 Windows、macOS 和 Linux。"
+            RELEASE_BODY="EasyPostman ${VERSION} Phiên bản phát hành, được hỗ trợ Windows、macOS và Linux。"
           fi
-          
-          # 把 body 写入临时文件，方便处理特殊字符
+
+          # Bó body Ghi vào một tập tin tạm thời để thuận tiện cho việc xử lý các ký tự đặc biệt
           BODY_FILE="/tmp/release_body.txt"
           printf '%s\n' "${RELEASE_BODY}" > "$BODY_FILE"
 
@@ -1367,25 +1367,25 @@ jobs:
           echo "release_id=$RELEASE_ID" >> "$GITHUB_OUTPUT"
           echo "✅ Gitee Release created successfully with ID: $RELEASE_ID"
 
-  # 跨平台 JAR 上传到 Gitee
+  # Đa nền tảng JAR Tải lên Gitee
   sync-jar-to-gitee:
-    name: Upload Standalone JAR to Gitee（上传独立 JAR 到 Gitee）
+    name: Upload Standalone JAR to Gitee（Tải lên độc lập JAR Đến Gitee）
     if: (github.event_name != 'release' || startsWith(github.event.release.tag_name || '', 'v')) && github.event_name == 'release' && needs.build-jar.result == 'success'
     needs: [ create-gitee-release, build-jar ]
     runs-on: ubuntu-latest
     timeout-minutes: 120
 
     steps:
-      - name: Checkout（检出代码）
+      - name: Checkout（Kiểm tra mã)
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
-      - name: Download standalone JAR artifact（下载独立 JAR 产物）
+      - name: Download standalone JAR artifact（Tải xuống độc lập JAR sản phẩm)
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
           name: EasyPostman-Standalone-JAR
           path: artifacts
 
-      - name: Upload standalone JAR to Gitee（上传独立 JAR 到 Gitee）
+      - name: Upload standalone JAR to Gitee（Tải lên độc lập JAR Đến Gitee）
         env:
           GITEE_TOKEN: ${{ secrets.GITEE_TOKEN }}
         run: |
@@ -1393,25 +1393,25 @@ jobs:
           FILE=$(find artifacts -name "*.jar" | head -n 1)
           bash .github/scripts/upload-gitee-release-asset.sh "$RELEASE_ID" "$FILE"
 
-  # Windows 绿色版上传到 Gitee
+  # Windows Phiên bản màu xanh lá cây được tải lên Gitee
   sync-windows-portable-to-gitee:
-    name: Upload Windows Portable to Gitee（上传 Windows 绿色版到 Gitee）
+    name: Upload Windows Portable to Gitee（Tải lên Windows Phiên bản xanh đã về Gitee）
     if: (github.event_name != 'release' || startsWith(github.event.release.tag_name || '', 'v')) && github.event_name == 'release' && needs.build-windows-portable.result == 'success'
     needs: [ create-gitee-release, build-windows-portable ]
     runs-on: ubuntu-latest
     timeout-minutes: 120
 
     steps:
-      - name: Checkout（检出代码）
+      - name: Checkout（Kiểm tra mã)
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
-      - name: Download Windows Portable artifact（下载 Windows 绿色版产物）
+      - name: Download Windows Portable artifact（tải về Windows Sản phẩm phiên bản xanh)
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
           name: EasyPostman-Windows-Portable
           path: artifacts
 
-      - name: Upload Windows Portable to Gitee（上传 Windows 绿色版到 Gitee）
+      - name: Upload Windows Portable to Gitee（Tải lên Windows Phiên bản xanh đã về Gitee）
         env:
           GITEE_TOKEN: ${{ secrets.GITEE_TOKEN }}
         run: |
@@ -1419,25 +1419,25 @@ jobs:
           FILE=$(find artifacts -name "*-portable.zip" | head -n 1)
           bash .github/scripts/upload-gitee-release-asset.sh "$RELEASE_ID" "$FILE"
 
-  # Windows EXE 上传到 Gitee
+  # Windows EXE Tải lên Gitee
   sync-windows-exe-to-gitee:
-    name: Upload Windows EXE to Gitee（上传 Windows EXE 到 Gitee）
+    name: Upload Windows EXE to Gitee（Tải lên Windows EXE Đến Gitee）
     if: (github.event_name != 'release' || startsWith(github.event.release.tag_name || '', 'v')) && github.event_name == 'release' && needs.build-windows-exe.result == 'success'
     needs: [ create-gitee-release, build-windows-exe ]
     runs-on: ubuntu-latest
     timeout-minutes: 120
 
     steps:
-      - name: Checkout（检出代码）
+      - name: Checkout（Kiểm tra mã)
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
-      - name: Download Windows EXE artifact（下载 Windows EXE 产物）
+      - name: Download Windows EXE artifact（tải về Windows EXE sản phẩm)
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
           name: EasyPostman-Windows-EXE
           path: artifacts
 
-      - name: Upload Windows EXE to Gitee（上传 Windows EXE 到 Gitee）
+      - name: Upload Windows EXE to Gitee（Tải lên Windows EXE Đến Gitee）
         env:
           GITEE_TOKEN: ${{ secrets.GITEE_TOKEN }}
         run: |
@@ -1445,25 +1445,25 @@ jobs:
           FILE=$(find artifacts -name "*.exe" | head -n 1)
           bash .github/scripts/upload-gitee-release-asset.sh "$RELEASE_ID" "$FILE"
 
-  # macOS ARM 上传到 Gitee
+  # macOS ARM Tải lên Gitee
   sync-macos-to-gitee:
-    name: Upload macOS ARM to Gitee（上传 macOS ARM 到 Gitee）
+    name: Upload macOS ARM to Gitee（Tải lên macOS ARM Đến Gitee）
     if: (github.event_name != 'release' || startsWith(github.event.release.tag_name || '', 'v')) && github.event_name == 'release' && needs.build-macos-arm.result == 'success'
     needs: [ create-gitee-release, build-macos-arm ]
     runs-on: ubuntu-latest
     timeout-minutes: 120
 
     steps:
-      - name: Checkout（检出代码）
+      - name: Checkout（Kiểm tra mã)
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
-      - name: Download macOS ARM artifact（下载 macOS ARM 产物）
+      - name: Download macOS ARM artifact（tải về macOS ARM sản phẩm)
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
           name: EasyPostman-macOS-ARM-DMG
           path: artifacts
 
-      - name: Upload macOS ARM to Gitee（上传 macOS ARM 到 Gitee）
+      - name: Upload macOS ARM to Gitee（Tải lên macOS ARM Đến Gitee）
         env:
           GITEE_TOKEN: ${{ secrets.GITEE_TOKEN }}
         run: |
@@ -1471,9 +1471,9 @@ jobs:
           FILE=$(find artifacts -name "*-macos-arm64.dmg" | head -n 1)
           bash .github/scripts/upload-gitee-release-asset.sh "$RELEASE_ID" "$FILE"
 
-  # 汇总结果
+  # Kết quả tổng hợp
   sync-summary:
-    name: Sync Summary（同步汇总）
+    name: Sync Summary（tóm tắt đồng bộ)
     if: |
       (github.event_name != 'release' || startsWith(github.event.release.tag_name || '', 'v')) &&
       github.event_name == 'release' &&
@@ -1482,10 +1482,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Summary（汇总）
+      - name: Summary（bản tóm tắt)
         run: |
-          echo "📊 Gitee Release 同步完成！"
-          
+          echo "📊 Gitee Release Đồng bộ hóa hoàn tất! ."
+
           CHECK_STATUS="${{ needs.check-any-build-success.result }}"
           VERIFY_STATUS="${{ needs.verify-gitee-assets.result }}"
           RELEASE_STATUS="${{ needs.create-gitee-release.result }}"
@@ -1493,34 +1493,34 @@ jobs:
           PORTABLE_STATUS="${{ needs.sync-windows-portable-to-gitee.result }}"
           EXE_STATUS="${{ needs.sync-windows-exe-to-gitee.result }}"
           MACOS_STATUS="${{ needs.sync-macos-to-gitee.result }}"
-          
+
           echo ""
-          echo "🔍 构建检查结果: $CHECK_STATUS"
-          echo "📏 Gitee 附件校验: $VERIFY_STATUS"
-          echo "📝 Gitee Release 创建: $RELEASE_STATUS"
-          
+          echo "🔍 Xây dựng kết quả kiểm tra: $CHECK_STATUS"
+          echo "📏 Gitee Xác minh tệp đính kèm: $VERIFY_STATUS"
+          echo "📝 Gitee Release Tạo: $RELEASE_STATUS"
+
           if [ "$RELEASE_STATUS" == "success" ]; then
             echo "📍 Release URL: https://gitee.com/lakernote/easy-postman/releases/${{ needs.create-gitee-release.outputs.tag_name }}"
           fi
-          
+
           echo ""
-          echo "已同步到 Gitee 的文件："
+          echo "Đã đồng bộ hóa với Gitee Tập tin:"
           echo "  ☕ Standalone JAR - $JAR_STATUS"
-          echo "  📦 Windows Portable (绿色版) - $PORTABLE_STATUS"
-          echo "  🪟 Windows EXE (安装包) - $EXE_STATUS"
+          echo "  📦 Windows Portable (Phiên bản màu xanh lá cây) - $PORTABLE_STATUS"
+          echo "  🪟 Windows EXE (Cài đặt gói) - $EXE_STATUS"
           echo "  🍎 macOS Apple Silicon (ARM64) - $MACOS_STATUS"
           echo ""
 
           if [ "$CHECK_STATUS" == "failure" ]; then
-            echo "❌ 所有构建都失败，未创建 Gitee Release"
+            echo "❌ Tất cả các bản dựng đều thất bại và không được tạo Gitee Release"
             exit 1
           fi
 
           if [ "$VERIFY_STATUS" == "failure" ] || [ "$RELEASE_STATUS" == "failure" ] || \
              [ "$JAR_STATUS" == "failure" ] || [ "$PORTABLE_STATUS" == "failure" ] || \
              [ "$EXE_STATUS" == "failure" ] || [ "$MACOS_STATUS" == "failure" ]; then
-            echo "❌ Gitee Release 流程存在失败步骤"
+            echo "❌ Gitee Release Có những bước không thành công trong quá trình này"
             exit 1
           fi
 
-          echo "✅ Gitee Release 创建成功，附件上传完成"
+          echo "✅ Gitee Release Quá trình tạo thành công và tệp đính kèm được tải lên"

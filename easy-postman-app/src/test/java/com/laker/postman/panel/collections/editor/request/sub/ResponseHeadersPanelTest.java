@@ -59,13 +59,13 @@ public class ResponseHeadersPanelTest extends AbstractSwingUiTest {
     public void shouldLocalizeResponseHeaderColumnTitles() throws Exception {
         Locale originalLocale = I18nUtil.currentLocale();
         try {
-            I18nUtil.setLocale(Locale.CHINESE);
+            I18nUtil.setLocale(Locale.forLanguageTag("vi"));
             ResponseHeadersPanel panel = createPanelOnEdt();
 
             JTable table = findResponseHeadersTable(panel);
 
-            assertEquals(table.getColumnName(0), "名称");
-            assertEquals(table.getColumnName(1), "值");
+            assertEquals(table.getColumnName(0), "tên");
+            assertEquals(table.getColumnName(1), "giá trị");
         } finally {
             I18nUtil.setLocale(originalLocale);
         }

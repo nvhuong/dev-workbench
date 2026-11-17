@@ -13,14 +13,14 @@ import javax.swing.border.EmptyBorder;
 import java.awt.*;
 
 /**
- * 响应大小 Tooltip 构建器
- * 使用 Swing 原生面板替代 HTML 字符串，行列对齐、扁平现代。
+ * Kích thước phản hồi Tooltip người xây dựng
+ * sử dụng Swing Thay thế bảng điều khiển gốc HTML Dây, hàng và cột thẳng hàng, phẳng và hiện đại.
  */
 @UtilityClass
 public class ResponseTooltipBuilder {
 
     /**
-     * 构建响应大小的 Swing Tooltip 面板
+     * Xây dựng một cách đáp ứng Swing Tooltip bảng điều khiển
      */
     public static JPanel buildSizeTooltipPanel(long uncompressedBytes,
                                                HttpEventInfo info,
@@ -70,10 +70,10 @@ public class ResponseTooltipBuilder {
         return root;
     }
 
-    // ── 内部构建方法 ──────────────────────────────────────────────────
+    // ── Phương pháp xây dựng nội bộ ──────────────────────────────────────────────────
 
     /**
-     * 区块标题行（加粗，主题主色）
+     * Dòng tiêu đề khối (in đậm, màu chủ đạo)
      */
     private static JPanel sectionHeader(String title) {
         JPanel p = row();
@@ -87,7 +87,7 @@ public class ResponseTooltipBuilder {
     }
 
     /**
-     * 普通数据行：label 左对齐，value 右对齐
+     * Hàng dữ liệu thông thường:label Căn trái,value Căn chỉnh đúng
      */
     private static JPanel row(String label, String value, Color valueColor) {
         JPanel p = row();
@@ -104,13 +104,13 @@ public class ResponseTooltipBuilder {
         p.add(Box.createHorizontalStrut(16));
         p.add(lblVal);
 
-        // 限制到单行高度
+        // Giới hạn chiều cao của một hàng
         p.setMaximumSize(new Dimension(Integer.MAX_VALUE, p.getPreferredSize().height + 2));
         return p;
     }
 
     /**
-     * 缩进的次级行（用于 Uncompressed 等说明）
+     * Các dòng phụ thụt vào (đối với  Uncompressed vân vân.)
      */
     private static JPanel subRow(String label, String value) {
         JPanel p = row();
@@ -134,7 +134,7 @@ public class ResponseTooltipBuilder {
     }
 
     /**
-     * gzip 压缩信息 badge
+     * gzip Nén thông tin badge
      */
     private static JPanel compressionBadge(ResponseSizeCalculator.SizeInfo sizeInfo) {
         JPanel badge = new JPanel(new GridBagLayout());
@@ -189,7 +189,7 @@ public class ResponseTooltipBuilder {
         c.insets = new Insets(0, 0, 0, 0);
         badge.add(savedVal, c);
 
-        // 包一层让 badge 撑满行宽
+        // Bọc trong một lớp badge Điền vào chiều rộng dòng
         JPanel wrapper = new JPanel(new BorderLayout());
         wrapper.setOpaque(false);
         wrapper.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -198,7 +198,7 @@ public class ResponseTooltipBuilder {
     }
 
     /**
-     * 1px 水平分隔线
+     * 1px Bộ chia ngang
      */
     private static JPanel divider() {
         JPanel line = new JPanel() {
@@ -216,7 +216,7 @@ public class ResponseTooltipBuilder {
     }
 
     /**
-     * 水平 row 容器
+     * mức độ row thùng chứa
      */
     private static JPanel row() {
         JPanel p = new JPanel();

@@ -1,184 +1,184 @@
-# 贡献指南 | Contributing Guide
+# Nguyên tắc đóng góp | Contributing Guide
 
-[English](#english) | [中文](#中文)
+[English](#english) | [Tiếng Trung Quốc](#Tiếng Trung Quốc)
 
 ---
 
-## 中文
+## Tiếng Trung Quốc
 
-感谢你对 EasyPostman 的关注！我们欢迎任何形式的贡献。
+Cảm ơn bạn vì điều đó EasyPostman sự chú ý! Chúng tôi hoan nghênh sự đóng góp dưới mọi hình thức.
 
-### 🚀 开始之前
+### 🚀 trước khi bắt đầu
 
-在提交贡献之前，请确保：
+Trước khi gửi đóng góp của bạn, vui lòng đảm bảo:
 
-1. 已阅读 [README](../README_zh.md) 了解项目
-2. 已搜索 [Issues](https://github.com/lakernote/easy-postman/issues) 确认问题未被报告
-3. 已阅读本贡献指南
+1. Đọc [README](../README_zh.md) Tìm hiểu về dự án
+2. Đã tìm kiếm [Issues](https://github.com/lakernote/easy-postman/issues) Xác nhận rằng vấn đề chưa được báo cáo
+3. Đã đọc hướng dẫn đóng góp này
 
-### 📋 贡献方式
+### 📋 Những cách đóng góp
 
-#### 1. 报告 Bug
+#### 1. Báo cáo Bug
 
-如果你发现了 Bug，请：
+Nếu bạn tìm ra Bug，Xin vui lòng:
 
-1. 在 [Issues](https://github.com/lakernote/easy-postman/issues) 中搜索是否已有相同问题
-2. 如果没有，创建新的 Issue，选择 "🐛 Bug 报告" 模板
-3. 填写完整的信息，包括：
-   - 复现步骤
-   - 期望行为和实际行为
-   - 环境信息（操作系统、版本号等）
-   - 相关日志和截图
+1. Vào [Issues](https://github.com/lakernote/easy-postman/issues) Hãy tìm kiếm xem bạn đã gặp vấn đề tương tự chưa
+2. Nếu không, hãy tạo một cái mới Issue，Chọn "🐛 Bug Báo cáo" bản mẫu
+3. Điền đầy đủ thông tin bao gồm:
+   - Các bước để tái tạo
+   - Hành vi mong đợi và hành vi thực tế
+   - Thông tin môi trường (hệ điều hành, số phiên bản, v.v.)
+   - Nhật ký và ảnh chụp màn hình có liên quan
 
-#### 2. 功能建议
+#### 2. Tính năng gợi ý
 
-如果你有新功能的想法：
+Nếu bạn có ý tưởng về các tính năng mới: .
 
-1. 先在 [Discussions](https://github.com/lakernote/easy-postman/discussions) 中讨论
-2. 如果获得认可，创建 Issue，选择 "✨ 功能请求" 模板
-3. 详细描述：
-   - 使用场景
-   - 期望的解决方案
-   - 备选方案
-   - 界面设计（如果涉及 UI）
+1. Đầu tiên vào [Discussions](https://github.com/lakernote/easy-postman/discussions) được thảo luận ở
+2. Nếu được chấp thuận, hãy tạo Issue，Chọn "✨ Yêu cầu tính năng" bản mẫu
+3. Mô tả chi tiết:
+   - Kịch bản sử dụng
+   - giải pháp mong muốn
+   - Các lựa chọn thay thế
+   - Thiết kế giao diện (nếu có liên quan UI）
 
-#### 3. 提交代码
+#### 3. Gửi mã
 
-我们非常欢迎代码贡献！
+Đóng góp mã rất được hoan nghênh! .
 
-##### 环境准备
+##### Chuẩn bị môi trường
 
 ```bash
-# 1. Fork 项目到你的 GitHub 账号
+# 1. Fork dự án của bạn GitHub Số tài khoản
 
-# 2. 克隆你的 Fork
+# 2. Nhân bản của bạn Fork
 git clone https://github.com/YOUR_USERNAME/easy-postman.git
 cd easy-postman
 
-# 3. 添加上游仓库
+# 3. Thêm kho lưu trữ ngược dòng
 git remote add upstream https://github.com/lakernote/easy-postman.git
 
-# 4. 安装依赖
-# 确保已安装 Java 21+
+# 4. Cài đặt phụ thuộc
+# Hãy chắc chắn rằng nó đã được cài đặt Java 21+
 mvn clean install
 ```
 
-##### 开发流程
+##### quá trình phát triển
 
 ```bash
-# 1. 同步最新代码
+# 1. Đồng bộ hóa mã mới nhất
 git checkout master
 git pull upstream master
 
-# 2. 创建功能分支
+# 2. Tạo các nhánh tính năng
 git checkout -b feature/your-feature-name
-# 或修复分支
+# Hoặc sửa chữa chi nhánh
 git checkout -b fix/your-bug-fix
 
-# 3. 进行开发
-# ... 编码 ...
+# 3. cho sự phát triển
+# ... Mã hóa ...
 
-# 4. 编译测试（package 已包含测试；测试日志默认关闭，排查时加 -Dtest.log.level=DEBUG）
+# 4. Biên dịch bài kiểm tra (package Các bài kiểm tra được bao gồm; nhật ký kiểm tra được tắt theo mặc định và có thể được thêm vào trong quá trình khắc phục sự cố -Dtest.log.level=DEBUG）
 mvn clean package
 
-# 5. 提交代码
+# 5. Gửi mã
 git add .
-git commit -m "feat: 添加新功能描述"
-# 或
-git commit -m "fix: 修复某个问题"
+git commit -m "feat: Thêm mô tả tính năng mới"
+# hoặc
+git commit -m "fix: Khắc phục sự cố"
 
-# 6. 推送到你的 Fork
+# 6. Đã đẩy tới bạn Fork
 git push origin feature/your-feature-name
 
-# 7. 创建 Pull Request
-# 在 GitHub 上创建 PR，从你的分支到 upstream/master
+# 7. Tạo Pull Request
+# Vào GitHub Được tạo trên PR，Từ chi nhánh của bạn đến upstream/master
 ```
 
-##### 代码规范
+##### Thông số mã
 
-- **编码风格**：遵循 Java 编码规范
-- **提交信息**：使用语义化提交信息
-  - `feat:` 新功能
-  - `fix:` Bug 修复
-  - `docs:` 文档更新
-  - `style:` 代码格式调整
-  - `refactor:` 代码重构
-  - `perf:` 性能优化
-  - `test:` 测试相关
-  - `chore:` 构建/工具相关
-- **注释**：为复杂逻辑添加清晰的注释
-- **测试**：为新功能添加测试用例
+- **Phong cách mã hóa**：Theo dõi Java Tiêu chuẩn mã hóa
+- **Gửi thông tin**：Sử dụng thông tin gửi ngữ nghĩa
+  - `feat:` Các tính năng mới
+  - `fix:` Bug Sửa chữa
+  - `docs:` Tài liệu được cập nhật
+  - `style:` Điều chỉnh định dạng mã
+  - `refactor:` Tái cấu trúc mã
+  - `perf:` Tối ưu hóa hiệu suất
+  - `test:` Kiểm tra liên quan
+  - `chore:` Xây dựng/Công cụ liên quan
+- **Lưu ý**：Thêm nhận xét rõ ràng cho logic phức tạp
+- **Bài kiểm tra**：Thêm trường hợp thử nghiệm cho các tính năng mới
 
-##### Pull Request 检查清单
+##### Pull Request Danh sách kiểm tra
 
-在提交 PR 前，请确保：
+Đang gửi PR Trước khi tiếp tục, hãy đảm bảo:
 
-- [ ] 代码可以成功编译（`mvn clean package`）
-- [ ] 所有测试通过（`mvn test`）
-- [ ] 代码遵循项目的编码规范
-- [ ] 添加了必要的注释
-- [ ] 更新了相关文档（如果需要）
-- [ ] PR 描述清晰，说明了改动内容和原因
-- [ ] 关联了相关的 Issue（如果有）
+- [ ] Mã biên dịch thành công (`mvn clean package`）
+- [ ] Tất cả các bài kiểm tra đã vượt qua (`mvn test`）
+- [ ] Mã tuân theo các tiêu chuẩn mã hóa của dự án
+- [ ] Đã thêm ý kiến ​​cần thiết
+- [ ] Cập nhật tài liệu liên quan (nếu cần)
+- [ ] PR Mô tả rõ ràng, giải thích những thay đổi là gì và tại sao
+- [ ] Những cái có liên quan được liên kết Issue（nếu có)
 
-#### 4. 改进文档
+#### 4. Cải thiện tài liệu
 
-文档同样重要！你可以：
+Giấy tờ cũng quan trọng không kém! Bạn có thể:
 
-- 修正错别字或不准确的描述
-- 补充使用示例
-- 翻译文档
-- 添加常见问题解答
+- Sửa lỗi chính tả hoặc mô tả không chính xác
+- Ví dụ sử dụng bổ sung
+- Dịch tài liệu
+- Thêm câu hỏi thường gặp
 
-### 🎯 开发建议
+### 🎯 Đề xuất phát triển
 
-#### 项目结构
+#### Cấu trúc dự án
 
 ```
 src/main/java/com/laker/
-├── postman/           # 主应用
-│   ├── ui/           # UI 组件
-│   ├── service/      # 业务逻辑
-│   ├── model/        # 数据模型
-│   ├── utils/        # 工具类
-│   └── network/      # 网络请求
+├── postman/           # ứng dụng chính
+│   ├── ui/           # UI thành phần
+│   ├── service/      # logic kinh doanh
+│   ├── model/        # Mô hình dữ liệu
+│   ├── utils/        # Công cụ
+│   └── network/      # Yêu cầu mạng
 └── ...
 ```
 
-#### 技术栈
+#### Ngăn xếp công nghệ
 
-- **UI 框架**: JavaFX / Swing + FlatLaf
-- **HTTP 客户端**: OkHttp
-- **JSON 处理**: Jackson / Gson
-- **Git 集成**: JGit
-- **脚本引擎**: GraalVM Polyglot
+- **UI khung**: JavaFX / Swing + FlatLaf
+- **HTTP khách hàng**: OkHttp
+- **JSON xử lý**: Jackson / Gson
+- **Git tích hợp**: JGit
+- **Công cụ kịch bản**: GraalVM Polyglot
 
-#### 调试技巧
+#### Mẹo gỡ lỗi
 
 ```bash
-# 开发模式运行
+# Chạy ở chế độ phát triển
 mvn clean compile exec:java -Dexec.mainClass="com.laker.postman.App"
 
-# 启用调试日志
-# 修改 src/main/resources/logback.xml 中的日志级别
+# Bật tính năng ghi nhật ký gỡ lỗi
+# Ôn lại src/main/resources/logback.xml Cấp độ nhật ký trong
 ```
 
-### 🤝 行为准则
+### 🤝 Quy tắc ứng xử
 
-- 尊重他人，友好交流
-- 接受建设性的批评
-- 专注于对项目最有利的事情
-- 对新手保持耐心和包容
+- Hãy đối xử tôn trọng với người khác và giao tiếp một cách thân thiện
+- Chấp nhận những lời chỉ trích mang tính xây dựng
+- Tập trung vào những gì tốt nhất cho dự án
+- Hãy kiên nhẫn và bao dung với người mới
 
-### 📞 联系方式
+### 📞 Chi tiết liên lạc
 
-- **GitHub Issues**: [提交 Issue](https://github.com/lakernote/easy-postman/issues)
-- **Discussions**: [参与讨论](https://github.com/lakernote/easy-postman/discussions)
-- **微信**: lakernote
+- **GitHub Issues**: [nộp Issue](https://github.com/lakernote/easy-postman/issues)
+- **Discussions**: [Tham gia vào các cuộc thảo luận](https://github.com/lakernote/easy-postman/discussions)
+- **WeChat**: lakernote
 
-### 🙏 感谢
+### 🙏 tri ân
 
-感谢所有为 EasyPostman 做出贡献的开发者！
+Cảm ơn vì tất cả EasyPostman Đóng góp của các nhà phát triển! .
 
 ---
 

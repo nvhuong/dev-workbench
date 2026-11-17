@@ -24,8 +24,8 @@ import javax.swing.tree.TreePath;
 import java.awt.*;
 
 /**
- * 添加请求对话框
- * 包含协议选择和名称输入
+ * Thêm hộp thoại yêu cầu
+ * Chứa lựa chọn giao thức và nhập tên
  */
 public class AddRequestDialog {
     static final int DIALOG_WIDTH = 400;
@@ -47,7 +47,7 @@ public class AddRequestDialog {
     }
 
     /**
-     * 初始化对话框
+     * Khởi tạo hộp thoại
      */
     private void initDialog() {
         dialog = new JDialog(
@@ -71,7 +71,7 @@ public class AddRequestDialog {
     }
 
     /**
-     * 创建主面板
+     * Tạo bảng điều khiển chính
      */
     private JPanel createMainPanel() {
         JPanel mainPanel = new JPanel();
@@ -90,7 +90,7 @@ public class AddRequestDialog {
     }
 
     /**
-     * 创建名称输入面板
+     * Tạo bảng nhập tên
      */
     private JPanel createNamePanel() {
         JPanel namePanel = new JPanel(new BorderLayout(10, 5));
@@ -109,7 +109,7 @@ public class AddRequestDialog {
     }
 
     /**
-     * 创建协议选择面板
+     * Tạo bảng lựa chọn giao thức
      */
     private JPanel createProtocolPanel() {
         ButtonGroup protocolGroup;
@@ -143,7 +143,7 @@ public class AddRequestDialog {
     }
 
     /**
-     * 创建协议按钮
+     * Tạo nút Thỏa thuận
      */
     private JToggleButton createProtocolButton(String text, String iconPath, boolean selected) {
         JToggleButton btn = new ProtocolOptionButton(text, new FlatSVGIcon(iconPath, 22, 22));
@@ -207,7 +207,7 @@ public class AddRequestDialog {
     }
 
     /**
-     * 创建按钮面板
+     * Tạo một bảng nút
      */
     private JPanel createButtonPanel() {
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
@@ -226,7 +226,7 @@ public class AddRequestDialog {
     }
 
     /**
-     * 处理确定按钮
+     * Xử lý nút OK
      */
     private void handleOk() {
         String requestName = nameField.getText().trim();
@@ -247,7 +247,7 @@ public class AddRequestDialog {
     }
 
     /**
-     * 获取选中的协议
+     * Nhận giao thức đã chọn
      */
     private RequestItemProtocolEnum getSelectedProtocol() {
         if (httpBtn.isSelected()) {
@@ -257,7 +257,7 @@ public class AddRequestDialog {
     }
 
     /**
-     * 创建并添加请求到树
+     * Tạo và thêm yêu cầu vào cây
      */
     private void createAndAddRequest(String requestName, RequestItemProtocolEnum protocol) {
         if (groupNode == null) return;
@@ -265,7 +265,7 @@ public class AddRequestDialog {
         HttpRequestItem defaultRequest = HttpRequestFactory.createBlankRequest(protocol);
         defaultRequest.setName(requestName);
 
-        // 添加到树中
+        // Thêm vào cây
         DefaultMutableTreeNode reqNode = CollectionTreeNodes.requestNode(defaultRequest);
         groupNode.add(reqNode);
         leftPanel.getTreeModel().reload(groupNode);
@@ -273,17 +273,17 @@ public class AddRequestDialog {
         tree.expandPath(new TreePath(groupNode.getPath()));
         leftPanel.getCollectionTreePersistence().saveCurrentTree();
 
-        // 定位到新创建的请求节点
+        // Xác định vị trí nút yêu cầu mới được tạo
         TreePath newPath = new TreePath(reqNode.getPath());
         tree.setSelectionPath(newPath);
         tree.scrollPathToVisible(newPath);
 
-        // 自动打开新创建的请求
+        // Tự động mở các yêu cầu mới tạo
         UiSingletonFactory.getInstance(RequestEditorPanel.class).showOrCreateTab(defaultRequest);
     }
 
     /**
-     * 显示对话框
+     * Hiển thị hộp thoại
      */
     public void show() {
         SwingUtilities.invokeLater(nameField::requestFocus);

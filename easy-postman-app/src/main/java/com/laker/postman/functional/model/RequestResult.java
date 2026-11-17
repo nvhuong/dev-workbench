@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * 单个请求的执行结果
+ * Kết quả thực hiện của một yêu cầu
  */
 @Data
 public class RequestResult {

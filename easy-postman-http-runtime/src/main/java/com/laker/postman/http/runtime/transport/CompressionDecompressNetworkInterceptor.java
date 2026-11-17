@@ -11,9 +11,9 @@ import java.io.IOException;
 import static com.laker.postman.util.HttpHeaderConstants.*;
 
 /**
- * 网络拦截器：自动解压 gzip、deflate、br 三种压缩格式，流式解压，兼容 SSE/chunked/普通响应
- * 严格参考 OkHttp BridgeInterceptor 的 promisesBody 逻辑，只有在响应确实有 body 时才解压
- * 头部处理与 BridgeInterceptor 保持一致，移除 Content-Encoding/Content-Length，保留 Content-Type
+ * Trình chặn mạng: Tự động giải nén gzip、deflate、br Ba định dạng nén, giải nén trực tuyến, tương thích SSE/chunked/Phản ứng bình thường
+ * Tham khảo nghiêm ngặt OkHttp BridgeInterceptor của promisesBody Logic, chỉ khi phản hồi tồn tại body Sau đó mới giải nén được
+ * Xử lý đầu Vs BridgeInterceptor Hãy nhất quán, loại bỏ Content-Encoding/Content-Length，Đã đặt trước Content-Type
  */
 public class CompressionDecompressNetworkInterceptor implements Interceptor {
     private boolean promisesBody(Response response) {
@@ -38,7 +38,7 @@ public class CompressionDecompressNetworkInterceptor implements Interceptor {
         String encoding = response.header(CONTENT_ENCODING);
         String contentLength = response.header(CONTENT_LENGTH);
         MediaType respContentType = response.body() != null ? response.body().contentType() : null;
-        // 只在 Content-Encoding 存在且 promisesBody 时处理，避免重复解压和流式响应卡死
+        // Chỉ trong Content-Encoding tồn tại và promisesBody Xử lý trong thời gian thực để tránh tình trạng giải nén lặp lại và phản hồi phát trực tuyến bị treo
         if (encoding != null && response.body() != null && promisesBody(response)) {
             encoding = encoding.toLowerCase();
             BufferedSource decompressed;
@@ -52,21 +52,21 @@ public class CompressionDecompressNetworkInterceptor implements Interceptor {
             } else {
                 return response;
             }
-            // 头部处理参考 BridgeInterceptor，流式解压，长度未知
+            // Tham chiếu xử lý tiêu đề BridgeInterceptor，Đang giải nén trực tuyến, độ dài không xác định
             Response.Builder builder = response.newBuilder()
                     .removeHeader(CONTENT_ENCODING)
                     .removeHeader(CONTENT_LENGTH)
                     .header(EASY_CONTENT_ENCODING, encoding)
                     .body(ResponseBody.create(respContentType, -1, decompressed));
 
-            // 如果原来有Content-Length，保存到Easy-Content-Length
+            // Nếu hóa ra là cóContent-Length，Lưu vàoEasy-Content-Length
             if (contentLength != null) {
                 builder.header(EASY_CONTENT_LENGTH, contentLength);
             }
 
             return builder.build();
         }
-        // 其他场景（无 body、流式响应、HEAD/204/304等），原样返回
+        // Các cảnh khác (không có body、Phản hồi trực tuyến,HEAD/204/304v.v.), trả lại như cũ
         return response;
     }
 }

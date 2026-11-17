@@ -6,21 +6,21 @@ import org.testng.annotations.Test;
 import static org.testng.Assert.*;
 
 /**
- * FileExtensionUtil 单元测试类
- * 测试文件扩展名推断、文件名生成和类型判断功能
+ * FileExtensionUtil Lớp kiểm tra đơn vị
+ * Kiểm tra khả năng suy luận phần mở rộng tệp, tạo tên tệp và xác định loại
  */
 public class FileExtensionUtilTest {
 
-    // ==================== guessExtension 测试 ====================
+    // ==================== guessExtension Bài kiểm tra ====================
 
     @DataProvider(name = "documentContentTypes")
     public Object[][] documentContentTypes() {
         return new Object[][]{
-                // Office 文档（现代格式）
+                // Office Tài liệu (định dạng hiện đại)
                 {"application/vnd.openxmlformats-officedocument.wordprocessingml.document", ".docx"},
                 {"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", ".xlsx"},
                 {"application/vnd.openxmlformats-officedocument.presentationml.presentation", ".pptx"},
-                // Office 文档（旧格式）
+                // Office Tài liệu (định dạng cũ)
                 {"application/msword", ".doc"},
                 {"application/vnd.ms-excel", ".xls"},
                 {"application/vnd.ms-powerpoint", ".ppt"},
@@ -29,10 +29,10 @@ public class FileExtensionUtilTest {
         };
     }
 
-    @Test(dataProvider = "documentContentTypes", description = "测试文档类型的扩展名推断")
+    @Test(dataProvider = "documentContentTypes", description = "Kiểm tra suy luận mở rộng cho các loại tài liệu")
     public void testGuessExtension_Documents(String contentType, String expectedExt) {
         assertEquals(FileExtensionUtil.guessExtension(contentType), expectedExt,
-                "Content-Type: " + contentType + " 应该返回扩展名: " + expectedExt);
+                "Content-Type: " + contentType + " Phần mở rộng phải được trả lại: " + expectedExt);
     }
 
     @DataProvider(name = "textContentTypes")
@@ -53,7 +53,7 @@ public class FileExtensionUtilTest {
         };
     }
 
-    @Test(dataProvider = "textContentTypes", description = "测试文本类型的扩展名推断")
+    @Test(dataProvider = "textContentTypes", description = "Kiểm tra suy luận mở rộng cho các loại văn bản")
     public void testGuessExtension_TextTypes(String contentType, String expectedExt) {
         assertEquals(FileExtensionUtil.guessExtension(contentType), expectedExt);
     }
@@ -71,7 +71,7 @@ public class FileExtensionUtilTest {
         };
     }
 
-    @Test(dataProvider = "imageContentTypes", description = "测试图片类型的扩展名推断")
+    @Test(dataProvider = "imageContentTypes", description = "Kiểm tra suy luận mở rộng cho các loại hình ảnh")
     public void testGuessExtension_Images(String contentType, String expectedExt) {
         assertEquals(FileExtensionUtil.guessExtension(contentType), expectedExt);
     }
@@ -88,7 +88,7 @@ public class FileExtensionUtilTest {
         };
     }
 
-    @Test(dataProvider = "archiveContentTypes", description = "测试压缩文件类型的扩展名推断")
+    @Test(dataProvider = "archiveContentTypes", description = "Kiểm tra suy luận mở rộng cho các loại tệp nén")
     public void testGuessExtension_Archives(String contentType, String expectedExt) {
         assertEquals(FileExtensionUtil.guessExtension(contentType), expectedExt);
     }
@@ -96,7 +96,7 @@ public class FileExtensionUtilTest {
     @DataProvider(name = "mediaContentTypes")
     public Object[][] mediaContentTypes() {
         return new Object[][]{
-                // 音频
+                // Âm thanh
                 {"audio/mpeg", ".mp3"},
                 {"audio/mp3", ".mp3"},
                 {"audio/wav", ".wav"},
@@ -110,69 +110,69 @@ public class FileExtensionUtilTest {
                 {"audio/basic", ".au"},
                 {"audio/webm", ".webm"},
                 {"audio/opus", ".opus"},
-                // 视频
+                // băng hình
                 {"video/mp4", ".mp4"},
                 {"video/mpeg", ".mpeg"},
                 {"video/webm", ".webm"},
         };
     }
 
-    @Test(dataProvider = "mediaContentTypes", description = "测试多媒体类型的扩展名推断")
+    @Test(dataProvider = "mediaContentTypes", description = "Kiểm tra suy luận mở rộng cho các loại đa phương tiện")
     public void testGuessExtension_Media(String contentType, String expectedExt) {
         assertEquals(FileExtensionUtil.guessExtension(contentType), expectedExt);
     }
 
-    @Test(description = "测试空值或无法识别的 Content-Type")
+    @Test(description = "Kiểm tra các giá trị null hoặc không được nhận dạng Content-Type")
     public void testGuessExtension_NullAndUnknown() {
-        assertNull(FileExtensionUtil.guessExtension(null), "null 应该返回 null");
-        assertNull(FileExtensionUtil.guessExtension(""), "空字符串应该返回 null");
-        assertNull(FileExtensionUtil.guessExtension("unknown/type"), "未知类型应该返回 null");
+        assertNull(FileExtensionUtil.guessExtension(null), "null nên được trả lại null");
+        assertNull(FileExtensionUtil.guessExtension(""), "Một chuỗi trống sẽ được trả về null");
+        assertNull(FileExtensionUtil.guessExtension("unknown/type"), "Các loại không xác định nên được trả lại null");
     }
 
-    @Test(description = "测试 Content-Type 带字符集参数的情况")
+    @Test(description = "Bài kiểm tra Content-Type Với các tham số bộ ký tự")
     public void testGuessExtension_WithCharset() {
         assertEquals(FileExtensionUtil.guessExtension("application/json; charset=UTF-8"), ".json");
         assertEquals(FileExtensionUtil.guessExtension("text/html; charset=UTF-8"), ".html");
         assertEquals(FileExtensionUtil.guessExtension("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet; charset=binary"), ".xlsx");
     }
 
-    // ==================== generateSmartFileName 测试 ====================
+    // ==================== generateSmartFileName Bài kiểm tra ====================
 
-    @Test(description = "测试生成智能文件名")
+    @Test(description = "Kiểm tra tạo tên tập tin thông minh")
     public void testGenerateSmartFileName() {
         String fileName = FileExtensionUtil.generateSmartFileName(".json");
-        assertTrue(fileName.startsWith("response_data_"), "JSON 文件名应该以 response_data_ 开头");
-        assertTrue(fileName.endsWith(".json"), "文件名应该以 .json 结尾");
+        assertTrue(fileName.startsWith("response_data_"), "JSON Tên tệp phải kết thúc bằng  response_data_ Bắt đầu");
+        assertTrue(fileName.endsWith(".json"), "Tên tệp phải kết thúc bằng  .json Sự kết thúc");
 
         fileName = FileExtensionUtil.generateSmartFileName("xlsx");
-        assertTrue(fileName.startsWith("document_"), "Excel 文件名应该以 document_ 开头");
-        assertTrue(fileName.endsWith(".xlsx"), "文件名应该以 .xlsx 结尾");
+        assertTrue(fileName.startsWith("document_"), "Excel Tên tệp phải kết thúc bằng  document_ Bắt đầu");
+        assertTrue(fileName.endsWith(".xlsx"), "Tên tệp phải kết thúc bằng  .xlsx Sự kết thúc");
 
         fileName = FileExtensionUtil.generateSmartFileName(".png");
-        assertTrue(fileName.startsWith("image_"), "图片文件名应该以 image_ 开头");
-        assertTrue(fileName.endsWith(".png"), "文件名应该以 .png 结尾");
+        assertTrue(fileName.startsWith("image_"), "Tên tệp hình ảnh phải kết thúc bằng  image_ Bắt đầu");
+        assertTrue(fileName.endsWith(".png"), "Tên tệp phải kết thúc bằng  .png Sự kết thúc");
     }
 
-    @Test(description = "测试生成文件名时扩展名为空的情况")
+    @Test(description = "Kiểm tra trường hợp phần mở rộng tệp trống khi tạo tên tệp")
     public void testGenerateSmartFileName_NullExtension() {
         String fileName = FileExtensionUtil.generateSmartFileName(null);
-        assertTrue(fileName.endsWith(".txt"), "null 扩展名应该默认为 .txt");
+        assertTrue(fileName.endsWith(".txt"), "null Tiện ích mở rộng phải mặc định là  .txt");
 
         fileName = FileExtensionUtil.generateSmartFileName("");
-        assertTrue(fileName.endsWith(".txt"), "空扩展名应该默认为 .txt");
+        assertTrue(fileName.endsWith(".txt"), "Phần mở rộng trống sẽ được mặc định là  .txt");
     }
 
-    @Test(description = "测试生成的文件名唯一性")
+    @Test(description = "Kiểm tra tính duy nhất của tên tệp được tạo")
     public void testGenerateSmartFileName_Uniqueness() throws InterruptedException {
         String fileName1 = FileExtensionUtil.generateSmartFileName(".json");
-        Thread.sleep(1); // 确保时间戳不同
+        Thread.sleep(1); // Đảm bảo dấu thời gian khác nhau
         String fileName2 = FileExtensionUtil.generateSmartFileName(".json");
-        assertNotEquals(fileName1, fileName2, "两次生成的文件名应该不同（包含不同的时间戳）");
+        assertNotEquals(fileName1, fileName2, "Tên tệp được tạo hai lần phải khác nhau (chứa các dấu thời gian khác nhau)");
     }
 
-    // ==================== extractMainType 测试 ====================
+    // ==================== extractMainType Bài kiểm tra ====================
 
-    @Test(description = "测试提取主类型")
+    @Test(description = "Kiểm tra để trích xuất loại chính")
     public void testExtractMainType() {
         assertEquals(FileExtensionUtil.extractMainType("text/plain"), "text");
         assertEquals(FileExtensionUtil.extractMainType("application/json"), "application");
@@ -180,14 +180,14 @@ public class FileExtensionUtilTest {
         assertEquals(FileExtensionUtil.extractMainType("video/mp4"), "video");
     }
 
-    @Test(description = "测试提取主类型时的异常情况")
+    @Test(description = "Kiểm tra các trường hợp ngoại lệ khi trích xuất loại chính")
     public void testExtractMainType_EdgeCases() {
-        assertNull(FileExtensionUtil.extractMainType(null), "null 应该返回 null");
-        assertNull(FileExtensionUtil.extractMainType(""), "空字符串应该返回 null");
-        assertNull(FileExtensionUtil.extractMainType("invalid"), "无斜杠的字符串应该返回 null");
+        assertNull(FileExtensionUtil.extractMainType(null), "null nên được trả lại null");
+        assertNull(FileExtensionUtil.extractMainType(""), "Một chuỗi trống sẽ được trả về null");
+        assertNull(FileExtensionUtil.extractMainType("invalid"), "Một chuỗi không có dấu gạch chéo sẽ được trả về null");
     }
 
-    // ==================== isTextType 测试 ====================
+    // ==================== isTextType Bài kiểm tra ====================
 
     @DataProvider(name = "textTypes")
     public Object[][] textTypes() {
@@ -204,10 +204,10 @@ public class FileExtensionUtilTest {
         };
     }
 
-    @Test(dataProvider = "textTypes", description = "测试文本类型判断")
+    @Test(dataProvider = "textTypes", description = "Kiểm tra phán đoán loại văn bản")
     public void testIsTextType_TextTypes(String contentType) {
         assertTrue(FileExtensionUtil.isTextType(contentType),
-                contentType + " 应该被识别为文本类型");
+                contentType + " Nên được công nhận là loại văn bản");
     }
 
     @DataProvider(name = "nonTextTypes")
@@ -222,19 +222,19 @@ public class FileExtensionUtilTest {
         };
     }
 
-    @Test(dataProvider = "nonTextTypes", description = "测试非文本类型判断")
+    @Test(dataProvider = "nonTextTypes", description = "Kiểm tra phán đoán loại phi văn bản")
     public void testIsTextType_NonTextTypes(String contentType) {
         assertFalse(FileExtensionUtil.isTextType(contentType),
-                contentType + " 不应该被识别为文本类型");
+                contentType + " Không nên được công nhận là một loại văn bản");
     }
 
-    @Test(description = "测试文本类型判断的边界情况")
+    @Test(description = "Kiểm tra các trường hợp cạnh để đánh giá loại văn bản")
     public void testIsTextType_EdgeCases() {
         assertFalse(FileExtensionUtil.isTextType(null));
         assertFalse(FileExtensionUtil.isTextType(""));
     }
 
-    // ==================== isBinaryType 测试 ====================
+    // ==================== isBinaryType Bài kiểm tra ====================
 
     @DataProvider(name = "binaryTypes")
     public Object[][] binaryTypes() {
@@ -248,7 +248,7 @@ public class FileExtensionUtilTest {
                 {"application/zip"},
                 {"application/gzip"},
                 {"application/msword"},
-                // 关键测试：Office 文档（包含 xml 但应该是二进制）
+                // Kiểm tra chính:Office Tài liệu (bao gồm xml Nhưng nó phải là nhị phân)
                 {"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"},
                 {"application/vnd.openxmlformats-officedocument.wordprocessingml.document"},
                 {"application/vnd.openxmlformats-officedocument.presentationml.presentation"},
@@ -256,10 +256,10 @@ public class FileExtensionUtilTest {
         };
     }
 
-    @Test(dataProvider = "binaryTypes", description = "测试二进制类型判断")
+    @Test(dataProvider = "binaryTypes", description = "Kiểm tra phán đoán kiểu nhị phân")
     public void testIsBinaryType_BinaryTypes(String contentType) {
         assertTrue(FileExtensionUtil.isBinaryType(contentType),
-                contentType + " 应该被识别为二进制类型");
+                contentType + " Nên được công nhận là loại nhị phân");
     }
 
     @DataProvider(name = "nonBinaryTypes")
@@ -273,38 +273,38 @@ public class FileExtensionUtilTest {
         };
     }
 
-    @Test(dataProvider = "nonBinaryTypes", description = "测试非二进制类型判断")
+    @Test(dataProvider = "nonBinaryTypes", description = "Kiểm tra phán đoán loại không nhị phân")
     public void testIsBinaryType_NonBinaryTypes(String contentType) {
         assertFalse(FileExtensionUtil.isBinaryType(contentType),
-                contentType + " 不应该被识别为二进制类型");
+                contentType + " Không nên được công nhận là loại nhị phân");
     }
 
-    @Test(description = "测试二进制类型判断的边界情况")
+    @Test(description = "Kiểm tra các trường hợp cạnh để phán đoán loại nhị phân")
     public void testIsBinaryType_EdgeCases() {
         assertFalse(FileExtensionUtil.isBinaryType(null));
         assertFalse(FileExtensionUtil.isBinaryType(""));
     }
 
-    // ==================== 关键问题回归测试 ====================
+    // ==================== Kiểm tra hồi quy các vấn đề chính ====================
 
-    @Test(description = "回归测试：xlsx 文件不应该被误判为 xml 文本")
+    @Test(description = "Kiểm tra hồi quy:xlsx Tài liệu không nên được xác định sai xml văn bản")
     public void testXlsxNotMisidentifiedAsXml() {
         String xlsxContentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
 
-        // 1. 应该返回正确的扩展名
+        // 1. Phần mở rộng chính xác sẽ được trả lại
         assertEquals(FileExtensionUtil.guessExtension(xlsxContentType), ".xlsx",
-                "xlsx 应该返回 .xlsx 而不是 .xml");
+                "xlsx nên được trả lại .xlsx Thay vào đó .xml");
 
-        // 2. 应该被识别为二进制类型
+        // 2. Nên được công nhận là loại nhị phân
         assertTrue(FileExtensionUtil.isBinaryType(xlsxContentType),
-                "xlsx 应该被识别为二进制类型");
+                "xlsx Nên được công nhận là loại nhị phân");
 
-        // 3. 不应该被识别为文本类型
+        // 3. Không nên được công nhận là một loại văn bản
         assertFalse(FileExtensionUtil.isTextType(xlsxContentType),
-                "xlsx 不应该被识别为文本类型");
+                "xlsx Không nên được công nhận là một loại văn bản");
     }
 
-    @Test(description = "回归测试：docx 文件不应该被误判为 xml 文本")
+    @Test(description = "Kiểm tra hồi quy:docx Tài liệu không nên được xác định sai xml văn bản")
     public void testDocxNotMisidentifiedAsXml() {
         String docxContentType = "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
 
@@ -313,7 +313,7 @@ public class FileExtensionUtilTest {
         assertFalse(FileExtensionUtil.isTextType(docxContentType));
     }
 
-    @Test(description = "回归测试：pptx 文件不应该被误判为 xml 文本")
+    @Test(description = "Kiểm tra hồi quy:pptx Tài liệu không nên được xác định sai xml văn bản")
     public void testPptxNotMisidentifiedAsXml() {
         String pptxContentType = "application/vnd.openxmlformats-officedocument.presentationml.presentation";
 
@@ -322,7 +322,7 @@ public class FileExtensionUtilTest {
         assertFalse(FileExtensionUtil.isTextType(pptxContentType));
     }
 
-    @Test(description = "回归测试：真正的 XML 应该被正确识别为文本")
+    @Test(description = "Kiểm tra hồi quy: có thật XML phải được nhận dạng chính xác dưới dạng văn bản")
     public void testRealXmlIdentifiedAsText() {
         String xmlContentType = "application/xml";
 
@@ -331,7 +331,7 @@ public class FileExtensionUtilTest {
         assertFalse(FileExtensionUtil.isBinaryType(xmlContentType));
     }
 
-    @Test(description = "回归测试：Vendor JSON 响应应该被识别为文本")
+    @Test(description = "Kiểm tra hồi quy:Vendor JSON Phản hồi phải được công nhận là văn bản")
     public void testVendorJsonIdentifiedAsText() {
         String contentType = "application/vnd.spring-boot.actuator.v3+json";
 
@@ -340,7 +340,7 @@ public class FileExtensionUtilTest {
         assertFalse(FileExtensionUtil.isBinaryType(contentType));
     }
 
-    @Test(description = "回归测试：验证类型判断的互斥性")
+    @Test(description = "Kiểm tra hồi quy: xác minh tính loại trừ lẫn nhau của các phán đoán kiểu")
     public void testTypeExclusivity() {
         String[] allContentTypes = {
                 "text/plain",
@@ -356,13 +356,13 @@ public class FileExtensionUtilTest {
             boolean isText = FileExtensionUtil.isTextType(contentType);
             boolean isBinary = FileExtensionUtil.isBinaryType(contentType);
 
-            // 一个 Content-Type 应该要么是文本，要么是二进制，要么都不是（unknown），但不应该同时是两者
+            // một Content-Type Phải là văn bản, nhị phân hoặc không (unknown），Nhưng nó không nên là cả hai cùng một lúc
             assertFalse(isText && isBinary,
-                    contentType + " 不应该同时被判断为文本和二进制类型");
+                    contentType + " Không nên đánh giá cả hai loại văn bản và nhị phân cùng một lúc");
         }
     }
 
-    @Test(description = "只按媒体类型判断，忽略参数")
+    @Test(description = "Chỉ đánh giá theo loại phương tiện, bỏ qua các tham số")
     public void testContentTypeParametersAreIgnored() {
         String contentType = "application/octet-stream; name=\"data.json\"";
 

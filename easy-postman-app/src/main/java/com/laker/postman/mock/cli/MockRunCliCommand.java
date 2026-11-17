@@ -98,7 +98,7 @@ public class MockRunCliCommand {
 
     static void printUsage(PrintStream out) {
         out.println("Usage: mock run <workspace-directory> [options]");
-        out.println("Starts a saved EasyPostman Mock Server without the desktop UI.");
+        out.println("Starts a saved Dev Workbench Mock Server without the desktop UI.");
         out.println("Options:");
         out.println("  -w, --workspace <directory>  Alternative to the positional workspace directory");
         out.println("  -s, --server <name-or-id>     Required when the workspace has multiple Mock Servers");

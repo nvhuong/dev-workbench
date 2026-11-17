@@ -20,7 +20,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.LinkedHashMap;
 import java.util.function.BooleanSupplier;
 
-// SSE事件监听器
+// SSENgười nghe sự kiện
 @Slf4j
 public class SseStreamEventListener extends EventSourceListener {
     private static final int MAX_FAILURE_BODY_BYTES = 64 * 1024;
@@ -204,7 +204,7 @@ public class SseStreamEventListener extends EventSourceListener {
         if (!status.isBlank()) {
             return status;
         }
-        return "未知错误";
+        return "Lỗi không xác định";
     }
 
     private String responseMessage(okhttp3.Response response) {
@@ -231,12 +231,12 @@ public class SseStreamEventListener extends EventSourceListener {
                 }
             }
         } catch (Exception ignored) {
-            // 非 JSON 错误体直接使用原文前缀。
+            // Không JSON Phần thân lỗi sử dụng trực tiếp tiền tố văn bản gốc.
         }
         return trimmed.length() > 2048 ? trimmed.substring(0, 2048) + "..." : trimmed;
     }
 
-    // 静态方法，避免内部类访问外部实例
+    // Phương thức tĩnh để ngăn các lớp bên trong truy cập vào các thể hiện bên ngoài
     private static String buildResponseHeadersTextStatic(HttpResponse resp) {
         StringBuilder headersBuilder = new StringBuilder();
         resp.headers.forEach((key, value) -> {

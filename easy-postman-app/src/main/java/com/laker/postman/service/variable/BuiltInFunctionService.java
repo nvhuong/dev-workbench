@@ -13,26 +13,26 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 /**
- * 内置函数提供者
+ * Các nhà cung cấp chức năng tích hợp
  * <p>
- * 负责处理所有内置动态函数，如 $guid, $timestamp, $randomInt 等
+ * Chịu trách nhiệm xử lý tất cả các hàm động được tích hợp sẵn như  $guid, $timestamp, $randomInt Đợi đã
  * <ul>
- *   <li>优先级最低</li>
- *   <li>每次调用都会生成新的随机值</li>
+ *   <li>Mức độ ưu tiên thấp nhất</li>
+ *   <li>Mỗi cuộc gọi tạo ra các giá trị ngẫu nhiên mới</li>
  * </ul>
  */
 @Slf4j
 public class BuiltInFunctionService implements VariableProvider {
 
     /**
-     * 单例实例
+     * Ví dụ Singleton
      */
     private static final BuiltInFunctionService INSTANCE = new BuiltInFunctionService();
 
     private static final Random RANDOM = new Random();
 
     /**
-     * 所有支持的内置函数列表
+     * Danh sách tất cả các chức năng tích hợp được hỗ trợ
      */
     private static final String[] BUILT_IN_FUNCTIONS = {
             "$guid", "$uuid", "$randomUUID",
@@ -47,13 +47,13 @@ public class BuiltInFunctionService implements VariableProvider {
     };
 
     /**
-     * 私有构造函数，防止外部实例化
+     * Nhà xây dựng riêng để ngăn chặn việc khởi tạo bên ngoài
      */
     private BuiltInFunctionService() {
     }
 
     /**
-     * 获取单例实例
+     * Nhận một ví dụ đơn lẻ
      */
     public static BuiltInFunctionService getInstance() {
         return INSTANCE;
@@ -84,13 +84,13 @@ public class BuiltInFunctionService implements VariableProvider {
         return VariableType.BUILT_IN;
     }
 
-    // ==================== 内置函数特有方法 ====================
+    // ==================== Các phương thức dành riêng cho các hàm dựng sẵn ====================
 
     /**
-     * 判断是否是内置函数
+     * Xác định xem đó có phải là chức năng tích hợp hay không
      *
-     * @param name 函数名
-     * @return 是否是内置函数
+     * @param name tên chức năng
+     * @return Cho dù đó là một chức năng tích hợp
      */
     public boolean isBuiltInFunction(String name) {
         if (name == null) {
@@ -105,10 +105,10 @@ public class BuiltInFunctionService implements VariableProvider {
     }
 
     /**
-     * 生成内置函数的值
+     * Tạo ra giá trị của hàm dựng sẵn
      *
-     * @param funcName 函数名
-     * @return 生成的值，如果函数不存在则返回 null
+     * @param funcName tên chức năng
+     * @return Giá trị được tạo, trả về nếu hàm không tồn tại null
      */
     public String generate(String funcName) {
         if (funcName == null) {
@@ -223,9 +223,9 @@ public class BuiltInFunctionService implements VariableProvider {
     }
 
     /**
-     * 获取所有内置函数及其描述
+     * Nhận tất cả các chức năng tích hợp và mô tả của chúng
      *
-     * @return Map<函数名, 描述>
+     * @return Map<tên chức năng, Mô tả>
      */
     public Map<String, String> getAllFunctionsWithDescriptions() {
         Map<String, String> functions = new LinkedHashMap<>();
@@ -236,21 +236,21 @@ public class BuiltInFunctionService implements VariableProvider {
     }
 
     /**
-     * 获取内置函数的描述
+     * Nhận mô tả về chức năng tích hợp
      *
-     * @param funcName 函数名
-     * @return 函数描述
+     * @param funcName tên chức năng
+     * @return Mô tả chức năng
      */
     private static String getDescription(String funcName) {
         try {
             return I18nUtil.getMessage("builtin.var." + funcName.substring(1));
         } catch (Exception e) {
-            // 如果没有找到国际化文本，返回默认描述
+            // Nếu không tìm thấy văn bản quốc tế hóa, mô tả mặc định sẽ được trả về
             return "Built-in function: " + funcName;
         }
     }
 
-    // ==================== 辅助方法 ====================
+    // ==================== Các phương pháp trợ giúp ====================
 
     private static String generateRandomAlphaNumeric(int length) {
         String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";

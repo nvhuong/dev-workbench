@@ -15,7 +15,7 @@ import java.awt.*;
 import java.awt.datatransfer.StringSelection;
 
 /**
- * 文本对比工具面板
+ * Bảng công cụ so sánh văn bản
  */
 @Slf4j
 public class DiffPanel extends JPanel {
@@ -31,7 +31,7 @@ public class DiffPanel extends JPanel {
     private void initUI() {
         ToolboxWorkbench.applyRoot(this);
 
-        // 顶部工具栏
+        // Thanh công cụ trên cùng
         JButton compareBtn = new JButton(I18nUtil.getMessage(MessageKeys.TOOLBOX_DIFF_COMPARE));
         JButton copyBtn = new JButton(I18nUtil.getMessage(MessageKeys.BUTTON_COPY));
         JButton clearBtn = new JButton(I18nUtil.getMessage(MessageKeys.BUTTON_CLEAR));
@@ -40,8 +40,8 @@ public class DiffPanel extends JPanel {
         JPanel topPanel = ToolboxWorkbench.leftToolbar(compareBtn, copyBtn, swapBtn, clearBtn);
         add(ToolboxWorkbench.toolbar(topPanel, null), BorderLayout.NORTH);
 
-        // 中间：三栏布局
-        // 原始文本
+        // Giữa: bố cục ba cột
+        // Văn bản gốc
         originalArea = new JTextArea();
         originalArea.setLineWrap(true);
         originalArea.setWrapStyleWord(true);
@@ -55,7 +55,7 @@ public class DiffPanel extends JPanel {
                 originalScrollPane
         );
 
-        // 修改后文本
+        // Văn bản sửa đổi
         modifiedArea = new JTextArea();
         modifiedArea.setLineWrap(true);
         modifiedArea.setWrapStyleWord(true);
@@ -77,9 +77,9 @@ public class DiffPanel extends JPanel {
         // Use the available width for the initial split instead of a fixed pixel width.
         SwingUtilities.invokeLater(() -> topSplitPane.setDividerLocation(0.5));
 
-        // 整体分割面板
+        // Bảng chia tổng thể
 
-        // 差异结果显示
+        // Kết quả khác biệt được hiển thị
         resultPane = new JTextPane();
         resultPane.setEditable(false);
         resultPane.setFont(FontsUtil.getMonospacedFontWithOffset(Font.PLAIN, 0));
@@ -101,7 +101,7 @@ public class DiffPanel extends JPanel {
 
         add(mainSplitPane, BorderLayout.CENTER);
 
-        // 按钮事件
+        // Sự kiện nút
         compareBtn.addActionListener(e -> compareDiff());
         copyBtn.addActionListener(e -> copyToClipboard());
         clearBtn.addActionListener(e -> {
@@ -126,15 +126,15 @@ public class DiffPanel extends JPanel {
         }
 
         try {
-            // 按行分割
+            // Chia theo hàng
             String[] originalLines = original.split("\n", -1);
             String[] modifiedLines = modified.split("\n", -1);
 
-            // 执行简单的行级差异比较
+            // Thực hiện so sánh chênh lệch cấp hàng đơn giản
             StyledDocument doc = resultPane.getStyledDocument();
             doc.remove(0, doc.getLength());
 
-            // 定义样式
+            // Xác định phong cách
             Style defaultStyle = resultPane.addStyle("default", null);
             StyleConstants.setForeground(defaultStyle, ModernColors.getTextPrimary());
 
@@ -150,16 +150,16 @@ public class DiffPanel extends JPanel {
             StyleConstants.setForeground(headerStyle, ModernColors.getPrimary());
             StyleConstants.setBold(headerStyle, true);
 
-            // 统计信息
+            // Thống kê
             int additions = 0;
             int deletions = 0;
             int modifications = 0;
 
-            // 头部信息
+            // thông tin tiêu đề
             doc.insertString(doc.getLength(), "📊 Diff Result\n", headerStyle);
             doc.insertString(doc.getLength(), "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n", defaultStyle);
 
-            // 使用简单的算法比较
+            // So sánh bằng các thuật toán đơn giản
             int maxLen = Math.max(originalLines.length, modifiedLines.length);
 
             for (int i = 0; i < maxLen; i++) {
@@ -167,27 +167,27 @@ public class DiffPanel extends JPanel {
                 String modLine = i < modifiedLines.length ? modifiedLines[i] : null;
 
                 if (origLine == null && modLine != null) {
-                    // 新增行
+                    // Thêm hàng mới
                     additions++;
                     doc.insertString(doc.getLength(), "+ " + modLine + "\n", addedStyle);
                 } else if (origLine != null && modLine == null) {
-                    // 删除行
+                    // Xóa hàng
                     deletions++;
                     doc.insertString(doc.getLength(), "- " + origLine + "\n", removedStyle);
                 } else if (origLine != null && modLine != null) {
                     if (!origLine.equals(modLine)) {
-                        // 修改行
+                        // Sửa đổi hàng
                         modifications++;
                         doc.insertString(doc.getLength(), "- " + origLine + "\n", removedStyle);
                         doc.insertString(doc.getLength(), "+ " + modLine + "\n", addedStyle);
                     } else {
-                        // 相同行
+                        // Cùng một hàng
                         doc.insertString(doc.getLength(), "  " + origLine + "\n", defaultStyle);
                     }
                 }
             }
 
-            // 统计信息
+            // Thống kê
             doc.insertString(doc.getLength(), "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n", defaultStyle);
             doc.insertString(doc.getLength(), "📈 Statistics:\n", headerStyle);
             doc.insertString(doc.getLength(), "  Additions: " + additions + " line(s)\n", addedStyle);

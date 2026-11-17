@@ -53,7 +53,7 @@ public class FunctionalRunCliCommand {
     static void printUsage(PrintStream out) {
         out.println("Usage: functional run <workspace-directory> [options]");
         out.println("Runs selected requests and embedded CSV rows from functional_config.json.");
-        out.println("Pass the EasyPostman workspace directory; use . at a checked-out Git workspace root.");
+        out.println("Pass the Dev Workbench workspace directory; use . at a checked-out Git workspace root.");
         out.println("Options:");
         out.println("  -w, --workspace <directory>      Alternative to the positional workspace directory");
         out.println("  -e, --environment <name>         Defaults to the workspace's active environment");

@@ -10,9 +10,9 @@ import java.awt.event.FocusEvent;
 import java.util.List;
 
 /**
- * 支持自动补全的单元格编辑器
- * 保留 EasyTextField 的所有功能（变量高亮、撤销重做等）
- * 新增自动补全功能
+ * Trình chỉnh sửa ô hỗ trợ tự động hoàn thành
+ * Đã đặt trước EasyTextField Tất cả các chức năng (đánh dấu biến, hoàn tác và làm lại, v.v.)
+ * Đã thêm chức năng tự động hoàn thành
  */
 public class HttpHeaderKeyEasyTextFieldCellEditor extends AbstractCellEditor implements TableCellEditor {
     private final AutoCompleteEasyTextField textField;
@@ -25,7 +25,7 @@ public class HttpHeaderKeyEasyTextFieldCellEditor extends AbstractCellEditor imp
             this.textField.setSuggestions(suggestions);
             this.textField.setAutoCompleteEnabled(true);
 
-            // 优化：只在文本为空时显示所有建议
+            // Tối ưu hóa: chỉ hiển thị tất cả gợi ý khi văn bản trống
             this.textField.addFocusListener(new FocusAdapter() {
                 @Override
                 public void focusGained(FocusEvent e) {
@@ -48,7 +48,7 @@ public class HttpHeaderKeyEasyTextFieldCellEditor extends AbstractCellEditor imp
                                                  boolean isSelected, int row, int column) {
         textField.setText(value == null ? "" : value.toString());
         TableUIConstants.styleTextCellEditor(textField, table, row);
-        // 激活时全选，方便直接覆盖输入
+        // Chọn tất cả khi được kích hoạt để tạo điều kiện ghi đè trực tiếp đầu vào
         SwingUtilities.invokeLater(textField::selectAll);
         return textField;
     }

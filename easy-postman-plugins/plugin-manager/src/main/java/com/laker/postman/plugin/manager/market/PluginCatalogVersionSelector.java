@@ -9,11 +9,11 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 从 catalog 历史版本里为当前宿主挑选“最合适的一条”。
+ * Từ catalog Được chọn làm máy chủ hiện tại từ các phiên bản lịch sử“Một trong những phù hợp nhất”。
  * <p>
- * 规则：
- * 1. 同一 plugin id 优先选当前宿主可兼容的最高版本
- * 2. 如果一个兼容版本都没有，回退为最新版本，用于向用户表达“需要升级宿主”
+ * luật lệ:
+ * 1. Giống nhau plugin id Ưu tiên phiên bản cao nhất tương thích với Host hiện tại
+ * 2. Nếu không có phiên bản tương thích thì quay lại phiên bản mới nhất để bày tỏ với người dùng“Máy chủ cần được nâng cấp”
  * </p>
  */
 @UtilityClass

@@ -12,7 +12,7 @@ import javax.swing.JMenu;
 import javax.swing.JRadioButtonMenuItem;
 
 /**
- * 顶部语言菜单。
+ * Menu ngôn ngữ hàng đầu.
  */
 @UtilityClass
 class TopMenuLanguageMenu {

@@ -46,13 +46,13 @@ public class CSharpRequestCodeGeneratorTest {
         HttpRequestItem request = request();
         request.setMethod("POST");
         request.setBodyType(RequestBodyTypes.BODY_TYPE_RAW);
-        request.setBody("{\"text\":\"中文\"}\n\\path\t\r" + (char) 0 + (char) 0x1b + '\u2028' + "😀");
+        request.setBody("{\"text\":\"Tiếng Trung Quốc\"}\n\\path\t\r" + (char) 0 + (char) 0x1b + '\u2028' + "😀");
         request.setHeadersList(List.of(new HttpHeader(true, "Content-Type", "application/example+json")));
 
         String code = CSharpRequestCodeGenerator.generate(request);
 
         assertTrue(code.contains("new ByteArrayContent(Encoding.UTF8.GetBytes("), code);
-        assertTrue(code.contains("\\\"text\\\":\\\"中文\\\""), code);
+        assertTrue(code.contains("\\\"text\\\":\\\"Tiếng Trung Quốc\\\""), code);
         assertTrue(code.contains("\\n\\\\path\\t\\r\\u0000\\u001b\\u2028\\ud83d\\ude00"), code);
         assertTrue(code.contains("request.Content.Headers.TryAddWithoutValidation(\"Content-Type\", \"application/example+json\");"), code);
         assertFalse(code.contains("request.Headers.TryAddWithoutValidation(\"Content-Type\""), code);
@@ -198,16 +198,16 @@ public class CSharpRequestCodeGeneratorTest {
         HttpRequestItem request = request();
         request.setBodyType(RequestBodyTypes.BODY_TYPE_FORM_DATA);
         request.setFormDataList(List.of(
-                new HttpFormData(true, "na\"me\\中文\r\n", HttpFormData.TYPE_TEXT, "value"),
-                new HttpFormData(true, "文件", HttpFormData.TYPE_FILE, "/tmp/图\"片.png")));
+                new HttpFormData(true, "na\"me\\Tiếng Trung Quốc\r\n", HttpFormData.TYPE_TEXT, "value"),
+                new HttpFormData(true, "tập tin", HttpFormData.TYPE_FILE, "/tmp/hình ảnh\"cái.png")));
 
         String code = CSharpRequestCodeGenerator.generate(request);
 
         assertTrue(code.contains("multipart.HeaderEncodingSelector = (_, _) => Encoding.UTF8;"), code);
         assertEquals(occurrences(code, ".Headers.TryAddWithoutValidation(\"Content-Disposition\""), 2, code);
-        assertTrue(code.contains("EscapeMultipartParameter(\"na\\\"me\\\\中文\\r\\n\")"), code);
-        assertTrue(code.contains("EscapeMultipartParameter(\"文件\")"), code);
-        assertTrue(code.contains("EscapeMultipartParameter(Path.GetFileName(\"/tmp/图\\\"片.png\"))"), code);
+        assertTrue(code.contains("EscapeMultipartParameter(\"na\\\"me\\\\Tiếng Trung Quốc\\r\\n\")"), code);
+        assertTrue(code.contains("EscapeMultipartParameter(\"tập tin\")"), code);
+        assertTrue(code.contains("EscapeMultipartParameter(Path.GetFileName(\"/tmp/hình ảnh\\\"cái.png\"))"), code);
         assertTrue(code.contains("return value.Replace(\"\\\\\", \"\\\\\\\\\")"), code);
         assertTrue(code.contains(".Replace(\"\\\"\", \"\\\\\\\"\")"), code);
         assertTrue(code.contains(".Replace(\"\\r\", \"%0D\")"), code);
@@ -233,7 +233,7 @@ public class CSharpRequestCodeGeneratorTest {
         String code = CSharpRequestCodeGenerator.generate(request);
 
         assertTrue(code.contains("var multipartContentType = MediaTypeHeaderValue.Parse(\"" + configured + "\");"), code);
-        assertTrue(code.contains("var multipartBoundary = multipart.Headers.ContentType!.Parameters.First(parameter =>"), code);
+        assertTrue(code.contains("var multipartBoundary = multipart.Headers.ContentType!Parameters.First(parameter =>"), code);
         assertTrue(code.contains("string.Equals(parameter.Name, \"boundary\", StringComparison.OrdinalIgnoreCase)).ToArray()"), code);
         assertTrue(code.contains("multipartContentType.Parameters.Remove(parameter);"), code);
         assertTrue(code.contains("multipartContentType.Parameters.Add(new NameValueHeaderValue(\"boundary\", multipartBoundary.Value));"), code);
@@ -246,12 +246,12 @@ public class CSharpRequestCodeGeneratorTest {
         HttpRequestItem request = request();
         request.setAuthType(RequestAuthTypes.AUTH_TYPE_BASIC);
         request.setAuthUsername("{{username}}");
-        request.setAuthPassword("密码");
+        request.setAuthPassword("mật khẩu");
 
         String code = CSharpRequestCodeGenerator.generate(request);
 
         assertTrue(code.contains("request.Headers.Authorization = new AuthenticationHeaderValue(\"Basic\","), code);
-        assertTrue(code.contains("Convert.ToBase64String(Encoding.UTF8.GetBytes(\"{{username}}:密码\")));"), code);
+        assertTrue(code.contains("Convert.ToBase64String(Encoding.UTF8.GetBytes(\"{{username}}:mật khẩu\")));"), code);
 
         request.setHeadersList(List.of(new HttpHeader(true, "Authorization", "Bearer explicit")));
         code = CSharpRequestCodeGenerator.generate(request);

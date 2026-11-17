@@ -9,8 +9,8 @@ import javax.swing.*;
 import java.awt.*;
 
 /**
- * 步骤指示器组件
- * 支持暗黑和亮色主题自动适配
+ * Thành phần chỉ báo bước
+ * Hỗ trợ tự động điều chỉnh các chủ đề tối và sáng
  */
 public class StepIndicator extends JPanel {
     private final String[] steps;
@@ -26,42 +26,42 @@ public class StepIndicator extends JPanel {
     }
 
     /**
-     * 获取激活状态的圆圈背景色（主题适配）
+     * Lấy màu nền của vòng tròn đang hoạt động (điều chỉnh theo chủ đề)
      */
     private Color getActiveCircleBackground() {
         return ModernColors.getPrimary();
     }
 
     /**
-     * 获取非激活状态的圆圈背景色（主题适配）
+     * Lấy màu nền của vòng tròn ở trạng thái không hoạt động (điều chỉnh chủ đề)
      */
     private Color getInactiveCircleBackground() {
         return ModernColors.getBorderLightColor();
     }
 
     /**
-     * 获取圆圈边框颜色（主题适配）
+     * Lấy màu đường viền vòng tròn (điều chỉnh theo chủ đề)
      */
     private Color getCircleBorderColor() {
         return ModernColors.getBorderMediumColor();
     }
 
     /**
-     * 获取激活状态的文本颜色（主题适配）
+     * Lấy màu văn bản hiện hoạt (điều chỉnh chủ đề)
      */
     private Color getActiveTextColor() {
         return ModernColors.getTextPrimary();
     }
 
     /**
-     * 获取非激活状态的文本颜色（主题适配）
+     * Lấy màu văn bản không hoạt động (điều chỉnh chủ đề)
      */
     private Color getInactiveTextColor() {
         return ModernColors.getTextHint();
     }
 
     /**
-     * 获取箭头颜色（主题适配）
+     * Nhận màu mũi tên (thích ứng chủ đề)
      */
     private Color getArrowColor() {
         return ModernColors.getTextSecondary();
@@ -92,7 +92,7 @@ public class StepIndicator extends JPanel {
         circle.setForeground(active ? ModernColors.getTextInverse() : getInactiveTextColor());
         circle.setFont(FontsUtil.getDefaultFont(Font.BOLD));
 
-        // 文本 - 使用主题适配的颜色
+        // văn bản - Sử dụng màu sắc phù hợp với chủ đề
         JLabel label = new JLabel(text, SwingConstants.CENTER);
         label.setFont(FontsUtil.getDefaultFontWithOffset(active ? Font.BOLD : Font.PLAIN, -3));
         label.setForeground(active ? getActiveTextColor() : getInactiveTextColor());
@@ -105,8 +105,8 @@ public class StepIndicator extends JPanel {
 
     private JLabel createArrow() {
         JLabel arrow = new JLabel("›");
-        arrow.setFont(FontsUtil.getDefaultFontWithOffset(Font.PLAIN, 2)); // 比标准字体大2号
-        arrow.setForeground(getArrowColor()); // 使用主题适配的箭头颜色
+        arrow.setFont(FontsUtil.getDefaultFontWithOffset(Font.PLAIN, 2)); // Lớn hơn kích thước phông chữ tiêu chuẩn2Không
+        arrow.setForeground(getArrowColor()); // Sử dụng màu mũi tên phù hợp với chủ đề
         return arrow;
     }
 

@@ -10,7 +10,7 @@ import static org.testng.Assert.assertTrue;
 
 public class RequestStreamUiAppenderTest {
 
-    @Test(description = "WebSocket 消息流收口到响应体后不应为空")
+    @Test(description = "WebSocket Nội dung phản hồi không được để trống sau khi nhận được luồng tin nhắn")
     public void testFinalizeWebSocketResponseShouldPopulateBody() {
         RequestStreamUiAppender appender = new RequestStreamUiAppender(null, DateTimeFormatter.ofPattern("HH:mm:ss"));
         HttpResponse response = new HttpResponse();
@@ -28,7 +28,7 @@ public class RequestStreamUiAppenderTest {
         assertTrue(response.costMs >= 0);
     }
 
-    @Test(description = "WebSocket transcript 应去掉首尾多余空行，避免 history body 第一行错位")
+    @Test(description = "WebSocket transcript Những dòng trống thừa ở đầu và cuối nên được loại bỏ để tránh history body Dòng đầu tiên bị đặt sai chỗ")
     public void testAppendWebSocketRawEventShouldTrimEdgeNewlines() {
         RequestStreamUiAppender appender = new RequestStreamUiAppender(null, DateTimeFormatter.ofPattern("HH:mm:ss"));
         StringBuilder bodyBuilder = new StringBuilder();
@@ -41,7 +41,7 @@ public class RequestStreamUiAppenderTest {
         assertTrue(transcript.contains("line1\n  line2"));
     }
 
-    @Test(description = "缺少 ResponsePanel 时流式 UI 追加应安全降级为 no-op")
+    @Test(description = "thiếu ResponsePanel dòng chảy thời gian UI Append nên được hạ cấp một cách an toàn xuống  no-op")
     public void testAppendUiMessageShouldIgnoreMissingResponsePanel() {
         RequestStreamUiAppender appender = new RequestStreamUiAppender(null, DateTimeFormatter.ofPattern("HH:mm:ss"));
 

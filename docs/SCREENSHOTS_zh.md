@@ -1,70 +1,70 @@
-# 🖼️ 截图展示
+# 🖼️ Hiển thị ảnh chụp màn hình
 
-## 应用图标 & 欢迎界面
+## Biểu tượng ứng dụng & Giao diện chào mừng
 
-|                                 图标                                  |                                  欢迎界面                                   |
+|                                 biểu tượng                                  |                                  Giao diện chào mừng                                   |
 |:---------------------------------------------------------------------:|:-------------------------------------------------------------------------:|
 |                          ![icon](icon.png)                          |                        ![welcome](welcome.png)                        |
 
-## 主界面
+## Giao diện chính
 
-### 接口集合管理
-|                                 接口集合                                  |                                  导入集合                                   |
+### Quản lý bộ sưu tập giao diện
+|                                 Bộ sưu tập giao diện                                  |                                  Bộ sưu tập nhập khẩu                                   |
 |:------------------------------------------------------------------------:|:--------------------------------------------------------------------------:|
 |                   ![collections](collections.png)                   |             ![collections-import](collections-import.png)             |
 
-### 暗色模式
-|                                 暗色集合界面                                  |                                  暗色性能趋势图                                   |
+### Chế độ tối
+|                                 Giao diện bộ sưu tập tối                                  |                                  Biểu đồ xu hướng hiệu suất tối                                   |
 |:----------------------------------------------------------------------------:|:-------------------------------------------------------------------------------:|
 |            ![dark-collections](dark-collections.png)            |          ![dark-performance-trend](dark-performance-trend.png)          |
 
-## 环境变量 & 功能测试
+## các biến môi trường & Kiểm tra chức năng
 
-### 功能测试
-|                                 功能测试                                  |                                  功能测试 1                                   |                                  功能测试 2                                   |
+### Kiểm tra chức năng
+|                                 Kiểm tra chức năng                                  |                                  Kiểm tra chức năng 1                                   |                                  Kiểm tra chức năng 2                                   |
 |:------------------------------------------------------------------------:|:----------------------------------------------------------------------------:|:----------------------------------------------------------------------------:|
 |                     ![functional](functional.png)                     |                  ![functional_1](functional_1.png)                  |                  ![functional_2](functional_2.png)                  |
 
-|                                 功能测试结果                                  |
+|                                 Kết quả kiểm tra chức năng                                  |
 |:----------------------------------------------------------------------------:|
 |                ![functional-results](functional-results.png)                |
 
-## 性能测试
+## Kiểm tra hiệu suất
 
-### 主界面
-|                                 性能测试                                  |
+### Giao diện chính
+|                                 Kiểm tra hiệu suất                                  |
 |:------------------------------------------------------------------------:|
 |                   ![performance](performance.png)                   |
 
-### 报告 & 分析
-|                                 性能报告                                  |                                  性能趋势图                                   |
+### Báo cáo & phân tích
+|                                 Báo cáo hiệu suất                                  |                                  Biểu đồ xu hướng hiệu suất                                   |
 |:------------------------------------------------------------------------:|:----------------------------------------------------------------------------:|
 |             ![performance-report](performance-report.png)             |              ![performance-trend](performance-trend.png)              |
 
-### 线程组模式
-|                                 固定线程                                  |                                  递增线程                                   |
+### Chế độ nhóm chủ đề
+|                                 Chủ đề cố định                                  |                                  Chủ đề tăng dần                                   |
 |:------------------------------------------------------------------------:|:--------------------------------------------------------------------------:|
 | ![performance-threadgroup-fixed](performance-threadgroup-fixed.png) | ![performance-threadgroup-rampup](performance-threadgroup-rampup.png) |
 
-|                                 尖刺线程                                  |                                  阶梯线程                                   |
+|                                 Chủ đề có gai                                  |                                  Sợi thang                                   |
 |:------------------------------------------------------------------------:|:--------------------------------------------------------------------------:|
 | ![performance-threadgroup-spike](performance-threadgroup-spike.png) | ![performance-threadgroup-stairs](performance-threadgroup-stairs.png) |
 
-## 脚本支持
+## Hỗ trợ viết kịch bản
 
-### 测试脚本
-|                                  测试脚本                                   |
+### Kịch bản thử nghiệm
+|                                  Kịch bản thử nghiệm                                   |
 |:--------------------------------------------------------------------------:|
 |                    ![script-post](script-post.png)                    |
 
-### 代码片段
-|                                 代码片段库                                  |
+### Đoạn mã
+|                                 Thư viện đoạn mã                                  |
 |:--------------------------------------------------------------------------:|
 |               ![script-snippets](script-snippets.png)               |
 
-## Git 集成
+## Git tích hợp
 
-### Git 提交
-|                                 Git 工作区提交                                  |
+### Git nộp
+|                                 Git Gửi không gian làm việc                                  |
 |:------------------------------------------------------------------------------:|
 |           ![workspaces-gitcommit](workspaces-gitcommit.png)           |

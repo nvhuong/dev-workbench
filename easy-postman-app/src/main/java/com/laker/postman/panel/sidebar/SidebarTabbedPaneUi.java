@@ -14,7 +14,7 @@ import java.util.function.IntSupplier;
 import java.util.function.IntUnaryOperator;
 
 /**
- * 侧边栏专用 TabbedPane 绘制策略。
+ * Đặc biệt cho thanh bên TabbedPane Vẽ chiến lược.
  */
 final class SidebarTabbedPaneUi extends BasicTabbedPaneUI {
     private final BooleanSupplier sidebarExpandedSupplier;
@@ -83,14 +83,14 @@ final class SidebarTabbedPaneUi extends BasicTabbedPaneUI {
     @Override
     protected void paintTabBorder(Graphics g, int tabPlacement, int tabIndex,
                                   int x, int y, int w, int h, boolean isSelected) {
-        // 侧边栏 tab 不绘制边框，选中态由圆角背景和图标颜色表达。
+        // Thanh bên tab Không có đường viền nào được vẽ và trạng thái đã chọn được thể hiện bằng màu nền và biểu tượng được làm tròn.
     }
 
     @Override
     protected void paintFocusIndicator(Graphics g, int tabPlacement, Rectangle[] rects,
                                        int tabIndex, Rectangle iconRect, Rectangle textRect,
                                        boolean isSelected) {
-        // 侧边栏 tab 的 focus 态由选中背景表达，不额外绘制虚线框。
+        // Thanh bên tab của focus Trạng thái được biểu thị bằng nền đã chọn và không có hộp chấm bổ sung nào được vẽ.
     }
 
     @Override

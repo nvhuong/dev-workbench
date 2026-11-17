@@ -20,9 +20,9 @@ import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 /**
- * 已保存响应动作控制器。
+ * Đã lưu bộ điều khiển hành động phản hồi.
  * <p>
- * 保存、加载和展示已保存响应都属于请求编辑器动作编排，不放在请求编辑面板布局类里。
+ * Tất cả việc lưu, tải và hiển thị các phản hồi đã lưu đều thuộc về vũ đạo hành động của trình chỉnh sửa yêu cầu và không được đặt trong lớp bố cục bảng chỉnh sửa yêu cầu.
  */
 @Slf4j
 @RequiredArgsConstructor
@@ -103,7 +103,7 @@ final class RequestSavedResponseController {
             }
             savedResponseUiController.displaySavedResponse(responsePanel, requestLinePanel, sendAction, savedResponse);
         } catch (Exception ex) {
-            log.error("加载保存的响应失败", ex);
+            log.error("Không tải được câu trả lời đã lưu", ex);
             NotificationCenter.showError(I18nUtil.getMessage(MessageKeys.RESPONSE_LOAD_ERROR, ex.getMessage()));
         }
     }

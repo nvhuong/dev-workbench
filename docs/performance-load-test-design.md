@@ -1,79 +1,79 @@
-# 性能压测模块设计
+# Thiết kế mô-đun kiểm tra căng thẳng hiệu suất
 
-本文档说明 `com.laker.postman.panel.performance` 下压测功能的当前设计边界，重点覆盖 UI、执行模型、线程组模型、指标采样和结果刷新。
+Tài liệu này giải thích `com.laker.postman.panel.performance` Hiểu ranh giới thiết kế hiện tại của chức năng kiểm tra áp suất, tập trung vào phạm vi bao phủ UI、Mô hình thực thi, mô hình nhóm luồng, lấy mẫu số liệu và làm mới kết quả.
 
-## 设计目标
+## mục tiêu thiết kế
 
-- `PerformancePanel` 只负责组装 Swing 视图、绑定事件和协调生命周期，不承载压测执行细节。
-- 压测执行和 UI 刷新解耦：请求执行在线程组 worker 中完成，统计快照在专用后台线程中生成，Swing 组件只在 EDT 更新。
-- 线程模型集中管理：所有性能压测后台线程通过统一工厂命名和设置 daemon，便于调试、关闭和日志排查。
-- 指标数据增量采样：总报表使用累计统计，趋势图使用采样窗口统计，WebSocket/SSE 长连接使用实时计数补充窗口内没有完成样本的情况。
-- 高并发结果显示保持有界：结果表通过队列和 Swing Timer 分批刷新，避免每个请求都直接触发 EDT 更新。
-- GUI、headless CLI 和 worker 使用同一份运行态 `plan.json`。`collections.json`、`environments.json`、`performance_config.json` 是编辑态工作区文件；`plan.json` 是可执行语义快照，包含环境、全局变量、执行设置、执行计划和外部 asset 引用。
+- `PerformancePanel` Chỉ chịu trách nhiệm lắp ráp Swing Chế độ xem, sự kiện ràng buộc và vòng đời phối hợp không mang theo chi tiết thực hiện kiểm tra căng thẳng.
+- Thực hiện kiểm tra căng thẳng và UI Làm mới việc tách rời: Yêu cầu thực thi trong nhóm luồng worker Hoàn thành vào , ảnh chụp nhanh thống kê được tạo trong chuỗi nền chuyên dụng.Swing Thành phần này chỉ có trong EDT đổi mới.
+- Quản lý tập trung các mô hình luồng: Tất cả các luồng nền kiểm tra mức độ căng thẳng về hiệu năng đều được đặt tên và thiết lập thông qua một nhà máy thống nhất daemon，Thuận tiện cho việc gỡ lỗi, tắt máy và khắc phục sự cố nhật ký.
+- Lấy mẫu gia tăng dữ liệu chỉ báo: tổng báo cáo sử dụng số liệu thống kê tích lũy và biểu đồ xu hướng sử dụng số liệu thống kê của cửa sổ lấy mẫu.WebSocket/SSE Các kết nối dài sử dụng tính năng đếm thời gian thực để bổ sung cho trường hợp mẫu không được hoàn thành trong cửa sổ.
+- Hiển thị kết quả đồng thời cao vẫn bị giới hạn: bảng kết quả được chuyển qua tổng hàng đợi Swing Timer Làm mới theo đợt để tránh kích hoạt trực tiếp từng yêu cầu EDT đổi mới.
+- GUI、headless CLI và worker Sử dụng cùng trạng thái chạy `plan.json`。`collections.json`、`environments.json`、`performance_config.json` Nó là một tập tin không gian làm việc chỉnh sửa;`plan.json` Đó là một ảnh chụp nhanh ngữ nghĩa có thể thực thi được, bao gồm môi trường, biến toàn cục, cài đặt thực thi, kế hoạch thực thi và các phần bên ngoài asset Trích dẫn.
 
-## 多计划设计结论
+## Kết luận thiết kế đa phương án
 
-当前 GUI 编辑态支持“一个工作区保存多个压测计划，但同一时刻只有一个 active plan”。顶部 plan 选择器负责新建、复制、重命名、删除和切换；编辑区、Start、导出 `plan.json`、CLI/master/worker 分发都只针对当前 active plan。
+hiện tại GUI Hỗ trợ chỉnh sửa“Một không gian làm việc lưu trữ nhiều kế hoạch kiểm tra sức chịu đựng nhưng mỗi lần chỉ có một kế hoạch active plan”。hàng đầu plan Bộ chọn có trách nhiệm tạo, sao chép, đổi tên, xóa và chuyển đổi; khu vực chỉnh sửa.Start、Xuất khẩu `plan.json`、CLI/master/worker Phân phối chỉ là hiện tại active plan。
 
-左侧根节点“测试计划”下面仍可以配置多个 Thread Group，它们属于同一个 active plan；勾选启用的 Thread Group 会在同一次 Start 中一起执行。
+Nút gốc bên trái“Kế hoạch kiểm tra”Bạn vẫn có thể định cấu hình nhiều bên dưới Thread Group，Họ thuộc về cùng một active plan；Đã bật kiểm tra Thread Group sẽ ở cùng một thời điểm Start cùng nhau thực hiện.
 
-暂不把 GUI 做成多个顶层 plan 同时执行，原因是多 plan 编排会引入新的运行语义：不同 plan 的线程组、CSV 分片、报表汇总、结果表明细、Stop All、worker assignment 都需要按 plan 维度隔离。如果直接允许多个 plan 同时跑，会让一次 report 同时混入多个测试目标，后续定位和对比都不清晰。
+Chưa GUI Tạo nhiều lớp trên cùng plan Thực hiện đồng thời vì nhiều lý do plan Phối hợp giới thiệu ngữ nghĩa thời gian chạy mới: khác nhau plan Nhóm chủ đề,CSV Phân đoạn, báo cáo tóm tắt và kết quả chi tiết.Stop All、worker assignment Tất cả đều cần phải được nhấn plan Cách ly kích thước. Nếu nhiều được phép trực tiếp plan Chạy cùng lúc sẽ cho một lần report Nhiều mục tiêu thử nghiệm được trộn lẫn vào cùng một lúc, việc định vị và so sánh tiếp theo không rõ ràng.
 
-当前边界：
+Ranh giới hiện tại: .
 
-1. 编辑态存储为 `plans[] + activePlanId`，每个 plan 保存自己的 tree、efficientMode、trendEnabled、reportRealtimeEnabled、remote worker 配置。
-2. 单次点击 Start 只执行当前选中的 active plan。批量执行多个 plan 应作为独立的“批量编排/套件”能力，串行或并行策略需要显式配置。
-3. `plan.json` 仍表示一个可执行 plan，不改成一次包含多个 plan。CLI/master/worker 继续以一个 plan 为最小执行单位；批量编排层负责按多个 `plan.json` 发起多次 run。
-4. 报表、趋势、结果明细都以 runId 隔离。后续如做批量编排，再在套件层加 planId 和跨 plan 对比摘要，不在单次压测 report 中混合。
+1. Trạng thái chỉnh sửa được lưu trữ dưới dạng `plans[] + activePlanId`，Mỗi plan Lưu của riêng bạn tree、efficientMode、trendEnabled、reportRealtimeEnabled、remote worker cấu hình.
+2. Nhấp chuột duy nhất Start Chỉ thực hiện cái hiện được chọn active plan。Thực hiện nhiều đợt plan Nên được coi là độc lập“Dàn nhạc hàng loạt/bộ”Khả năng, chiến lược nối tiếp hoặc song song yêu cầu cấu hình rõ ràng.
+3. `plan.json` Vẫn đại diện cho một tệp thực thi plan，Đừng thay đổi nó để bao gồm nhiều hơn một cùng một lúc plan。CLI/master/worker Tiếp tục với một plan Nó là đơn vị thực thi nhỏ nhất; lớp điều phối hàng loạt chịu trách nhiệm nhấn nhiều `plan.json` Đã bắt đầu nhiều lần run。
+4. Các báo cáo, xu hướng và chi tiết kết quả đều được trình bày dưới dạng  runId sự cách ly. Nếu bạn muốn sắp xếp hàng loạt trong tương lai, hãy thêm nó ở cấp độ gói planId và ngang qua plan Tóm tắt so sánh, không phải là một bài kiểm tra căng thẳng duy nhất report Hỗn hợp vừa.
 
-## 主要组件
+## Các thành phần chính
 
-### UI 编排
+### UI Sự sắp xếp
 
-- `PerformancePanel`：模块入口，创建树、属性面板、结果页、执行引擎、统计协调器和定时器。
-- `PerformancePanelViewFactory`：集中创建 Swing 组件，降低 `PerformancePanel` 的 UI 构建代码量。
-- 顶部 plan 选择器提供编辑态多计划管理。切换 plan 前会把当前 UI tree 和执行设置写回内存快照，再加载目标 plan，避免不同计划的线程组、CSV 和 worker 配置互相污染。
-- 顶部工具栏支持 `Remote` 模式和 worker 列表配置。开启后 GUI 的 Start/Stop 不再本机执行，而是按 JMeter Remote Start/Stop All 的语义控制所有配置的 worker；顶部虚拟用户数、趋势开关和报表刷新方式与本机执行保持同一套语义。
-- `PerformanceTreeSupport` / `PerformanceTreeInteractionSupport`：管理树节点结构、右键菜单、节点选择和请求结构同步。
-- `PerformancePropertyPanelSupport`：保存当前属性面板数据，屏蔽线程组、断言、定时器、SSE、WebSocket 配置面板的细节。
-- `PerformanceRunControlSupport`：处理启动、停止、按钮状态、最终 flush 和完成通知。
-- `PerformanceRemoteRunControlSupport`：GUI 远程执行控制器，负责生成运行态 `plan`、向 worker 分发 assignment、轮询状态、Stop All 和把 master 聚合报表写回 GUI 报表页。
+- `PerformancePanel`：Lối vào mô-đun, cây tạo, bảng thuộc tính, trang kết quả, công cụ thực thi, điều phối viên thống kê và bộ đếm thời gian.
+- `PerformancePanelViewFactory`：Tạo tập trung Swing các thành phần, hạ xuống `PerformancePanel` của UI Xây dựng khối lượng mã.
+- hàng đầu plan Bộ chọn cung cấp khả năng quản lý nhiều gói trong chế độ chỉnh sửa. chuyển đổi plan Cái trước sẽ là hiện tại UI tree và cài đặt thực thi được ghi lại vào ảnh chụp nhanh bộ nhớ trước khi tải mục tiêu plan，Tránh các nhóm chủ đề có kế hoạch khác nhau.CSV và worker Các cấu hình làm ô nhiễm lẫn nhau.
+- Hỗ trợ thanh công cụ hàng đầu `Remote` chế độ và worker Cấu hình danh sách. Sau khi mở GUI của Start/Stop Không còn thực thi nguyên bản nữa mà nhấn JMeter Remote Start/Stop All Ngữ nghĩa kiểm soát tất cả các cấu hình worker；Số lượng người dùng ảo hàng đầu, chuyển đổi xu hướng và phương pháp làm mới báo cáo duy trì cùng một bộ ngữ nghĩa như thực thi gốc.
+- `PerformanceTreeSupport` / `PerformanceTreeInteractionSupport`：Quản lý cấu trúc nút cây, menu chuột phải, chọn nút và đồng bộ hóa cấu trúc yêu cầu.
+- `PerformancePropertyPanelSupport`：Lưu dữ liệu bảng thuộc tính hiện tại và chặn các nhóm luồng, xác nhận và bộ hẹn giờ.SSE、WebSocket Cấu hình các chi tiết của bảng điều khiển.
+- `PerformanceRunControlSupport`：Xử lý bắt đầu, dừng, trạng thái nút, cuối cùng flush và thông báo hoàn thành.
+- `PerformanceRemoteRunControlSupport`：GUI Bộ điều khiển thực thi từ xa chịu trách nhiệm tạo trạng thái đang chạy `plan`、Đối với worker Phân phối assignment、Tình trạng bỏ phiếu,Stop All và xử lý master Báo cáo tổng hợp được viết lại GUI Trang báo cáo.
 
-### 执行模型
+### Mô hình thực hiện
 
-- `PerformanceTestPlanCompiler`：将执行快照从 Swing `DefaultMutableTreeNode` 编译成不可变的性能执行计划。计划由 `PerformanceTestPlan`、`PerformanceThreadGroupPlan`、`PerformanceLoopController`、`PerformanceTimerElement`、`PerformanceRequestSampler`、断言元素和协议阶段元素组成。
-- `com.laker.postman.panel.performance.plan`：只保存执行所需的不可变 plan 数据。除编译器负责读取 Swing tree 外，plan 元素不再提供反向重建 Swing tree 的 API。
-- `easy-postman-performance-core` 的 `PerformanceRunPlan`：运行态 envelope，保存 `environment`、`globals`、`settings`、`testPlan`、`assets`。它不保存 Swing tree 或 `HttpRequestItem`，而是保存跨 GUI/CLI/worker 可消费的请求快照；`settings` 只放执行语义，例如 efficientMode 和 HTTP runtime 并发参数，不放趋势开关、实时报表刷新等 GUI 展示状态。
-- `PerformanceRunPlanFactory`：GUI 导出 `plan.json` 时将当前压测配置、活动环境、全局变量和 asset 引用冻结成运行态计划。
-- `com.laker.postman.performance.runtime.PerformanceRunPlanExecutor`：headless CLI 和 worker 共用的 app 侧运行适配器，加载 `plan.json`，将 core plan 编译后通过 `PerformanceCorePlanAdapter.toExecutablePlan(...)` 转成 app 现有执行链可消费的 plan，并复用 `PerformanceExecutionEngine` 执行。CLI 包只负责参数解析和结果输出。
-- `PerformanceExecutionEngine`：执行门面，负责运行生命周期、实时指标、网络取消资源和树到 plan 的入口转换。它不再直接遍历 Swing tree。
-- `PerformanceThreadGroupRunner`：执行启用的线程组，并根据 FIXED、RAMP_UP、SPIKE、STAIRS 调度虚拟用户 worker。
-- `PerformancePlanExecutor`：执行线程组内的控制器模型，按顺序处理 Loop、Timer 和 Request Sampler。
-- `PerformanceSamplerExecutor`：把 request sampler 交给 `PerformanceRequestExecutor`，并通过 `PerformanceResultRecorder` 记录结果。执行层直接消费 plan model，request 级别不再保留 tree-based 执行入口。
-- `PerformanceIterationContextFactory`：为每次虚拟用户迭代创建 `ExecutionVariableContext`，设置迭代编号，并按当前 `PerformanceThreadGroupPlan` 的 CSV Data Set 和线程组内虚拟用户编号绑定 CSV 行。
-- `PerformanceThreadGroupPlanner`：基于编译后的 plan 计算线程数和预估请求量。旧的 tree-based 方法保留，但内部会先编译 plan。
-- `PerformanceVirtualUserCoordinator`：维护虚拟用户上下文，包括 active user 数、虚拟用户编号、当前迭代编号和进度回调。
+- `PerformanceTestPlanCompiler`：Sẽ thực hiện ảnh chụp nhanh từ Swing `DefaultMutableTreeNode` Được tổng hợp thành các kế hoạch thực hiện hiệu suất bất biến. Được quy hoạch bởi `PerformanceTestPlan`、`PerformanceThreadGroupPlan`、`PerformanceLoopController`、`PerformanceTimerElement`、`PerformanceRequestSampler`、Nó bao gồm các phần tử xác nhận và các phần tử pha giao thức.
+- `com.laker.postman.panel.performance.plan`：Chỉ lưu các bất biến cần thiết để thực thi plan dữ liệu. Ngoại trừ trình biên dịch chịu trách nhiệm đọc Swing tree ngoài,plan Các phần tử không còn cung cấp khả năng tái thiết ngược Swing tree của API。
+- `easy-postman-performance-core` của `PerformanceRunPlan`：Trạng thái đang chạy envelope，cứu `environment`、`globals`、`settings`、`testPlan`、`assets`。Nó không lưu Swing tree hoặc `HttpRequestItem`，Thay vào đó, hãy lưu khoảng thời gian GUI/CLI/worker Ảnh chụp nhanh yêu cầu tiêu thụ;`settings` Chỉ cần đặt ngữ nghĩa thực thi, ví dụ efficientMode và HTTP runtime Các tham số đồng thời, chuyển đổi xu hướng, làm mới báo cáo theo thời gian thực, v.v GUI Hiển thị trạng thái.
+- `PerformanceRunPlanFactory`：GUI Xuất khẩu `plan.json` Cấu hình stress test hiện tại, môi trường hoạt động, các biến toàn cục và asset Tham chiếu được cố định vào một kế hoạch đang chạy.
+- `com.laker.postman.performance.runtime.PerformanceRunPlanExecutor`：headless CLI và worker Đã chia sẻ app Bộ chuyển đổi chạy bên, đã tải `plan.json`，Sẽ core plan Đã vượt qua sau khi biên soạn `PerformanceCorePlanAdapter.toExecutablePlan(...)` Chuyển đổi sang app Chuỗi thực thi hiện tại có thể được sử dụng plan，và tái sử dụng `PerformanceExecutionEngine` thực hiện.CLI Gói này chỉ chịu trách nhiệm phân tích tham số và đưa ra kết quả.
+- `PerformanceExecutionEngine`：Mặt tiền thực thi, chịu trách nhiệm chạy vòng đời, chỉ báo thời gian thực, tài nguyên hủy mạng và cây đến plan chuyển đổi lối vào. Nó không còn đi qua trực tiếp nữa Swing tree。
+- `PerformanceThreadGroupRunner`：Thực thi nhóm luồng được kích hoạt và dựa trên FIXED、RAMP_UP、SPIKE、STAIRS Lên lịch cho người dùng ảo worker。
+- `PerformancePlanExecutor`：Các mô hình bộ điều khiển trong nhóm luồng thực thi được xử lý tuần tự Loop、Timer và Request Sampler。
+- `PerformanceSamplerExecutor`：Bó request sampler Đưa nó cho `PerformanceRequestExecutor`，và đã vượt qua `PerformanceResultRecorder` Ghi lại kết quả. Lớp thực thi tiêu thụ trực tiếp plan model，request Cấp độ không còn được giữ lại tree-based Mục thực thi.
+- `PerformanceIterationContextFactory`：Được tạo cho mỗi lần lặp của người dùng ảo `ExecutionVariableContext`，Đặt số lần lặp và nhấn hiện tại `PerformanceThreadGroupPlan` của CSV Data Set Liên kết với số người dùng ảo trong nhóm chủ đề CSV Được rồi.
+- `PerformanceThreadGroupPlanner`：Dựa trên biên soạn plan Tính toán số lượng chủ đề và khối lượng yêu cầu ước tính. cũ tree-based Phương thức này được giữ lại nhưng sẽ được biên dịch nội bộ trước tiên plan。
+- `PerformanceVirtualUserCoordinator`：Duy trì bối cảnh người dùng ảo, bao gồm active user số, số người dùng ảo, số lần lặp hiện tại và gọi lại tiến trình.
 
-### Headless CLI 与 Worker 边界
+### Headless CLI Và Worker biên giới
 
-- 单机 headless 使用主 app jar，不单独发布 CLI jar：`java -jar easy-postman.jar performance run --plan plan.json [--out result.json]`。
-- `App.main(args)` 先经 `AppCommandRouter` 判断命令行模式；命中 `performance run`、`performance worker` 或 `performance master run` 时自动设置 `java.awt.headless=true`，并且不进入 Swing EDT。
-- `performance run` 和 `performance worker` 初始化 IOC、宿主插件桥接服务和插件运行时，不创建 `MainFrame`、主题、字体或 Splash；`performance master run` 当前只读取 plan、生成 assignment 并通过 HTTP 调度 worker。
-- headless 命令默认保留控制台 INFO 日志，方便在服务器上直接排查插件扫描、脚本池、workspace 加载等问题；如需临时收敛输出，可手动加 `-DCONSOLE_LOG_LEVEL=ERROR`。
-- CLI 运行期间通过 `RunScopedVariableContext` 注入 `plan.json` 内的 environment/globals；请求最终发送前的 `{{var}}` 替换、脚本 `pm.environment` / `pm.globals` 和子线程变量解析都走同一份运行态变量，不写回用户持久化全局变量文件。
-- 单机 CLI 和 CLI master 的 `--out` 使用同一份 `PerformanceJsonReport` JSON 结构。命令启动后先原子写入 `PENDING`，运行中持续用 `RUNNING` 快照原子替换，结束后写入 `SUCCESS`、`FAILED` 或 `STOPPED` 最终报告；即使参数校验或执行异常，也会尽力用本次 `FAILED` 报告替换旧文件。报告保存机器可读的原始数值：总请求数、成功/失败数、协议级 total、API 级 total、samplesPerSecond、HTTP 字节吞吐、耗时分位数，以及 WebSocket/SSE 的消息数、消息速率和首消息/首事件延迟。
-- worker 使用主 app jar 内的 JDK `HttpServer`，不引入 Jetty/Netty/Spring Boot。server 只在 `performance worker` 模式启动，GUI 默认不监听端口。
-- worker 控制台输出用户可读的生命周期和进度状态：listening、accepted、started、progress、completed。进度默认每秒打印一次，可通过 `--progress-interval <seconds>` 调整，或用 `--no-progress` 关闭；请求级和内部组件日志仍按日志配置输出。
-- worker 控制面协议为 HTTP/JSON：`GET /api/performance/v1/health`、`POST /api/performance/v1/runs`、`GET /api/performance/v1/runs/{runId}`、`GET /api/performance/v1/runs/{runId}/result`、`GET /api/performance/v1/runs/{runId}/details`、`POST /api/performance/v1/runs/{runId}/stop`。
-- master 使用 JDK `HttpClient` 调度 worker：`performance master run --plan plan.json --workers host:port[,host:port] [--out result.json]`。master 读取同一份 `plan.json`，生成 `PerformanceWorkerAssignment`，将 plan + assignment 发送给各 worker，轮询状态后拉取 worker report 并聚合。
-- GUI 远程模式复用同一套 HTTP/JSON worker 协议和 assignment planner。GUI 配置的虚拟用户数是全局总并发，master 会按 worker 数切成连续虚拟用户区间；例如 100 用户、2 个 worker 时分别执行 0-49 和 50-99，而不是每台 worker 各跑 100。
-- GUI 不上传 `assets.zip`；GUI 导入或手工创建的 CSV 行会内嵌进 `plan`，file-source CSV 和 multipart 文件引用会进入 `plan.assets` 并保持原路径，用户需要按这些路径把文件提前放到每台 worker 服务器上。CSV Data Set 按同一全局虚拟用户区间取行，因此 100 行 CSV 搭配 100 用户、2 个 worker 时也是 0-49 和 50-99 两段；如果 CSV 行数少于虚拟用户数，仍按全局用户编号循环复用。
-- worker 必须接收 master/GUI 生成的 assignment 才会执行，避免误把同一份完整 `plan` 在多台 worker 上各跑一遍导致总并发被放大。
-- `performance-core.worker` 保存无 UI 的 assignment/protocol DTO、assignment planner 和 worker execution plan partitioner；`performance.worker` / `performance.master` 保存 app 侧 server/client/命令实现。后续要做认证、心跳、资产 bundle、精确全局分位数聚合时，仍按这个边界扩展。
+- Độc lập headless Sử dụng chính app jar，Không được xuất bản riêng lẻ CLI jar：`java -jar easy-postman.jar performance run --plan plan.json [--out result.json]`。
+- `App.main(args)` Đầu tiên bởi `AppCommandRouter` Xác định chế độ dòng lệnh; đánh `performance run`、`performance worker` hoặc `performance master run` tự động thiết lập `java.awt.headless=true`，Và đừng vào Swing EDT。
+- `performance run` và `performance worker` khởi tạo IOC、Dịch vụ cầu nối trình cắm thêm máy chủ không được tạo khi trình cắm này chạy `MainFrame`、Chủ đề, phông chữ hoặc Splash；`performance master run` Hiện tại chỉ đọc plan、phát ra assignment và đã vượt qua HTTP Lập kế hoạch worker。
+- headless Lệnh giữ lại bàn điều khiển theo mặc định INFO Nhật ký để hỗ trợ khắc phục sự cố khi quét phần bổ trợ và nhóm tập lệnh trực tiếp trên máy chủ.workspace Đang tải và các vấn đề khác; nếu bạn cần hội tụ tạm thời đầu ra, bạn có thể thêm nó theo cách thủ công `-DCONSOLE_LOG_LEVEL=ERROR`。
+- CLI được thông qua trong quá trình hoạt động `RunScopedVariableContext` tiêm `plan.json` bên trong environment/globals；trước khi yêu cầu cuối cùng được gửi đi `{{var}}` Thay thế, kịch bản `pm.environment` / `pm.globals` Cả phân tích biến luồng con và phân tích biến luồng con đều sử dụng cùng các biến trạng thái đang chạy và không ghi lại vào tệp biến toàn cục liên tục của người dùng.
+- Độc lập CLI và CLI master của `--out` Sử dụng cùng một phần `PerformanceJsonReport` JSON cấu trúc. Sau khi lệnh được bắt đầu, nó được viết một cách nguyên tử `PENDING`，Tiếp tục sử dụng trong quá trình hoạt động `RUNNING` Ảnh chụp thay thế nguyên tử, được viết sau khi hoàn thành `SUCCESS`、`FAILED` hoặc `STOPPED` Báo cáo cuối cùng; ngay cả khi việc xác minh hoặc thực thi tham số không bình thường, chúng tôi sẽ cố gắng hết sức để tận dụng thời gian này `FAILED` Báo cáo thay thế các tập tin cũ. Báo cáo chứa các giá trị thô, máy có thể đọc được: tổng số yêu cầu, thành công/Số lần thất bại, cấp độ giao thức total、API cấp độ total、samplesPerSecond、HTTP Thông lượng byte, lượng tử tiêu tốn thời gian và WebSocket/SSE số lượng tin nhắn, tỷ lệ tin nhắn và tin nhắn đầu tiên/Sự kiện đầu tiên bị trì hoãn .
+- worker Sử dụng chính app jar bên trong JDK `HttpServer`，Không được giới thiệu Jetty/Netty/Spring Boot。server Chỉ trong `performance worker` chế độ bắt đầu,GUI Cổng này không được lắng nghe theo mặc định.
+- worker Bảng điều khiển xuất ra trạng thái tiến trình và vòng đời mà người dùng có thể đọc được: .listening、accepted、started、progress、completed。Tiến trình được in một lần mỗi giây theo mặc định và có thể được thông qua `--progress-interval <seconds>` Điều chỉnh hoặc sử dụng `--no-progress` Tắt; nhật ký thành phần bên trong và cấp độ yêu cầu vẫn được xuất ra theo cấu hình nhật ký.
+- worker Giao thức mặt phẳng điều khiển là HTTP/JSON：`GET /api/performance/v1/health`、`POST /api/performance/v1/runs`、`GET /api/performance/v1/runs/{runId}`、`GET /api/performance/v1/runs/{runId}/result`、`GET /api/performance/v1/runs/{runId}/details`、`POST /api/performance/v1/runs/{runId}/stop`。
+- master sử dụng JDK `HttpClient` Lập kế hoạch worker：`performance master run --plan plan.json --workers host:port[,host:port] [--out result.json]`。master Đọc cùng một bản sao `plan.json`，phát ra `PerformanceWorkerAssignment`，Sẽ plan + assignment Gửi tới mọi người worker，Kéo sau trạng thái bỏ phiếu worker report và tổng hợp.
+- GUI Chế độ từ xa sử dụng lại cùng một bộ HTTP/JSON worker thỏa thuận và assignment planner。GUI Số lượng người dùng ảo được định cấu hình là tổng số đồng thời toàn cầu.master Sẽ nhấn worker Số lượng được cắt thành các khoảng người dùng ảo liên tục; Ví dụ 100 Người sử dụng,2 cá nhân worker được thực hiện riêng biệt 0-49 và 50-99，hơn là từng đơn vị worker Mỗi lần chạy 100。
+- GUI Chưa được tải lên `assets.zip`；GUI Được nhập hoặc tạo thủ công CSV Bang hội được nhúng `plan`，file-source CSV và multipart Tài liệu tham khảo tập tin sẽ đến `plan.assets` Và giữ nguyên đường dẫn ban đầu. Người dùng cần đặt trước các tập tin trên mỗi trạm theo các đường dẫn này worker trên máy chủ.CSV Data Set Vì vậy, các hàng được tìm nạp từ cùng một phạm vi người dùng ảo toàn cầu 100 Được rồi CSV Trận đấu 100 Người sử dụng,2 cá nhân worker Thời gian cũng vậy 0-49 và 50-99 Hai đoạn văn; nếu như CSV Nếu số lượng hàng ít hơn số lượng người dùng ảo thì vẫn sẽ được tái chế theo số lượng người dùng toàn cầu.
+- worker Phải được nhận master/GUI Đã tạo assignment sẽ được thực thi để tránh điền nhầm vào cùng một bản sao `plan` Trên nhiều nền tảng worker Việc chạy từng thao tác trên sẽ khiến tổng số đồng thời được khuếch đại.
+- `performance-core.worker` Không lưu gì cả UI của assignment/protocol DTO、assignment planner và worker execution plan partitioner；`performance.worker` / `performance.master` cứu app bên server/client/Thực hiện lệnh. Các bước tiếp theo bao gồm xác thực, nhịp tim và tài sản bundle、Tập hợp lượng tử toàn cầu chính xác vẫn được mở rộng theo ranh giới này.
 
-### Headless CLI 验证脚本
+### Headless CLI Kịch bản xác thực
 
-从 GUI 导出 `plan.json` 后，headless 单机验证使用主 app jar：
+Từ GUI Xuất khẩu `plan.json` mặt sau,headless Xác minh độc lập sử dụng bản gốc app jar：
 
 ```bash
 mvn -q -pl easy-postman-app -am -DskipTests package
@@ -84,7 +84,7 @@ java -jar easy-postman-app/target/easy-postman-5.5.28.jar \
 jq . /tmp/easy-postman-headless-result.json
 ```
 
-macOS 本机如果需要给压测命令加最长运行时间保护，可以用 `perl` 的 alarm 包一层：
+macOS Máy này có thể được sử dụng nếu bạn cần thêm tính năng bảo vệ thời gian chạy tối đa cho lệnh kiểm tra sức chịu đựng `perl` của alarm Bọc một lớp:
 
 ```bash
 perl -e 'alarm shift; exec @ARGV' 90 \
@@ -94,7 +94,7 @@ perl -e 'alarm shift; exec @ARGV' 90 \
   --out /tmp/easy-postman-headless-result.json
 ```
 
-本地验证记录：使用 GUI 导出的 `$HOME/Downloads/plan.json`，线程组为固定 20 线程、按时间运行 60 秒，CLI 成功完成并写出结果。下面是 `result.json` 节选，字段名与真实输出一致：
+Bản ghi xác thực cục bộ: use GUI Đã xuất khẩu `$HOME/Downloads/plan.json`，Các nhóm chủ đề được cố định 20 Chủ đề, chạy theo thời gian 60 Thứ hai,CLI Hoàn thành thành công và ghi kết quả. Đây rồi `result.json` Đoạn trích, tên trường phù hợp với đầu ra thực tế :
 
 ```json
 {
@@ -136,9 +136,9 @@ perl -e 'alarm shift; exec @ARGV' 90 \
 }
 ```
 
-### Master / Worker 本机验证脚本
+### Master / Worker Tập lệnh xác minh gốc
 
-先启动两个 worker 进程：
+Bắt đầu hai cái trước worker Quá trình:
 
 ```bash
 java -jar easy-postman-app/target/easy-postman-5.5.28.jar \
@@ -152,7 +152,7 @@ java -jar easy-postman-app/target/easy-postman-5.5.28.jar \
   --port 19091
 ```
 
-再由 master 分发同一份 `plan.json`：
+Lại master Phân phối cùng một bản sao `plan.json`：
 
 ```bash
 java -jar easy-postman-app/target/easy-postman-5.5.28.jar \
@@ -163,7 +163,7 @@ java -jar easy-postman-app/target/easy-postman-5.5.28.jar \
 jq . /tmp/easy-postman-master-result.json
 ```
 
-本地验证记录：同一份 `$HOME/Downloads/plan.json` 通过两个本机 worker 分片执行，master 成功聚合。下面是 `master-result.json` 节选：
+Hồ sơ xác minh địa phương: bản sao tương tự `$HOME/Downloads/plan.json` thông qua hai máy cục bộ worker Thực thi phân đoạn,master Tổng hợp thành công. Đây rồi `master-result.json` Trích đoạn:
 
 ```json
 {
@@ -195,11 +195,11 @@ jq . /tmp/easy-postman-master-result.json
 }
 ```
 
-打包脚本的 `jlink --add-modules` 已包含 `jdk.httpserver`，否则 jpackage 后的 worker 模式会因为精简运行时缺少 `com.sun.net.httpserver.HttpServer` 而启动失败。
+Kịch bản đóng gói `jlink --add-modules` Đã bao gồm `jdk.httpserver`，Ngược lại jpackage Sau đó worker Mẫu sẽ bị thiếu do thời gian chạy ngắn `com.sun.net.httpserver.HttpServer` Và việc khởi nghiệp đã thất bại.
 
-### Master / Worker 时序与协议
+### Master / Worker Thời gian và giao thức
 
-Master / worker 使用 JDK `HttpClient` + JDK `HttpServer`，控制面是 HTTP/JSON，数据面仍由各 worker 本机执行 OkHttp 请求。GUI 远程模式和 CLI master 使用同一套协议。
+Master / worker sử dụng JDK `HttpClient` + JDK `HttpServer`，Bề mặt điều khiển là HTTP/JSON，Mặt phẳng dữ liệu vẫn được chia cho mỗi mặt worker Thực hiện tại địa phương OkHttp yêu cầu.GUI chế độ từ xa và CLI master Sử dụng cùng một giao thức.
 
 ```mermaid
 sequenceDiagram
@@ -240,120 +240,120 @@ sequenceDiagram
     GUI->>GUI: merge reports and refresh GUI report
 ```
 
-协议端点：
+Điểm cuối giao thức: .
 
-| Method | Path | 用途 | 时间口径 |
+| Method | Path | Mục đích | tầm cỡ thời gian |
 |---|---|---|---|
-| `GET` | `/api/performance/v1/health` | 探活，返回 worker id、host、port。 | 不计入压测时间。 |
-| `POST` | `/api/performance/v1/runs` | 提交一次运行，body 包含完整 `plan` 和该 worker 的 `assignment`。 | plan 上传、JSON 解析和 assignment 校验不计入最终 report 的执行时间。 |
-| `GET` | `/api/performance/v1/runs/{runId}?report=false` | 轻量状态轮询，只返回 users、requests、QPS、状态，不构建完整 report。 | 不改变最终 report 时间；只有关闭实时报表且关闭趋势时使用。 |
-| `GET` | `/api/performance/v1/runs/{runId}` | 完整状态轮询，返回运行中聚合 report。GUI 远程模式每 1 秒轮询一次，开启“实时报表”或“启用趋势”时使用。 | 实时报表用它刷新表格；趋势用它读取 HTTP/WS/SSE 协议级累计计数。 |
-| `POST` | `/api/performance/v1/runs/{runId}/stop` | 请求 worker 停止当前运行。 | 停止控制面不计入成功请求数。 |
-| `GET` | `/api/performance/v1/runs/{runId}/result` | 拉取 worker 最终 JSON report。 | 最终 report 已固定，不再重新采样。 |
-| `GET` | `/api/performance/v1/runs/{runId}/details` | 拉取 worker 有界保留的失败/慢请求明细，用于 GUI 结果表。 | 明细拉取发生在收尾阶段，不计入成功请求数。 |
+| `GET` | `/api/performance/v1/health` | Khám phá và trở về worker id、host、port。 | Không bao gồm trong thời gian kiểm tra căng thẳng. |
+| `POST` | `/api/performance/v1/runs` | Gửi một cuộc chạy,body Chứa đầy đủ `plan` và worker của `assignment`。 | plan Tải lên,JSON Phân tích và assignment Việc xác minh không được tính vào trận chung kết report thời gian thực hiện. |
+| `GET` | `/api/performance/v1/runs/{runId}?report=false` | Bỏ phiếu trạng thái nhẹ, chỉ trả lại users、requests、QPS、Hiện trạng, chưa xây dựng hoàn thiện report。 | Đừng thay đổi kết thúc report Thời gian; chỉ được sử dụng khi tắt báo cáo thời gian thực và tắt xu hướng. |
+| `GET` | `/api/performance/v1/runs/{runId}` | Hoàn thành việc bỏ phiếu trạng thái, trả về tổng hợp đang chạy report。GUI Chế độ từ xa cho mỗi 1 Thăm dò ý kiến ​​mỗi giây một lần và bật“Báo cáo thời gian thực”hoặc“Kích hoạt xu hướng”khi sử dụng. | Báo cáo thời gian thực sử dụng nó để làm mới bảng; xu hướng sử dụng nó để đọc HTTP/WS/SSE Số lượng tích lũy cấp độ giao thức. |
+| `POST` | `/api/performance/v1/runs/{runId}/stop` | yêu cầu worker Dừng hoạt động hiện tại. | Việc dừng mặt phẳng điều khiển không được tính vào số lượng yêu cầu thành công. |
+| `GET` | `/api/performance/v1/runs/{runId}/result` | Sự lôi kéo worker cuối cùng JSON report。 | cuối cùng report Đã sửa, không còn được lấy mẫu lại. |
+| `GET` | `/api/performance/v1/runs/{runId}/details` | Sự lôi kéo worker Thất bại trong việc duy trì giới hạn/Chi tiết yêu cầu chậm cho GUI Bảng kết quả. | Các lần kéo chi tiết xảy ra trong giai đoạn kết thúc và không được tính vào số lượng yêu cầu thành công. |
 
-时间口径：
+Tầm cỡ thời gian:
 
-1. `plan.json` 通过 `POST /runs` 发送到 worker，这属于控制面分发，不计入最终 report 的 `elapsedTimeMs` 和报表 QPS。
-2. worker 控制台的 `completed run ... elapsedMs` 从 worker 异步开始执行算起，包含 worker 侧 plan 编译、分片应用、脚本池启动和实际请求执行，不包含 HTTP body 上传时间。
-3. 最终 JSON report 的 `metadata.startTimeMs/endTimeMs` 来自 worker 内部 `PerformanceRunSession`，从执行引擎 `beginRun` 开始，到运行结束为止；不包含 master 读 plan、生成 assignment、POST plan 和最终拉取 result 的时间。
-4. GUI 远程模式固定每 1 秒轮询 worker 状态；趋势图总览按 worker status 的增量请求数采样，HTTP/WS/SSE 协议指标按运行中聚合 report 的协议累计值做窗口差分。采样窗口在所有 worker 接收 plan 后重置，避免第一秒趋势点把 plan 分发耗时算进 QPS。
-5. CLI master 默认每 500ms 使用 `report=false` 轻量轮询，可通过 `--poll-interval-ms <ms>` 调整；每轮把 users、requests、QPS 和 worker 完成数聚合为轻量 `RUNNING` 快照并原子更新 `--out`，最终再替换为完整协议报告。GUI remote 在“实时报表”或“启用趋势”开启时请求运行中聚合 report。关闭实时报表但开启趋势时不会刷新报表页，但会用聚合 report 计算 HTTP/WS/SSE 趋势。
-6. GUI remote 在 worker 到达终态后拉取 `/details`，把失败/慢请求明细写入“结果表”；worker 不实时推送请求级明细，避免拖慢压测主路径。
+1. `plan.json` vượt qua `POST /runs` Gửi tới worker，Đây là sự phân bổ mặt phẳng điều khiển và không được tính vào kết quả cuối cùng report của `elapsedTimeMs` và báo cáo QPS。
+2. worker bảng điều khiển `completed run ... elapsedMs` Từ worker Được tính từ khi bắt đầu thực hiện không đồng bộ, bao gồm worker bên plan Không bao gồm quá trình biên dịch, phân đoạn ứng dụng, khởi động nhóm tập lệnh và thực thi yêu cầu thực tế HTTP body Thời gian tải lên.
+3. cuối cùng JSON report của `metadata.startTimeMs/endTimeMs` Từ worker nội bộ `PerformanceRunSession`，từ công cụ thực thi `beginRun` Bắt đầu cho đến khi kết thúc cuộc chạy; không được bao gồm master đọc plan、phát ra assignment、POST plan và lực kéo cuối cùng result thời gian.
+4. GUI Chế độ từ xa cố định cho mỗi 1 Cuộc bỏ phiếu thứ hai worker Trạng thái; nút tổng quan về biểu đồ xu hướng worker status Số lượng yêu cầu gia tăng được lấy mẫu,HTTP/WS/SSE Số liệu giao thức được tổng hợp theo lượt chạy report Giá trị tích lũy của thỏa thuận được sử dụng làm chênh lệch cửa sổ. Cửa sổ lấy mẫu ở tất cả worker nhận plan Sau đó đặt lại để tránh điểm xu hướng trong giây đầu tiên plan Thời gian phân phối được bao gồm trong tính toán QPS。
+5. CLI master Mặc định cho mỗi 500ms sử dụng `report=false` Bỏ phiếu nhẹ nhàng, khá `--poll-interval-ms <ms>` Điều chỉnh; xử lý từng vòng users、requests、QPS và worker Tổng hợp số hoàn thành thành nhẹ `RUNNING` Ảnh chụp nhanh và cập nhật nguyên tử `--out`，Cuối cùng được thay thế bằng một báo cáo giao thức đầy đủ.GUI remote Vào“Báo cáo thời gian thực”hoặc“Kích hoạt xu hướng”Yêu cầu chạy tổng hợp khi được bật report。Khi báo cáo thời gian thực bị tắt nhưng xu hướng được bật, trang báo cáo sẽ không được làm mới nhưng tính năng tổng hợp sẽ được sử dụng report Tính toán HTTP/WS/SSE xu hướng.
+6. GUI remote Vào worker Kéo sau khi đạt đến trạng thái cuối cùng `/details`，Đặt thất bại/Chi tiết yêu cầu chậm được viết“Bảng kết quả”；worker Không đẩy chi tiết cấp độ yêu cầu trong thời gian thực để tránh làm chậm quá trình kiểm tra căng thẳng chính.
 
-### GUI 远程控制方式
+### GUI Phương pháp điều khiển từ xa
 
-1. 在每台压测机上启动 worker：`java -jar easy-postman.jar performance worker --host 0.0.0.0 --port 19090`。worker 默认每秒打印一次 `users/requests/QPS` 进度，可用 `--progress-interval <seconds>` 调整或 `--no-progress` 关闭。
-2. GUI 导入或手工创建的 CSV 行已包含在 `plan.json` 内；如果压测计划引用 file-source CSV 或 multipart 文件，按 `plan.assets` 中的路径把文件放到每台 worker 的相同路径。
-3. 在 GUI 顶部工具栏勾选 `Remote`，在 `Workers` 输入框中填写 `host:port` 列表，支持逗号或空白分隔，例如 `10.0.0.11:19090,10.0.0.12:19090`。
-4. 点击 `Start` 后 GUI 作为 master 分发当前计划；点击 `Stop` 后向所有 worker 发送 `/stop`。顶部状态仍显示“活跃虚拟用户/总虚拟用户”，`启用趋势` 和 `报表更新方式` 与本机执行使用相同开关。运行中如果关闭实时报表且关闭趋势，GUI 只向 worker 拉取轻量状态；开启趋势时会拉聚合 report 用于协议指标，但不刷新报表页。运行结束后 GUI 报表页展示 master 聚合后的 JSON report 数据。
-5. 分布式并发采用总量分摊：GUI 配置 100 个虚拟用户、2 个 worker 时，每台 worker 默认约 50 个；101 个虚拟用户、2 个 worker 时按 51/50 分配。CSV 行跟随虚拟用户全局区间分配，避免不同 worker 同时从第 0 行开始读取。
+1. Bắt đầu trên mỗi máy kiểm tra sức chịu đựng worker：`java -jar easy-postman.jar performance worker --host 0.0.0.0 --port 19090`。worker Mặc định là in một lần mỗi giây `users/requests/QPS` Tiến độ, có sẵn `--progress-interval <seconds>` Điều chỉnh hoặc `--no-progress` Đóng lại.
+2. GUI Được nhập hoặc tạo thủ công CSV Hàng được bao gồm `plan.json` Ở trong; nếu được tham chiếu bởi kế hoạch kiểm tra căng thẳng file-source CSV hoặc multipart Tập tin, nhấn `plan.assets` Đặt tập tin vào đường dẫn trong mỗi trạm worker cùng một con đường.
+3. Vào GUI Đã kiểm tra thanh công cụ trên cùng `Remote`，Vào `Workers` Điền vào hộp đầu vào `host:port` Danh sách, hỗ trợ phân tách bằng dấu phẩy hoặc khoảng trắng, vd `10.0.0.11:19090,10.0.0.12:19090`。
+4. Bấm vào `Start` mặt sau GUI như master Phân phối kế hoạch hiện tại; bấm vào `Stop` Ngược lại tất cả worker gửi `/stop`。Trạng thái hàng đầu vẫn được hiển thị“Người dùng ảo đang hoạt động/Tổng số người dùng ảo”，`Kích hoạt xu hướng` và `Phương pháp cập nhật báo cáo` Sử dụng các công tắc tương tự như cách triển khai gốc. Nếu báo cáo thời gian thực bị tắt và xu hướng bị tắt trong quá trình hoạt động.GUI Chỉ để worker Kéo trạng thái nhẹ; tổng hợp sẽ được kéo khi xu hướng được bật report Được sử dụng cho các chỉ báo giao thức nhưng không làm mới trang báo cáo. Sau khi cuộc chạy kết thúc GUI Hiển thị trang báo cáo master Sau khi tổng hợp JSON report dữ liệu.
+5. Đồng thời phân phối sử dụng tổng khấu hao:GUI cấu hình 100 người dùng ảo,2 cá nhân worker thời gian, từng đơn vị worker Mặc định là khoảng 50 cá nhân;101 người dùng ảo,2 cá nhân worker Nhấn khi nào 51/50 Nhiệm vụ.CSV Các hàng tuân theo phân bổ phạm vi toàn cầu của người dùng ảo để tránh sự khác biệt worker Đồng thời từ No 0 Dòng bắt đầu đọc.
 
-## 线程模型
+## Mô hình luồng
 
-### 线程类型
+### Loại chủ đề
 
-- `PerformanceRun-*`：一次压测运行的顶层后台线程，由 `PerformanceRunControlSupport` 创建。
-- `PerformanceThreadGroup-*`：根节点下每个启用线程组的调度入口。
-- `PerformanceFixedWorker-*`：固定线程模式 worker。
-- `PerformanceRampScheduler-*` / `PerformanceRampWorker-*`：递增模式的调度线程和 worker。
-- `PerformanceSpikeScheduler-*` / `PerformanceSpikeWorker-*`：尖刺模式的调度线程和 worker。
-- `PerformanceStairsScheduler-*` / `PerformanceStairsWorker-*`：阶梯模式的调度线程和 worker。
-- `PerformanceTimer-*`：趋势图采样和报表刷新定时触发器。
-- `PerformanceMetrics-*`：统计快照和趋势窗口计算线程。
-- `PerformanceStopFlush-*`：停止压测后的最终 UI flush 协调线程。
+- `PerformanceRun-*`：Chuỗi nền cấp cao nhất cho quá trình chạy thử nghiệm căng thẳng, bao gồm `PerformanceRunControlSupport` Tạo.
+- `PerformanceThreadGroup-*`：Mục lập lịch cho từng nhóm luồng được kích hoạt trong nút gốc.
+- `PerformanceFixedWorker-*`：Đã sửa chế độ chủ đề worker。
+- `PerformanceRampScheduler-*` / `PerformanceRampWorker-*`：Lập kế hoạch chủ đề ở chế độ tăng dần và worker。
+- `PerformanceSpikeScheduler-*` / `PerformanceSpikeWorker-*`：Lập kế hoạch chủ đề ở chế độ tăng đột biến và worker。
+- `PerformanceStairsScheduler-*` / `PerformanceStairsWorker-*`：Lập kế hoạch chủ đề ở chế độ bậc thang và worker。
+- `PerformanceTimer-*`：Lấy mẫu biểu đồ xu hướng và kích hoạt thời gian làm mới báo cáo.
+- `PerformanceMetrics-*`：Thống kê ảnh chụp nhanh và chủ đề tính toán cửa sổ xu hướng.
+- `PerformanceStopFlush-*`：Cái kết sau kì thi căng thẳng UI flush Chủ đề phối hợp.
 
-所有这些线程都通过 `PerformanceThreadFactory` 创建，统一设置线程名、daemon 属性和未捕获异常日志。
+Tất cả các chủ đề này vượt qua `PerformanceThreadFactory` Tạo và đặt thống nhất tên chủ đề.daemon Thuộc tính và nhật ký ngoại lệ chưa được nắm bắt.
 
-### 停止语义
+### Dừng ngữ nghĩa
 
-停止压测时按以下顺序处理：
+Khi dừng thử áp suất, tiến hành theo trình tự sau:
 
-1. 将 running 状态置为 false，并 interrupt 顶层运行线程。
-2. 取消 OkHttp 请求、SSE EventSource 和 WebSocket。
-3. 停止采样/刷新定时器。
-4. 异步等待短暂统计收敛，然后在 EDT 上 flush 结果表、采样最后一次趋势数据、刷新报表。
-5. 恢复 OkHttp 默认连接池和 dispatcher 配置。
+1. Sẽ running Trạng thái được đặt thành  false，Và interrupt Chủ đề chạy cấp cao nhất.
+2. Hủy bỏ OkHttp yêu cầu,SSE EventSource và WebSocket。
+3. Dừng lấy mẫu/Làm mới bộ đếm thời gian.
+4. Không đồng bộ chờ một thời gian ngắn để thống kê hội tụ, sau đó tiếp tục EDT thượng đẳng flush Bảng kết quả, lấy mẫu dữ liệu xu hướng cuối cùng và làm mới báo cáo.
+5. khôi phục OkHttp Nhóm kết nối mặc định và dispatcher cấu hình.
 
-`PerformanceTimerManager.stopAll()` 在非 EDT 调用时会等待 scheduler 关闭；如果从 EDT 调用，只取消任务并关闭 scheduler，不等待 termination，避免停止按钮卡住界面。
+`PerformanceTimerManager.stopAll()` Ở Châu Phi EDT Sẽ đợi khi được gọi scheduler Đóng; nếu từ EDT Được gọi, chỉ có nhiệm vụ bị hủy và đóng lại scheduler，Đừng chờ đợi termination，Tránh để nút dừng bị kẹt trong giao diện.
 
-## 指标模型
+## mô hình chỉ số
 
-### 累计统计
+### Thống kê tích lũy
 
-`PerformanceStatsCollector` 使用同步方法维护累计统计：
+`PerformanceStatsCollector` Duy trì số liệu thống kê tích lũy bằng phương pháp đồng bộ hóa: .
 
-- 按协议和 API 聚合请求数、成功数、失败数。
-- 使用直方图计算耗时分位数，避免保存所有请求耗时。
-- HTTP 记录请求头 + 请求体发送字节、响应头 + 响应体接收字节，并派生 Sent KB/s、Received KB/s 和 Avg Bytes。
-- WebSocket/SSE 额外记录消息数、匹配数、首消息延迟和主要完成原因。
+- Theo thỏa thuận và API Tổng hợp số lượng yêu cầu, số lượng thành công và số lượng thất bại.
+- Sử dụng biểu đồ để tính toán lượng tử tiêu tốn thời gian nhằm tránh tiết kiệm tất cả thời gian yêu cầu.
+- HTTP Tiêu đề yêu cầu đăng nhập + The request body sends bytes and response headers + Phần thân phản hồi nhận byte và được dẫn xuất Sent KB/s、Received KB/s và Avg Bytes。
+- WebSocket/SSE Nhật ký bổ sung bao gồm số lượng tin nhắn, số lượng trùng khớp, độ trễ của tin nhắn đầu tiên và lý do hoàn thành chính.
 
-`snapshot()` 生成报表快照，不保留单请求结果。
+`snapshot()` Tạo ảnh chụp nhanh báo cáo mà không giữ lại kết quả yêu cầu duy nhất.
 
-### HTTP 指标口径
+### HTTP Cỡ nòng chỉ báo
 
-- 请求耗时：只统计 sampler/request 的网络请求耗时，从请求开始到最后响应数据收到后结束；不包含前置脚本、后置脚本、断言、结果表渲染和 master/worker 控制面耗时。
-- QPS：`total / ((lastSampleEndTimeMs - firstSampleStartTimeMs) / 1000)`。单机和单 worker 使用本机样本窗口；master 合并多个 worker 时使用所有 worker 的全局最早样本开始时间和最晚样本结束时间重算，避免简单相加 worker QPS 带来的误差。
-- Sent KB/s：`sentBytes / sampleWindow / 1024`，sentBytes 为请求头 + 请求体字节数。
-- Received KB/s：`receivedBytes / sampleWindow / 1024`，receivedBytes 为响应头 + 响应体字节数。
-- Avg Bytes：`receivedBytes / total`，按每个 HTTP sample 的平均接收字节数展示，对齐 JMeter Aggregate Report 的 Avg. Bytes 使用习惯。
+- Thời gian yêu cầu: chỉ thống kê sampler/request Yêu cầu mạng cần có thời gian, từ khi bắt đầu yêu cầu đến khi kết thúc sau khi nhận được dữ liệu phản hồi cuối cùng; nó không bao gồm tiền kịch bản, hậu kịch bản, xác nhận, hiển thị bảng kết quả và master/worker Bề mặt điều khiển tốn nhiều thời gian.
+- QPS：`total / ((lastSampleEndTimeMs - firstSampleStartTimeMs) / 1000)`。Độc lập và độc lập worker Sử dụng cửa sổ mẫu gốc;master Hợp nhất nhiều worker Sử dụng tất cả worker Thời gian bắt đầu mẫu sớm nhất toàn cầu và thời gian kết thúc mẫu muộn nhất được tính toán lại để tránh việc cộng đơn giản worker QPS những sai sót gây ra.
+- Sent KB/s：`sentBytes / sampleWindow / 1024`，sentBytes Đối với tiêu đề yêu cầu + The number of bytes in the request body.
+- Received KB/s：`receivedBytes / sampleWindow / 1024`，receivedBytes cho tiêu đề phản hồi + Số byte nội dung phản hồi.
+- Avg Bytes：`receivedBytes / total`，Nhấn từng cái HTTP sample Số byte trung bình nhận được được hiển thị, căn chỉnh JMeter Aggregate Report của Avg. Bytes thói quen sử dụng.
 
-### 趋势窗口
+### Cửa sổ xu hướng
 
-`sampleTrendSnapshot(...)` 读取当前窗口内的增量统计，然后重置窗口计数。HTTP 的 QPS、失败率和耗时来自已完成请求；WebSocket/SSE 的实时消息速率、首消息延迟和活跃会话时长来自 `PerformanceRealtimeMetrics`，用于补齐长连接运行中尚未结束的样本。
+`sampleTrendSnapshot(...)` Đọc số liệu thống kê gia tăng trong cửa sổ hiện tại, sau đó đặt lại số lượng cửa sổ.HTTP của QPS、Tỷ lệ thất bại và thời gian trôi qua là từ các yêu cầu đã hoàn thành;WebSocket/SSE Tốc độ tin nhắn theo thời gian thực, độ trễ của tin nhắn đầu tiên và thời lượng phiên hoạt động là từ  `PerformanceRealtimeMetrics`，Được sử dụng để hoàn thành các mẫu chưa hoàn thành trong các lần chạy kết nối dài.
 
-### UI 刷新
+### UI Làm mới
 
-`PerformanceStatisticsCoordinator` 负责连接统计数据和 UI：
+`PerformanceStatisticsCoordinator` Chịu trách nhiệm thống kê kết nối và UI：
 
-- `refreshReport()` 先切到 EDT 检查当前是否在报表 Tab，未查看时报表刷新直接跳过。
-- 报表快照和趋势窗口计算提交到单线程 `PerformanceMetrics-*`，串行执行，避免占用 common pool。
-- 所有 Swing 组件更新通过 `SwingUtilities.invokeLater` 回到 EDT。
+- `refreshReport()` Cắt đầu tiên EDT Kiểm tra xem báo cáo có đang được tiến hành hay không Tab，Nếu báo cáo không được xem, việc làm mới báo cáo sẽ bị bỏ qua trực tiếp.
+- Báo cáo ảnh chụp nhanh và tính toán cửa sổ xu hướng được gửi tới một chuỗi duy nhất `PerformanceMetrics-*`，Thực hiện tuần tự để tránh bị chiếm dụng common pool。
+- Tất cả Swing Cập nhật thành phần đã được thông qua `SwingUtilities.invokeLater` Quay lại EDT。
 
-## 结果表刷新
+## Bảng kết quả được làm mới
 
-`PerformanceResultTablePanel` 不直接在请求线程更新表格：
+`PerformanceResultTablePanel` Không cập nhật bảng trực tiếp trên chuỗi yêu cầu:
 
-- 请求线程只把 `ResultNodeInfo` 放入 `pendingQueue`。
-- Swing Timer 每 200ms 在 EDT 上批量拉取最多 2000 条结果并追加到 TableModel。
-- 停止或完成时调用 `flushPendingResults()`，确保队列中的结果最终显示。
-- 搜索使用 300ms 防抖，避免每次输入都对大结果集做过滤。
+- Chỉ yêu cầu chủ đề `ResultNodeInfo` Đặt vào `pendingQueue`。
+- Swing Timer Mọi 200ms Vào EDT Kéo nhiều nhất theo đợt 2000 kết quả và thêm vào TableModel。
+- Được gọi khi dừng hoặc hoàn thành `flushPendingResults()`，Đảm bảo kết quả trong hàng đợi cuối cùng cũng được hiển thị.
+- Tìm kiếm bằng cách sử dụng 300ms Chống rung, tránh lọc tập kết quả lớn mỗi lần nhập liệu.
 
-## 扩展新线程模式
+## Mở rộng chế độ luồng mới
 
-新增线程组模式时建议按以下步骤处理：
+Bạn nên làm theo các bước sau khi thêm chế độ nhóm chủ đề mới:
 
-1. 在 `ThreadGroupData.ThreadMode` 中增加模式及配置字段，并在 `normalize()` 中定义边界。
-2. 在 `ThreadGroupPropertyPanel` 中增加配置 UI 和预览数据。
-3. 在 `PerformanceThreadGroupPlanner` 中增加最大线程数和请求量估算。
-4. 在 `PerformanceThreadGroupRunner` 中增加调度方法，worker 生命周期交给 `PerformanceVirtualUserCoordinator`。
-5. 增加针对估算、调度边界、停止语义的单元测试。
+1. Vào `ThreadGroupData.ThreadMode` Thêm các trường chế độ và cấu hình trong  `normalize()` xác định ranh giới.
+2. Vào `ThreadGroupPropertyPanel` Thêm cấu hình UI và xem trước dữ liệu.
+3. Vào `PerformanceThreadGroupPlanner` Tăng số lượng chủ đề tối đa và ước tính khối lượng yêu cầu.
+4. Vào `PerformanceThreadGroupRunner` Thêm phương thức lập lịch trong .worker Vòng đời được bàn giao `PerformanceVirtualUserCoordinator`。
+5. Thêm các bài kiểm tra đơn vị để ước tính, lập kế hoạch ranh giới và dừng ngữ nghĩa.
 
-## 维护原则
+## Nguyên tắc bảo trì
 
-- Swing 组件只在 EDT 读写。
-- 压测执行只能消费 `PerformanceTestPlanCompiler` 生成的执行计划，不直接依赖可变 UI 树。
-- 执行线程不直接操作 UI，只通过进度回调、结果队列和统计协调器传递状态。
-- 线程创建不要直接 `new Thread(...)`，使用 `PerformanceThreadFactory`。
-- 指标计算不要使用 `CompletableFuture.runAsync(...)` 默认线程池，使用模块内专用执行器。
-- 高并发路径不保存不必要的明细对象；需要展示明细时由高效模式控制保留范围。
+- Swing Thành phần này chỉ có trong EDT Đọc và viết.
+- Việc thực hiện kiểm tra căng thẳng chỉ có thể được thực hiện `PerformanceTestPlanCompiler` Kế hoạch thực hiện được tạo ra không phụ thuộc trực tiếp vào khả năng thay đổi UI cây.
+- Chuỗi thực thi không hoạt động trực tiếp UI，Chỉ trạng thái được chuyển qua lệnh gọi lại tiến trình, hàng đợi kết quả và điều phối viên thống kê.
+- Đừng tạo chủ đề trực tiếp `new Thread(...)`，sử dụng `PerformanceThreadFactory`。
+- Không sử dụng nó để tính toán chỉ số `CompletableFuture.runAsync(...)` Nhóm luồng mặc định sử dụng các trình thực thi chuyên dụng trong mô-đun.
+- Đường dẫn đồng thời cao không lưu các đối tượng chi tiết không cần thiết; khi cần hiển thị chi tiết, chế độ hiệu quả sẽ kiểm soát phạm vi lưu giữ.

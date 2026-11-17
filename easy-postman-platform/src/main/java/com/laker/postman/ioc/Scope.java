@@ -3,8 +3,8 @@ package com.laker.postman.ioc;
 import java.lang.annotation.*;
 
 /**
- * 指定Bean的作用域
- * 默认为单例（singleton）
+ * được chỉ địnhBeanphạm vi
+ * Mặc định là singleton (singleton）
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
@@ -12,19 +12,19 @@ import java.lang.annotation.*;
 public @interface Scope {
 
     /**
-     * Bean的作用域
-     * - "singleton": 单例模式（默认）
-     * - "prototype": 原型模式（每次获取都创建新实例）
+     * Beanphạm vi
+     * - "singleton": Chế độ Singleton (mặc định)
+     * - "prototype": Mẫu nguyên mẫu (tạo phiên bản mới trên mỗi lần tìm nạp)
      */
     String value() default "singleton";
 
     /**
-     * 常量：单例
+     * Hằng số: Singleton
      */
     String SINGLETON = "singleton";
 
     /**
-     * 常量：原型
+     * Hằng số: Nguyên mẫu
      */
     String PROTOTYPE = "prototype";
 }

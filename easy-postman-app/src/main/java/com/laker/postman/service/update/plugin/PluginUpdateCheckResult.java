@@ -3,7 +3,7 @@ package com.laker.postman.service.update.plugin;
 import java.util.List;
 
 /**
- * 插件更新检查结果。
+ * Kết quả kiểm tra cập nhật plug-in.
  */
 public record PluginUpdateCheckResult(
         List<PluginUpdateCandidate> candidates,

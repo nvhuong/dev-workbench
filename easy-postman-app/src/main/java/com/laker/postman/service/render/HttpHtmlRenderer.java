@@ -29,7 +29,7 @@ import java.util.Locale;
 import java.util.Map;
 
 /**
- * 统一的 HTTP 请求/响应 HTML 渲染工具类
+ * thống nhất HTTP yêu cầu/phản hồi HTML Lớp công cụ kết xuất
  */
 @UtilityClass
 public class HttpHtmlRenderer {
@@ -37,11 +37,11 @@ public class HttpHtmlRenderer {
     private static final int MAX_DISPLAY_SIZE = 2 * 1024;
     private static final int MAX_REQUEST_DISPLAY_SIZE = 2 * 1024;
 
-    // ==================== 字号 ====================
+    // ==================== Cỡ chữ ====================
 
     /**
-     * JTextPane HTMLEditorKit 基于 72dpi，Swing 字号基于屏幕 DPI，
-     * 乘以 0.7 换算为视觉等效的 HTML px。
+     * JTextPane HTMLEditorKit dựa trên 72dpi，Swing Kích thước phông chữ dựa trên màn hình DPI，
+     * Nhân với 0.7 Chuyển đổi thành tương đương trực quan HTML px。
      */
     private static int htmlFontSize() {
         return Math.max(8, (int) Math.round(SettingManager.getUiFontSize() * 0.7));
@@ -50,7 +50,7 @@ public class HttpHtmlRenderer {
     private static String fs()      { return htmlFontSize() + "px"; }
     private static String fsSmall() { return Math.max(8, htmlFontSize() - 1) + "px"; }
 
-    // ==================== 主题 ====================
+    // ==================== chủ đề ====================
 
     private static String colorPrimary() { return toHex(ModernColors.getPrimary()); }
     private static String colorSuccess() { return toHex(ModernColors.getSuccess()); }
@@ -77,10 +77,10 @@ public class HttpHtmlRenderer {
         return colorSuccess();
     }
 
-    // ==================== HTML 文档 ====================
+    // ==================== HTML Tài liệu ====================
 
     /**
-     * 完整 HTML 文档：body 设好字体、字号、颜色，子元素直接继承，无需重复设置。
+     * trọn HTML Tài liệu: .body Đặt phông chữ, cỡ chữ và màu sắc và các thành phần phụ sẽ kế thừa chúng trực tiếp mà không cần cài đặt lặp lại.
      */
     private static String htmlDoc(String bodyContent) {
         return "<html><body style='"
@@ -92,9 +92,9 @@ public class HttpHtmlRenderer {
                 + "'>" + bodyContent + "</body></html>";
     }
 
-    // ==================== 通用 HTML 片段 ====================
+    // ==================== Phổ quát HTML mảnh vỡ ====================
 
-    /** key: value 行。详情页使用单一白色内容面，避免灰色条块切碎视线。 */
+    /** key: value Được rồi. Trang chi tiết sử dụng một bề mặt nội dung màu trắng duy nhất để tránh các thanh màu xám làm rối mắt. */
     private static String kvRow(String keyColor, String key, String value, boolean alt) {
         return "<div style='padding:3px 4px 4px 4px;"
                 + "line-height:1.35;"
@@ -105,19 +105,19 @@ public class HttpHtmlRenderer {
                 + "</div>";
     }
 
-    /** 节标题，带左边竖线装饰 */
+    /** Tiêu đề phần, có trang trí đường dọc bên trái */
     private static String sectionTitle(String color, String title) {
         return "<div style='margin:10px 0 4px 0;padding-left:6px;"
                 + "border-left:3px solid " + color + ";"
                 + "font-weight:bold;color:" + color + ";'>" + title + "</div>";
     }
 
-    /** 无数据提示 */
+    /** Không có dữ liệu nhắc nhở */
     private static String noData(String message) {
         return "<div style='color:" + colorGray() + ";padding:12px;font-style:italic;'>" + message + "</div>";
     }
 
-    /** 警告/错误提示框 */
+    /** Cảnh báo/Hộp thông báo lỗi */
     private static String alertBox(String color, String title, String message) {
         return "<div style='border-left:3px solid " + color + ";padding:8px 12px;"
                 + "margin-bottom:10px;background:" + codeBgColor() + ";border-radius:0 4px 4px 0;'>"
@@ -126,7 +126,7 @@ public class HttpHtmlRenderer {
                 + "</div>";
     }
 
-    // ==================== 公开 API ====================
+    // ==================== công cộng API ====================
 
     public static String renderTimingInfo(HttpResponse response) {
         if (response == null || response.httpEventInfo == null) return htmlDoc(noData("No Timing Info"));
@@ -138,9 +138,9 @@ public class HttpHtmlRenderer {
         return htmlDoc(buildEventInfoHtml(response.httpEventInfo));
     }
 
-    /** 渲染请求信息 */
+    /** Hiển thị thông tin yêu cầu */
     public static String renderRequest(PreparedRequest req) {
-        if (req == null) return htmlDoc(noData("无请求信息"));
+        if (req == null) return htmlDoc(noData("Không có thông tin được yêu cầu"));
         StringBuilder sb = new StringBuilder();
 
         if (hasWebSocketHandshakeSnapshot(req)) {
@@ -220,9 +220,9 @@ public class HttpHtmlRenderer {
         return lower.startsWith("ws://") || lower.startsWith("wss://");
     }
 
-    /** 渲染响应信息 */
+    /** Hiển thị thông tin phản hồi */
     public static String renderResponse(HttpResponse resp) {
-        if (resp == null) return htmlDoc(noData("无响应信息"));
+        if (resp == null) return htmlDoc(noData("Không có tin nhắn phản hồi"));
         StringBuilder sb = new StringBuilder();
 
         appendNetworkErrorAlert(sb, resp.httpEventInfo);
@@ -253,7 +253,7 @@ public class HttpHtmlRenderer {
             sb.append(codeBlock(truncate(resp.body)));
             return;
         }
-        // 二进制文件按文本解码只会得到乱码，这里只展示文件信息
+        // Việc giải mã các tệp nhị phân dưới dạng văn bản sẽ chỉ dẫn đến các ký tự bị cắt xén. Chỉ có thông tin tập tin được hiển thị ở đây
         sb.append(sectionTitle(colorSuccess(), I18nUtil.getMessage(MessageKeys.RESPONSE_FILE_SECTION_TITLE)));
         String extension = resp.detectedFileExtension != null
                 ? resp.detectedFileExtension
@@ -295,7 +295,7 @@ public class HttpHtmlRenderer {
                 request.getResponse());
     }
 
-    /** 渲染测试结果 */
+    /** Kết xuất kết quả kiểm tra */
     public static String renderTestResults(List<TestResult> testResults) {
         if (testResults == null || testResults.isEmpty()) return htmlDoc(noData("No test results"));
 
@@ -314,9 +314,9 @@ public class HttpHtmlRenderer {
         return htmlDoc(sb.toString());
     }
 
-    // ==================== 私有实现 ====================
+    // ==================== Thực hiện riêng tư ====================
 
-    /** 代码块（请求/响应 body） */
+    /** khối mã (request/phản hồi body） */
     private static String codeBlock(String content) {
         return "<div style='background:" + codeBgColor()
                 + ";color:" + textColor()
@@ -327,7 +327,7 @@ public class HttpHtmlRenderer {
     }
 
     /**
-     * 构建包含错误信息的响应内容（不做字符串截取，直接复用 renderResponseBody）
+     * Xây dựng nội dung phản hồi chứa thông tin lỗi (không chặn chuỗi, tái sử dụng trực tiếp renderResponseBody）
      */
     private static String buildResponseWithError(String errorMsg, HttpEventInfo eventInfo, HttpResponse response) {
         StringBuilder sb = new StringBuilder();
@@ -337,13 +337,13 @@ public class HttpHtmlRenderer {
         if (eventInfo != null && isNotEmpty(eventInfo.getErrorMessage())) {
             sb.append(alertBox(colorWarning(), "⚠ Network Error", eventInfo.getErrorMessage()));
         }
-        // 直接拼响应内容片段，不包装外层 htmlDoc（由最后统一包装）
+        // Trực tiếp đánh vần đoạn nội dung phản hồi mà không cần bọc lớp bên ngoài htmlDoc（bằng cách đóng gói thống nhất cuối cùng)
         sb.append(renderResponseBody(response));
         return htmlDoc(sb.toString());
     }
 
     /**
-     * 只输出响应内容片段（无 htmlDoc 包装），供 buildResponseWithError 复用
+     * Chỉ xuất đoạn nội dung phản hồi (Không có htmlDoc bao bì), được cung cấp buildResponseWithError Tái sử dụng
      */
     private static String renderResponseBody(HttpResponse resp) {
         if (resp == null) return noData("No Response");
@@ -421,7 +421,7 @@ public class HttpHtmlRenderer {
         return resp.httpEventInfo != null ? safeStr(resp.httpEventInfo.getThreadName()) : "";
     }
 
-    // Timeline 各阶段语义色，统一从主题 token 取色，避免暗色主题下固定色过暗。
+    // Timeline Màu sắc ngữ nghĩa của từng giai đoạn được thống nhất từ chủ đề token Chọn một màu để tránh màu cố định quá tối trong chủ đề tối.
     private static String timelineQueueColor() { return colorGray(); }
     private static String timelineDnsColor() { return toHex(ModernColors.getAccent()); }
     private static String timelineTcpColor() { return colorWarning(); }
@@ -445,7 +445,7 @@ public class HttpHtmlRenderer {
                 .append("<th style='padding:4px 6px;width:54%;'>Bar</th>")
                 .append("</tr>");
 
-        // Total 行不显示 bar（它是基准，显示 100% bar 没意义）
+        // Total Hàng không được hiển thị bar（Đó là điểm chuẩn, nó cho thấy 100% bar vô nghĩa)
         // These are peer phases. TimingCalculator already removes nested TCP/TLS overlap,
         // so avoid tree-like labels that imply parent/child durations.
         timingRow(sb, "Total", calc.getTotal(), colorError(), true, total, true, -1);
@@ -544,9 +544,9 @@ public class HttpHtmlRenderer {
     }
 
     /**
-     * Timeline 行：名称列 + 时间列 + 进度条列
-     * 用 table 实现进度条——JTextPane HTML 渲染器对嵌套 div 的 width:% 支持很差，
-     * 而 table 的 width 属性支持可靠。
+     * Timeline Hàng: Cột tên + Cột thời gian + Thanh tiến trình
+     * Sử dụng table Triển khai thanh tiến trình——.JTextPane HTML Các cặp trình kết xuất được lồng nhau div của width:% Hỗ trợ rất kém.
+     * Và table của width Hỗ trợ tài sản là đáng tin cậy.
      */
     private static void appendTimingRow(StringBuilder sb, String name, String val,
                                         String color, boolean bold, long barVal, long total) {
@@ -560,7 +560,7 @@ public class HttpHtmlRenderer {
         String valStyle = (color != null ? "color:" + color + ";" : "color:" + textColor() + ";")
                 + (bold ? "font-weight:bold;" : "");
 
-        // 进度条：用 table 实现，两列：filled + empty，宽度用整数 px 近似
+        // Thanh tiến trình: Đã sử dụng table Triển khai, hai cột: .filled + empty，Sử dụng số nguyên cho chiều rộng px xấp xỉ
         String bar = "";
         if (barVal > 0 && total > 0) {
             int pct = displayPercent >= 0
@@ -568,8 +568,8 @@ public class HttpHtmlRenderer {
                     : (int) Math.min(100, Math.round(barVal * 100.0 / total));
             int emptyPct = 100 - pct;
             String barColor = color != null ? color : colorPrimary();
-            // 用 table 宽度百分比：JTextPane 对 table width=% 支持良好。
-            // 空轨道使用 hover background，亮色下是轻灰蓝，暗色下是比 surface 稍亮的灰。
+            // Sử dụng table Tỷ lệ phần trăm chiều rộng: .JTextPane Vâng table width=% Hỗ trợ là tốt.
+            // Bài hát trống được sử dụng hover background，Màu sáng là màu xanh xám nhạt, màu tối là tỷ lệ surface Màu xám nhạt hơn một chút.
             String barTrack = "<table style='border-collapse:collapse;width:100%;' cellpadding='0' cellspacing='0'><tr>"
                     + "<td width='" + pct + "%' style='background:" + barColor
                     + ";height:8px;border-radius:2px 0 0 2px;'></td>"
@@ -691,7 +691,7 @@ public class HttpHtmlRenderer {
                 .append("<th style='padding:3px 8px;text-align:left;'>Time</th>")
                 .append("</tr>");
 
-        // 只显示非空（>0）的时间戳，减少噪音
+        // Chỉ hiển thị các tệp không trống (>0）dấu thời gian để giảm tiếng ồn
         appendEventTimingRowIfSet(sb, "QueueStart",          info.getQueueStart(),          colorGray(),    false);
         appendEventTimingRowIfSet(sb, "CallStart",            info.getCallStart(),            colorPrimary(), true);
         appendEventTimingRowIfSet(sb, "DispatcherQueueStart", info.getDispatcherQueueStart(), null, false);
@@ -743,7 +743,7 @@ public class HttpHtmlRenderer {
                 .append("</tr>");
     }
 
-    /** 只在时间戳 > 0 时才输出行，避免大量 "-" 噪音 */
+    /** Chỉ ở dấu thời gian > 0 Chỉ xuất dòng khi cần thiết để tránh số lượng lớn "-" tiếng ồn */
     private static void appendEventTimingRowIfSet(StringBuilder sb, String label, long millis, String color, boolean alt) {
         if (millis <= 0) return;
         String style = color != null ? "color:" + color + ";" : "";
@@ -753,7 +753,7 @@ public class HttpHtmlRenderer {
                 .append("</tr>");
     }
 
-    // ==================== 工具方法 ====================
+    // ==================== Phương pháp công cụ ====================
 
     private static String safeStr(String s) { return s != null ? s : "-"; }
     private static boolean isNotEmpty(String s) { return s != null && !s.isEmpty(); }

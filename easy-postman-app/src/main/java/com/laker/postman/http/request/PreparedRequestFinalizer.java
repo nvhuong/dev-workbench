@@ -26,29 +26,29 @@ import static com.laker.postman.request.model.RequestAuthTypes.AUTH_TYPE_BEARER;
 import static com.laker.postman.request.model.RequestAuthTypes.AUTH_TYPE_DIGEST;
 
 /**
- * 发送前的最终收尾逻辑：
- * 1. 替换请求里的变量占位符
- * 2. 如果脚本/请求头里还没有 Authorization，再按 auth tab 自动补齐
+ * Logic đóng cuối cùng trước khi gửi:
+ * 1. Thay thế các phần giữ chỗ có thể thay đổi trong các yêu cầu
+ * 2. nếu kịch bản/Tiêu đề yêu cầu chưa có ở đó Authorization，Nhấn lại auth tab Tự động hoàn thành
  * <p>
- * 认证优先级约定：
+ * Quy ước ưu tiên xác thực:
  * <ol>
- *   <li>pre-script 中显式写入的 Authorization</li>
- *   <li>请求头列表里已有的 Authorization</li>
- *   <li>auth tab 自动生成的 Authorization</li>
+ *   <li>pre-script được viết rõ ràng bằng  Authorization</li>
+ *   <li>Đã có trong danh sách tiêu đề yêu cầu Authorization</li>
+ *   <li>auth tab Tự động tạo ra Authorization</li>
  * </ol>
  * <p>
- * 为了保持规则简单稳定，pm.request.headers.remove("Authorization")
- * 不再表示“禁用 auth tab 认证”，它只表示删除当前 header。
- * 如果最终阶段请求头里仍然没有 Authorization，而 auth tab 又配置了认证，
- * finalizer 会按配置重新补齐认证头。
+ * Để giữ cho các quy tắc đơn giản và ổn định,pm.request.headers.remove("Authorization")
+ * Không còn thể hiện nữa“Tàn tật auth tab Chứng nhận”，Nó chỉ có nghĩa là xóa cái hiện tại header。
+ * Nếu vẫn không có tiêu đề yêu cầu ở giai đoạn cuối Authorization，Và auth tab Xác thực được cấu hình lại.
+ * finalizer Tiêu đề xác thực sẽ được nạp lại theo cấu hình.
  */
 @UtilityClass
 public class PreparedRequestFinalizer {
 
     /**
-     * 在请求真正发出前统一完成变量替换和认证决策。
-     * 所有发送路径（普通发送、Functional、Performance、复制 cURL）
-     * 都应尽量复用这里，避免不同入口出现不一致行为。
+     * Hoàn thành các quyết định xác thực và thay thế biến một cách thống nhất trước khi yêu cầu thực sự được đưa ra.
+     * Tất cả các đường dẫn gửi (gửi bình thường, .Functional、Performance、Sao chép cURL）
+     * Tất cả nên được tái sử dụng ở đây càng nhiều càng tốt để tránh hành vi không nhất quán ở các lối vào khác nhau.
      */
     public void finalizeForSend(PreparedRequest request,
                                 PreparedRequestMapper.DeferredAuthorization deferredAuthorization) {

@@ -9,7 +9,7 @@ import static org.testng.Assert.assertTrue;
 
 public class RequestBodyPanelFormatTest {
 
-    @Test(description = "JSON 格式化遇到多个顶层对象时不抛异常")
+    @Test(description = "JSON Định dạng không đưa ra ngoại lệ khi gặp nhiều đối tượng cấp cao nhất")
     public void jsonFormatReturnsEmptyWhenInputHasTrailingTokens() {
         Optional<String> formatted = RequestBodyPanel.formatBodyTextForDisplay(
                 RequestBodyPanel.RAW_TYPE_JSON, "{\"a\":1}{\"b\":2}");
@@ -17,7 +17,7 @@ public class RequestBodyPanelFormatTest {
         assertTrue(formatted.isEmpty());
     }
 
-    @Test(description = "JSON 格式化对有效对象返回格式化文本")
+    @Test(description = "JSON Định dạng trả về văn bản được định dạng cho một đối tượng hợp lệ")
     public void jsonFormatReturnsPrettyTextForValidObject() {
         Optional<String> formatted = RequestBodyPanel.formatBodyTextForDisplay(
                 RequestBodyPanel.RAW_TYPE_JSON, "{\"a\":1}");
@@ -29,7 +29,7 @@ public class RequestBodyPanelFormatTest {
                 }""");
     }
 
-    @Test(description = "JSON 压缩对有效对象返回单行文本")
+    @Test(description = "JSON Việc nén trả về một dòng văn bản cho các đối tượng hợp lệ")
     public void jsonCompressReturnsCompactTextForValidObject() {
         Optional<String> compressed = RequestBodyPanel.compressBodyTextForDisplay(
                 RequestBodyPanel.RAW_TYPE_JSON, """

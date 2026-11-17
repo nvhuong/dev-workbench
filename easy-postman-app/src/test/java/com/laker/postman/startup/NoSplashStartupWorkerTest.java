@@ -13,7 +13,7 @@ import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 
 /**
- * 不创建窗口：在独立 JVM 中验证无 Splash 启动任务的保活和 EDT 完成语义。
+ * Không tạo cửa sổ: độc lập JVM Không có gì trong xác minh Splash Bắt đầu tổng số duy trì của nhiệm vụ EDT Ngữ nghĩa hoàn chỉnh.
  */
 public class NoSplashStartupWorkerTest {
     @Test
@@ -70,7 +70,7 @@ public class NoSplashStartupWorkerTest {
                     if (Thread.currentThread().isDaemon()) {
                         throw new IllegalStateException("Startup task must keep the JVM alive");
                     }
-                    // 超过 AWT 无窗口自动关闭时间；代表慢 IOC 或插件初始化。
+                    // Quá AWT Không có thời gian đóng cửa sổ tự động; có nghĩa là chậm IOC hoặc khởi tạo plugin.
                     Thread.sleep(3_000);
                     if (fail) {
                         throw new IllegalStateException("SLOW_STARTUP_FAILURE");

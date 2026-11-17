@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * 支持JTree节点拖拽排序的TransferHandler
+ * Hỗ trợJTreeCác nút được sắp xếp bằng cách kéo và thảTransferHandler
  */
 @Slf4j
 public class TreeTransferHandler extends TransferHandler {
@@ -21,8 +21,8 @@ public class TreeTransferHandler extends TransferHandler {
     private final DefaultMutableTreeNode rootTreeNode;
     private final DefaultTreeModel treeModel;
     private final Runnable saveRequestGroups;
-    private DataFlavor nodesFlavor; // 用于传输节点的DataFlavor
-    private DefaultMutableTreeNode[] nodesToRemove; // 被拖动的节点数组
+    private DataFlavor nodesFlavor; // Đối với các nút vận chuyểnDataFlavor
+    private DefaultMutableTreeNode[] nodesToRemove; // Mảng nút đang được kéo
 
     public TreeTransferHandler(JTree requestTree, DefaultTreeModel treeModel, Runnable saveRequestGroups) {
         this.requestTree = requestTree;
@@ -32,32 +32,32 @@ public class TreeTransferHandler extends TransferHandler {
         try {
             nodesFlavor = new DataFlavor(DefaultMutableTreeNode[].class, "Node Array");
         } catch (Exception e) {
-            log.error("拖转发生异常", e);
+            log.error("Đã xảy ra ngoại lệ khi kéo", e);
         }
     }
 
     @Override
     public boolean canImport(TransferSupport support) {
-        if (!support.isDrop()) return false; // 只处理拖放操作
-        support.setShowDropLocation(true); // 显示拖放位置
-        if (!support.isDataFlavorSupported(nodesFlavor)) return false; // 只支持节点数组的DataFlavor
-        JTree.DropLocation dl = (JTree.DropLocation) support.getDropLocation(); // 获取拖放位置
-        TreePath dest = dl.getPath(); // 获取目标路径
-        TreePath[] selPaths = requestTree.getSelectionPaths(); // 获取当前选中的路径
-        if (selPaths == null || dest == null) return false; // 必须有选中的路径和目标路径
+        if (!support.isDrop()) return false; // Chỉ xử lý các thao tác kéo và thả
+        support.setShowDropLocation(true); // Hiển thị vị trí kéo và thả
+        if (!support.isDataFlavorSupported(nodesFlavor)) return false; // Chỉ hỗ trợ mảng nútDataFlavor
+        JTree.DropLocation dl = (JTree.DropLocation) support.getDropLocation(); // Lấy vị trí kéo và thả
+        TreePath dest = dl.getPath(); // Nhận đường dẫn mục tiêu
+        TreePath[] selPaths = requestTree.getSelectionPaths(); // Nhận đường dẫn hiện đang được chọn
+        if (selPaths == null || dest == null) return false; // Phải có một đường dẫn được chọn và một đường dẫn đích
 
-        DefaultMutableTreeNode draggedNode = (DefaultMutableTreeNode) selPaths[0].getLastPathComponent(); // 获取拖动的节点
-        DefaultMutableTreeNode targetNode = (DefaultMutableTreeNode) dest.getLastPathComponent(); // 获取目标节点
-        if (draggedNode == rootTreeNode) return false; // 禁止拖动根节点
+        DefaultMutableTreeNode draggedNode = (DefaultMutableTreeNode) selPaths[0].getLastPathComponent(); // Lấy nút được kéo
+        DefaultMutableTreeNode targetNode = (DefaultMutableTreeNode) dest.getLastPathComponent(); // Lấy nút mục tiêu
+        if (draggedNode == rootTreeNode) return false; // Vô hiệu hóa việc kéo nút gốc
 
         if (CollectionTreeNodes.isGroup(draggedNode)) {
-            // 禁止拖动到自己或自己的子节点
+            // Cấm kéo vào chính nó hoặc các nút con của nó
             if (isNodeDescendant(draggedNode, targetNode)) return false;
             if (targetNode == rootTreeNode) return true;
             return CollectionTreeNodes.isGroup(targetNode);
         }
 
-        // 请求节点只能拖到分组节点下，且不能拖到请求节点下
+        // Nút yêu cầu chỉ có thể được kéo dưới nút nhóm và không thể được kéo dưới nút yêu cầu
         if (CollectionTreeNodes.isRequest(draggedNode)) {
             return CollectionTreeNodes.isGroup(targetNode);
         }
@@ -102,7 +102,7 @@ public class TreeTransferHandler extends TransferHandler {
         DefaultMutableTreeNode parent = (DefaultMutableTreeNode) dest.getLastPathComponent();
         if (childIndex == -1) childIndex = parent.getChildCount();
         for (DefaultMutableTreeNode node : nodes) {
-            // 拖动请求节点时，始终插入到分组下
+            // Khi kéo một nút yêu cầu, nó luôn được chèn vào trong nhóm
             if (CollectionTreeNodes.isRequest(node) || CollectionTreeNodes.isGroup(node)) {
                 treeModel.insertNodeInto(node, parent, childIndex++);
             }
@@ -122,7 +122,7 @@ public class TreeTransferHandler extends TransferHandler {
         }
     }
 
-    // 判断目标节点是否是拖动节点本身或其子节点
+    // Xác định xem nút đích là nút được kéo hay nút con của nó
     private boolean isNodeDescendant(DefaultMutableTreeNode node, DefaultMutableTreeNode possibleDescendant) {
         if (node == possibleDescendant) return true;
         for (int i = 0; i < node.getChildCount(); i++) {

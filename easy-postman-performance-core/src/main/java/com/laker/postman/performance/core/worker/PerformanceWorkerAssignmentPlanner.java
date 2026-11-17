@@ -14,7 +14,7 @@ public class PerformanceWorkerAssignmentPlanner {
     public List<PerformanceWorkerAssignment> plan(PerformanceRunPlan runPlan,
                                                   List<PerformanceWorkerEndpoint> endpoints,
                                                   String runId) {
-        // 按虚拟用户切片，而不是把完整线程组复制到每台 worker；这样总并发量与 GUI 单机语义一致。
+        // Cắt theo người dùng ảo thay vì sao chép toàn bộ nhóm luồng vào mỗi máy worker；Bằng cách này, tổng số đồng thời bằng GUI Ngữ nghĩa của một máy là nhất quán.
         List<PerformanceWorkerEndpoint> safeEndpoints = endpoints == null ? List.of() : endpoints;
         PerformanceTestPlan testPlan = PerformanceCorePlanDocumentCompiler.compile(
                 runPlan == null ? null : runPlan.getTestPlan()

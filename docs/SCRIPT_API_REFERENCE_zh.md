@@ -1,76 +1,76 @@
-# Script API 参考手册
+# Script API Hướng dẫn tham khảo
 
-本文档提供了 EasyPostman 脚本功能的完整 API 参考。所有 API 均基于实际代码整理，确保准确可用。
+Tài liệu này được cung cấp EasyPostman Chức năng tập lệnh đã hoàn tất API Tham khảo. Tất cả API Tất cả đều được biên dịch dựa trên mã thực tế để đảm bảo tính chính xác và khả năng sử dụng.
 
-## 目录
+## Thư mục
 
-- [全局对象](#全局对象)
-- [pm 对象](#pm-对象)
-- [Postman 兼容性基线](#postman-兼容性基线)
-- [pm.environment - 环境变量](#pmenvironment---环境变量)
-- [全局变量（Global Variables）](#全局变量global-variables)
-- [pm.variables - 临时变量](#pmvariables---临时变量)
-- [pm.request - 请求对象](#pmrequest---请求对象)
-- [pm.response - 响应对象](#pmresponse---响应对象)
-- [pm.cookies - Cookie 管理](#pmcookies---cookie-管理)
-- [pm.expect - 断言](#pmexpect---断言)
-- [pm.test - 测试](#pmtest---测试)
-- [外部数据源脚本 API](#外部数据源脚本-api)
-- [console - 控制台](#console---控制台)
-- [内置 JavaScript 库](#内置-javascript-库)
-- [完整示例](#完整示例)
-- [注意事项](#注意事项)
-- [快速参考](#快速参考)
-- [参考资源](#参考资源)
+- [Đối tượng toàn cầu](#Đối tượng toàn cầu)
+- [pm đối tượng](#pm-đối tượng)
+- [Postman Cơ sở tương thích](#postman-Cơ sở tương thích)
+- [pm.environment - các biến môi trường](#pmenvironment---các biến môi trường)
+- [Các biến toàn cục (Global Variables）](#Các biến toàn cầuglobal-variables)
+- [pm.variables - Các biến tạm thời](#pmvariables---Các biến tạm thời)
+- [pm.request - đối tượng yêu cầu](#pmrequest---đối tượng yêu cầu)
+- [pm.response - đối tượng phản hồi](#pmresponse---đối tượng phản hồi)
+- [pm.cookies - Cookie quản lý](#pmcookies---cookie-quản lý)
+- [pm.expect - khẳng định](#pmexpect---khẳng định)
+- [pm.test - Bài kiểm tra](#pmtest---Bài kiểm tra)
+- [Tập lệnh nguồn dữ liệu bên ngoài API](#Tập lệnh nguồn dữ liệu bên ngoài-api)
+- [console - bảng điều khiển](#console---bảng điều khiển)
+- [Tích hợp sẵn JavaScript thư viện](#Tích hợp sẵn-javascript-thư viện)
+- [Ví dụ đầy đủ](#Ví dụ đầy đủ)
+- [Những điều cần lưu ý](#Những điều cần lưu ý)
+- [Tham khảo nhanh](#Tham khảo nhanh)
+- [Tài nguyên tham khảo](#Tài nguyên tham khảo)
 
 ---
 
-## 全局对象
+## Đối tượng toàn cầu
 
 ### pm
 
-主要的 Postman API 对象，提供了所有脚本功能的访问入口。
+Chủ yếu Postman API Đối tượng cung cấp quyền truy cập vào tất cả các chức năng của tập lệnh.
 
 ---
 
-## pm 对象
+## pm đối tượng
 
-### 方法列表
+### Danh sách các phương pháp
 
-| 方法                                 | 说明                 | 示例                                                   |
+| phương pháp                                 | Mô tả                 | Ví dụ                                                   |
 |------------------------------------|--------------------|------------------------------------------------------|
-| `pm.test(name, fn)`                | 定义一个测试             | `pm.test("状态码是 200", () => {})`                      |
-| `pm.expect(value)`                 | 创建断言               | `pm.expect(200).to.equal(200)`                       |
-| `pm.uuid()`                        | 生成 UUID            | `pm.uuid()`                                          |
-| `pm.getTimestamp()`                | 获取当前时间戳（毫秒）        | `pm.getTimestamp()`                                  |
-| `pm.getResponseCookie(name)`       | 获取响应中的 Cookie      | `pm.getResponseCookie('sessionId')`                  |
-| `pm.sendRequest(options, callback)` | 在脚本中发送额外 HTTP 请求 | `pm.sendRequest({ url: 'https://api.com' }, (err, resp) => {})` |
+| `pm.test(name, fn)`                | Xác định một bài kiểm tra             | `pm.test("Mã trạng thái là  200", () => {})`                      |
+| `pm.expect(value)`                 | Tạo các khẳng định               | `pm.expect(200).to.equal(200)`                       |
+| `pm.uuid()`                        | phát ra UUID            | `pm.uuid()`                                          |
+| `pm.getTimestamp()`                | Lấy dấu thời gian hiện tại (mili giây)        | `pm.getTimestamp()`                                  |
+| `pm.getResponseCookie(name)`       | Nhận được phản hồi Cookie      | `pm.getResponseCookie('sessionId')`                  |
+| `pm.sendRequest(options, callback)` | Gửi thêm trong kịch bản HTTP yêu cầu | `pm.sendRequest({ url: 'https://api.com' }, (err, resp) => {})` |
 
-### 外部数据源对象
+### Đối tượng nguồn dữ liệu bên ngoài
 
-| 对象 | 说明 | 常用方法 |
+| đối tượng | Mô tả | Các phương pháp thường được sử dụng |
 |------|------|----------|
-| `pm.plugin("redis")` | Redis 读写与查询 | `execute(options)`、`query(options)` |
-| `pm.plugin("kafka")` | Kafka 查询、发消息、消费消息 | `listTopics(options)`、`send(options)`、`poll(options)` |
-| `pm.elasticsearch` | Elasticsearch 请求与查询 | `request(options)`、`query(options)` |
-| `pm.influxdb` | InfluxDB Flux / InfluxQL 查询与写入 | `query(options)`、`write(options)`、`request(options)` |
+| `pm.plugin("redis")` | Redis Đọc, viết và truy vấn | `execute(options)`、`query(options)` |
+| `pm.plugin("kafka")` | Kafka Truy vấn, gửi tin nhắn và tiêu thụ tin nhắn | `listTopics(options)`、`send(options)`、`poll(options)` |
+| `pm.elasticsearch` | Elasticsearch Yêu cầu và thắc mắc | `request(options)`、`query(options)` |
+| `pm.influxdb` | InfluxDB Flux / InfluxQL Truy vấn và viết | `query(options)`、`write(options)`、`request(options)` |
 
 ### pm.sendRequest()
 
-`pm.sendRequest()` 已支持在脚本中主动发起额外 HTTP 请求，适用于前置脚本里刷新 token、拉取签名、预热上下文数据等场景。
+`pm.sendRequest()` Nó đã được hỗ trợ để chủ động khởi tạo các chức năng bổ sung trong tập lệnh HTTP Yêu cầu, áp dụng để làm mới trong tập lệnh trước token、Các tình huống như kéo chữ ký và làm nóng trước dữ liệu ngữ cảnh.
 
-回调函数签名为 `(err, response)`：
+Chữ ký hàm gọi lại là `(err, response)`：
 
-- `err`：请求失败时返回错误对象，包含 `message`、`name`
-- `response`：成功时返回响应包装对象，可使用 `response.code`、`response.status`、`response.headers.get()`、`response.text()`、`response.json()`
+- `err`：Đối tượng lỗi được trả về khi yêu cầu không thành công, chứa `message`、`name`
+- `response`：Khi thành công, đối tượng trình bao bọc phản hồi sẽ được trả về và có thể được sử dụng `response.code`、`response.status`、`response.headers.get()`、`response.text()`、`response.json()`
 
-支持的请求格式：
+Các định dạng yêu cầu được hỗ trợ: .
 
-- 直接传 URL 字符串，默认 `GET`
-- 传对象：`url`、`method`、`header`、`body`
-- `body.mode` 当前支持 `raw`、`formdata`、`urlencoded`
+- Trực tiếp đi qua URL Chuỗi, mặc định `GET`
+- Đối tượng truyền:`url`、`method`、`header`、`body`
+- `body.mode` Hiện đang được hỗ trợ `raw`、`formdata`、`urlencoded`
 
-示例：
+Ví dụ:
 
 ```javascript
 pm.sendRequest({
@@ -81,85 +81,85 @@ pm.sendRequest({
     }
 }, function (err, response) {
     if (err) {
-        console.error('请求失败:', err.message);
+        console.error('Yêu cầu không thành công:', err.message);
         return;
     }
 
     const data = response.json();
     pm.environment.set('lastHttpbinUrl', data.url || '');
-    pm.environment.set('lastHttpbinSource', data.args?.source || '');
+    pm.environment.set('lastHttpbinSource', data.args?source || '');
     console.log('httpbin args:', data.args);
 });
 ```
 
 ---
 
-## Postman 兼容性基线
+## Postman Cơ sở tương thích
 
-实现顺序遵循“Postman 同名 API 语义优先，EasyPostman 扩展不冲突”的原则。
-下表中的“核心兼容”只指已列出并有自动化测试的路径，不表示整个 Postman 对象已逐项实现。
+Trình tự thực hiện sau đây“Postman Cùng tên API Ngữ nghĩa đầu tiên,EasyPostman Các phần mở rộng không xung đột”nguyên tắc.
+trong bảng dưới đây“Tương thích cốt lõi”Chỉ đề cập đến các đường dẫn được liệt kê và có các bài kiểm tra tự động chứ không phải toàn bộ đường dẫn Postman Các đối tượng được thực hiện từng mục một.
 
-| 范围 | 状态 | 说明 |
+| phạm vi | trạng thái | Mô tả |
 |---|---|---|
-| `pm.environment`、`pm.globals`、`pm.variables`、`pm.iterationData` | 常用路径 | 支持各作用域中适用的 `get/set/has/unset/clear/toObject/replaceIn` |
-| `pm.info` | 常用路径 | 请求、迭代和事件信息；WebSocket 字段是 EasyPostman 扩展 |
-| `pm.request.method` / `headers` | 核心兼容 | 标量修改与 HeaderList 修改会作用于当前发送 |
-| `pm.request.url` | 部分兼容 | `query` PropertyList 可读写；`request.update` 支持字符串和常用 Url definition |
-| `pm.request.body` | 对象结构兼容；写入为扩展 | `raw`、`urlencoded`、`formdata` 的读取、`toString/toJSON/isEmpty` 对齐 Collection SDK；body mutation 是迁移兼容扩展 |
-| `pm.response`、`pm.test`、`pm.expect` | 常用路径 | 响应读取、HeaderList 和常用 Chai BDD 链 |
-| `pm.sendRequest(options, callback)` | 已支持回调形式 | Promise 返回形式暂未实现 |
-| `pm.cookies` / `pm.cookies.jar()` | 部分支持 | 常用读写和回调形式可用；Promise 与完整 Cookie Store 选项未完全对齐 |
-| `pm.collectionVariables` | 待实现 | 当前集合/分组变量可参与 `pm.variables` 和 `{{...}}` 解析，但尚无独立 API 对象 |
-| `pm.execution`、`pm.visualizer`、`pm.vault`、`pm.require` | 待实现 | 全局 `require()` 是 EasyPostman 已有扩展，不等同于 `pm.require()` |
-| `pm.request.auth` mutation | 待完善 | Header 方式认证可通过 `pm.request.headers` 修改 |
+| `pm.environment`、`pm.globals`、`pm.variables`、`pm.iterationData` | Những đường dẫn thường dùng | Hỗ trợ áp dụng trong từng phạm vi `get/set/has/unset/clear/toObject/replaceIn` |
+| `pm.info` | Những đường dẫn thường dùng | Request, iteration and event information;WebSocket Lĩnh vực này là EasyPostman Sự mở rộng |
+| `pm.request.method` / `headers` | Tương thích cốt lõi | Sửa đổi vô hướng so với HeaderList Các sửa đổi sẽ được áp dụng cho lần gửi hiện tại |
+| `pm.request.url` | Tương thích một phần | `query` PropertyList Có thể đọc và ghi được;`request.update` Hỗ trợ chuỗi và phổ biến Url definition |
+| `pm.request.body` | Cấu trúc đối tượng tương thích; được viết dưới dạng phần mở rộng | `raw`、`urlencoded`、`formdata` Đọc,`toString/toJSON/isEmpty` Căn chỉnh Collection SDK；body mutation Là một phần mở rộng tương thích di chuyển |
+| `pm.response`、`pm.test`、`pm.expect` | Những đường dẫn thường dùng | Đã đọc phản hồi,HeaderList và được sử dụng phổ biến Chai BDD xích |
+| `pm.sendRequest(options, callback)` | Hình thức gọi lại được hỗ trợ | Promise Hình thức trả lại vẫn chưa được thực hiện |
+| `pm.cookies` / `pm.cookies.jar()` | Được hỗ trợ một phần | Có sẵn các biểu mẫu đọc, viết và gọi lại thường được sử dụng;Promise và hoàn thành Cookie Store Các tùy chọn không được căn chỉnh đầy đủ |
+| `pm.collectionVariables` | Để được thực hiện | bộ sưu tập hiện tại/Nhóm các biến có thể tham gia `pm.variables` và `{{...}}` được phân tích cú pháp, nhưng chưa độc lập API đối tượng |
+| `pm.execution`、`pm.visualizer`、`pm.vault`、`pm.require` | Để được thực hiện | Bức tranh lớn `require()` Vâng EasyPostman Đã được mở rộng, không tương đương với `pm.require()` |
+| `pm.request.auth` mutation | Để được cải thiện | Header Việc xác thực phương thức có thể được thông qua `pm.request.headers` Ôn lại |
 
-兼容判定按以下优先级执行：
+Việc xác định khả năng tương thích được thực hiện theo mức độ ưu tiên sau:
 
-1. 当前 Postman 官方 Sandbox 文档决定公开脚本 API 的标准行为；
-2. Collection SDK / Runtime 源码决定对象结构、序列化和历史运行语义；
-3. 超出当前官方 Sandbox 的能力必须明确标为“EasyPostman 扩展”或“迁移兼容”，不能混入核心兼容结论。
+1. hiện tại Postman chính thức Sandbox Tài liệu quyết định công khai kịch bản API hành vi tiêu chuẩn;
+2. Collection SDK / Runtime Mã nguồn xác định cấu trúc đối tượng, tuần tự hóa và ngữ nghĩa thời gian chạy lịch sử;
+3. Ngoài quan chức hiện tại Sandbox Các khả năng phải được đánh dấu rõ ràng“EasyPostman Sự mở rộng”hoặc“Tương thích di chuyển”，Không thể kết hợp các kết luận tương thích cốt lõi.
 
-自动补全条目和 EasyPostman 历史别名不作为“已兼容”的证据。本轮实现对照的官方源码版本为
-Postman Collection SDK `5.3.1`、Runtime `7.56.1`，并同时核对当前 Postman v12 Sandbox 文档。
+Tự động hoàn thành các mục và EasyPostman Bí danh lịch sử không làm gì cả“Đã tương thích rồi”chứng cớ. Phiên bản mã nguồn chính thức cho vòng so sánh này là
+Postman Collection SDK `5.3.1`、Runtime `7.56.1`，Và kiểm tra hiện tại cùng một lúc Postman v12 Sandbox Tài liệu.
 
 ---
 
-## pm.environment - 环境变量
+## pm.environment - các biến môi trường
 
-环境变量的读写操作。
+Hoạt động đọc và ghi trên các biến môi trường.
 
-### 方法列表
+### Danh sách các phương pháp
 
-| 方法                | 参数                      | 返回值     | 说明         | 示例                                      |
+| phương pháp                | các thông số                      | Giá trị trả về     | Mô tả         | Ví dụ                                      |
 |-------------------|-------------------------|---------|------------|-----------------------------------------|
-| `get(key)`        | key: String             | String  | 获取环境变量     | `pm.environment.get('token')`           |
-| `set(key, value)` | key: String, value: Any | void    | 设置环境变量     | `pm.environment.set('token', 'abc123')` |
-| `unset(key)`      | key: String             | void    | 删除环境变量     | `pm.environment.unset('token')`         |
-| `has(key)`        | key: String             | Boolean | 检查环境变量是否存在 | `pm.environment.has('token')`           |
-| `clear()`         | 无                       | void    | 清空所有环境变量   | `pm.environment.clear()`                |
+| `get(key)`        | key: String             | String  | Nhận các biến môi trường     | `pm.environment.get('token')`           |
+| `set(key, value)` | key: String, value: Any | void    | Đặt các biến môi trường     | `pm.environment.set('token', 'abc123')` |
+| `unset(key)`      | key: String             | void    | Loại bỏ các biến môi trường     | `pm.environment.unset('token')`         |
+| `has(key)`        | key: String             | Boolean | Kiểm tra xem biến môi trường có tồn tại không | `pm.environment.has('token')`           |
+| `clear()`         | Không                       | void    | Xóa tất cả các biến môi trường   | `pm.environment.clear()`                |
 
 ---
 
-## 全局变量（Global Variables）
+## Các biến toàn cục (Global Variables）
 
-全局变量通过 `pm.globals` 访问，生命周期独立于当前请求。
+Biến toàn cầu vượt qua `pm.globals` Quyền truy cập, vòng đời độc lập với yêu cầu hiện tại.
 
-### 重要说明
+### Lưu ý quan trọng
 
-- ✅ **支持**：`pm.globals.set()` / `pm.globals.get()`
-- ✅ **支持**：`pm.globals.has()` / `pm.globals.unset()` / `pm.globals.clear()` / `pm.globals.toObject()`
+- ✅ **Hỗ trợ**：`pm.globals.set()` / `pm.globals.get()`
+- ✅ **Hỗ trợ**：`pm.globals.has()` / `pm.globals.unset()` / `pm.globals.clear()` / `pm.globals.toObject()`
 
-### 方法列表
+### Danh sách các phương pháp
 
-| 方法 | 参数 | 说明 | 示例 |
+| phương pháp | các thông số | Mô tả | Ví dụ |
 |------|------|------|------|
-| `pm.globals.set(key, value)` | key: String<br>value: Any | 设置全局变量 | `pm.globals.set('baseUrl', 'https://api.com')` |
-| `pm.globals.get(key)` | key: String | 获取全局变量 | `pm.globals.get('baseUrl')` |
-| `pm.globals.has(key)` | key: String | 检查全局变量是否存在 | `pm.globals.has('baseUrl')` |
-| `pm.globals.unset(key)` | key: String | 删除全局变量 | `pm.globals.unset('baseUrl')` |
-| `pm.globals.clear()` | 无 | 清空全局变量 | `pm.globals.clear()` |
+| `pm.globals.set(key, value)` | key: String<br>value: Any | Đặt các biến toàn cục | `pm.globals.set('baseUrl', 'https://api.com')` |
+| `pm.globals.get(key)` | key: String | Nhận các biến toàn cục | `pm.globals.get('baseUrl')` |
+| `pm.globals.has(key)` | key: String | Kiểm tra xem biến toàn cục có tồn tại không | `pm.globals.has('baseUrl')` |
+| `pm.globals.unset(key)` | key: String | Xóa các biến toàn cục | `pm.globals.unset('baseUrl')` |
+| `pm.globals.clear()` | Không | Xóa các biến toàn cục | `pm.globals.clear()` |
 
-### 使用示例
+### Ví dụ sử dụng
 
 ```javascript
 pm.globals.set('apiKey', 'abc123');
@@ -171,78 +171,78 @@ console.log('API Key:', apiKey);
 
 ---
 
-## pm.variables - 临时变量
+## pm.variables - Các biến tạm thời
 
-临时变量管理，仅在当前请求执行过程中有效（不会持久化）。
+Quản lý biến tạm thời chỉ có hiệu lực trong quá trình thực hiện yêu cầu hiện tại (sẽ không được duy trì).
 
-### 方法列表
+### Danh sách các phương pháp
 
-| 方法                | 参数                      | 返回值     | 说明              | 示例                                |
+| phương pháp                | các thông số                      | Giá trị trả về     | Mô tả              | Ví dụ                                |
 |-------------------|-------------------------|---------|-----------------|-----------------------------------|
-| `get(key)`        | key: String             | String  | 获取临时变量          | `pm.variables.get('userId')`      |
-| `set(key, value)` | key: String, value: Any | void    | 设置临时变量          | `pm.variables.set('userId', 123)` |
-| `has(key)`        | key: String             | Boolean | 检查临时变量是否存在      | `pm.variables.has('userId')`      |
-| `unset(key)`      | key: String             | void    | 删除临时变量          | `pm.variables.unset('userId')`    |
-| `clear()`         | 无                       | void    | 清空所有临时变量        | `pm.variables.clear()`            |
-| `toObject()`      | 无                       | Object  | 获取所有临时变量对象（键值对） | `pm.variables.toObject()`         |
+| `get(key)`        | key: String             | String  | Nhận các biến tạm thời          | `pm.variables.get('userId')`      |
+| `set(key, value)` | key: String, value: Any | void    | Đặt các biến tạm thời          | `pm.variables.set('userId', 123)` |
+| `has(key)`        | key: String             | Boolean | Kiểm tra xem biến tạm thời có tồn tại không      | `pm.variables.has('userId')`      |
+| `unset(key)`      | key: String             | void    | Xóa các biến tạm thời          | `pm.variables.unset('userId')`    |
+| `clear()`         | Không                       | void    | Xóa tất cả các biến tạm thời        | `pm.variables.clear()`            |
+| `toObject()`      | Không                       | Object  | Nhận tất cả các đối tượng biến tạm thời (cặp khóa-giá trị) | `pm.variables.toObject()`         |
 
 ---
 
-## pm.request - 请求对象
+## pm.request - đối tượng yêu cầu
 
-访问和操作当前 HTTP 请求的信息（主要在 Pre-request 脚本中使用）。
+Truy cập và vận hành hiện tại HTTP Thông tin được yêu cầu (chủ yếu ở dạng Pre-request được sử dụng trong các tập lệnh).
 
-### 属性
+### tài sản
 
-| 属性                | 类型            | 说明                | 示例                           |
+| tài sản                | loại            | Mô tả                | Ví dụ                           |
 |-------------------|---------------|-------------------|------------------------------|
-| `id`              | String        | 请求唯一标识            | `pm.request.id`              |
-| `url`             | Url           | 当前请求 URL 对象              | `pm.request.url`             |
-| `method`          | String        | 当前执行的 HTTP 方法（可修改）      | `pm.request.method`          |
-| `headers`         | HeaderList    | 当前请求头列表                  | `pm.request.headers`         |
-| `body`            | RequestBody   | 当前请求体对象；无请求体时为空          | `pm.request.body`            |
-| `formData`        | JsListWrapper | EasyPostman 旧脚本兼容别名       | `pm.request.formData`        |
-| `urlencoded`      | JsListWrapper | EasyPostman 旧脚本兼容别名       | `pm.request.urlencoded`      |
-| `params`          | JsListWrapper | EasyPostman 旧脚本兼容别名       | `pm.request.params`          |
-| `isMultipart`     | Boolean       | EasyPostman 执行期扩展          | `pm.request.isMultipart`     |
-| `followRedirects` | Boolean       | EasyPostman 执行期扩展          | `pm.request.followRedirects` |
+| `id`              | String        | Yêu cầu một mã định danh duy nhất            | `pm.request.id`              |
+| `url`             | Url           | yêu cầu hiện tại URL đối tượng              | `pm.request.url`             |
+| `method`          | String        | hiện đang được thực thi HTTP Phương pháp (có thể sửa đổi)      | `pm.request.method`          |
+| `headers`         | HeaderList    | Danh sách các tiêu đề yêu cầu hiện tại                  | `pm.request.headers`         |
+| `body`            | RequestBody   | Đối tượng nội dung yêu cầu hiện tại; trống nếu không có nội dung yêu cầu          | `pm.request.body`            |
+| `formData`        | JsListWrapper | EasyPostman Các tập lệnh cũ tương thích với bí danh       | `pm.request.formData`        |
+| `urlencoded`      | JsListWrapper | EasyPostman Các tập lệnh cũ tương thích với bí danh       | `pm.request.urlencoded`      |
+| `params`          | JsListWrapper | EasyPostman Các tập lệnh cũ tương thích với bí danh       | `pm.request.params`          |
+| `isMultipart`     | Boolean       | EasyPostman Gia hạn thời gian thực hiện          | `pm.request.isMultipart`     |
+| `followRedirects` | Boolean       | EasyPostman Gia hạn thời gian thực hiện          | `pm.request.followRedirects` |
 
-`pm.request.update(options)`、`pm.request.body`、`pm.request.url.query` 和
-`pm.request.headers` 优先遵循 Postman Collection SDK 的对象结构。EasyPostman 扩展只作为补充，
-不改变同名 Postman API 的含义。脚本修改只影响当前执行，不会改写编辑器中保存的请求定义。
+`pm.request.update(options)`、`pm.request.body`、`pm.request.url.query` và
+`pm.request.headers` Theo dõi đầu tiên Postman Collection SDK cấu trúc đối tượng.EasyPostman Phần mở rộng chỉ mang tính bổ sung.
+Đừng thay đổi tên Postman API ý nghĩa. Các sửa đổi tập lệnh chỉ ảnh hưởng đến việc thực thi hiện tại và sẽ không ghi đè lên định nghĩa yêu cầu được lưu trong trình chỉnh sửa.
 
 ### RequestBody
 
-| 属性/方法               | 说明                                      |
+| tài sản/phương pháp               | Mô tả                                      |
 |---------------------|-----------------------------------------|
-| `mode`              | 已验证的核心模式：`raw`、`urlencoded`、`formdata` |
-| `raw`               | raw 模式正文                                |
-| `urlencoded`        | URL 编码参数列表                              |
-| `formdata`          | multipart 参数列表                           |
-| `update(definition)` | 按 Postman RequestBody 规则更新；字符串会切换到 raw 模式 |
-| `toString()`        | raw/urlencoded 正文的字符串表示；urlencoded 按 Postman QueryParam 规则规范化分隔符 |
+| `mode`              | Các mẫu cốt lõi đã được chứng minh:`raw`、`urlencoded`、`formdata` |
+| `raw`               | raw Thân hình mẫu                                |
+| `urlencoded`        | URL Danh sách tham số mã hóa                              |
+| `formdata`          | multipart Danh sách tham số                           |
+| `update(definition)` | Nhấn Postman RequestBody Các quy tắc được cập nhật; chuỗi được chuyển sang raw người mẫu |
+| `toString()`        | raw/urlencoded Biểu diễn chuỗi của văn bản;urlencoded Nhấn Postman QueryParam Dấu phân cách chuẩn hóa quy tắc |
 | `toJSON()`          | Postman Collection body definition      |
-| `isEmpty()`         | 当前 body 是否为空                            |
+| `isEmpty()`         | hiện tại body Cho dù nó trống rỗng                            |
 
-需要区分“当前 Postman 产品契约”和“历史 Runtime / Collection SDK 能力”：
+Cần phải phân biệt“hiện tại Postman Hợp đồng sản phẩm”và“lịch sử Runtime / Collection SDK Khả năng”：
 
-- 当前 Postman v12 Sandbox 文档把 `pm.request.body` 标为不可修改，并明确说明 `pm` 不支持请求 mutation；
-- Collection SDK `RequestBody` 仍提供 `update()`，Postman Runtime `7.27.0`（2021-03）起也曾把
-  pre-request 中的 body 变更应用到实际请求；`7.26.x` 及更早版本不会发送修改后的 body；
-- EasyPostman 为迁移旧集合和已有脚本继续支持 `body.update(text)`、修改 `.raw`，以及
-  `pm.request.body = 'text'`。这些写入能力是明确的兼容扩展，不宣称为当前 Postman v12 Sandbox 标准。
+- hiện tại Postman v12 Sandbox Xử lý tài liệu `pm.request.body` Đánh dấu nó là không thể sửa đổi và nêu rõ điều này `pm` Yêu cầu không được hỗ trợ mutation；
+- Collection SDK `RequestBody` Vẫn có sẵn `update()`，Postman Runtime `7.27.0`（2021-03）Tôi cũng đã nuôi nó
+  pre-request trong body Những thay đổi được áp dụng cho yêu cầu thực tế;`7.26.x` và các phiên bản trước đó sẽ không được gửi sửa đổi body；
+- EasyPostman Tiếp tục hỗ trợ di chuyển các bộ sưu tập cũ và tập lệnh hiện có `body.update(text)`、Ôn lại `.raw`，cũng như
+  `pm.request.body = 'text'`。Các khả năng ghi này rõ ràng tương thích với tiện ích mở rộng và không được cho là hiện hành Postman v12 Sandbox tiêu chuẩn.
 
-因此，要实现可在当前 Postman 与 EasyPostman 间直接替换的新脚本，不应依赖 body mutation；
-如果是迁移历史脚本，优先使用 SDK 形态的 `update(text)` 或修改 `.raw`，直接赋字符串仅作为
-EasyPostman 的宽松迁移能力保留。
+Vì vậy, nó có thể được thực hiện ở thời điểm hiện tại Postman Và EasyPostman Một tập lệnh mới thay thế trực tiếp giữa . và không nên dựa vào body mutation；
+Nếu bạn đang di chuyển các tập lệnh lịch sử, hãy sử dụng chúng trước tiên SDK hình thái `update(text)` hoặc sửa đổi `.raw`，Việc gán một chuỗi trực tiếp chỉ hoạt động như
+EasyPostman Khả năng di chuyển thoải mái được giữ lại.
 
-当前边界：
+Ranh giới hiện tại: .
 
-- `file` 模式仅保留 EasyPostman 本地路径 `src` 能力，尚未对齐 Postman Runtime 文件解析后的 `content`。
-- GraphQL 导入仍沿用现有 raw JSON 转换，未声明脚本 mutation 兼容。
-- `pm.request.update(options)` 已验证字符串 URL、常用 Url definition（`protocol/auth/host/port/path/query/hash`）、method、header 和 body，不代表已实现 Request SDK 的所有字段。
+- `file` Chế độ chỉ được bảo lưu EasyPostman đường đi cục bộ `src` Khả năng, chưa phù hợp Postman Runtime Sau khi phân tích tập tin `content`。
+- GraphQL Việc nhập vẫn sử dụng cái hiện có raw JSON Chuyển đổi, không có tập lệnh nào được khai báo mutation Tương thích.
+- `pm.request.update(options)` Chuỗi đã được xác minh URL、Thường được sử dụng Url definition（`protocol/auth/host/port/path/query/hash`）、method、header và body，Nó không có nghĩa là nó đã được thực hiện Request SDK tất cả các lĩnh vực.
 
-### 修改当前请求
+### Sửa đổi yêu cầu hiện tại
 
 ```javascript
 const xmlBody = `<data>${pm.request.body.toString()}</data>`;
@@ -263,212 +263,212 @@ pm.request.headers.upsert({
 });
 ```
 
-### URL 对象方法
+### URL Các phương thức đối tượng
 
-| 方法                   | 返回值    | 说明           | 示例                                  |
+| phương pháp                   | Giá trị trả về    | Mô tả           | Ví dụ                                  |
 |----------------------|--------|--------------|-------------------------------------|
-| `toString()`         | String | 获取完整 URL 字符串 | `pm.request.url.toString()`         |
-| `getHost()`          | String | 获取主机名        | `pm.request.url.getHost()`          |
-| `getPath()`          | String | 获取路径         | `pm.request.url.getPath()`          |
-| `getQueryString()`   | String | 获取查询字符串      | `pm.request.url.getQueryString()`   |
-| `getPathWithQuery()` | String | 获取路径和查询字符串   | `pm.request.url.getPathWithQuery()` |
+| `toString()`         | String | Nhận đầy đủ URL chuỗi | `pm.request.url.toString()`         |
+| `getHost()`          | String | Lấy tên máy chủ        | `pm.request.url.getHost()`          |
+| `getPath()`          | String | Nhận được con đường         | `pm.request.url.getPath()`          |
+| `getQueryString()`   | String | Lấy chuỗi truy vấn      | `pm.request.url.getQueryString()`   |
+| `getPathWithQuery()` | String | Lấy đường dẫn và chuỗi truy vấn   | `pm.request.url.getPathWithQuery()` |
 
-### URL Query 对象
+### URL Query đối tượng
 
-访问查询参数：`pm.request.url.query`
+Truy cập các tham số truy vấn: .`pm.request.url.query`
 
-| 方法             | 返回值          | 说明       | 示例                                                        |
+| phương pháp             | Giá trị trả về          | Mô tả       | Ví dụ                                                        |
 |----------------|--------------|----------|-----------------------------------------------------------|
-| `add(item)`    | void         | 添加查询参数   | `pm.request.url.query.add({key: 'page', value: '1'})`      |
-| `upsert(item)` | Boolean/null | 更新或添加参数；新增返回 `true`，更新返回 `false` | `pm.request.url.query.upsert({key: 'page', value: '2'})`   |
-| `remove(key)`  | void         | 删除参数     | `pm.request.url.query.remove('page')`                      |
-| `get(key)`     | String       | 获取参数值    | `pm.request.url.query.get('page')`                         |
-| `has(key)`     | Boolean      | 判断参数是否存在 | `pm.request.url.query.has('page')`                         |
-| `has(key, value)` | Boolean   | 严格匹配参数名和值 | `pm.request.url.query.has('page', '1')`                    |
-| `all()`        | Array        | 获取所有查询参数 | `pm.request.url.query.all()`                               |
-| `one(key)`     | QueryParam   | 获取指定参数对象 | `pm.request.url.query.one('page')`                         |
-| `idx(index)`   | QueryParam   | 按下标获取参数  | `pm.request.url.query.idx(0)`                              |
+| `add(item)`    | void         | Thêm tham số truy vấn   | `pm.request.url.query.add({key: 'page', value: '1'})`      |
+| `upsert(item)` | Boolean/null | Cập nhật hoặc thêm tham số; trả lại những cái mới `true`，Cập nhật trả về `false` | `pm.request.url.query.upsert({key: 'page', value: '2'})`   |
+| `remove(key)`  | void         | Xóa tham số     | `pm.request.url.query.remove('page')`                      |
+| `get(key)`     | String       | Lấy giá trị tham số    | `pm.request.url.query.get('page')`                         |
+| `has(key)`     | Boolean      | Xác định xem tham số có tồn tại hay không | `pm.request.url.query.has('page')`                         |
+| `has(key, value)` | Boolean   | Khớp chặt chẽ tên và giá trị tham số | `pm.request.url.query.has('page', '1')`                    |
+| `all()`        | Array        | Nhận tất cả các tham số truy vấn | `pm.request.url.query.all()`                               |
+| `one(key)`     | QueryParam   | Lấy đối tượng tham số đã chỉ định | `pm.request.url.query.one('page')`                         |
+| `idx(index)`   | QueryParam   | Bấm vào subscript để có được các thông số  | `pm.request.url.query.idx(0)`                              |
 
-### Headers/FormData/Urlencoded/Params 集合方法
+### Headers/FormData/Urlencoded/Params Các phương pháp thu thập
 
-这些集合都是 `JsListWrapper` 类型，支持以下方法：
+Những bộ sưu tập này là `JsListWrapper` Loại, hỗ trợ các phương thức sau: .
 
-| 方法                       | 参数                   | 返回值     | 说明        | 示例                                                           |
+| phương pháp                       | các thông số                   | Giá trị trả về     | Mô tả        | Ví dụ                                                           |
 |--------------------------|----------------------|---------|-----------|--------------------------------------------------------------|
-| `add(item)`              | item: Object         | void    | 添加一项      | `pm.request.headers.add({key: 'X-Custom', value: 'test'})`   |
-| `remove(key)`            | key: String          | void    | 删除同名项    | `pm.request.headers.remove('X-Custom')`                      |
-| `upsert(item)`           | item: Object         | Boolean/null | 更新或插入一项；新增 `true`、更新 `false`、无效输入 `null` | `pm.request.headers.upsert({key: 'X-Custom', value: 'new'})` |
-| `get(key)`               | key: String          | String  | 获取指定键的值   | `pm.request.headers.get('Content-Type')`                     |
-| `has(key)`               | key: String          | Boolean | 检查是否存在指定键 | `pm.request.headers.has('Authorization')`                    |
-| `has(key, value)`        | key/value            | Boolean | 严格匹配键和值   | `pm.request.headers.has('Content-Type', 'application/json')` |
-| `all()`                  | 无                    | Array   | 获取所有项     | `pm.request.headers.all()`                                   |
-| `one(key)`               | key: String          | Object  | 获取最后一个同名项 | `pm.request.headers.one('X-Custom')`                         |
-| `idx(index)`             | index: Number        | Object  | 按下标获取项   | `pm.request.headers.idx(0)`                                  |
-| `count()`                | 无                    | Number  | 获取项数      | `pm.request.headers.count()`                                 |
-| `clear()`                | 无                    | void    | 清空所有项     | `pm.request.headers.clear()`                                 |
-| `each(callback)`         | callback: Function   | void    | 以 `(item, index, collection)` 遍历；回调异常会中断脚本 | `pm.request.headers.each((h, i) => console.log(i, h))`        |
-| `toObject()`             | 无                    | Object  | 转为键值对象    | `pm.request.headers.toObject()`                              |
+| `add(item)`              | item: Object         | void    | Thêm một mục      | `pm.request.headers.add({key: 'X-Custom', value: 'test'})`   |
+| `remove(key)`            | key: String          | void    | Xóa mục có cùng tên    | `pm.request.headers.remove('X-Custom')`                      |
+| `upsert(item)`           | item: Object         | Boolean/null | Cập nhật hoặc chèn một mục; thêm mới `true`、đổi mới `false`、Đầu vào không hợp lệ `null` | `pm.request.headers.upsert({key: 'X-Custom', value: 'new'})` |
+| `get(key)`               | key: String          | String  | Lấy giá trị của khóa được chỉ định   | `pm.request.headers.get('Content-Type')`                     |
+| `has(key)`               | key: String          | Boolean | Kiểm tra xem khóa được chỉ định có tồn tại không | `pm.request.headers.has('Authorization')`                    |
+| `has(key, value)`        | key/value            | Boolean | Kết hợp chặt chẽ các khóa và giá trị   | `pm.request.headers.has('Content-Type', 'application/json')` |
+| `all()`                  | Không                    | Array   | Nhận tất cả các mặt hàng     | `pm.request.headers.all()`                                   |
+| `one(key)`               | key: String          | Object  | Lấy mục cuối cùng có cùng tên | `pm.request.headers.one('X-Custom')`                         |
+| `idx(index)`             | index: Number        | Object  | Nhấn vào đăng ký để nhận vật phẩm   | `pm.request.headers.idx(0)`                                  |
+| `count()`                | Không                    | Number  | Lấy số lượng mặt hàng      | `pm.request.headers.count()`                                 |
+| `clear()`                | Không                    | void    | Xóa tất cả các mục     | `pm.request.headers.clear()`                                 |
+| `each(callback)`         | callback: Function   | void    | qua `(item, index, collection)` Truyền tải; ngoại lệ gọi lại làm gián đoạn tập lệnh | `pm.request.headers.each((h, i) => console.log(i, h))`        |
+| `toObject()`             | Không                    | Object  | Chuyển đổi sang đối tượng khóa-giá trị    | `pm.request.headers.toObject()`                              |
 
-### 使用示例
+### Ví dụ sử dụng
 
 ```javascript
-// 添加请求头
+// Thêm tiêu đề yêu cầu
 pm.request.headers.add({
     key: "Authorization",
     value: "Bearer " + pm.environment.get("token")
 });
 
-// 添加查询参数（Postman 标准路径）
+// Thêm tham số truy vấn (Postman đường dẫn tiêu chuẩn)
 pm.request.url.query.add({
     key: "timestamp",
     value: Date.now().toString()
 });
 
-// 当前 body 为 formdata 时添加字段
+// hiện tại body vì formdata Khi thêm các trường
 pm.request.body.formdata.add({
     key: "username",
     value: "john",
     type: "text"
 });
 
-// 获取 URL 信息
+// Lấy URL thông tin
 console.log("Host:", pm.request.url.getHost());
 console.log("Path:", pm.request.url.getPath());
 ```
 
 ---
 
-## pm.response - 响应对象
+## pm.response - đối tượng phản hồi
 
-访问 HTTP 响应的信息（仅在 Post-request 脚本中可用）。
+thăm HTTP Thông tin phản hồi (chỉ ở dạng  Post-request có sẵn trong kịch bản).
 
-### 属性
+### tài sản
 
-| 属性             | 类型                | 说明        | 示例                                           |
+| tài sản             | loại                | Mô tả        | Ví dụ                                           |
 |----------------|-------------------|-----------|----------------------------------------------|
-| `code`         | Number            | HTTP 状态码  | `pm.response.code`                           |
-| `status`       | String            | HTTP 状态文本 | `pm.response.status`                         |
-| `headers`      | Headers           | 响应头对象     | `pm.response.headers`                        |
-| `responseTime` | Number            | 响应时间（毫秒）  | `pm.response.responseTime`                   |
-| `to`           | ResponseAssertion | 链式断言语法支持  | `pm.response.to.have.status(200)`            |
-| `have`         | ResponseAssertion | 链式断言语法支持  | `pm.response.to.have.header('Content-Type')` |
-| `be`           | ResponseAssertion | 链式断言语法支持  | 用于链式调用                                       |
+| `code`         | Number            | HTTP mã trạng thái  | `pm.response.code`                           |
+| `status`       | String            | HTTP Văn bản trạng thái | `pm.response.status`                         |
+| `headers`      | Headers           | Đối tượng tiêu đề phản hồi     | `pm.response.headers`                        |
+| `responseTime` | Number            | Thời gian đáp ứng (mili giây)  | `pm.response.responseTime`                   |
+| `to`           | ResponseAssertion | Hỗ trợ cú pháp xác nhận theo chuỗi  | `pm.response.to.have.status(200)`            |
+| `have`         | ResponseAssertion | Hỗ trợ cú pháp xác nhận theo chuỗi  | `pm.response.to.have.header('Content-Type')` |
+| `be`           | ResponseAssertion | Hỗ trợ cú pháp xác nhận theo chuỗi  | Được sử dụng cho các cuộc gọi chuỗi                                       |
 
-### 方法列表
+### Danh sách các phương pháp
 
-| 方法       | 返回值          | 说明            | 示例                   |
+| phương pháp       | Giá trị trả về          | Mô tả            | Ví dụ                   |
 |----------|--------------|---------------|----------------------|
-| `text()` | String       | 获取响应体文本       | `pm.response.text()` |
-| `json()` | Object       | 获取响应体 JSON 对象 | `pm.response.json()` |
-| `size()` | ResponseSize | 获取响应大小信息      | `pm.response.size()` |
+| `text()` | String       | Nhận văn bản nội dung phản hồi       | `pm.response.text()` |
+| `json()` | Object       | Nhận nội dung phản hồi JSON đối tượng | `pm.response.json()` |
+| `size()` | ResponseSize | Nhận thông tin kích thước phản hồi      | `pm.response.size()` |
 
-### 响应断言方法
+### Phương pháp xác nhận phản hồi
 
-| 方法                     | 说明          | 示例                                                      |
+| phương pháp                     | Mô tả          | Ví dụ                                                      |
 |------------------------|-------------|---------------------------------------------------------|
-| `to.have.status(code)` | 断言状态码       | `pm.response.to.have.status(200)`                       |
-| `to.have.header(name)` | 断言包含响应头     | `pm.response.to.have.header('Content-Type')`            |
-| `to.be.below(ms)`      | 断言响应时间小于指定值 | `pm.expect(pm.response.responseTime).to.be.below(1000)` |
+| `to.have.status(code)` | Khẳng định mã trạng thái       | `pm.response.to.have.status(200)`                       |
+| `to.have.header(name)` | Xác nhận chứa tiêu đề phản hồi     | `pm.response.to.have.header('Content-Type')`            |
+| `to.be.below(ms)`      | Khẳng định rằng thời gian phản hồi nhỏ hơn giá trị được chỉ định | `pm.expect(pm.response.responseTime).to.be.below(1000)` |
 
-### Headers 对象方法
+### Headers Các phương thức đối tượng
 
-访问响应头：`pm.response.headers`
+Truy cập tiêu đề phản hồi: .`pm.response.headers`
 
-| 方法               | 参数                 | 返回值     | 说明        | 示例                                              |
+| phương pháp               | các thông số                 | Giá trị trả về     | Mô tả        | Ví dụ                                              |
 |------------------|--------------------|---------|-----------|-------------------------------------------------|
-| `get(name)`      | name: String       | String  | 获取响应头值    | `pm.response.headers.get('Content-Type')`       |
-| `has(name)`      | name: String       | Boolean | 检查响应头是否存在 | `pm.response.headers.has('Set-Cookie')`         |
-| `count()`        | 无                  | Number  | 获取响应头数量   | `pm.response.headers.count()`                   |
-| `all()`          | 无                  | Array   | 获取所有响应头   | `pm.response.headers.all()`                     |
-| `each(callback)` | callback: Function | void    | 遍历所有响应头   | `pm.response.headers.each(h => console.log(h))` |
+| `get(name)`      | name: String       | String  | Nhận giá trị tiêu đề phản hồi    | `pm.response.headers.get('Content-Type')`       |
+| `has(name)`      | name: String       | Boolean | Kiểm tra xem tiêu đề phản hồi có tồn tại không | `pm.response.headers.has('Set-Cookie')`         |
+| `count()`        | Không                  | Number  | Lấy số lượng tiêu đề phản hồi   | `pm.response.headers.count()`                   |
+| `all()`          | Không                  | Array   | Nhận tất cả các tiêu đề phản hồi   | `pm.response.headers.all()`                     |
+| `each(callback)` | callback: Function | void    | Lặp lại qua tất cả các tiêu đề phản hồi   | `pm.response.headers.each(h => console.log(h))` |
 
-### ResponseSize 对象
+### ResponseSize đối tượng
 
-`pm.response.size()` 返回的对象包含以下属性：
+`pm.response.size()` Đối tượng được trả về chứa các thuộc tính sau: .
 
-| 属性       | 类型     | 说明        |
+| tài sản       | loại     | Mô tả        |
 |----------|--------|-----------|
-| `body`   | Number | 响应体大小（字节） |
-| `header` | Number | 响应头大小（字节） |
-| `total`  | Number | 总大小（字节）   |
+| `body`   | Number | Kích thước nội dung phản hồi (byte) |
+| `header` | Number | Kích thước tiêu đề phản hồi (byte) |
+| `total`  | Number | Tổng kích thước (byte)   |
 
-### 使用示例
+### Ví dụ sử dụng
 
 ```javascript
-// 获取响应数据
+// Nhận dữ liệu phản hồi
 const jsonData = pm.response.json();
 console.log("Status:", pm.response.status);
 console.log("Code:", pm.response.code);
 
-// 断言状态码
+// Khẳng định mã trạng thái
 pm.response.to.have.status(200);
 
-// 断言响应头
+// Khẳng định tiêu đề phản hồi
 pm.response.to.have.header('Content-Type');
 
-// 获取响应头
+// Nhận tiêu đề phản hồi
 const contentType = pm.response.headers.get('Content-Type');
 
-// 获取响应大小
+// Nhận kích thước phản hồi
 const size = pm.response.size();
-console.log("响应体大小:", size.body, "bytes");
+console.log("Kích thước cơ thể phản ứng:", size.body, "bytes");
 ```
 
 ---
 
-## pm.cookies - Cookie 管理
+## pm.cookies - Cookie quản lý
 
-管理和访问 Cookie。
+Quản lý và truy cập Cookie。
 
-### 方法列表
+### Danh sách các phương pháp
 
-| 方法            | 参数                    | 返回值       | 说明                    | 示例                                            |
+| phương pháp            | các thông số                    | Giá trị trả về       | Mô tả                    | Ví dụ                                            |
 |---------------|-----------------------|-----------|-----------------------|-----------------------------------------------|
-| `get(name)`   | name: String          | Cookie    | 获取指定名称的 Cookie        | `pm.cookies.get('sessionId')`                 |
-| `set(cookie)` | cookie: Cookie/String | void      | 设置 Cookie             | `pm.cookies.set({name: 'key', value: 'val'})` |
-| `getAll()`    | 无                     | Array     | 获取所有 Cookie           | `pm.cookies.getAll()`                         |
-| `has(name)`   | name: String          | Boolean   | 检查 Cookie 是否存在        | `pm.cookies.has('sessionId')`                 |
-| `toObject()`  | 无                     | Object    | 获取所有 Cookie 对象（键值对形式） | `pm.cookies.toObject()`                       |
-| `jar()`       | 无                     | CookieJar | 获取 CookieJar 对象       | `pm.cookies.jar()`                            |
+| `get(name)`   | name: String          | Cookie    | Lấy tên được chỉ định Cookie        | `pm.cookies.get('sessionId')`                 |
+| `set(cookie)` | cookie: Cookie/String | void      | cài đặt Cookie             | `pm.cookies.set({name: 'key', value: 'val'})` |
+| `getAll()`    | Không                     | Array     | Nhận tất cả chúng Cookie           | `pm.cookies.getAll()`                         |
+| `has(name)`   | name: String          | Boolean   | nghiên cứu Cookie tồn tại        | `pm.cookies.has('sessionId')`                 |
+| `toObject()`  | Không                     | Object    | Nhận tất cả chúng Cookie Đối tượng (ở dạng cặp khóa-giá trị) | `pm.cookies.toObject()`                       |
+| `jar()`       | Không                     | CookieJar | Lấy CookieJar đối tượng       | `pm.cookies.jar()`                            |
 
-### CookieJar 对象
+### CookieJar đối tượng
 
-CookieJar 用于跨域管理 Cookie，通过 `pm.cookies.jar()` 获取。
+CookieJar Được sử dụng để quản lý tên miền chéo Cookie，vượt qua `pm.cookies.jar()` Lấy.
 
-#### 方法列表
+#### Danh sách các phương pháp
 
-| 方法                           | 参数                                                         | 说明                  | 示例                                      |
+| phương pháp                           | các thông số                                                         | Mô tả                  | Ví dụ                                      |
 |------------------------------|------------------------------------------------------------|---------------------|-----------------------------------------|
-| `set(url, cookie, callback)` | url: String<br>cookie: String/Object<br>callback: Function | 设置指定 URL 的 Cookie   | `jar.set(url, 'key=value', callback)`   |
-| `get(url, name, callback)`   | url: String<br>name: String<br>callback: Function          | 获取指定 URL 的 Cookie   | `jar.get(url, 'sessionId', callback)`   |
-| `getAll(url, callback)`      | url: String<br>callback: Function                          | 获取指定 URL 的所有 Cookie | `jar.getAll(url, callback)`             |
-| `unset(url, name, callback)` | url: String<br>name: String<br>callback: Function          | 删除指定 URL 的 Cookie   | `jar.unset(url, 'sessionId', callback)` |
-| `clear(url, callback)`       | url: String<br>callback: Function                          | 清空指定 URL 的所有 Cookie | `jar.clear(url, callback)`              |
+| `set(url, cookie, callback)` | url: String<br>cookie: String/Object<br>callback: Function | Cài đặt được chỉ định URL của Cookie   | `jar.set(url, 'key=value', callback)`   |
+| `get(url, name, callback)`   | url: String<br>name: String<br>callback: Function          | Nhận được chỉ định URL của Cookie   | `jar.get(url, 'sessionId', callback)`   |
+| `getAll(url, callback)`      | url: String<br>callback: Function                          | Nhận được chỉ định URL của tất cả Cookie | `jar.getAll(url, callback)`             |
+| `unset(url, name, callback)` | url: String<br>name: String<br>callback: Function          | Xóa đã chỉ định URL của Cookie   | `jar.unset(url, 'sessionId', callback)` |
+| `clear(url, callback)`       | url: String<br>callback: Function                          | Xóa bài tập URL của tất cả Cookie | `jar.clear(url, callback)`              |
 
-### Cookie 对象属性
+### Cookie Thuộc tính đối tượng
 
-| 属性         | 类型      | 说明            |
+| tài sản         | loại      | Mô tả            |
 |------------|---------|---------------|
-| `name`     | String  | Cookie 名称     |
-| `value`    | String  | Cookie 值      |
-| `domain`   | String  | Cookie 域      |
-| `path`     | String  | Cookie 路径     |
-| `expires`  | String  | 过期时间          |
-| `maxAge`   | Number  | 最大存活时间（秒）     |
-| `httpOnly` | Boolean | 是否仅 HTTP      |
-| `secure`   | Boolean | 是否安全传输（HTTPS） |
-| `sameSite` | String  | SameSite 属性   |
+| `name`     | String  | Cookie tên     |
+| `value`    | String  | Cookie giá trị      |
+| `domain`   | String  | Cookie lãnh địa      |
+| `path`     | String  | Cookie con đường     |
+| `expires`  | String  | Thời gian hết hạn          |
+| `maxAge`   | Number  | Thời gian tồn tại tối đa (giây)     |
+| `httpOnly` | Boolean | Chỉ có vậy thôi HTTP      |
+| `secure`   | Boolean | Liệu có truyền an toàn hay không (HTTPS） |
+| `sameSite` | String  | SameSite tài sản   |
 
-### 使用示例
+### Ví dụ sử dụng
 
 ```javascript
-// 获取 Cookie
+// Lấy Cookie
 const sessionId = pm.cookies.get('sessionId');
 if (sessionId) {
     console.log('Session ID:', sessionId.value);
 }
 
-// 设置 Cookie
+// cài đặt Cookie
 pm.cookies.set({
     name: 'myToken',
     value: 'abc123',
@@ -476,26 +476,26 @@ pm.cookies.set({
     path: '/'
 });
 
-// 检查 Cookie 是否存在
+// nghiên cứu Cookie tồn tại
 if (pm.cookies.has('sessionId')) {
     console.log('Session cookie exists');
 }
 
-// 获取所有 Cookie
+// Nhận tất cả chúng Cookie
 const allCookies = pm.cookies.getAll();
 console.log('Total cookies:', allCookies.length);
 
-// 使用 CookieJar 跨域设置 Cookie
+// sử dụng CookieJar Cài đặt tên miền chéo Cookie
 const jar = pm.cookies.jar();
 jar.set('https://api.example.com', 'token=xyz', (error, cookie) => {
     if (error) {
-        console.error('设置 cookie 失败:', error);
+        console.error('cài đặt cookie thất bại:', error);
     } else {
-        console.log('Cookie 设置成功:', cookie);
+        console.log('Cookie Thiết lập thành công:', cookie);
     }
 });
 
-// 使用 CookieJar 获取 Cookie
+// sử dụng CookieJar Lấy Cookie
 jar.get('https://api.example.com', 'token', (error, cookie) => {
     if (!error && cookie) {
         console.log('Token:', cookie.value);
@@ -505,130 +505,130 @@ jar.get('https://api.example.com', 'token', (error, cookie) => {
 
 ---
 
-## pm.expect - 断言
+## pm.expect - khẳng định
 
-使用链式断言进行测试（类 Chai.js 风格）。
+Kiểm tra bằng cách sử dụng các xác nhận theo chuỗi (class Chai.js phong cách).
 
-### 链式语法支持
+### Hỗ trợ cú pháp chuỗi
 
-| 链式属性   | 说明    |
+| Thuộc tính bị xích   | Mô tả    |
 |--------|-------|
-| `to`   | 链式连接词 |
-| `be`   | 链式连接词 |
-| `have` | 链式连接词 |
+| `to`   | Liên kết chuỗi |
+| `be`   | Liên kết chuỗi |
+| `have` | Liên kết chuỗi |
 
-### 支持的断言方法
+### Các phương pháp xác nhận được hỗ trợ
 
-| 断言                   | 参数                           | 说明                   | 示例                                             |
+| khẳng định                   | các thông số                           | Mô tả                   | Ví dụ                                             |
 |----------------------|------------------------------|----------------------|------------------------------------------------|
-| `equal(value)`       | value: Any                   | 严格相等（深度比较）           | `pm.expect(200).to.equal(200)`                 |
-| `eql(value)`         | value: Any                   | 深度相等（与 equal 相同）     | `pm.expect({a: 1}).to.eql({a: 1})`             |
-| `include(substring)` | substring: String            | 包含子串                 | `pm.expect('hello world').to.include('hello')` |
-| `property(key)`      | key: String                  | 包含属性（仅支持 Map/Object） | `pm.expect(obj).to.have.property('id')`        |
-| `match(regex)`       | regex: String/Pattern/RegExp | 匹配正则表达式              | `pm.expect('hello').to.match(/^h/)`            |
-| `below(number)`      | number: Number               | 数值小于指定值              | `pm.expect(5).to.be.below(10)`                 |
+| `equal(value)`       | value: Any                   | Bình đẳng nghiêm ngặt (so sánh sâu sắc)           | `pm.expect(200).to.equal(200)`                 |
+| `eql(value)`         | value: Any                   | Độ sâu bằng nhau (với equal như nhau)     | `pm.expect({a: 1}).to.eql({a: 1})`             |
+| `include(substring)` | substring: String            | Chứa các chuỗi con                 | `pm.expect('hello world').to.include('hello')` |
+| `property(key)`      | key: String                  | Chứa các thuộc tính (chỉ được hỗ trợ Map/Object） | `pm.expect(obj).to.have.property('id')`        |
+| `match(regex)`       | regex: String/Pattern/RegExp | Khớp biểu thức chính quy              | `pm.expect('hello').to.match(/^h/)`            |
+| `below(number)`      | number: Number               | Giá trị nhỏ hơn giá trị được chỉ định              | `pm.expect(5).to.be.below(10)`                 |
 
-### 使用示例
+### Ví dụ sử dụng
 
 ```javascript
-// 基本相等断言
+// Khẳng định đẳng thức cơ bản
 pm.test("Status code is 200", function () {
     pm.expect(pm.response.code).to.equal(200);
 });
 
-// 深度相等断言
+// Khẳng định đẳng thức sâu sắc
 pm.test("Response data matches", function () {
     const jsonData = pm.response.json();
     pm.expect(jsonData).to.eql({status: "success"});
 });
 
-// 包含子串
+// Chứa các chuỗi con
 pm.test("Response contains success", function () {
     pm.expect(pm.response.text()).to.include("success");
 });
 
-// 属性存在
+// Tài sản tồn tại
 pm.test("Response has userId property", function () {
     const jsonData = pm.response.json();
     pm.expect(jsonData).to.have.property('userId');
 });
 
-// 正则匹配
+// Trận đấu thường lệ
 pm.test("Email format is correct", function () {
     pm.expect(email).to.match(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/);
 });
 
-// 数值比较
+// So sánh số
 pm.test("Response time is acceptable", function () {
     pm.expect(pm.response.responseTime).to.be.below(1000);
 });
 ```
 
-### 注意事项
+### Những điều cần lưu ý
 
-- 当前实现支持的断言方法有限，主要包括：equal、eql、include、property、match、below
-- 不支持：above、least、most、within、length、keys、members、true、false、null、undefined、ok、empty 等
-- 如需更多断言功能，建议使用 pm.test 结合简单的 if 判断
+- Việc triển khai hiện tại hỗ trợ các phương pháp xác nhận có giới hạn, chủ yếu bao gồm:equal、eql、include、property、match、below
+- Không được hỗ trợ:above、least、most、within、length、keys、members、true、false、null、undefined、ok、empty Đợi đã
+- Nếu bạn cần thêm chức năng xác nhận thì nên sử dụng pm.test Kết hợp với sự đơn giản if phán xét
 
 ---
 
-## pm.test - 测试
+## pm.test - Bài kiểm tra
 
-定义和管理测试用例。
+Xác định và quản lý các trường hợp thử nghiệm.
 
-### 主要方法
+### Các phương pháp chính
 
 #### pm.test(name, function)
 
-定义一个测试用例。
+Xác định một trường hợp thử nghiệm.
 
-| 参数         | 类型       | 说明                                   |
+| các thông số         | loại       | Mô tả                                   |
 |------------|----------|--------------------------------------|
-| `name`     | String   | 测试名称                                 |
-| `function` | Function | 测试函数（可使用 pm.expect 或 pm.response 断言） |
+| `name`     | String   | Tên thử nghiệm                                 |
+| `function` | Function | Chức năng kiểm tra (có thể được sử dụng pm.expect hoặc pm.response khẳng định) |
 
-### 使用示例
+### Ví dụ sử dụng
 
 ```javascript
-// 定义测试 - 状态码检查
-pm.test("状态码是 200", function () {
+// Xác định các bài kiểm tra - Kiểm tra mã trạng thái
+pm.test("Mã trạng thái là  200", function () {
     pm.response.to.have.status(200);
 });
 
-// 定义测试 - 使用 pm.expect
-pm.test("响应时间小于 500ms", function () {
+// Xác định các bài kiểm tra - sử dụng pm.expect
+pm.test("Thời gian đáp ứng ít hơn 500ms", function () {
     pm.expect(pm.response.responseTime).to.be.below(500);
 });
 
-// 定义测试 - JSON 数据验证
-pm.test("响应包含用户 ID", function () {
+// Xác định các bài kiểm tra - JSON Xác thực dữ liệu
+pm.test("Phản hồi có chứa người dùng ID", function () {
     const jsonData = pm.response.json();
     pm.expect(jsonData).to.have.property('userId');
     pm.expect(jsonData.userId).to.equal(123);
 });
 
-// 定义测试 - 响应头检查
-pm.test("响应包含 Content-Type", function () {
+// Xác định các bài kiểm tra - Kiểm tra tiêu đề phản hồi
+pm.test("Câu trả lời có chứa Content-Type", function () {
     pm.response.to.have.header('Content-Type');
 });
 ```
 
 ---
 
-## 外部数据源脚本 API
+## Tập lệnh nguồn dữ liệu bên ngoài API
 
-可以在 Pre-request Script 或 Test Script 中直接访问 Redis、Kafka、Elasticsearch、InfluxDB，并结合 `pm.test()` / `pm.expect()` 进行断言。
+Có thể vào Pre-request Script hoặc Test Script truy cập trực tiếp Redis、Kafka、Elasticsearch、InfluxDB，và kết hợp `pm.test()` / `pm.expect()` Hãy khẳng định.
 
 ### pm.plugin("redis")
 
-#### 方法列表
+#### Danh sách các phương pháp
 
-| 方法 | 参数 | 返回值 | 说明 |
+| phương pháp | các thông số | Giá trị trả về | Mô tả |
 |------|------|--------|------|
-| `execute(options)` | `host`、`port`、`db`、`command`、`key`、`args`、`value` | Any | 执行一次 Redis 命令 |
-| `query(options)` | 同 `execute(options)` | Any | `execute()` 的别名 |
+| `execute(options)` | `host`、`port`、`db`、`command`、`key`、`args`、`value` | Any | Thực hiện một lần Redis Đặt hàng |
+| `query(options)` | Giống nhau `execute(options)` | Any | `execute()` bí danh |
 
-#### 示例：写入并断言 Redis
+#### Ví dụ: Viết và khẳng định Redis
 
 ```javascript
 const redis = pm.plugin('redis');
@@ -650,22 +650,22 @@ const redisValue = redis.query({
     key: 'user:1001'
 });
 
-pm.test('Redis 写入成功', function () {
+pm.test('Redis Việc viết đã thành công', function () {
     pm.expect(redisValue).to.include('Alice');
 });
 ```
 
 ### pm.plugin("kafka")
 
-#### 方法列表
+#### Danh sách các phương pháp
 
-| 方法 | 参数 | 返回值 | 说明 |
+| phương pháp | các thông số | Giá trị trả về | Mô tả |
 |------|------|--------|------|
-| `listTopics(options)` | `bootstrapServers` 等 | `Array<String>` | 获取 topic 列表 |
-| `send(options)` | `bootstrapServers`、`topic`、`key`、`value`、`headers` | Object | 发送消息 |
-| `poll(options)` | `bootstrapServers`、`topic`、`groupId`、`pollTimeoutMs` 等 | Array | 拉取消息 |
+| `listTopics(options)` | `bootstrapServers` Đợi đã | `Array<String>` | Lấy topic danh sách |
+| `send(options)` | `bootstrapServers`、`topic`、`key`、`value`、`headers` | Object | Gửi tin nhắn |
+| `poll(options)` | `bootstrapServers`、`topic`、`groupId`、`pollTimeoutMs` Đợi đã | Array | Kéo tin nhắn |
 
-#### 示例：发消息并断言 Kafka
+#### Ví dụ: Gửi tin nhắn và khẳng định Kafka
 
 ```javascript
 const kafka = pm.plugin('kafka');
@@ -677,7 +677,7 @@ const sendResp = kafka.send({
     value: JSON.stringify({orderId: 1001, status: 'CREATED'})
 });
 
-pm.test('Kafka 发送成功', function () {
+pm.test('Kafka Đã gửi thành công', function () {
     pm.expect(sendResp.topic).to.equal('orders');
     pm.expect(sendResp.offset).to.be.least(0);
 });
@@ -685,14 +685,14 @@ pm.test('Kafka 发送成功', function () {
 
 ### pm.elasticsearch
 
-#### 方法列表
+#### Danh sách các phương pháp
 
-| 方法 | 参数 | 返回值 | 说明 |
+| phương pháp | các thông số | Giá trị trả về | Mô tả |
 |------|------|--------|------|
-| `request(options)` | `baseUrl`、`method`、`path`、`body`、`headers` | Object | 执行一次 ES HTTP 请求 |
-| `query(options)` | 同 `request(options)` | Object | `request()` 的别名 |
+| `request(options)` | `baseUrl`、`method`、`path`、`body`、`headers` | Object | Thực hiện một lần ES HTTP yêu cầu |
+| `query(options)` | Giống nhau `request(options)` | Object | `request()` bí danh |
 
-#### 示例：写入并断言 Elasticsearch
+#### Ví dụ: Viết và khẳng định Elasticsearch
 
 ```javascript
 const indexResp = pm.elasticsearch.request({
@@ -702,42 +702,42 @@ const indexResp = pm.elasticsearch.request({
     body: JSON.stringify({orderId: 1001, status: 'CREATED'})
 });
 
-pm.test('ES 写入成功', function () {
+pm.test('ES Việc viết đã thành công', function () {
     pm.expect(indexResp.code).to.be.within(200, 201);
 });
 ```
 
 ### pm.influxdb
 
-支持两种模式：
+Hai chế độ được hỗ trợ:
 
-- `version: 'v1'` 或 `mode: 'influxql'`：使用 InfluxQL（默认走 `/query`、`/write`）
-- `version: 'v2'` 或 `mode: 'flux'`：使用 Flux / InfluxDB 2.x（走 `/api/v2/query`、`/api/v2/write`）
+- `version: 'v1'` hoặc `mode: 'influxql'`：sử dụng InfluxQL（Để lại theo mặc định `/query`、`/write`）
+- `version: 'v2'` hoặc `mode: 'flux'`：sử dụng Flux / InfluxDB 2.x（Đi `/api/v2/query`、`/api/v2/write`）
 
-#### 方法列表
+#### Danh sách các phương pháp
 
-| 方法 | 参数 | 返回值 | 说明 |
+| phương pháp | các thông số | Giá trị trả về | Mô tả |
 |------|------|--------|------|
-| `query(options)` | `baseUrl`、`version`、`db/org`、`query`、`token` 等 | Object | 查询 InfluxDB |
-| `write(options)` | `baseUrl`、`version`、`db/org/bucket`、`lineProtocol`、`precision` | Object | 写入 line protocol 数据 |
-| `request(options)` | `baseUrl`、`path`、`method`、`body`、`headers` | Object | 发送原始 HTTP 请求 |
+| `query(options)` | `baseUrl`、`version`、`db/org`、`query`、`token` Đợi đã | Object | Truy vấn InfluxDB |
+| `write(options)` | `baseUrl`、`version`、`db/org/bucket`、`lineProtocol`、`precision` | Object | Viết line protocol dữ liệu |
+| `request(options)` | `baseUrl`、`path`、`method`、`body`、`headers` | Object | Gửi bản gốc HTTP yêu cầu |
 
-#### 常用参数
+#### Các thông số thường dùng
 
-| 参数 | 适用版本 | 说明 |
+| các thông số | Phiên bản áp dụng | Mô tả |
 |------|----------|------|
-| `baseUrl` | v1 / v2 | InfluxDB 地址，默认 `http://localhost:8086` |
-| `version` / `mode` | v1 / v2 | `v1` / `influxql` 或 `v2` / `flux` |
-| `db` / `database` | v1 | 数据库名 |
-| `org` | v2 | 组织名 |
-| `bucket` | v2 写入 | bucket 名 |
+| `baseUrl` | v1 / v2 | InfluxDB Địa chỉ, mặc định `http://localhost:8086` |
+| `version` / `mode` | v1 / v2 | `v1` / `influxql` hoặc `v2` / `flux` |
+| `db` / `database` | v1 | Tên cơ sở dữ liệu |
+| `org` | v2 | Tên tổ chức |
+| `bucket` | v2 Viết | bucket tên |
 | `token` | v2 | `Authorization: Token xxx` |
-| `username` / `password` | v1 | 通过 `u/p` 参数传递 |
-| `query` | v1 / v2 | InfluxQL 或 Flux 查询语句 |
-| `lineProtocol` | v1 / v2 写入 | 写入的 line protocol 文本 |
-| `precision` | v1 / v2 写入 | 时间精度，默认 `ms` |
+| `username` / `password` | v1 | vượt qua `u/p` Truyền tham số |
+| `query` | v1 / v2 | InfluxQL hoặc Flux câu lệnh truy vấn |
+| `lineProtocol` | v1 / v2 Viết | được viết line protocol văn bản |
+| `precision` | v1 / v2 Viết | Độ chính xác về thời gian, mặc định `ms` |
 
-#### 示例：InfluxDB 1.x 查询并断言
+#### Ví dụ:InfluxDB 1.x Truy vấn và khẳng định
 
 ```javascript
 const queryResp = pm.influxdb.query({
@@ -749,13 +749,13 @@ const queryResp = pm.influxdb.query({
     query: 'SELECT * FROM cpu ORDER BY time DESC LIMIT 1'
 });
 
-pm.test('InfluxQL 查询成功', function () {
+pm.test('InfluxQL Truy vấn thành công', function () {
     pm.expect(queryResp.code).to.equal(200);
     pm.expect(queryResp.json).to.exist();
 });
 ```
 
-#### 示例：InfluxDB 1.x 写入并断言
+#### Ví dụ:InfluxDB 1.x Viết và khẳng định
 
 ```javascript
 const writeResp = pm.influxdb.write({
@@ -768,12 +768,12 @@ const writeResp = pm.influxdb.write({
     lineProtocol: 'api_requests,service=order count=1i ' + Date.now()
 });
 
-pm.test('Influx 写入成功', function () {
+pm.test('Influx Việc viết đã thành công', function () {
     pm.expect(writeResp.code).to.equal(204);
 });
 ```
 
-#### 示例：InfluxDB 2.x Flux 查询
+#### Ví dụ:InfluxDB 2.x Flux Truy vấn
 
 ```javascript
 const resp = pm.influxdb.query({
@@ -784,7 +784,7 @@ const resp = pm.influxdb.query({
     query: 'from(bucket: "metrics") |> range(start: -5m) |> limit(n: 1)'
 });
 
-pm.test('Influx Flux 查询成功', function () {
+pm.test('Influx Flux Truy vấn thành công', function () {
     pm.expect(resp.code).to.equal(200);
     pm.expect(resp.body).to.include('_value');
 });
@@ -792,75 +792,75 @@ pm.test('Influx Flux 查询成功', function () {
 
 ---
 
-## console - 控制台
+## console - bảng điều khiển
 
-输出调试信息。
+Thông tin gỡ lỗi đầu ra.
 
-### 方法列表
+### Danh sách các phương pháp
 
-| 方法                    | 参数           | 说明   | 示例                                |
+| phương pháp                    | các thông số           | Mô tả   | Ví dụ                                |
 |-----------------------|--------------|------|-----------------------------------|
-| `log(message, ...)`   | message: Any | 输出日志 | `console.log('Hello', 'World')`   |
-| `info(message, ...)`  | message: Any | 输出信息 | `console.info('Info message')`    |
-| `warn(message, ...)`  | message: Any | 输出警告 | `console.warn('Warning message')` |
-| `error(message, ...)` | message: Any | 输出错误 | `console.error('Error message')`  |
+| `log(message, ...)`   | message: Any | Nhật ký đầu ra | `console.log('Hello', 'World')`   |
+| `info(message, ...)`  | message: Any | Thông tin đầu ra | `console.info('Info message')`    |
+| `warn(message, ...)`  | message: Any | Xuất ra một cảnh báo | `console.warn('Warning message')` |
+| `error(message, ...)` | message: Any | Lỗi đầu ra | `console.error('Error message')`  |
 
 ---
 
-## 内置 JavaScript 库
+## Tích hợp sẵn JavaScript thư viện
 
-EasyPostman 内置了三个常用的 JavaScript 库，这些库**已预加载到全局作用域**，可以直接使用，无需 `require()`。
+EasyPostman Ba cái thường được sử dụng được tích hợp sẵn JavaScript thư viện, những thư viện này**Được tải sẵn vào phạm vi toàn cầu**，Có thể sử dụng trực tiếp, không cần thiết `require()`。
 
-### 支持的库列表
+### Danh sách các thư viện được hỗ trợ
 
-| 库名         | 全局变量名       | 版本       | 说明                                    | 官方文档                                      |
+| Tên thư viện         | Tên biến toàn cầu       | Phiên bản       | Mô tả                                    | Tài liệu chính thức                                      |
 |------------|-------------|----------|---------------------------------------|--------------------------------------------|
-| crypto-js  | `CryptoJS`  | 4.1.1    | 加密库，支持 AES、DES、MD5、SHA、HMAC 等多种加密算法 | [crypto-js](https://cryptojs.gitbook.io/docs/) |
-| lodash     | `_`         | 4.17.21  | JavaScript 实用工具库，提供丰富的函数式编程辅助方法      | [lodash](https://lodash.com/docs/)          |
-| moment     | `moment`    | 2.29.4   | 日期时间处理库，用于格式化、解析和操作日期时间             | [moment.js](https://momentjs.com/docs/)     |
+| crypto-js  | `CryptoJS`  | 4.1.1    | Thư viện tiền điện tử, được hỗ trợ AES、DES、MD5、SHA、HMAC và các thuật toán mã hóa khác | [crypto-js](https://cryptojs.gitbook.io/docs/) |
+| lodash     | `_`         | 4.17.21  | JavaScript Một thư viện công cụ thực tế cung cấp nhiều phương pháp phụ trợ lập trình chức năng      | [lodash](https://lodash.com/docs/)          |
+| moment     | `moment`    | 2.29.4   | Thư viện xử lý ngày và giờ để định dạng, phân tích cú pháp và thao tác ngày giờ             | [moment.js](https://momentjs.com/docs/)     |
 
-### 使用方式
+### Cách sử dụng
 
 ```javascript
-// ✅ 推荐：直接使用全局变量（无需 require）
+// ✅ Khuyến nghị: Sử dụng trực tiếp các biến toàn cục (không cần require）
 var hash = CryptoJS.MD5('message').toString();
 var randomNum = _.random(1, 100);
 var now = moment().format('YYYY-MM-DD HH:mm:ss');
 
-// ✅ 也支持：使用 require() 加载
+// ✅ Cũng được hỗ trợ: sử dụng require() trọng tải
 var CryptoJS = require('crypto-js');
 var _ = require('lodash');
 var moment = require('moment');
 ```
 
-### `require()` 加载本地 / 网络脚本
+### `require()` Tải cục bộ / Kịch bản web
 
-除内置库外，脚本还支持通过 `require()` 加载你自己的 JavaScript 文件。
+Ngoài các thư viện tích hợp sẵn, các tập lệnh còn hỗ trợ chuyển `require()` Tải của riêng bạn JavaScript tập tin.
 
 ```javascript
-// 1. 加载本地绝对路径脚本
+// 1. Tải tập lệnh đường dẫn tuyệt đối cục bộ
 var signer = require('/absolute/path/to/signer.js');
 
-// 2. 加载相对路径脚本
-// 顶层脚本中的 ./ 和 ../ 默认相对当前工作区目录解析
+// 2. Tải tập lệnh đường dẫn tương đối
+// trong tập lệnh cấp cao nhất ./ và ../ Theo mặc định, nó được giải quyết tương ứng với thư mục không gian làm việc hiện tại
 var helper = require('./scripts/helper.js');
 
-// 3. 本地脚本内部继续引用相对依赖
+// 3. Các tập lệnh cục bộ tiếp tục tham chiếu các phần phụ thuộc tương đối trong nội bộ
 // parent.js -> require('./child.js')
 var parent = require('/absolute/path/to/parent.js');
 ```
 
-可以直接测试的现成示例：
+Các ví dụ làm sẵn có thể được kiểm tra trực tiếp :
 
 ```javascript
-// 仓库内置本地示例，local-parent.js 内部还会继续 require('./local-child.js')
-// 当前工作区指向仓库根目录时可直接执行
+// Kho lưu trữ có các ví dụ cục bộ tích hợp.local-parent.js Nó sẽ tiếp tục trong nội bộ require('./local-child.js')
+// Nó có thể được thực thi trực tiếp khi không gian làm việc hiện tại trỏ đến thư mục gốc của kho
 var localDemo = require('./docs/examples/js-require/local-parent.js');
 console.log(localDemo.describe('easy-postman'));
 console.log(localDemo.marker());
 ```
 
-自定义脚本建议使用 CommonJS 风格导出：
+Tập lệnh tùy chỉnh được khuyến khích CommonJS Xuất kiểu: .
 
 ```javascript
 function sign(input) {
@@ -870,159 +870,159 @@ function sign(input) {
 module.exports = { sign };
 ```
 
-网络脚本默认**关闭**，需要在“设置 -> 请求设置 -> 脚本加载”中显式开启“允许从网络加载脚本”后才允许加载。
+Tập lệnh mạng mặc định**Đóng lại**，Cần phải ở đó“cài đặt -> Yêu cầu cài đặt -> Đã tải tập lệnh”Được kích hoạt rõ ràng trong “Cho phép tải tập lệnh từ mạng”Chỉ sau đó tải được cho phép.
 
 ```javascript
-// 先到“设置 -> 请求设置 -> 脚本加载”开启远程脚本
+// Hãy đến trước“cài đặt -> Yêu cầu cài đặt -> Đã tải tập lệnh”Kích hoạt tập lệnh từ xa
 var dayjs = require('https://cdn.jsdelivr.net/npm/dayjs@1.11.13/dayjs.min.js');
 console.log(dayjs('2026-03-27').add(1, 'day').format('YYYY-MM-DD'));
 ```
 
-同一组设置里还可以控制：
+Trong cùng một bộ cài đặt, bạn cũng có thể kiểm soát:
 
-- 是否允许 `http://` 远程脚本（默认关闭，仅建议本地调试使用）
-- 远程脚本主机白名单
-- 连接超时 / 读取超时
-- 单个远程脚本最大大小
+- Nó có được phép không? `http://` Tập lệnh từ xa (tắt theo mặc định, chỉ được khuyến nghị để gỡ lỗi cục bộ)
+- Danh sách trắng máy chủ tập lệnh từ xa
+- Đã hết thời gian kết nối / Đọc thời gian chờ
+- Kích thước tối đa của một tập lệnh từ xa
 
-注意事项：
+Lưu ý:
 
-- 顶层相对路径默认相对当前工作区目录解析；若当前工作区不可用，则退回到进程当前目录。
-- 每次脚本执行结束后，`require()` 模块缓存都会清空，所以本地文件修改后下次执行会重新加载。
-- 网络脚本本质上仍然是“下载后执行代码”，只建议加载你自己信任的脚本源。
+- Theo mặc định, đường dẫn tương đối cấp cao nhất được giải quyết tương ứng với thư mục không gian làm việc hiện tại; nếu không gian làm việc hiện tại không khả dụng, nó sẽ quay trở lại thư mục hiện tại của quy trình.
+- Sau khi mỗi lần thực thi tập lệnh kết thúc,`require()` Bộ đệm mô-đun sẽ bị xóa, vì vậy các tệp cục bộ sẽ được tải lại vào lần tiếp theo chúng được thực thi sau khi sửa đổi.
+- Về cơ bản, kịch bản web vẫn vậy“Thực thi mã sau khi tải xuống”，Bạn chỉ nên tải các nguồn tập lệnh mà bạn tin cậy.
 
-### crypto-js - 加密库
+### crypto-js - Thư viện tiền điện tử
 
-提供多种加密和哈希算法，常用于生成签名、加密敏感数据等场景。
+Cung cấp nhiều thuật toán mã hóa và băm khác nhau, thường được sử dụng trong các tình huống như tạo chữ ký và mã hóa dữ liệu nhạy cảm.
 
-#### 常用功能
+#### Các chức năng thường dùng
 
-| 功能          | 方法                                  | 说明            | 示例                                                   |
+| Chức năng          | phương pháp                                  | Mô tả            | Ví dụ                                                   |
 |-------------|-------------------------------------|---------------|------------------------------------------------------|
-| MD5 哈希      | `CryptoJS.MD5(message)`             | 生成 MD5 哈希     | `CryptoJS.MD5('text').toString()`                    |
-| SHA1 哈希     | `CryptoJS.SHA1(message)`            | 生成 SHA1 哈希    | `CryptoJS.SHA1('text').toString()`                   |
-| SHA256 哈希   | `CryptoJS.SHA256(message)`          | 生成 SHA256 哈希  | `CryptoJS.SHA256('text').toString()`                 |
-| HMAC-SHA256 | `CryptoJS.HmacSHA256(message, key)` | HMAC 签名       | `CryptoJS.HmacSHA256('data', 'secret').toString()`   |
-| AES 加密      | `CryptoJS.AES.encrypt(msg, key)`    | AES 对称加密      | `CryptoJS.AES.encrypt('text', 'secret').toString()`  |
-| AES 解密      | `CryptoJS.AES.decrypt(cipher, key)` | AES 解密        | `CryptoJS.AES.decrypt(cipher, 'secret').toString()`  |
-| Base64 编码   | `CryptoJS.enc.Base64.stringify()`   | Base64 编码     | `CryptoJS.enc.Base64.stringify(wordArray)`           |
-| 随机字节        | `CryptoJS.lib.WordArray.random(n)`  | 生成 n 字节随机数据   | `CryptoJS.lib.WordArray.random(16).toString()`       |
+| MD5 Băm      | `CryptoJS.MD5(message)`             | phát ra MD5 Băm     | `CryptoJS.MD5('text').toString()`                    |
+| SHA1 Băm     | `CryptoJS.SHA1(message)`            | phát ra SHA1 Băm    | `CryptoJS.SHA1('text').toString()`                   |
+| SHA256 Băm   | `CryptoJS.SHA256(message)`          | phát ra SHA256 Băm  | `CryptoJS.SHA256('text').toString()`                 |
+| HMAC-SHA256 | `CryptoJS.HmacSHA256(message, key)` | HMAC dấu hiệu       | `CryptoJS.HmacSHA256('data', 'secret').toString()`   |
+| AES Mã hóa      | `CryptoJS.AES.encrypt(msg, key)`    | AES Mã hóa đối xứng      | `CryptoJS.AES.encrypt('text', 'secret').toString()`  |
+| AES Giải mã      | `CryptoJS.AES.decrypt(cipher, key)` | AES Giải mã        | `CryptoJS.AES.decrypt(cipher, 'secret').toString()`  |
+| Base64 Mã hóa   | `CryptoJS.enc.Base64.stringify()`   | Base64 Mã hóa     | `CryptoJS.enc.Base64.stringify(wordArray)`           |
+| Byte ngẫu nhiên        | `CryptoJS.lib.WordArray.random(n)`  | phát ra n Byte dữ liệu ngẫu nhiên   | `CryptoJS.lib.WordArray.random(16).toString()`       |
 
-#### 使用示例
+#### Ví dụ sử dụng
 
 ```javascript
-// 直接使用全局变量 CryptoJS（无需 require）
+// Sử dụng trực tiếp các biến toàn cục CryptoJS（Không cần require）
 
-// MD5 哈希
+// MD5 Băm
 var md5 = CryptoJS.MD5('password123').toString();
 pm.environment.set('passwordHash', md5);
 
-// HMAC-SHA256 签名
+// HMAC-SHA256 dấu hiệu
 var data = 'userId=123&timestamp=' + Date.now();
 var signature = CryptoJS.HmacSHA256(data, 'secret-key').toString();
 pm.environment.set('signature', signature);
 
-// AES 加密解密
+// AES Mã hóa và giải mã
 var encrypted = CryptoJS.AES.encrypt('sensitive data', 'my-key').toString();
 var decrypted = CryptoJS.AES.decrypt(encrypted, 'my-key').toString(CryptoJS.enc.Utf8);
 ```
 
-### lodash - 工具库
+### lodash - Thư viện công cụ
 
-提供数组、对象、字符串等数据类型的实用操作方法，简化数据处理逻辑。
+Cung cấp các phương thức hoạt động thực tế cho các kiểu dữ liệu như mảng, đối tượng và chuỗi để đơn giản hóa logic xử lý dữ liệu.
 
-#### 常用功能
+#### Các chức năng thường dùng
 
-| 分类   | 方法                          | 说明           | 示例                                      |
+| phân loại   | phương pháp                          | Mô tả           | Ví dụ                                      |
 |------|-----------------------------|--------------|-----------------------------------------|
-| 数组   | `_.random(min, max)`        | 生成随机数        | `_.random(1, 100)`                      |
-|      | `_.shuffle(array)`          | 打乱数组         | `_.shuffle([1, 2, 3])`                  |
-|      | `_.sample(array)`           | 随机取一个元素      | `_.sample(['a', 'b', 'c'])`             |
-|      | `_.uniq(array)`             | 数组去重         | `_.uniq([1, 2, 2, 3])`                  |
-| 集合   | `_.map(collection, fn)`     | 映射转换         | `_.map([1,2], n => n*2)`                |
-|      | `_.filter(collection, fn)`  | 过滤           | `_.filter([1,2,3], n => n>1)`           |
-|      | `_.find(collection, fn)`    | 查找第一个匹配项     | `_.find(users, {role: 'admin'})`        |
-|      | `_.groupBy(collection, fn)` | 分组           | `_.groupBy(users, 'role')`              |
-|      | `_.sortBy(collection, fn)`  | 排序           | `_.sortBy(users, 'age')`                |
-| 对象   | `_.pick(object, keys)`      | 提取指定属性       | `_.pick(user, ['id', 'name'])`          |
-|      | `_.omit(object, keys)`      | 排除指定属性       | `_.omit(user, ['password'])`            |
-|      | `_.merge(obj1, obj2)`       | 深度合并对象       | `_.merge({a:1}, {b:2})`                 |
-|      | `_.cloneDeep(object)`       | 深度克隆         | `_.cloneDeep(complexObject)`            |
-| 字符串  | `_.camelCase(string)`       | 转驼峰命名        | `_.camelCase('hello-world')`            |
-|      | `_.snakeCase(string)`       | 转蛇形命名        | `_.snakeCase('helloWorld')`             |
-|      | `_.capitalize(string)`      | 首字母大写        | `_.capitalize('hello')`                 |
-| 其他   | `_.times(n, fn)`            | 执行 n 次       | `_.times(3, i => console.log(i))`       |
-|      | `_.debounce(fn, wait)`      | 防抖函数         | `_.debounce(func, 300)`                 |
+| mảng   | `_.random(min, max)`        | Tạo số ngẫu nhiên        | `_.random(1, 100)`                      |
+|      | `_.shuffle(array)`          | Xáo trộn mảng         | `_.shuffle([1, 2, 3])`                  |
+|      | `_.sample(array)`           | Chọn ngẫu nhiên một phần tử      | `_.sample(['a', 'b', 'c'])`             |
+|      | `_.uniq(array)`             | Chống trùng lặp mảng         | `_.uniq([1, 2, 2, 3])`                  |
+| tập trung   | `_.map(collection, fn)`     | Chuyển đổi bản đồ         | `_.map([1,2], n => n*2)`                |
+|      | `_.filter(collection, fn)`  | lọc           | `_.filter([1,2,3], n => n>1)`           |
+|      | `_.find(collection, fn)`    | Tìm trận đấu đầu tiên     | `_.find(users, {role: 'admin'})`        |
+|      | `_.groupBy(collection, fn)` | Nhóm           | `_.groupBy(users, 'role')`              |
+|      | `_.sortBy(collection, fn)`  | Loại           | `_.sortBy(users, 'age')`                |
+| đối tượng   | `_.pick(object, keys)`      | Trích xuất các thuộc tính được chỉ định       | `_.pick(user, ['id', 'name'])`          |
+|      | `_.omit(object, keys)`      | Loại trừ các thuộc tính được chỉ định       | `_.omit(user, ['password'])`            |
+|      | `_.merge(obj1, obj2)`       | Hợp nhất sâu các đối tượng       | `_.merge({a:1}, {b:2})`                 |
+|      | `_.cloneDeep(object)`       | Nhân bản sâu         | `_.cloneDeep(complexObject)`            |
+| chuỗi  | `_.camelCase(string)`       | Đặt tên bướu        | `_.camelCase('hello-world')`            |
+|      | `_.snakeCase(string)`       | Được đặt tên theo hình con rắn        | `_.snakeCase('helloWorld')`             |
+|      | `_.capitalize(string)`      | Viết hoa chữ cái đầu tiên        | `_.capitalize('hello')`                 |
+| khác   | `_.times(n, fn)`            | thực hiện n lần       | `_.times(3, i => console.log(i))`       |
+|      | `_.debounce(fn, wait)`      | Chức năng chống rung         | `_.debounce(func, 300)`                 |
 
-#### 使用示例
+#### Ví dụ sử dụng
 
 ```javascript
-// 直接使用全局变量 _（无需 require）
+// Sử dụng trực tiếp các biến toàn cục _（Không cần require）
 
-// 生成随机测试数据
+// Tạo dữ liệu thử nghiệm ngẫu nhiên
 var userId = _.random(10000, 99999);
 var status = _.sample(['pending', 'approved', 'rejected']);
 
-// 数组操作
+// Hoạt động mảng
 var nums = [1, 2, 3, 4, 5];
 var doubled = _.map(nums, n => n * 2);
 var filtered = _.filter(nums, n => n > 2);
 
-// 对象操作
+// Hoạt động đối tượng
 var user = {id: 1, name: 'John', password: 'secret', age: 30};
 var safeUser = _.omit(user, ['password']);
 pm.environment.set('user', JSON.stringify(safeUser));
 ```
 
-### moment - 日期时间库
+### moment - Thư viện ngày và giờ
 
-强大的日期时间处理库，支持格式化、解析、计算和验证日期。
+Thư viện xử lý ngày và giờ mạnh mẽ hỗ trợ định dạng, phân tích cú pháp, tính toán và xác thực ngày tháng.
 
-#### 常用功能
+#### Các chức năng thường dùng
 
-| 功能       | 方法                                  | 说明             | 示例                                          |
+| Chức năng       | phương pháp                                  | Mô tả             | Ví dụ                                          |
 |----------|-------------------------------------|----------------|---------------------------------------------|
-| 获取当前时间   | `moment()`                          | 创建当前时间对象       | `moment()`                                  |
-| 格式化      | `moment().format(format)`           | 格式化日期          | `moment().format('YYYY-MM-DD HH:mm:ss')`    |
-| ISO格式    | `moment().toISOString()`            | 转 ISO 8601 格式  | `moment().toISOString()`                    |
-| 时间戳      | `moment().valueOf()`                | 获取毫秒时间戳        | `moment().valueOf()`                        |
-|          | `moment().unix()`                   | 获取秒级时间戳        | `moment().unix()`                           |
-| 解析日期     | `moment(str, format)`               | 解析字符串为日期       | `moment('2024-01-01', 'YYYY-MM-DD')`        |
-| 日期加减     | `moment().add(n, unit)`             | 增加时间           | `moment().add(7, 'days')`                   |
-|          | `moment().subtract(n, unit)`        | 减少时间           | `moment().subtract(1, 'months')`            |
-| 日期比较     | `moment().isBefore(date)`           | 是否在之前          | `moment().isBefore('2025-01-01')`           |
-|          | `moment().isAfter(date)`            | 是否在之后          | `moment().isAfter('2023-01-01')`            |
-|          | `moment().isSame(date)`             | 是否相同           | `moment().isSame('2024-01-01', 'day')`      |
-| 时间差      | `moment().diff(date, unit)`         | 计算时间差          | `moment().diff('2024-01-01', 'days')`       |
-| 开始/结束时间 | `moment().startOf(unit)`            | 获取单位开始时间       | `moment().startOf('day')`                   |
-|          | `moment().endOf(unit)`              | 获取单位结束时间       | `moment().endOf('month')`                   |
-| 验证       | `moment(str, format, true).isValid()` | 验证日期是否有效       | `moment('2024-13-01', 'YYYY-MM-DD', true).isValid()` |
+| Lấy thời gian hiện tại   | `moment()`                          | Tạo đối tượng thời gian hiện tại       | `moment()`                                  |
+| Định dạng      | `moment().format(format)`           | Định dạng ngày          | `moment().format('YYYY-MM-DD HH:mm:ss')`    |
+| ISOđịnh dạng    | `moment().toISOString()`            | thay đổi ISO 8601 định dạng  | `moment().toISOString()`                    |
+| dấu thời gian      | `moment().valueOf()`                | Lấy dấu thời gian tính bằng mili giây        | `moment().valueOf()`                        |
+|          | `moment().unix()`                   | Lấy dấu thời gian cấp hai        | `moment().unix()`                           |
+| Phân tích ngày     | `moment(str, format)`               | Phân tích một chuỗi thành một ngày       | `moment('2024-01-01', 'YYYY-MM-DD')`        |
+| Phép cộng và phép trừ ngày tháng     | `moment().add(n, unit)`             | Thêm thời gian           | `moment().add(7, 'days')`                   |
+|          | `moment().subtract(n, unit)`        | Giảm thời gian           | `moment().subtract(1, 'months')`            |
+| So sánh ngày     | `moment().isBefore(date)`           | Cho dù trước đây          | `moment().isBefore('2025-01-01')`           |
+|          | `moment().isAfter(date)`            | Liệu sau này          | `moment().isAfter('2023-01-01')`            |
+|          | `moment().isSame(date)`             | Họ có giống nhau không?           | `moment().isSame('2024-01-01', 'day')`      |
+| Sự khác biệt về thời gian      | `moment().diff(date, unit)`         | Tính toán chênh lệch thời gian          | `moment().diff('2024-01-01', 'days')`       |
+| bắt đầu/thời gian kết thúc | `moment().startOf(unit)`            | Lấy thời gian bắt đầu của thiết bị       | `moment().startOf('day')`                   |
+|          | `moment().endOf(unit)`              | Nhận thời gian kết thúc đơn vị       | `moment().endOf('month')`                   |
+| Xác minh       | `moment(str, format, true).isValid()` | Xác minh rằng ngày đó là hợp lệ       | `moment('2024-13-01', 'YYYY-MM-DD', true).isValid()` |
 
-#### 使用示例
+#### Ví dụ sử dụng
 
 ```javascript
-// 直接使用全局变量 moment（无需 require）
+// Sử dụng trực tiếp các biến toàn cục moment（Không cần require）
 
-// 生成各种时间格式
+// Tạo các định dạng thời gian khác nhau
 pm.environment.set('currentDate', moment().format('YYYY-MM-DD'));
 pm.environment.set('currentTime', moment().format('YYYY-MM-DD HH:mm:ss'));
 pm.environment.set('timestamp', moment().valueOf().toString());
 pm.environment.set('isoTime', moment().toISOString());
 
-// 日期计算
+// Tính toán ngày
 var tomorrow = moment().add(1, 'days').format('YYYY-MM-DD');
 var lastMonth = moment().subtract(1, 'months').format('YYYY-MM');
 var startOfDay = moment().startOf('day').valueOf();
 var endOfDay = moment().endOf('day').valueOf();
 ```
 
-### 组合使用示例
+### Ví dụ về cách sử dụng kết hợp
 
 ```javascript
-// 直接使用全局变量（无需 require）
-// CryptoJS、_（lodash）、moment 都已预加载
+// Sử dụng trực tiếp các biến toàn cục (không cần require）
+// CryptoJS、_（lodash）、moment Tất cả đều được tải sẵn
 
-// 生成带签名的 API 请求参数
+// Tạo một bản đã ký API Yêu cầu tham số
 var params = {
     userId: pm.environment.get('userId') || '123',
     timestamp: moment().valueOf().toString(),
@@ -1030,41 +1030,41 @@ var params = {
     action: 'getUserInfo'
 };
 
-// 按键名排序并拼接签名字符串
+// Sắp xếp và nối các chuỗi chữ ký theo tên khóa
 var sortedKeys = _.keys(params).sort();
 var signString = _.map(sortedKeys, key => key + '=' + params[key]).join('&');
 
-// 生成 HMAC-SHA256 签名
+// phát ra HMAC-SHA256 dấu hiệu
 var secretKey = pm.environment.get('secretKey') || 'default-secret';
 var signature = CryptoJS.HmacSHA256(signString, secretKey).toString();
 
-// 保存到环境变量
+// Lưu vào các biến môi trường
 pm.environment.set('requestTimestamp', params.timestamp);
 pm.environment.set('requestNonce', params.nonce);
 pm.environment.set('requestSignature', signature);
 
-console.log('请求参数已准备完成');
-console.log('签名字符串:', signString);
-console.log('签名:', signature);
+console.log('Các tham số yêu cầu đã sẵn sàng');
+console.log('Chuỗi chữ ký:', signString);
+console.log('dấu hiệu:', signature);
 ```
 
 ---
 
-## 完整示例
+## Ví dụ đầy đủ
 
-### Pre-request Script 示例
+### Pre-request Script Ví dụ
 
-#### 示例 1：基础请求准备
+#### Ví dụ 1：Chuẩn bị yêu cầu cơ bản
 
 ```javascript
-// 1. 设置环境变量
+// 1. Đặt các biến môi trường
 pm.environment.set('timestamp', Date.now());
 pm.environment.set('requestId', pm.uuid());
 
-// 2. 设置临时变量
+// 2. Đặt các biến tạm thời
 pm.variables.set('localVar', 'tempValue');
 
-// 3. 添加请求头
+// 3. Thêm tiêu đề yêu cầu
 pm.request.headers.add({
     key: 'X-Request-Time',
     value: new Date().toISOString()
@@ -1075,48 +1075,48 @@ pm.request.headers.add({
     value: pm.environment.get('requestId')
 });
 
-// 4. 添加查询参数
+// 4. Thêm tham số truy vấn
 pm.request.params.add({
     key: 'timestamp',
     value: pm.getTimestamp().toString()
 });
 
-// 5. 修改 URL 编码表单数据
+// 5. Ôn lại URL Mã hóa dữ liệu biểu mẫu
 pm.request.urlencoded.add({
     key: 'username',
     value: 'john'
 });
 
-// 6. 添加 multipart 表单数据
+// 6. Thêm vào multipart Dữ liệu biểu mẫu
 pm.request.formData.add({
     key: 'userId',
     value: '123'
 });
 
-// 7. 输出调试信息
+// 7. Thông tin gỡ lỗi đầu ra
 console.log('Request URL:', pm.request.url.toString());
 console.log('Request Method:', pm.request.method);
 console.log('Request ID:', pm.environment.get('requestId'));
 ```
 
-#### 示例 2：JWT Token 认证
+#### Ví dụ 2：JWT Token Chứng nhận
 
 ```javascript
-// 检查 token 是否存在
+// nghiên cứu token tồn tại
 const token = pm.environment.get('authToken');
 
 if (token) {
-    // 添加 Bearer Token
+    // Thêm vào Bearer Token
     pm.request.headers.upsert({
         key: 'Authorization',
         value: 'Bearer ' + token
     });
-    console.log('已添加认证 Token');
+    console.log('Đã thêm chứng nhận Token');
 } else {
-    console.warn('警告：未找到认证 Token，请先登录');
+    console.warn('Cảnh báo: Không tìm thấy chứng nhận Token，Vui lòng đăng nhập trước');
 }
 
-// 添加 API Key（如果需要）
+// Thêm vào API Key（nếu cần)
 const apiKey = pm.environment.get('apiKey');
 if (apiKey) {
     pm.request.headers.upsert({
@@ -1126,26 +1126,26 @@ if (apiKey) {
 }
 ```
 
-#### 示例 3：动态生成签名（HMAC-SHA256）
+#### Ví dụ 3：Tự động tạo chữ ký (HMAC-SHA256）
 
 ```javascript
 var CryptoJS = require('crypto-js');
 
-// 获取请求信息
+// Nhận thông tin yêu cầu
 const timestamp = Date.now().toString();
 const method = pm.request.method;
 const path = pm.request.url.getPath();
 const secretKey = pm.environment.get('secretKey') || 'default-secret';
 
-// 生成签名字符串
+// Tạo chuỗi chữ ký
 const signString = method + '\n' + path + '\n' + timestamp;
-console.log('签名字符串:', signString);
+console.log('Chuỗi chữ ký:', signString);
 
-// 计算 HMAC-SHA256 签名
+// Tính toán HMAC-SHA256 dấu hiệu
 const signature = CryptoJS.HmacSHA256(signString, secretKey).toString();
-console.log('生成的签名:', signature);
+console.log('Chữ ký được tạo:', signature);
 
-// 添加签名相关请求头
+// Thêm tiêu đề yêu cầu liên quan đến chữ ký
 pm.request.headers.upsert({
     key: 'X-Timestamp',
     value: timestamp
@@ -1162,13 +1162,13 @@ pm.request.headers.upsert({
 });
 ```
 
-#### 示例 4：动态数据生成器
+#### Ví dụ 4：Trình tạo dữ liệu động
 
 ```javascript
 var moment = require('moment');
 var _ = require('lodash');
 
-// 生成随机用户数据
+// Tạo dữ liệu người dùng ngẫu nhiên
 const randomUser = {
     id: pm.uuid(),
     username: 'user_' + _.random(10000, 99999),
@@ -1178,27 +1178,27 @@ const randomUser = {
     age: _.random(18, 60)
 };
 
-// 保存到环境变量供后续使用
+// Lưu vào các biến môi trường để sử dụng tiếp theo
 pm.environment.set('testUserId', randomUser.id);
 pm.environment.set('testUserEmail', randomUser.email);
 pm.environment.set('testUsername', randomUser.username);
 
-// 如果是 JSON 请求体，可以动态修改
-console.log('生成的测试用户:', JSON.stringify(randomUser, null, 2));
+// trong trường hợp JSON Phần thân yêu cầu có thể được sửa đổi linh hoạt
+console.log('Đã tạo người dùng thử nghiệm:', JSON.stringify(randomUser, null, 2));
 
-// 生成随机订单号
+// Tạo số thứ tự ngẫu nhiên
 const orderId = 'ORD' + moment().format('YYYYMMDDHHmmss') + _.random(1000, 9999);
 pm.environment.set('testOrderId', orderId);
-console.log('订单号:', orderId);
+console.log('Số thứ tự:', orderId);
 ```
 
-#### 示例 5：条件请求修改
+#### Ví dụ 5：Điều kiện yêu cầu được sửa đổi
 
 ```javascript
-// 根据环境变量决定请求配置
+// Xác định cấu hình yêu cầu dựa trên các biến môi trường
 const env = pm.environment.get('currentEnv') || 'dev';
 
-// 根据环境设置不同的 baseURL
+// Các cài đặt khác nhau tùy thuộc vào môi trường baseURL
 const baseUrls = {
     'dev': 'https://dev-api.example.com',
     'test': 'https://test-api.example.com',
@@ -1206,9 +1206,9 @@ const baseUrls = {
 };
 
 pm.environment.set('baseUrl', baseUrls[env]);
-console.log('当前环境:', env, '- API 地址:', baseUrls[env]);
+console.log('môi trường hiện nay:', env, '- API địa chỉ:', baseUrls[env]);
 
-// 根据请求方法添加不同的请求头
+// Thêm các tiêu đề yêu cầu khác nhau dựa trên phương thức yêu cầu
 if (pm.request.method === 'POST' || pm.request.method === 'PUT') {
     pm.request.headers.upsert({
         key: 'Content-Type',
@@ -1216,7 +1216,7 @@ if (pm.request.method === 'POST' || pm.request.method === 'PUT') {
     });
 }
 
-// 为特定路径添加额外参数
+// Thêm tham số bổ sung cho các đường dẫn cụ thể
 if (pm.request.url.getPath().includes('/api/v2/')) {
     pm.request.params.add({
         key: 'version',
@@ -1225,10 +1225,10 @@ if (pm.request.url.getPath().includes('/api/v2/')) {
 }
 ```
 
-#### 示例 6：请求数据校验
+#### Ví dụ 6：Yêu cầu xác minh dữ liệu
 
 ```javascript
-// 检查必要的环境变量
+// Kiểm tra các biến môi trường cần thiết
 const requiredVars = ['baseUrl', 'apiKey', 'userId'];
 const missingVars = [];
 
@@ -1239,24 +1239,24 @@ requiredVars.forEach(function(varName) {
 });
 
 if (missingVars.length > 0) {
-    console.error('错误：缺少必要的环境变量:', missingVars.join(', '));
-    throw new Error('缺少环境变量: ' + missingVars.join(', '));
+    console.error('Lỗi: Thiếu biến môi trường bắt buộc:', missingVars.join(', '));
+    throw new Error('Biến môi trường bị thiếu: ' + missingVars.join(', '));
 }
 
-// 检查请求头是否完整
+// Kiểm tra xem tiêu đề yêu cầu đã hoàn tất chưa
 if (!pm.request.headers.has('Content-Type')) {
-    console.warn('警告：缺少 Content-Type 请求头');
+    console.warn('Cảnh báo: Thiếu Content-Type Tiêu đề yêu cầu');
 }
 
-console.log('✓ 环境变量校验通过');
+console.log('✓ Đã thông qua xác minh biến môi trường');
 ```
 
-#### 示例 7：批量操作与数据处理
+#### Ví dụ 7：Hoạt động hàng loạt và xử lý dữ liệu
 
 ```javascript
 var _ = require('lodash');
 
-// 批量添加自定义请求头
+// Thêm tiêu đề yêu cầu tùy chỉnh theo đợt
 const customHeaders = [
     { key: 'X-Client-Version', value: '1.0.0' },
     { key: 'X-Platform', value: 'web' },
@@ -1268,7 +1268,7 @@ customHeaders.forEach(function(header) {
     pm.request.headers.upsert(header);
 });
 
-// 批量添加查询参数
+// Thêm tham số truy vấn theo lô
 const commonParams = {
     'appId': pm.environment.get('appId') || 'default',
     'lang': 'zh-CN',
@@ -1280,34 +1280,34 @@ _.forEach(commonParams, function(value, key) {
     pm.request.params.add({ key: key, value: value });
 });
 
-console.log('已添加', customHeaders.length, '个请求头');
-console.log('已添加', Object.keys(commonParams).length, '个查询参数');
+console.log('Đã thêm', customHeaders.length, 'tiêu đề yêu cầu');
+console.log('Đã thêm', Object.keys(commonParams).length, 'các tham số truy vấn');
 ```
 
-#### 示例 8：URL 参数加密
+#### Ví dụ 8：URL Mã hóa tham số
 
 ```javascript
 var CryptoJS = require('crypto-js');
 
-// 获取敏感参数
+// Nhận các thông số nhạy cảm
 const userId = pm.environment.get('userId');
 const secretKey = pm.environment.get('encryptKey') || 'default-key';
 
 if (userId) {
-    // 加密用户 ID
+    // Người dùng được mã hóa ID
     const encryptedUserId = CryptoJS.AES.encrypt(userId, secretKey).toString();
-    
-    // 使用加密后的值
+
+    // Sử dụng giá trị được mã hóa
     pm.request.params.add({
         key: 'uid',
         value: encodeURIComponent(encryptedUserId)
     });
-    
-    console.log('原始 userId:', userId);
-    console.log('加密后:', encryptedUserId.substring(0, 20) + '...');
+
+    console.log('nguyên bản userId:', userId);
+    console.log('Sau khi mã hóa:', encryptedUserId.substring(0, 20) + '...');
 }
 
-// Base64 编码
+// Base64 Mã hóa
 const credentials = pm.environment.get('username') + ':' + pm.environment.get('password');
 const base64Credentials = CryptoJS.enc.Base64.stringify(CryptoJS.enc.Utf8.parse(credentials));
 
@@ -1317,37 +1317,37 @@ pm.request.headers.upsert({
 });
 ```
 
-#### 示例 9：请求重试机制准备
+#### Ví dụ 9：Yêu cầu chuẩn bị cơ chế thử lại
 
 ```javascript
-// 设置重试计数器
+// Đặt bộ đếm thử lại
 let retryCount = pm.environment.get('retryCount');
 if (!retryCount) {
     retryCount = 0;
 }
 pm.environment.set('retryCount', retryCount);
 
-// 添加重试标识
+// Thêm cờ thử lại
 pm.request.headers.upsert({
     key: 'X-Retry-Count',
     value: retryCount.toString()
 });
 
-// 设置超时时间（根据重试次数递增）
+// Đặt thời gian chờ (tăng dần dựa trên số lần thử lại)
 const baseTimeout = 5000;
 const timeout = baseTimeout * (retryCount + 1);
 pm.environment.set('currentTimeout', timeout);
 
-console.log('重试次数:', retryCount, '- 超时时间:', timeout + 'ms');
+console.log('Số lần thử lại:', retryCount, '- khoảng thời gian chờ:', timeout + 'ms');
 ```
 
-#### 示例 10：模拟数据填充（用于测试）
+#### Ví dụ 10：Dân số dữ liệu giả (để thử nghiệm)
 
 ```javascript
 var _ = require('lodash');
 var moment = require('moment');
 
-// 生成模拟订单数据
+// Tạo dữ liệu đơn hàng mô phỏng
 const mockOrder = {
     orderId: 'TEST_' + moment().format('YYYYMMDDHHmmss') + _.random(1000, 9999),
     customerId: pm.environment.get('testUserId') || 'CUST_' + _.random(10000, 99999),
@@ -1363,64 +1363,64 @@ const mockOrder = {
     status: 'pending'
 };
 
-// 计算总金额
+// Tính tổng số tiền
 mockOrder.totalAmount = _.sumBy(mockOrder.products, function(p) {
     return p.quantity * p.price;
 });
 mockOrder.totalAmount = _.round(mockOrder.totalAmount, 2);
 
-// 保存模拟数据
+// Lưu dữ liệu mô phỏng
 pm.environment.set('mockOrderData', JSON.stringify(mockOrder));
-console.log('生成的模拟订单:', JSON.stringify(mockOrder, null, 2));
+console.log('Tạo thứ tự mô phỏng:', JSON.stringify(mockOrder, null, 2));
 ```
 
-### Post-request Script 示例
+### Post-request Script Ví dụ
 
-#### 示例 1：基础响应验证
+#### Ví dụ 1：Xác thực phản hồi cơ bản
 
 ```javascript
-// 1. 状态码测试
-pm.test("状态码是 200", function () {
+// 1. Kiểm tra mã trạng thái
+pm.test("Mã trạng thái là  200", function () {
     pm.response.to.have.status(200);
 });
 
-// 2. 响应时间测试
-pm.test("响应时间小于 500ms", function () {
+// 2. Kiểm tra thời gian đáp ứng
+pm.test("Thời gian đáp ứng ít hơn 500ms", function () {
     pm.expect(pm.response.responseTime).to.be.below(500);
 });
 
-// 3. 响应头测试
-pm.test("响应包含 Content-Type", function () {
+// 3. Kiểm tra tiêu đề phản hồi
+pm.test("Câu trả lời có chứa Content-Type", function () {
     pm.response.to.have.header('Content-Type');
 });
 
 const contentType = pm.response.headers.get('Content-Type');
 console.log('Content-Type:', contentType);
 
-// 4. JSON 结构测试
-pm.test("响应包含正确的数据结构", function () {
+// 4. JSON Kiểm tra kết cấu
+pm.test("Phản hồi chứa cấu trúc dữ liệu chính xác", function () {
     const jsonData = pm.response.json();
 
-    // 检查属性存在
+    // Kiểm tra xem thuộc tính có tồn tại không
     pm.expect(jsonData).to.have.property('status');
     pm.expect(jsonData).to.have.property('data');
 
-    // 检查值
+    // Kiểm tra giá trị
     pm.expect(jsonData.status).to.equal('success');
 });
 
-// 5. 字符串包含测试
-pm.test("响应体包含 success", function () {
+// 5. Chuỗi chứa bài kiểm tra
+pm.test("Phần thân phản hồi chứa success", function () {
     pm.expect(pm.response.text()).to.include('success');
 });
 
-// 6. 正则匹配测试
-pm.test("响应包含有效的 email", function () {
+// 6. Kiểm tra kết hợp thường xuyên
+pm.test("Phản hồi có chứa hợp lệ email", function () {
     const jsonData = pm.response.json();
     pm.expect(jsonData.email).to.match(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/);
 });
 
-// 7. 保存响应数据到环境变量
+// 7. Lưu dữ liệu phản hồi vào các biến môi trường
 const responseData = pm.response.json();
 if (responseData.token) {
     pm.environment.set('authToken', responseData.token);
@@ -1432,90 +1432,90 @@ if (responseData.userId) {
 }
 ```
 
-#### 示例 2：登录接口完整测试
+#### Ví dụ 2：Hoàn thành kiểm tra giao diện đăng nhập
 
 ```javascript
-pm.test("登录请求成功", function () {
+pm.test("Yêu cầu đăng nhập thành công", function () {
     pm.response.to.have.status(200);
 });
 
-pm.test("登录响应时间合理", function () {
+pm.test("Thời gian phản hồi đăng nhập là hợp lý", function () {
     pm.expect(pm.response.responseTime).to.be.below(2000);
 });
 
 const jsonData = pm.response.json();
 
-pm.test("登录返回正确的数据结构", function () {
+pm.test("Đăng nhập trả về cấu trúc dữ liệu chính xác", function () {
     pm.expect(jsonData).to.have.property('code');
     pm.expect(jsonData).to.have.property('message');
     pm.expect(jsonData).to.have.property('data');
     pm.expect(jsonData.code).to.equal(200);
 });
 
-pm.test("返回了认证令牌", function () {
+pm.test("Mã thông báo xác thực được trả lại", function () {
     pm.expect(jsonData.data).to.have.property('token');
     pm.expect(jsonData.data).to.have.property('refreshToken');
-    pm.expect(jsonData.data.token).to.match(/^[A-Za-z0-9\-_]+\.[A-Za-z0-9\-_]+\.[A-Za-z0-9\-_]+$/); // JWT 格式
+    pm.expect(jsonData.data.token).to.match(/^[A-Za-z0-9\-_]+\.[A-Za-z0-9\-_]+\.[A-Za-z0-9\-_]+$/); // JWT định dạng
 });
 
-pm.test("返回了用户信息", function () {
+pm.test("Thông tin người dùng được trả về", function () {
     pm.expect(jsonData.data).to.have.property('userInfo');
     pm.expect(jsonData.data.userInfo).to.have.property('userId');
     pm.expect(jsonData.data.userInfo).to.have.property('username');
 });
 
-// 保存认证信息
+// Lưu thông tin xác thực
 if (jsonData.code === 200 && jsonData.data) {
     pm.environment.set('authToken', jsonData.data.token);
     pm.environment.set('refreshToken', jsonData.data.refreshToken);
     pm.environment.set('currentUserId', jsonData.data.userInfo.userId);
     pm.environment.set('currentUsername', jsonData.data.userInfo.username);
-    
-    console.log('✓ 登录成功，用户:', jsonData.data.userInfo.username);
-    console.log('✓ Token 已保存');
+
+    console.log('✓ Đăng nhập thành công, người dùng:', jsonData.data.userInfo.username);
+    console.log('✓ Token Đã lưu');
 }
 ```
 
-#### 示例 3：数据列表接口测试
+#### Ví dụ 3：Kiểm tra giao diện danh sách dữ liệu
 
 ```javascript
 const jsonData = pm.response.json();
 
-pm.test("获取列表成功", function () {
+pm.test("Lấy được danh sách đã thành công", function () {
     pm.response.to.have.status(200);
     pm.expect(jsonData.code).to.equal(200);
 });
 
-pm.test("列表数据结构正确", function () {
+pm.test("Cấu trúc dữ liệu danh sách là chính xác", function () {
     pm.expect(jsonData.data).to.have.property('list');
     pm.expect(jsonData.data).to.have.property('total');
     pm.expect(jsonData.data).to.have.property('pageNum');
     pm.expect(jsonData.data).to.have.property('pageSize');
 });
 
-pm.test("列表数据有效", function () {
+pm.test("Dữ liệu danh sách là hợp lệ", function () {
     pm.expect(Array.isArray(jsonData.data.list)).to.equal(true);
     pm.expect(jsonData.data.total).to.be.a('number');
     pm.expect(jsonData.data.list.length).to.be.below(jsonData.data.pageSize + 1);
 });
 
-// 验证列表项结构
+// Xác thực cấu trúc mục danh sách
 if (jsonData.data.list.length > 0) {
-    pm.test("列表项包含必要字段", function () {
+    pm.test("Các mục danh sách chứa các trường bắt buộc", function () {
         const firstItem = jsonData.data.list[0];
         pm.expect(firstItem).to.have.property('id');
         pm.expect(firstItem).to.have.property('name');
         pm.expect(firstItem).to.have.property('createTime');
     });
-    
-    // 保存第一项的 ID 供后续测试使用
+
+    // Lưu mục đầu tiên ID cho việc thử nghiệm tiếp theo
     pm.environment.set('firstItemId', jsonData.data.list[0].id);
-    console.log('总记录数:', jsonData.data.total);
-    console.log('当前页记录数:', jsonData.data.list.length);
+    console.log('Tổng số hồ sơ:', jsonData.data.total);
+    console.log('Số lượng bản ghi trên trang hiện tại:', jsonData.data.list.length);
 }
 ```
 
-#### 示例 4：错误处理和重试逻辑
+#### Ví dụ 4：Xử lý lỗi và thử lại logic
 
 ```javascript
 const statusCode = pm.response.code;
@@ -1523,56 +1523,56 @@ const retryCount = parseInt(pm.environment.get('retryCount') || '0');
 const maxRetries = 3;
 
 if (statusCode === 200) {
-    // 成功，重置重试计数
+    // Thành công, đặt lại số lần thử lại
     pm.environment.set('retryCount', '0');
-    
-    pm.test("请求成功", function () {
+
+    pm.test("Yêu cầu đã thành công", function () {
         pm.response.to.have.status(200);
     });
-    
-    console.log('✓ 请求成功');
-    
+
+    console.log('✓ Yêu cầu đã thành công');
+
 } else if (statusCode === 401) {
-    // 未授权，可能 token 过期
-    pm.test("认证失败 - Token 可能已过期", function () {
+    // Có lẽ là trái phép token Hết hạn
+    pm.test("Xác thực không thành công - Token Có thể đã hết hạn", function () {
         pm.expect(statusCode).to.equal(401);
     });
-    
-    console.error('✗ 认证失败，请重新登录');
+
+    console.error('✗ Xác thực không thành công, vui lòng đăng nhập lại');
     pm.environment.unset('authToken');
-    
+
 } else if (statusCode === 429) {
-    // 请求过于频繁
-    pm.test("请求限流", function () {
+    // Yêu cầu được thực hiện quá thường xuyên
+    pm.test("Yêu cầu giới hạn hiện tại", function () {
         pm.expect(statusCode).to.equal(429);
     });
-    
+
     const retryAfter = pm.response.headers.get('Retry-After') || '60';
-    console.warn('⚠ 请求过于频繁，建议等待', retryAfter, '秒后重试');
-    
+    console.warn('⚠ Yêu cầu quá thường xuyên, nên chờ đợi', retryAfter, 'Hãy thử lại sau vài giây');
+
 } else if (statusCode >= 500) {
-    // 服务器错误，可以重试
+    // Lỗi máy chủ, bạn có thể thử lại
     if (retryCount < maxRetries) {
         pm.environment.set('retryCount', (retryCount + 1).toString());
-        console.warn('⚠ 服务器错误，准备重试 (' + (retryCount + 1) + '/' + maxRetries + ')');
+        console.warn('⚠ Lỗi máy chủ, sẵn sàng thử lại (' + (retryCount + 1) + '/' + maxRetries + ')');
     } else {
-        console.error('✗ 达到最大重试次数，放弃重试');
+        console.error('✗ Đã đạt đến số lần thử lại tối đa và việc thử lại sẽ bị hủy bỏ');
         pm.environment.set('retryCount', '0');
     }
 } else {
-    // 其他错误
-    pm.test("请求失败 - 状态码: " + statusCode, function () {
+    // Các lỗi khác
+    pm.test("Yêu cầu không thành công - mã trạng thái: " + statusCode, function () {
         const jsonData = pm.response.json();
-        console.error('错误信息:', jsonData.message || '未知错误');
+        console.error('thông báo lỗi:', jsonData.message || 'Lỗi không xác định');
     });
 }
 ```
 
-#### 示例 5：Cookie 和 Session 管理
+#### Ví dụ 5：Cookie và Session quản lý
 
 ```javascript
-// 8. Cookie 管理
-pm.test("检查 session cookie", function () {
+// 8. Cookie quản lý
+pm.test("nghiên cứu session cookie", function () {
     pm.expect(pm.cookies.has('sessionId')).to.equal(true);
 });
 
@@ -1582,45 +1582,45 @@ if (sessionCookie) {
     pm.environment.set('sessionId', sessionCookie.value);
 }
 
-// 9. 从响应头获取 Cookie
+// 9. Thu được từ tiêu đề phản hồi Cookie
 const responseCookie = pm.getResponseCookie('JSESSIONID');
 if (responseCookie) {
     console.log('JSESSIONID:', responseCookie.value);
     pm.environment.set('jsessionId', responseCookie.value);
 }
 
-// 10. 使用 CookieJar 跨域设置 Cookie
+// 10. sử dụng CookieJar Cài đặt tên miền chéo Cookie
 const jar = pm.cookies.jar();
 jar.set('https://api.example.com', 'custom_token=xyz123', function (error, cookie) {
     if (error) {
-        console.error('设置 cookie 失败:', error);
+        console.error('cài đặt cookie thất bại:', error);
     } else {
-        console.log('Cookie 设置成功');
+        console.log('Cookie Thiết lập thành công');
     }
 });
 
-// 检查所有 Cookie
-console.log('=== 所有 Cookie ===');
+// Kiểm tra tất cả Cookie
+console.log('=== Tất cả Cookie ===');
 const allCookies = pm.cookies.getAll();
 allCookies.forEach(function(cookie) {
     console.log(cookie.name + ':', cookie.value);
 });
 ```
 
-#### 示例 6：性能监控和统计
+#### Ví dụ 6：Giám sát và thống kê hiệu suất
 
 ```javascript
-// 11. 获取响应大小信息
+// 11. Nhận thông tin kích thước phản hồi
 const size = pm.response.size();
-console.log('响应体大小:', size.body, 'bytes');
-console.log('响应头大小:', size.header, 'bytes');
-console.log('总大小:', size.total, 'bytes');
+console.log('Kích thước cơ thể phản ứng:', size.body, 'bytes');
+console.log('Kích thước tiêu đề phản hồi:', size.header, 'bytes');
+console.log('Tổng kích thước:', size.total, 'bytes');
 
-// 性能统计
+// Thống kê hiệu suất
 const responseTime = pm.response.responseTime;
 pm.environment.set('lastResponseTime', responseTime.toString());
 
-// 计算平均响应时间
+// Tính thời gian phản hồi trung bình
 let totalTime = parseFloat(pm.environment.get('totalResponseTime') || '0');
 let requestCount = parseInt(pm.environment.get('requestCount') || '0');
 
@@ -1631,196 +1631,196 @@ pm.environment.set('totalResponseTime', totalTime.toString());
 pm.environment.set('requestCount', requestCount.toString());
 
 const avgResponseTime = totalTime / requestCount;
-console.log('本次响应时间:', responseTime, 'ms');
-console.log('平均响应时间:', avgResponseTime.toFixed(2), 'ms');
-console.log('请求总数:', requestCount);
+console.log('Thời gian phản hồi này:', responseTime, 'ms');
+console.log('Thời gian phản hồi trung bình:', avgResponseTime.toFixed(2), 'ms');
+console.log('Tổng số yêu cầu:', requestCount);
 
-// 性能等级判断
+// Đánh giá mức độ hiệu suất
 let performanceLevel = '';
 if (responseTime < 100) {
-    performanceLevel = '优秀';
+    performanceLevel = 'Tuyệt vời';
 } else if (responseTime < 300) {
-    performanceLevel = '良好';
+    performanceLevel = 'Tốt';
 } else if (responseTime < 1000) {
-    performanceLevel = '一般';
+    performanceLevel = 'Trung bình';
 } else {
-    performanceLevel = '较慢';
+    performanceLevel = 'chậm hơn';
 }
 
-pm.test("响应性能: " + performanceLevel + " (" + responseTime + "ms)", function () {
-    console.log('性能等级:', performanceLevel);
+pm.test("Khả năng đáp ứng: " + performanceLevel + " (" + responseTime + "ms)", function () {
+    console.log('Mức hiệu suất:', performanceLevel);
 });
 ```
 
-#### 示例 7：复杂数据验证
+#### Ví dụ 7：Xác thực dữ liệu phức tạp
 
 ```javascript
 const jsonData = pm.response.json();
 
-pm.test("验证嵌套数据结构", function () {
-    // 多层嵌套验证
+pm.test("Xác thực cấu trúc dữ liệu lồng nhau", function () {
+    // Nhiều cấp độ xác nhận lồng nhau
     pm.expect(jsonData).to.have.property('data');
     pm.expect(jsonData.data).to.have.property('user');
     pm.expect(jsonData.data.user).to.have.property('profile');
     pm.expect(jsonData.data.user.profile).to.have.property('address');
 });
 
-// 数组遍历验证
+// Xác minh truyền tải mảng
 if (jsonData.data && jsonData.data.items) {
-    pm.test("所有商品都有价格", function () {
+    pm.test("Tất cả các mặt hàng đều có giá", function () {
         jsonData.data.items.forEach(function(item, index) {
             pm.expect(item).to.have.property('price');
             pm.expect(item.price).to.be.a('number');
             pm.expect(item.price).to.be.below(100000);
-            console.log('商品' + (index + 1) + ':', item.name, '- 价格:', item.price);
+            console.log('hàng hóa' + (index + 1) + ':', item.name, '- giá:', item.price);
         });
     });
-    
-    // 计算总价
+
+    // Tính tổng giá
     let totalPrice = 0;
     jsonData.data.items.forEach(function(item) {
         totalPrice += item.price * item.quantity;
     });
-    
-    pm.test("总价计算正确", function () {
+
+    pm.test("Tổng giá được tính toán chính xác", function () {
         pm.expect(totalPrice).to.equal(jsonData.data.totalAmount);
     });
-    
-    console.log('商品总价:', totalPrice);
+
+    console.log('Tổng giá sản phẩm:', totalPrice);
 }
 ```
 
-#### 示例 8：响应头详细分析
+#### Ví dụ 8：Phân tích chi tiết các tiêu đề phản hồi
 
 ```javascript
-// 12. 遍历所有响应头
-console.log('所有响应头:');
+// 12. Lặp lại qua tất cả các tiêu đề phản hồi
+console.log('Tất cả các tiêu đề phản hồi:');
 pm.response.headers.each(function (header) {
     console.log('  ' + header.key + ': ' + header.value);
 });
 
-// 验证安全相关响应头
-pm.test("检查安全响应头", function () {
+// Xác minh các tiêu đề phản hồi liên quan đến bảo mật
+pm.test("Kiểm tra tiêu đề phản hồi bảo mật", function () {
     const securityHeaders = [
         'X-Content-Type-Options',
         'X-Frame-Options',
         'X-XSS-Protection'
     ];
-    
+
     securityHeaders.forEach(function(headerName) {
         if (pm.response.headers.has(headerName)) {
-            console.log('✓ 包含安全头:', headerName);
+            console.log('✓ Chứa các tiêu đề bảo mật:', headerName);
         } else {
-            console.warn('⚠ 缺少安全头:', headerName);
+            console.warn('⚠ Thiếu tiêu đề bảo mật:', headerName);
         }
     });
 });
 
-// 检查缓存策略
+// Kiểm tra chính sách bộ nhớ đệm
 if (pm.response.headers.has('Cache-Control')) {
     const cacheControl = pm.response.headers.get('Cache-Control');
-    console.log('缓存策略:', cacheControl);
+    console.log('Chiến lược bộ nhớ đệm:', cacheControl);
 }
 
-// 检查 CORS 设置
+// nghiên cứu CORS cài đặt
 if (pm.response.headers.has('Access-Control-Allow-Origin')) {
     const cors = pm.response.headers.get('Access-Control-Allow-Origin');
-    console.log('CORS 设置:', cors);
+    console.log('CORS cài đặt:', cors);
 }
 ```
 
-#### 示例 10：数据提取和传递（API 链式调用）
+#### Ví dụ 10：Trích xuất và phân phối dữ liệu (API cuộc gọi bị xâu chuỗi)
 
 ```javascript
-// 从 JSON 响应中提取嵌套数据
-pm.test("提取用户信息", function () {
+// Từ JSON Trích xuất dữ liệu lồng nhau từ phản hồi
+pm.test("Trích xuất thông tin người dùng", function () {
     const jsonData = pm.response.json();
 
-    // 假设响应结构：{ data: { user: { id: 123, name: "John" } } }
+    // Cấu trúc phản hồi giả định: .{ data: { user: { id: 123, name: "John" } } }
     pm.expect(jsonData).to.have.property('data');
 
     const userData = jsonData.data.user;
     pm.expect(userData).to.have.property('id');
     pm.expect(userData).to.have.property('name');
 
-    // 保存到环境变量供下一个请求使用
+    // Lưu vào các biến môi trường cho yêu cầu tiếp theo
     pm.environment.set('currentUserId', userData.id.toString());
     pm.environment.set('currentUserName', userData.name);
-    
-    // 如果有权限信息，也保存
+
+    // Nếu có thông tin về quyền, hãy lưu nó
     if (userData.roles) {
         pm.environment.set('userRoles', JSON.stringify(userData.roles));
     }
 });
 
-// 处理数组响应
-pm.test("处理数组数据", function () {
+// Xử lý các phản hồi mảng
+pm.test("Xử lý dữ liệu mảng", function () {
     const jsonData = pm.response.json();
 
-    // 假设响应是数组
+    // Giả sử phản hồi là một mảng
     pm.expect(Array.isArray(jsonData.items)).to.equal(true);
 
-    // 检查第一个元素
+    // Kiểm tra phần tử đầu tiên
     if (jsonData.items.length > 0) {
         const firstItem = jsonData.items[0];
         pm.expect(firstItem).to.have.property('id');
 
-        // 保存第一个项的 ID
+        // Lưu mục đầu tiên ID
         pm.environment.set('firstItemId', firstItem.id.toString());
     }
-    
-    // 保存整个列表的 ID 数组
+
+    // Lưu toàn bộ danh sách ID mảng
     const itemIds = jsonData.items.map(function(item) {
         return item.id;
     });
     pm.environment.set('allItemIds', JSON.stringify(itemIds));
-    console.log('提取了', itemIds.length, '个 ID');
+    console.log('Đã trích xuất', itemIds.length, 'cá nhân ID');
 });
 ```
 
-#### 示例 11：响应数据解密和验证
+#### Ví dụ 11：Giải mã và xác minh dữ liệu phản hồi
 
 ```javascript
 var CryptoJS = require('crypto-js');
 
 const jsonData = pm.response.json();
 
-pm.test("响应包含加密数据", function () {
+pm.test("Phản hồi chứa dữ liệu được mã hóa", function () {
     pm.expect(jsonData).to.have.property('encryptedData');
 });
 
-// 解密响应数据
+// Giải mã dữ liệu phản hồi
 if (jsonData.encryptedData) {
     const secretKey = pm.environment.get('encryptKey') || 'default-key';
-    
+
     try {
         const decryptedBytes = CryptoJS.AES.decrypt(jsonData.encryptedData, secretKey);
         const decryptedText = decryptedBytes.toString(CryptoJS.enc.Utf8);
         const decryptedData = JSON.parse(decryptedText);
-        
-        console.log('✓ 数据解密成功');
-        console.log('解密后的数据:', decryptedData);
-        
-        // 验证解密后的数据
-        pm.test("解密后的数据有效", function () {
+
+        console.log('✓ Giải mã dữ liệu thành công');
+        console.log('Dữ liệu được giải mã:', decryptedData);
+
+        // Xác minh dữ liệu được giải mã
+        pm.test("Dữ liệu được giải mã là hợp lệ", function () {
             pm.expect(decryptedData).to.have.property('userId');
             pm.expect(decryptedData).to.have.property('balance');
         });
-        
-        // 保存解密后的数据
+
+        // Lưu dữ liệu được giải mã
         pm.environment.set('decryptedUserId', decryptedData.userId);
         pm.environment.set('userBalance', decryptedData.balance.toString());
-        
+
     } catch (error) {
-        console.error('✗ 解密失败:', error.message);
-        pm.test("数据解密失败", function () {
-            throw new Error('解密失败: ' + error.message);
+        console.error('✗ Giải mã không thành công:', error.message);
+        pm.test("Giải mã dữ liệu không thành công", function () {
+            throw new Error('Giải mã không thành công: ' + error.message);
         });
     }
 }
 ```
 
-#### 示例 12：业务逻辑验证
+#### Ví dụ 12：Xác minh logic kinh doanh
 
 ```javascript
 var _ = require('lodash');
@@ -1828,132 +1828,132 @@ var moment = require('moment');
 
 const jsonData = pm.response.json();
 
-// 订单状态验证
-pm.test("订单状态有效", function () {
+// Xác minh trạng thái đơn hàng
+pm.test("Trạng thái đơn hàng là hợp lệ", function () {
     const validStatuses = ['pending', 'processing', 'completed', 'cancelled'];
     pm.expect(validStatuses).to.include(jsonData.order.status);
 });
 
-// 日期格式验证
-pm.test("日期格式正确", function () {
+// Xác thực định dạng ngày
+pm.test("Định dạng ngày là chính xác", function () {
     const createTime = jsonData.order.createTime;
     pm.expect(moment(createTime, moment.ISO_8601, true).isValid()).to.equal(true);
 });
 
-// 金额计算验证
-pm.test("订单金额计算正确", function () {
+// Xác minh tính toán số tiền
+pm.test("Số tiền đặt hàng được tính toán chính xác", function () {
     const items = jsonData.order.items;
     let calculatedTotal = _.sumBy(items, function(item) {
         return item.price * item.quantity;
     });
-    
-    // 加上运费
+
+    // Cộng với vận chuyển
     calculatedTotal += jsonData.order.shippingFee || 0;
-    
-    // 减去折扣
+
+    // Trừ đi giảm giá
     calculatedTotal -= jsonData.order.discount || 0;
-    
+
     calculatedTotal = _.round(calculatedTotal, 2);
-    
+
     pm.expect(calculatedTotal).to.equal(jsonData.order.totalAmount);
-    console.log('计算金额:', calculatedTotal, '订单金额:', jsonData.order.totalAmount);
+    console.log('Tính số tiền:', calculatedTotal, 'Số tiền đặt hàng:', jsonData.order.totalAmount);
 });
 
-// 库存验证
-pm.test("商品库存充足", function () {
+// Xác minh hàng tồn kho
+pm.test("Hàng đã có đầy đủ", function () {
     jsonData.order.items.forEach(function(item) {
         pm.expect(item.quantity).to.be.below(item.stock + 1);
         if (item.quantity > item.stock * 0.8) {
-            console.warn('⚠ 商品', item.name, '库存不足，剩余:', item.stock);
+            console.warn('⚠ hàng hóa', item.name, 'Hàng thiếu, thừa:', item.stock);
         }
     });
 });
 ```
 
-### 使用内置库示例
+### Sử dụng các ví dụ thư viện tích hợp
 
-#### 示例 1：CryptoJS 加密库
+#### Ví dụ 1：CryptoJS Thư viện tiền điện tử
 
 ```javascript
-// 直接使用全局变量 CryptoJS（无需 require）
-// var CryptoJS = require('crypto-js'); // 可选，也支持这种方式
+// Sử dụng trực tiếp các biến toàn cục CryptoJS（Không cần require）
+// var CryptoJS = require('crypto-js'); // Tùy chọn, phương pháp này cũng được hỗ trợ
 
-// 1. AES 加密/解密
+// 1. AES Mã hóa/Giải mã
 const message = 'secret message';
 const secretKey = 'my-secret-key-123';
 
-// 加密
+// Mã hóa
 const encrypted = CryptoJS.AES.encrypt(message, secretKey).toString();
 pm.environment.set('encrypted', encrypted);
-console.log('AES 加密:', encrypted);
+console.log('AES Mã hóa:', encrypted);
 
-// 解密
+// Giải mã
 const decrypted = CryptoJS.AES.decrypt(encrypted, secretKey);
 const decryptedText = decrypted.toString(CryptoJS.enc.Utf8);
-console.log('AES 解密:', decryptedText);
+console.log('AES Giải mã:', decryptedText);
 
-// 2. MD5 哈希
+// 2. MD5 Băm
 const password = 'myPassword123';
 const md5Hash = CryptoJS.MD5(password).toString();
-console.log('MD5 哈希:', md5Hash);
+console.log('MD5 Băm:', md5Hash);
 pm.environment.set('passwordHash', md5Hash);
 
-// 3. SHA256 哈希
+// 3. SHA256 Băm
 const sha256Hash = CryptoJS.SHA256(password).toString();
-console.log('SHA256 哈希:', sha256Hash);
+console.log('SHA256 Băm:', sha256Hash);
 
-// 4. HMAC-SHA256 签名
+// 4. HMAC-SHA256 dấu hiệu
 const timestamp = Date.now().toString();
 const data = 'userId=123&timestamp=' + timestamp;
 const hmacKey = 'my-hmac-key';
 const signature = CryptoJS.HmacSHA256(data, hmacKey).toString();
-console.log('HMAC-SHA256 签名:', signature);
+console.log('HMAC-SHA256 dấu hiệu:', signature);
 
-// 5. Base64 编码/解码
+// 5. Base64 Mã hóa/giải mã
 const text = 'Hello World';
 const base64Encoded = CryptoJS.enc.Base64.stringify(CryptoJS.enc.Utf8.parse(text));
-console.log('Base64 编码:', base64Encoded);
+console.log('Base64 Mã hóa:', base64Encoded);
 
 const base64Decoded = CryptoJS.enc.Base64.parse(base64Encoded).toString(CryptoJS.enc.Utf8);
-console.log('Base64 解码:', base64Decoded);
+console.log('Base64 giải mã:', base64Decoded);
 
-// 6. 生成随机字符串
+// 6. Tạo một chuỗi ngẫu nhiên
 const randomBytes = CryptoJS.lib.WordArray.random(16);
 const randomString = randomBytes.toString(CryptoJS.enc.Hex);
-console.log('随机字符串:', randomString);
+console.log('Chuỗi ngẫu nhiên:', randomString);
 pm.environment.set('nonce', randomString);
 ```
 
-#### 示例 2：Lodash 数据处理库
+#### Ví dụ 2：Lodash Thư viện xử lý dữ liệu
 
 ```javascript
-// 直接使用全局变量 _（无需 require）
-// var _ = require('lodash'); // 可选，也支持这种方式
+// Sử dụng trực tiếp các biến toàn cục _（Không cần require）
+// var _ = require('lodash'); // Tùy chọn, phương pháp này cũng được hỗ trợ
 
-// 1. 数组操作
+// 1. Hoạt động mảng
 const numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 
-// 过滤
+// lọc
 const filtered = _.filter(numbers, function (n) {
     return n > 5;
 });
-console.log('过滤结果:', filtered); // [6, 7, 8, 9, 10]
+console.log('Lọc kết quả:', filtered); // [6, 7, 8, 9, 10]
 
-// 映射
+// lập bản đồ
 const doubled = _.map(numbers, function(n) {
     return n * 2;
 });
-console.log('映射结果:', doubled);
+console.log('Kết quả bản đồ:', doubled);
 
-// 求和
+// Tổng hợp
 const sum = _.sum(numbers);
-console.log('数组求和:', sum);
+console.log('Tổng hợp mảng:', sum);
 
-// 取平均值
+// Lấy mức trung bình
 const avg = _.mean(numbers);
-console.log('平均值:', avg);
+console.log('giá trị trung bình:', avg);
 
-// 2. 对象操作
+// 2. Hoạt động đối tượng
 const user = {
     id: 123,
     name: 'John Doe',
@@ -1962,23 +1962,23 @@ const user = {
     city: 'Beijing'
 };
 
-// 提取属性值
+// Trích xuất các giá trị thuộc tính
 const values = _.values(user);
-console.log('对象值:', values);
+console.log('giá trị đối tượng:', values);
 
-// 提取属性名
+// Trích xuất tên thuộc tính
 const keys = _.keys(user);
-console.log('对象键:', keys);
+console.log('Khóa đối tượng:', keys);
 
-// 挑选特定属性
+// Chọn thuộc tính cụ thể
 const picked = _.pick(user, ['id', 'name', 'email']);
-console.log('挑选属性:', picked);
+console.log('Chọn thuộc tính:', picked);
 
-// 省略特定属性
+// Bỏ qua các thuộc tính cụ thể
 const omitted = _.omit(user, ['age', 'city']);
-console.log('省略属性:', omitted);
+console.log('Bỏ qua các thuộc tính:', omitted);
 
-// 3. 集合操作
+// 3. Hoạt động thu thập
 const users = [
     { id: 1, name: 'Alice', age: 25, role: 'admin' },
     { id: 2, name: 'Bob', age: 30, role: 'user' },
@@ -1986,226 +1986,226 @@ const users = [
     { id: 4, name: 'David', age: 28, role: 'admin' }
 ];
 
-// 查找
+// Tìm thấy
 const admin = _.find(users, { role: 'admin' });
-console.log('第一个管理员:', admin);
+console.log('Người quản trị đầu tiên:', admin);
 
-// 过滤
+// lọc
 const admins = _.filter(users, { role: 'admin' });
-console.log('所有管理员:', admins);
+console.log('Tất cả các quản trị viên:', admins);
 
-// 分组
+// Nhóm
 const grouped = _.groupBy(users, 'role');
-console.log('按角色分组:', grouped);
+console.log('Nhóm theo vai trò:', grouped);
 
-// 排序
+// Loại
 const sorted = _.sortBy(users, ['age']);
-console.log('按年龄排序:', sorted);
+console.log('Sắp xếp theo độ tuổi:', sorted);
 
-// 提取特定字段
+// Trích xuất các trường cụ thể
 const names = _.map(users, 'name');
-console.log('所有姓名:', names);
+console.log('Tất cả các tên:', names);
 
-// 统计
+// số liệu thống kê
 const sumAges = _.sumBy(users, 'age');
-console.log('年龄总和:', sumAges);
+console.log('Tổng số tuổi:', sumAges);
 
-// 4. 字符串操作
+// 4. Hoạt động chuỗi
 const str = 'hello world';
 const capitalized = _.capitalize(str);
-console.log('首字母大写:', capitalized);
+console.log('Viết hoa chữ cái đầu tiên:', capitalized);
 
 const camelCase = _.camelCase('hello-world-example');
-console.log('驼峰命名:', camelCase); // helloWorldExample
+console.log('Đặt tên bướu:', camelCase); // helloWorldExample
 
 const snakeCase = _.snakeCase('helloWorldExample');
-console.log('蛇形命名:', snakeCase); // hello_world_example
+console.log('Đặt tên cho rắn:', snakeCase); // hello_world_example
 
-// 5. 随机数生成
+// 5. Tạo số ngẫu nhiên
 const randomNum = _.random(1, 100);
-console.log('随机整数:', randomNum);
+console.log('Số nguyên ngẫu nhiên:', randomNum);
 
 const randomFloat = _.random(1.5, 5.5, true);
-console.log('随机浮点数:', randomFloat);
+console.log('Số dấu phẩy động ngẫu nhiên:', randomFloat);
 
-// 6. 去重
+// 6. Loại bỏ trọng lượng
 const duplicates = [1, 2, 2, 3, 4, 4, 5];
 const unique = _.uniq(duplicates);
-console.log('去重结果:', unique);
+console.log('Loại bỏ kết quả trùng lặp:', unique);
 
-// 7. 数组操作
+// 7. Hoạt động mảng
 const arr1 = [1, 2, 3];
 const arr2 = [3, 4, 5];
 
-// 交集
+// ngã tư
 const intersection = _.intersection(arr1, arr2);
-console.log('交集:', intersection); // [3]
+console.log('ngã tư:', intersection); // [3]
 
-// 并集
+// Liên minh
 const union = _.union(arr1, arr2);
-console.log('并集:', union); // [1, 2, 3, 4, 5]
+console.log('Liên minh:', union); // [1, 2, 3, 4, 5]
 
-// 差集
+// bộ khác biệt
 const difference = _.difference(arr1, arr2);
-console.log('差集:', difference); // [1, 2]
+console.log('bộ khác biệt:', difference); // [1, 2]
 
-// 8. 深度克隆
+// 8. Nhân bản sâu
 const original = { a: 1, b: { c: 2 } };
 const cloned = _.cloneDeep(original);
 cloned.b.c = 999;
-console.log('原始对象:', original.b.c); // 2
-console.log('克隆对象:', cloned.b.c); // 999
+console.log('đối tượng ban đầu:', original.b.c); // 2
+console.log('Nhân bản đối tượng:', cloned.b.c); // 999
 
-// 9. 合并对象
+// 9. Hợp nhất các đối tượng
 const obj1 = { a: 1, b: 2 };
 const obj2 = { b: 3, c: 4 };
 const merged = _.merge({}, obj1, obj2);
-console.log('合并结果:', merged); // { a: 1, b: 3, c: 4 }
+console.log('Hợp nhất kết quả:', merged); // { a: 1, b: 3, c: 4 }
 
-// 10. 防抖和节流（在循环中使用）
+// 10. Chống rung và tiết lưu (dùng trong vòng lặp)
 const processData = _.debounce(function(data) {
-    console.log('处理数据:', data);
+    console.log('Xử lý dữ liệu:', data);
 }, 300);
 
-// 11. 链式调用
+// 11. Cuộc gọi chuỗi
 const result = _(numbers)
     .filter(function(n) { return n % 2 === 0; })
     .map(function(n) { return n * n; })
     .sum();
-console.log('偶数平方和:', result);
+console.log('Tổng các bình phương chẵn:', result);
 ```
 
-#### 示例 3：Moment.js 日期时间库
+#### Ví dụ 3：Moment.js Thư viện ngày và giờ
 
 ```javascript
-// 直接使用全局变量 moment（无需 require）
-// var moment = require('moment'); // 可选，也支持这种方式
+// Sử dụng trực tiếp các biến toàn cục moment（Không cần require）
+// var moment = require('moment'); // Tùy chọn, phương pháp này cũng được hỗ trợ
 
-// 1. 获取当前时间
+// 1. Lấy thời gian hiện tại
 const now = moment();
-console.log('当前时间:', now.format('YYYY-MM-DD HH:mm:ss'));
+console.log('thời điểm hiện tại:', now.format('YYYY-MM-DD HH:mm:ss'));
 
-// 2. 格式化日期
+// 2. Định dạng ngày
 const formatted = moment().format('YYYY-MM-DD HH:mm:ss');
 pm.environment.set('currentTime', formatted);
-console.log('格式化时间:', formatted);
+console.log('Định dạng thời gian:', formatted);
 
-// ISO 8601 格式
+// ISO 8601 định dạng
 const iso = moment().toISOString();
-console.log('ISO 格式:', iso);
+console.log('ISO định dạng:', iso);
 
-// Unix 时间戳
+// Unix dấu thời gian
 const timestamp = moment().unix();
-console.log('Unix 时间戳:', timestamp);
+console.log('Unix dấu thời gian:', timestamp);
 
-// 毫秒时间戳
+// Dấu thời gian mili giây
 const milliseconds = moment().valueOf();
-console.log('毫秒时间戳:', milliseconds);
+console.log('Dấu thời gian mili giây:', milliseconds);
 
-// 3. 解析日期
+// 3. Phân tích ngày
 const parsed1 = moment('2024-01-01', 'YYYY-MM-DD');
-console.log('解析日期:', parsed1.format('YYYY年MM月DD日'));
+console.log('Phân tích ngày:', parsed1.format('YYYYNămMMmặt trăngDDNgày'));
 
 const parsed2 = moment('01/15/2024', 'MM/DD/YYYY');
-console.log('美式日期:', parsed2.format('YYYY-MM-DD'));
+console.log('ngày Mỹ:', parsed2.format('YYYY-MM-DD'));
 
-// 从时间戳解析
+// Phân tích từ dấu thời gian
 const fromTimestamp = moment(1704067200000);
-console.log('时间戳解析:', fromTimestamp.format('YYYY-MM-DD HH:mm:ss'));
+console.log('Phân tích dấu thời gian:', fromTimestamp.format('YYYY-MM-DD HH:mm:ss'));
 
-// 4. 日期计算
+// 4. Tính toán ngày
 const tomorrow = moment().add(1, 'days');
-console.log('明天:', tomorrow.format('YYYY-MM-DD'));
+console.log('ngày mai:', tomorrow.format('YYYY-MM-DD'));
 
 const nextWeek = moment().add(1, 'weeks');
-console.log('下周:', nextWeek.format('YYYY-MM-DD'));
+console.log('tuần tới:', nextWeek.format('YYYY-MM-DD'));
 
 const nextMonth = moment().add(1, 'months');
-console.log('下月:', nextMonth.format('YYYY-MM-DD'));
+console.log('tháng tới:', nextMonth.format('YYYY-MM-DD'));
 
 const yesterday = moment().subtract(1, 'days');
-console.log('昨天:', yesterday.format('YYYY-MM-DD'));
+console.log('ngày hôm qua:', yesterday.format('YYYY-MM-DD'));
 
-// 5. 日期比较
+// 5. So sánh ngày
 const date1 = moment('2024-01-01');
 const date2 = moment('2024-12-31');
 
-console.log('date1 在 date2 之前:', date1.isBefore(date2)); // true
-console.log('date1 在 date2 之后:', date1.isAfter(date2)); // false
-console.log('日期相同:', date1.isSame(date2)); // false
+console.log('date1 Vào date2 Trước:', date1.isBefore(date2)); // true
+console.log('date1 Vào date2 sau đó:', date1.isAfter(date2)); // false
+console.log('Ngày tháng giống nhau:', date1.isSame(date2)); // false
 
-// 6. 日期差异
+// 6. Sự khác biệt ngày
 const start = moment('2024-01-01');
 const end = moment('2024-12-31');
 
 const diffDays = end.diff(start, 'days');
-console.log('相差天数:', diffDays);
+console.log('Sự khác biệt là ngày:', diffDays);
 
 const diffMonths = end.diff(start, 'months');
-console.log('相差月数:', diffMonths);
+console.log('Sự khác biệt là tháng:', diffMonths);
 
 const diffYears = end.diff(start, 'years');
-console.log('相差年数:', diffYears);
+console.log('Sự khác biệt trong năm:', diffYears);
 
-// 7. 开始和结束时间
+// 7. Thời gian bắt đầu và kết thúc
 const startOfDay = moment().startOf('day');
-console.log('今天开始:', startOfDay.format('YYYY-MM-DD HH:mm:ss'));
+console.log('Hãy bắt đầu ngay hôm nay:', startOfDay.format('YYYY-MM-DD HH:mm:ss'));
 
 const endOfDay = moment().endOf('day');
-console.log('今天结束:', endOfDay.format('YYYY-MM-DD HH:mm:ss'));
+console.log('Kết thúc ngày hôm nay:', endOfDay.format('YYYY-MM-DD HH:mm:ss'));
 
 const startOfMonth = moment().startOf('month');
-console.log('本月开始:', startOfMonth.format('YYYY-MM-DD'));
+console.log('Bắt đầu từ tháng này:', startOfMonth.format('YYYY-MM-DD'));
 
 const endOfMonth = moment().endOf('month');
-console.log('本月结束:', endOfMonth.format('YYYY-MM-DD'));
+console.log('Kết thúc trong tháng này:', endOfMonth.format('YYYY-MM-DD'));
 
-// 8. 相对时间
+// 8. thời gian tương đối
 const aWeekAgo = moment().subtract(7, 'days');
-console.log('一周前:', aWeekAgo.fromNow()); // 7 days ago
+console.log('một tuần trước:', aWeekAgo.fromNow()); // 7 days ago
 
 const inThreeDays = moment().add(3, 'days');
-console.log('三天后:', inThreeDays.fromNow()); // in 3 days
+console.log('Ba ngày sau:', inThreeDays.fromNow()); // in 3 days
 
-// 9. 验证日期
+// 9. Ngày xác minh
 const validDate = moment('2024-01-01', 'YYYY-MM-DD', true).isValid();
-console.log('日期有效:', validDate); // true
+console.log('Ngày hợp lệ:', validDate); // true
 
 const invalidDate = moment('2024-13-01', 'YYYY-MM-DD', true).isValid();
-console.log('日期无效:', invalidDate); // false
+console.log('Ngày không hợp lệ:', invalidDate); // false
 
-// 10. 实用场景：生成各种时间格式
+// 10. Tình huống thực tế: Tạo các định dạng thời gian khác nhau
 pm.environment.set('dateYMD', moment().format('YYYY-MM-DD'));
 pm.environment.set('dateYMDHMS', moment().format('YYYY-MM-DD HH:mm:ss'));
 pm.environment.set('dateISO', moment().toISOString());
 pm.environment.set('timestamp', moment().valueOf().toString());
-pm.environment.set('dateChina', moment().format('YYYY年MM月DD日 HH时mm分ss秒'));
+pm.environment.set('dateChina', moment().format('YYYYNămMMmặt trăngDDNgày HHthời gianmmđiểmssgiây'));
 
-// 11. 时区处理（如果支持）
+// 11. Xử lý múi giờ (nếu được hỗ trợ)
 const utc = moment.utc();
-console.log('UTC 时间:', utc.format('YYYY-MM-DD HH:mm:ss'));
+console.log('UTC thời gian:', utc.format('YYYY-MM-DD HH:mm:ss'));
 
-// 12. 业务场景：生成时间范围
+// 12. Kịch bản kinh doanh: Phạm vi thời gian thế hệ
 const today = moment().startOf('day');
 const todayEnd = moment().endOf('day');
 
 pm.environment.set('queryStartTime', today.valueOf().toString());
 pm.environment.set('queryEndTime', todayEnd.valueOf().toString());
 
-console.log('查询开始时间:', today.format('YYYY-MM-DD HH:mm:ss'));
-console.log('查询结束时间:', todayEnd.format('YYYY-MM-DD HH:mm:ss'));
+console.log('Thời gian bắt đầu truy vấn:', today.format('YYYY-MM-DD HH:mm:ss'));
+console.log('Thời gian kết thúc truy vấn:', todayEnd.format('YYYY-MM-DD HH:mm:ss'));
 ```
 
-#### 示例 4：组合使用多个库
+#### Ví dụ 4：Sử dụng kết hợp nhiều thư viện
 
 ```javascript
 var _ = require('lodash');
 var moment = require('moment');
 var CryptoJS = require('crypto-js');
 
-// 场景：生成带签名的 API 请求
+// Kịch bản: Tạo chữ ký API yêu cầu
 
-// 1. 准备请求参数
+// 1. Chuẩn bị các thông số yêu cầu
 const params = {
     userId: pm.environment.get('userId') || '123',
     timestamp: moment().valueOf().toString(),
@@ -2213,38 +2213,38 @@ const params = {
     action: 'getUserInfo'
 };
 
-// 2. 按键名排序参数
+// 2. Sắp xếp các tham số theo tên khóa
 const sortedKeys = _.keys(params).sort();
-console.log('排序后的键:', sortedKeys);
+console.log('Các phím được sắp xếp:', sortedKeys);
 
-// 3. 拼接签名字符串
+// 3. Nối chuỗi chữ ký
 const signString = _.map(sortedKeys, function(key) {
     return key + '=' + params[key];
 }).join('&');
-console.log('签名字符串:', signString);
+console.log('Chuỗi chữ ký:', signString);
 
-// 4. 生成签名
+// 4. Tạo chữ ký
 const secretKey = pm.environment.get('secretKey') || 'default-secret';
 const signature = CryptoJS.HmacSHA256(signString, secretKey).toString();
-console.log('签名:', signature);
+console.log('dấu hiệu:', signature);
 
-// 5. 保存到环境变量
+// 5. Lưu vào các biến môi trường
 pm.environment.set('requestTimestamp', params.timestamp);
 pm.environment.set('requestNonce', params.nonce);
 pm.environment.set('requestSignature', signature);
 
-// 6. 打印完整请求参数
+// 6. In các thông số yêu cầu đầy đủ
 const fullParams = _.assign({}, params, { signature: signature });
-console.log('完整请求参数:', JSON.stringify(fullParams, null, 2));
+console.log('Hoàn thành các tham số yêu cầu:', JSON.stringify(fullParams, null, 2));
 ```
 
-#### 示例 5：数据模拟生成器
+#### Ví dụ 5：Trình tạo mô phỏng dữ liệu
 
 ```javascript
 var _ = require('lodash');
 var moment = require('moment');
 
-// 生成批量测试数据
+// Tạo dữ liệu kiểm tra hàng loạt
 const mockUsers = _.times(10, function(index) {
     return {
         id: 1000 + index,
@@ -2260,38 +2260,38 @@ const mockUsers = _.times(10, function(index) {
     };
 });
 
-console.log('生成了', mockUsers.length, '个模拟用户');
-console.log('示例用户:', JSON.stringify(mockUsers[0], null, 2));
+console.log('Đã tạo', mockUsers.length, 'người dùng mô phỏng');
+console.log('Người dùng ví dụ:', JSON.stringify(mockUsers[0], null, 2));
 
-// 保存第一个用户信息
+// Lưu thông tin người dùng đầu tiên
 pm.environment.set('testUserId', mockUsers[0].id.toString());
 pm.environment.set('testUsername', mockUsers[0].username);
 pm.environment.set('mockUsersData', JSON.stringify(mockUsers));
 
-// 统计信息
+// Thống kê
 const avgAge = _.meanBy(mockUsers, 'age');
 const avgScore = _.meanBy(mockUsers, 'score');
 const activeCount = _.filter(mockUsers, { isActive: true }).length;
 
-console.log('平均年龄:', _.round(avgAge, 1));
-console.log('平均得分:', _.round(avgScore, 2));
-console.log('活跃用户数:', activeCount);
+console.log('Độ tuổi trung bình:', _.round(avgAge, 1));
+console.log('Điểm trung bình:', _.round(avgScore, 2));
+console.log('Số lượng người dùng đang hoạt động:', activeCount);
 ```
 
 ---
 
-## 高级代码片段示例
+## Ví dụ về đoạn mã nâng cao
 
-### 代码片段 1：OAuth 2.0 Token 自动刷新
+### Đoạn mã 1：OAuth 2.0 Token Tự động làm mới
 
 ```javascript
-// Pre-request Script: 自动检查和刷新 Token
+// Pre-request Script: Tự động kiểm tra và làm mới Token
 const tokenExpireTime = pm.environment.get('tokenExpireTime');
 const currentTime = Date.now();
 
-// 检查 token 是否过期（提前5分钟刷新）
+// nghiên cứu token Cho dù nó hết hạn (trước5phút để làm mới)
 if (!tokenExpireTime || currentTime > (parseInt(tokenExpireTime) - 300000)) {
-    console.log('Token 即将过期或已过期，需要刷新');
+    console.log('Token Nó sắp hết hạn hoặc đã hết hạn và cần được làm mới');
     pm.sendRequest({
         url: pm.environment.get('authUrl'),
         method: 'POST',
@@ -2306,7 +2306,7 @@ if (!tokenExpireTime || currentTime > (parseInt(tokenExpireTime) - 300000)) {
         }
     }, function (err, response) {
         if (err) {
-            console.error('刷新 token 失败:', err.message);
+            console.error('Làm mới token thất bại:', err.message);
             return;
         }
 
@@ -2318,7 +2318,7 @@ if (!tokenExpireTime || currentTime > (parseInt(tokenExpireTime) - 300000)) {
                 key: 'Authorization',
                 value: 'Bearer ' + token
             });
-            console.log('✓ Token 刷新成功，已更新认证头');
+            console.log('✓ Token Việc làm mới thành công và tiêu đề xác thực đã được cập nhật');
         }
     });
 } else {
@@ -2328,33 +2328,33 @@ if (!tokenExpireTime || currentTime > (parseInt(tokenExpireTime) - 300000)) {
             key: 'Authorization',
             value: 'Bearer ' + token
         });
-        console.log('✓ Token 有效，已添加认证头');
+        console.log('✓ Token Hợp lệ, tiêu đề xác thực đã được thêm');
     }
 }
 ```
 
-### 代码片段 2：接口限流处理（本地计数）
+### Đoạn mã 2：Giao diện xử lý giới hạn dòng điện (đếm cục bộ)
 
 ```javascript
-// Pre-request Script: 本地请求限流检查
+// Pre-request Script: Yêu cầu địa phương kiểm tra giới hạn hiện tại
 const lastRequestTime = pm.environment.get('lastRequestTime');
-const minInterval = 100; // 最小请求间隔（毫秒）
+const minInterval = 100; // Khoảng thời gian yêu cầu tối thiểu (mili giây)
 
 if (lastRequestTime) {
     const timeSinceLastRequest = Date.now() - parseInt(lastRequestTime);
     if (timeSinceLastRequest < minInterval) {
         const waitTime = minInterval - timeSinceLastRequest;
-        console.warn('⚠ 请求过于频繁，建议等待', waitTime, 'ms');
+        console.warn('⚠ Yêu cầu quá thường xuyên, nên chờ đợi', waitTime, 'ms');
     }
 }
 
 pm.environment.set('lastRequestTime', Date.now().toString());
 ```
 
-### 代码片段 3：动态环境切换
+### Đoạn mã 3：Chuyển đổi môi trường năng động
 
 ```javascript
-// Pre-request Script: 根据变量切换环境配置
+// Pre-request Script: Chuyển đổi cấu hình môi trường dựa trên các biến
 const env = pm.environment.get('ENV') || 'dev';
 
 const configs = {
@@ -2382,33 +2382,33 @@ const configs = {
 
 const config = configs[env];
 if (!config) {
-    throw new Error('未知环境: ' + env);
+    throw new Error('Môi trường không xác định: ' + env);
 }
 
-// 应用配置
+// Áp dụng cấu hình
 pm.environment.set('baseUrl', config.baseUrl);
 pm.environment.set('timeout', config.timeout.toString());
 pm.environment.set('debug', config.debug.toString());
 
-// 添加环境标识头
+// Thêm tiêu đề nhận dạng môi trường
 pm.request.headers.upsert({
     key: 'X-Environment',
     value: env
 });
 
-console.log('✓ 已切换到', env, '环境');
+console.log('✓ Đã chuyển sang', env, 'môi trường');
 console.log('  Base URL:', config.baseUrl);
 console.log('  Timeout:', config.timeout);
 ```
 
-### 代码片段 4：请求体动态模板填充
+### Đoạn mã 4：Dynamic template filling of request body
 
 ```javascript
-// Pre-request Script: JSON 模板动态替换
+// Pre-request Script: JSON Mẫu thay thế động
 var _ = require('lodash');
 var moment = require('moment');
 
-// 定义请求体模板（可以从环境变量获取）
+// Xác định mẫu nội dung yêu cầu (có thể lấy từ các biến môi trường)
 const requestTemplate = {
     "requestId": "{{requestId}}",
     "timestamp": "{{timestamp}}",
@@ -2422,7 +2422,7 @@ const requestTemplate = {
     }
 };
 
-// 准备替换数据
+// Chuẩn bị thay thế dữ liệu
 const templateData = {
     requestId: pm.uuid(),
     timestamp: moment().valueOf(),
@@ -2434,7 +2434,7 @@ const templateData = {
     pageSize: 20
 };
 
-// 替换模板
+// Thay thế mẫu
 let requestBodyStr = JSON.stringify(requestTemplate);
 _.forEach(templateData, function(value, key) {
     const placeholder = '{{' + key + '}}';
@@ -2442,35 +2442,35 @@ _.forEach(templateData, function(value, key) {
 });
 
 const requestBody = JSON.parse(requestBodyStr);
-console.log('生成的请求体:', JSON.stringify(requestBody, null, 2));
+console.log('Nội dung yêu cầu được tạo:', JSON.stringify(requestBody, null, 2));
 
-// 保存到环境变量供请求使用
+// Lưu vào các biến môi trường để sử dụng theo yêu cầu
 pm.environment.set('dynamicRequestBody', JSON.stringify(requestBody));
 ```
 
-### 代码片段 5：批量参数验证器
+### Đoạn mã 5：Trình xác thực tham số hàng loạt
 
 ```javascript
-// Pre-request Script: 请求参数验证
+// Pre-request Script: Yêu cầu xác thực tham số
 const validationRules = {
     userId: {
         required: true,
         type: 'string',
         pattern: /^[0-9]+$/,
-        message: 'userId 必须是数字字符串'
+        message: 'userId Phải là một chuỗi số'
     },
     email: {
         required: false,
         type: 'string',
         pattern: /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/,
-        message: 'email 格式不正确'
+        message: 'email Định dạng không chính xác'
     },
     age: {
         required: false,
         type: 'number',
         min: 0,
         max: 150,
-        message: 'age 必须在 0-150 之间'
+        message: 'age Phải ở đó 0-150 giữa'
     }
 };
 
@@ -2482,88 +2482,88 @@ const params = {
 
 const errors = [];
 
-// 执行验证
+// Thực hiện xác minh
 Object.keys(validationRules).forEach(function(key) {
     const rule = validationRules[key];
     const value = params[key];
-    
-    // 必填校验
+
+    // Xác thực là cần thiết
     if (rule.required && (!value || value === '')) {
-        errors.push(key + ' 是必填项');
+        errors.push(key + ' được yêu cầu');
         return;
     }
-    
+
     if (value !== undefined && value !== null && value !== '') {
-        // 类型校验
+        // Kiểm tra kiểu
         if (rule.type === 'number' && typeof value !== 'number') {
-            errors.push(key + ' 必须是数字类型');
+            errors.push(key + ' Phải có kiểu số');
         }
-        
-        // 正则校验
+
+        // Kiểm tra thường xuyên
         if (rule.pattern && !rule.pattern.test(String(value))) {
-            errors.push(rule.message || key + ' 格式不正确');
+            errors.push(rule.message || key + ' Định dạng không chính xác');
         }
-        
-        // 范围校验
+
+        // Kiểm tra phạm vi
         if (rule.type === 'number') {
             if (rule.min !== undefined && value < rule.min) {
-                errors.push(key + ' 不能小于 ' + rule.min);
+                errors.push(key + ' không thể ít hơn ' + rule.min);
             }
             if (rule.max !== undefined && value > rule.max) {
-                errors.push(key + ' 不能大于 ' + rule.max);
+                errors.push(key + ' Không thể lớn hơn ' + rule.max);
             }
         }
     }
 });
 
 if (errors.length > 0) {
-    console.error('参数验证失败:');
+    console.error('Xác thực tham số không thành công:');
     errors.forEach(function(error) {
         console.error('  ✗', error);
     });
-    throw new Error('参数验证失败: ' + errors.join('; '));
+    throw new Error('Xác thực tham số không thành công: ' + errors.join('; '));
 } else {
-    console.log('✓ 所有参数验证通过');
+    console.log('✓ Tất cả các tham số được xác minh đã thông qua');
 }
 ```
 
-### 代码片段 6：响应数据提取链（链式调用场景）
+### Đoạn mã 6：Chuỗi trích xuất dữ liệu phản hồi (kịch bản cuộc gọi chuỗi)
 
 ```javascript
-// Post-request Script: 从复杂嵌套响应中提取数据
+// Post-request Script: Trích xuất dữ liệu từ các phản hồi lồng nhau phức tạp
 var _ = require('lodash');
 
 const jsonData = pm.response.json();
 
-pm.test("响应结构正确", function () {
+pm.test("Cấu trúc phản hồi là chính xác", function () {
     pm.response.to.have.status(200);
     pm.expect(jsonData.code).to.equal(0);
 });
 
-// 使用 lodash 从复杂结构提取数据
+// sử dụng lodash Trích xuất dữ liệu từ các cấu trúc phức tạp
 const extractedData = {
-    // 提取用户 ID 列表
+    // Trích xuất người dùng ID danh sách
     userIds: _.map(_.get(jsonData, 'data.users', []), 'id'),
-    
-    // 提取第一个用户的详细信息
+
+    // Trích xuất thông tin chi tiết của người dùng đầu tiên
     firstUser: _.get(jsonData, 'data.users[0]', null),
-    
-    // 提取所有管理员
+
+    // Trích xuất tất cả các quản trị viên
     admins: _.filter(_.get(jsonData, 'data.users', []), { role: 'admin' }),
-    
-    // 计算总金额
+
+    // Tính tổng số tiền
     totalAmount: _.sumBy(_.get(jsonData, 'data.orders', []), 'amount'),
-    
-    // 按状态分组订单
+
+    // Nhóm đơn hàng theo trạng thái
     ordersByStatus: _.groupBy(_.get(jsonData, 'data.orders', []), 'status'),
-    
-    // 提取分页信息
+
+    // Trích xuất thông tin phân trang
     pagination: _.pick(_.get(jsonData, 'data', {}), ['pageNum', 'pageSize', 'total'])
 };
 
-console.log('提取的数据:', JSON.stringify(extractedData, null, 2));
+console.log('Dữ liệu được trích xuất:', JSON.stringify(extractedData, null, 2));
 
-// 保存关键信息到环境变量
+// Lưu thông tin quan trọng vào các biến môi trường
 if (extractedData.firstUser) {
     pm.environment.set('firstUserId', extractedData.firstUser.id);
     pm.environment.set('firstUserName', extractedData.firstUser.name);
@@ -2575,20 +2575,20 @@ if (extractedData.userIds.length > 0) {
 
 pm.environment.set('totalAmount', extractedData.totalAmount.toString());
 
-console.log('✓ 提取了', extractedData.userIds.length, '个用户ID');
-console.log('✓ 总金额:', extractedData.totalAmount);
+console.log('✓ Đã trích xuất', extractedData.userIds.length, 'người dùngID');
+console.log('✓ một lần:', extractedData.totalAmount);
 ```
 
-### 代码片段 7：性能基准测试
+### Đoạn mã 7：Điểm chuẩn hiệu suất
 
 ```javascript
-// Post-request Script: 性能监控和基准对比
+// Post-request Script: Giám sát hiệu suất và điểm chuẩn
 var _ = require('lodash');
 
 const responseTime = pm.response.responseTime;
 const endpoint = pm.request.url.getPath();
 
-// 定义性能基准（毫秒）
+// Xác định đường cơ sở hiệu suất (mili giây)
 const benchmarks = {
     '/api/user/login': 500,
     '/api/user/profile': 300,
@@ -2599,31 +2599,31 @@ const benchmarks = {
 
 const benchmark = benchmarks[endpoint] || benchmarks['default'];
 
-// 性能等级评估
+// Đánh giá mức độ thực hiện
 let performanceGrade = '';
 let performanceScore = 100;
 
 if (responseTime <= benchmark * 0.3) {
-    performanceGrade = 'A+ (优秀)';
+    performanceGrade = 'A+ (Tuyệt vời)';
     performanceScore = 100;
 } else if (responseTime <= benchmark * 0.5) {
-    performanceGrade = 'A (良好)';
+    performanceGrade = 'A (Tốt)';
     performanceScore = 90;
 } else if (responseTime <= benchmark * 0.8) {
-    performanceGrade = 'B (一般)';
+    performanceGrade = 'B (Trung bình)';
     performanceScore = 75;
 } else if (responseTime <= benchmark) {
-    performanceGrade = 'C (及格)';
+    performanceGrade = 'C (Đi qua)';
     performanceScore = 60;
 } else if (responseTime <= benchmark * 1.5) {
-    performanceGrade = 'D (较慢)';
+    performanceGrade = 'D (chậm hơn)';
     performanceScore = 40;
 } else {
-    performanceGrade = 'F (缓慢)';
+    performanceGrade = 'F (Từ từ thôi)';
     performanceScore = 20;
 }
 
-// 记录性能数据
+// Ghi lại dữ liệu hiệu suất
 const perfKey = 'perf_' + endpoint.replace(/\//g, '_');
 let perfHistory = pm.environment.get(perfKey);
 if (!perfHistory) {
@@ -2638,72 +2638,72 @@ if (!perfHistory) {
 
 perfHistory.push(responseTime);
 
-// 只保留最近10次记录
+// Chỉ giữ lại những gì gần đây nhất10hồ sơ
 if (perfHistory.length > 10) {
     perfHistory = _.takeRight(perfHistory, 10);
 }
 
 pm.environment.set(perfKey, JSON.stringify(perfHistory));
 
-// 计算平均响应时间
+// Tính thời gian phản hồi trung bình
 const avgResponseTime = _.mean(perfHistory);
 const minResponseTime = _.min(perfHistory);
 const maxResponseTime = _.max(perfHistory);
 
-// 输出性能报告
-console.log('=== 性能测试报告 ===');
-console.log('接口:', endpoint);
-console.log('本次响应时间:', responseTime, 'ms');
-console.log('性能等级:', performanceGrade, '(得分:', performanceScore + ')');
-console.log('性能基准:', benchmark, 'ms');
-console.log('历史平均:', _.round(avgResponseTime, 2), 'ms');
-console.log('最快响应:', minResponseTime, 'ms');
-console.log('最慢响应:', maxResponseTime, 'ms');
+// Báo cáo hiệu suất đầu ra
+console.log('=== Báo cáo thử nghiệm hiệu suất ===');
+console.log('giao diện:', endpoint);
+console.log('Thời gian phản hồi này:', responseTime, 'ms');
+console.log('Mức hiệu suất:', performanceGrade, '(ghi điểm:', performanceScore + ')');
+console.log('Điểm chuẩn hiệu suất:', benchmark, 'ms');
+console.log('trung bình lịch sử:', _.round(avgResponseTime, 2), 'ms');
+console.log('Phản hồi nhanh nhất:', minResponseTime, 'ms');
+console.log('Phản hồi chậm nhất:', maxResponseTime, 'ms');
 
-// 创建性能测试
-pm.test("性能测试: " + performanceGrade, function () {
+// Tạo các bài kiểm tra hiệu suất
+pm.test("Kiểm tra hiệu suất: " + performanceGrade, function () {
     pm.expect(responseTime).to.be.below(benchmark);
 });
 
-// 如果性能下降，发出警告
+// Cảnh báo nếu hiệu suất suy giảm
 if (responseTime > avgResponseTime * 1.5) {
-    console.warn('⚠️ 警告: 本次响应时间比平均值慢了', _.round((responseTime / avgResponseTime - 1) * 100, 1) + '%');
+    console.warn('⚠️ Cảnh báo: Thời gian phản hồi này chậm hơn mức trung bình', _.round((responseTime / avgResponseTime - 1) * 100, 1) + '%');
 }
 ```
 
-### 代码片段 8：数据一致性校验
+### Đoạn mã 8：Kiểm tra tính nhất quán dữ liệu
 
 ```javascript
-// Post-request Script: 复杂业务逻辑验证
+// Post-request Script: Xác thực logic kinh doanh phức tạp
 var _ = require('lodash');
 var moment = require('moment');
 
 const jsonData = pm.response.json();
 
-pm.test("订单数据一致性校验", function () {
+pm.test("Kiểm tra tính nhất quán của dữ liệu đặt hàng", function () {
     if (!jsonData.data || !jsonData.data.order) {
-        throw new Error('订单数据不存在');
+        throw new Error('Dữ liệu đơn hàng không tồn tại');
     }
-    
+
     const order = jsonData.data.order;
-    
-    // 1. 金额计算验证
+
+    // 1. Xác minh tính toán số tiền
     const calculatedSubtotal = _.sumBy(order.items, function(item) {
         return item.price * item.quantity;
     });
-    
+
     pm.expect(_.round(calculatedSubtotal, 2)).to.equal(order.subtotal);
-    console.log('✓ 小计金额正确:', order.subtotal);
-    
-    // 2. 总金额验证（小计 + 运费 - 折扣）
+    console.log('✓ Tổng số tiền là chính xác:', order.subtotal);
+
+    // 2. TotalAmountValidation(Subtotal + vận chuyển hàng hóa - Giảm giá)
     const calculatedTotal = _.round(
         order.subtotal + (order.shippingFee || 0) - (order.discount || 0),
         2
     );
     pm.expect(calculatedTotal).to.equal(order.totalAmount);
-    console.log('✓ 总金额正确:', order.totalAmount);
-    
-    // 3. 状态转换逻辑验证
+    console.log('✓ Tổng số tiền là chính xác:', order.totalAmount);
+
+    // 3. Xác minh logic chuyển trạng thái
     const validStatusFlow = {
         'pending': ['processing', 'cancelled'],
         'processing': ['shipped', 'cancelled'],
@@ -2715,39 +2715,39 @@ pm.test("订单数据一致性校验", function () {
         'cancelled': [],
         'refunded': []
     };
-    
+
     const currentStatus = order.status;
-    console.log('✓ 当前订单状态:', currentStatus);
-    
-    // 4. 日期逻辑验证
+    console.log('✓ Tình trạng đơn hàng hiện tại:', currentStatus);
+
+    // 4. Xác thực logic ngày
     if (order.createTime && order.updateTime) {
         const createTime = moment(order.createTime);
         const updateTime = moment(order.updateTime);
-        
+
         pm.expect(updateTime.isSameOrAfter(createTime)).to.equal(true);
-        console.log('✓ 更新时间不早于创建时间');
+        console.log('✓ Thời gian cập nhật không sớm hơn thời gian tạo');
     }
-    
-    // 5. 商品数量验证
+
+    // 5. Xác minh số lượng sản phẩm
     pm.expect(order.items.length).to.be.above(0);
-    
+
     order.items.forEach(function(item, index) {
-        // 数量必须大于0
+        // Số lượng phải lớn hơn0
         pm.expect(item.quantity).to.be.above(0);
-        
-        // 价格必须大于等于0
+
+        // Giá phải lớn hơn hoặc bằng0
         pm.expect(item.price).to.be.below(999999);
-        
-        // SKU 不能为空
+
+        // SKU Không thể để trống
         pm.expect(item.sku).to.be.a('string');
         pm.expect(item.sku.length).to.be.above(0);
-        
-        console.log('✓ 商品', (index + 1), '验证通过:', item.name);
+
+        console.log('✓ hàng hóa', (index + 1), 'Xác minh đã được thông qua:', item.name);
     });
 });
 
-// 6. 数据完整性检查
-pm.test("必填字段检查", function () {
+// 6. Kiểm tra tính toàn vẹn dữ liệu
+pm.test("Đã kiểm tra các trường bắt buộc", function () {
     const requiredFields = [
         'orderId',
         'userId',
@@ -2756,94 +2756,94 @@ pm.test("必填字段检查", function () {
         'createTime',
         'items'
     ];
-    
+
     const order = jsonData.data.order;
     requiredFields.forEach(function(field) {
         pm.expect(order).to.have.property(field);
         pm.expect(order[field]).to.not.equal(null);
         pm.expect(order[field]).to.not.equal(undefined);
-        console.log('✓ 字段', field, '存在且有值');
+        console.log('✓ lĩnh vực', field, 'Tồn tại và có giá trị');
     });
 });
 ```
 
-### 代码片段 9：自定义断言函数库
+### Đoạn mã 9：Thư viện chức năng xác nhận tùy chỉnh
 
 ```javascript
-// Post-request Script: 创建可复用的断言函数
+// Post-request Script: Tạo các hàm xác nhận có thể tái sử dụng
 
-// 定义自定义断言函数库
+// Xác định thư viện hàm xác nhận tùy chỉnh
 const customAssert = {
-    // 断言数组包含特定元素
+    // Khẳng định rằng một mảng chứa các phần tử cụ thể
     arrayContains: function(array, element, message) {
         const contains = array.indexOf(element) !== -1;
         if (!contains) {
-            throw new Error(message || '数组不包含元素: ' + element);
+            throw new Error(message || 'Mảng không chứa phần tử nào: ' + element);
         }
         return true;
     },
-    
-    // 断言字符串长度在范围内
+
+    // Khẳng định rằng độ dài chuỗi nằm trong phạm vi
     stringLengthBetween: function(str, min, max, message) {
         if (str.length < min || str.length > max) {
-            throw new Error(message || '字符串长度应在 ' + min + '-' + max + ' 之间');
+            throw new Error(message || 'Độ dài chuỗi phải ở mức  ' + min + '-' + max + ' giữa');
         }
         return true;
     },
-    
-    // 断言日期在范围内
+
+    // Khẳng định rằng ngày nằm trong phạm vi
     dateInRange: function(dateStr, startDate, endDate, message) {
         const date = new Date(dateStr);
         const start = new Date(startDate);
         const end = new Date(endDate);
-        
+
         if (date < start || date > end) {
-            throw new Error(message || '日期不在指定范围内');
+            throw new Error(message || 'Ngày nằm ngoài phạm vi được chỉ định');
         }
         return true;
     },
-    
-    // 断言对象结构匹配
+
+    // Khẳng định rằng cấu trúc đối tượng phù hợp
     objectMatchesSchema: function(obj, schema, message) {
         for (let key in schema) {
             if (!obj.hasOwnProperty(key)) {
-                throw new Error(message || '对象缺少字段: ' + key);
+                throw new Error(message || 'Đối tượng bị thiếu trường: ' + key);
             }
-            
+
             const expectedType = schema[key];
             const actualType = typeof obj[key];
-            
+
             if (actualType !== expectedType && !(expectedType === 'array' && Array.isArray(obj[key]))) {
-                throw new Error(message || '字段 ' + key + ' 类型错误，期望: ' + expectedType + '，实际: ' + actualType);
+                throw new Error(message || 'lĩnh vực ' + key + ' Lỗi gõ, dự kiến: ' + expectedType + '，thật sự: ' + actualType);
             }
         }
         return true;
     },
-    
-    // 断言枚举值
+
+    // Khẳng định giá trị liệt kê
     isOneOf: function(value, allowedValues, message) {
         if (allowedValues.indexOf(value) === -1) {
-            throw new Error(message || '值必须是以下之一: ' + allowedValues.join(', '));
+            throw new Error(message || 'Giá trị phải là một trong những giá trị sau: ' + allowedValues.join(', '));
         }
         return true;
     },
-    
-    // 断言数值范围
+
+    // Khẳng định phạm vi số
     numberInRange: function(num, min, max, message) {
         if (num < min || num > max) {
-            throw new Error(message || '数值应在 ' + min + '-' + max + ' 之间');
+            throw new Error(message || 'Giá trị phải ở  ' + min + '-' + max + ' giữa');
         }
         return true;
     }
 };
 
-// 使用自定义断言
+// Sử dụng xác nhận tùy chỉnh
 const jsonData = pm.response.json();
 
-pm.test("自定义断言测试", function () {
+pm.test("Kiểm tra xác nhận tùy chỉnh", function () {
     const user = jsonData.data.user;
-    
-    // 测试对象结构
+
+    // Cấu trúc đối tượng thử nghiệm
     customAssert.objectMatchesSchema(user, {
         id: 'string',
         name: 'string',
@@ -2851,34 +2851,34 @@ pm.test("自定义断言测试", function () {
         email: 'string',
         roles: 'array'
     });
-    console.log('✓ 对象结构匹配');
-    
-    // 测试枚举值
+    console.log('✓ So khớp cấu trúc đối tượng');
+
+    // Kiểm tra các giá trị liệt kê
     customAssert.isOneOf(user.status, ['active', 'inactive', 'suspended']);
-    console.log('✓ 状态值有效');
-    
-    // 测试数值范围
+    console.log('✓ Giá trị trạng thái là hợp lệ');
+
+    // Phạm vi giá trị kiểm tra
     customAssert.numberInRange(user.age, 0, 150);
-    console.log('✓ 年龄在有效范围内');
-    
-    // 测试字符串长度
+    console.log('✓ Độ tuổi nằm trong phạm vi hợp lệ');
+
+    // Kiểm tra độ dài chuỗi
     customAssert.stringLengthBetween(user.name, 1, 50);
-    console.log('✓ 名称长度有效');
-    
-    // 测试数组包含
+    console.log('✓ Độ dài tên là hợp lệ');
+
+    // Mảng thử nghiệm chứa
     customAssert.arrayContains(user.roles, 'user');
-    console.log('✓ 角色列表包含基础角色');
+    console.log('✓ Danh sách ký tự chứa các ký tự cơ sở');
 });
 ```
 
-### 代码片段 10：多语言国际化测试
+### Đoạn mã 10：Kiểm tra quốc tế hóa đa ngôn ngữ
 
 ```javascript
-// Pre-request Script: 国际化多语言测试
+// Pre-request Script: Kiểm tra đa ngôn ngữ quốc tế
 const languages = ['zh-CN', 'en-US', 'ja-JP', 'ko-KR', 'fr-FR'];
 const currentLang = pm.environment.get('testLanguage') || 'zh-CN';
 
-// 设置语言请求头
+// Đặt tiêu đề yêu cầu ngôn ngữ
 pm.request.headers.upsert({
     key: 'Accept-Language',
     value: currentLang
@@ -2889,23 +2889,23 @@ pm.request.headers.upsert({
     value: currentLang
 });
 
-console.log('当前测试语言:', currentLang);
+console.log('Ngôn ngữ kiểm tra hiện tại:', currentLang);
 
-// Post-request Script: 验证多语言响应
-pm.test("多语言响应验证", function () {
+// Post-request Script: Xác thực phản hồi đa ngôn ngữ
+pm.test("Xác thực phản hồi đa ngôn ngữ", function () {
     const jsonData = pm.response.json();
     const lang = pm.request.headers.get('Accept-Language') || 'zh-CN';
-    
-    // 检查响应中的语言字段
+
+    // Kiểm tra trường ngôn ngữ trong phản hồi
     if (jsonData.message) {
-        console.log('响应消息 (' + lang + '):', jsonData.message);
-        
-        // 验证中文响应包含中文字符
+        console.log('Trả lời tin nhắn (' + lang + '):', jsonData.message);
+
+        // Xác minh rằng phản hồi bằng tiếng Trung có chứa các ký tự tiếng Trung
         if (lang === 'zh-CN') {
             pm.expect(jsonData.message).to.match(/[\u4e00-\u9fa5]/);
         }
-        
-        // 验证英文响应只包含ASCII字符
+
+        // Xác minh rằng các câu trả lời bằng tiếng Anh chỉ chứaASCIInhân vật
         if (lang === 'en-US') {
             pm.expect(jsonData.message).to.match(/^[\x00-\x7F]*$/);
         }
@@ -2913,48 +2913,48 @@ pm.test("多语言响应验证", function () {
 });
 ```
 
-### 代码片段 11：幂等性测试
+### Đoạn mã 11：Kiểm tra sự bất lực
 
 ```javascript
-// Post-request Script: 幂等性验证（需要多次执行同一请求）
+// Post-request Script: Xác minh bình thường (yêu cầu thực hiện cùng một yêu cầu nhiều lần)
 const requestId = pm.environment.get('idempotencyTestId');
 const responseBody = pm.response.text();
 const responseHash = CryptoJS.MD5(responseBody).toString();
 
 if (!requestId) {
-    // 第一次请求，保存请求ID和响应哈希
+    // Yêu cầu đầu tiên, lưu yêu cầuIDvà hàm băm phản hồi
     pm.environment.set('idempotencyTestId', pm.uuid());
     pm.environment.set('idempotencyResponseHash', responseHash);
     pm.environment.set('idempotencyCount', '1');
-    console.log('幂等性测试：第1次请求，已保存响应基准');
+    console.log('Kiểm tra bất lực: Chương1yêu cầu, đường cơ sở phản hồi đã được lưu');
 } else {
-    // 后续请求，验证响应是否一致
+    // Đối với các yêu cầu tiếp theo, hãy xác minh xem các phản hồi có nhất quán hay không
     const savedHash = pm.environment.get('idempotencyResponseHash');
     let count = parseInt(pm.environment.get('idempotencyCount') || '1');
     count++;
     pm.environment.set('idempotencyCount', count.toString());
-    
-    pm.test("幂等性验证 - 第" + count + "次请求", function () {
+
+    pm.test("Xác minh bất lực - KHÔNG. " + count + "yêu cầu", function () {
         pm.expect(responseHash).to.equal(savedHash);
-        console.log('✓ 响应与第1次请求一致');
+        console.log('✓ Trả lời bằng không1Các yêu cầu là nhất quán');
     });
-    
-    console.log('幂等性测试：已执行', count, '次请求');
-    
-    // 完成5次测试后清理
+
+    console.log('Kiểm tra Idempotence: thực hiện', count, 'yêu cầu');
+
+    // Hoàn thành5Dọn dẹp sau mỗi lần kiểm tra
     if (count >= 5) {
         pm.environment.unset('idempotencyTestId');
         pm.environment.unset('idempotencyResponseHash');
         pm.environment.unset('idempotencyCount');
-        console.log('✓ 幂等性测试完成，已清理测试数据');
+        console.log('✓ Kiểm tra idempotence đã hoàn thành và dữ liệu kiểm tra đã được làm sạch');
     }
 }
 ```
 
-### 代码片段 12：响应时间统计图表数据生成
+### Đoạn mã 12：Tạo dữ liệu biểu đồ thống kê thời gian đáp ứng
 
 ```javascript
-// Post-request Script: 收集性能数据用于图表展示
+// Post-request Script: Thu thập dữ liệu hiệu suất để trình bày biểu đồ
 var moment = require('moment');
 var _ = require('lodash');
 
@@ -2962,7 +2962,7 @@ const endpoint = pm.request.url.getPath();
 const responseTime = pm.response.responseTime;
 const timestamp = moment().format('YYYY-MM-DD HH:mm:ss');
 
-// 获取历史数据
+// Lấy dữ liệu lịch sử
 let perfData = pm.environment.get('performanceChartData');
 if (!perfData) {
     perfData = [];
@@ -2974,7 +2974,7 @@ if (!perfData) {
     }
 }
 
-// 添加新数据点
+// Thêm điểm dữ liệu mới
 perfData.push({
     endpoint: endpoint,
     responseTime: responseTime,
@@ -2983,14 +2983,14 @@ perfData.push({
     success: pm.response.code === 200
 });
 
-// 保留最近100条记录
+// Giữ gần đây100hồ sơ
 if (perfData.length > 100) {
     perfData = _.takeRight(perfData, 100);
 }
 
 pm.environment.set('performanceChartData', JSON.stringify(perfData));
 
-// 按接口分组统计
+// Thống kê theo nhóm giao diện
 const groupedByEndpoint = _.groupBy(perfData, 'endpoint');
 const stats = {};
 
@@ -3007,124 +3007,124 @@ _.forEach(groupedByEndpoint, function(records, endpoint) {
     };
 });
 
-console.log('=== 性能统计数据 ===');
+console.log('=== Thống kê hiệu suất ===');
 console.log(JSON.stringify(stats, null, 2));
 
-// 保存统计数据
+// Lưu số liệu thống kê
 pm.environment.set('performanceStats', JSON.stringify(stats));
 ```
 
 ---
 
-## 注意事项
+## Những điều cần lưu ý
 
-1. **作用域限制**
-    - Postman 中 `pm.response` 主要用于 Post-response 脚本
-    - EasyPostman 在 Pre-request 中提供空响应对象作为向后兼容扩展，不应依赖其中的数据
+1. **Hạn chế phạm vi**
+    - Postman ở giữa `pm.response` Chủ yếu được sử dụng cho Post-response kịch bản
+    - EasyPostman Vào Pre-request Các đối tượng phản hồi trống được cung cấp dưới dạng tiện ích mở rộng tương thích ngược và không nên dựa vào dữ liệu bên trong chúng
 
-2. **变量类型**
-    - `pm.environment` 用于持久化变量存储
-    - `pm.variables` 是当前执行/运行作用域的临时变量，不会持久化
-    - `pm.globals` 用于应用级全局变量
-    - 环境变量会被持久化保存到文件，临时变量不会
+2. **Loại biến**
+    - `pm.environment` Được sử dụng để lưu trữ biến liên tục
+    - `pm.variables` là việc thực hiện hiện tại/Các biến tạm thời trong phạm vi đang chạy sẽ không được duy trì
+    - `pm.globals` Được sử dụng cho các biến toàn cục cấp ứng dụng
+    - Các biến môi trường sẽ được lưu vào các tệp, các biến tạm thời thì không
 
-3. **断言范围**
-    - 已支持常用 Chai BDD 链，包括相等、包含、属性、类型、正则、长度、数值范围、键和成员等
-    - 尚未承诺与完整 Chai 插件生态逐项一致；迁移复杂断言时应运行兼容测试
+3. **Phạm vi khẳng định**
+    - Những cái thường được sử dụng được hỗ trợ Chai BDD Chuỗi, bao gồm đẳng thức, bao gồm, thuộc tính, loại, tính đều đặn, độ dài, phạm vi số, khóa và thành viên, v.v
+    - Chưa cam kết và đầy đủ Chai Hệ sinh thái plug-in nhất quán theo từng mục; nên chạy thử nghiệm khả năng tương thích khi di chuyển các xác nhận phức tạp
 
-4. **Cookie 管理**
-    - `pm.cookies` 提供当前请求域的 Cookie 访问
-    - `pm.cookies.jar()` 可以跨域管理 Cookie，需要完整的 URL
-    - Cookie 操作是异步的，使用回调函数处理结果
+4. **Cookie quản lý**
+    - `pm.cookies` Cung cấp miền yêu cầu hiện tại Cookie thăm
+    - `pm.cookies.jar()` Có thể được quản lý trên các miền Cookie，Cần phải đầy đủ URL
+    - Cookie Hoạt động không đồng bộ, sử dụng các hàm gọi lại để xử lý kết quả
 
-5. **类型转换**
-    - 使用 `pm.response.json()` 前确保响应是合法的 JSON 格式
-    - 环境变量存储时会自动转换为字符串
-    - 使用 `.toString()` 确保数值类型正确转换
+5. **Chuyển đổi kiểu**
+    - sử dụng `pm.response.json()` Trước khi đảm bảo phản hồi là hợp pháp JSON định dạng
+    - Các biến môi trường được tự động chuyển đổi thành chuỗi khi được lưu trữ
+    - sử dụng `.toString()` Đảm bảo các loại số được chuyển đổi chính xác
 
-6. **集合操作**
-    - 标准路径是 `pm.request.headers`、`pm.request.url.query`、`pm.request.body.formdata` 和 `pm.request.body.urlencoded`
-    - 对这些集合的修改会直接影响实际发送的请求（仅在 Pre-request 中有效）
-    - 使用 `add()`、`remove()`、`upsert()` 进行集合操作
+6. **Hoạt động thu thập**
+    - Đường dẫn tiêu chuẩn là `pm.request.headers`、`pm.request.url.query`、`pm.request.body.formdata` và `pm.request.body.urlencoded`
+    - Các sửa đổi đối với các bộ sưu tập này ảnh hưởng trực tiếp đến các yêu cầu thực tế được gửi (chỉ trong  Pre-request hợp lệ)
+    - sử dụng `add()`、`remove()`、`upsert()` Thực hiện các hoạt động thu thập
 
-7. **内置库**
-    - 支持 `crypto-js`、`lodash`、`moment` 三个内置库
-    - ✅ **推荐**：直接使用全局变量 `CryptoJS`、`_`、`moment`（已预加载）
-    - ✅ **也支持**：使用 `require('library-name')` 加载
-    - 库代码会被缓存，重复加载不会影响性能
+7. **Thư viện tích hợp**
+    - Hỗ trợ `crypto-js`、`lodash`、`moment` Ba thư viện tích hợp
+    - ✅ **gợi ý**：Sử dụng trực tiếp các biến toàn cục `CryptoJS`、`_`、`moment`（được tải trước)
+    - ✅ **Cũng được hỗ trợ**：sử dụng `require('library-name')` trọng tải
+    - Mã thư viện sẽ được lưu vào bộ nhớ đệm và việc tải lặp lại sẽ không ảnh hưởng đến hiệu suất
 
-8. **尚未完全兼容的功能**
+8. **Các tính năng chưa tương thích hoàn toàn**
     - `pm.collectionVariables`
     - `pm.execution`、`pm.visualizer`、`pm.vault`、`pm.require`
-    - `pm.sendRequest()` 和 Cookie Jar 的 Promise 形式
+    - `pm.sendRequest()` và Cookie Jar của Promise hình thức
 
 ---
 
-## 快速参考
+## Tham khảo nhanh
 
-### 常用 API 速查
+### Thường được sử dụng API Kiểm tra nhanh
 
 ```javascript
-// ===== 环境变量 =====
-pm.environment.set('key', 'value')        // 设置
-pm.environment.get('key')                 // 获取
-pm.environment.has('key')                 // 检查
-pm.environment.unset('key')               // 删除
-pm.environment.clear()                    // 清空
+// ===== các biến môi trường =====
+pm.environment.set('key', 'value')        // cài đặt
+pm.environment.get('key')                 // Lấy
+pm.environment.has('key')                 // nghiên cứu
+pm.environment.unset('key')               // xóa bỏ
+pm.environment.clear()                    // Trống
 
-// ===== 全局变量 =====
-pm.globals.set('key', 'value')            // 设置全局变量
-pm.globals.get('key')                     // 获取全局变量
+// ===== Các biến toàn cầu =====
+pm.globals.set('key', 'value')            // Đặt các biến toàn cục
+pm.globals.get('key')                     // Nhận các biến toàn cục
 
-// ===== 临时变量 =====
-pm.variables.set('key', 'value')          // 设置
-pm.variables.get('key')                   // 获取
-pm.variables.has('key')                   // 检查
-pm.variables.unset('key')                 // 删除
+// ===== Các biến tạm thời =====
+pm.variables.set('key', 'value')          // cài đặt
+pm.variables.get('key')                   // Lấy
+pm.variables.has('key')                   // nghiên cứu
+pm.variables.unset('key')                 // xóa bỏ
 
-// ===== 请求操作 (Pre-request) =====
-pm.request.headers.add({key, value})      // 添加请求头
-pm.request.url.query.add({key, value})    // 添加查询参数
-pm.request.body.formdata.add({key, value, type: 'text'}) // 添加表单数据
-pm.request.body.update('new raw body')    // 更新 raw body
-pm.request.url.toString()                 // 获取 URL
+// ===== Yêu cầu hành động (Pre-request) =====
+pm.request.headers.add({key, value})      // Thêm tiêu đề yêu cầu
+pm.request.url.query.add({key, value})    // Thêm tham số truy vấn
+pm.request.body.formdata.add({key, value, type: 'text'}) // Thêm dữ liệu biểu mẫu
+pm.request.body.update('new raw body')    // đổi mới raw body
+pm.request.url.toString()                 // Lấy URL
 
-// ===== 响应访问 (Post-request) =====
-pm.response.code                          // 状态码
-pm.response.status                        // 状态文本
-pm.response.responseTime                  // 响应时间
-pm.response.text()                        // 响应文本
-pm.response.json()                        // 响应 JSON
-pm.response.headers.get('name')           // 获取响应头
-pm.response.size()                        // 响应大小
+// ===== Trả lời quyền truy cập (Post-request) =====
+pm.response.code                          // mã trạng thái
+pm.response.status                        // Văn bản trạng thái
+pm.response.responseTime                  // thời gian đáp ứng
+pm.response.text()                        // Văn bản phản hồi
+pm.response.json()                        // phản hồi JSON
+pm.response.headers.get('name')           // Nhận tiêu đề phản hồi
+pm.response.size()                        // Kích thước phản hồi
 
 // ===== Cookie =====
-pm.cookies.get('name')                    // 获取 Cookie
-pm.cookies.set({name, value})             // 设置 Cookie
-pm.cookies.has('name')                    // 检查 Cookie
-pm.getResponseCookie('name')              // 从响应获取
+pm.cookies.get('name')                    // Lấy Cookie
+pm.cookies.set({name, value})             // cài đặt Cookie
+pm.cookies.has('name')                    // nghiên cứu Cookie
+pm.getResponseCookie('name')              // Nhận được từ phản hồi
 
-// ===== 测试断言 =====
-pm.test("测试名", function () {            // 定义测试
-    pm.response.to.have.status(200)       // 断言状态码
-    pm.expect(value).to.equal(expected)   // 相等断言
-    pm.expect(str).to.include(substr)     // 包含断言
-    pm.expect(obj).to.have.property('k')  // 属性断言
-    pm.expect(str).to.match(/regex/)      // 正则断言
-    pm.expect(num).to.be.below(max)       // 数值断言
+// ===== Kiểm tra khẳng định =====
+pm.test("Tên thử nghiệm", function () {            // Xác định các bài kiểm tra
+    pm.response.to.have.status(200)       // Khẳng định mã trạng thái
+    pm.expect(value).to.equal(expected)   // Khẳng định bình đẳng
+    pm.expect(str).to.include(substr)     // Chứa các khẳng định
+    pm.expect(obj).to.have.property('k')  // Khẳng định tài sản
+    pm.expect(str).to.match(/regex/)      // Khẳng định thường xuyên
+    pm.expect(num).to.be.below(max)       // Khẳng định bằng số
 })
 
-// ===== 工具方法 =====
-pm.uuid()                                 // 生成 UUID
-pm.getTimestamp()                         // 获取时间戳
-console.log(message)                      // 输出日志
+// ===== Phương pháp công cụ =====
+pm.uuid()                                 // phát ra UUID
+pm.getTimestamp()                         // Nhận dấu thời gian
+console.log(message)                      // Nhật ký đầu ra
 
-// ===== 内置库（全局变量，直接使用）=====
-CryptoJS.MD5('text').toString()           // 加密库（全局变量 CryptoJS）
-_.random(1, 100)                          // 工具库（全局变量 _）
-moment().format('YYYY-MM-DD')             // 日期库（全局变量 moment）
+// ===== Thư viện tích hợp (biến toàn cục, được sử dụng trực tiếp)=====
+CryptoJS.MD5('text').toString()           // CryptoLibrary (biến toàn cục CryptoJS）
+_.random(1, 100)                          // Thư viện công cụ (biến toàn cục _）
+moment().format('YYYY-MM-DD')             // Thư viện ngày (biến toàn cục moment）
 
-// 也支持 require()
+// Cũng được hỗ trợ require()
 var CryptoJS = require('crypto-js')
 var _ = require('lodash')
 var moment = require('moment')
@@ -3132,10 +3132,10 @@ var moment = require('moment')
 
 ---
 
-## 参考资源
+## Tài nguyên tham khảo
 
-- [Postman 官方文档](https://learning.postman.com/docs/writing-scripts/intro-to-scripts/)
-- [Postman Runtime 请求 mutation 集成测试](https://github.com/postmanlabs/postman-runtime/blob/develop/test/integration/mutations/request.test.js)
-- [Postman Runtime 7.27.0 body mutation 变更](https://github.com/postmanlabs/postman-runtime/commit/3b998e4471919df458e09651de00d4a45e6f3bb2)
-- [Postman Collection SDK RequestBody 实现](https://github.com/postmanlabs/postman-collection/blob/develop/lib/collection/request-body.js)
-- [ChaiJS 断言库](https://www.chaijs.com/api/bdd/)
+- [Postman Tài liệu chính thức](https://learning.postman.com/docs/writing-scripts/intro-to-scripts/)
+- [Postman Runtime yêu cầu mutation Kiểm tra tích hợp](https://github.com/postmanlabs/postman-runtime/blob/develop/test/integration/mutations/request.test.js)
+- [Postman Runtime 7.27.0 body mutation thay đổi](https://github.com/postmanlabs/postman-runtime/commit/3b998e4471919df458e09651de00d4a45e6f3bb2)
+- [Postman Collection SDK RequestBody hoàn thành](https://github.com/postmanlabs/postman-collection/blob/develop/lib/collection/request-body.js)
+- [ChaiJS Thư viện khẳng định](https://www.chaijs.com/api/bdd/)

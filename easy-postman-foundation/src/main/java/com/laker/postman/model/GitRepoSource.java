@@ -1,7 +1,7 @@
 package com.laker.postman.model;
 
-// 枚举定义
+// Định nghĩa liệt kê
 public enum GitRepoSource {
-    INITIALIZED, // 本地初始化后推送到远程
-    CLONED       // 从远程仓库克隆
+    INITIALIZED, // Đẩy vào điều khiển từ xa sau khi khởi tạo cục bộ
+    CLONED       // Sao chép từ kho lưu trữ từ xa
 }

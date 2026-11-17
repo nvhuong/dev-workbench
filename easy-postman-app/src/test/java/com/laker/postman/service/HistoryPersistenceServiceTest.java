@@ -47,7 +47,7 @@ public class HistoryPersistenceServiceTest {
         assertNotNull(restored.getRequest());
         assertTrue(restored.getRequest().body.length() < largeBody.length());
         assertEquals(restored.getRequest().body, restored.getRequest().sentRequestBody);
-        assertTrue(restored.getRequest().body.contains("内容过大，已截断"));
+        assertTrue(restored.getRequest().body.contains("Nội dung quá lớn và đã bị cắt bớt"));
     }
 
     @Test
@@ -120,7 +120,7 @@ public class HistoryPersistenceServiceTest {
         assertNull(historyResponse.rawBodyBytes);
         assertEquals(historyResponse.body, "");
         assertTrue(historyResponse.fileContentOmitted);
-        assertSame(response.rawBodyBytes, xlsx, "当前响应面板仍需原始字节用于下载");
+        assertSame(response.rawBodyBytes, xlsx, "Hiện tại bảng phản hồi vẫn yêu cầu byte thô để tải xuống");
 
         JSONObject json = invokeConvertToJson(service, new RequestHistoryItem(request, historyResponse, 1L));
         assertEquals(json.getJSONObject("response").getStr("body"), "");
@@ -280,15 +280,15 @@ public class HistoryPersistenceServiceTest {
         assertEquals(history.fileName, "data.csv");
 
         HttpResponse gbk = new HttpResponse();
-        gbk.body = "名称";
-        gbk.rawBodyBytes = "名称".getBytes(java.nio.charset.Charset.forName("GBK"));
+        gbk.body = "tên";
+        gbk.rawBodyBytes = "tên".getBytes(java.nio.charset.Charset.forName("GBK"));
         gbk.fileAttachment = true;
         gbk.headers = new LinkedHashMap<>();
         gbk.headers.put("Content-Type", List.of("text/csv; charset=GBK"));
 
         HttpResponse gbkHistory = HistoryPersistenceService.toHistoryResponse(gbk);
 
-        assertEquals(gbkHistory.body, "名称", "可无损还原的附件保留正文");
+        assertEquals(gbkHistory.body, "tên", "Các tệp đính kèm có thể được khôi phục một cách dễ dàng sẽ giữ lại văn bản");
         assertFalse(gbkHistory.fileContentOmitted);
         assertNull(gbkHistory.rawBodyBytes);
     }

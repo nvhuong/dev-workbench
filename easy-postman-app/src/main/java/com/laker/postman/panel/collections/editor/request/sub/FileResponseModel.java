@@ -11,15 +11,15 @@ import java.io.File;
 import java.util.Locale;
 
 /**
- * 文件概览的展示数据，以及“响应是否以文件概览展示”的判定规则。
+ * Hiển thị dữ liệu để biết tổng quan về tệp và“Liệu phản hồi có được hiển thị dưới dạng tổng quan về tệp hay không”quy tắc quyết định.
  *
- * @param fileName            下载文件名
- * @param fileType            展示用文件类型（如 XLSX）
- * @param bodySize            响应体字节数
- * @param declaredContentType 服务端声明的 Content-Type，可为空
- * @param detectedFileType    根据内容识别出的类型；非空时提示与声明类型不符
- * @param canViewAsText       是否提供“按文本查看”（仅文本附件，如 CSV）
- * @param contentAvailable    文件内容是否可下载；示例/历史只保存文件信息时为 false
+ * @param fileName            Tải xuống tên tập tin
+ * @param fileType            Hiển thị loại tệp (ví dụ XLSX）
+ * @param bodySize            Số byte nội dung phản hồi
+ * @param declaredContentType Được khai báo bởi máy chủ Content-Type，Có thể trống
+ * @param detectedFileType    Loại được xác định dựa trên nội dung; khi nó không trống, dấu nhắc không khớp với kiểu đã khai báo
+ * @param canViewAsText       Nó có được cung cấp không?“Xem bằng văn bản”（Chỉ có các tệp đính kèm văn bản như  CSV）
+ * @param contentAvailable    Liệu nội dung tệp có thể tải xuống được hay không; ví dụ/Lịch sử chỉ lưu thông tin tập tin false
  */
 record FileResponseModel(String fileName,
                          String fileType,
@@ -30,7 +30,7 @@ record FileResponseModel(String fileName,
                          boolean contentAvailable) {
 
     /**
-     * 识别出文件、附件声明或二进制 Content-Type，且有可下载的内容（或内容已明确省略）时以文件概览展示。
+     * A file, attachment statement, or binary was identified Content-Type，Và khi có nội dung có thể tải xuống (hoặc nội dung đã bị bỏ qua rõ ràng), tổng quan về tệp sẽ được hiển thị.
      */
     static boolean shouldShow(HttpResponse response) {
         if (response == null) {
@@ -57,7 +57,7 @@ record FileResponseModel(String fileName,
                 response.bodySize,
                 contentType,
                 detectedBinaryFile ? fileType : null,
-                // 识别出的二进制格式按文本查看只有乱码，仅对文本附件（如 CSV）提供
+                // The recognized binary format is only garbled when viewed as text, only for text attachments (eg CSV）cung cấp
                 response.rawBodyBytes != null && !detectedBinaryFile,
                 !response.fileContentOmitted
         );

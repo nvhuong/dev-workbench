@@ -119,7 +119,7 @@ public class RequestDescriptionColumnTablePanelTest extends AbstractSwingUiTest 
     public void requestParameterLabelsShouldFollowCurrentLocale() throws Exception {
         Locale originalLocale = I18nUtil.currentLocale();
         try {
-            I18nUtil.setLocale(Locale.CHINESE);
+            I18nUtil.setLocale(Locale.forLanguageTag("vi"));
             SwingUtilities.invokeAndWait(() -> {
                 assertColumnHeaders(
                         new ParamsTablePanel().getTable(),

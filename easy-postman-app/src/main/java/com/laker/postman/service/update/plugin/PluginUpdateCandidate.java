@@ -1,7 +1,7 @@
 package com.laker.postman.service.update.plugin;
 
 /**
- * 插件更新候选项。
+ * Ứng viên cập nhật plug-in.
  */
 public record PluginUpdateCandidate(
         String pluginId,

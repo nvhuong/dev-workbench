@@ -17,15 +17,15 @@ import javax.swing.text.Document;
 import javax.swing.text.JTextComponent;
 
 /**
- * 脚本 API 自动补全管理器
- * 提供全面的 JavaScript 内置对象、Postman API 和第三方库的自动补全支持
+ * kịch bản API Trình quản lý tự động hoàn thành
+ * Cung cấp toàn diện JavaScript Các đối tượng tích hợp,Postman API và hỗ trợ tự động hoàn thành cho các thư viện của bên thứ ba
  *
- * <p>包含以下内容：</p>
+ * <p>Gồm các nội dung sau:</p>
  * <ul>
- *     <li>JavaScript 内置对象：String, Array, Object, Math, Date, JSON, Promise, RegExp 等</li>
- *     <li>Postman 核心 API：pm, pm.test, pm.expect, pm.request, pm.response 等</li>
- *     <li>第三方库：CryptoJS, Lodash, Moment.js, Cheerio, xml2Json 等</li>
- *     <li>Chai 断言库：完整的 BDD/TDD 断言链</li>
+ *     <li>JavaScript Các đối tượng tích hợp: .String, Array, Object, Math, Date, JSON, Promise, RegExp Đợi đã</li>
+ *     <li>Postman cốt lõi API：pm, pm.test, pm.expect, pm.request, pm.response Đợi đã</li>
+ *     <li>Thư viện của bên thứ ba:CryptoJS, Lodash, Moment.js, Cheerio, xml2Json Đợi đã</li>
+ *     <li>Chai Thư viện khẳng định: hoàn thành BDD/TDD Chuỗi khẳng định</li>
  * </ul>
  *
  */
@@ -34,10 +34,10 @@ import javax.swing.text.JTextComponent;
 public class ScriptSnippetManager {
 
     /**
-     * 创建自动补全提供器
+     * Tạo một nhà cung cấp tự động hoàn thành
      */
     public static CompletionProvider createCompletionProvider() {
-        // 使用自定义 Provider 来实现自动激活和点号分隔的补全
+        // Sử dụng tùy chỉnh Provider Để đạt được kích hoạt tự động và hoàn thành được phân cách bằng dấu chấm
         DefaultCompletionProvider provider = new DefaultCompletionProvider() {
             @Override
             public boolean isAutoActivateOkay(JTextComponent tc) {
@@ -86,22 +86,22 @@ public class ScriptSnippetManager {
             }
         };
 
-        // 添加所有 API 补全提示
+        // Thêm tất cả API Lời khuyên hoàn thành
         addAllCompletions(provider);
 
         return provider;
     }
 
     private static boolean isCompletionTriggerChar(char ch) {
-        // 点号也是有效字符，这样 pm. 会被当作一个整体
+        // Dấu chấm cũng là một ký tự hợp lệ, như thế này pm. sẽ được xử lý một cách tổng thể
         return Character.isLetterOrDigit(ch) || ch == '_' || ch == '.';
     }
 
     /**
-     * 添加所有 API 补全提示（主入口）
+     * Thêm tất cả API Mẹo hoàn thành (lối vào chính)
      */
     private static void addAllCompletions(DefaultCompletionProvider provider) {
-        // ===== JavaScript 核心 =====
+        // ===== JavaScript cốt lõi =====
         addJavaScriptKeywords(provider);
         addJavaScriptGlobalObjects(provider);
         addStringMethods(provider);
@@ -116,7 +116,7 @@ public class ScriptSnippetManager {
         addConsoleMethods(provider);
         addEncodingFunctions(provider);
 
-        // ===== Postman 核心 API =====
+        // ===== Postman cốt lõi API =====
         addPostmanCore(provider);
         addPmCoreMethods(provider);
         addPmEnvironment(provider);
@@ -130,10 +130,10 @@ public class ScriptSnippetManager {
         addPmSendRequest(provider);
         addPmDataStoreApis(provider);
 
-        // ===== Chai 断言库 =====
+        // ===== Chai Thư viện khẳng định =====
         addChaiAssertions(provider);
 
-        // ===== 第三方库 =====
+        // ===== Thư viện của bên thứ ba =====
         addCryptoJS(provider);
         addLodash(provider);
         addMoment(provider);
@@ -141,8 +141,8 @@ public class ScriptSnippetManager {
         addXml2Json(provider);
 
         for (var contributor : PluginAccess.getScriptCompletionContributors()) {
-            // 内建补全先注册，插件补全后追加。
-            // 这样宿主负责“基础语言 + 核心 pm”，插件只补自己的增量能力。
+            // Quá trình hoàn thành tích hợp được đăng ký trước và quá trình hoàn thành trình cắm thêm sẽ được thêm sau khi hoàn thành.
+            // Bằng cách này, chủ nhà phải chịu trách nhiệm“Ngôn ngữ cơ bản + cốt lõi pm”，Các plug-in chỉ bổ sung khả năng gia tăng của chính chúng.
             try {
                 contributor.contribute(item -> addPluginCompletion(provider, item));
             } catch (Throwable t) {
@@ -168,14 +168,14 @@ public class ScriptSnippetManager {
     }
 
     // ========================================
-    // JavaScript 核心对象和方法
+    // JavaScript Các đối tượng và phương thức cốt lõi
     // ========================================
 
     /**
-     * 添加 JavaScript 关键字
+     * Thêm vào JavaScript Từ khóa
      */
     private static void addJavaScriptKeywords(DefaultCompletionProvider provider) {
-        // 关键字
+        // Từ khóa
         String[] keywords = {
                 "function", "var", "let", "const", "if", "else", "for", "while", "do",
                 "switch", "case", "default", "break", "continue", "return", "try", "catch",
@@ -190,7 +190,7 @@ public class ScriptSnippetManager {
     }
 
     /**
-     * 添加 JavaScript 全局对象
+     * Thêm vào JavaScript Đối tượng toàn cầu
      */
     private static void addJavaScriptGlobalObjects(DefaultCompletionProvider provider) {
         provider.addCompletion(new BasicCompletion(provider, "String", "String constructor"));
@@ -216,7 +216,7 @@ public class ScriptSnippetManager {
     }
 
     /**
-     * 添加 String 方法
+     * Thêm vào String phương pháp
      */
     private static void addStringMethods(DefaultCompletionProvider provider) {
         provider.addCompletion(new BasicCompletion(provider, "charAt", "String.prototype.charAt() - get char at index"));
@@ -247,10 +247,10 @@ public class ScriptSnippetManager {
     }
 
     /**
-     * 添加 Array 方法
+     * Thêm vào Array phương pháp
      */
     private static void addArrayMethods(DefaultCompletionProvider provider) {
-        // 遍历方法
+        // Phương pháp truyền tải
         provider.addCompletion(new BasicCompletion(provider, "forEach", "Array.prototype.forEach() - iterate array"));
         provider.addCompletion(new BasicCompletion(provider, "map", "Array.prototype.map() - transform array"));
         provider.addCompletion(new BasicCompletion(provider, "filter", "Array.prototype.filter() - filter array"));
@@ -261,12 +261,12 @@ public class ScriptSnippetManager {
         provider.addCompletion(new BasicCompletion(provider, "some", "Array.prototype.some() - test if any passes"));
         provider.addCompletion(new BasicCompletion(provider, "every", "Array.prototype.every() - test if all pass"));
 
-        // 查找方法
+        // Tìm hiểu làm thế nào
         provider.addCompletion(new BasicCompletion(provider, "includes", "Array.prototype.includes() - check if contains"));
         provider.addCompletion(new BasicCompletion(provider, "indexOf", "Array.prototype.indexOf() - find first index"));
         provider.addCompletion(new BasicCompletion(provider, "lastIndexOf", "Array.prototype.lastIndexOf() - find last index"));
 
-        // 修改方法
+        // Phương pháp sửa đổi
         provider.addCompletion(new BasicCompletion(provider, "push", "Array.prototype.push() - add to end"));
         provider.addCompletion(new BasicCompletion(provider, "pop", "Array.prototype.pop() - remove from end"));
         provider.addCompletion(new BasicCompletion(provider, "shift", "Array.prototype.shift() - remove from start"));
@@ -279,20 +279,20 @@ public class ScriptSnippetManager {
         provider.addCompletion(new BasicCompletion(provider, "fill", "Array.prototype.fill() - fill with value"));
         provider.addCompletion(new BasicCompletion(provider, "copyWithin", "Array.prototype.copyWithin() - copy within array"));
 
-        // 转换方法
+        // Phương pháp chuyển đổi
         provider.addCompletion(new BasicCompletion(provider, "join", "Array.prototype.join() - join to string"));
         provider.addCompletion(new BasicCompletion(provider, "toString", "Array.prototype.toString() - convert to string"));
         provider.addCompletion(new BasicCompletion(provider, "flat", "Array.prototype.flat() - flatten array"));
         provider.addCompletion(new BasicCompletion(provider, "flatMap", "Array.prototype.flatMap() - map and flatten"));
 
-        // 静态方法
+        // các phương pháp tĩnh
         provider.addCompletion(new BasicCompletion(provider, "Array.isArray", "Array.isArray() - check if array"));
         provider.addCompletion(new BasicCompletion(provider, "Array.from", "Array.from() - create array from iterable"));
         provider.addCompletion(new BasicCompletion(provider, "Array.of", "Array.of() - create array from arguments"));
     }
 
     /**
-     * 添加 Object 方法
+     * Thêm vào Object phương pháp
      */
     private static void addObjectMethods(DefaultCompletionProvider provider) {
         provider.addCompletion(new BasicCompletion(provider, "Object.keys", "Object.keys() - get object keys"));
@@ -312,10 +312,10 @@ public class ScriptSnippetManager {
     }
 
     /**
-     * 添加 Math 方法
+     * Thêm vào Math phương pháp
      */
     private static void addMathMethods(DefaultCompletionProvider provider) {
-        // 常用方法
+        // Các phương pháp thường được sử dụng
         provider.addCompletion(new BasicCompletion(provider, "Math.random", "Math.random() - random number [0,1)"));
         provider.addCompletion(new BasicCompletion(provider, "Math.floor", "Math.floor() - round down"));
         provider.addCompletion(new BasicCompletion(provider, "Math.ceil", "Math.ceil() - round up"));
@@ -329,7 +329,7 @@ public class ScriptSnippetManager {
         provider.addCompletion(new BasicCompletion(provider, "Math.sign", "Math.sign() - sign of number"));
         provider.addCompletion(new BasicCompletion(provider, "Math.trunc", "Math.trunc() - truncate decimal"));
 
-        // 三角函数
+        // Các hàm lượng giác
         provider.addCompletion(new BasicCompletion(provider, "Math.sin", "Math.sin() - sine"));
         provider.addCompletion(new BasicCompletion(provider, "Math.cos", "Math.cos() - cosine"));
         provider.addCompletion(new BasicCompletion(provider, "Math.tan", "Math.tan() - tangent"));
@@ -338,7 +338,7 @@ public class ScriptSnippetManager {
         provider.addCompletion(new BasicCompletion(provider, "Math.atan", "Math.atan() - arctangent"));
         provider.addCompletion(new BasicCompletion(provider, "Math.atan2", "Math.atan2() - arctangent of quotient"));
 
-        // 常量
+        // không thay đổi
         provider.addCompletion(new BasicCompletion(provider, "Math.PI", "Math.PI - π constant"));
         provider.addCompletion(new BasicCompletion(provider, "Math.E", "Math.E - Euler's number"));
         provider.addCompletion(new BasicCompletion(provider, "Math.LN2", "Math.LN2 - natural log of 2"));
@@ -348,15 +348,15 @@ public class ScriptSnippetManager {
     }
 
     /**
-     * 添加 Date 方法
+     * Thêm vào Date phương pháp
      */
     private static void addDateMethods(DefaultCompletionProvider provider) {
-        // 静态方法
+        // các phương pháp tĩnh
         provider.addCompletion(new BasicCompletion(provider, "Date.now", "Date.now() - current timestamp"));
         provider.addCompletion(new BasicCompletion(provider, "Date.parse", "Date.parse() - parse date string"));
         provider.addCompletion(new BasicCompletion(provider, "Date.UTC", "Date.UTC() - UTC timestamp"));
 
-        // 实例方法 - 获取
+        // các phương pháp ví dụ - Lấy
         provider.addCompletion(new BasicCompletion(provider, "getFullYear", "Get full year"));
         provider.addCompletion(new BasicCompletion(provider, "getMonth", "Get month (0-11)"));
         provider.addCompletion(new BasicCompletion(provider, "getDate", "Get day of month (1-31)"));
@@ -368,7 +368,7 @@ public class ScriptSnippetManager {
         provider.addCompletion(new BasicCompletion(provider, "getTime", "Get timestamp"));
         provider.addCompletion(new BasicCompletion(provider, "getTimezoneOffset", "Get timezone offset"));
 
-        // 实例方法 - 设置
+        // các phương pháp ví dụ - cài đặt
         provider.addCompletion(new BasicCompletion(provider, "setFullYear", "Set full year"));
         provider.addCompletion(new BasicCompletion(provider, "setMonth", "Set month"));
         provider.addCompletion(new BasicCompletion(provider, "setDate", "Set day of month"));
@@ -378,7 +378,7 @@ public class ScriptSnippetManager {
         provider.addCompletion(new BasicCompletion(provider, "setMilliseconds", "Set milliseconds"));
         provider.addCompletion(new BasicCompletion(provider, "setTime", "Set timestamp"));
 
-        // 转换方法
+        // Phương pháp chuyển đổi
         provider.addCompletion(new BasicCompletion(provider, "toISOString", "Convert to ISO 8601 string"));
         provider.addCompletion(new BasicCompletion(provider, "toJSON", "Convert to JSON string"));
         provider.addCompletion(new BasicCompletion(provider, "toDateString", "Convert to date string"));
@@ -389,7 +389,7 @@ public class ScriptSnippetManager {
     }
 
     /**
-     * 添加 JSON 方法
+     * Thêm vào JSON phương pháp
      */
     private static void addJsonMethods(DefaultCompletionProvider provider) {
         provider.addCompletion(new BasicCompletion(provider, "JSON.parse",
@@ -399,7 +399,7 @@ public class ScriptSnippetManager {
     }
 
     /**
-     * 添加 Promise 方法
+     * Thêm vào Promise phương pháp
      */
     private static void addPromiseMethods(DefaultCompletionProvider provider) {
         provider.addCompletion(new BasicCompletion(provider, "Promise.resolve", "Promise.resolve() - create resolved promise"));
@@ -414,7 +414,7 @@ public class ScriptSnippetManager {
     }
 
     /**
-     * 添加 RegExp 方法
+     * Thêm vào RegExp phương pháp
      */
     private static void addRegExpMethods(DefaultCompletionProvider provider) {
         provider.addCompletion(new BasicCompletion(provider, "test", "RegExp.test() - test if matches"));
@@ -422,7 +422,7 @@ public class ScriptSnippetManager {
     }
 
     /**
-     * 添加 Number 方法
+     * Thêm vào Number phương pháp
      */
     private static void addNumberMethods(DefaultCompletionProvider provider) {
         provider.addCompletion(new BasicCompletion(provider, "Number.isNaN", "Number.isNaN() - check if NaN"));
@@ -437,7 +437,7 @@ public class ScriptSnippetManager {
     }
 
     /**
-     * 添加 console 方法
+     * Thêm vào console phương pháp
      */
     private static void addConsoleMethods(DefaultCompletionProvider provider) {
         provider.addCompletion(new BasicCompletion(provider, "console.log",
@@ -453,7 +453,7 @@ public class ScriptSnippetManager {
     }
 
     /**
-     * 添加编码/解码函数
+     * Thêm mã hóa/chức năng giải mã
      */
     private static void addEncodingFunctions(DefaultCompletionProvider provider) {
         provider.addCompletion(new BasicCompletion(provider, "btoa",
@@ -471,11 +471,11 @@ public class ScriptSnippetManager {
     }
 
     // ========================================
-    // Postman 核心 API
+    // Postman cốt lõi API
     // ========================================
 
     /**
-     * 添加 Postman 核心对象
+     * Thêm vào Postman đối tượng cốt lõi
      */
     private static void addPostmanCore(DefaultCompletionProvider provider) {
         provider.addCompletion(new BasicCompletion(provider, "pm",
@@ -486,7 +486,7 @@ public class ScriptSnippetManager {
     }
 
     /**
-     * 添加 pm 核心方法
+     * Thêm vào pm các phương pháp cốt lõi
      */
     private static void addPmCoreMethods(DefaultCompletionProvider provider) {
         provider.addCompletion(new BasicCompletion(provider, "pm.test",
@@ -495,7 +495,7 @@ public class ScriptSnippetManager {
                 I18nUtil.getMessage(MessageKeys.AUTOCOMPLETE_PM_EXPECT)));
         provider.addCompletion(new BasicCompletion(provider, "pm.sendRequest", "pm.sendRequest() - send HTTP request"));
 
-        // UUID 和时间戳
+        // UUID và dấu thời gian
         provider.addCompletion(new BasicCompletion(provider, "pm.uuid",
                 I18nUtil.getMessage(MessageKeys.AUTOCOMPLETE_PM_UUID)));
         provider.addCompletion(new BasicCompletion(provider, "pm.getTimestamp",
@@ -507,7 +507,7 @@ public class ScriptSnippetManager {
     }
 
     /**
-     * 添加 pm.environment - 环境变量
+     * Thêm vào pm.environment - các biến môi trường
      */
     private static void addPmEnvironment(DefaultCompletionProvider provider) {
         provider.addCompletion(new BasicCompletion(provider, "pm.environment",
@@ -526,7 +526,7 @@ public class ScriptSnippetManager {
     }
 
     /**
-     * 添加 pm.globals - 全局变量
+     * Thêm vào pm.globals - Các biến toàn cầu
      */
     private static void addPmGlobals(DefaultCompletionProvider provider) {
         provider.addCompletion(new BasicCompletion(provider, "pm.globals", "Global variables object"));
@@ -539,7 +539,7 @@ public class ScriptSnippetManager {
     }
 
     /**
-     * 添加 pm.variables - 变量（脚本级别）
+     * Thêm vào pm.variables - Các biến (cấp tập lệnh)
      */
     private static void addPmVariables(DefaultCompletionProvider provider) {
         provider.addCompletion(new BasicCompletion(provider, "pm.variables",
@@ -560,7 +560,7 @@ public class ScriptSnippetManager {
     }
 
     /**
-     * 添加 pm.iterationData - 迭代数据
+     * Thêm vào pm.iterationData - Lặp lại dữ liệu
      */
     private static void addPmIterationData(DefaultCompletionProvider provider) {
         provider.addCompletion(new BasicCompletion(provider, "pm.iterationData", "Iteration data object"));
@@ -571,7 +571,7 @@ public class ScriptSnippetManager {
     }
 
     /**
-     * 添加 pm.request - 请求对象
+     * Thêm vào pm.request - đối tượng yêu cầu
      */
     private static void addPmRequest(DefaultCompletionProvider provider) {
         provider.addCompletion(new BasicCompletion(provider, "pm.request",
@@ -587,7 +587,7 @@ public class ScriptSnippetManager {
         provider.addCompletion(new BasicCompletion(provider, "pm.request.update",
                 I18nUtil.getMessage(MessageKeys.AUTOCOMPLETE_PM_REQUEST_UPDATE)));
 
-        // URL 相关
+        // URL Có liên quan
         provider.addCompletion(new BasicCompletion(provider, "pm.request.url.query",
                 I18nUtil.getMessage(MessageKeys.AUTOCOMPLETE_PM_REQUEST_URL_QUERY)));
         provider.addCompletion(new BasicCompletion(provider, "pm.request.url.query.add",
@@ -603,7 +603,7 @@ public class ScriptSnippetManager {
         provider.addCompletion(new BasicCompletion(provider, "pm.request.url.query.all",
                 I18nUtil.getMessage(MessageKeys.AUTOCOMPLETE_PM_REQUEST_URL_QUERY_ALL)));
 
-        // Headers 方法
+        // Headers phương pháp
         provider.addCompletion(new BasicCompletion(provider, "pm.request.headers.get",
                 I18nUtil.getMessage(MessageKeys.AUTOCOMPLETE_PM_REQUEST_HEADERS_GET)));
         provider.addCompletion(new BasicCompletion(provider, "pm.request.headers.has",
@@ -635,7 +635,7 @@ public class ScriptSnippetManager {
     }
 
     /**
-     * 添加 pm.response - 响应对象
+     * Thêm vào pm.response - đối tượng phản hồi
      */
     private static void addPmResponse(DefaultCompletionProvider provider) {
         provider.addCompletion(new BasicCompletion(provider, "pm.response",
@@ -655,12 +655,12 @@ public class ScriptSnippetManager {
         provider.addCompletion(new BasicCompletion(provider, "pm.response.size",
                 I18nUtil.getMessage(MessageKeys.AUTOCOMPLETE_PM_RESPONSE_SIZE)));
 
-        // Headers 方法
+        // Headers phương pháp
         provider.addCompletion(new BasicCompletion(provider, "pm.response.headers.get", "Get response header"));
         provider.addCompletion(new BasicCompletion(provider, "pm.response.headers.has", "Check if header exists"));
         provider.addCompletion(new BasicCompletion(provider, "pm.response.headers.toObject", "Convert to object"));
 
-        // 断言链
+        // Chuỗi khẳng định
         provider.addCompletion(new BasicCompletion(provider, "pm.response.to.have.status",
                 I18nUtil.getMessage(MessageKeys.AUTOCOMPLETE_PM_RESPONSE_TO_HAVE_STATUS)));
         provider.addCompletion(new BasicCompletion(provider, "pm.response.to.have.header",
@@ -674,7 +674,7 @@ public class ScriptSnippetManager {
     }
 
     /**
-     * 添加 pm.cookies - Cookie 管理
+     * Thêm vào pm.cookies - Cookie quản lý
      */
     private static void addPmCookies(DefaultCompletionProvider provider) {
         provider.addCompletion(new BasicCompletion(provider, "pm.cookies",
@@ -692,7 +692,7 @@ public class ScriptSnippetManager {
     }
 
     /**
-     * 添加 pm.info - 请求信息
+     * Thêm vào pm.info - Yêu cầu thông tin
      */
     private static void addPmInfo(DefaultCompletionProvider provider) {
         provider.addCompletion(new BasicCompletion(provider, "pm.info", "Request execution info"));
@@ -704,7 +704,7 @@ public class ScriptSnippetManager {
     }
 
     /**
-     * 添加 pm.sendRequest - 发送HTTP请求
+     * Thêm vào pm.sendRequest - gửiHTTPyêu cầu
      */
     private static void addPmSendRequest(DefaultCompletionProvider provider) {
         provider.addCompletion(new ShorthandCompletion(provider, "sendreq",
@@ -776,14 +776,14 @@ public class ScriptSnippetManager {
     }
 
     // ========================================
-    // Chai 断言库
+    // Chai Thư viện khẳng định
     // ========================================
 
     /**
-     * 添加 Chai 断言库（BDD/TDD 风格）
+     * Thêm vào Chai Thư viện xác nhận (BDD/TDD phong cách)
      */
     private static void addChaiAssertions(DefaultCompletionProvider provider) {
-        // 基础断言
+        // Khẳng định cơ bản
         provider.addCompletion(new ShorthandCompletion(provider, "expect.equal",
                 "pm.expect(${value}).to.equal(${expected})",
                 I18nUtil.getMessage(MessageKeys.AUTOCOMPLETE_PM_EXPECT_TO_EQUAL)));
@@ -794,7 +794,7 @@ public class ScriptSnippetManager {
                 "pm.expect(${value}).to.deep.equal(${expected})",
                 "Deep equality assertion"));
 
-        // 包含断言
+        // Chứa các khẳng định
         provider.addCompletion(new ShorthandCompletion(provider, "expect.include",
                 "pm.expect(${text}).to.include(\"${substring}\")",
                 I18nUtil.getMessage(MessageKeys.AUTOCOMPLETE_PM_EXPECT_TO_INCLUDE)));
@@ -802,7 +802,7 @@ public class ScriptSnippetManager {
                 "pm.expect(${array}).to.contain(${item})",
                 "Check if contains item"));
 
-        // 属性断言
+        // Khẳng định tài sản
         provider.addCompletion(new ShorthandCompletion(provider, "expect.property",
                 "pm.expect(${object}).to.have.property(\"${propertyName}\")",
                 I18nUtil.getMessage(MessageKeys.AUTOCOMPLETE_PM_EXPECT_TO_HAVE_PROPERTY)));
@@ -813,7 +813,7 @@ public class ScriptSnippetManager {
                 "pm.expect(${object}).to.have.nested.property(\"${path}\")",
                 "Check if has nested property"));
 
-        // 数值比较断言
+        // Khẳng định so sánh số
         provider.addCompletion(new ShorthandCompletion(provider, "expect.above",
                 "pm.expect(${value}).to.be.above(${min})",
                 I18nUtil.getMessage(MessageKeys.AUTOCOMPLETE_PM_EXPECT_TO_BE_ABOVE)));
@@ -833,14 +833,14 @@ public class ScriptSnippetManager {
                 "pm.expect(${actual}).to.be.closeTo(${expected}, ${delta})",
                 "Check if close to value"));
 
-        // 类型断言
+        // Khẳng định kiểu
         provider.addCompletion(new ShorthandCompletion(provider, "expect.a",
                 "pm.expect(${value}).to.be.a(\"${type}\")",
                 I18nUtil.getMessage(MessageKeys.AUTOCOMPLETE_PM_EXPECT_TO_BE_A)));
         provider.addCompletion(new ShorthandCompletion(provider, "expect.an",
                 "pm.expect(${value}).to.be.an(\"${type}\")",
                 I18nUtil.getMessage(MessageKeys.AUTOCOMPLETE_PM_EXPECT_TO_BE_AN)));
-        // 长度断言
+        // Khẳng định độ dài
         provider.addCompletion(new ShorthandCompletion(provider, "expect.length",
                 "pm.expect(${array}).to.have.length(${expectedLength})",
                 I18nUtil.getMessage(MessageKeys.AUTOCOMPLETE_PM_EXPECT_TO_HAVE_LENGTH)));
@@ -848,7 +848,7 @@ public class ScriptSnippetManager {
                 "pm.expect(${array}).to.have.lengthOf(${expectedLength})",
                 "Check length of array/string"));
 
-        // 匹配断言
+        // Khẳng định phù hợp
         provider.addCompletion(new ShorthandCompletion(provider, "expect.match",
                 "pm.expect(${text}).to.match(/${regex}/)",
                 I18nUtil.getMessage(MessageKeys.AUTOCOMPLETE_PM_EXPECT_TO_MATCH)));
@@ -856,7 +856,7 @@ public class ScriptSnippetManager {
                 "pm.expect(${text}).to.have.string(\"${substring}\")",
                 "Check if has substring"));
 
-        // 数组/对象断言
+        // mảng/Khẳng định đối tượng
         provider.addCompletion(new ShorthandCompletion(provider, "expect.keys",
                 "pm.expect(${object}).to.have.keys([\"${key1}\", \"${key2}\"])",
                 "Check if has keys"));
@@ -873,7 +873,7 @@ public class ScriptSnippetManager {
                 "pm.expect(${value}).to.be.oneOf([${val1}, ${val2}])",
                 "Check if one of values"));
 
-        // 状态断言
+        // Khẳng định trạng thái
         provider.addCompletion(new ShorthandCompletion(provider, "expect.ok",
                 "pm.expect(${value}).to.be.ok",
                 I18nUtil.getMessage(MessageKeys.AUTOCOMPLETE_PM_EXPECT_TO_BE_OK)));
@@ -884,7 +884,7 @@ public class ScriptSnippetManager {
                 "pm.expect(${value}).to.be.empty",
                 I18nUtil.getMessage(MessageKeys.AUTOCOMPLETE_PM_EXPECT_TO_BE_EMPTY)));
 
-        // 布尔值断言
+        // Khẳng định Boolean
         provider.addCompletion(new ShorthandCompletion(provider, "expect.true",
                 "pm.expect(${value}).to.be.true",
                 I18nUtil.getMessage(MessageKeys.AUTOCOMPLETE_PM_EXPECT_TO_BE_TRUE)));
@@ -892,7 +892,7 @@ public class ScriptSnippetManager {
                 "pm.expect(${value}).to.be.false",
                 I18nUtil.getMessage(MessageKeys.AUTOCOMPLETE_PM_EXPECT_TO_BE_FALSE)));
 
-        // 特殊值断言
+        // Khẳng định giá trị đặc biệt
         provider.addCompletion(new ShorthandCompletion(provider, "expect.null",
                 "pm.expect(${value}).to.be.null",
                 I18nUtil.getMessage(MessageKeys.AUTOCOMPLETE_PM_EXPECT_TO_BE_NULL)));
@@ -903,7 +903,7 @@ public class ScriptSnippetManager {
                 "pm.expect(${value}).to.be.NaN",
                 I18nUtil.getMessage(MessageKeys.AUTOCOMPLETE_PM_EXPECT_TO_BE_NAN)));
 
-        // 否定断言
+        // Khẳng định phủ định
         provider.addCompletion(new ShorthandCompletion(provider, "expect.not",
                 "pm.expect(${value}).to.not.equal(${unexpected})",
                 I18nUtil.getMessage(MessageKeys.AUTOCOMPLETE_PM_EXPECT_NOT)));
@@ -911,17 +911,17 @@ public class ScriptSnippetManager {
                 "pm.expect(${value}).to.not.exist",
                 "Assert value does not exist"));
 
-        // 响应断言
+        // Trả lời các khẳng định
         provider.addCompletion(new ShorthandCompletion(provider, "expect.respondTo",
                 "pm.expect(${object}).to.respondTo(\"${method}\")",
                 "Assert object responds to method"));
 
-        // 满足条件
+        // Đáp ứng các điều kiện
         provider.addCompletion(new ShorthandCompletion(provider, "expect.satisfy",
                 "pm.expect(${value}).to.satisfy(function(val) { return val > 0; })",
                 "Assert satisfies custom condition"));
 
-        // 变化断言
+        // Thay đổi khẳng định
         provider.addCompletion(new ShorthandCompletion(provider, "expect.change",
                 "pm.expect(${fn}).to.change(${object}, \"${property}\")",
                 "Assert function changes property"));
@@ -934,17 +934,17 @@ public class ScriptSnippetManager {
     }
 
     // ========================================
-    // 第三方库
+    // Thư viện của bên thứ ba
     // ========================================
 
     /**
-     * 添加 CryptoJS 加密库
+     * Thêm vào CryptoJS Thư viện tiền điện tử
      */
     private static void addCryptoJS(DefaultCompletionProvider provider) {
         provider.addCompletion(new BasicCompletion(provider, "CryptoJS",
                 I18nUtil.getMessage(MessageKeys.AUTOCOMPLETE_CRYPTOJS)));
 
-        // 加密算法
+        // thuật toán mã hóa
         provider.addCompletion(new BasicCompletion(provider, "CryptoJS.AES",
                 I18nUtil.getMessage(MessageKeys.AUTOCOMPLETE_CRYPTOJS_AES)));
         provider.addCompletion(new BasicCompletion(provider, "CryptoJS.AES.encrypt", "AES encrypt"));
@@ -957,7 +957,7 @@ public class ScriptSnippetManager {
         provider.addCompletion(new BasicCompletion(provider, "CryptoJS.RC4", "RC4 encryption"));
         provider.addCompletion(new BasicCompletion(provider, "CryptoJS.Rabbit", "Rabbit encryption"));
 
-        // 哈希算法
+        // Thuật toán băm
         provider.addCompletion(new BasicCompletion(provider, "CryptoJS.MD5",
                 I18nUtil.getMessage(MessageKeys.AUTOCOMPLETE_CRYPTOJS_MD5)));
         provider.addCompletion(new BasicCompletion(provider, "CryptoJS.SHA1",
@@ -979,7 +979,7 @@ public class ScriptSnippetManager {
         provider.addCompletion(new BasicCompletion(provider, "CryptoJS.HmacSHA384", "HMAC-SHA384"));
         provider.addCompletion(new BasicCompletion(provider, "CryptoJS.HmacSHA512", "HMAC-SHA512"));
 
-        // 编码
+        // Mã hóa
         provider.addCompletion(new BasicCompletion(provider, "CryptoJS.enc",
                 I18nUtil.getMessage(MessageKeys.AUTOCOMPLETE_CRYPTOJS_ENC)));
         provider.addCompletion(new BasicCompletion(provider, "CryptoJS.enc.Hex", "Hex encoding"));
@@ -988,7 +988,7 @@ public class ScriptSnippetManager {
         provider.addCompletion(new BasicCompletion(provider, "CryptoJS.enc.Utf8", "UTF-8 encoding"));
         provider.addCompletion(new BasicCompletion(provider, "CryptoJS.enc.Utf16", "UTF-16 encoding"));
 
-        // 其他
+        // khác
         provider.addCompletion(new BasicCompletion(provider, "CryptoJS.lib.WordArray",
                 I18nUtil.getMessage(MessageKeys.AUTOCOMPLETE_CRYPTOJS_WORD_ARRAY)));
         provider.addCompletion(new BasicCompletion(provider, "CryptoJS.pad.Pkcs7", "PKCS7 padding"));
@@ -999,13 +999,13 @@ public class ScriptSnippetManager {
     }
 
     /**
-     * 添加 Lodash 工具库
+     * Thêm vào Lodash Thư viện công cụ
      */
     private static void addLodash(DefaultCompletionProvider provider) {
         provider.addCompletion(new BasicCompletion(provider, "_",
                 I18nUtil.getMessage(MessageKeys.AUTOCOMPLETE_LODASH)));
 
-        // 数组方法
+        // Các phương thức mảng
         provider.addCompletion(new BasicCompletion(provider, "_.chunk", "Split array into chunks"));
         provider.addCompletion(new BasicCompletion(provider, "_.compact", "Remove falsy values"));
         provider.addCompletion(new BasicCompletion(provider, "_.concat", "Concatenate arrays"));
@@ -1029,7 +1029,7 @@ public class ScriptSnippetManager {
         provider.addCompletion(new BasicCompletion(provider, "_.zip", "Zip arrays"));
         provider.addCompletion(new BasicCompletion(provider, "_.zipObject", "Create object from arrays"));
 
-        // 集合方法
+        // Các phương pháp thu thập
         provider.addCompletion(new BasicCompletion(provider, "_.countBy", "Count by criterion"));
         provider.addCompletion(new BasicCompletion(provider, "_.every", "Test if all pass"));
         provider.addCompletion(new BasicCompletion(provider, "_.filter",
@@ -1057,7 +1057,7 @@ public class ScriptSnippetManager {
         provider.addCompletion(new BasicCompletion(provider, "_.sortBy",
                 I18nUtil.getMessage(MessageKeys.AUTOCOMPLETE_LODASH_SORT_BY)));
 
-        // 对象方法
+        // Các phương thức đối tượng
         provider.addCompletion(new BasicCompletion(provider, "_.assign", "Assign properties"));
         provider.addCompletion(new BasicCompletion(provider, "_.at", "Get values at paths"));
         provider.addCompletion(new BasicCompletion(provider, "_.clone", "Shallow clone"));
@@ -1081,7 +1081,7 @@ public class ScriptSnippetManager {
         provider.addCompletion(new BasicCompletion(provider, "_.toPairs", "Convert to key-value pairs"));
         provider.addCompletion(new BasicCompletion(provider, "_.values", "Get object values"));
 
-        // 字符串方法
+        // Các phương thức chuỗi
         provider.addCompletion(new BasicCompletion(provider, "_.camelCase", "Convert to camelCase"));
         provider.addCompletion(new BasicCompletion(provider, "_.capitalize", "Capitalize first letter"));
         provider.addCompletion(new BasicCompletion(provider, "_.escape", "Escape HTML entities"));
@@ -1100,7 +1100,7 @@ public class ScriptSnippetManager {
         provider.addCompletion(new BasicCompletion(provider, "_.unescape", "Unescape HTML entities"));
         provider.addCompletion(new BasicCompletion(provider, "_.upperCase", "Convert to upper case"));
 
-        // 数学方法
+        // các phương pháp toán học
         provider.addCompletion(new BasicCompletion(provider, "_.add", "Add numbers"));
         provider.addCompletion(new BasicCompletion(provider, "_.ceil", "Round up"));
         provider.addCompletion(new BasicCompletion(provider, "_.divide", "Divide numbers"));
@@ -1121,7 +1121,7 @@ public class ScriptSnippetManager {
         provider.addCompletion(new BasicCompletion(provider, "_.sumBy",
                 I18nUtil.getMessage(MessageKeys.AUTOCOMPLETE_LODASH_SUM_BY)));
 
-        // 实用方法
+        // Phương pháp thực tế
         provider.addCompletion(new BasicCompletion(provider, "_.debounce", "Debounce function"));
         provider.addCompletion(new BasicCompletion(provider, "_.delay", "Delay function execution"));
         provider.addCompletion(new BasicCompletion(provider, "_.isArray", "Check if array"));
@@ -1143,7 +1143,7 @@ public class ScriptSnippetManager {
     }
 
     /**
-     * 添加 Moment.js 时间处理库
+     * Thêm vào Moment.js Thư viện xử lý thời gian
      */
     private static void addMoment(DefaultCompletionProvider provider) {
         provider.addCompletion(new BasicCompletion(provider, "moment",
@@ -1151,11 +1151,11 @@ public class ScriptSnippetManager {
         provider.addCompletion(new BasicCompletion(provider, "moment()",
                 I18nUtil.getMessage(MessageKeys.AUTOCOMPLETE_MOMENT_CALL)));
 
-        // 解析
+        // phân tích
         provider.addCompletion(new BasicCompletion(provider, "moment.utc", "Parse as UTC"));
         provider.addCompletion(new BasicCompletion(provider, "moment.unix", "Parse unix timestamp"));
 
-        // 格式化
+        // Định dạng
         provider.addCompletion(new BasicCompletion(provider, "format",
                 I18nUtil.getMessage(MessageKeys.AUTOCOMPLETE_MOMENT_FORMAT)));
         provider.addCompletion(new BasicCompletion(provider, "fromNow", "Time from now"));
@@ -1164,7 +1164,7 @@ public class ScriptSnippetManager {
         provider.addCompletion(new BasicCompletion(provider, "to", "Time to date"));
         provider.addCompletion(new BasicCompletion(provider, "calendar", "Calendar time"));
 
-        // 获取/设置
+        // Lấy/cài đặt
         provider.addCompletion(new BasicCompletion(provider, "millisecond", "Get/set millisecond"));
         provider.addCompletion(new BasicCompletion(provider, "second", "Get/set second"));
         provider.addCompletion(new BasicCompletion(provider, "minute", "Get/set minute"));
@@ -1182,7 +1182,7 @@ public class ScriptSnippetManager {
         provider.addCompletion(new BasicCompletion(provider, "weekYear", "Get/set week year"));
         provider.addCompletion(new BasicCompletion(provider, "isoWeekYear", "Get/set ISO week year"));
 
-        // 操作
+        // hoạt động
         provider.addCompletion(new BasicCompletion(provider, "add",
                 I18nUtil.getMessage(MessageKeys.AUTOCOMPLETE_MOMENT_ADD)));
         provider.addCompletion(new BasicCompletion(provider, "subtract",
@@ -1195,7 +1195,7 @@ public class ScriptSnippetManager {
         provider.addCompletion(new BasicCompletion(provider, "utc", "Convert to UTC"));
         provider.addCompletion(new BasicCompletion(provider, "utcOffset", "Get/set UTC offset"));
 
-        // 比较
+        // So sánh
         provider.addCompletion(new BasicCompletion(provider, "isBefore",
                 I18nUtil.getMessage(MessageKeys.AUTOCOMPLETE_MOMENT_IS_BEFORE)));
         provider.addCompletion(new BasicCompletion(provider, "isAfter",
@@ -1208,11 +1208,11 @@ public class ScriptSnippetManager {
         provider.addCompletion(new BasicCompletion(provider, "isDST", "Check if DST"));
         provider.addCompletion(new BasicCompletion(provider, "isLeapYear", "Check if leap year"));
 
-        // 差异
+        // sự khác biệt
         provider.addCompletion(new BasicCompletion(provider, "diff",
                 I18nUtil.getMessage(MessageKeys.AUTOCOMPLETE_MOMENT_DIFF)));
 
-        // 转换
+        // Chuyển thành
         provider.addCompletion(new BasicCompletion(provider, "valueOf",
                 I18nUtil.getMessage(MessageKeys.AUTOCOMPLETE_MOMENT_VALUE_OF)));
         provider.addCompletion(new BasicCompletion(provider, "unix",
@@ -1225,14 +1225,14 @@ public class ScriptSnippetManager {
         provider.addCompletion(new BasicCompletion(provider, "toObject", "Convert to object"));
         provider.addCompletion(new BasicCompletion(provider, "toString", "Convert to string"));
 
-        // 查询
+        // Truy vấn
         provider.addCompletion(new BasicCompletion(provider, "isValid", "Check if valid"));
         provider.addCompletion(new BasicCompletion(provider, "locale", "Get/set locale"));
         provider.addCompletion(new BasicCompletion(provider, "daysInMonth", "Get days in month"));
     }
 
     /**
-     * 添加 Cheerio HTML/XML 解析库
+     * Thêm vào Cheerio HTML/XML Thư viện phân tích cú pháp
      */
     private static void addCheerio(DefaultCompletionProvider provider) {
         provider.addCompletion(new BasicCompletion(provider, "cheerio", "Cheerio HTML/XML parser"));
@@ -1254,7 +1254,7 @@ public class ScriptSnippetManager {
     }
 
     /**
-     * 添加 xml2Json 库
+     * Thêm vào xml2Json thư viện
      */
     private static void addXml2Json(DefaultCompletionProvider provider) {
         provider.addCompletion(new BasicCompletion(provider, "xml2Json", "Convert XML to JSON"));

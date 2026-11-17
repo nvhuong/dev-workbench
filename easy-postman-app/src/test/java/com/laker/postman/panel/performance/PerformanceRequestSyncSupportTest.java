@@ -40,7 +40,7 @@ public class PerformanceRequestSyncSupportTest extends AbstractSwingUiTest {
         RequestExecutionContext.clearCurrentScope();
     }
 
-    @Test(description = "syncRequestItem 应更新树中匹配请求，并同步当前编辑器内容")
+    @Test(description = "syncRequestItem Các yêu cầu phù hợp trong cây phải được cập nhật và nội dung của trình soạn thảo hiện tại được đồng bộ hóa")
     public void shouldSyncMatchingRequestAndRefreshCurrentEditor() {
         HttpRequestItem oldItem = requestItem("req-1", "Old Request", "https://old.example.com");
         TestContext context = newTestContext(oldItem);
@@ -63,7 +63,7 @@ public class PerformanceRequestSyncSupportTest extends AbstractSwingUiTest {
         assertSame(switchedItem.get(), requestData.httpRequestItem);
     }
 
-    @Test(description = "syncRequestItem 应刷新当前请求的分组变量作用域，避免 tooltip 使用旧快照")
+    @Test(description = "syncRequestItem Nên tránh phạm vi biến nhóm của yêu cầu hiện tại tooltip Sử dụng ảnh chụp nhanh cũ")
     public void shouldRefreshCurrentRequestScopeWhenSyncingMatchingRequest() {
         HttpRequestItem oldItem = requestItem("req-1", "Old Request", "https://old.example.com?test={{testname}}");
         TestContext context = newTestContext(oldItem);
@@ -92,7 +92,7 @@ public class PerformanceRequestSyncSupportTest extends AbstractSwingUiTest {
         assertEquals(RequestExecutionContext.getCurrentScope().getGroupVariable("testname"), "888");
     }
 
-    @Test(description = "刷新 collection 请求时应同步执行快照，避免编辑器显示新 URL 但实际发送旧 URL")
+    @Test(description = "Làm mới collection Ảnh chụp nhanh phải được thực thi đồng bộ khi được yêu cầu để tránh trình chỉnh sửa hiển thị ảnh mới URL Nhưng việc gửi thực tế đã cũ URL")
     public void shouldRefreshRequestSnapshotWhenRefreshingFromCollections() {
         HttpRequestItem oldItem = requestItem("req-1", "GET Example", "https://httpbin.org/get?test={{testname}}");
         TestContext context = newTestContext(oldItem);
@@ -129,7 +129,7 @@ public class PerformanceRequestSyncSupportTest extends AbstractSwingUiTest {
         assertEquals(requestData.requestSnapshot.getExecutionScope().getGroupVariable("testname"), "888");
     }
 
-    @Test(description = "syncRequestItem 遇到空请求或空 id 时应直接忽略")
+    @Test(description = "syncRequestItem Đã gặp phải yêu cầu trống hoặc không có giá trị id nên đơn giản là bỏ qua")
     public void shouldIgnoreRequestWithoutId() {
         HttpRequestItem oldItem = requestItem("req-1", "Old Request", "https://old.example.com");
         TestContext context = newTestContext(oldItem);

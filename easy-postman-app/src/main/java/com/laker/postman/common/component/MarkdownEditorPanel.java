@@ -25,8 +25,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Markdown 编辑器组件
- * 支持实时预览、工具栏、撤销/重做、导出等功能
+ * Markdown Thành phần soạn thảo
+ * Hỗ trợ xem trước, thanh công cụ và hoàn tác theo thời gian thực/Làm lại, xuất và các chức năng khác
  */
 public class MarkdownEditorPanel extends JPanel {
     private RSyntaxTextArea editorArea;
@@ -78,7 +78,7 @@ public class MarkdownEditorPanel extends JPanel {
     }
 
     /**
-     * 更新预览面板样式以适应主题变化
+     * Updated preview panel style to accommodate theme changes
      */
     private void updatePreviewPaneStyles() {
         if (previewPane != null) {
@@ -88,7 +88,7 @@ public class MarkdownEditorPanel extends JPanel {
 
 
     /**
-     * 将 Color 转换为十六进制字符串
+     * Sẽ Color Chuyển đổi sang chuỗi thập lục phân
      */
     private String toHex(Color color) {
         return String.format("#%02x%02x%02x", color.getRed(), color.getGreen(), color.getBlue());
@@ -175,7 +175,7 @@ public class MarkdownEditorPanel extends JPanel {
     }
 
     /**
-     * 创建工具栏
+     * Tạo một thanh công cụ
      */
     private JPanel createEnhancedToolbar() {
         JPanel toolbarContainer = new JPanel(new WrapLayout(FlowLayout.LEFT, 5, 2));
@@ -258,7 +258,7 @@ public class MarkdownEditorPanel extends JPanel {
     }
 
     /**
-     * 支持自动换行的 FlowLayout
+     * Hỗ trợ gói dòng tự động FlowLayout
      */
     private static class WrapLayout extends FlowLayout {
         public WrapLayout(int align, int hgap, int vgap) {
@@ -336,7 +336,7 @@ public class MarkdownEditorPanel extends JPanel {
     }
 
     /**
-     * 创建更多功能菜单
+     * Tạo nhiều menu chức năng hơn
      */
     private JPopupMenu createMoreMenu() {
         JPopupMenu menu = new JPopupMenu();
@@ -400,30 +400,30 @@ public class MarkdownEditorPanel extends JPanel {
     }
 
     /**
-     * 创建编辑器面板
+     * Tạo một bảng soạn thảo
      */
     private JPanel createEditorPanel() {
         JPanel panel = new JPanel(new BorderLayout());
         panel.setOpaque(false);
 
-        // 创建 RSyntaxTextArea 用于 Markdown 编辑
+        // Tạo RSyntaxTextArea Được sử dụng cho Markdown Chỉnh sửa
         editorArea = new FallbackAwareRSyntaxTextArea();
-        editorArea.setSyntaxEditingStyle(SyntaxConstants.SYNTAX_STYLE_MARKDOWN); // 设置为 Markdown 语法高亮
-        editorArea.setCodeFoldingEnabled(false); // Markdown 不需要代码折叠
-        editorArea.setTabSize(4); // 设置 Tab 宽度为 4 个空格
-        // 统一加载主题、编辑器字体和缺字回退绘制
+        editorArea.setSyntaxEditingStyle(SyntaxConstants.SYNTAX_STYLE_MARKDOWN); // Đặt thành  Markdown Syntax highlighting
+        editorArea.setCodeFoldingEnabled(false); // Markdown Không cần gấp mã
+        editorArea.setTabSize(4); // cài đặt Tab Chiều rộng là  4 không gian
+        // Tải thống nhất các chủ đề, phông chữ soạn thảo và bản vẽ dự phòng cho các ký tự bị thiếu
         EditorThemeUtil.loadTheme(editorArea);
 
-        // 使用 SearchableTextArea 包装器（启用搜索替换功能）
+        // sử dụng SearchableTextArea Wrapper (cho phép chức năng tìm kiếm và thay thế)
         searchableTextArea = new SearchableTextArea(editorArea, true);
 
-        // 添加撤销/重做支持
+        // Thêm hoàn tác/Làm lại hỗ trợ
         editorArea.getDocument().addUndoableEditListener(e -> {
             undoManager.addEdit(e.getEdit());
             updateUndoRedoButtons();
         });
 
-        // 监听内容变化，更新预览
+        // Theo dõi các thay đổi nội dung và cập nhật bản xem trước
         editorArea.getDocument().addDocumentListener(new DocumentListener() {
             @Override
             public void insertUpdate(DocumentEvent e) {
@@ -449,7 +449,7 @@ public class MarkdownEditorPanel extends JPanel {
     }
 
     /**
-     * 创建预览面板
+     * Tạo bảng xem trước
      */
     private JPanel createPreviewPanel() {
         JPanel panel = new JPanel(new BorderLayout());
@@ -468,7 +468,7 @@ public class MarkdownEditorPanel extends JPanel {
     }
 
     /**
-     * 创建状态栏
+     * Tạo một thanh trạng thái
      */
     private JPanel createStatusBar() {
         JPanel statusBar = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 3));
@@ -479,7 +479,7 @@ public class MarkdownEditorPanel extends JPanel {
         statusLabel.setForeground(ModernColors.getTextSecondary());
         statusBar.add(statusLabel);
 
-        // 字数统计
+        // Số từ
         JLabel wordCountLabel = new JLabel(String.format("%s: 0 | %s: 0",
                 I18nUtil.getMessage(MessageKeys.MARKDOWN_STATUS_WORDS),
                 I18nUtil.getMessage(MessageKeys.MARKDOWN_STATUS_CHARS)));
@@ -488,7 +488,7 @@ public class MarkdownEditorPanel extends JPanel {
         statusBar.add(new JSeparator(SwingConstants.VERTICAL));
         statusBar.add(wordCountLabel);
 
-        // 行列号
+        // Số hàng
         JLabel positionLabel = new JLabel(I18nUtil.getMessage(MessageKeys.MARKDOWN_STATUS_LINE) + ": 1, " +
                 I18nUtil.getMessage(MessageKeys.MARKDOWN_STATUS_COLUMN) + ": 1");
         positionLabel.setFont(FontsUtil.getDefaultFontWithOffset(Font.PLAIN, -1));
@@ -496,7 +496,7 @@ public class MarkdownEditorPanel extends JPanel {
         statusBar.add(new JSeparator(SwingConstants.VERTICAL));
         statusBar.add(positionLabel);
 
-        // 更新状态栏
+        // Cập nhật thanh trạng thái
         editorArea.addCaretListener(e -> {
             try {
                 int pos = editorArea.getCaretPosition();
@@ -507,7 +507,7 @@ public class MarkdownEditorPanel extends JPanel {
                         I18nUtil.getMessage(MessageKeys.MARKDOWN_STATUS_COLUMN), col + 1));
 
                 String text = editorArea.getText();
-                // 计算单词数：空文本或只有空白字符时为0
+                // Đếm số từ: văn bản trống hoặc chỉ có ký tự khoảng trắng0
                 int wordCount = 0;
                 int charCount = 0;
                 if (text != null) {
@@ -529,13 +529,13 @@ public class MarkdownEditorPanel extends JPanel {
 
 
     /**
-     * 设置快捷键
+     * Đặt phím tắt
      */
     private void setupKeyBindings() {
         InputMap inputMap = editorArea.getInputMap(JComponent.WHEN_FOCUSED);
         ActionMap actionMap = editorArea.getActionMap();
 
-        // Ctrl+B - 粗体
+        // Ctrl+B - In đậm
         inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_B, InputEvent.CTRL_DOWN_MASK), "bold");
         actionMap.put("bold", new AbstractAction() {
             @Override
@@ -544,7 +544,7 @@ public class MarkdownEditorPanel extends JPanel {
             }
         });
 
-        // Ctrl+I - 斜体
+        // Ctrl+I - in nghiêng
         inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_I, InputEvent.CTRL_DOWN_MASK), "italic");
         actionMap.put("italic", new AbstractAction() {
             @Override
@@ -553,7 +553,7 @@ public class MarkdownEditorPanel extends JPanel {
             }
         });
 
-        // Ctrl+K - 链接
+        // Ctrl+K - Liên kết
         inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_K, InputEvent.CTRL_DOWN_MASK), "link");
         actionMap.put("link", new AbstractAction() {
             @Override
@@ -562,7 +562,7 @@ public class MarkdownEditorPanel extends JPanel {
             }
         });
 
-        // Ctrl+Z - 撤销
+        // Ctrl+Z - Hoàn tác
         inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_Z, InputEvent.CTRL_DOWN_MASK), "undo");
         actionMap.put("undo", new AbstractAction() {
             @Override
@@ -571,7 +571,7 @@ public class MarkdownEditorPanel extends JPanel {
             }
         });
 
-        // Ctrl+Y - 重做
+        // Ctrl+Y - làm lại
         inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_Y, InputEvent.CTRL_DOWN_MASK), "redo");
         actionMap.put("redo", new AbstractAction() {
             @Override
@@ -581,7 +581,7 @@ public class MarkdownEditorPanel extends JPanel {
         });
 
 
-        // Ctrl+` - 行内代码
+        // Ctrl+` - Mã nội tuyến
         inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_BACK_QUOTE, InputEvent.CTRL_DOWN_MASK), "inlineCode");
         actionMap.put("inlineCode", new AbstractAction() {
             @Override
@@ -590,7 +590,7 @@ public class MarkdownEditorPanel extends JPanel {
             }
         });
 
-        // Ctrl+Shift+K - 删除线
+        // Ctrl+Shift+K - Gạch ngang
         inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_K, InputEvent.CTRL_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK), "strikethrough");
         actionMap.put("strikethrough", new AbstractAction() {
             @Override
@@ -599,7 +599,7 @@ public class MarkdownEditorPanel extends JPanel {
             }
         });
 
-        // Ctrl+Shift+C - 代码块
+        // Ctrl+Shift+C - khối mã
         inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.CTRL_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK), "codeBlock");
         actionMap.put("codeBlock", new AbstractAction() {
             @Override
@@ -608,7 +608,7 @@ public class MarkdownEditorPanel extends JPanel {
             }
         });
 
-        // Ctrl+Shift+Q - 引用
+        // Ctrl+Shift+Q - Trích dẫn
         inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_Q, InputEvent.CTRL_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK), "quote");
         actionMap.put("quote", new AbstractAction() {
             @Override
@@ -617,7 +617,7 @@ public class MarkdownEditorPanel extends JPanel {
             }
         });
 
-        // Ctrl+Shift+L - 无序列表
+        // Ctrl+Shift+L - Danh sách không có thứ tự
         inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_L, InputEvent.CTRL_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK), "unorderedList");
         actionMap.put("unorderedList", new AbstractAction() {
             @Override
@@ -626,7 +626,7 @@ public class MarkdownEditorPanel extends JPanel {
             }
         });
 
-        // Ctrl+Shift+O - 有序列表
+        // Ctrl+Shift+O - Danh sách đặt hàng
         inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_O, InputEvent.CTRL_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK), "orderedList");
         actionMap.put("orderedList", new AbstractAction() {
             @Override
@@ -635,7 +635,7 @@ public class MarkdownEditorPanel extends JPanel {
             }
         });
 
-        // Ctrl+Shift+T - 任务列表
+        // Ctrl+Shift+T - Danh sách nhiệm vụ
         inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_T, InputEvent.CTRL_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK), "taskList");
         actionMap.put("taskList", new AbstractAction() {
             @Override
@@ -644,7 +644,7 @@ public class MarkdownEditorPanel extends JPanel {
             }
         });
 
-        // Ctrl+1-6 - 标题级别
+        // Ctrl+1-6 - Cấp độ tiêu đề
         for (int i = 1; i <= 6; i++) {
             final int level = i;
             inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_0 + i, InputEvent.CTRL_DOWN_MASK), "heading" + i);
@@ -657,7 +657,7 @@ public class MarkdownEditorPanel extends JPanel {
             });
         }
 
-        // Ctrl+Shift+H - 水平线
+        // Ctrl+Shift+H - đường ngang
         inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_H, InputEvent.CTRL_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK), "horizontalLine");
         actionMap.put("horizontalLine", new AbstractAction() {
             @Override
@@ -668,7 +668,7 @@ public class MarkdownEditorPanel extends JPanel {
             }
         });
 
-        // Ctrl+Shift+I - 插入图片
+        // Ctrl+Shift+I - Chèn hình ảnh
         inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_I, InputEvent.CTRL_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK), "image");
         actionMap.put("image", new AbstractAction() {
             @Override
@@ -677,7 +677,7 @@ public class MarkdownEditorPanel extends JPanel {
             }
         });
 
-        // Ctrl+Shift+T - 插入表格
+        // Ctrl+Shift+T - Chèn bảng
         inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_T, InputEvent.CTRL_DOWN_MASK | InputEvent.ALT_DOWN_MASK), "table");
         actionMap.put("table", new AbstractAction() {
             @Override
@@ -686,17 +686,17 @@ public class MarkdownEditorPanel extends JPanel {
             }
         });
 
-        // Ctrl+S - 触发保存事件（通知监听器）
+        // Ctrl+S - Kích hoạt sự kiện lưu (thông báo cho người nghe)
         inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.CTRL_DOWN_MASK), "save");
         actionMap.put("save", new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                // 触发文档变化事件，让外部监听器处理保存
+                // Kích hoạt sự kiện thay đổi tài liệu và để trình nghe bên ngoài xử lý việc lưu
                 editorArea.getDocument().putProperty("save-requested", true);
             }
         });
 
-        // Ctrl+E - 导出HTML
+        // Ctrl+E - Xuất khẩuHTML
         inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_E, InputEvent.CTRL_DOWN_MASK), "export");
         actionMap.put("export", new AbstractAction() {
             @Override
@@ -705,7 +705,7 @@ public class MarkdownEditorPanel extends JPanel {
             }
         });
 
-        // Ctrl+Shift+C - 复制HTML（不与代码块冲突，使用Alt）
+        // Ctrl+Shift+C - Sao chépHTML（Không xung đột với các khối mã, hãy sử dụngAlt）
         inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.CTRL_DOWN_MASK | InputEvent.ALT_DOWN_MASK), "copyHtml");
         actionMap.put("copyHtml", new AbstractAction() {
             @Override
@@ -716,7 +716,7 @@ public class MarkdownEditorPanel extends JPanel {
     }
 
     /**
-     * 在行首插入前缀（用于列表、引用、标题等）
+     * Chèn tiền tố vào đầu dòng (dành cho danh sách, trích dẫn, tiêu đề, v.v.)
      */
     private void insertLinePrefix(String prefix) {
         try {
@@ -726,7 +726,7 @@ public class MarkdownEditorPanel extends JPanel {
             editorArea.setCaretPosition(lineStart + prefix.length());
             editorArea.requestFocus();
         } catch (Exception e) {
-            // 如果出错，就在光标位置插入
+            // Nếu xảy ra lỗi, hãy chèn vào vị trí con trỏ
             int pos = editorArea.getCaretPosition();
             editorArea.insert(prefix, pos);
             editorArea.requestFocus();
@@ -734,7 +734,7 @@ public class MarkdownEditorPanel extends JPanel {
     }
 
     /**
-     * 插入格式化文本
+     * Chèn văn bản được định dạng
      */
     private void insertFormat(String prefix, String suffix) {
         int start = editorArea.getSelectionStart();
@@ -753,14 +753,14 @@ public class MarkdownEditorPanel extends JPanel {
     }
 
     /**
-     * 插入表格
+     * Chèn bảng
      */
     private void insertTable() {
         String table = """
-                | 列1 | 列2 | 列3 |
+                | cột1 | cột2 | cột3 |
                 | --- | --- | --- |
-                | 单元格 | 单元格 | 单元格 |
-                | 单元格 | 单元格 | 单元格 |
+                | tế bào | tế bào | tế bào |
+                | tế bào | tế bào | tế bào |
                 """;
         int pos = editorArea.getCaretPosition();
         editorArea.insert(table, pos);
@@ -768,7 +768,7 @@ public class MarkdownEditorPanel extends JPanel {
     }
 
     /**
-     * 撤销
+     * Hoàn tác
      */
     private void undo() {
         if (undoManager.canUndo()) {
@@ -778,7 +778,7 @@ public class MarkdownEditorPanel extends JPanel {
     }
 
     /**
-     * 重做
+     * làm lại
      */
     private void redo() {
         if (undoManager.canRedo()) {
@@ -788,7 +788,7 @@ public class MarkdownEditorPanel extends JPanel {
     }
 
     /**
-     * 更新撤销/重做按钮状态
+     * Cập nhật hoàn tác/Làm lại trạng thái nút
      */
     private void updateUndoRedoButtons() {
         if (undoButton != null) {
@@ -801,13 +801,13 @@ public class MarkdownEditorPanel extends JPanel {
 
 
     /**
-     * 导出为 HTML（使用国际化文本）
+     * Xuất dưới dạng HTML（Sử dụng văn bản quốc tế hóa)
      */
     private void exportToHtml() {
         SystemFileChooser fileChooser = FileChooserUtil.createSaveFileChooser(
                 "markdown.export.html",
                 I18nUtil.getMessage(MessageKeys.MARKDOWN_EXPORT_HTML));
-        fileChooser.setFileFilter(FileChooserUtil.extensionFilter("HTML 文件", "html"));
+        fileChooser.setFileFilter(FileChooserUtil.extensionFilter("HTML tập tin", "html"));
 
         if (fileChooser.showSaveDialog(this) == SystemFileChooser.APPROVE_OPTION) {
             try {
@@ -831,7 +831,7 @@ public class MarkdownEditorPanel extends JPanel {
     }
 
     /**
-     * 复制 HTML 到剪贴板（使用国际化文本）
+     * Sao chép HTML vào clipboard (sử dụng văn bản được quốc tế hóa)
      */
     private void copyHtmlToClipboard() {
         String html = convertMarkdownToHtml(editorArea.getText());
@@ -844,7 +844,7 @@ public class MarkdownEditorPanel extends JPanel {
     }
 
     /**
-     * 更新视图模式
+     * Cập nhật chế độ xem
      */
     private void updateViewMode() {
         switch (viewMode) {
@@ -873,7 +873,7 @@ public class MarkdownEditorPanel extends JPanel {
     }
 
     /**
-     * 更新预览
+     * Cập nhật bản xem trước
      */
     private void updatePreview() {
         String markdown = editorArea.getText();
@@ -884,8 +884,8 @@ public class MarkdownEditorPanel extends JPanel {
 
 
     /**
-     * 企业级 Markdown 到 HTML 转换
-     * 支持完整的 GitHub Flavored Markdown (GFM) 语法
+     * Cấp doanh nghiệp Markdown Đến HTML Chuyển thành
+     * Hỗ trợ đầy đủ GitHub Flavored Markdown (GFM) ngữ pháp
      */
     private String convertMarkdownToHtml(String markdown) {
         if (markdown == null || markdown.isEmpty()) {
@@ -897,9 +897,9 @@ public class MarkdownEditorPanel extends JPanel {
         html.append("<meta charset='UTF-8'>");
         html.append("</head>");
 
-        // 在 body 上使用 inline style 设置基本样式（不使用 StyleSheet）
+        // Vào body được sử dụng trên inline style Đặt kiểu cơ bản (không sử dụng  StyleSheet）
         html.append("<body style='");
-        html.append("margin:0;padding:8px;"); // 设置内边距，更紧凑
+        html.append("margin:0;padding:8px;"); // Đặt phần đệm để làm cho nó nhỏ gọn hơn
         html.append("font-family:sans-serif;");
         html.append("font-size:10px;");
         html.append("line-height:1.6;");
@@ -917,14 +917,14 @@ public class MarkdownEditorPanel extends JPanel {
         for (int i = 0; i < lines.length; i++) {
             String line = lines[i];
 
-            // 代码块
+            // khối mã
             if (line.trim().startsWith("```")) {
                 if (inCodeBlock) {
                     html.append("</pre>");
                     inCodeBlock = false;
                     codeLanguage = "";
                 } else {
-                    // 提取语言标识
+                    // Trích xuất định danh ngôn ngữ
                     codeLanguage = line.trim().substring(3).trim();
                     html.append("<pre style='").append(getCodeBlockStyle()).append("'");
                     if (!codeLanguage.isEmpty()) {
@@ -937,26 +937,26 @@ public class MarkdownEditorPanel extends JPanel {
             }
 
             if (inCodeBlock) {
-                // 去除行尾空白字符，避免渲染为方框
+                // Xóa các ký tự khoảng trắng ở cuối để tránh hiển thị dưới dạng hộp
                 String codeLine = line.replaceAll("\\s+$", "");
                 html.append(escapeHtml(codeLine)).append("\n");
                 continue;
             }
 
-            // 表格处理
+            // Xử lý biểu mẫu
             if (line.trim().startsWith("|") && line.trim().endsWith("|")) {
                 if (!inTable) {
                     html.append("<table style='").append(getTableStyle()).append("'>");
                     inTable = true;
                 }
 
-                // 检查是否是分隔行
+                // Kiểm tra xem nó có phải là một đường phân cách không
                 if (line.matches("^\\|[\\s\\-:|]+\\|$")) {
-                    // 跳过分隔行
+                    // Bỏ qua các dòng phân cách
                     continue;
                 }
 
-                // 判断是否是表头（下一行是分隔行）
+                // Xác định xem đó có phải là tiêu đề bảng hay không (dòng tiếp theo là dòng tách biệt)
                 boolean isHeader = false;
                 if (i + 1 < lines.length && lines[i + 1].matches("^\\|[\\s\\-:|]+\\|$")) {
                     isHeader = true;
@@ -970,8 +970,8 @@ public class MarkdownEditorPanel extends JPanel {
                     html.append("<tr>");
                 }
 
-                String[] cells = line.split("\\|", -1); // -1 保留尾部空字符串
-                // 去除首尾的空元素（| 开头和结尾导致的）
+                String[] cells = line.split("\\|", -1); // -1 Giữ chuỗi trống ở cuối
+                // Xóa các phần tử trống ở đầu và cuối (| đầu và cuối)
                 int start = cells[0].trim().isEmpty() ? 1 : 0;
                 int end = cells[cells.length - 1].trim().isEmpty() ? cells.length - 1 : cells.length;
 
@@ -997,7 +997,7 @@ public class MarkdownEditorPanel extends JPanel {
                 inTable = false;
             }
 
-            // 标题
+            // tiêu đề
             if (line.startsWith("# ")) {
                 closeLists(html, inList, inOrderedList);
                 inList = false;
@@ -1029,14 +1029,14 @@ public class MarkdownEditorPanel extends JPanel {
                 inOrderedList = false;
                 html.append("<h6 style='").append(getHeadingStyle(6)).append("'>").append(processInlineMarkdown(line.substring(7))).append("</h6>");
             }
-            // 水平线
+            // đường ngang
             else if (line.trim().equals("---") || line.trim().equals("***") || line.trim().equals("___")) {
                 closeLists(html, inList, inOrderedList);
                 inList = false;
                 inOrderedList = false;
                 html.append("<hr style='").append(getHrStyle()).append("'>");
             }
-            // 任务列表 - 使用表格布局确保对齐，优化样式
+            // Danh sách nhiệm vụ - Sử dụng bố cục bảng để đảm bảo căn chỉnh và tối ưu hóa kiểu dáng
             else if (line.trim().matches("^[-*]\\s+\\[[ xX]\\]\\s+.*")) {
                 closeLists(html, inList, inOrderedList);
                 inList = false;
@@ -1045,7 +1045,7 @@ public class MarkdownEditorPanel extends JPanel {
                 boolean checked = line.toLowerCase().contains("[x]");
                 String content = line.trim().replaceFirst("^[-*]\\s+\\[[ xX]\\]\\s+", "");
 
-                // 使用内联样式彻底覆盖表格样式，移除所有边框
+                // Ghi đè hoàn toàn các kiểu bảng bằng các kiểu nội tuyến, loại bỏ tất cả các đường viền
                 html.append("<table class='task-item' cellpadding='0' cellspacing='0' border='0' style='border: 0; border-collapse: separate; margin: 0; padding: 0; margin-bottom: 0.25em; width: 100%; background: transparent;'>");
                 html.append("<tr style='border: 0; border-top: 0; background: transparent;'>");
                 html.append("<td style='border: 0; padding: 0; margin: 0; width: 18px; padding-right: 6px; background: transparent; vertical-align: middle;'>");
@@ -1059,7 +1059,7 @@ public class MarkdownEditorPanel extends JPanel {
                 html.append("</tr>");
                 html.append("</table>");
             }
-            // 无序列表 - 使用表格布局实现完全左对齐
+            // Danh sách không có thứ tự - Sử dụng bố cục bảng để căn lề trái hoàn toàn
             else if (line.trim().startsWith("- ") || line.trim().startsWith("* ")) {
                 closeLists(html, inList, inOrderedList);
                 inList = false;
@@ -1067,7 +1067,7 @@ public class MarkdownEditorPanel extends JPanel {
 
                 String content = line.substring(line.indexOf(" ") + 1);
 
-                // 使用表格布局，与任务列表保持一致的左对齐
+                // Sử dụng bố cục bảng, giữ sự căn lề trái nhất quán với danh sách nhiệm vụ
                 html.append("<table class='list-item' cellpadding='0' cellspacing='0' border='0' style='border: 0; border-collapse: separate; margin: 0; padding: 0; margin-bottom: 0.25em; width: 100%; background: transparent;'>");
                 html.append("<tr style='border: 0; border-top: 0; background: transparent;'>");
                 html.append("<td style='border: 0; padding: 0; margin: 0; width: 1%; padding-right: 6px; background: transparent; vertical-align: top; white-space: nowrap;'>");
@@ -1079,19 +1079,19 @@ public class MarkdownEditorPanel extends JPanel {
                 html.append("</tr>");
                 html.append("</table>");
             }
-            // 有序列表 - 使用表格布局实现完全左对齐
+            // Danh sách đặt hàng - Sử dụng bố cục bảng để căn lề trái hoàn toàn
             else if (line.trim().matches("^\\d+\\.\\s.*")) {
                 closeLists(html, inList, inOrderedList);
                 inList = false;
                 inOrderedList = false;
 
-                // 提取序号和内容
+                // Trích xuất số sê-ri và nội dung
                 String trimmed = line.trim();
                 int dotIndex = trimmed.indexOf('.');
-                String number = trimmed.substring(0, dotIndex + 1); // 包括点号
+                String number = trimmed.substring(0, dotIndex + 1); // Bao gồm khoảng thời gian
                 String content = trimmed.substring(dotIndex + 1).trim();
 
-                // 使用表格布局，与任务列表保持一致的左对齐
+                // Sử dụng bố cục bảng, giữ sự căn lề trái nhất quán với danh sách nhiệm vụ
                 html.append("<table class='list-item' cellpadding='0' cellspacing='0' border='0' style='border: 0; border-collapse: separate; margin: 0; padding: 0; margin-bottom: 0.25em; width: 100%; background: transparent;'>");
                 html.append("<tr style='border: 0; border-top: 0; background: transparent;'>");
                 html.append("<td style='border: 0; padding: 0; margin: 0; width: 1%; padding-right: 6px; background: transparent; vertical-align: top; text-align: left; white-space: nowrap;'>");
@@ -1103,7 +1103,7 @@ public class MarkdownEditorPanel extends JPanel {
                 html.append("</tr>");
                 html.append("</table>");
             }
-            // 引用
+            // Trích dẫn
             else if (line.trim().startsWith("> ")) {
                 closeLists(html, inList, inOrderedList);
                 inList = false;
@@ -1111,14 +1111,14 @@ public class MarkdownEditorPanel extends JPanel {
                 String content = line.substring(line.indexOf(">") + 1).trim();
                 html.append("<blockquote style='").append(getBlockquoteStyle()).append("'>").append(processInlineMarkdown(content)).append("</blockquote>");
             }
-            // 空行
+            // Dòng trống
             else if (line.trim().isEmpty()) {
                 closeLists(html, inList, inOrderedList);
                 inList = false;
                 inOrderedList = false;
                 html.append("<br>");
             }
-            // 普通段落
+            // Đoạn thông thường
             else {
                 closeLists(html, inList, inOrderedList);
                 inList = false;
@@ -1127,7 +1127,7 @@ public class MarkdownEditorPanel extends JPanel {
             }
         }
 
-        // 关闭未闭合的标签
+        // Đóng các thẻ không được tiết lộ
         closeLists(html, inList, inOrderedList);
         if (inTable) {
             if (html.toString().contains("<tbody>")) {
@@ -1144,7 +1144,7 @@ public class MarkdownEditorPanel extends JPanel {
     }
 
     /**
-     * 关闭列表标签
+     * Đóng nhãn danh sách
      */
     private void closeLists(StringBuilder html, boolean inList, boolean inOrderedList) {
         if (inList) {
@@ -1156,60 +1156,60 @@ public class MarkdownEditorPanel extends JPanel {
     }
 
     /**
-     * 处理行内 Markdown 语法（GFM 增强版）
+     * Xử lý nội tuyến Markdown Syntax (GFM Phiên bản nâng cao)
      */
     private String processInlineMarkdown(String text) {
         if (text == null || text.isEmpty()) {
             return "";
         }
 
-        // 先转义 HTML，防止用户输入的 HTML 标签被执行
+        // Hãy trốn thoát trước tiên HTML，Ngăn chặn đầu vào của người dùng HTML Thẻ được thực thi
         text = escapeHtml(text);
 
-        // 然后处理 Markdown 语法（此时可以安全地插入 HTML 标签）
+        // Sau đó giải quyết nó Markdown syntax (safe to insert at this point HTML Nhãn)
 
-        // 粗斜体 ***text*** (必须在粗体和斜体之前处理)
+        // In nghiêng đậm ***text*** (Phải được xử lý trước chữ in đậm và in nghiêng)
         text = text.replaceAll("\\*\\*\\*(.+?)\\*\\*\\*", "<strong><em>$1</em></strong>");
         text = text.replaceAll("___(.+?)___", "<strong><em>$1</em></strong>");
 
-        // 粗体 **text** 或 __text__
+        // In đậm **text** hoặc __text__
         text = text.replaceAll("\\*\\*(.+?)\\*\\*", "<strong>$1</strong>");
         text = text.replaceAll("__(.+?)__", "<strong>$1</strong>");
 
-        // 斜体 *text* 或 _text_ (必须在粗体之后处理)
+        // in nghiêng *text* hoặc _text_ (Phải được xử lý sau khi in đậm)
         text = text.replaceAll("\\*(.+?)\\*", "<em>$1</em>");
         text = text.replaceAll("(?<!_)_(.+?)_(?!_)", "<em>$1</em>");
 
-        // 删除线 ~~text~~ - 使用 strike 标签，Swing HTMLEditorKit 原生支持
+        // Gạch ngang ~~text~~ - sử dụng strike Nhãn,Swing HTMLEditorKit Hỗ trợ bản địa
         text = text.replaceAll("~~(.+?)~~", "<strike>$1</strike>");
 
-        // 高亮 ==text== (部分编辑器支持)
+        // Làm nổi bật ==text== (Được hỗ trợ bởi một số biên tập viên)
         text = text.replaceAll("==(.+?)==", "<mark>$1</mark>");
 
-        // 行内代码 `code` (必须在其他处理之后，避免代码中的特殊字符被处理)
+        // Mã nội tuyến `code` (Phải tránh các ký tự đặc biệt trong mã sau khi xử lý khác)
         text = text.replaceAll("`(.+?)`", "<code style='" + getInlineCodeStyle() + "'>$1</code>");
 
-        // 图片 ![alt](url)
+        // hình ảnh ![alt](url)
         text = text.replaceAll("!\\[([^\\]]*)\\]\\(([^)]+)\\)", "<img src=\"$2\" alt=\"$1\" style=\"max-width: 100%;\" />");
 
-        // 链接 [text](url)
+        // Liên kết [text](url)
         text = text.replaceAll("\\[([^\\]]+)\\]\\(([^)]+)\\)", "<a href=\"$2\">$1</a>");
 
-        // 自动链接 <url>
+        // Liên kết tự động <url>
         text = text.replaceAll("&lt;(https?://[^&]+)&gt;", "<a href=\"$1\">$1</a>");
 
         return text;
     }
 
     /**
-     * HTML 转义
+     * HTML bỏ trốn
      */
     private String escapeHtml(String text) {
         return HttpHtmlRenderer.escapeHtml(text);
     }
 
     /**
-     * 获取编辑器文本
+     * Lấy văn bản soạn thảo
      */
     public String getText() {
         return editorArea.getText();
@@ -1217,13 +1217,13 @@ public class MarkdownEditorPanel extends JPanel {
 
 
     /**
-     * 设置编辑器文本
+     * Đặt văn bản soạn thảo
      */
     public void setText(String text) {
         editorArea.setText(text == null ? "" : text);
         editorArea.setCaretPosition(0);
-        // setText 多用于切换请求/分组时加载已有描述，不应成为用户可撤销的一步。
-        // 同时清理 RSTA 内置 undo 和本面板自管 undo，避免 Ctrl+Z 把加载出的内容清空。
+        // setText Chủ yếu được sử dụng cho các yêu cầu chuyển giao/Việc tải mô tả hiện có khi nhóm không phải là một bước không thể hoàn tác đối với người dùng.
+        // Cũng dọn dẹp RSTA Tích hợp sẵn undo Và bảng này tự quản lý undo，tránh Ctrl+Z Xóa nội dung đã tải.
         editorArea.discardAllEdits();
         undoManager.discardAllEdits();
         updateUndoRedoButtons();
@@ -1248,14 +1248,14 @@ public class MarkdownEditorPanel extends JPanel {
     }
 
     /**
-     * 添加文档变化监听器
+     * Thêm trình nghe thay đổi tài liệu
      */
     public void addDocumentListener(DocumentListener listener) {
         changeListeners.add(listener);
     }
 
     /**
-     * 通知所有监听器
+     * Thông báo cho tất cả người nghe
      */
     private void notifyChangeListeners(DocumentEvent e) {
         for (DocumentListener listener : changeListeners) {

@@ -1,27 +1,27 @@
 # Easy Postman Plugins
 
-这里放官方插件模块和插件管理模块：
+Dưới đây là các mô-đun trình cắm thêm và mô-đun quản lý trình cắm thêm chính thức:
 
-- `plugin-manager`: catalog 解析、在线/离线安装、插件管理门面
-- `plugin-client-cert`: 客户端证书插件
-- `plugin-capture`: 抓包插件
-- `plugin-redis`: Redis 插件
-- `plugin-kafka`: Kafka 插件
-- `plugin-decompiler`: Java 反编译插件
+- `plugin-manager`: catalog Phân tích, trực tuyến/Mặt tiền quản lý plug-in và cài đặt ngoại tuyến
+- `plugin-client-cert`: Plugin chứng chỉ ứng dụng khách
+- `plugin-capture`: Plug-in chụp gói
+- `plugin-redis`: Redis plugin
+- `plugin-kafka`: Kafka plugin
+- `plugin-decompiler`: Java Dịch ngược plugin
 
-共享平台层仍放在根目录：
+Lớp nền tảng chia sẻ vẫn được đặt trong thư mục gốc:
 
 - `easy-postman-plugin-api`
 - `easy-postman-plugin-runtime`
 
-常用命令：
+Các lệnh thường dùng:
 
 ```bash
 mvn -pl easy-postman-app,easy-postman-plugins/plugin-redis -am clean package -DskipTests
 mvn clean package -DskipTests
 ```
 
-更多说明见：
+Để biết thêm hướng dẫn, hãy xem:
 
 - `docs/PLUGINS_zh.md`
 - `docs/BUILD_zh.md`

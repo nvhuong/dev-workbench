@@ -9,11 +9,11 @@ import lombok.experimental.UtilityClass;
 public class JsonPathUtil {
 
     /**
-     * 从JSON对象中提取指定路径的值，支持简单的$.a.b[0].c格式
+     * TừJSONTrích xuất giá trị của đường dẫn đã chỉ định từ đối tượng, hỗ trợ đơn giản$.a.b[0].cđịnh dạng
      *
-     * @param jsonObj 可以是JSONObject/JSONArray/String
-     * @param path    形如$.a.b[0].c
-     * @return 提取到的值，找不到返回null
+     * @param jsonObj Nó có thể đượcJSONObject/JSONArray/String
+     * @param path    Hình dáng như$.a.b[0].c
+     * @return Giá trị được trích xuất không thể được tìm thấy và trả vềnull
      */
     public static String extractJsonPath(Object jsonObj, String path) {
         if (jsonObj == null || path == null || path.isEmpty()) return null;

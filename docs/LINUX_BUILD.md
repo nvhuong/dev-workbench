@@ -1,171 +1,171 @@
-# Linux 系统打包说明
+# Linux Hướng dẫn đóng gói hệ thống
 
-## 概述
+## Tổng quan
 
-本项目提供了两个 Linux 打包脚本：
-- `build/linux-deb.sh` - 用于 Ubuntu/Debian 系统的 DEB 包
-- `build/linux-rpm.sh` - 用于 CentOS/RedHat/Fedora 系统的 RPM 包
+Dự án này cung cấp hai Linux Kịch bản đóng gói:
+- `build/linux-deb.sh` - Được sử dụng cho Ubuntu/Debian Có hệ thống DEB gói
+- `build/linux-rpm.sh` - Được sử dụng cho CentOS/RedHat/Fedora Có hệ thống RPM gói
 
-## 前置要求
+## Điều kiện tiên quyết
 
-### 1. 系统要求
+### 1. Yêu cầu hệ thống
 
-#### Ubuntu/Debian 系统（打包 DEB）
+#### Ubuntu/Debian hệ thống (gói DEB）
 ```bash
-# 安装必需的工具
+# Cài đặt các công cụ cần thiết
 sudo apt-get update
 sudo apt-get install -y openjdk-21-jdk maven fakeroot binutils
 
-# 注意：生成的 DEB 包安装时需要 xdg-utils，但打包时不需要
+# Lưu ý: Đã tạo DEB Cần thiết khi cài đặt gói xdg-utils，Nhưng nó không cần thiết khi đóng gói
 ```
 
-#### CentOS/RedHat 系统（打包 RPM）
+#### CentOS/RedHat hệ thống (gói RPM）
 ```bash
 # CentOS 7/8
 sudo yum install -y java-21-openjdk java-21-openjdk-devel maven rpm-build binutils
 
-# 或者使用 dnf (CentOS 8+/Fedora)
+# Hoặc sử dụng dnf (CentOS 8+/Fedora)
 sudo dnf install -y java-21-openjdk java-21-openjdk-devel maven rpm-build binutils
 ```
 
-### 2. 验证环境
+### 2. Xác minh môi trường
 ```bash
-# 检查 Java 版本（需要 >= 17）
+# nghiên cứu Java phiên bản (bắt buộc >= 17）
 java -version
 
-# 检查 Maven
+# nghiên cứu Maven
 mvn -version
 
-# 检查 jlink 和 jpackage（JDK 21+ 自带）
+# nghiên cứu jlink và jpackage（JDK 21+ Mang theo của riêng bạn)
 jlink --version
 jpackage --version
 ```
 
-## 打包步骤
+## Các bước đóng gói
 
-### Ubuntu/Debian 系统 - 打包 DEB
+### Ubuntu/Debian hệ thống - Đóng gói DEB
 
-1. **克隆项目代码**
+1. **Sao chép mã dự án**
    ```bash
    git clone https://gitee.com/lakernote/easy-postman.git
    cd easy-postman
    ```
 
-2. **运行打包脚本**
+2. **Chạy tập lệnh đóng gói**
    ```bash
    ./build/linux-deb.sh
    ```
 
-3. **生成的文件**
+3. **tập tin được tạo ra**
    ```
    dist/<generated-package>.deb
    ```
 
-4. **安装 DEB 包**
+4. **Cài đặt DEB gói**
    ```bash
-   # 推荐方式：使用 apt 安装（自动处理依赖）
+   # Phương pháp đề xuất: sử dụng apt Cài đặt (tự động xử lý các phần phụ thuộc)
    sudo apt install ./dist/<generated-package>.deb
-   
-   # 或者先用 dpkg 安装，再修复依赖
+
+   # Hoặc sử dụng nó đầu tiên dpkg Cài đặt và sau đó sửa chữa các phần phụ thuộc
    sudo dpkg -i dist/<generated-package>.deb
    sudo apt-get install -f
-   
-   # 卸载
+
+   # gỡ cài đặt
    sudo dpkg -r easypostman
    ```
 
-### CentOS/RedHat 系统 - 打包 RPM
+### CentOS/RedHat hệ thống - Đóng gói RPM
 
-1. **克隆项目代码**
+1. **Sao chép mã dự án**
    ```bash
    git clone https://gitee.com/lakernote/easy-postman.git
    cd easy-postman
    ```
 
-2. **运行打包脚本**
+2. **Chạy tập lệnh đóng gói**
    ```bash
    ./build/linux-rpm.sh
    ```
 
-3. **生成的文件**
+3. **tập tin được tạo ra**
    ```
    dist/<generated-package>.rpm
    ```
 
-4. **安装 RPM 包**
+4. **Cài đặt RPM gói**
    ```bash
-   # 使用 rpm 安装
+   # sử dụng rpm Cài đặt
    sudo rpm -ivh dist/<generated-package>.rpm
-   
-   # 或使用 yum/dnf（会自动处理依赖）
+
+   # hoặc sử dụng yum/dnf（Các phần phụ thuộc sẽ được xử lý tự động)
    sudo yum install dist/<generated-package>.rpm
-   # 或
+   # hoặc
    sudo dnf install dist/<generated-package>.rpm
-   
-   # 卸载
+
+   # gỡ cài đặt
    sudo rpm -e EasyPostMan
-   # 或
+   # hoặc
    sudo yum remove EasyPostMan
    ```
 
-## 打包过程说明
+## Hướng dẫn quy trình đóng gói
 
-两个脚本都会执行以下步骤：
+Cả hai tập lệnh đều thực hiện các bước sau:
 
-1. **环境检查** - 验证 Java、Maven、jlink、jpackage 是否已安装
-2. **版本读取** - 从 `pom.xml` 自动读取项目版本号
-3. **Maven 构建** - 执行 `mvn clean package` 生成 fat JAR
-4. **创建运行时** - 使用 `jlink` 创建精简的 JRE 运行时
-5. **打包应用** - 使用 `jpackage` 创建系统安装包
+1. **Kiểm tra môi trường** - Xác minh Java、Maven、jlink、jpackage Nó đã được cài đặt chưa?
+2. **Phiên bản đã đọc** - Từ `pom.xml` Tự động đọc số phiên bản dự án
+3. **Maven Xây dựng** - thực hiện `mvn clean package` phát ra fat JAR
+4. **Tạo một thời gian chạy** - sử dụng `jlink` Tạo tinh gọn JRE thời gian chạy
+5. **Các ứng dụng đóng gói** - sử dụng `jpackage` Tạo gói cài đặt hệ thống
 
-## 打包特性
+## Tính năng đóng gói
 
-### DEB 包特性
-- ✅ 自动创建桌面快捷方式
-- ✅ 添加到应用程序菜单（开发工具分类）
-- ✅ 包含精简的 JRE 运行时（无需系统安装 Java）
-- ✅ 自动配置内存参数（256MB-512MB）
-- ✅ UTF-8 编码支持
+### DEB Đặc điểm gói
+- ✅ Tự động tạo lối tắt trên màn hình
+- ✅ Đã thêm vào Menu Ứng dụng (danh mục Công cụ phát triển)
+- ✅ Chứa hợp lý JRE Thời gian chạy (không cần cài đặt hệ thống Java）
+- ✅ Tự động cấu hình các tham số bộ nhớ (256MB-512MB）
+- ✅ UTF-8 Hỗ trợ mã hóa
 
-### RPM 包特性
-- ✅ 自动创建桌面快捷方式
-- ✅ 添加到应用程序菜单（开发工具分类）
-- ✅ 包含精简的 JRE 运行时（无需系统安装 Java）
-- ✅ 自动配置内存参数（256MB-512MB）
-- ✅ UTF-8 编码支持
-- ✅ MIT 许可证声明
+### RPM Đặc điểm gói
+- ✅ Tự động tạo lối tắt trên màn hình
+- ✅ Đã thêm vào Menu Ứng dụng (danh mục Công cụ phát triển)
+- ✅ Chứa hợp lý JRE Thời gian chạy (không cần cài đặt hệ thống Java）
+- ✅ Tự động cấu hình các tham số bộ nhớ (256MB-512MB）
+- ✅ UTF-8 Hỗ trợ mã hóa
+- ✅ MIT Tuyên bố giấy phép
 
-## 安装后使用
+## Sử dụng sau khi cài đặt
 
-### 启动应用
+### Bắt đầu ứng dụng
 
-1. **通过应用程序菜单**
-   - 在系统菜单中找到 "Development" 或 "开发工具" 分类
-   - 点击 "EasyPostman" 图标启动
+1. **Thông qua menu ứng dụng**
+   - Tìm thấy trong menu hệ thống "Development" hoặc "công cụ phát triển" phân loại
+   - Bấm vào "EasyPostman" biểu tượng để bắt đầu
 
-2. **通过命令行**
+2. **Thông qua dòng lệnh**
    ```bash
    easypostman
    ```
 
-3. **查看安装位置**
+3. **Kiểm tra vị trí cài đặt**
    ```bash
-   # DEB 包
+   # DEB gói
    dpkg -L easypostman
-   
-   # RPM 包
+
+   # RPM gói
    rpm -ql easypostman
    ```
 
-## 常见问题
+## Câu hỏi thường gặp
 
-### 1. 打包失败：找不到 jpackage
+### 1. Đóng gói không thành công: không tìm thấy jpackage
 
-**问题**: `jpackage: command not found`
+**câu hỏi**: `jpackage: command not found`
 
-**解决方案**: 
+**giải pháp**:
 ```bash
-# 确保安装了完整的 JDK 21+（不是 JRE）
+# Hãy chắc chắn rằng bạn đã cài đặt hoàn chỉnh JDK 21+（KHÔNG JRE）
 # Ubuntu/Debian
 sudo apt-get install openjdk-21-jdk
 
@@ -173,76 +173,76 @@ sudo apt-get install openjdk-21-jdk
 sudo yum install java-21-openjdk-devel
 ```
 
-### 2. 安装后无法启动
+### 2. Không thể khởi động sau khi cài đặt
 
-**问题**: 双击图标无反应
+**câu hỏi**: Không có phản hồi khi nhấp đúp vào biểu tượng
 
-**解决方案**:
+**giải pháp**:
 ```bash
-# 查看错误日志
+# Kiểm tra nhật ký lỗi
 journalctl --user -f
 
-# 或直接从终端运行查看错误
+# Hoặc chạy trực tiếp từ terminal để xem lỗi
 /opt/easypostman/bin/EasyPostMan
 ```
 
-### 3. 权限问题
+### 3. Vấn đề về quyền
 
-**问题**: `Permission denied`
+**câu hỏi**: `Permission denied`
 
-**解决方案**:
+**giải pháp**:
 ```bash
-# 确保脚本有执行权限
+# Đảm bảo tập lệnh có quyền thực thi
 chmod +x build/linux-deb.sh build/linux-rpm.sh
 ```
 
-### 4. Maven 构建失败
+### 4. Maven Xây dựng không thành công
 
-**问题**: 依赖下载失败
+**câu hỏi**: Tải xuống phần phụ thuộc không thành công
 
-**解决方案**:
+**giải pháp**:
 ```bash
-# 清理 Maven 缓存重试
+# Dọn dẹp Maven Thử lại bộ nhớ đệm
 rm -rf ~/.m2/repository
-./build/linux-deb.sh  # 或 ./build/linux-rpm.sh
+./build/linux-deb.sh  # hoặc ./build/linux-rpm.sh
 ```
 
-### 5. jlink 失败：找不到 objcopy
+### 5. jlink Thất bại: Không tìm thấy objcopy
 
-**问题**: `Error: java.io.IOException: Cannot run program "objcopy": error=2, No such file or directory`
+**câu hỏi**: `Error: java.io.IOException: Cannot run program "objcopy": error=2, No such file or directory`
 
-**原因**: jlink 在创建运行时镜像时需要 `objcopy` 工具来优化和压缩模块
+**lý do**: jlink Cần thiết khi tạo hình ảnh thời gian chạy `objcopy` Công cụ tối ưu hóa và nén các mô-đun
 
-**解决方案**:
+**giải pháp**:
 ```bash
-# Ubuntu/Debian 系统
+# Ubuntu/Debian hệ thống
 sudo apt-get install binutils
 
-# CentOS/RedHat 系统
+# CentOS/RedHat hệ thống
 sudo yum install binutils
-# 或
+# hoặc
 sudo dnf install binutils
 
-# 验证安装
+# Xác minh cài đặt
 objcopy --version
 ```
 
-### 6. DEB 包安装失败：缺少 xdg-utils
+### 6. DEB Cài đặt gói không thành công: thiếu xdg-utils
 
-**问题**: `easypostman depends on xdg-utils; however: Package xdg-utils is not installed.`
+**câu hỏi**: `easypostman depends on xdg-utils; however: Package xdg-utils is not installed.`
 
-**原因**: DEB 包依赖 `xdg-utils` 来处理桌面集成（快捷方式、文件关联等）
+**lý do**: DEB Phụ thuộc gói `xdg-utils` để xử lý việc tích hợp máy tính để bàn (phím tắt, liên kết tệp, v.v.)
 
-**解决方案**:
+**giải pháp**:
 ```bash
-# 方式 1：先安装依赖，再安装 DEB 包
+# cách 1：Cài đặt phụ thuộc trước, sau đó cài đặt DEB gói
 sudo apt-get install xdg-utils
 sudo dpkg -i dist/<generated-package>.deb
 
-# 方式 2：使用 apt-get 自动处理依赖（推荐）
+# cách 2：sử dụng apt-get Tự động xử lý các phần phụ thuộc (được khuyến nghị)
 sudo apt-get install -f
-# 这会自动安装缺失的依赖并完成 easypostman 的配置
+# Điều này sẽ tự động cài đặt các phần phụ thuộc còn thiếu và hoàn tất easypostman cấu hình
 
-# 方式 3：使用 apt 直接安装（会自动处理依赖）
+# cách 3：sử dụng apt Cài đặt trực tiếp (các phần phụ thuộc sẽ được xử lý tự động)
 sudo apt install ./dist/<generated-package>.deb
 ```

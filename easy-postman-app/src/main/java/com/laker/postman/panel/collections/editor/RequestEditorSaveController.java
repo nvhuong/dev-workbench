@@ -20,9 +20,9 @@ import java.util.function.BiFunction;
 import java.util.function.Supplier;
 
 /**
- * 请求编辑器保存控制器。
+ * Yêu cầu người soạn thảo lưu bộ điều khiển.
  * <p>
- * 保存动作需要协调当前 Tab、集合树、命名弹窗和错误提示。放在控制层后，RequestEditorPanel 不再直接承载保存流程细节。
+ * Hành động lưu yêu cầu sự phối hợp của dòng điện Tab、Cây bộ sưu tập, cửa sổ bật lên được đặt tên và thông báo lỗi. Đặt nó sau lớp điều khiển.RequestEditorPanel Nó không còn mang trực tiếp các chi tiết của quá trình lưu nữa.
  */
 @Slf4j
 @RequiredArgsConstructor
@@ -70,7 +70,7 @@ final class RequestEditorSaveController {
 
             @Override
             public void onNoRequestToSave() {
-                log.warn("没有可保存的请求");
+                log.warn("Không có yêu cầu nào để lưu");
             }
 
             @Override
@@ -108,7 +108,7 @@ final class RequestEditorSaveController {
 
             @Override
             public void showUpdateExistingRequestFailed(HttpRequestItem item) {
-                log.error("更新请求失败: {}", item.getId() + " - " + item.getName());
+                log.error("Yêu cầu cập nhật không thành công: {}", item.getId() + " - " + item.getName());
                 JOptionPane.showMessageDialog(
                         dialogParent,
                         I18nUtil.getMessage(MessageKeys.UPDATE_REQUEST_FAILED),

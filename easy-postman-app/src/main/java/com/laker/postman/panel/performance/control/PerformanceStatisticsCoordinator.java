@@ -75,18 +75,18 @@ public final class PerformanceStatisticsCoordinator {
 
         try {
             if (resultTabbedPane.getSelectedIndex() != 1) {
-                log.debug("当前未查看报表Tab，跳过刷新");
+                log.debug("Báo cáo hiện không được xemTab，Bỏ qua việc làm mới");
                 return;
             }
             updateReportWithLatestData();
         } catch (Exception ex) {
-            log.warn("实时刷新报表失败: {}", ex.getMessage(), ex);
+            log.warn("Không thể làm mới báo cáo trong thời gian thực: {}", ex.getMessage(), ex);
         }
     }
 
     public void updateReportWithLatestData() {
         long generation = currentGeneration();
-        submitMetricsTask("报表更新", generation, () -> {
+        submitMetricsTask("Báo cáo cập nhật", generation, () -> {
             var snapshot = snapshotService.reportSnapshot(System.currentTimeMillis());
             invokeUiIfActive(generation, () -> performanceReportPanel.updateReport(snapshot));
         });
@@ -107,28 +107,28 @@ public final class PerformanceStatisticsCoordinator {
             return;
         }
 
-        // 最终报表只看累计 stats，不合并实时 live snapshot，避免运行结束瞬间的弱一致数据污染最终结果。
+        // Báo cáo cuối cùng chỉ xem xét tổng số tích lũy stats，Không hợp nhất trong thời gian thực live snapshot，Tránh để dữ liệu có tính nhất quán yếu ở cuối quá trình chạy làm ảnh hưởng đến kết quả cuối cùng.
         performanceReportPanel.updateReport(snapshotService.statsSnapshot());
     }
 
     public void sampleTrendData() {
         if (!isTrendEnabled()) {
-            log.debug("趋势图未启用，跳过采样");
+            log.debug("Biểu đồ xu hướng không được bật và việc lấy mẫu bị bỏ qua");
             return;
         }
         if (performanceTrendPanel == null) {
-            log.debug("趋势图面板未初始化，跳过采样");
+            log.debug("Bảng xu hướng không được khởi tạo và việc lấy mẫu bị bỏ qua");
             return;
         }
         long generation = currentGeneration();
 
-        submitMetricsTask("趋势图采样", generation, () -> {
-            // 趋势窗口在这里真正 drain，X 轴时间必须使用 drain 时刻，避免后台队列延迟导致样本画到旧时间点。
+        submitMetricsTask("Lấy mẫu biểu đồ xu hướng", generation, () -> {
+            // Cửa sổ xu hướng là có thật ở đây drain，X Thời gian trục phải được sử dụng drain thời gian để tránh sự chậm trễ trong hàng đợi nền khiến mẫu được rút về điểm thời gian cũ.
             long sampleTimeMs = System.currentTimeMillis();
             RegularTimePeriod period = createTrendPeriod(sampleTimeMs);
             PerformanceTrendSnapshot snapshot = snapshotService.drainTrendWindowSnapshot(sampleTimeMs);
             invokeUiIfActive(generation, () -> {
-                log.debug("采样数据 {} - 用户数: {}, HTTP: {}, WS: {}, SSE: {}",
+                log.debug("Dữ liệu mẫu {} - Số lượng người dùng: {}, HTTP: {}, WS: {}, SSE: {}",
                         period, snapshot.activeUsers(), snapshot.http().samples(), snapshot.webSocket().samples(), snapshot.sse().samples());
                 performanceTrendPanel.addOrUpdate(period, snapshot);
                 performanceReportPanel.setTrendReportPoints(performanceTrendPanel.reportPoints());
@@ -156,7 +156,7 @@ public final class PerformanceStatisticsCoordinator {
         RegularTimePeriod period = createTrendPeriod(normalizedSampleTimeMs);
         PerformanceTrendSnapshot snapshot = snapshotService.drainTrendWindowSnapshot(normalizedSampleTimeMs);
 
-        log.debug("同步采样数据 {} - 用户数: {}, HTTP: {}, WS: {}, SSE: {}",
+        log.debug("Đồng bộ hóa dữ liệu được lấy mẫu {} - Số lượng người dùng: {}, HTTP: {}, WS: {}, SSE: {}",
                 period, snapshot.activeUsers(), snapshot.http().samples(), snapshot.webSocket().samples(), snapshot.sse().samples());
         performanceTrendPanel.addOrUpdate(period, snapshot);
         performanceReportPanel.setTrendReportPoints(performanceTrendPanel.reportPoints());
@@ -217,19 +217,19 @@ public final class PerformanceStatisticsCoordinator {
             metricsExecutor.execute(() -> {
                 synchronized (runGenerationLock) {
                     if (!isCurrentGeneration(generation)) {
-                        log.debug("{}已过期，跳过旧压测轮次的异步任务", taskName);
+                        log.debug("{}Đã hết hạn, bỏ qua nhiệm vụ không đồng bộ của vòng kiểm tra căng thẳng cũ", taskName);
                         return;
                     }
                     try {
                         task.run();
                     } catch (Exception ex) {
-                        log.error("{}失败", taskName, ex);
+                        log.error("{}thất bại", taskName, ex);
                     }
                 }
             });
         } catch (RejectedExecutionException ex) {
             if (!disposed) {
-                log.warn("{}提交失败", taskName, ex);
+                log.warn("{}Gửi không thành công", taskName, ex);
             }
         }
     }

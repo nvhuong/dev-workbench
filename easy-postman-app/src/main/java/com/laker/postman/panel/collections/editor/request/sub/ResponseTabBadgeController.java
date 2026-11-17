@@ -10,9 +10,9 @@ import java.awt.Color;
 import java.util.List;
 
 /**
- * 响应标签计数/状态徽标控制器。
+ * Số lượng thẻ phản hồi/Bộ điều khiển logo trạng thái.
  * <p>
- * Headers 和 Tests 的标题会随结果动态变化，集中在这里避免 ResponsePanel 混入文案拼装细节。
+ * Headers và Tests Tiêu đề sẽ thay đổi linh hoạt theo kết quả, vì vậy hãy tránh tập trung vào đây ResponsePanel Trộn trong copywriting để tập hợp các chi tiết.
  */
 final class ResponseTabBadgeController {
     private static final int BADGE_ICON_TEXT_GAP = 5;

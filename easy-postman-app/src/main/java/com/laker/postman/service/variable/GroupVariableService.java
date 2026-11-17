@@ -7,31 +7,31 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * 分组级别变量服务（单例模式）
+ * Dịch vụ biến cấp nhóm (chế độ đơn)
  * <p>
- * 提供从请求所在分组继承的变量
- * 变量优先级：内层分组 > 外层分组
+ * Cung cấp các biến được kế thừa từ nhóm mà yêu cầu được thực hiện
+ * Mức độ ưu tiên thay đổi: nhóm bên trong > Nhóm bên ngoài
  * <p>
- * 注意：使用全局 RequestExecutionContext 获取当前请求执行 scope
+ * LƯU Ý: Sử dụng toàn cầu RequestExecutionContext Nhận thực hiện yêu cầu hiện tại scope
  */
 @Slf4j
 public class GroupVariableService implements VariableProvider {
 
     /**
-     * 单例实例
+     * Ví dụ Singleton
      */
     private static final GroupVariableService INSTANCE = new GroupVariableService();
 
     /**
-     * 私有构造函数，防止外部实例化
+     * Nhà xây dựng riêng để ngăn chặn việc khởi tạo bên ngoài
      */
     private GroupVariableService() {
     }
 
     /**
-     * 获取单例实例
+     * Nhận một ví dụ đơn lẻ
      *
-     * @return GroupVariableService 单例
+     * @return GroupVariableService Singleton
      */
     public static GroupVariableService getInstance() {
         return INSTANCE;

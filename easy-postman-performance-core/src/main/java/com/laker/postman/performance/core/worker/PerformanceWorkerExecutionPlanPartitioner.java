@@ -14,7 +14,7 @@ public class PerformanceWorkerExecutionPlanPartitioner {
         if (plan == null || assignment == null) {
             return plan;
         }
-        // 没有分到虚拟用户的 worker 必须执行空计划，不能回退成完整计划。
+        // Không có người dùng ảo nào được chỉ định worker Một kế hoạch trống phải được thực thi và không thể khôi phục về một kế hoạch đầy đủ.
         if (assignment.getThreadGroups().isEmpty()) {
             return new PerformanceTestPlan(List.of());
         }
@@ -26,7 +26,7 @@ public class PerformanceWorkerExecutionPlanPartitioner {
                 continue;
             }
             PerformanceThreadGroupPlan source = plan.getThreadGroups().get(groupIndex);
-            // CSV 数据不在 master 端物理截断，worker 通过全局虚拟用户起点取行，避免每台 worker 都从第 0 行读取。
+            // CSV Dữ liệu không có ở đó master Kết thúc việc cắt bớt vật lý,worker Đi qua nguồn gốc người dùng ảo toàn cầu và tránh từng máy worker Tất cả từ đầu tiên 0 hàng đọc.
             groups.add(new PerformanceThreadGroupPlan(
                     source.getName(),
                     adjustThreadGroupData(source.getThreadGroupData(), threadGroupAssignment.getVirtualUserCount()),

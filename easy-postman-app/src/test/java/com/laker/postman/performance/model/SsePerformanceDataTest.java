@@ -24,12 +24,12 @@ public class SsePerformanceDataTest {
 
     @Test
     public void shouldDescribeSseReceiveCompletionAsClosingStream() {
-        ResourceBundle zh = ResourceBundle.getBundle("messages", Locale.CHINESE);
-        assertEquals(zh.getString(MessageKeys.PERFORMANCE_SSE_READ_MODE), "读取方式");
+        ResourceBundle zh = ResourceBundle.getBundle("messages", Locale.forLanguageTag("vi"));
+        assertEquals(zh.getString(MessageKeys.PERFORMANCE_SSE_READ_MODE), "Chế độ đọc");
         assertEquals(zh.getString(MessageKeys.PERFORMANCE_SSE_NODE_READ), "SSE Read");
-        assertEquals(zh.getString(MessageKeys.PERFORMANCE_MENU_ADD_SSE_READ), "添加 SSE Read");
+        assertEquals(zh.getString(MessageKeys.PERFORMANCE_MENU_ADD_SSE_READ), "Thêm vào SSE Read");
         assertEquals(zh.getString(MessageKeys.PERFORMANCE_SSE_HINT_FIRST_MESSAGE),
-                "收到首事件即结束；超时失败。");
+                "Nó kết thúc khi nhận được sự kiện đầu tiên; hết thời gian chờ không thành công.");
 
         ResourceBundle en = ResourceBundle.getBundle("messages", Locale.ENGLISH);
         assertEquals(en.getString(MessageKeys.PERFORMANCE_SSE_READ_MODE), "Read");

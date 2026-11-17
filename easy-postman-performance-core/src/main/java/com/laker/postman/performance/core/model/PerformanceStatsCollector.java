@@ -10,7 +10,7 @@ import java.util.concurrent.ConcurrentMap;
 
 public final class PerformanceStatsCollector {
 
-    // 最终报表的唯一权威来源。趋势图和实时报告可以弱一致，但不能反向写入这里。
+    // Nguồn có thẩm quyền duy nhất của các tuyên bố cuối cùng. Biểu đồ xu hướng và báo cáo thời gian thực có thể ít nhất quán nhưng không thể viết ngược lại ở đây.
     private final ConcurrentMap<PerformanceProtocol, ConcurrentMap<String, PerformanceSampleMeterSet>> apiStatsByProtocol =
             new ConcurrentHashMap<>();
     private final ConcurrentLinkedDeque<PerformanceSampleMeterSet> apiStatsInFirstSeenOrder = new ConcurrentLinkedDeque<>();
@@ -36,7 +36,7 @@ public final class PerformanceStatsCollector {
     }
 
     public PerformanceStatsSnapshot snapshot() {
-        // Meter 内部使用 LongAdder/CAS；运行中快照允许弱一致，压测完成后采集线程退出时收敛为最终准确值。
+        // Meter Để sử dụng nội bộ LongAdder/CAS；Ảnh chụp nhanh đang chạy cho phép tính nhất quán yếu và hội tụ đến giá trị chính xác cuối cùng khi luồng thu thập thoát ra sau khi hoàn tất quá trình kiểm tra căng thẳng.
         List<PerformanceStatsSnapshot.ApiSummary> summaries = new ArrayList<>();
         for (PerformanceSampleMeterSet stats : apiStatsInFirstSeenOrder) {
             summaries.add(stats.toSummary(stats.apiName()));

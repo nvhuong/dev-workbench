@@ -10,10 +10,10 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreeModel;
 
 /**
- * 请求编辑器访问集合树的 Swing 网关。
+ * Yêu cầu người soạn thảo truy cập vào cây bộ sưu tập Swing cổng.
  * <p>
- * 核心点：编辑器控制器不直接寻找 CollectionTreePanel，后续如果集合树实现替换，
- * 只需要替换这个网关，而不是在保存、打开、分组编辑控制器里到处改。
+ * Điểm cốt lõi: Bộ điều khiển soạn thảo không tìm kiếm trực tiếp CollectionTreePanel，Nếu cây bộ sưu tập được thay thế sau đó, .
+ * Bạn chỉ cần thay thế cổng này thay vì thay đổi nó ở mọi nơi trong bộ điều khiển lưu, mở và chỉnh sửa nhóm.
  */
 public final class CollectionTreeEditorGateway {
 

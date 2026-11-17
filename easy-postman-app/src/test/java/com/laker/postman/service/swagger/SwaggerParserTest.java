@@ -23,7 +23,7 @@ import static org.testng.Assert.*;
 
 
 /**
- * Swagger解析器测试
+ * SwaggerKiểm tra trình phân tích cú pháp
  */
 public class SwaggerParserTest {
 
@@ -103,16 +103,16 @@ public class SwaggerParserTest {
         RequestGroup group = (RequestGroup) userObject[1];
         assertEquals(group.getName(), "Pet Store API (1.0.0)");
 
-        // 应该有一个Pets分组
+        // Nên có một cáiPetsNhóm
         assertEquals(collectionNode.getChildCount(), 1);
         DefaultMutableTreeNode petsGroup = (DefaultMutableTreeNode) collectionNode.getChildAt(0);
         Object[] petsUserObject = (Object[]) petsGroup.getUserObject();
         assertEquals(petsUserObject[0], "group");
 
-        // Pets分组应该有2个请求
+        // PetsNên có các nhóm2lời yêu cầu
         assertEquals(petsGroup.getChildCount(), 2);
 
-        // 验证第一个请求 (GET /pets)
+        // Xác minh yêu cầu đầu tiên (GET /pets)
         DefaultMutableTreeNode getRequest = (DefaultMutableTreeNode) petsGroup.getChildAt(0);
         Object[] getRequestUserObject = (Object[]) getRequest.getUserObject();
         assertEquals(getRequestUserObject[0], "request");
@@ -125,7 +125,7 @@ public class SwaggerParserTest {
         assertEquals(getItem.getParamsList().size(), 1);
         assertEquals(getItem.getParamsList().get(0).getKey(), "limit");
 
-        // 验证第二个请求 (POST /pets)
+        // Xác minh yêu cầu thứ hai (POST /pets)
         DefaultMutableTreeNode postRequest = (DefaultMutableTreeNode) petsGroup.getChildAt(1);
         Object[] postRequestUserObject = (Object[]) postRequest.getUserObject();
         assertEquals(postRequestUserObject[0], "request");
@@ -216,24 +216,24 @@ public class SwaggerParserTest {
         RequestGroup group = (RequestGroup) userObject[1];
         assertEquals(group.getName(), "User API (2.0.0)");
 
-        // 应该有一个Users分组
+        // Nên có một cáiUsersNhóm
         assertEquals(collectionNode.getChildCount(), 1);
         DefaultMutableTreeNode usersGroup = (DefaultMutableTreeNode) collectionNode.getChildAt(0);
 
-        // Users分组应该有2个请求
+        // UsersNên có các nhóm2lời yêu cầu
         assertEquals(usersGroup.getChildCount(), 2);
 
-        // 验证第一个请求 (GET /users)
+        // Xác minh yêu cầu đầu tiên (GET /users)
         DefaultMutableTreeNode getRequest = (DefaultMutableTreeNode) usersGroup.getChildAt(0);
         Object[] getRequestUserObject = (Object[]) getRequest.getUserObject();
         HttpRequestItem getItem = (HttpRequestItem) getRequestUserObject[1];
         assertEquals(getItem.getName(), "Get all users");
         assertEquals(getItem.getMethod(), "GET");
-        // 验证 URL 使用了 {{baseUrl}} 变量引用
-        assertTrue(getItem.getUrl().contains("{{baseUrl}}"), "URL 应该使用 {{baseUrl}} 变量");
+        // Xác minh URL đã sử dụng {{baseUrl}} Tham chiếu biến
+        assertTrue(getItem.getUrl().contains("{{baseUrl}}"), "URL nên được sử dụng {{baseUrl}} các biến");
         assertTrue(getItem.getUrl().contains("/users"));
 
-        // 验证第二个请求 (POST /users)
+        // Xác minh yêu cầu thứ hai (POST /users)
         DefaultMutableTreeNode postRequest = (DefaultMutableTreeNode) usersGroup.getChildAt(1);
         Object[] postRequestUserObject = (Object[]) postRequest.getUserObject();
         HttpRequestItem postItem = (HttpRequestItem) postRequestUserObject[1];
@@ -304,24 +304,24 @@ public class SwaggerParserTest {
         Object[] requestUserObject = (Object[]) getRequest.getUserObject();
         HttpRequestItem item = (HttpRequestItem) requestUserObject[1];
 
-        // 应该设置了Bearer认证
+        // Nó nên được thiết lậpBearerChứng nhận
         assertEquals(item.getAuthType(), AUTH_TYPE_BEARER);
     }
 
     /**
-     * 测试解析服务并保存到环境
+     * Kiểm tra dịch vụ phân tích cú pháp và lưu nó vào môi trường
      */
     @Test
     void testParseServersOpenAPI3() {
-        // 从resources目录读取zfile.openapi.json文件
+        // TừresourcesĐọc thư mụczfile.openapi.jsontập tin
         String openapiJson;
         try (var stream = getClass().getResourceAsStream("/zfile.openapi.json")) {
             if (stream == null) {
-                throw new RuntimeException("无法找到资源文件: zfile.openapi.json");
+                throw new RuntimeException("Không thể tìm thấy tập tin tài nguyên: zfile.openapi.json");
             }
             openapiJson = new String(stream.readAllBytes(), StandardCharsets.UTF_8);
         } catch (IOException e) {
-            throw new RuntimeException("读取zfile.openapi.json文件时发生错误", e);
+            throw new RuntimeException("Đọczfile.openapi.jsonĐã xảy ra lỗi khi cố gắng gửi tệp", e);
         }
 
         CollectionParseResult parseResult = SwaggerParser.parseSwagger(openapiJson);
@@ -330,7 +330,7 @@ public class SwaggerParserTest {
         DefaultMutableTreeNode collectionNode = TreeNodeBuilder.buildFromParseResult(parseResult);
         assertNotNull(collectionNode);
 
-        // 验证解析结果中创建了环境，并且每个环境都包含 baseUrl 变量
+        // Xác minh rằng môi trường được tạo trong kết quả phân tích cú pháp và mỗi môi trường đều được đưa vào baseUrl các biến
         List<Environment> environments = parseResult.getEnvironments();
         assertNotNull(environments);
         assertFalse(environments.isEmpty(), "Expected environments parsed from OpenAPI servers");
@@ -358,15 +358,15 @@ public class SwaggerParserTest {
                   "servers": [
                     {
                       "url": "http://localhost:8080",
-                      "description": "本地环境"
+                      "description": "môi trường địa phương"
                     },
                     {
                       "url": "http://dev.example.com",
-                      "description": "开发环境"
+                      "description": "môi trường phát triển"
                     },
                     {
                       "url": "http://prod.example.com",
-                      "description": "生产环境"
+                      "description": "môi trường sản xuất"
                     }
                   ],
                   "paths": {
@@ -388,36 +388,36 @@ public class SwaggerParserTest {
         CollectionParseResult parseResult = SwaggerParser.parseSwagger(openapi3Json);
         assertNotNull(parseResult);
 
-        // 验证解析出了3个环境
+        // Xác minh được phân tích cú pháp3một môi trường
         assertEquals(parseResult.getEnvironments().size(), 3);
 
-        // 验证第一个环境
+        // Xác minh môi trường đầu tiên
         Environment env1 = parseResult.getEnvironments().get(0);
-        assertEquals(env1.getName(), "Test API - 本地环境");
+        assertEquals(env1.getName(), "Test API - môi trường địa phương");
         assertEquals(env1.getVariableList().size(), 1);
         assertEquals(env1.getVariableList().get(0).getKey(), "baseUrl");
         assertEquals(env1.getVariableList().get(0).getValue(), "http://localhost:8080");
 
-        // 验证第二个环境
+        // Xác minh môi trường thứ hai
         Environment env2 = parseResult.getEnvironments().get(1);
-        assertEquals(env2.getName(), "Test API - 开发环境");
+        assertEquals(env2.getName(), "Test API - môi trường phát triển");
         assertEquals(env2.getVariableList().get(0).getValue(), "http://dev.example.com");
 
-        // 验证第三个环境
+        // Xác minh môi trường thứ ba
         Environment env3 = parseResult.getEnvironments().get(2);
-        assertEquals(env3.getName(), "Test API - 生产环境");
+        assertEquals(env3.getName(), "Test API - môi trường sản xuất");
         assertEquals(env3.getVariableList().get(0).getValue(), "http://prod.example.com");
 
-        // 验证请求 URL 使用了 {{baseUrl}} 变量引用
+        // Xác minh yêu cầu URL đã sử dụng {{baseUrl}} Tham chiếu biến
         DefaultMutableTreeNode collectionNode = TreeNodeBuilder.buildFromParseResult(parseResult);
         DefaultMutableTreeNode usersGroup = (DefaultMutableTreeNode) collectionNode.getChildAt(0);
         DefaultMutableTreeNode getUserRequest = (DefaultMutableTreeNode) usersGroup.getChildAt(0);
         Object[] requestUserObject = (Object[]) getUserRequest.getUserObject();
         HttpRequestItem requestItem = (HttpRequestItem) requestUserObject[1];
 
-        // 验证 URL 格式为 {{baseUrl}}/users
+        // Xác minh URL Định dạng là  {{baseUrl}}/users
         assertEquals(requestItem.getUrl(), "{{baseUrl}}/users");
-        System.out.println("✅ URL 使用变量引用: " + requestItem.getUrl());
+        System.out.println("✅ URL Sử dụng tham chiếu biến: " + requestItem.getUrl());
     }
 
     @Test

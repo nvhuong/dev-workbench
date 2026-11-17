@@ -15,25 +15,25 @@ import org.graalvm.polyglot.Value;
 import java.util.*;
 
 /**
- * Postman 脚本 API 上下文 (pm 对象)
+ * Postman kịch bản API bối cảnh (pm đối tượng)
  * <p>
- * 该类模拟 Postman 中的 <code>pm</code> 对象，为 PreRequest/PostRequest 脚本提供完整的 API 支持。
- * 在脚本执行时，该对象会被注入到 JavaScript 引擎中，供脚本代码访问。
+ * This type of simulation Postman trong <code>pm</code> đối tượng, cho PreRequest/PostRequest Kịch bản được cung cấp đầy đủ API Hỗ trợ.
+ * Đối tượng này sẽ được đưa vào khi tập lệnh được thực thi JavaScript Trong công cụ, có thể truy cập mã script.
  * </p>
  *
- * <h3>主要功能模块：</h3>
+ * <h3>Các module chức năng chính:</h3>
  * <ul>
- *   <li><b>环境变量管理</b>: pm.environment.set/get - 操作当前激活的环境变量</li>
- *   <li><b>全局变量管理</b>: pm.globals.set/get - 操作应用级全局变量</li>
- *   <li><b>执行变量管理</b>: pm.variables.set/get - 操作当前运行上下文内的变量</li>
- *   <li><b>迭代数据管理</b>: pm.iterationData.get - 访问当前数据驱动行</li>
- *   <li><b>Cookie 操作</b>: pm.cookies.get/set/delete - 管理请求的 Cookie</li>
- *   <li><b>测试断言</b>: pm.test() - 执行测试断言并记录结果</li>
- *   <li><b>请求访问</b>: pm.request - 访问和修改当前请求信息</li>
- *   <li><b>响应访问</b>: pm.response - 访问响应数据（仅后置脚本可用）</li>
+ *   <li><b>Quản lý biến môi trường</b>: pm.environment.set/get - Thao tác với các biến môi trường hiện được kích hoạt</li>
+ *   <li><b>Quản lý biến toàn cầu</b>: pm.globals.set/get - Thao tác các biến toàn cục cấp ứng dụng</li>
+ *   <li><b>Thực hiện quản lý biến</b>: pm.variables.set/get - Thao tác các biến trong bối cảnh đang chạy hiện tại</li>
+ *   <li><b>Quản lý dữ liệu lặp</b>: pm.iterationData.get - Truy cập hàng điều khiển dữ liệu hiện tại</li>
+ *   <li><b>Cookie hoạt động</b>: pm.cookies.get/set/delete - Yêu cầu quản lý Cookie</li>
+ *   <li><b>Kiểm tra khẳng định</b>: pm.test() - Thực hiện các xác nhận kiểm tra và ghi lại kết quả</li>
+ *   <li><b>Yêu cầu quyền truy cập</b>: pm.request - Truy cập và sửa đổi thông tin yêu cầu hiện tại</li>
+ *   <li><b>Trả lời quyền truy cập</b>: pm.response - Truy cập dữ liệu phản hồi (chỉ có sẵn cho phần tái bút)</li>
  * </ul>
  *
- * <h3>使用示例：</h3>
+ * <h3>Ví dụ sử dụng:</h3>
  * <pre>{@code
  * // PreRequest Script
  * pm.environment.set("timestamp", Date.now());
@@ -54,58 +54,58 @@ import java.util.*;
 public class PostmanApiContext {
 
     /**
-     * 测试结果列表 - 存储所有 pm.test() 调用的结果
+     * Danh sách kết quả kiểm tra - Lưu trữ tất cả pm.test() Kết quả của cuộc gọi
      */
     public List<TestResult> testResults = new ArrayList<>();
 
     /**
-     * 环境变量对象 - 对应 pm.environment
+     * Đối tượng biến môi trường - tương ứng pm.environment
      */
     public ScriptScopedVariablesApi environment;
 
     /**
-     * 历史兼容别名 - 对应 pm.env。
-     * Postman 官方 API 使用 pm.environment，新脚本和内置片段仍应优先使用 pm.environment。
+     * Bí danh tương thích trong lịch sử - tương ứng pm.env。
+     * Postman chính thức API sử dụng pm.environment，Các tập lệnh mới và đoạn mã tích hợp vẫn được ưu tiên pm.environment。
      */
     public ScriptScopedVariablesApi env;
 
     /**
-     * 全局变量对象 - 对应 pm.globals
+     * Đối tượng biến toàn cục - tương ứng pm.globals
      */
     public ScriptScopedVariablesApi globals;
 
     /**
-     * 响应对象 - 对应 pm.response，仅在后置脚本中可用
+     * đối tượng phản hồi - tương ứng pm.response，Chỉ có sẵn trong phần tái bút
      */
     public ResponseAssertion response;
 
     /**
-     * 执行变量管理器 - 对应 pm.variables，用于存储当前运行上下文内的变量
+     * Thực thi trình quản lý biến - tương ứng pm.variables，Được sử dụng để lưu trữ các biến trong ngữ cảnh đang chạy hiện tại
      */
     public ScriptVariablesApi variables;
 
     /**
-     * 迭代数据管理器 - 对应 pm.iterationData，用于存储当前 CSV/JSON 行数据
+     * Trình quản lý dữ liệu lặp - tương ứng pm.iterationData，Dùng để lưu trữ dòng điện CSV/JSON dữ liệu hàng
      */
     public IterationDataApi iterationData = new IterationDataApi();
 
     /**
-     * 运行元信息 - 对应 Postman 的 pm.info。
+     * Chạy thông tin meta - tương ứng Postman của pm.info。
      */
     public PostmanInfoApi info;
 
     /**
-     * 请求对象包装器 - 对应 pm.request，提供对请求的 JavaScript 访问接口
+     * Yêu cầu trình bao bọc đối tượng - tương ứng pm.request，Cung cấp theo yêu cầu JavaScript giao diện truy cập
      */
     public ScriptRequestAccessor request;
 
     /**
-     * Cookie 管理器 - 对应 pm.cookies，提供 Cookie 操作接口
+     * Cookie giám đốc - tương ứng pm.cookies，cung cấp Cookie Giao diện hoạt động
      */
     public CookieApi cookies;
 
     /**
-     * 测试 API - 对应 pm.test。
+     * Bài kiểm tra API - tương ứng pm.test。
      */
     public TestApi test;
 
@@ -113,19 +113,19 @@ public class PostmanApiContext {
     private final ScriptSendRequestExecutor sendRequestExecutor;
 
     /**
-     * Elasticsearch API - 对应 pm.elasticsearch
+     * Elasticsearch API - tương ứng pm.elasticsearch
      */
     public ScriptElasticsearchApi elasticsearch;
 
     /**
-     * InfluxDB API - 对应 pm.influxdb
+     * InfluxDB API - tương ứng pm.influxdb
      */
     public ScriptInfluxDbApi influxdb;
 
     /**
-     * 构造 Postman API 上下文
+     * kết cấu Postman API bối cảnh
      *
-     * @param environment 当前激活的环境对象
+     * @param environment Đối tượng môi trường hiện đang hoạt động
      */
     public PostmanApiContext(Environment environment) {
         this(
@@ -136,8 +136,8 @@ public class PostmanApiContext {
     }
 
     /**
-     * 构造 headless / run-scoped 脚本上下文。
-     * 这里直接使用 plan 内携带的环境和全局变量，避免 worker 执行时回落到 GUI 工作区服务。
+     * kết cấu headless / run-scoped Bối cảnh kịch bản.
+     * Sử dụng nó trực tiếp ở đây plan Các biến môi trường và toàn cầu được mang bên trong đều được tránh worker Dự phòng khi được thực thi GUI Dịch vụ không gian làm việc.
      */
     public static PostmanApiContext scoped(Environment environment, Environment globals) {
         return new PostmanApiContext(environment, globals, null, false);
@@ -190,13 +190,13 @@ public class PostmanApiContext {
                 globals,
                 null
         );
-        this.cookies = new CookieApi(); // 初始化 cookies
-        this.test = new TestApi(this); // 初始化 test API
+        this.cookies = new CookieApi(); // khởi tạo cookies
+        this.test = new TestApi(this); // khởi tạo test API
         this.info = new PostmanInfoApi(IterationInfoService.getInstance().getCurrentInfo());
         this.elasticsearch = new ScriptElasticsearchApi();
         this.influxdb = new ScriptInfluxDbApi();
-        // 核心 pm 能力先由宿主内建，再把插件注册表里的扩展 API 动态挂进来。
-        // 这样脚本层看到的是一个统一的 pm 对象，而不是“宿主 API + 插件 API”两套入口。
+        // cốt lõi pm Các khả năng đầu tiên được tích hợp vào máy chủ và sau đó được mở rộng trong sổ đăng ký plug-in API Tự động treo vào.
+        // Bằng cách này, lớp tập lệnh sẽ nhìn thấy một chế độ xem thống nhất pm thay vào đó là đối tượng“chủ nhà API + plugin API”Hai bộ lối vào.
         PluginAccess.createScriptApis().forEach(this::registerPluginApi);
     }
 
@@ -215,7 +215,7 @@ public class PostmanApiContext {
     }
 
     public Object plugin(String alias) {
-        // 统一的插件 API 访问入口，脚本里可以通过 pm.plugin("kafka") 这种方式按需取能力。
+        // Plugin hợp nhất API Lối vào truy cập có thể được thông qua trong tập lệnh pm.plugin("kafka") Phương pháp này có được khả năng theo yêu cầu.
         return pluginApis.get(alias);
     }
 
@@ -224,10 +224,10 @@ public class PostmanApiContext {
     }
 
     /**
-     * 设置请求对象
-     * 在脚本执行前由框架调用，注入当前请求信息
+     * Đặt đối tượng yêu cầu
+     * Được khung gọi trước khi thực thi tập lệnh, đưa thông tin yêu cầu hiện tại vào
      *
-     * @param preparedRequest 准备好的请求对象
+     * @param preparedRequest Đối tượng yêu cầu đã chuẩn bị
      */
     public void setRequest(PreparedRequest preparedRequest) {
         this.request = new ScriptRequestAccessor(preparedRequest);
@@ -237,22 +237,22 @@ public class PostmanApiContext {
     }
 
     /**
-     * 设置响应对象
-     * 在后置脚本执行前由框架调用，注入响应信息
+     * Đặt đối tượng phản hồi
+     * Được gọi bởi khung trước khi phần tái bút được thực thi, thông tin phản hồi sẽ được đưa vào
      *
-     * @param httpResponse HTTP 响应对象
+     * @param httpResponse HTTP đối tượng phản hồi
      */
     public void setResponse(HttpResponse httpResponse) {
         this.response = new ResponseAssertion(httpResponse);
 
-        // 自动将响应中的 Cookie 填充到 pm.cookies，使得 pm.cookies.get() 能够工作
+        // Tự động trả lời Cookie Điền vào pm.cookies，Làm cho pm.cookies.get() Có khả năng làm việc
         populateResponseCookies(httpResponse);
     }
 
     /**
-     * 从响应头中提取所有 Cookie 并填充到 pm.cookies
+     * Trích xuất tất cả từ tiêu đề phản hồi Cookie và điền vào pm.cookies
      *
-     * @param httpResponse HTTP 响应对象
+     * @param httpResponse HTTP đối tượng phản hồi
      */
     private void populateResponseCookies(HttpResponse httpResponse) {
         if (cookies == null) {
@@ -265,30 +265,30 @@ public class PostmanApiContext {
     }
 
     /**
-     * 生成 UUID
-     * 对应脚本中的: pm.uuid()
+     * phát ra UUID
+     * Tương ứng với kịch bản: pm.uuid()
      *
-     * @return UUID 字符串
+     * @return UUID chuỗi
      */
     public String uuid() {
         return UUID.randomUUID().toString();
     }
 
     /**
-     * 获取当前时间戳（毫秒）
-     * 对应脚本中的: pm.getTimestamp()
+     * Lấy dấu thời gian hiện tại (mili giây)
+     * Tương ứng với kịch bản: pm.getTimestamp()
      *
-     * @return 当前时间戳（毫秒）
+     * @return Dấu thời gian hiện tại (mili giây)
      */
     public long getTimestamp() {
         return System.currentTimeMillis();
     }
 
     /**
-     * 创建断言期望对象
-     * 对应脚本中的: pm.expect(actual)
+     * Tạo một đối tượng kỳ vọng khẳng định
+     * Tương ứng với kịch bản: pm.expect(actual)
      *
-     * <p>示例：
+     * <p>Ví dụ:
      * <pre>{@code
      * pm.expect(pm.response.code).to.equal(200);
      * pm.expect(pm.response.json().name).to.eql("John");
@@ -296,8 +296,8 @@ public class PostmanApiContext {
      * pm.expect(pm.response.responseTime).to.be.below(1000);
      * }</pre>
      *
-     * @param actual 要断言的实际值
-     * @return Expectation 对象，支持链式断言
+     * @param actual Giá trị thực tế cần khẳng định
+     * @return Expectation Đối tượng, hỗ trợ các xác nhận theo chuỗi
      */
     public Expectation expect(Object actual) {
         return new Expectation(actual);
@@ -336,15 +336,15 @@ public class PostmanApiContext {
     }
 
     /**
-     * 从响应头中获取指定名称的 Cookie
-     * 对应脚本中的: pm.getResponseCookie(name)
+     * Lấy tên được chỉ định từ tiêu đề phản hồi Cookie
+     * Tương ứng với kịch bản: pm.getResponseCookie(name)
      *
-     * <p>该方法从 HTTP 响应的 Set-Cookie 头中解析并返回指定名称的 Cookie。
-     * 常用于在后置脚本中提取服务器设置的 Cookie 值，例如 session ID、token 等。</p>
+     * <p>This method starts from HTTP Đáp ứng Set-Cookie Phân tích cú pháp và trả về tên được chỉ định trong tiêu đề Cookie。
+     * Thường được sử dụng để trích xuất cài đặt máy chủ trong các tập lệnh sau Cookie giá trị, ví dụ session ID、token Đợi đã.</p>
      *
-     * <p>示例：
+     * <p>Ví dụ:
      * <pre>{@code
-     * // 获取响应中的 JSESSIONID cookie
+     * // Nhận được phản hồi JSESSIONID cookie
      * var jsessionId = pm.getResponseCookie('JSESSIONID');
      * if (jsessionId) {
      *     pm.environment.set('session_id', jsessionId.value);
@@ -352,8 +352,8 @@ public class PostmanApiContext {
      * }
      * }</pre>
      *
-     * @param name Cookie 名称
-     * @return Cookie 对象，包含 name、value、domain 等属性；如果不存在则返回 null
+     * @param name Cookie tên
+     * @return Cookie Đối tượng chứa name、value、domain và các thuộc tính khác; nếu nó không tồn tại, nó sẽ được trả về null
      */
     public Cookie getResponseCookie(String name) {
         if (name == null || response == null) {
@@ -363,11 +363,11 @@ public class PostmanApiContext {
     }
 
     /**
-     * 发送 HTTP 请求
-     * 对应脚本中的: pm.sendRequest(requestOptions, callback)
+     * gửi HTTP yêu cầu
+     * Tương ứng với kịch bản: pm.sendRequest(requestOptions, callback)
      *
-     * @param requestOptions 请求配置，可以是 URL 字符串或包含请求详情的对象
-     * @param callback       回调函数，接收 (error, response) 两个参数
+     * @param requestOptions Yêu cầu cấu hình, có thể được URL Một chuỗi hoặc đối tượng chứa chi tiết yêu cầu
+     * @param callback       Chức năng gọi lại, nhận (error, response) Hai tham số
      */
     public void sendRequest(Object requestOptions, Value callback) {
         if (requestOptions == null) {

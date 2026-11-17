@@ -104,7 +104,7 @@ public class PerformanceRunPlanExecutor {
         if (assignment != null) {
             corePlan = new PerformanceWorkerExecutionPlanPartitioner().apply(corePlan, assignment);
         }
-        // headless 先复用 app 现有执行链，所有变量、脚本、断言和协议行为与 GUI 本机执行保持同源。
+        // headless Tái sử dụng đầu tiên app Chuỗi thực thi hiện có, tất cả các biến, tập lệnh, xác nhận và hành vi giao thức đều có GUI Việc thực thi bản địa vẫn tương đồng.
         PerformanceTestPlan appExecutablePlan = PerformanceCorePlanAdapter.toExecutablePlan(corePlan);
 
         AtomicBoolean running = new AtomicBoolean(false);

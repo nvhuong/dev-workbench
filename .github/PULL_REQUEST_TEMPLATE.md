@@ -1,63 +1,63 @@
-## 📝 PR 描述 | Description
+## 📝 PR Mô tả | Description
 
-<!-- 请简要描述此 PR 的目的和改动内容 | Please briefly describe the purpose and changes of this PR -->
+<!-- Hãy mô tả ngắn gọn điều này PR Mục đích và nội dung của sự thay đổi | Please briefly describe the purpose and changes of this PR -->
 
-## 🔗 相关 Issue | Related Issue
+## 🔗 Có liên quan Issue | Related Issue
 
-<!-- 如果此 PR 解决了某个 Issue，请在此关联 | If this PR fixes an issue, please link it here -->
+<!-- Nếu điều này PR Đã giải quyết được điều gì đó Issue，Xin vui lòng liên kết ở đây | If this PR fixes an issue, please link it here -->
 Fixes #(issue number)
 
-## 🎯 改动类型 | Type of Change
+## 🎯 Thay đổi loại | Type of Change
 
-<!-- 请勾选适用的选项 | Please check the applicable options -->
+<!-- Please check the applicable options | Please check the applicable options -->
 
-- [ ] 🐛 Bug 修复 | Bug fix
-- [ ] ✨ 新功能 | New feature
-- [ ] 📝 文档更新 | Documentation update
-- [ ] 🎨 代码优化 | Code refactoring
-- [ ] ⚡️ 性能优化 | Performance improvement
-- [ ] 🔧 配置变更 | Configuration change
-- [ ] 🧪 测试相关 | Test related
-- [ ] 🔨 构建相关 | Build related
-- [ ] 🌐 国际化 | Internationalization
+- [ ] 🐛 Bug Sửa chữa | Bug fix
+- [ ] ✨ Các tính năng mới | New feature
+- [ ] 📝 Tài liệu được cập nhật | Documentation update
+- [ ] 🎨 Tối ưu hóa mã | Code refactoring
+- [ ] ⚡️ Tối ưu hóa hiệu suất | Performance improvement
+- [ ] 🔧 Thay đổi cấu hình | Configuration change
+- [ ] 🧪 Kiểm tra liên quan | Test related
+- [ ] 🔨 Xây dựng liên quan | Build related
+- [ ] 🌐 quốc tế hóa | Internationalization
 
-## 📋 改动内容 | Changes Made
+## 📋 Thay đổi nội dung | Changes Made
 
-<!-- 请详细列出你的改动 | Please list your changes in detail -->
+<!-- Vui lòng liệt kê chi tiết những thay đổi của bạn | Please list your changes in detail -->
 
-- 
+-
 
-## 🧪 测试 | Testing
+## 🧪 Bài kiểm tra | Testing
 
-<!-- 请描述你如何测试这些改动 | Please describe how you tested these changes -->
+<!-- Please describe how you tested these changes | Please describe how you tested these changes -->
 
-- [ ] 本地编译通过 | Local build passed
-- [ ] 功能测试通过 | Functional tests passed
-- [ ] 在以下环境测试 | Tested on:
+- [ ] Việc biên soạn cục bộ đã được thông qua | Local build passed
+- [ ] Kiểm tra chức năng đã thông qua | Functional tests passed
+- [ ] Đã thử nghiệm trong môi trường sau | Tested on:
   - [ ] Windows
   - [ ] macOS
   - [ ] Linux
 
-## 📸 截图 | Screenshots
+## 📸 ảnh chụp màn hình | Screenshots
 
-<!-- 如果有 UI 相关改动，请提供截图 | If there are UI changes, please provide screenshots -->
+<!-- Nếu vậy UI Vui lòng cung cấp ảnh chụp màn hình cho những thay đổi có liên quan | If there are UI changes, please provide screenshots -->
 
-## ✅ 检查清单 | Checklist
+## ✅ Danh sách kiểm tra | Checklist
 
-<!-- 提交前请确认以下事项 | Please confirm the following before submitting -->
+<!-- Vui lòng xác nhận những điều sau trước khi gửi | Please confirm the following before submitting -->
 
-- [ ] 代码遵循项目编码规范 | Code follows the project's coding standards
-- [ ] 已添加必要的注释 | Added necessary comments
-- [ ] 文档已更新（如需要）| Documentation updated (if needed)
-- [ ] 没有引入新的警告 | No new warnings introduced
-- [ ] 改动不影响现有功能 | Changes do not affect existing functionality
-- [ ] 已在本地完整测试 | Fully tested locally
+- [ ] Mã tuân theo các tiêu chuẩn mã hóa của dự án | Code follows the project's coding standards
+- [ ] Những bình luận cần thiết đã được thêm vào | Added necessary comments
+- [ ] Tài liệu đã được cập nhật (nếu cần thiết)| Documentation updated (if needed)
+- [ ] Không có cảnh báo mới nào được đưa ra | No new warnings introduced
+- [ ] Những thay đổi không ảnh hưởng đến chức năng hiện có | Changes do not affect existing functionality
+- [ ] Đã được thử nghiệm hoàn toàn tại địa phương | Fully tested locally
 
-## 💡 其他说明 | Additional Notes
+## 💡 Hướng dẫn bổ sung | Additional Notes
 
-<!-- 其他需要说明的内容 | Any additional information -->
+<!-- Bất cứ điều gì khác cần được giải thích | Any additional information -->
 
 ---
 
-感谢你的贡献！ | Thank you for your contribution! 🎉
+Cảm ơn sự đóng góp của bạn! . | Thank you for your contribution! 🎉
 

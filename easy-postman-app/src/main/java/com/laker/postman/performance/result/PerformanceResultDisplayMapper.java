@@ -31,7 +31,7 @@ public class PerformanceResultDisplayMapper {
         }
         String displayErrorMsg = resolveDisplayErrorMsg(sampleResult);
         HttpResponse displayResponse = responseForDisplay(sampleResult, displayErrorMsg);
-        // 精简模式会丢弃 httpEventInfo，先提取结果表需要的计时。
+        // Chế độ Lite bị loại bỏ httpEventInfo，Đầu tiên trích xuất thời gian cần thiết cho bảng kết quả.
         ResultTiming timing = ResultTiming.fromResponse(displayResponse, sampleResult.getStartTimeMs());
         simplifyForDisplay(sampleResult, displayResponse, compactMode, displayErrorMsg);
         return new ResultNodeInfo(
@@ -110,7 +110,7 @@ public class PerformanceResultDisplayMapper {
             return null;
         }
 
-        // HTTP 在停止时可能没有响应对象；结果表仍要展示耗时和失败原因。
+        // HTTP Có thể không có đối tượng phản hồi khi dừng lại; bảng kết quả vẫn phải hiển thị thời gian thực hiện và lý do thất bại.
         HttpResponse response = new HttpResponse();
         response.code = sampleResult.getResponseCode();
         response.costMs = Math.max(0L, sampleResult.getElapsedTimeMs());

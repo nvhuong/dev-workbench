@@ -1,8 +1,8 @@
-# EasyPostman 模块边界规范
+# EasyPostman Thông số ranh giới mô-đun
 
-这份文档定义模块职责和放置规则。目标是让后续重构和 vibecoding 时优先维护边界，而不是把新代码塞进最近的目录。
+Tài liệu này xác định trách nhiệm của mô-đun và các quy tắc sắp xếp. Mục tiêu là cho phép tái cấu trúc tiếp theo và vibecoding Ưu tiên duy trì ranh giới thay vì nhồi nhét mã mới vào thư mục gần nhất.
 
-## 当前模块图
+## Sơ đồ mô-đun hiện tại
 
 ```text
 easy-postman-parent
@@ -21,122 +21,122 @@ easy-postman-parent
 └── easy-postman-app
 ```
 
-## 模块职责
+## Trách nhiệm của mô-đun
 
-`easy-postman-foundation` 是最底层非 UI 基础层。它可以放共享 DTO、enum、常量、路径、JSON、系统工具、用户设置工具、国际化机制、基础消息 key，以及可跨宿主/插件复用的通用解析和格式化工具，例如 Cron、JSON Path、XML、文件大小、文件扩展名、时间显示、HTTP header 常量。它不能依赖 Swing、插件运行时、宿主 app、压测运行实现或业务 UI。
+`easy-postman-foundation` Đúng và sai ở mức độ thấp nhất UI lớp nền. Nó có thể được chia sẻ DTO、enum、Các hằng số, đường dẫn,JSON、Công cụ hệ thống, công cụ thiết lập người dùng, cơ chế quốc tế hóa và các thông báo cơ bản key，Và có thể vượt qua các máy chủ/Các công cụ phân tích và định dạng phổ biến để tái sử dụng plugin, ví dụ: Cron、JSON Path、XML、Kích thước tệp, phần mở rộng tệp, hiển thị thời gian,HTTP header không thay đổi. Nó không thể dựa vào được Swing、Thời gian chạy plug-in, máy chủ app、Thực hiện chạy thử nghiệm căng thẳng hoặc kinh doanh UI。
 
-`easy-postman-request-core` 是请求规格核心模型层。它放可被集合、导入导出、脚本、压测计划等复用的请求配置数据，例如 `HttpRequestItem`、`SavedResponse`、`HttpHeader`、`HttpParam`、`HttpFormData`、`HttpFormUrlencoded`、`CookieInfo`、`AuthType`、`RequestAuthTypes`、`RequestBodyTypes`、`RequestItemProtocolEnum`、`TransportAuth`、`RedirectInfo`。它只表达“请求是什么”，不能依赖 Swing、OkHttp、app service、panel、插件运行时或具体发送/渲染实现。`PreparedRequest`、`HttpResponse`、`HttpEventInfo` 是运行期交换快照，归属 `easy-postman-http-runtime` 的 `com.laker.postman.http.runtime.model`，不能回流到 request-core 或 app model。
+`easy-postman-request-core` Đây là lớp mô hình lõi đặc tả yêu cầu. Ví dụ: nó chứa dữ liệu cấu hình yêu cầu có thể được sử dụng lại bởi các bộ sưu tập, nhập và xuất, tập lệnh, kế hoạch kiểm tra căng thẳng, v.v `HttpRequestItem`、`SavedResponse`、`HttpHeader`、`HttpParam`、`HttpFormData`、`HttpFormUrlencoded`、`CookieInfo`、`AuthType`、`RequestAuthTypes`、`RequestBodyTypes`、`RequestItemProtocolEnum`、`TransportAuth`、`RedirectInfo`。Nó chỉ thể hiện“Yêu cầu là gì?”，Không thể dựa vào được Swing、OkHttp、app service、panel、Được gửi khi plugin được chạy hoặc cụ thể/Kết xuất thực hiện.`PreparedRequest`、`HttpResponse`、`HttpEventInfo` Là ảnh chụp nhanh trao đổi thời gian chạy, được sở hữu `easy-postman-http-runtime` của `com.laker.postman.http.runtime.model`，Không thể chảy trở lại request-core hoặc app model。
 
-`easy-postman-http-runtime` 是无 UI 的 HTTP 传输运行时层。它放发送态模型 `PreparedRequest`、`HttpResponse`、`HttpEventInfo`，以及 `http.runtime.transport`、`http.runtime.okhttp`、`http.runtime.file`、`http.runtime.ssl`、`http.runtime.sse`、`http.runtime.cookie`、`http.runtime.redirect`、`http.runtime.error`、`http.runtime.config`、`http.runtime.interaction`、`http.runtime.observation` 下的传输执行、OkHttp 适配、TLS/证书、SSE、Cookie、redirect、错误映射、运行期设置、交互端口和观测端口；`http.runtime.file` 负责响应文件识别（文件头检测、下载文件名解析、是否按文件处理的统一判定），供响应面板、示例保存、历史与渲染共用。该模块可以依赖 foundation、request-core 和 OkHttp，但不能依赖 Swing/AWT、panel、app `SettingManager`、插件宿主访问器或 IOC。宿主必须通过 `HttpRuntimeSettingsProvider`、`ClientCertificateProvider`、sink/dispatcher 等端口注入设置、证书和 UI 交互实现。
+`easy-postman-http-runtime` Không có gì cả UI của HTTP Lớp thời gian chạy vận chuyển. Nó phát ra một mô hình trạng thái `PreparedRequest`、`HttpResponse`、`HttpEventInfo`，cũng như `http.runtime.transport`、`http.runtime.okhttp`、`http.runtime.file`、`http.runtime.ssl`、`http.runtime.sse`、`http.runtime.cookie`、`http.runtime.redirect`、`http.runtime.error`、`http.runtime.config`、`http.runtime.interaction`、`http.runtime.observation` Việc truyền tải được thực hiện dưới.OkHttp sự thích nghi,TLS/Giấy chứng nhận,SSE、Cookie、redirect、Ánh xạ lỗi, cài đặt thời gian chạy, cổng tương tác và cổng quan sát;`http.runtime.file` Chịu trách nhiệm nhận dạng tệp phản hồi (phát hiện tiêu đề tệp, phân tích tên tệp đã tải xuống, xác định thống nhất xem có nên xử lý tệp hay không) và được chia sẻ bởi bảng phản hồi, lưu mẫu, lịch sử và hiển thị. Mô-đun này có thể được dựa vào foundation、request-core và OkHttp，Nhưng nó không thể dựa vào được Swing/AWT、panel、app `SettingManager`、Trình truy cập máy chủ plugin hoặc IOC。Chủ nhà phải vượt qua `HttpRuntimeSettingsProvider`、`ClientCertificateProvider`、sink/dispatcher v.v. Cổng cài đặt, chứng chỉ và UI Thực hiện tương tác.
 
-`easy-postman-collection-core` 是集合领域核心层。它放集合树和导入解析可复用的无 UI 类型，例如 `RequestGroup`、`CollectionNode`、`CollectionNodeType`、`CollectionParseResult`、集合认证解析 helper，以及 Postman collection parser。它可以依赖 `easy-postman-foundation` 和 `easy-postman-request-core`，但不能依赖 Swing/AWT、OkHttp、app service/panel/runtime、platform、plugin-runtime、IOC 或具体发送/渲染实现。`TreeNodeBuilder`、集合树 UI、持久化服务、导出器和其他仍绑定宿主 UI/服务的逻辑先留在 `easy-postman-app`。
+`easy-postman-collection-core` Đây là lớp cốt lõi của trường bộ sưu tập. Nó làm cho cây thu thập và phân tích cú pháp nhập có thể tái sử dụng được UI Nhập, ví dụ `RequestGroup`、`CollectionNode`、`CollectionNodeType`、`CollectionParseResult`、Phân tích xác thực bộ sưu tập helper，cũng như Postman collection parser。Nó có thể được dựa vào `easy-postman-foundation` và `easy-postman-request-core`，Nhưng nó không thể dựa vào được Swing/AWT、OkHttp、app service/panel/runtime、platform、plugin-runtime、IOC Hoặc gửi cụ thể/Kết xuất thực hiện.`TreeNodeBuilder`、Cây sưu tầm UI、Dịch vụ kiên trì, nhà xuất khẩu và những người khác vẫn bị ràng buộc với chủ nhà UI/Logic của dịch vụ vẫn là đầu tiên `easy-postman-app`。
 
-`easy-postman-mock-core` 是自托管 Mock Server 的无 UI 运行时。它放 Mock 定义、Example 路由快照、method/path/query/header/body 匹配、JDK `HttpServer`、有界调用日志、内存会话状态、可选共享访问密钥和中立 `MockScriptExecutor` 端口。它只依赖 foundation 和 JDK，不引入 Swing/AWT、collection/request 模型、app service、GraalVM、OkHttp/Netty、platform IOC 或 plugin runtime。集合到路由的映射、工作区持久化、GraalJS 脚本适配、无头 CLI 和 Swing 管理页属于 `easy-postman-app`。运行时可以绑定 loopback、本机网卡或所有网卡，用于本机开发、局域网共享和用户自行部署；不承担 EasyPostman 云端托管、团队权限、npm 包或 AI 生成能力。
+`easy-postman-mock-core` Nó tự lưu trữ Mock Server không có gì cả UI thời gian chạy. Nó đặt Mock sự định nghĩa,Example Ảnh chụp nhanh định tuyến,method/path/query/header/body cuộc thi đấu,JDK `HttpServer`、Ghi nhật ký cuộc gọi bị giới hạn, trạng thái phiên trong bộ nhớ, khóa truy cập được chia sẻ tùy chọn và tính trung lập `MockScriptExecutor` cổng. Nó chỉ phụ thuộc foundation và JDK，Không được giới thiệu Swing/AWT、collection/request Người mẫu,app service、GraalVM、OkHttp/Netty、platform IOC hoặc plugin runtime。Bộ sưu tập để lập bản đồ tuyến đường, tính bền vững của không gian làm việc,GraalJS Chuyển thể kịch bản, không đầu CLI và Swing Trang quản trị thuộc về `easy-postman-app`。Có thể bị ràng buộc trong thời gian chạy loopback、Card mạng cục bộ hoặc tất cả các card mạng được sử dụng để phát triển cục bộ, chia sẻ mạng LAN và tự triển khai của người dùng; không có trách nhiệm nào được đảm nhận EasyPostman Lưu trữ đám mây, quyền của nhóm,npm gói hoặc AI Khả năng sáng tạo.
 
-`easy-postman-plugin-api` 是插件契约层。它放插件 SPI、插件描述、插件上下文、扩展点数据结构和插件服务接口，例如 `GitPluginService`、`ClientCertificatePluginService`、`RequestCollectionImportService`。插件和宿主通过这里的类型建立契约。
+`easy-postman-plugin-api` Đây là lớp hợp đồng plug-in. Nó đặt các plugin SPI、Ví dụ: mô tả plugin, bối cảnh plugin, cấu trúc dữ liệu điểm mở rộng và giao diện dịch vụ plugin `GitPluginService`、`ClientCertificatePluginService`、`RequestCollectionImportService`。Plug-in và máy chủ thiết lập hợp đồng thông qua các loại ở đây.
 
-`easy-postman-platform` 是宿主平台框架层。当前已承接自定义 IOC 容器 `com.laker.postman.ioc`，以及可脱离具体界面的更新发现核心 `com.laker.postman.platform.update`：版本比较、发布源选择、安装包资产匹配、变更日志抓取/格式化、更新结果模型。后续启动、欢迎页、帮助、设置中心、主题/字体应用编排等平台能力，如果能脱离具体 app 面板和业务服务，也优先迁到这里。
+`easy-postman-platform` Đây là lớp khung nền tảng máy chủ. Tùy chỉnh hiện được chấp nhận IOC thùng chứa `com.laker.postman.ioc`，và lõi khám phá cập nhật có thể tách rời khỏi các giao diện cụ thể `com.laker.postman.platform.update`：So sánh phiên bản, lựa chọn nguồn phát hành, khớp nội dung gói cài đặt, ghi lại nhật ký thay đổi/Định dạng và cập nhật mô hình kết quả. Khởi động tiếp theo, trang chào mừng, trợ giúp, trung tâm cài đặt, chủ đề/Các khả năng của nền tảng như bố cục ứng dụng phông chữ, nếu nó có thể được tách biệt khỏi cụ thể app Các tấm nền và dịch vụ kinh doanh cũng được ưu tiên chuyển đến đây.
 
-`easy-postman-ui` 是共享 Swing 设计系统。它放 `FontsUtil`、`IconUtil`、`NotificationCenter`、`EditorThemeUtil`、`ModernColors`、`UiSingletonFactory`/`UiSingletonPanel`/`UiSingletonMenuBar`、`DebouncedSaveSupport`、`IRefreshable`、公共按钮/搜索/表格/输入控件等组件，例如 `EasyComboBox`、`EasyJSpinner`、`EasyPasswordField`、`EditButton`、`SaveButton`、`WrapToggleButton`，以及这些组件直接引用的 icons/theme 资源。主色 button 上的 icon 应使用 on-primary 颜色策略，保持白色，不跟随明暗主题切换。
+`easy-postman-ui` Nó được chia sẻ Swing Hệ thống thiết kế. Nó đặt `FontsUtil`、`IconUtil`、`NotificationCenter`、`EditorThemeUtil`、`ModernColors`、`UiSingletonFactory`/`UiSingletonPanel`/`UiSingletonMenuBar`、`DebouncedSaveSupport`、`IRefreshable`、Nút công khai/tìm kiếm/cái bàn/Các thành phần như điều khiển đầu vào chẳng hạn `EasyComboBox`、`EasyJSpinner`、`EasyPasswordField`、`EditButton`、`SaveButton`、`WrapToggleButton`，và được tham chiếu trực tiếp bởi các thành phần này icons/theme tài nguyên. Màu chính button TRÊN icon nên được sử dụng on-primary Chiến lược màu sắc, giữ màu trắng và không theo sự chuyển đổi chủ đề sáng và tối.
 
-资源归属按唯一 owner 管理：`easy-postman-ui/src/main/resources/icons` 放通用控件/动作/状态图标，例如 save、copy、paste、search、clear、cancel、close、delete、duplicate、eye、info、warning、arrow、chevron、wrap、start、stop、send、connect、collapse、expand、more、detail、import、export；`easy-postman-app/src/main/resources/icons` 只放宿主业务、品牌、协议、工作区、压测、集合树等 app 专属图标；插件入口图标放插件自己的 `src/main/resources/icons`。两个模块不要保留同路径同名资源，避免 classpath 资源遮蔽和图标版本漂移。官方插件若引用 `icons/*.svg`，该图标必须来自插件自身或 `easy-postman-ui`，不能依赖 app resources。
+Quyền sở hữu tài nguyên là duy nhất owner Quản lý:`easy-postman-ui/src/main/resources/icons` Đặt các điều khiển chung/hành động/Biểu tượng trạng thái chẳng hạn save、copy、paste、search、clear、cancel、close、delete、duplicate、eye、info、warning、arrow、chevron、wrap、start、stop、send、connect、collapse、expand、more、detail、import、export；`easy-postman-app/src/main/resources/icons` Chỉ bao gồm doanh nghiệp lưu trữ, thương hiệu, giao thức, không gian làm việc, bài kiểm tra sức chịu đựng, cây bộ sưu tập, v.v app Biểu tượng độc quyền; biểu tượng lối vào trình cắm là của riêng trình cắm `src/main/resources/icons`。Không giữ các tài nguyên có cùng tên và đường dẫn trong hai mô-đun, hãy tránh điều này classpath Đổ bóng tài nguyên và trôi dạt phiên bản biểu tượng. Nếu plugin chính thức được trích dẫn `icons/*.svg`，The icon must come from the plugin itself or `easy-postman-ui`，Không thể dựa vào được app resources。
 
-其他资源也按 owner 管理：`easy-postman-app/src/main/resources/js-libs` 是宿主脚本运行时内置库，`logback.xml` 是宿主运行配置，`easy-postman-plugins/plugin-manager/src/main/resources/plugin-catalog` 是宿主侧插件市场兜底目录，普通插件 descriptor 和插件专属 icon/message bundle 跟随各自插件模块。
+Các tài nguyên khác cũng nhấp vào owner Quản lý:`easy-postman-app/src/main/resources/js-libs` Nó là một thư viện tích hợp khi tập lệnh máy chủ được chạy.`logback.xml` Máy chủ có đang chạy cấu hình không.`easy-postman-plugins/plugin-manager/src/main/resources/plugin-catalog` Nó là thư mục từ dưới lên của thị trường plug-in ở phía máy chủ và là một plug-in thông thường descriptor và plugin độc quyền icon/message bundle Thực hiện theo các mô-đun plug-in tương ứng.
 
-`easy-postman-plugin-runtime` 只负责插件扫描、descriptor 解析、classloader、registry、生命周期和状态持久化。它不放具体业务插件能力，也不负责 catalog 解析、下载或安装 UI。
+`easy-postman-plugin-runtime` Chỉ chịu trách nhiệm quét plug-in.descriptor Phân tích,classloader、registry、Sự kiên trì của vòng đời và trạng thái. Nó không phát hành các khả năng bổ trợ kinh doanh cụ thể và không chịu trách nhiệm catalog Phân tích, tải xuống hoặc cài đặt UI。
 
-`easy-postman-mcp` 是独立的 MCP 协议适配层，只负责官方 SDK、stdio 生命周期、tool schema、annotations、结构化结果和最小 `EasyPostmanMcpBackend` 契约。它可以依赖 foundation 和 MCP SDK，但不能依赖 app、Swing、工作区持久化或具体 HTTP/脚本执行；宿主在 app 内实现 backend。
+`easy-postman-mcp` là độc lập MCP Lớp thích ứng giao thức chỉ chịu trách nhiệm cho chính thức SDK、stdio vòng đời,tool schema、annotations、Kết quả có cấu trúc và tối thiểu `EasyPostmanMcpBackend` hợp đồng. Nó có thể được dựa vào foundation và MCP SDK，Nhưng nó không thể dựa vào được app、Swing、Không gian làm việc kiên trì hoặc cụ thể HTTP/Thực thi tập lệnh; chủ nhà có mặt app được nhận ra bên trong backend。
 
-`easy-postman-performance-core` 放无 UI、无传输实现绑定的压测领域核心：编辑态计划节点数据、运行态 `plan.json` 模型、运行时契约、线程组规划、统计、趋势、报告快照、worker assignment/asset reference 这类 GUI、CLI、worker 都要复用的契约。它不直接依赖 OkHttp、Swing、workspace 服务或 app 执行链。
+`easy-postman-performance-core` Đừng để bất cứ điều gì đi UI、Cốt lõi của trường kiểm tra sức chịu đựng thực hiện liên kết mà không cần truyền: chỉnh sửa dữ liệu nút lập kế hoạch trạng thái và trạng thái đang chạy `plan.json` Mô hình, hợp đồng thời gian chạy, lập kế hoạch nhóm luồng, thống kê, xu hướng, ảnh chụp nhanh báo cáo,worker assignment/asset reference Loại điều này GUI、CLI、worker Tất cả các hợp đồng phải được sử dụng lại. Nó không phụ thuộc trực tiếp OkHttp、Swing、workspace dịch vụ hoặc app chuỗi thực thi.
 
-压测的具体执行适配当前留在 `easy-postman-app`：GUI 运行、headless CLI、worker server 先复用 app 内完整执行链，包含变量解析、环境/全局变量、脚本、断言、提取器、CSV inline/file asset、multipart 文件、证书和 HTTP/SSE/WebSocket 传输。后续只有在这些非 UI 语义能从 app 干净抽离后，才考虑新增独立 headless/runner 模块。
+Việc điều chỉnh thực thi cụ thể của bài kiểm tra căng thẳng hiện vẫn được giữ nguyên `easy-postman-app`：GUI chạy,headless CLI、worker server Tái sử dụng đầu tiên app Một chuỗi thực thi hoàn chỉnh được bao gồm, bao gồm phân tích biến và môi trường/Biến toàn cục, tập lệnh, xác nhận, trình trích xuất,CSV inline/file asset、multipart các giấy tờ, chứng chỉ và HTTP/SSE/WebSocket quá trình lây truyền. Việc theo dõi chỉ có trong những không UI Semantics can follow app Chỉ sau khi tách biệt rõ ràng, chúng ta mới có thể xem xét bổ sung thêm sự độc lập mới headless/runner mô-đun.
 
-无头运行遵循相同边界：`easy-postman-collection-core` 提供无 UI 的原生集合领域模型；`com.laker.postman.collection.cli` 只拥有 `collection run` 的参数和集合/文件夹选择；`com.laker.postman.functional.cli` 只拥有 `functional run` 的参数、`functional_config.json` 解析和请求选择；`com.laker.postman.workspace.cli` 提供两者共享的工作区解析、原生 `collections.json` / `environments.json` 装载、全局变量、外部迭代数据、HTTP、脚本和报告执行引擎。两个命令通过 `WorkspaceRunPlanner` 计划接口连接，不互相依赖 CLI 包。Postman 解析器只服务导入能力，不进入 CLI 执行链。不要让 collection-core 反向依赖 app 的执行服务、IOC、插件运行时或 Swing。
+Các cuộc chạy không đầu tuân theo các ranh giới giống nhau: .`easy-postman-collection-core` Không có sẵn UI Mô hình miền bộ sưu tập gốc;`com.laker.postman.collection.cli` Chỉ cần sở hữu `collection run` các tham số và bộ sưu tập/Lựa chọn thư mục;`com.laker.postman.functional.cli` Chỉ cần sở hữu `functional run` thông số,`functional_config.json` Phân tích cú pháp và lựa chọn yêu cầu;`com.laker.postman.workspace.cli` Cung cấp khả năng phân tích cú pháp không gian làm việc và tính năng gốc được chia sẻ bởi cả hai `collections.json` / `environments.json` Đang tải, biến toàn cục, dữ liệu lặp bên ngoài,HTTP、Công cụ thực thi tập lệnh và báo cáo. Cả hai mệnh lệnh đều được thông qua `WorkspaceRunPlanner` Lập kế hoạch kết nối giao diện mà không phụ thuộc vào nhau CLI gói.Postman Trình phân tích cú pháp chỉ phục vụ khả năng nhập chứ không phục vụ mục nhập CLI chuỗi thực thi. Đừng để nó collection-core Sự phụ thuộc ngược lại app dịch vụ thực thi.IOC、Thời gian chạy plugin hoặc Swing。
 
-MCP Server 采用端口/适配器拆分：`easy-postman-mcp/com.laker.postman.mcp.server` 拥有标准 transport、可观测 stdio 生命周期和六个核心 tool schema；`easy-postman-app/com.laker.postman.mcp` 只拥有 `mcp serve` CLI、工作区授权、环境读取、上传路径约束、Cookie 调用隔离、脱敏、结果明细上限和 `WorkspaceRunExecutor` backend。协议模块不能反向依赖 app，也不复制变量、脚本或请求执行语义。为返回每个请求的响应快照并支持单次环境覆盖，共享执行层增加了可选 `WorkspaceRunObserver`、`environmentOverrides`、上传文件根目录和报告明细上限；默认分别为 no-op、空 Map、无限制和无限制，现有 `collection run` / `functional run` 的参数、输出和行为不变。详细使用方式见 `docs/MCP_SERVER_DESIGN_zh.md`。
+MCP Server Sử dụng cổng/Bộ chia bộ chuyển đổi:`easy-postman-mcp/com.laker.postman.mcp.server` Có tiêu chuẩn transport、có thể quan sát được stdio Vòng đời và sáu lõi tool schema；`easy-postman-app/com.laker.postman.mcp` Chỉ cần sở hữu `mcp serve` CLI、Ủy quyền không gian làm việc, đọc môi trường, hạn chế đường dẫn tải lên,Cookie Kiểm dịch cuộc gọi, giải mẫn cảm, giới hạn chi tiết kết quả và `WorkspaceRunExecutor` backend。Các mô-đun giao thức không thể phụ thuộc ngược lại app，Các biến, tập lệnh hoặc ngữ nghĩa thực thi yêu cầu cũng không được sao chép. Lớp thực thi được chia sẻ đã được thêm tùy chọn để trả về ảnh chụp nhanh phản hồi cho từng yêu cầu và hỗ trợ phạm vi môi trường một lần chụp `WorkspaceRunObserver`、`environmentOverrides`、Tải lên thư mục gốc của tập tin và báo cáo chi tiết giới hạn trên; mặc định là tương ứng no-op、vô giá trị Map、Không hạn chế và không hạn chế, tồn tại `collection run` / `functional run` Các thông số, đầu ra và hành vi không thay đổi. Xem cách sử dụng chi tiết `docs/MCP_SERVER_DESIGN_zh.md`。
 
-HTTP 发送执行链按“准备在 app，传输在 runtime，UI 在 adapter”拆分：请求准备、校验和默认请求工厂仍在 `easy-postman-app` 的 `http.request`，因为它们还依赖集合继承、变量解析、脚本和 app 服务；URL/query 通用工具在 `easy-postman-request-core` 的 `request.util`；请求级运行设置解析、`HttpTransport` 端口、`DefaultHttpTransport`、`HttpExchangeExecutor`、`RealtimeConnectionFactory`、作用域 client provider、OkHttp 适配、TLS/证书配置、SSE runtime、Cookie store、redirect、错误映射、交互端口和观测端口已经归属 `easy-postman-http-runtime`。Swing 实现只放在 `panel/http/runtime` 或 `http.runtime.app` 这类 app adapter 中。上述 runtime 代码不能直接依赖 Swing/panel，也不能直接读取 app 的 `SettingManager`；未来 JavaFX host 应只提供 JavaFX adapter，而不改 HTTP runtime。
+HTTP Gửi nút chuỗi thực thi“Sẵn sàng vào app，Truyền vào runtime，UI Vào adapter”Phân chia: việc chuẩn bị yêu cầu, tổng kiểm tra và các nhà máy yêu cầu mặc định vẫn còn đó `easy-postman-app` của `http.request`，Bởi vì họ cũng dựa vào tính kế thừa của bộ sưu tập, độ phân giải của biến, tập lệnh và app dịch vụ;URL/query Các công cụ chung có sẵn `easy-postman-request-core` của `request.util`；Phân tích cài đặt chạy ở cấp độ yêu cầu, .`HttpTransport` cảng,`DefaultHttpTransport`、`HttpExchangeExecutor`、`RealtimeConnectionFactory`、Phạm vi client provider、OkHttp sự thích nghi,TLS/Certificate configuration,SSE runtime、Cookie store、redirect、Bản đồ lỗi, cổng tương tác và cổng quan sát đã được chỉ định `easy-postman-http-runtime`。Swing Việc thực hiện chỉ được đặt `panel/http/runtime` hoặc `http.runtime.app` Loại điều này app adapter ở giữa. bên trên runtime Mã không thể phụ thuộc trực tiếp vào nó Swing/panel，Nó không thể được đọc trực tiếp app của `SettingManager`；tương lai JavaFX host chỉ nên được cung cấp JavaFX adapter，mà không thay đổi HTTP runtime。
 
-`easy-postman-app` 是宿主组装层。它可以放主入口、MainFrame、菜单、具体 app 面板、具体启动 wiring、设置页、更新页、欢迎页、帮助页、app-only 服务，以及宿主侧插件访问适配 `com.laker.postman.plugin.host`。后续迁移平台能力时，从这里逐步迁到 `easy-postman-platform`。
+`easy-postman-app` Là lớp lắp ráp máy chủ. Nó có thể được đặt ở lối vào chính.MainFrame、Thực đơn, cụ thể app Bảng điều khiển, khởi động cụ thể wiring、Trang cài đặt, trang cập nhật, trang chào mừng, trang trợ giúp,app-only dịch vụ và khả năng thích ứng truy cập plug-in phía máy chủ `com.laker.postman.plugin.host`。Khi di chuyển các khả năng của nền tảng sau này, chúng tôi sẽ di chuyển dần dần từ đây `easy-postman-platform`。
 
-`easy-postman-app` 内部也要避免再形成新的泛化 model 包。app 不再拥有 `com.laker.postman.model` 下的 HTTP 运行期交换模型；功能测试 runner 数据放 `com.laker.postman.functional.model`，脚本断言结果放 `com.laker.postman.script.model`，SSE/WebSocket 消息类型放 `com.laker.postman.stream`，脚本片段目录放 `com.laker.postman.snippet`，历史、证书、变量、环境、cURL 导入等 app 内模型跟随各自 owner 包。不要把 UI view-state、导入临时 DTO 或领域专属模型重新塞回 `com.laker.postman.model`。
+`easy-postman-app` Cũng cần tránh việc hình thành những khái quát mới trong nội bộ model gói.app Không còn sở hữu nữa `com.laker.postman.model` Xuống HTTP Mô hình trao đổi thời gian chạy; thử nghiệm chức năng runner Đặt dữ liệu `com.laker.postman.functional.model`，Kịch bản xác nhận kết quả `com.laker.postman.script.model`，SSE/WebSocket Loại tin nhắn đặt `com.laker.postman.stream`，Thư mục đoạn mã `com.laker.postman.snippet`，lịch sử, chứng chỉ, biến, môi trường,cURL Nhập khẩu vv app Mô hình bên trong theo sau mỗi owner gói. Đừng đặt nó UI view-state、Nhập khẩu tạm thời DTO Hoặc các mô hình dành riêng cho miền được cắm lại `com.laker.postman.model`。
 
-`easy-postman-plugins/*` 通常是官方插件 JAR。普通插件不得反向依赖宿主 app 内部实现；需要扩展宿主时通过 `easy-postman-plugin-api` 注册能力，需要共享基础 DTO/工具时依赖 `easy-postman-foundation`，需要统一 Swing 风格时依赖 `easy-postman-ui`。
+`easy-postman-plugins/*` Thông thường các plugin chính thức JAR。Các plug-in thông thường không được dựa vào máy chủ ngược lại app Thực hiện nội bộ; được thông qua khi máy chủ cần được mở rộng `easy-postman-plugin-api` Khả năng đăng ký yêu cầu một nền tảng chung DTO/Sự phụ thuộc của công cụ `easy-postman-foundation`，Cần phải thống nhất Swing Phụ thuộc vào phong cách `easy-postman-ui`。
 
-插件兼容边界不只包含 `easy-postman-plugin-api` 的 SPI。因为插件会以 `provided` 方式依赖 `easy-postman-plugin-api`、`easy-postman-foundation`、`easy-postman-ui` 等平台模块，删除、重命名、移动这些模块里的公开类/方法/枚举/资源路径，或改变签名和扩展点语义，都可能让旧插件在加载前后出现 `NoClassDefFoundError`、`NoSuchMethodError` 或其他 linkage 错误。若变更故意不保持二进制兼容，应提升根 `pom.xml` 的 `plugin.platform.version`，同步官方插件 `plugin.min/maxPlatformVersion`，并补运行时/更新检查测试，让旧平台范围的插件在加载前明确显示不兼容。已发布 catalog 条目对应既有 jar 和 `sha256`，不要为了新平台兼容性去篡改旧条目的 platform range；新范围应随新构建插件 artifact 发布。
+Ranh giới tương thích của trình cắm không chỉ bao gồm `easy-postman-plugin-api` của SPI。Bởi vì plug-in sẽ `provided` phụ thuộc vào phương pháp `easy-postman-plugin-api`、`easy-postman-foundation`、`easy-postman-ui` và các mô-đun nền tảng khác, hãy xóa, đổi tên và di chuyển các lớp công khai trong các mô-đun này/phương pháp/liệt kê/Đường dẫn tài nguyên hoặc thay đổi chữ ký và ngữ nghĩa điểm mở rộng có thể khiến các plugin cũ xuất hiện trước hoặc sau khi chúng được tải `NoClassDefFoundError`、`NoSuchMethodError` hoặc khác linkage sai lầm. Nếu các thay đổi có chủ ý không duy trì khả năng tương thích nhị phân, thì nên tăng cường quyền root `pom.xml` của `plugin.platform.version`，Đồng bộ hóa các plug-in chính thức `plugin.min/maxPlatformVersion`，Và bù đắp cho thời gian chạy/Đã cập nhật các bài kiểm tra kiểm tra để các plugin cũ trên toàn nền tảng được hiển thị rõ ràng là không tương thích trước khi tải. Đã xuất bản catalog Mục nhập tương ứng với mục hiện có jar và `sha256`，Không giả mạo các mục cũ để tương thích với nền tảng mới platform range；Phạm vi mới nên được xây dựng bằng plugin mới artifact giải phóng.
 
-`easy-postman-plugins/plugin-manager` 是这个目录下的归属特例：它是宿主 app 直接依赖的宿主侧插件管理辅助模块，负责 catalog 解析、在线/离线安装门面和安装来源记录；它不是由 `easy-postman-plugin-runtime` 扫描加载的普通运行时插件，也不能作为普通插件模板。它继续放在 `easy-postman-plugins` 聚合目录下，是历史路径和发布组织选择；新的宿主侧插件管理库不应默认继续放到 `easy-postman-plugins/*`，后续可以迁到更清晰的模块名或目录。依赖方向上，普通插件仍不得依赖 `easy-postman-app`，但宿主 app 可以依赖 `plugin-manager` 这个特例。
+`easy-postman-plugins/plugin-manager` là trường hợp đặc biệt về quyền sở hữu trong thư mục này: nó là máy chủ app Chịu trách nhiệm về mô-đun phụ trợ quản lý plug-in phía máy chủ phụ thuộc trực tiếp catalog Phân tích, trực tuyến/Mặt tiền cài đặt ngoại tuyến và bản ghi nguồn cài đặt; nó không được cung cấp bởi  `easy-postman-plugin-runtime` Không thể sử dụng các phần bổ trợ thời gian chạy thông thường được tải bằng cách quét làm các mẫu phần bổ trợ thông thường. Nó tiếp tục được đặt `easy-postman-plugins` Trong thư mục tổng hợp có các đường dẫn lịch sử và các lựa chọn tổ chức phát hành; thư viện quản lý plug-in phía máy chủ mới không được đặt theo mặc định `easy-postman-plugins/*`，Bạn có thể chuyển sang tên mô-đun hoặc thư mục rõ ràng hơn sau này. Về mặt phụ thuộc, các plug-in thông thường vẫn không được phép phụ thuộc vào nó `easy-postman-app`，Nhưng chủ nhà app Có thể dựa vào `plugin-manager` Đây là một trường hợp đặc biệt.
 
-## 国际化、字体、主题放置
+## Quốc tế hóa, phông chữ, vị trí chủ đề
 
-国际化机制和跨模块基础词汇放 `easy-postman-foundation`。`I18nUtil`、`CommonI18n`、`CommonMessageKeys`、`common-messages.properties` / `common-messages_zh.properties`、locale/settings key 属于基础能力。通用词汇包括 OK、Cancel、Save、Copy、Close、Search、Success、Error、Warning、Tip 这类无具体业务 owner 的短标签。
+Cơ chế quốc tế hóa và sắp xếp từ vựng cơ bản đa mô-đun `easy-postman-foundation`。`I18nUtil`、`CommonI18n`、`CommonMessageKeys`、`common-messages.properties` / `common-messages_vi.properties`、locale/settings key Thuộc về khả năng cơ bản. Từ vựng phổ biến bao gồm OK、Cancel、Save、Copy、Close、Search、Success、Error、Warning、Tip Loại này không có kinh doanh cụ thể owner nhãn ngắn.
 
-国际化资源跟随所属模块。公共 UI 组件专属文案放 `easy-postman-ui`，例如 `ui-messages.properties` / `ui-messages_zh.properties`；宿主页面和宿主业务文案放 `easy-postman-app` 的 `messages_en.properties` / `messages_zh.properties`；插件文案放各插件模块，例如 `redis-messages.properties`、`kafka-messages.properties`。不要让公共 UI 组件或插件依赖 app resources 才能显示文案；如果多个模块需要同一个短标签，先放 foundation common bundle，并用 `CommonI18n.get(CommonMessageKeys...)`，不要在 `ui-messages*`、app 或插件 bundle 里重复定义同名 common key。
+Tài nguyên quốc tế theo mô-đun tương ứng. công cộng UI Thành phần copywriting độc quyền được đặt `easy-postman-ui`，Ví dụ `ui-messages.properties` / `ui-messages_vi.properties`；Trang chủ và bản sao doanh nghiệp lưu trữ được đặt `easy-postman-app` của `messages_en.properties` / `messages_vi.properties`；Ví dụ: bản sao trình cắm thêm được đặt trong mỗi mô-đun trình cắm thêm `redis-messages.properties`、`kafka-messages.properties`。Đừng công khai UI Phụ thuộc vào thành phần hoặc plugin app resources để hiển thị bản sao; nếu nhiều mô-đun yêu cầu cùng một nhãn ngắn, hãy đặt nó lên đầu foundation common bundle，được sử dụng cùng nhau `CommonI18n.get(CommonMessageKeys...)`，Đừng ở đó `ui-messages*`、app hoặc plugin bundle Tên tương tự được xác định nhiều lần ở đây common key。
 
-字体工具和字体 token 放 `easy-postman-ui`。全局启动时读取设置并应用字体的编排当前在 app，迁移时属于 `easy-postman-platform`。
+Công cụ phông chữ và phông chữ token đặt `easy-postman-ui`。Đọc cài đặt khi khởi động chung và áp dụng bố cục phông chữ hiện đang được sử dụng app，Thuộc về khi di cư `easy-postman-platform`。
 
-主题 token、语义色、图标主题适配、RSyntaxTextArea 编辑器主题 XML 和公共 UI 资源放 `easy-postman-ui`。FlatLaf 的安装、主题切换动画和启动应用编排当前在 app，迁移时属于 `easy-postman-platform`。FlatLaf token 覆盖文件如果依赖 app 内的具体 `EasyLightLaf` / `EasyDarkLaf` 类路径，先跟随 app。
+chủ đề token、Semantic color, icon theme adaptation,RSyntaxTextArea Chủ đề biên tập XML và công cộng UI Giải phóng tài nguyên `easy-postman-ui`。FlatLaf Quá trình cài đặt, hoạt ảnh chuyển đổi chủ đề và điều phối ứng dụng khởi động hiện đang được thực hiện app，Thuộc về khi di cư `easy-postman-platform`。FlatLaf token Ghi đè tập tin nếu phụ thuộc app cụ thể bên trong `EasyLightLaf` / `EasyDarkLaf` Đường dẫn lớp, hãy theo dõi trước app。
 
-## 判断一个类该放哪里
+## Xác định nơi một lớp nên được đặt
 
-先问 5 个问题：
+Hãy hỏi trước 5 Câu hỏi:
 
-1. 是否完全无 UI 且多个模块要用？是则优先 `foundation`。
-2. 是否是请求配置/保存响应/请求协议这类可复用请求规格模型？是则 `request-core`。
-3. 是否是集合树/集合分组/导入解析这类可复用且无 UI 的集合领域模型？是则 `collection-core`。
-4. 是否是插件对宿主声明能力的契约？是则 `plugin-api`。
-5. 是否是无 UI 的本地 Mock 路由匹配、会话状态或 JDK HTTP 运行时？是则 `mock-core`；集合/GraalJS/Swing 适配留在 `app`。
-6. 是否是可复用 Swing 组件、颜色、字体、图标或 UI 工具？是则 `ui`。
-7. 是否是插件加载、扫描、生命周期或 registry？是则 `plugin-runtime`。
-8. 是否是平台框架能力，例如 IOC、启动编排、升级、欢迎页、帮助、设置中心、主题/字体应用编排？能脱离具体 app UI 时放 `platform`，否则先留 `app`。
-9. 是否是具体宿主页面、菜单或业务组装？是则放 `app`。
+1. Cho dù nó hoàn toàn không có gì UI Và cần sử dụng nhiều mô-đun? Có được ưu tiên `foundation`。
+2. Cho dù đó là một cấu hình yêu cầu/Lưu phản hồi/Mô hình đặc tả yêu cầu có thể tái sử dụng như giao thức yêu cầu? Đúng `request-core`。
+3. Cho dù đó là một cây sưu tập/Nhóm bộ sưu tập/Phân tích cú pháp nhập có thể được sử dụng lại và không có tệp  UI Mô hình miền bộ sưu tập? Đúng `collection-core`。
+4. Đây có phải là hợp đồng để plugin khai báo khả năng của máy chủ không? Vâng `plugin-api`。
+5. Cho dù đó là Không có UI của địa phương Mock khớp tuyến đường, trạng thái phiên hoặc JDK HTTP Thời gian chạy? Đúng `mock-core`；tập trung/GraalJS/Swing Sự thích ứng vẫn còn `app`。
+6. Liệu nó có thể tái sử dụng được hay không Swing thành phần, màu sắc, phông chữ, biểu tượng hoặc UI dụng cụ? Đúng `ui`。
+7. Cho dù đó là tải plugin, quét, vòng đời hay registry？Vâng `plugin-runtime`。
+8. Cho dù đó là khả năng của khung nền tảng hay không, vd IOC、Bắt đầu điều phối, nâng cấp, trang chào mừng, trợ giúp, trung tâm cài đặt, chủ đề/Bố cục ứng dụng phông chữ? Có khả năng tách ra khỏi bê tông app UI Thời gian để phát hành `platform`，Nếu không thì ở lại đầu tiên `app`。
+9. Đây có phải là một trang chủ, một menu hoặc một tổ hợp kinh doanh cụ thể không? Nếu vậy thì hãy để nó đi `app`。
 
-更新能力按这条边界拆：版本检查、更新源、资产解析、变更日志和 `UpdateInfo`/`UpdateCheckFrequency` 这类平台数据放 `easy-postman-platform`；`AppUpdateCheckCoordinator`、`UpdateUiController`、`UpdateDownloader`、更新弹窗、安装/退出流程、插件市场更新 UI 留在 `easy-postman-app`。platform 不能直接依赖 app 的 `SettingManager`，需要通过 `UpdateSettingsProvider` 这类最小接口由 app 适配。
+The update capabilities are divided according to this boundary: version checking, update source, asset analysis, change log and `UpdateInfo`/`UpdateCheckFrequency` Loại dữ liệu nền tảng này được đặt `easy-postman-platform`；`AppUpdateCheckCoordinator`、`UpdateUiController`、`UpdateDownloader`、Cập nhật cửa sổ bật lên và cài đặt/Quá trình thoát, cập nhật thị trường plug-in UI Ở lại `easy-postman-app`。platform Không thể dựa vào trực tiếp app của `SettingManager`，Cần phải vượt qua `UpdateSettingsProvider` Loại giao diện tối thiểu này bao gồm app sự thích nghi.
 
-只有满足至少两个条件时才拆新模块：多个领域复用、依赖方向清晰、可独立测试、发布/风险节奏不同、当前包已经承担多种职责。否则先用 package 组织，不为名字好看而拆模块。
+Các mô-đun mới chỉ được tháo dỡ khi đáp ứng ít nhất hai điều kiện: tái sử dụng ở nhiều khu vực, hướng phụ thuộc rõ ràng và có thể được thử nghiệm và phát hành độc lập/Tốc độ rủi ro là khác nhau và các gói hiện tại đã có nhiều trách nhiệm. Nếu không thì sử dụng trước package Tổ chức, đừng xé rời các mô-đun chỉ để làm cho tên trông đẹp mắt.
 
-## 禁止事项
+## Những vấn đề bị cấm
 
-- 不要把 Swing 组件放进 `foundation`。
-- 不要把请求规格模型重新放回 `easy-postman-app` 的 `com.laker.postman.model`。
-- 不要让 `easy-postman-request-core` 依赖 Swing、OkHttp、app service、panel 或插件运行时。
-- 不要把集合核心模型或 Postman collection parser 放回 `easy-postman-app`，也不要让 `easy-postman-collection-core` 依赖 Swing、OkHttp、app service/panel/runtime、platform、plugin-runtime 或 IOC。
-- 不要让 `easy-postman-mock-core` 依赖 Swing/AWT、collection/request 模型、app service、GraalVM、OkHttp/Netty、platform IOC 或 plugin runtime，也不要在这里扩展云端部署、权限和 npm 生态。
-- 不要让 HTTP 发送、OkHttp 适配、SSL、Cookie 通知这类 runtime/service 代码直接依赖 Swing/panel；使用中立 sink/dispatcher，由 Swing/JavaFX adapter 实现。
-- 不要把插件服务接口放进 `foundation`。
-- 不要让普通官方插件依赖 `easy-postman-app`；`easy-postman-plugins/plugin-manager` 是宿主 app 可直接依赖的插件管理特例，不能作为新插件模板。
-- 不要让公共 UI 组件依赖 app resources 才能加载自身 icons。
-- 不要在 app 和 ui 中重复放同名 `icons/*.svg`；通用图标归 `easy-postman-ui`，业务图标归使用方模块。
-- 不要在 app 面板里新增一套私有按钮/颜色/字体规则，优先沉淀到 `easy-postman-ui`。
-- 不要把“暂时不知道放哪”的代码放进一个泛化 common 包。
+- Đừng đặt nó Swing Đặt thành phần vào `foundation`。
+- Đừng đặt lại mô hình đặc tả yêu cầu `easy-postman-app` của `com.laker.postman.model`。
+- Đừng để nó `easy-postman-request-core` phụ thuộc Swing、OkHttp、app service、panel hoặc thời gian chạy plugin.
+- Không đặt các bộ sưu tập trong các mô hình cốt lõi hoặc  Postman collection parser Đặt nó lại `easy-postman-app`，Cũng đừng để nó `easy-postman-collection-core` phụ thuộc Swing、OkHttp、app service/panel/runtime、platform、plugin-runtime hoặc IOC。
+- Đừng để nó `easy-postman-mock-core` phụ thuộc Swing/AWT、collection/request Người mẫu,app service、GraalVM、OkHttp/Netty、platform IOC hoặc plugin runtime，Cũng không mở rộng triển khai đám mây, quyền và npm sinh thái.
+- Đừng để nó HTTP gửi,OkHttp sự thích nghi,SSL、Cookie Thông báo loại này runtime/service Mã trực tiếp phụ thuộc vào nó Swing/panel；Sử dụng tính trung lập sink/dispatcher，Bởi Swing/JavaFX adapter hoàn thành.
+- Không đặt giao diện dịch vụ plug-in `foundation`。
+- Đừng phụ thuộc vào các plugin chính thức thông thường `easy-postman-app`；`easy-postman-plugins/plugin-manager` Đó là chủ nhà app Các trường hợp đặc biệt về quản lý trình cắm có thể dựa trực tiếp vào và không thể sử dụng làm mẫu trình cắm mới.
+- Đừng công khai UI Sự phụ thuộc thành phần app resources để tự tải icons。
+- Đừng ở đó app và ui Lặp lại cùng một tên `icons/*.svg`；Biểu tượng phổ quát được trả lại `easy-postman-ui`，Biểu tượng doanh nghiệp thuộc về mô-đun người tiêu dùng.
+- Đừng ở đó app Một bộ nút riêng tư mới đã được thêm vào bảng điều khiển/màu sắc/Quy tắc phông chữ nên được giải quyết trước tiên `easy-postman-ui`。
+- Đừng đặt nó“Tôi vẫn chưa biết đặt nó ở đâu”Mã được đưa vào một khái quát common gói.
 
-## 后续简化拆分目标
+## Sau đó đơn giản hóa việc phân chia mục tiêu
 
-后续可以按收益逐步抽取，不需要一次性完成：
+Việc rút tiền tiếp theo có thể được thực hiện dần dần tùy theo thu nhập và không cần phải hoàn thành tất cả cùng một lúc:
 
 ```text
 easy-postman-platform
-  已有：IOC、更新发现核心
-  后续：启动、欢迎页、帮助、设置中心、主题/字体应用编排
+  Đã có:IOC、Cập nhật lõi khám phá
+  Theo dõi: khởi động, trang chào mừng, trợ giúp, trung tâm cài đặt, chủ đề/Bố cục ứng dụng phông chữ
 
 easy-postman-request-core
-  已有：请求配置模型、保存响应、header/body/auth/protocol DTO
-  后续：继续收敛请求规格模型，保持无传输实现依赖
+  Hiện có: mô hình cấu hình yêu cầu, lưu phản hồi,header/body/auth/protocol DTO
+  Theo dõi: Tiếp tục hội tụ mô hình đặc tả yêu cầu và không duy trì sự phụ thuộc vào việc triển khai truyền dẫn
 
 easy-postman-collection-core
-  已有：集合树纯模型、分组模型、解析结果、Postman collection parser
-  后续：导出中立 DTO、集合读写契约、非 UI 查询/复制/继承逻辑
+  Hiện có: thiết lập mô hình cây thuần túy, mô hình nhóm, kết quả phân tích cú pháp,Postman collection parser
+  Tiếp theo: Xuất khẩu tính trung lập DTO、Hợp đồng đọc-ghi bộ sưu tập, không UI Truy vấn/Sao chép/Logic kế thừa
 
 easy-postman-mock-core
-  已有：本地 JDK HTTP 服务、Example 路由匹配、会话状态、日志和脚本端口
-  边界：支持本机、局域网和自托管运行，不增加 EasyPostman 云端、团队权限、npm 或 AI 生成依赖
+  Đã: địa phương JDK HTTP dịch vụ,Example Khớp tuyến, trạng thái phiên, cổng ghi nhật ký và tập lệnh
+  Ranh giới: Hỗ trợ hoạt động cục bộ, LAN và tự lưu trữ, không tăng EasyPostman Đám mây, quyền nhóm,npm hoặc AI Tạo sự phụ thuộc
 
 easy-postman-runtime-core
-  后续：变量解析、脚本流水线契约、断言/提取器中立运行模型；具体 Rhino/Graal/HTTP 适配仍按依赖拆分
+  Theo dõi: phân tích biến, hợp đồng đường dẫn tập lệnh, xác nhận/Mô hình chạy trung tính vắt; cụ thể Rhino/Graal/HTTP Sự thích ứng vẫn bị chia cắt bởi sự phụ thuộc
 
 easy-postman-http-runtime
-  已有：`PreparedRequest`、`HttpResponse`、`HttpEventInfo`、transport、OkHttp、SSL、Cookie store、SSE、redirect、runtime settings、交互/观测端口
-  后续：继续把运行期模型里的 OkHttp-specific 类型收敛为中立 DTO，并保持 UI 仅通过 sink/dispatcher 接入
+  Đã có:`PreparedRequest`、`HttpResponse`、`HttpEventInfo`、transport、OkHttp、SSL、Cookie store、SSE、redirect、runtime settings、Sự tương tác/Cảng quan sát
+  Theo dõi: Tiếp tục đưa vào mô hình thời gian chạy OkHttp-specific Loại hội tụ về trung tính DTO，và giữ UI Chỉ vượt qua sink/dispatcher truy cập
 ```
 
-抽取时保持 app 只做组装，核心模块不反向依赖 app UI。
+Giữ trong khi giải nén app Chỉ việc lắp ráp được thực hiện, các mô-đun lõi không có sự phụ thuộc ngược lại app UI。

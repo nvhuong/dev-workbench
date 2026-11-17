@@ -74,8 +74,8 @@ public class PerformanceStatisticsCoordinatorTest extends AbstractSwingUiTest {
 
         PerformanceReportPanel reportPanel = new PerformanceReportPanel();
         JTabbedPane tabbedPane = new JTabbedPane();
-        tabbedPane.addTab("趋势", new JPanel());
-        tabbedPane.addTab("报表", reportPanel);
+        tabbedPane.addTab("xu hướng", new JPanel());
+        tabbedPane.addTab("Báo cáo", reportPanel);
         tabbedPane.setSelectedIndex(1);
 
         PerformanceStatisticsCoordinator coordinator = new PerformanceStatisticsCoordinator(
@@ -122,8 +122,8 @@ public class PerformanceStatisticsCoordinatorTest extends AbstractSwingUiTest {
 
         PerformanceReportPanel reportPanel = new PerformanceReportPanel();
         JTabbedPane tabbedPane = new JTabbedPane();
-        tabbedPane.addTab("趋势", new JPanel());
-        tabbedPane.addTab("报表", reportPanel);
+        tabbedPane.addTab("xu hướng", new JPanel());
+        tabbedPane.addTab("Báo cáo", reportPanel);
         tabbedPane.setSelectedIndex(1);
 
         PerformanceStatisticsCoordinator coordinator = new PerformanceStatisticsCoordinator(

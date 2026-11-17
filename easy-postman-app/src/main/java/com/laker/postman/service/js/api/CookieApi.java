@@ -8,15 +8,15 @@ import java.util.List;
 /**
  * Cookie API (pm.cookies)
  * <p>
- * 提供 Cookie 的读取、设置和删除功能，模拟 Postman 的 Cookie 管理接口。
+ * cung cấp Cookie Các chức năng đọc, đặt và xóa được mô phỏng Postman của Cookie Giao diện quản lý.
  * </p>
  *
- * <h3>使用示例：</h3>
+ * <h3>Ví dụ sử dụng:</h3>
  * <pre>{@code
- * // 获取 Cookie
+ * // Lấy Cookie
  * var token = pm.cookies.get("session_token");
  *
- * // 设置 Cookie
+ * // cài đặt Cookie
  * pm.cookies.set({
  *     name: "user_id",
  *     value: "12345",
@@ -26,10 +26,10 @@ import java.util.List;
  *     httpOnly: true
  * });
  *
- * // 删除 Cookie
+ * // xóa bỏ Cookie
  * pm.cookies.delete("session_token");
  *
- * // 使用 Cookie Jar
+ * // sử dụng Cookie Jar
  * var jar = pm.cookies.jar();
  * jar.unset(pm.request.url, 'session_id', function(error) {
  *     if (error) {
@@ -40,20 +40,20 @@ import java.util.List;
  */
 public class CookieApi {
     /**
-     * Cookie 存储列表
+     * Cookie Danh sách lưu trữ
      */
     private final List<Cookie> cookiesList = new ArrayList<>();
 
     /**
-     * Cookie Jar 实例（延迟初始化）
+     * Cookie Jar Ví dụ (khởi tạo lười biếng)
      */
     private CookieJar cookieJar;
 
     /**
-     * 获取指定名称的 Cookie
+     * Lấy tên được chỉ định Cookie
      *
-     * @param name Cookie 名称
-     * @return Cookie 对象，不存在则返回 null
+     * @param name Cookie tên
+     * @return Cookie Đối tượng, được trả về nếu nó không tồn tại null
      */
     public Cookie get(String name) {
         if (name == null) {
@@ -66,19 +66,19 @@ public class CookieApi {
     }
 
     /**
-     * 获取所有 Cookie
+     * Nhận tất cả chúng Cookie
      *
-     * @return Cookie 列表
+     * @return Cookie danh sách
      */
     public List<Cookie> getAll() {
         return new ArrayList<>(cookiesList);
     }
 
     /**
-     * 设置 Cookie（通过名称和值）
+     * cài đặt Cookie（theo tên và giá trị)
      *
-     * @param name  Cookie 名称
-     * @param value Cookie 值
+     * @param name  Cookie tên
+     * @param value Cookie giá trị
      */
     public void set(String name, String value) {
         if (name == null || value == null) {
@@ -91,24 +91,24 @@ public class CookieApi {
     }
 
     /**
-     * 设置 Cookie（通过 Cookie 对象）
+     * cài đặt Cookie（vượt qua Cookie đối tượng)
      *
-     * @param cookie Cookie 对象
+     * @param cookie Cookie đối tượng
      */
     public void set(Cookie cookie) {
         if (cookie == null || cookie.name == null) {
             return;
         }
-        // 删除同名的旧 Cookie
+        // Xóa cái cũ có cùng tên Cookie
         delete(cookie.name);
-        // 添加新 Cookie
+        // Thêm mới Cookie
         cookiesList.add(cookie);
     }
 
     /**
-     * 设置 Cookie（通过 GraalVM Value 对象，支持 JavaScript 对象）
+     * cài đặt Cookie（vượt qua GraalVM Value đối tượng, hỗ trợ JavaScript đối tượng)
      *
-     * @param cookieValue JavaScript Cookie 对象
+     * @param cookieValue JavaScript Cookie đối tượng
      */
     public void set(Value cookieValue) {
         if (cookieValue == null || !cookieValue.hasMembers()) {
@@ -148,9 +148,9 @@ public class CookieApi {
     }
 
     /**
-     * 删除指定名称的 Cookie
+     * Xóa tên được chỉ định Cookie
      *
-     * @param name Cookie 名称
+     * @param name Cookie tên
      */
     public void delete(String name) {
         if (name == null) {
@@ -160,10 +160,10 @@ public class CookieApi {
     }
 
     /**
-     * 检查是否存在指定名称的 Cookie
+     * Kiểm tra xem tên được chỉ định có tồn tại không Cookie
      *
-     * @param name Cookie 名称
-     * @return 是否存在
+     * @param name Cookie tên
+     * @return tồn tại
      */
     public boolean has(String name) {
         if (name == null) {
@@ -173,28 +173,28 @@ public class CookieApi {
     }
 
     /**
-     * 清空所有 Cookie
+     * Xóa mọi thứ Cookie
      */
     public void clear() {
         cookiesList.clear();
     }
 
     /**
-     * 转换为 Cookie 对象数组（供 JavaScript 访问）
+     * Chuyển đổi sang  Cookie Mảng đối tượng (for JavaScript thăm)
      *
-     * @return Cookie 数组
+     * @return Cookie mảng
      */
     public Cookie[] toArray() {
         return cookiesList.toArray(new Cookie[0]);
     }
 
     /**
-     * 获取 Cookie Jar 实例
+     * Lấy Cookie Jar Ví dụ
      * <p>
-     * Cookie Jar 提供异步 Cookie 操作接口。
+     * Cookie Jar Cung cấp không đồng bộ Cookie Giao diện hoạt động.
      * </p>
      *
-     * @return CookieJar 实例
+     * @return CookieJar Ví dụ
      */
     public CookieJar jar() {
         if (cookieJar == null) {

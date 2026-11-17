@@ -23,10 +23,10 @@ import java.util.Map;
 import java.util.function.Supplier;
 
 /**
- * 脚本执行流水线
- * 提供完整的脚本执行生命周期管理，包括前置脚本、后置脚本、测试结果收集等
+ * Đường dẫn thực thi tập lệnh
+ * Cung cấp quản lý vòng đời thực thi tập lệnh hoàn chỉnh, bao gồm tiền tập lệnh, hậu tập lệnh, thu thập kết quả kiểm tra, v.v
  * <p>
- * 使用示例：
+ * Ví dụ sử dụng:
  * <pre>{@code
  * ScriptExecutionResult result = ScriptExecutionPipeline.builder()
  *     .request(req)
@@ -130,49 +130,49 @@ public class ScriptExecutionPipeline {
     }
 
     /**
-     * 准备好的请求对象
+     * Đối tượng yêu cầu đã chuẩn bị
      */
     private final PreparedRequest request;
 
     /**
-     * 前置脚本内容
+     * Nội dung có sẵn kịch bản
      */
     private final String preScript;
 
     /**
-     * 后置脚本内容
+     * Nội dung phần tái bút
      */
     private final String postScript;
 
     /**
-     * 变量绑定（可选，如果不提供则自动创建）
+     * Liên kết biến (tùy chọn, được tạo tự động nếu không được cung cấp)
      */
     private Map<String, Object> bindings;
 
     /**
-     * 是否在前置脚本失败时显示错误对话框
+     * Có hiển thị hộp thoại lỗi khi tập lệnh trước bị lỗi hay không
      */
     @Builder.Default
     private final boolean showPreScriptErrorDialog = true;
 
     /**
-     * 输出回调（可选）
+     * Gọi lại đầu ra (tùy chọn)
      */
     private final JsScriptExecutor.OutputCallback outputCallback;
 
     /**
-     * 可选的环境变量供应器。Headless / 集群 worker 可按 run 注入环境；
-     * GUI 默认不传时仍使用 EnvironmentService 的 active environment。
+     * Nhà cung cấp biến môi trường tùy chọn.Headless / cụm worker Có thể ép được run Tiêm môi trường;
+     * GUI Vẫn được sử dụng khi không được thông qua theo mặc định EnvironmentService của active environment。
      */
     private final Supplier<Environment> environmentSupplier;
 
     /**
-     * 脚本执行器。性能压测会注入 run-scoped executor，普通 GUI 请求默认使用全局 executor。
+     * Người thực thi kịch bản. Kiểm tra căng thẳng hiệu suất sẽ được tiêm run-scoped executor，bình thường GUI Yêu cầu sử dụng toàn cầu theo mặc định executor。
      */
     private final JsScriptExecutor.ScriptExecutor scriptExecutor;
 
     /**
-     * 当前脚本所属请求的变量作用域，用于 headless / GUI 共用的分组变量解析。
+     * Phạm vi thay đổi của yêu cầu mà tập lệnh hiện tại thuộc về sẽ được sử dụng headless / GUI Độ phân giải biến nhóm được chia sẻ.
      */
     private final RequestExecutionScope requestExecutionScope;
 
@@ -183,23 +183,23 @@ public class ScriptExecutionPipeline {
     private final boolean includeIterationDataInPmVariables;
 
     /**
-     * 可选的共享上下文。Functional / Performance 这类“同一轮多请求”
-     * 场景会显式传入它，避免再依赖线程残留来共享 pm.variables。
+     * Bối cảnh được chia sẻ tùy chọn.Functional / Performance Loại điều này“Nhiều yêu cầu trong cùng một vòng”
+     * Cảnh sẽ chuyển nó một cách rõ ràng để tránh dựa vào dư lượng luồng để chia sẻ pm.variables。
      */
     private final ExecutionVariableContext sharedExecutionContext;
 
     /**
-     * 延迟到执行上下文挂载后再生成的自动认证配置。
-     * 这样同一轮共享变量可用于 Basic/Bearer 认证，同时 pre-script 仍可删除/覆盖该请求头。
+     * Trì hoãn việc tạo cấu hình xác thực tự động cho đến khi việc gắn bối cảnh được thực thi.
+     * Bằng cách này, các biến được chia sẻ có thể được sử dụng trong cùng một vòng Basic/Bearer Chứng nhận, đồng thời pre-script Vẫn có thể xóa được/Ghi đè tiêu đề yêu cầu này.
      */
     private PreparedRequestMapper.DeferredAuthorization deferredAuthorization;
 
     private transient ExecutionVariableContext runtimeExecutionContext;
 
     /**
-     * 执行前置脚本
+     * Thực hiện kịch bản trước
      *
-     * @return 执行结果
+     * @return Kết quả thực hiện
      */
     public ScriptExecutionResult executePreScript() {
         return executePreScript(false);
@@ -253,10 +253,10 @@ public class ScriptExecutionPipeline {
     }
 
     /**
-     * 执行后置脚本
+     * Thực hiện phần tái bút
      *
-     * @param response HTTP 响应对象
-     * @return 执行结果（包含测试结果）
+     * @param response HTTP đối tượng phản hồi
+     * @return Kết quả thực hiện (bao gồm cả kết quả kiểm tra)
      */
     public ScriptExecutionResult executePostScript(HttpResponse response) {
         return withExecutionContext(() -> {
@@ -337,25 +337,25 @@ public class ScriptExecutionPipeline {
     }
 
     /**
-     * 完整执行流程：前置脚本 -> 后置脚本
-     * 如果前置脚本失败，则不执行后置脚本
+     * Quá trình thực hiện hoàn chỉnh: pre-script -> Tái bút
+     * Nếu tập lệnh trước không thành công, tập lệnh sau sẽ không được thực thi
      *
-     * @param response HTTP 响应对象
-     * @return 后置脚本的执行结果
+     * @param response HTTP đối tượng phản hồi
+     * @return Kết quả thực hiện của phần tái bút
      */
     public ScriptExecutionResult executeFullPipeline(HttpResponse response) {
-        // 执行前置脚本
+        // Thực hiện kịch bản trước
         ScriptExecutionResult preResult = executePreScript();
         if (!preResult.isSuccess()) {
             return preResult;
         }
 
-        // 执行后置脚本
+        // Thực hiện phần tái bút
         return executePostScript(response);
     }
 
     /**
-     * 清空测试结果
+     * Kết quả kiểm tra rõ ràng
      */
     private void clearTestResults() {
         if (bindings != null) {
@@ -374,7 +374,7 @@ public class ScriptExecutionPipeline {
     }
 
     /**
-     * 获取有效的输出回调
+     * Nhận một cuộc gọi lại đầu ra hợp lệ
      */
     private JsScriptExecutor.OutputCallback getEffectiveOutputCallback(String prefix) {
         if (outputCallback != null) {
@@ -401,9 +401,9 @@ public class ScriptExecutionPipeline {
     }
 
     /**
-     * 前置脚本执行成功后，统一进入最终收尾阶段。
-     * 这里不再散落处理变量替换 / Authorization 兜底规则，
-     * 而是全部委托给 PreparedRequestFinalizer，保证各发送入口行为一致。
+     * Sau khi pre-script được thực thi thành công sẽ bước vào giai đoạn hoàn thiện cuối cùng.
+     * Ở đây không còn việc xử lý rải rác việc thay thế biến nữa / Authorization Quy tắc ngón tay cái.
+     * Nhưng hãy ủy thác tất cả PreparedRequestFinalizer，Đảm bảo rằng hành vi của mỗi cổng gửi là nhất quán.
      */
     public void finalizeRequest() {
         withExecutionContext(() -> PreparedRequestFinalizer.finalizeForSend(request, deferredAuthorization));
@@ -445,10 +445,10 @@ public class ScriptExecutionPipeline {
     }
 
     /**
-     * 执行脚本（通用方法）
+     * Thực thi tập lệnh (phương thức chung)
      *
-     * @param context 脚本执行上下文
-     * @throws ScriptExecutionException 脚本执行异常
+     * @param context Bối cảnh thực thi tập lệnh
+     * @throws ScriptExecutionException Ngoại lệ thực thi tập lệnh
      */
     private void executeScript(ScriptExecutionContext context) throws ScriptExecutionException {
         if (context == null || CharSequenceUtil.isBlank(context.getScript())) {
@@ -462,11 +462,11 @@ public class ScriptExecutionPipeline {
 
 
     /**
-     * 准备前置脚本的变量绑定
-     * 只暴露 pm 上下文，并初始化空响应对象。
+     * Chuẩn bị ràng buộc biến cho tập lệnh trước
+     * Chỉ bị lộ thôi pm context và khởi tạo một đối tượng phản hồi trống.
      *
-     * @param req 准备好的请求对象
-     * @return 变量绑定 Map
+     * @param req Đối tượng yêu cầu đã chuẩn bị
+     * @return Ràng buộc biến đổi Map
      */
     private Map<String, Object> preparePreRequestBindings(PreparedRequest req) {
         Environment activeEnv = resolveActiveEnvironment();
@@ -481,7 +481,7 @@ public class ScriptExecutionPipeline {
         bindings.put("globals", postman.globals);
         bindings.put("iterationData", postman.iterationData);
 
-        // 为前置脚本提供一个空的响应对象，防止 pm.response 为 undefined
+        // Cung cấp một đối tượng phản hồi trống cho tập lệnh trước để ngăn chặn pm.response vì undefined
         try {
             HttpResponse emptyResponse = new HttpResponse();
             emptyResponse.code = 0;
@@ -518,11 +518,11 @@ public class ScriptExecutionPipeline {
     }
 
     /**
-     * 为后置脚本添加响应相关的变量绑定
-     * 在现有 bindings 基础上添加响应数据
+     * Thêm các ràng buộc biến liên quan đến phản hồi vào các tập lệnh sau
+     * ở hiện tại bindings Thêm dữ liệu phản hồi dựa trên điều này
      *
-     * @param bindings 现有的变量绑定
-     * @param response HTTP 响应对象
+     * @param bindings Ràng buộc biến hiện có
+     * @param response HTTP đối tượng phản hồi
      */
     private static void addResponseBindings(Map<String, Object> bindings, HttpResponse response) {
         if (bindings == null || response == null) {

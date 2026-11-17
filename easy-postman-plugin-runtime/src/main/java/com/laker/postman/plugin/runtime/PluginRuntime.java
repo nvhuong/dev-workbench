@@ -12,13 +12,13 @@ import java.nio.file.Path;
 import java.util.*;
 
 /**
- * 简单插件运行时：从本地 plugins 目录加载插件 jar。
+ * Thời gian chạy plugin đơn giản: từ local plugins Plugin tải thư mục jar。
  * <p>
- * 这里是插件体系的核心入口，主要职责有 4 个：
- * 1. 扫描插件目录并解析 descriptor
- * 2. 决定哪些插件应该被加载（启用、兼容、版本优先）
- * 3. 创建类加载器并调用插件生命周期
- * 4. 维护禁用/待卸载等持久化状态
+ * Đây là lối vào cốt lõi của hệ thống plug-in và có trách nhiệm chính 4 cá nhân:
+ * 1. Quét thư mục plugin và phân tích nó descriptor
+ * 2. Quyết định nên tải plugin nào (đã bật, tương thích, phiên bản trước)
+ * 3. Tạo trình nạp lớp và gọi vòng đời của plugin
+ * 4. Bảo trì bị vô hiệu hóa/Để được gỡ cài đặt và trạng thái liên tục khác
  * </p>
  */
 @Slf4j
@@ -27,7 +27,7 @@ public final class PluginRuntime {
     private static final String RUNTIME_PROPERTIES_RESOURCE = "/META-INF/easy-postman/runtime.properties";
     private static final String PLATFORM_VERSION_KEY = "plugin.platform.version";
     private static final PluginRegistry REGISTRY = new PluginRegistry();
-    // 当前进程内已成功加载的插件实例、类加载器与文件信息
+    // Các phiên bản trình cắm, trình nạp lớp và thông tin tệp đã được tải thành công trong quy trình hiện tại
     private static final List<EasyPostmanPlugin> LOADED_PLUGINS = new ArrayList<>();
     private static final List<URLClassLoader> PLUGIN_CLASSLOADERS = new ArrayList<>();
     private static final List<PluginFileInfo> LOADED_PLUGIN_FILES = new ArrayList<>();
@@ -54,13 +54,13 @@ public final class PluginRuntime {
             log.info("Plugin runtime initializing. managedPluginDir={}, pluginPackageDir={}, scanDirs={}",
                     managedPluginDir, pluginPackageDir, pluginDirs);
 
-            // 启动时先处理上一次退出后遗留的“待卸载”插件文件，
-            // 这样后面的扫描结果才是干净的当前状态。
+            // Khi bắt đầu, các mục còn lại sau lần thoát cuối cùng sẽ được xử lý trước“Sẽ được gỡ cài đặt”Các tệp trình cắm, .
+            // Bằng cách này, kết quả quét tiếp theo sẽ ở trạng thái hiện tại sạch sẽ.
             LOAD_FAILURES.clear();
             cleanupPendingUninstallPlugins();
 
-            // 这里先做“选插件”而不是直接扫到什么就加载什么。
-            // 运行时会统一处理禁用、待卸载、兼容性和同 id 多版本择优。
+            // Làm điều đó ở đây đầu tiên“Chọn plugin”Thay vì tải trực tiếp bất cứ thứ gì bạn quét.
+            // Việc vô hiệu hóa, chờ gỡ cài đặt, tính tương thích và đồng bộ hóa sẽ được xử lý thống nhất trong thời gian chạy id Chọn tốt nhất trong số nhiều phiên bản.
             List<PluginFileInfo> loadCandidates = resolveLoadCandidates(pluginDirs);
             if (loadCandidates.isEmpty()) {
                 log.info("No plugin candidates selected for loading.");
@@ -82,7 +82,7 @@ public final class PluginRuntime {
                 ).ifPresent(failureMessage ->
                         LOAD_FAILURES.put(normalizePath(pluginFile.jarPath()), failureMessage));
             }
-            // onLoad 负责注册扩展点，onStart 则表示“所有插件都注册完了，可以开始运行”。
+            // onLoad Chịu trách nhiệm đăng ký điểm mở rộng.onStart có nghĩa là“Tất cả các plug-in đã được đăng ký và có thể bắt đầu chạy”。
             PluginLoader.startPlugins(LOADED_PLUGINS);
             if (LOADED_PLUGIN_FILES.isEmpty()) {
                 log.info("Plugin runtime initialized with 0 loaded plugins.");
@@ -191,7 +191,7 @@ public final class PluginRuntime {
         String currentAppVersion = runtimeVersionInfo.currentAppVersion();
         String currentPlatformVersion = runtimeVersionInfo.currentPlatformVersion();
 
-        // app 版本决定“这个宿主发行版是否允许安装”，platform 版本决定“这套插件 SPI 是否还能装配”。
+        // app Phiên bản được xác định“Liệu phân phối máy chủ này có cho phép cài đặt hay không”，platform Phiên bản được xác định“Bộ plug-in này SPI Cho dù nó vẫn có thể được lắp ráp”。
         boolean appVersionCompatible = isVersionInRange(currentAppVersion, minAppVersion, maxAppVersion);
         boolean platformVersionCompatible = isVersionInRange(currentPlatformVersion, minPlatformVersion, maxPlatformVersion);
         return new PluginCompatibility(
@@ -212,10 +212,10 @@ public final class PluginRuntime {
             try {
                 PluginLoader.stopPlugins(LOADED_PLUGINS);
                 PluginLoader.closeClassLoaders(PLUGIN_CLASSLOADERS);
-                // shutdown 阶段清理待卸载插件，避免已加载 jar 在运行期间删除失败
+                // shutdown Dọn dẹp từng giai đoạn các plugin sẽ được gỡ cài đặt để ngăn chúng được tải jar Xóa không thành công trong thời gian chạy
                 cleanupPendingUninstallPlugins();
             } finally {
-                // 彻底清空进程内状态，避免 IDE 反复启动时出现脏缓存
+                // Xóa hoàn toàn trạng thái trong quá trình để tránh IDE Bộ đệm bẩn xuất hiện khi khởi động lại
                 LOADED_PLUGINS.clear();
                 PLUGIN_CLASSLOADERS.clear();
                 LOADED_PLUGIN_FILES.clear();
@@ -326,7 +326,7 @@ public final class PluginRuntime {
         }
         List<PluginFileInfo> managedPluginFiles = getManagedPluginFiles();
 
-        // 只清理托管安装目录里的副本，不碰 packages 里的本地插件包
+        // Chỉ làm sạch bản sao trong thư mục cài đặt được quản lý, không chạm vào nó packages gói plug-in cục bộ
         for (PluginFileInfo info : managedPluginFiles) {
             if (!pendingIds.contains(info.descriptor().id())) {
                 continue;

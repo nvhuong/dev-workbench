@@ -3,7 +3,7 @@ package com.laker.postman.performance.core.threadgroup;
 import com.laker.postman.util.MessageKeys;
 
 /**
- * 线程组数据模型，支持多种线程模式
+ * Mô hình dữ liệu nhóm luồng hỗ trợ nhiều chế độ luồng
  */
 public class ThreadGroupData {
     public static final int MIN_THREADS = 1;
@@ -12,12 +12,12 @@ public class ThreadGroupData {
     private static final int MIN_LOOPS = 1;
     private static final int MIN_STEP = 1;
 
-    // 线程组类型
+    // Loại nhóm chủ đề
     public enum ThreadMode {
-        FIXED(MessageKeys.THREADGROUP_MODE_FIXED),           // 固定线程数
-        RAMP_UP(MessageKeys.THREADGROUP_MODE_RAMP_UP),       // 递增线程数
-        SPIKE(MessageKeys.THREADGROUP_MODE_SPIKE),           // 尖刺模式
-        STAIRS(MessageKeys.THREADGROUP_MODE_STAIRS);         // 阶梯模式
+        FIXED(MessageKeys.THREADGROUP_MODE_FIXED),           // Số lượng chủ đề cố định
+        RAMP_UP(MessageKeys.THREADGROUP_MODE_RAMP_UP),       // Tăng số lượng chủ đề
+        SPIKE(MessageKeys.THREADGROUP_MODE_SPIKE),           // Chế độ đột biến
+        STAIRS(MessageKeys.THREADGROUP_MODE_STAIRS);         // Chế độ thang
 
         private final String messageKey;
 
@@ -35,35 +35,35 @@ public class ThreadGroupData {
         }
     }
 
-    // 公共属性
-    public ThreadMode threadMode = ThreadMode.FIXED;  // 默认固定线程数
-    public int numThreads = 20;                        // 固定模式-默认用户数
-    public int duration = 60;                         // 所有模式-默认持续时间(秒)
-    public int loops = 1;                             // 固定模式-默认循环次数
-    public boolean useTime = true;                   // 是否使用时间而不是循环次数
-    public int maxInFlightWaitSeconds = DEFAULT_MAX_IN_FLIGHT_WAIT_SECONDS; // 到时后等待在途请求完成的最长时间
+    // Tài sản công cộng
+    public ThreadMode threadMode = ThreadMode.FIXED;  // Số lượng chủ đề cố định mặc định
+    public int numThreads = 20;                        // Mẫu cố định-Số lượng người dùng mặc định
+    public int duration = 60;                         // Tất cả các chế độ-Thời lượng mặc định(giây)
+    public int loops = 1;                             // Mẫu cố định-Số vòng lặp mặc định
+    public boolean useTime = true;                   // Có nên sử dụng thời gian thay vì số vòng lặp hay không
+    public int maxInFlightWaitSeconds = DEFAULT_MAX_IN_FLIGHT_WAIT_SECONDS; // Khoảng thời gian tối đa để chờ hoàn tất các yêu cầu trên chuyến bay sau khi hết hạn
 
-    // 递增模式属性
-    public int rampUpStartThreads = 1;                // 递增起始线程数
-    public int rampUpEndThreads = 20;                 // 递增最终线程数
-    public int rampUpTime = 30;                       // 递增时间(秒)
-    public int rampUpDuration = 60;                  // 递增模式总测试持续时间(秒)
+    // Thuộc tính chế độ tăng
+    public int rampUpStartThreads = 1;                // Tăng số lượng chủ đề bắt đầu
+    public int rampUpEndThreads = 20;                 // Tăng số lượng chủ đề cuối cùng
+    public int rampUpTime = 30;                       // Tăng thời gian(giây)
+    public int rampUpDuration = 60;                  // Chế độ tăng tổng thời lượng thử nghiệm(giây)
 
-    // 尖刺模式属性
-    public int spikeMinThreads = 1;                   // 尖刺最小线程数
-    public int spikeMaxThreads = 20;                  // 尖刺最大线程数
-    public int spikeRampUpTime = 20;                  // 尖刺上升时间(秒)
-    public int spikeHoldTime = 15;                     // 尖刺保持时间(秒)
-    public int spikeRampDownTime = 20;                // 尖刺下降时间(秒)
-    public int spikeDuration = 60;                   // 尖刺模式总测试持续时间(秒)
+    // Thuộc tính chế độ tăng đột biến
+    public int spikeMinThreads = 1;                   // Tăng số lượng chủ đề tối thiểu
+    public int spikeMaxThreads = 20;                  // Số lượng chủ đề tối đa cho gai
+    public int spikeRampUpTime = 20;                  // Spike tăng thời gian(giây)
+    public int spikeHoldTime = 15;                     // Gai giữ thời gian(giây)
+    public int spikeRampDownTime = 20;                // Thời gian giảm đột ngột(giây)
+    public int spikeDuration = 60;                   // Tổng thời gian thử nghiệm chế độ tăng đột biến(giây)
 
 
-    // 阶梯模式属性
-    public int stairsStartThreads = 5;                // 阶梯起始线程数
-    public int stairsEndThreads = 20;                 // 阶梯最终线程数
-    public int stairsStep = 5;                        // 阶梯步长
-    public int stairsHoldTime = 15;                   // 每阶段保持时间(秒)
-    public int stairsDuration = 60;                  // 阶梯模式总测试持续时间(秒)
+    // Thuộc tính chế độ bậc thang
+    public int stairsStartThreads = 5;                // Số lượng ren bắt đầu của thang
+    public int stairsEndThreads = 20;                 // Số lượng chủ đề cuối cùng trong thang
+    public int stairsStep = 5;                        // Chiều dài bậc thang
+    public int stairsHoldTime = 15;                   // Giữ thời gian cho từng giai đoạn(giây)
+    public int stairsDuration = 60;                  // Tổng thời gian thử nghiệm ở chế độ bậc thang(giây)
 
     public void normalize() {
         if (threadMode == null) {

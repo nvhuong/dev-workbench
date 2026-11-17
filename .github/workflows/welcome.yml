@@ -19,7 +19,7 @@ jobs:
         with:
           script: |
             const isIssue = context.payload.issue !== undefined;
-            
+
             if (isIssue) {
               // Check if this is the user's first issue
               const issues = await github.rest.issues.listForRepo({
@@ -28,25 +28,25 @@ jobs:
                 creator: context.payload.sender.login,
                 state: 'all'
               });
-              
+
               const isFirstIssue = issues.data.length === 1;
-              
+
               if (isFirstIssue) {
-                const issueComment = `👋 你好 @${context.payload.sender.login}！感谢你提交第一个 Issue！
-                
+                const issueComment = `👋 Xin chào @${context.payload.sender.login}！Cảm ơn bạn đã gửi cái đầu tiên Issue！
+
               Hi @${context.payload.sender.login}! Thank you for submitting your first issue!
-              
-              我们会尽快查看并回复你。在等待的过程中，你可以：
+
+              Chúng tôi sẽ kiểm tra và liên hệ lại với bạn trong thời gian sớm nhất. Trong khi chờ đợi, bạn có thể:
               We'll review and respond as soon as possible. While waiting, you can:
-              
-              - 📖 查看 [文档](https://github.com/lakernote/easy-postman#readme) | Check the [documentation](https://github.com/lakernote/easy-postman#readme)
-              - 💬 加入 [讨论区](https://github.com/lakernote/easy-postman/discussions) | Join the [Discussions](https://github.com/lakernote/easy-postman/discussions)
-              - ⭐ 给项目点个 Star！| Give the project a Star!
-              
-              如果你愿意帮助解决这个问题，欢迎提交 PR！
+
+              - 📖 Xem [Tài liệu](https://github.com/lakernote/easy-postman#readme) | Check the [documentation](https://github.com/lakernote/easy-postman#readme)
+              - 💬 Tham gia [Bảng thảo luận](https://github.com/lakernote/easy-postman/discussions) | Join the [Discussions](https://github.com/lakernote/easy-postman/discussions)
+              - ⭐ Hãy ủng hộ dự án Star！| Give the project a Star!
+
+              Nếu bạn muốn giúp giải quyết vấn đề này, vui lòng gửi PR！
               If you'd like to help fix this issue, PRs are welcome!
               `;
-                
+
                 await github.rest.issues.createComment({
                   owner: context.repo.owner,
                   repo: context.repo.repo,
@@ -62,26 +62,26 @@ jobs:
                 state: 'all',
                 creator: context.payload.sender.login
               });
-              
+
               const isFirstPR = pulls.data.length === 1;
-              
+
               if (isFirstPR) {
-                const prComment = `🎉 感谢你的第一个 Pull Request @${context.payload.sender.login}！
-                
+                const prComment = `🎉 Cảm ơn vì điều đầu tiên Pull Request @${context.payload.sender.login}！
+
               🎉 Thank you for your first Pull Request @${context.payload.sender.login}!
-              
-              我们的维护者会尽快审查你的代码。在等待的过程中，请确保：
+
+              Những người bảo trì của chúng tôi sẽ xem xét mã của bạn sớm nhất có thể. Trong khi chờ đợi, hãy đảm bảo:
               Our maintainers will review your code soon. While waiting, please ensure:
-              
-              - ✅ 代码可以成功编译 | Code compiles successfully
-              - ✅ 所有测试通过 | All tests pass
-              - ✅ 遵循 [贡献指南](https://github.com/lakernote/easy-postman/blob/master/.github/CONTRIBUTING.md) | Follow the [Contributing Guide](https://github.com/lakernote/easy-postman/blob/master/.github/CONTRIBUTING.md)
-              - ✅ PR 描述清晰完整 | PR description is clear and complete
-              
-              再次感谢你的贡献！🙏
+
+              - ✅ Mã biên dịch thành công | Code compiles successfully
+              - ✅ Tất cả các bài kiểm tra đã vượt qua | All tests pass
+              - ✅ Theo dõi [Nguyên tắc đóng góp](https://github.com/lakernote/easy-postman/blob/master/.github/CONTRIBUTING.md) | Follow the [Contributing Guide](https://github.com/lakernote/easy-postman/blob/master/.github/CONTRIBUTING.md)
+              - ✅ PR Mô tả rõ ràng và đầy đủ | PR description is clear and complete
+
+              Cảm ơn một lần nữa vì sự đóng góp của bạn! .🙏
               Thank you again for your contribution! 🙏
               `;
-                
+
                 await github.rest.issues.createComment({
                   owner: context.repo.owner,
                   repo: context.repo.repo,

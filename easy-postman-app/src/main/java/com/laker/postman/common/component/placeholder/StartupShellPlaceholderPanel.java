@@ -8,9 +8,9 @@ import javax.swing.*;
 import java.awt.*;
 
 /**
- * 主窗口启动壳骨架屏。
- * 只复用主界面的外层分栏关系，不创建真实树、编辑器和响应组件，
- * 这样既能和真实界面位置对齐，又不会把启动链路重新变重。
+ * Cửa sổ chính khởi chạy màn hình khung vỏ.
+ * Chỉ sử dụng lại mối quan hệ cột bên ngoài của giao diện chính và không tạo cây, trình chỉnh sửa và thành phần phản hồi thực.
+ * Bằng cách này, nó có thể được căn chỉnh với vị trí giao diện thực mà không cần sao chép lại liên kết khởi động.
  */
 public class StartupShellPlaceholderPanel extends AbstractPlaceholderPanel {
 

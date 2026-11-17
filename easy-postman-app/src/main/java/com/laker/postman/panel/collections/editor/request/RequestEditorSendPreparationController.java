@@ -9,9 +9,9 @@ import lombok.RequiredArgsConstructor;
 import java.util.function.Supplier;
 
 /**
- * 请求发送前准备控制器。
+ * Chuẩn bị bộ điều khiển trước khi gửi yêu cầu.
  * <p>
- * 发送前只做“收集表单 + 设置校验 + 构建请求 + 执行前置脚本”，真正协议执行由 runtime controller 分发。
+ * Chỉ cần làm điều đó trước khi gửi“Hình thức sưu tầm + Đặt xác minh + Xây dựng yêu cầu + Thực hiện kịch bản trước”，Thỏa thuận thực tế được thực hiện bởi runtime controller Phân phối.
  */
 @RequiredArgsConstructor
 final class RequestEditorSendPreparationController {

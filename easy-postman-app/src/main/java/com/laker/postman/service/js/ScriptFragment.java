@@ -3,34 +3,34 @@ package com.laker.postman.service.js;
 import lombok.Getter;
 
 /**
- * 脚本片段
+ * Đoạn kịch bản
  * <p>
- * 表示一个可执行的脚本片段，包含脚本内容和来源标识。
- * 主要用于脚本继承场景，区分脚本来自请求本身还是从父分组继承。
+ * Đại diện cho một đoạn tập lệnh thực thi, bao gồm nội dung tập lệnh và nhận dạng nguồn.
+ * Chủ yếu được sử dụng trong các tình huống kế thừa tập lệnh để phân biệt xem tập lệnh xuất phát từ chính yêu cầu hay được kế thừa từ nhóm mẹ.
  * </p>
  *
- * <h3>使用场景：</h3>
+ * <h3>Tình huống sử dụng:</h3>
  * <ul>
- *   <li>分组级别的脚本继承</li>
- *   <li>合并多个来源的脚本</li>
- *   <li>脚本来源追踪和调试</li>
+ *   <li>Kế thừa tập lệnh cấp nhóm</li>
+ *   <li>Kết hợp các tập lệnh từ nhiều nguồn</li>
+ *   <li>Truy tìm và gỡ lỗi nguồn tập lệnh</li>
  * </ul>
  *
- * <h3>示例：</h3>
+ * <h3>Ví dụ:</h3>
  * <pre>{@code
- * // 创建请求自身的脚本片段
+ * // Tạo một đoạn mã yêu cầu chính nó
  * ScriptFragment requestScript = new ScriptFragment(
  *     "pm.environment.set('token', 'abc123');",
  *     "Request: /api/login"
  * );
  *
- * // 创建继承的脚本片段
+ * // Tạo các đoạn script được kế thừa
  * ScriptFragment inheritedScript = new ScriptFragment(
  *     "pm.request.headers.add({key: 'X-API-Key', value: pm.environment.get('apiKey')});",
  *     "Group: API Requests"
  * );
  *
- * // 合并脚本
+ * // Hợp nhất kịch bản
  * List<ScriptFragment> fragments = Arrays.asList(inheritedScript, requestScript);
  * String mergedScript = ScriptMerger.merge(fragments);
  * }</pre>
@@ -41,14 +41,14 @@ import lombok.Getter;
 @Getter
 public class ScriptFragment {
     /**
-     * 脚本内容（JavaScript 代码）
+     * Nội dung tập lệnh (JavaScript mã số)
      */
     private final String content;
 
     /**
-     * 脚本来源标识
+     * Mã định danh nguồn tập lệnh
      * <p>
-     * 用于标识脚本来源，便于调试和追踪。例如：
+     * Được sử dụng để xác định nguồn của tập lệnh để thuận tiện cho việc gỡ lỗi và truy tìm. Ví dụ:
      * <ul>
      *   <li>"Request: /api/users"</li>
      *   <li>"Group: API Requests"</li>
@@ -59,10 +59,10 @@ public class ScriptFragment {
     private final String source;
 
     /**
-     * 构造脚本片段（带来源标识）
+     * Xây dựng một đoạn script (có nhận dạng nguồn)
      *
-     * @param source 脚本来源标识
-     * @param content 脚本内容
+     * @param source Mã định danh nguồn tập lệnh
+     * @param content Nội dung kịch bản
      */
     public ScriptFragment(String source, String content) {
         this.source = source;
@@ -70,30 +70,30 @@ public class ScriptFragment {
     }
 
     /**
-     * 构造脚本片段（无来源标识）
+     * Xây dựng một đoạn script (không xác định nguồn)
      *
-     * @param content 脚本内容
+     * @param content Nội dung kịch bản
      */
     public ScriptFragment(String content) {
         this(null, content);
     }
 
     /**
-     * 工厂方法：创建带来源标识的脚本片段
+     * Phương pháp xuất xưởng: Tạo một đoạn tập lệnh có nhận dạng nguồn
      *
-     * @param source 脚本来源标识
-     * @param content 脚本内容
-     * @return 脚本片段实例
+     * @param source Mã định danh nguồn tập lệnh
+     * @param content Nội dung kịch bản
+     * @return Ví dụ về đoạn mã
      */
     public static ScriptFragment of(String source, String content) {
         return new ScriptFragment(source, content);
     }
 
     /**
-     * 工厂方法：创建无来源标识的脚本片段
+     * Phương pháp xuất xưởng: Tạo một đoạn tập lệnh mà không cần xác định nguồn
      *
-     * @param content 脚本内容
-     * @return 脚本片段实例
+     * @param content Nội dung kịch bản
+     * @return Ví dụ về đoạn mã
      */
     public static ScriptFragment of(String content) {
         return new ScriptFragment(content);

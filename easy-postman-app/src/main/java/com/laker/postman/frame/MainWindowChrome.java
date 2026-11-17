@@ -15,7 +15,7 @@ import java.awt.Color;
 import java.awt.Container;
 
 /**
- * 主窗口平台标题栏和背景外观适配。
+ * Thanh tiêu đề nền tảng cửa sổ chính và điều chỉnh giao diện nền.
  */
 @UtilityClass
 @Slf4j
@@ -99,7 +99,7 @@ class MainWindowChrome {
         if (!SystemInfo.isMacFullWindowContentSupported || rootPane == null) {
             return;
         }
-        // 在窗口首显前一次性应用，避免显示后再切换 title bar / fullWindowContent 造成二次重绘。
+        // Áp dụng nó một lần trước khi cửa sổ được hiển thị lần đầu tiên để tránh chuyển đổi sau khi nó được hiển thị title bar / fullWindowContent Khiến phải vẽ lại lần thứ hai.
         rootPane.putClientProperty("apple.awt.fullWindowContent", true);
         rootPane.putClientProperty("apple.awt.transparentTitleBar", true);
     }

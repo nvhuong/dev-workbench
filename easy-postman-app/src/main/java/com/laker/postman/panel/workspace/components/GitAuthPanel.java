@@ -18,7 +18,7 @@ import java.awt.*;
 import java.io.File;
 
 /**
- * Git认证配置面板公共组件
+ * GitCác thành phần công khai của bảng cấu hình xác thực
  */
 public class GitAuthPanel extends JPanel {
 
@@ -47,7 +47,7 @@ public class GitAuthPanel extends JPanel {
 
     private JPanel authDetailsPanel;
 
-    // SSH 认证相关组件
+    // SSH Các thành phần liên quan đến chứng nhận
     private JButton sshKeyBrowseButton;
 
     public GitAuthPanel() {
@@ -61,7 +61,7 @@ public class GitAuthPanel extends JPanel {
         authTypeCombo.setRenderer(new GitAuthTypeRenderer());
         SettingsInputStyle.apply(authTypeCombo);
 
-        // 调整字段宽度以更好匹配父对话框
+        // Điều chỉnh độ rộng trường để phù hợp hơn với hộp thoại gốc
         passwordUsernameField = new JTextField(20);
         passwordField = new EasyPasswordField(20);
         tokenUsernameField = new JTextField(20);
@@ -76,7 +76,7 @@ public class GitAuthPanel extends JPanel {
         sshKeyBrowseButton.setMinimumSize(BROWSE_BUTTON_SIZE);
         sshKeyBrowseButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 
-        // 设置默认字体（EasyPostmanPasswordField 已自动设置默认字体）
+        // Đặt phông chữ mặc định (EasyPostmanPasswordField Phông chữ mặc định được đặt tự động)
         Font defaultFont = FontsUtil.getDefaultFont(Font.PLAIN);
         passwordUsernameField.setFont(defaultFont);
         tokenUsernameField.setFont(defaultFont);
@@ -101,7 +101,7 @@ public class GitAuthPanel extends JPanel {
         add(authTypeLabel, "cell 0 0, aligny center");
         add(authTypeCombo, "cell 1 0, w " + AUTH_TYPE_WIDTH + "!, h " + FORM_CONTROL_HEIGHT + "!");
 
-        // 认证详情面板
+        // Bảng chi tiết chứng nhận
         authDetailsPanel = new JPanel(new CardLayout()) {
             @Override
             public Dimension getPreferredSize() {
@@ -125,21 +125,21 @@ public class GitAuthPanel extends JPanel {
     private void setupEventHandlers() {
         authTypeCombo.addActionListener(e -> updateAuthDetailsPanel());
 
-        // SSH 私钥文件选择事件
+        // SSH Sự kiện chọn tệp khóa riêng
         sshKeyBrowseButton.addActionListener(e -> selectSshKeyFile());
 
-        updateAuthDetailsPanel(); // 初始状态
+        updateAuthDetailsPanel(); // trạng thái ban đầu
     }
 
     /**
-     * 选择SSH私钥文件
+     * ChọnSSHTệp khóa riêng
      */
     private void selectSshKeyFile() {
         SystemFileChooser fileChooser = FileChooserUtil.createOpenFileChooser(
                 "workspace.git.sshKey",
                 I18nUtil.getMessage(MessageKeys.WORKSPACE_GIT_SSH_SELECT_KEY));
 
-        // 设置默认目录为用户主目录下的 .ssh 文件夹
+        // Đặt thư mục mặc định vào thư mục chính của người dùng .ssh thư mục
         String userHome = System.getProperty("user.home");
         File sshDir = new File(userHome, ".ssh");
         if (sshDir.exists() && sshDir.isDirectory()) {
@@ -261,7 +261,7 @@ public class GitAuthPanel extends JPanel {
     }
 
     /**
-     * 设置组件启用状态
+     * Đặt trạng thái kích hoạt thành phần
      */
     public void setComponentsEnabled(boolean enabled) {
         authTypeCombo.setEnabled(enabled);
@@ -275,7 +275,7 @@ public class GitAuthPanel extends JPanel {
     }
 
     /**
-     * 验证认证信息
+     * Xác minh thông tin xác thực
      */
     public void validateAuth() throws IllegalArgumentException {
         GitAuthType selectedAuthType = (GitAuthType) authTypeCombo.getSelectedItem();
@@ -300,7 +300,7 @@ public class GitAuthPanel extends JPanel {
     }
 
     /**
-     * 获取用户名（根据认证类型）
+     * Lấy tên người dùng (theo loại xác thực)
      */
     public String getUsername() {
         GitAuthType authType = (GitAuthType) authTypeCombo.getSelectedItem();
@@ -313,35 +313,35 @@ public class GitAuthPanel extends JPanel {
     }
 
     /**
-     * 获取密码
+     * Nhận mật khẩu
      */
     public String getPassword() {
         return passwordField.getPasswordText();
     }
 
     /**
-     * 获取Token
+     * LấyToken
      */
     public String getToken() {
         return tokenField.getPasswordText();
     }
 
     /**
-     * 获取SSH私钥路径
+     * LấySSHĐường dẫn khóa riêng
      */
     public String getSshKeyPath() {
         return sshKeyPathField.getText().trim();
     }
 
     /**
-     * 获取SSH私钥密码
+     * LấySSHMật khẩu khóa riêng
      */
     public String getSshPassphrase() {
         return sshPassphraseField.getPasswordText();
     }
 
     /**
-     * Git认证类型渲染器
+     * GitTrình kết xuất loại được chứng nhận
      */
     private static class GitAuthTypeRenderer extends DefaultListCellRenderer {
         @Override

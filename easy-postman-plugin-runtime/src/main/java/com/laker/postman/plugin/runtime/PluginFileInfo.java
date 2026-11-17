@@ -5,7 +5,7 @@ import com.laker.postman.plugin.api.PluginDescriptor;
 import java.nio.file.Path;
 
 /**
- * 插件文件信息。
+ * Thông tin tập tin plug-in.
  */
 public record PluginFileInfo(
         PluginDescriptor descriptor,

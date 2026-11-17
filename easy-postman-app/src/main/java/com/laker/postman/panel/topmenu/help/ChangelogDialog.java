@@ -18,9 +18,9 @@ import java.awt.*;
 import java.net.URI;
 
 /**
- * 版本更新日志对话框
+ * Hộp thoại nhật ký cập nhật phiên bản
  *
- * <p>重构后的版本：使用统一的更新源架构，消除代码重复</p>
+ * <p>Phiên bản được tái cấu trúc: Sử dụng kiến trúc nguồn cập nhật thống nhất để loại bỏ trùng lặp mã</p>
  */
 @Slf4j
 public class ChangelogDialog extends JDialog {
@@ -40,11 +40,11 @@ public class ChangelogDialog extends JDialog {
         ToolWindowSurfaceStyle.applyDialogSurface((JPanel) getContentPane());
         ((JPanel) getContentPane()).setBorder(new EmptyBorder(15, 15, 15, 15));
 
-        // 顶部面板：当前版本信息
+        // Bảng trên cùng: Thông tin phiên bản hiện tại
         JPanel topPanel = createTopPanel();
         add(topPanel, BorderLayout.NORTH);
 
-        // 中间面板：更新日志内容
+        // Bảng ở giữa: Cập nhật nội dung nhật ký
         contentArea = new JTextArea();
         contentArea.setEditable(false);
         contentArea.setFont(FontsUtil.getDefaultFont(Font.PLAIN));
@@ -58,17 +58,17 @@ public class ChangelogDialog extends JDialog {
         scrollPane.setPreferredSize(new Dimension(700, 500));
         add(scrollPane, BorderLayout.CENTER);
 
-        // 底部面板：按钮
+        // Bảng dưới cùng: Nút
         JPanel bottomPanel = new JPanel(new BorderLayout());
         ToolWindowSurfaceStyle.applyDialogFooter(bottomPanel);
 
-        // 状态标签
+        // nhãn trạng thái
         statusLabel = new JLabel(" ");
         statusLabel.setFont(FontsUtil.getDefaultFontWithOffset(Font.PLAIN, -1));
         statusLabel.setForeground(ModernColors.getTextSecondary());
         bottomPanel.add(statusLabel, BorderLayout.WEST);
 
-        // 按钮面板
+        // Bảng nút
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 8, 0));
         ToolWindowSurfaceStyle.applyDialogSurface(buttonPanel);
 
@@ -94,17 +94,17 @@ public class ChangelogDialog extends JDialog {
         bottomPanel.add(buttonPanel, BorderLayout.EAST);
         add(bottomPanel, BorderLayout.SOUTH);
 
-        // 设置对话框属性
+        // Đặt thuộc tính hộp thoại
         setSize(750, 650);
         setLocationRelativeTo(parent);
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 
-        // 异步加载更新日志
+        // Tải nhật ký cập nhật không đồng bộ
         loadChangelog();
     }
 
     /**
-     * 创建顶部面板
+     * Tạo bảng trên cùng
      */
     private JPanel createTopPanel() {
         JPanel panel = new JPanel(new BorderLayout());
@@ -121,7 +121,7 @@ public class ChangelogDialog extends JDialog {
     }
 
     /**
-     * 加载更新日志
+     * Tải nhật ký thay đổi
      */
     private void loadChangelog() {
         contentArea.setText(I18nUtil.getMessage(MessageKeys.CHANGELOG_LOADING));
@@ -140,7 +140,7 @@ public class ChangelogDialog extends JDialog {
                     String result = get();
                     if (result != null) {
                         contentArea.setText(result);
-                        contentArea.setCaretPosition(0); // 滚动到顶部
+                        contentArea.setCaretPosition(0); // Cuộn lên trên cùng
                         statusLabel.setText(" ");
                     } else {
                         String errorMsg = I18nUtil.getMessage(MessageKeys.CHANGELOG_LOAD_FAILED,
@@ -162,11 +162,11 @@ public class ChangelogDialog extends JDialog {
     }
 
     /**
-     * 打开 GitHub 网页版
+     * Mở GitHub Phiên bản web
      */
     private void openGitHubWeb() {
         UpdateSource github = changelogService.getSourceSelector().selectBestSource();
-        // 如果当前不是 GitHub，获取 GitHub 实例
+        // Nếu hiện tại không có GitHub，Lấy GitHub Ví dụ
         if (!"GitHub".equals(github.getName())) {
             github = changelogService.getSourceSelector().getFallbackSource(github);
         }
@@ -174,11 +174,11 @@ public class ChangelogDialog extends JDialog {
     }
 
     /**
-     * 打开 Gitee 网页版
+     * Mở Gitee Phiên bản web
      */
     private void openGiteeWeb() {
         UpdateSource source = changelogService.getSourceSelector().selectBestSource();
-        // 如果当前不是 Gitee，获取 Gitee 实例
+        // Nếu hiện tại không có Gitee，Lấy Gitee Ví dụ
         if (!"Gitee".equals(source.getName())) {
             source = changelogService.getSourceSelector().getFallbackSource(source);
         }
@@ -186,7 +186,7 @@ public class ChangelogDialog extends JDialog {
     }
 
     /**
-     * 打开 URL
+     * Mở URL
      */
     private void openUrl(String url) {
         try {
@@ -203,7 +203,7 @@ public class ChangelogDialog extends JDialog {
     }
 
     /**
-     * 显示更新日志对话框
+     * Hiển thị hộp thoại nhật ký cập nhật
      */
     public static void showDialog(Frame parent) {
         SwingUtilities.invokeLater(() -> {

@@ -14,7 +14,7 @@ import java.awt.Desktop;
 import java.awt.Dimension;
 
 /**
- * EasyPostman 关于对话框。
+ * EasyPostman Về hộp thoại.
  */
 @UtilityClass
 class TopMenuAboutDialog {
@@ -38,7 +38,7 @@ class TopMenuAboutDialog {
                 + "<div style='text-align:center;'>"
                 + "<img src='" + iconUrl + "' width='56' height='56' style='margin-bottom:10px;'/>"
                 + "</div>"
-                + "<div style='font-size:16px; font-weight:bold; color:" + getThemeTextColor() + "; text-align:center; margin-bottom:6px;'>EasyPostman</div>"
+                + "<div style='font-size:16px; font-weight:bold; color:" + getThemeTextColor() + "; text-align:center; margin-bottom:6px;'>Dev Workbench</div>"
                 + "<div style='font-size:12px; color:" + getThemeSecondaryTextColor() + "; text-align:center; margin-bottom:12px;'>"
                 + I18nUtil.getMessage(MessageKeys.ABOUT_VERSION, SystemUtil.getCurrentVersion()) + "</div>"
                 + "<div style='font-size:10px; color:" + getThemeHintTextColor() + "; margin-bottom:2px;'>"

@@ -35,23 +35,23 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Git冲突检测工具类
- * 检测Git操作前的潜在冲突和问题
+ * GitLớp công cụ phát hiện xung đột
+ * phát hiệnGitNhững xung đột và vấn đề tiềm ẩn trước khi vận hành
  */
 @Slf4j
 public class GitConflictDetector {
 
     private static final String REFS_HEADS_PREFIX = "refs/heads/";
 
-    // Git 操作超时时间（秒）- 与 WorkspaceService 保持一致
+    // Git Thời gian chờ hoạt động (giây)- Và WorkspaceService Hãy nhất quán
     private static final int GIT_OPERATION_TIMEOUT = 10;
 
     private GitConflictDetector() {
-        // 工具类，隐藏构造函数
+        // Lớp tiện ích, hàm tạo ẩn
     }
 
     /**
-     * 检查Git仓库状态，判断是否可以执行指定操作
+     * nghiên cứuGitTrạng thái kho hàng để xác định xem hoạt động được chỉ định có thể được thực hiện hay không
      */
     public static GitStatusCheck checkGitStatus(String workspacePath, String operationType,
                                                 CredentialsProvider credentialsProvider,
@@ -59,17 +59,17 @@ public class GitConflictDetector {
         GitStatusCheck result = new GitStatusCheck();
 
         try (Git git = Git.open(new File(workspacePath))) {
-            // 获取基本信息
+            // Nhận thông tin cơ bản
             result.currentBranch = git.getRepository().getBranch();
 
-            // 检查本地状态
+            // Kiểm tra trạng thái cục bộ
             Status status = git.status().call();
             checkLocalStatus(status, result);
 
-            // 检查远程状态
+            // Kiểm tra trạng thái từ xa
             checkRemoteStatus(git, workspacePath, result, credentialsProvider, sshCredentialsProvider);
 
-            // 根据操作类型生成建议
+            // Tạo đề xuất dựa trên loại hành động
             generateSuggestions(result, operationType);
 
         } catch (Exception e) {
@@ -82,10 +82,10 @@ public class GitConflictDetector {
     }
 
     private static void checkLocalStatus(Status status, GitStatusCheck result) {
-        // 检查未提交的变更
+        // Kiểm tra những thay đổi không được cam kết
         result.hasUncommittedChanges = status.hasUncommittedChanges();
 
-        // 详细变更类型赋值
+        // Detailed change type assignment
         result.added.addAll(status.getAdded());
         result.changed.addAll(status.getChanged());
         result.modified.addAll(status.getModified());
@@ -94,7 +94,7 @@ public class GitConflictDetector {
         result.untracked.addAll(status.getUntracked());
         result.conflicting.addAll(status.getConflicting());
 
-        // 检查是否可以提交
+        // Kiểm tra xem có thể gửi được không
         int totalChanges = result.added.size() + result.changed.size() + result.modified.size()
                 + result.missing.size() + result.removed.size() + result.untracked.size();
         result.canCommit = totalChanges > 0 && result.conflicting.isEmpty();
@@ -108,7 +108,7 @@ public class GitConflictDetector {
             String tracking = git.getRepository().getConfig()
                     .getString("branch", currentBranch, "merge");
 
-            // 检查是否有远程仓库
+            // Kiểm tra xem có kho lưu trữ từ xa không
             var remotes = git.remoteList().call();
             result.hasRemoteRepository = !remotes.isEmpty();
 
@@ -119,37 +119,37 @@ public class GitConflictDetector {
                 return;
             }
 
-            // 设置远程仓库URL
+            // Thiết lập một nhà kho từ xaURL
             result.remoteUrl = remotes.get(0).getURIs().get(0).toString();
 
             result.hasUpstreamBranch = tracking != null;
 
             if (!result.hasUpstreamBranch) {
-                // 有远程仓库但没有设置跟踪分支（典型的 init 类型工作区情况）
+                // Có một kho lưu trữ từ xa nhưng không có nhánh theo dõi nào được thiết lập (điển hình init loại tình huống không gian làm việc)
                 result.isInitTypeWorkspace = true;
                 result.warnings.add(I18nUtil.getMessage(MessageKeys.GIT_CONFLICT_DETECTOR_NO_UPSTREAM_BRANCH));
                 result.canPull = false;
 
-                // 对于 init 类型，需要检查潜在的冲突
+                // Đối với init các loại, cần phải được kiểm tra các xung đột tiềm ẩn
                 checkInitTypeConflicts(git, result, currentBranch, credentialsProvider, sshCredentialsProvider);
                 return;
             }
 
-            // 获取远程仓库名称
+            // Lấy tên kho từ xa
             String remoteName = git.getRepository().getConfig()
                     .getString("branch", currentBranch, "remote");
             if (remoteName == null) {
                 remoteName = "origin";
             }
 
-            // 获取远程分支名称
+            // Lấy tên chi nhánh từ xa
             String remoteBranchName = tracking;
             if (remoteBranchName.startsWith(REFS_HEADS_PREFIX)) {
                 remoteBranchName = remoteBranchName.substring(REFS_HEADS_PREFIX.length());
             }
             result.remoteBranch = remoteName + "/" + remoteBranchName;
 
-            // 比较本地和远程分支
+            // So sánh các chi nhánh địa phương và từ xa
             String localRef = REFS_HEADS_PREFIX + currentBranch;
             String remoteRef = "refs/remotes/" + remoteName + "/" + remoteBranchName;
 
@@ -158,16 +158,16 @@ public class GitConflictDetector {
 
             result.isEmptyLocalRepository = localId == null;
 
-            // 检查本地和远程提交情况
+            // Kiểm tra các cam kết cục bộ và từ xa
             checkLocalAndRemoteCommit(git, result, localId, remoteId, currentBranch);
 
-            // 尝试 fetch 最新的远程状态（用于更准确的检测）
+            // Hãy thử fetch Trạng thái từ xa mới nhất (để phát hiện chính xác hơn)
             boolean fetchSuccess = false;
             Boolean remoteHasBranches = null;
             try {
                 var fetchCommand = git.fetch().setDryRun(false);
-                fetchCommand.setTimeout(GIT_OPERATION_TIMEOUT); // 设置超时时间
-                // 设置认证信息 - 支持SSH和其他认证方式
+                fetchCommand.setTimeout(GIT_OPERATION_TIMEOUT); // Đặt thời gian chờ
+                // Đặt thông tin xác thực - Hỗ trợSSHvà các phương thức xác thực khác
                 if (sshCredentialsProvider != null) {
                     fetchCommand.setTransportConfigCallback(sshCredentialsProvider);
                 } else if (credentialsProvider != null) {
@@ -180,13 +180,13 @@ public class GitConflictDetector {
                 fetchSuccess = true;
                 result.canConnectToRemote = true;
 
-                // fetch 成功后重新解析远程分支ID
+                // fetch Giải quyết lại chi nhánh từ xa sau khi thành côngID
                 remoteId = git.getRepository().resolve(remoteRef);
-                // 前面的提交统计使用的是 fetch 前的远程跟踪分支；远程刚有新提交时，
-                // 这里必须基于 fetch 后的分支重新统计，否则首次打开会误判为无需拉取。
+                // Số liệu thống kê nộp trước đó được sử dụng fetch Nhánh theo dõi từ xa trước đây; khi có một cam kết mới trên điều khiển từ xa.
+                // Điều này phải dựa vào fetch Các nhánh tiếp theo sẽ được tính toán lại, nếu không sẽ bị đánh giá sai là không cần kéo khi mở lần đầu.
                 checkLocalAndRemoteCommit(git, result, localId, remoteId, currentBranch);
 
-                // 检查远程分支与本地分支的文件变更类型
+                // Kiểm tra các loại thay đổi tập tin của nhánh từ xa và nhánh cục bộ
                 if (localId != null && remoteId != null) {
                     try (RevWalk revWalk = new RevWalk(git.getRepository())) {
                         RevCommit localCommit = revWalk.parseCommit(localId);
@@ -199,7 +199,7 @@ public class GitConflictDetector {
                         CanonicalTreeParser remoteTreeIter = new CanonicalTreeParser();
                         remoteTreeIter.reset(git.getRepository().newObjectReader(), remoteTree);
 
-                        // 获取 merge base
+                        // Lấy merge base
                         ObjectId mergeBaseId = findMergeBase(git, localId, remoteId);
                         if (mergeBaseId != null) {
                             RevCommit mergeBaseCommit = revWalk.parseCommit(mergeBaseId);
@@ -207,7 +207,7 @@ public class GitConflictDetector {
                             CanonicalTreeParser baseTreeIter = new CanonicalTreeParser();
                             baseTreeIter.reset(git.getRepository().newObjectReader(), baseTree);
 
-                            // 用 merge base 和 remote 做 diff，获取 remote 的新增/修改/删除
+                            // Sử dụng merge base và remote làm diff，Lấy remote sự bổ sung mới/Ôn lại/xóa bỏ
                             List<DiffEntry> diffEntries = git.diff()
                                     .setOldTree(baseTreeIter)
                                     .setNewTree(remoteTreeIter)
@@ -237,7 +237,7 @@ public class GitConflictDetector {
                                 }
                             }
                         } else {
-                            // 没有 merge base，保持原逻辑（直接 diff remote 和 local）
+                            // Không merge base，Giữ nguyên logic ban đầu (direct diff remote và local）
                             List<DiffEntry> diffEntries = git.diff()
                                     .setOldTree(remoteTreeIter)
                                     .setNewTree(localTreeIter)
@@ -276,7 +276,7 @@ public class GitConflictDetector {
             } catch (Exception fetchEx) {
                 log.debug("Failed to fetch remote status, using cached refs: {}", fetchEx.getMessage());
                 result.canConnectToRemote = false;
-                // 远程状态不可用时必须明确标记为未知，不能把缓存缺失误判成空远程仓库。
+                // Khi trạng thái từ xa không khả dụng, trạng thái đó phải được đánh dấu rõ ràng là không xác định và việc thiếu bộ nhớ đệm không thể bị đánh giá sai là kho trống từ xa.
                 result.warnings.add(I18nUtil.getMessage(MessageKeys.GIT_CONFLICT_DETECTOR_CANNOT_GET_LATEST_REMOTE, fetchEx.getMessage()));
                 if (credentialsProvider != null || sshCredentialsProvider != null) {
                     result.hasAuthenticationIssue = true;
@@ -285,24 +285,24 @@ public class GitConflictDetector {
                 }
             }
 
-            // 设置操作可行性
+            // Thiết lập tính khả thi trong hoạt động
             determineOperationCapabilities(result, localId, remoteId, fetchSuccess, remoteHasBranches);
 
-            // 执行冲突检测
+            // Thực hiện phát hiện xung đột
             performIntelligentConflictDetection(git, workspacePath, result, localId, remoteId);
 
         } catch (Exception e) {
             log.warn("Failed to check remote status", e);
             result.warnings.add(I18nUtil.getMessage(MessageKeys.GIT_CONFLICT_DETECTOR_CANNOT_CHECK_REMOTE, e.getMessage()));
             result.hasAuthenticationIssue = true;
-            // 发生错误时，保守设置操作能力
+            // Khi xảy ra lỗi, hãy thiết lập thận trọng khả năng vận hành
             result.canPull = false;
             result.canPush = false;
         }
     }
 
     private static void checkLocalAndRemoteCommit(Git git, GitStatusCheck result, ObjectId localId, ObjectId remoteId, String currentBranch) {
-        // 该方法会在 fetch 前后各调用一次，先清除旧的远程比较结果再重新计算。
+        // This method will be in fetch Được gọi một lần trước và sau, kết quả so sánh từ xa cũ trước tiên sẽ bị xóa rồi tính toán lại.
         result.localCommitsAhead = 0;
         result.remoteCommitsBehind = 0;
         result.hasRemoteCommits = false;
@@ -313,13 +313,13 @@ public class GitConflictDetector {
 
         if (localId != null) {
             try {
-                // 检查仓库是否为空
+                // Kiểm tra xem kho có trống không
                 Iterable<RevCommit> localCommits = git.log().setMaxCount(1).call();
                 result.hasLocalCommits = localCommits.iterator().hasNext();
 
                 int localCommitsAhead = 0;
                 if (result.hasLocalCommits && remoteId != null) {
-                    // 计算本地领先于远程的提交数
+                    // Đếm số lượng cam kết cục bộ trước điều khiển từ xa
                     Iterable<RevCommit> aheadCommits = git.log()
                             .addRange(remoteId, localId)
                             .call();
@@ -327,9 +327,9 @@ public class GitConflictDetector {
                         localCommitsAhead++;
                     }
                     result.localCommitsAhead = localCommitsAhead;
-                    log.info("[GitStatusCheck] 当前分支: {}，本地未推送 commit 数量: {}", currentBranch, localCommitsAhead);
+                    log.info("[GitStatusCheck] Chi nhánh hiện tại: {}，Không được đẩy cục bộ commit Số lượng: {}", currentBranch, localCommitsAhead);
 
-                    // 计算远程领先于本地的提交数
+                    // Đếm số lần xác nhận từ xa trước cục bộ
                     int remoteCommitsBehind = 0;
                     Iterable<RevCommit> behindCommits = git.log()
                             .addRange(localId, remoteId)
@@ -340,21 +340,21 @@ public class GitConflictDetector {
                     result.remoteCommitsBehind = remoteCommitsBehind;
                     result.hasRemoteCommits = remoteCommitsBehind > 0;
 
-                    // 设置需要强制操作的标志
+                    // Đặt cờ yêu cầu hành động bắt buộc
                     result.needsForcePush = result.hasRemoteCommits && result.localCommitsAhead > 0;
                     result.needsForcePull = result.hasUncommittedChanges && result.hasRemoteCommits;
 
                 } else if (result.hasLocalCommits) {
-                    // 远程跟踪分支还不存在；是否为首次推送要等 fetch 完成后再判断。
+                    // Nhánh theo dõi từ xa chưa tồn tại; liệu đây có phải là lần đẩy đầu tiên hay không sẽ phải chờ fetch Đánh giá sau khi hoàn thành.
                     Iterable<RevCommit> allCommits = git.log().call();
                     for (RevCommit ignored : allCommits) {
                         localCommitsAhead++;
                     }
                     result.localCommitsAhead = localCommitsAhead;
-                    log.info("[GitStatusCheck] 当前分支: {}，远程分支不存在，全部本地 commit 未推送，数量: {}", currentBranch, localCommitsAhead);
+                    log.info("[GitStatusCheck] Chi nhánh hiện tại: {}，Nhánh từ xa không tồn tại, mọi thứ đều cục bộ commit Không đẩy, số lượng: {}", currentBranch, localCommitsAhead);
                 }
             } catch (org.eclipse.jgit.api.errors.NoHeadException e) {
-                // 空仓库，没有提交
+                // Kho trống, không có cam kết
                 log.debug("Repository has no HEAD (empty repository): {}", e.getMessage());
                 result.hasLocalCommits = false;
                 result.localCommitsAhead = 0;
@@ -367,20 +367,20 @@ public class GitConflictDetector {
     }
 
     /**
-     * 根据本地和远程状态确定操作能力
+     * Xác định khả năng hoạt động dựa trên trạng thái cục bộ và từ xa
      */
     private static void determineOperationCapabilities(GitStatusCheck result, ObjectId localId, ObjectId remoteId,
                                                        boolean fetchSuccess, Boolean remoteHasBranches) {
-        // Pull 操作判断：
-        // 1. 远程分支必须存在
-        // 2. 如果 fetch 失败，则不建议拉取
-        // 3. 必须有上游分支
-        // 4. 远程有新提交
+        // Pull Đánh giá hoạt động:
+        // 1. Chi nhánh từ xa phải tồn tại
+        // 2. nếu fetch Nếu thất bại, không nên kéo
+        // 3. Phải có một nhánh ngược dòng
+        // 4. Có những cam kết mới trên điều khiển từ xa
         result.canPull = remoteId != null && fetchSuccess && result.hasUpstreamBranch && result.remoteCommitsBehind > 0;
 
-        // 检查远程仓库状态并添加相应建议
+        // Kiểm tra trạng thái kho lưu trữ từ xa và thêm các đề xuất tương ứng
         if (remoteId == null && result.canConnectToRemote) {
-            // 无当前分支的跟踪引用不代表仓库为空；只有远端没有任何分支时才标记为空仓库。
+            // Việc không có tham chiếu theo dõi đến chi nhánh hiện tại không có nghĩa là kho trống; kho chỉ được đánh dấu là trống nếu không có chi nhánh nào ở phía xa.
             result.isRemoteRepositoryEmpty = Boolean.FALSE.equals(remoteHasBranches);
             result.isFirstPush = result.hasLocalCommits;
             if (result.isRemoteRepositoryEmpty) {
@@ -389,7 +389,7 @@ public class GitConflictDetector {
             result.suggestions.add(I18nUtil.getMessage(MessageKeys.GIT_CONFLICT_DETECTOR_REMOTE_NO_SAME_BRANCH));
             result.suggestions.add(I18nUtil.getMessage(MessageKeys.GIT_CONFLICT_DETECTOR_WAITING_FIRST_PUSH));
         } else if (remoteId == null) {
-            // fetch 失败时远程状态未知，不能把它当作空仓库，也不能允许推送。
+            // fetch Trạng thái từ xa không xác định tại thời điểm xảy ra lỗi, nó không thể được coi là kho lưu trữ trống và không thể cho phép đẩy.
             result.isRemoteRepositoryEmpty = false;
             result.isFirstPush = false;
             result.canPull = false;
@@ -403,37 +403,37 @@ public class GitConflictDetector {
             }
         }
 
-        // Push 操作判断：
-        // 1. 必须有本地提交
-        // 2. 不能有未提交的变更（除非是 init 类型的首次推送）
+        // Push Đánh giá hoạt động:
+        // 1. Phải có hồ sơ địa phương
+        // 2. Không thể có những thay đổi không được cam kết (trừ khi có init loại lần đẩy đầu tiên)
         if (!result.hasLocalCommits) {
             result.canPush = false;
         } else if (result.hasUncommittedChanges) {
-            // 有未提交变更时，只有在特殊情况下才能推送
-            result.canPush = result.isInitTypeWorkspace; // init 类型的首次推送可能允许
-        } else if (result.localCommitsAhead > 0) { // 有本地未推送的提交
+            // Khi có những thay đổi không được cam kết, chúng chỉ có thể được đẩy lên trong những trường hợp đặc biệt
+            result.canPush = result.isInitTypeWorkspace; // init Loại lần đẩy đầu tiên có thể được cho phép
+        } else if (result.localCommitsAhead > 0) { // Có những cam kết cục bộ chưa được thực hiện
             result.canPush = true;
         }
 
-        // 设置需要强制操作的标志
+        // Đặt cờ yêu cầu hành động bắt buộc
         result.needsForcePush = result.hasRemoteCommits && result.localCommitsAhead > 0;
         result.needsForcePull = result.hasUncommittedChanges && result.hasRemoteCommits;
 
-        // 如果远程有新提交，推送可能会失败
+        // Nếu có những cam kết mới trên điều khiển từ xa, việc đẩy có thể không thành công
         if (result.hasRemoteCommits && result.canPush) {
             result.warnings.add(I18nUtil.getMessage(MessageKeys.GIT_CONFLICT_DETECTOR_REMOTE_HAS_NEW_COMMITS));
         }
 
-        // 如果本地仓库为空，则无法进行任何操作
+        // Nếu kho lưu trữ cục bộ trống, không thể thực hiện thao tác nào
         if (localId == null) {
             result.isEmptyLocalRepository = true;
             result.canPush = false;
             if (remoteId != null) {
-                result.canPull = fetchSuccess; // 空本地仓库可以拉取远程内容
+                result.canPull = fetchSuccess; // Kho lưu trữ cục bộ trống có thể lấy nội dung từ xa
             }
         }
 
-        // 远程状态未确认时，禁止基于缓存结果显示可推送或可拉取。
+        // Khi trạng thái từ xa không được xác nhận, nó bị cấm hiển thị có thể đẩy hoặc kéo dựa trên kết quả được lưu trong bộ nhớ cache.
         if (result.hasRemoteRepository && !result.canConnectToRemote) {
             result.canPull = false;
             result.canPush = false;
@@ -441,14 +441,14 @@ public class GitConflictDetector {
     }
 
     /**
-     * 检查 init 类型工作区的潜在冲突
-     * 当本地仓库已有内容，但要绑定到已存在的远程分支时
+     * nghiên cứu init Xung đột tiềm ẩn trong không gian làm việc kiểu
+     * Khi kho lưu trữ cục bộ đã có nội dung nhưng cần được liên kết với một nhánh từ xa hiện có
      */
     private static void checkInitTypeConflicts(Git git, GitStatusCheck result, String currentBranch,
                                                CredentialsProvider credentialsProvider,
                                                SshCredentialsProvider sshCredentialsProvider) {
         try {
-            // 检查本地是否有提交
+            // Kiểm tra xem có cam kết cục bộ hay không
             boolean hasLocalCommits = false;
             ObjectId localId = null;
             try {
@@ -461,11 +461,11 @@ public class GitConflictDetector {
 
             int localCommitsAhead = 0;
             if (hasLocalCommits) {
-                // fetch 远程分支信息
+                // fetch Thông tin chi nhánh từ xa
                 ObjectId remoteId = null;
                 try {
                     var fetchCommand = git.fetch().setDryRun(true);
-                    fetchCommand.setTimeout(GIT_OPERATION_TIMEOUT); // 设置超时时间
+                    fetchCommand.setTimeout(GIT_OPERATION_TIMEOUT); // Đặt thời gian chờ
                     if (sshCredentialsProvider != null) {
                         fetchCommand.setTransportConfigCallback(sshCredentialsProvider);
                     } else if (credentialsProvider != null) {
@@ -479,7 +479,7 @@ public class GitConflictDetector {
                 }
 
                 if (remoteId != null) {
-                    // 统计本地领先于远程的 commit 数
+                    // Về mặt thống kê, cục bộ đi trước điều khiển từ xa commit con số
                     try {
                         Iterable<RevCommit> aheadCommits = git.log().addRange(remoteId, localId).call();
                         for (RevCommit ignored : aheadCommits) {
@@ -488,9 +488,9 @@ public class GitConflictDetector {
                     } catch (Exception e) {
                         log.warn("Failed to count ahead commits", e);
                     }
-                    log.info("[GitStatusCheck] 当前分支: {}，本地未推送 commit 数量: {}", currentBranch, localCommitsAhead);
+                    log.info("[GitStatusCheck] Chi nhánh hiện tại: {}，Không được đẩy cục bộ commit Số lượng: {}", currentBranch, localCommitsAhead);
                 } else {
-                    // 远程分支不存在，全部本地 commit 都未推送
+                    // Nhánh từ xa không tồn tại, mọi thứ đều cục bộ commit Không ai đã được đẩy
                     try {
                         Iterable<RevCommit> allCommits = git.log().call();
                         for (RevCommit ignored : allCommits) {
@@ -499,18 +499,18 @@ public class GitConflictDetector {
                     } catch (Exception e) {
                         log.warn("Failed to count local commits", e);
                     }
-                    log.info("[GitStatusCheck] 当前分支: {}，远程分支不存在，全部本地 commit 未推送，数量: {}", currentBranch, localCommitsAhead);
+                    log.info("[GitStatusCheck] Chi nhánh hiện tại: {}，Nhánh từ xa không tồn tại, mọi thứ đều cục bộ commit Không đẩy, số lượng: {}", currentBranch, localCommitsAhead);
                 }
             }
             result.localCommitsAhead = localCommitsAhead;
 
-            // 尝试 fetch 远程分支信息来检查冲突
+            // Hãy thử fetch Thông tin chi nhánh từ xa để kiểm tra xung đột
             try {
-                // 尝试获取远程分支信息（不会修改工作区）
+                // Cố gắng lấy thông tin chi nhánh từ xa (không gian làm việc sẽ không được sửa đổi)
                 var fetchCommand = git.fetch().setDryRun(true);
-                fetchCommand.setTimeout(GIT_OPERATION_TIMEOUT); // 设置超时时间
+                fetchCommand.setTimeout(GIT_OPERATION_TIMEOUT); // Đặt thời gian chờ
 
-                // 设置认证信息 - 支持SSH和其他认证方式
+                // Đặt thông tin xác thực - Hỗ trợSSHvà các phương thức xác thực khác
                 if (sshCredentialsProvider != null) {
                     fetchCommand.setTransportConfigCallback(sshCredentialsProvider);
                 } else if (credentialsProvider != null) {
@@ -520,29 +520,29 @@ public class GitConflictDetector {
                 fetchCommand.call();
                 result.canConnectToRemote = true;
 
-                // 检查远程是否有同名分支
+                // Kiểm tra xem điều khiển từ xa có nhánh có cùng tên không
                 String remoteRef = "refs/remotes/origin/" + currentBranch;
                 ObjectId remoteId = git.getRepository().resolve(remoteRef);
 
                 if (remoteId != null) {
-                    // 远程已有同名分支，可能存在冲突
+                    // Nhánh từ xa đã có cùng tên và có thể xảy ra xung đột
                     result.warnings.add(I18nUtil.getMessage(MessageKeys.GIT_CONFLICT_DETECTOR_INIT_REMOTE_BRANCH_EXISTS));
                     result.suggestions.add(I18nUtil.getMessage(MessageKeys.GIT_CONFLICT_DETECTOR_INIT_BACKUP_SUGGESTION));
 
-                    // 检查具体的文件冲突
+                    // Kiểm tra xung đột tập tin cụ thể
                     checkFileConflicts(git, result, remoteId);
                 } else {
-                    // 远程没有同名分支，相对安全
+                    // Remote không có nhánh cùng tên nên tương đối an toàn
                     result.suggestions.add(I18nUtil.getMessage(MessageKeys.GIT_CONFLICT_DETECTOR_INIT_SAFE_FIRST_PUSH));
                 }
 
             } catch (org.eclipse.jgit.api.errors.RefNotAdvertisedException e) {
-                // 远程分支不存在，这是正常情况
+                // Chi nhánh từ xa không tồn tại, điều này là bình thường
                 log.debug("Remote branch does not exist: {}", e.getMessage());
                 result.canConnectToRemote = true;
                 result.suggestions.add(I18nUtil.getMessage(MessageKeys.GIT_CONFLICT_DETECTOR_INIT_SAFE_FIRST_PUSH));
             } catch (Exception fetchEx) {
-                // fetch 失败可能是网络问题或认证问题
+                // fetch Lỗi có thể là sự cố mạng hoặc sự cố xác thực
                 log.debug("Cannot fetch remote info for conflict check", fetchEx);
                 result.canConnectToRemote = false;
                 result.hasAuthenticationIssue = true;
@@ -550,7 +550,7 @@ public class GitConflictDetector {
                 result.suggestions.add(I18nUtil.getMessage(MessageKeys.GIT_CONFLICT_DETECTOR_INIT_CHECK_NETWORK_AUTH));
             }
 
-            // 空本地仓库或没有本地提交时不能推送。
+            // Bạn không thể đẩy khi kho lưu trữ cục bộ trống hoặc không có cam kết cục bộ.
             result.canPush = result.canConnectToRemote && result.hasLocalCommits
                     && result.localCommitsAhead > 0 && !result.hasUncommittedChanges;
 
@@ -563,15 +563,15 @@ public class GitConflictDetector {
     }
 
     /**
-     * 检查文件级别的冲突
+     * Kiểm tra xung đột cấp độ tập tin
      */
     private static void checkFileConflicts(Git git, GitStatusCheck result, ObjectId remoteCommitId) {
         try {
-            // 获取本地文件列表
+            // Nhận danh sách các tập tin cục bộ
             ObjectId localCommitId = git.getRepository().resolve("HEAD");
             if (localCommitId == null) return;
 
-            // 比较本地和远程的文件差异
+            // So sánh sự khác biệt của tập tin cục bộ và từ xa
             var diffs = git.diff()
                     .setOldTree(prepareTreeParser(git.getRepository(), remoteCommitId))
                     .setNewTree(prepareTreeParser(git.getRepository(), localCommitId))
@@ -581,13 +581,13 @@ public class GitConflictDetector {
 
             for (var diff : diffs) {
                 String fileName = diff.getNewPath();
-                // 检查是否是同一文件的不同版本（潜在冲突）
+                // Kiểm tra xem chúng có phải là phiên bản khác nhau của cùng một tệp không (có thể xảy ra xung đột)
                 if (diff.getChangeType() == DiffEntry.ChangeType.MODIFY) {
                     conflictFiles.add(fileName);
                 }
             }
 
-            // 设置冲突状态
+            // Đặt trạng thái xung đột
             result.hasFileConflicts = !conflictFiles.isEmpty();
             result.conflictingFiles.addAll(conflictFiles);
 
@@ -602,12 +602,12 @@ public class GitConflictDetector {
 
         } catch (Exception e) {
             log.debug("Failed to check file conflicts", e);
-            // 文件冲突检查失败不影响主要功能
+            // Lỗi kiểm tra xung đột tệp không ảnh hưởng đến chức năng chính
         }
     }
 
     /**
-     * 辅助方法：准备树解析器
+     * Phương thức trợ giúp: Chuẩn bị trình phân tích cú pháp cây
      */
     private static AbstractTreeIterator prepareTreeParser(
             Repository repository, ObjectId objectId) throws Exception {
@@ -626,7 +626,7 @@ public class GitConflictDetector {
     }
 
     private static void generateSuggestions(GitStatusCheck result, String operationType) {
-        // 根据操作类型生成建议
+        // Tạo đề xuất dựa trên loại hành động
         switch (operationType.toLowerCase()) {
             case "commit":
                 generateCommitSuggestions(result);
@@ -664,32 +664,32 @@ public class GitConflictDetector {
             return;
         }
 
-        // 分析推送场景
+        // Phân tích các kịch bản đẩy
         if (result.isInitTypeWorkspace || result.isFirstPush || result.isRemoteRepositoryEmpty) {
-            // 首次推送或初始化类型工作区
+            // Đẩy hoặc khởi tạo một loại không gian làm việc lần đầu tiên
             handleFirstPushSuggestions(result);
         } else if (result.needsForcePush) {
-            // 需要强制推送的情况（有分歧历史）
+            // Các tình huống cần lực đẩy (có lịch sử phân kỳ)
             result.warnings.add(I18nUtil.getMessage(MessageKeys.GIT_CONFLICT_DETECTOR_DIVERGED_HISTORY));
             result.suggestions.add(I18nUtil.getMessage(MessageKeys.GIT_CONFLICT_DETECTOR_LOCAL_AHEAD_COMMITS, result.localCommitsAhead));
             result.suggestions.add(I18nUtil.getMessage(MessageKeys.GIT_CONFLICT_DETECTOR_REMOTE_AHEAD_COMMITS, result.remoteCommitsBehind));
             result.suggestions.add(I18nUtil.getMessage(MessageKeys.GIT_CONFLICT_DETECTOR_PULL_FIRST_OR_FORCE_PUSH));
             result.suggestions.add(I18nUtil.getMessage(MessageKeys.GIT_CONFLICT_DETECTOR_FORCE_PUSH_OVERWRITE_COMMITS, result.remoteCommitsBehind));
         } else if (result.hasRemoteCommits) {
-            // 远程有新提交，但可以快进合并
+            // Có những cam kết mới trên điều khiển từ xa, nhưng việc hợp nhất có thể được chuyển tiếp nhanh
             result.warnings.add(I18nUtil.getMessage(MessageKeys.GIT_CONFLICT_DETECTOR_REMOTE_HAS_NEW_COMMITS_WARN));
             result.suggestions.add(I18nUtil.getMessage(MessageKeys.GIT_CONFLICT_DETECTOR_REMOTE_AHEAD_COMMITS_COUNT, result.remoteCommitsBehind));
             result.suggestions.add(I18nUtil.getMessage(MessageKeys.GIT_CONFLICT_DETECTOR_PULL_FIRST_THEN_PUSH));
             result.suggestions.add(I18nUtil.getMessage(MessageKeys.GIT_CONFLICT_DETECTOR_AVOID_PUSH_CONFLICTS));
         } else {
-            // 正常推送情况
+            // Tình huống đẩy bình thường
             result.suggestions.add(I18nUtil.getMessage(MessageKeys.GIT_CONFLICT_DETECTOR_SAFE_PUSH_LOCAL_COMMITS, result.localCommitsAhead));
             result.suggestions.add(I18nUtil.getMessage(MessageKeys.GIT_CONFLICT_DETECTOR_REMOTE_SYNC_AFTER_PUSH));
         }
     }
 
     /**
-     * 处理首次推送的建议
+     * Xử lý các đề xuất cho lần đẩy đầu tiên
      */
     private static void handleFirstPushSuggestions(GitStatusCheck result) {
         if (result.hasFileConflicts) {
@@ -713,9 +713,9 @@ public class GitConflictDetector {
         if (result.hasRemoteRepository && !result.canConnectToRemote) {
             return;
         }
-        // 直接使用布尔属性而不是文本判断
+        // Sử dụng trực tiếp các thuộc tính boolean thay vì phán đoán văn bản
         if (!result.hasUpstreamBranch) {
-            // 检查是否是 init 类型且可能有冲突的情况
+            // Kiểm tra xem có init loại và các tình huống xung đột có thể xảy ra
             if (result.hasFileConflicts) {
                 result.warnings.add(I18nUtil.getMessage(MessageKeys.GIT_CONFLICT_DETECTOR_CANNOT_PULL_FILE_CONFLICTS));
                 result.suggestions.add(I18nUtil.getMessage(MessageKeys.GIT_CONFLICT_DETECTOR_MANUAL_HANDLE_CONFLICTS));
@@ -731,7 +731,7 @@ public class GitConflictDetector {
             return;
         }
 
-        // 直接使用布尔属性检查空仓库状态
+        // Kiểm tra trạng thái kho trống trực tiếp bằng cách sử dụng thuộc tính boolean
         if (result.isRemoteRepositoryEmpty) {
             result.suggestions.add(I18nUtil.getMessage(MessageKeys.GIT_CONFLICT_DETECTOR_REMOTE_REPO_STATUS_EMPTY));
             result.suggestions.add(I18nUtil.getMessage(MessageKeys.GIT_CONFLICT_DETECTOR_CAN_TRY_PULL_NO_CONTENT));
@@ -750,34 +750,34 @@ public class GitConflictDetector {
     }
 
     /**
-     * 执行冲突检测
-     * 通过分析本地和远程的变更，判断是否存在实际冲突以及是否可以自动合并
+     * Thực hiện phát hiện xung đột
+     * Bằng cách phân tích các thay đổi cục bộ và từ xa, người ta xác định được liệu có xung đột thực tế hay không và liệu chúng có thể được hợp nhất tự động hay không
      */
     private static void performIntelligentConflictDetection(Git git, String workspacePath, GitStatusCheck result, ObjectId localId, ObjectId remoteId) {
         try {
-            // 如果本地或远程仓库为空，则无法进行智能冲突检测
+            // Nếu kho lưu trữ cục bộ hoặc từ xa trống, việc phát hiện xung đột thông minh không thể xảy ra
             if (localId == null || remoteId == null) {
                 result.hasActualConflicts = false;
                 result.canAutoMerge = false;
                 return;
             }
 
-            // 查找共同的基础提交（merge base）
+            // Tìm các cam kết cơ sở chung (merge base）
             ObjectId mergeBase = findMergeBase(git, localId, remoteId);
 
             if (mergeBase == null) {
-                // 没有共同基础，可能是完全不同的历史
+                // Nếu không có điểm chung, đó có thể là một lịch sử hoàn toàn khác
                 result.hasActualConflicts = true;
                 result.canAutoMerge = false;
                 result.warnings.add(I18nUtil.getMessage(MessageKeys.GIT_CONFLICT_DETECTOR_NO_COMMON_HISTORY));
                 return;
             }
 
-            // 如果merge base等于远程ID，说明远程是本地的子集，可以快进推送
+            // nếumerge baseTương đương với điều khiển từ xaID，Giải thích rằng điều khiển từ xa là một tập hợp con của điều khiển cục bộ và có thể được đẩy về phía trước nhanh chóng
             if (mergeBase.equals(remoteId)) {
                 result.hasActualConflicts = false;
                 result.canAutoMerge = true;
-                log.info("本地分支是远程的子集，可以快进推送");
+                log.info("Nhánh cục bộ là một tập hợp con của điều khiển từ xa và có thể được đẩy nhanh về phía trước");
                 return;
             }
 
@@ -787,18 +787,18 @@ public class GitConflictDetector {
                 return;
             }
 
-            // 分析文件级别的冲突
+            // Phân tích xung đột ở cấp độ tệp
             analyzeFileConflicts(git, workspacePath, result, mergeBase, localId, remoteId);
 
         } catch (Exception e) {
-            log.debug("智能冲突检测失败", e);
+            log.debug("Phát hiện xung đột thông minh không thành công", e);
             result.hasActualConflicts = false;
             result.canAutoMerge = false;
         }
     }
 
     /**
-     * 查找两个提交的合并基础
+     * Tìm cơ sở hợp nhất của hai lần xác nhận
      */
     private static ObjectId findMergeBase(Git git, ObjectId commit1, ObjectId commit2) {
         try {
@@ -820,30 +820,30 @@ public class GitConflictDetector {
     }
 
     /**
-     * 分析文件级别的冲突
+     * Phân tích xung đột ở cấp độ tệp
      */
     private static void analyzeFileConflicts(Git git, String workspacePath, GitStatusCheck result, ObjectId mergeBase,
                                              ObjectId localId, ObjectId remoteId) {
         try {
-            // 获取从merge base到本地的变更
+            // Nhận từmerge baseThay đổi về mặt địa phương
             var localDiffs = git.diff()
                     .setOldTree(prepareTreeParser(git.getRepository(), mergeBase))
                     .setNewTree(prepareTreeParser(git.getRepository(), localId))
                     .call();
 
-            // 获取从merge base到远程的变更
+            // Nhận từmerge baseThay đổi từ xa
             var remoteDiffs = git.diff()
                     .setOldTree(prepareTreeParser(git.getRepository(), mergeBase))
                     .setNewTree(prepareTreeParser(git.getRepository(), remoteId))
                     .call();
 
-            // 分析冲突情况
+            // Phân tích các tình huống xung đột
             List<String> localChangedFiles = new ArrayList<>();
             List<String> remoteChangedFiles = new ArrayList<>();
             List<String> conflictFiles = new ArrayList<>();
             List<String> newFiles = new ArrayList<>();
 
-            // 收集本地变更的文件
+            // Thu thập các tập tin thay đổi cục bộ
             for (DiffEntry diff : localDiffs) {
                 String filePath = diff.getNewPath();
                 localChangedFiles.add(filePath);
@@ -852,7 +852,7 @@ public class GitConflictDetector {
                 }
             }
 
-            // 收集远程变更的文件并检查冲突
+            // Thu thập các tập tin được thay đổi từ xa và kiểm tra xung đột
             for (DiffEntry diff : remoteDiffs) {
                 String filePath = diff.getNewPath();
                 remoteChangedFiles.add(filePath);
@@ -861,7 +861,7 @@ public class GitConflictDetector {
                 }
             }
 
-            // 内容级冲突检测
+            // Phát hiện xung đột ở cấp độ nội dung
             Set<String> intersectFiles = new HashSet<>(localChangedFiles);
             intersectFiles.retainAll(remoteChangedFiles);
             Repository repo = git.getRepository();
@@ -876,13 +876,13 @@ public class GitConflictDetector {
                 MergeResult<RawText> mergeResult = mergeAlgorithm.merge(RawTextComparator.DEFAULT, baseText, localText, remoteText);
                 boolean hasConflict = false;
                 List<ConflictBlock> conflictBlocks = new ArrayList<>();
-                // 遍历所有chunk，按冲突区块分组
+                // Đi qua tất cảchunk，Nhóm theo khối xung đột
                 List<MergeChunk> conflictChunkGroup = new ArrayList<>();
                 for (MergeChunk chunk : mergeResult) {
                     if (chunk.getConflictState() != MergeChunk.ConflictState.NO_CONFLICT) {
                         hasConflict = true;
                         conflictChunkGroup.add(chunk);
-                        // 冲突区块通常连续3个chunk（base/local/remote），但有时可能不是，需按sourceIndex分组
+                        // Các khối xung đột thường liền kề nhau3cá nhânchunk（base/local/remote），Nhưng đôi khi có thể không được, cần phải nhấnsourceIndexNhóm
                         if (conflictChunkGroup.size() == 3) {
                             int begin = conflictChunkGroup.get(0).getBegin();
                             int end = conflictChunkGroup.get(2).getEnd();
@@ -901,7 +901,7 @@ public class GitConflictDetector {
                             conflictChunkGroup.clear();
                         }
                     } else {
-                        // 非冲突chunk，清空分组
+                        // Không xung độtchunk，Xóa nhóm
                         conflictChunkGroup.clear();
                     }
                 }
@@ -911,7 +911,7 @@ public class GitConflictDetector {
                 }
             }
 
-            // 检查本地未提交的更改
+            // Kiểm tra các thay đổi không được cam kết cục bộ
             var status = git.status().call();
             Set<String> uncommittedFiles = new HashSet<>();
             uncommittedFiles.addAll(status.getModified());
@@ -965,21 +965,21 @@ public class GitConflictDetector {
                 }
             }
 
-            // 设置检测结果
+            // Đặt kết quả phát hiện
             result.hasActualConflicts = !conflictFiles.isEmpty();
             result.conflictingFiles.addAll(conflictFiles);
 
-            // 判断是否只有新文件
+            // Xác định xem chỉ có các tập tin mới
             result.hasOnlyNewFiles = conflictFiles.isEmpty() && !newFiles.isEmpty();
 
-            // 判断是否为非重叠变更
+            // Xác định xem đó có phải là một thay đổi không chồng chéo hay không
             result.hasNonOverlappingChanges = conflictFiles.isEmpty() &&
                     (!localChangedFiles.isEmpty() || !remoteChangedFiles.isEmpty());
 
-            // 判断是否可以自动合并
+            // Xác định xem có thể hợp nhất tự động hay không
             result.canAutoMerge = conflictFiles.isEmpty();
 
-            // 添加详细建议
+            // Thêm gợi ý chi tiết
             if (result.hasActualConflicts) {
                 result.warnings.add(I18nUtil.getMessage(MessageKeys.GIT_CONFLICT_DETECTOR_ACTUAL_FILE_CONFLICTS, conflictFiles.size()));
                 result.warnings.add(I18nUtil.getMessage(MessageKeys.GIT_CONFLICT_DETECTOR_CONFLICT_FILES_LIST,
@@ -997,13 +997,13 @@ public class GitConflictDetector {
             }
 
         } catch (Exception e) {
-            log.debug("文件冲突分析失败", e);
+            log.debug("Phân tích xung đột tệp không thành công", e);
             result.hasActualConflicts = true;
             result.canAutoMerge = false;
         }
     }
 
-    // 获取指定commit下文件内容
+    // Nhận được chỉ địnhcommitTải nội dung tập tin
     private static String getFileContent(Repository repo, ObjectId commitId, String filePath) {
         try (RevWalk revWalk = new RevWalk(repo)) {
             RevCommit commit = revWalk.parseCommit(commitId);

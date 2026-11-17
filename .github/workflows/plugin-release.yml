@@ -1,4 +1,4 @@
-name: Plugin Release（插件独立发版）
+name: Plugin Release（Plug-in được phát hành độc lập)
 run-name: >-
   Plugin Release / ${{ inputs.plugin }} / ${{ inputs.dry_run && 'dry-run' || 'release' }}
 
@@ -9,7 +9,7 @@ on:
   workflow_dispatch:
     inputs:
       plugin:
-        description: 选择要发布的插件
+        description: Chọn plugin để xuất bản
         required: true
         type: choice
         options:
@@ -22,27 +22,27 @@ on:
           - remote
           - minio
       dry_run:
-        description: 仅做构建验证，不创建 Release，不回写 catalog
+        description: Chỉ xây dựng xác minh, không tạo Release，Đừng viết lại catalog
         required: true
         default: false
         type: boolean
       publish_gitee_release:
-        description: 是否同时创建 Gitee 插件 Release 并上传附件
+        description: Có nên tạo ra cùng một lúc hay không Gitee plugin Release và tải lên tệp đính kèm
         required: true
         default: true
         type: boolean
       update_github_catalog:
-        description: 是否回写官方 GitHub plugin catalog
+        description: Có nên viết lại cho quan chức hay không GitHub plugin catalog
         required: true
         default: true
         type: boolean
       update_gitee_catalog:
-        description: 是否回写官方 Gitee plugin catalog
+        description: Có nên viết lại cho quan chức hay không Gitee plugin catalog
         required: true
         default: true
         type: boolean
       release_notes:
-        description: Release Notes（可选）
+        description: Release Notes（không bắt buộc)
         required: false
         type: string
 
@@ -52,7 +52,7 @@ env:
 
 jobs:
   prepare-context:
-    name: Prepare Context（准备发版上下文）
+    name: Prepare Context（Chuẩn bị cho bối cảnh phát hành)
     runs-on: ubuntu-latest
     outputs:
       plugin: ${{ steps.meta.outputs.plugin }}
@@ -64,10 +64,10 @@ jobs:
       module_path: ${{ steps.meta.outputs.module_path }}
       release_title: ${{ steps.meta.outputs.release_title }}
     steps:
-      - name: Checkout（检出代码）
+      - name: Checkout（Kiểm tra mã)
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
-      - name: Setup Java（配置 Java）
+      - name: Setup Java（cấu hình Java）
         uses: actions/setup-java@de7274f081f381c8f8158605e0321c36c376e2e6 # v6.0.1
         with:
           distribution: ${{ env.JAVA_DISTRIBUTION }}
@@ -76,7 +76,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Validate release source（校验默认分支）
+      - name: Validate release source（Xác minh nhánh mặc định)
         shell: bash
         run: |
           set -euo pipefail
@@ -94,7 +94,7 @@ jobs:
             exit 1
           fi
 
-      - name: Compute metadata（计算元数据）
+      - name: Compute metadata（Tính toán siêu dữ liệu)
         id: meta
         shell: bash
         run: |
@@ -135,7 +135,7 @@ jobs:
           echo "release_title=${RELEASE_TITLE}" >> "$GITHUB_OUTPUT"
 
   release-plugin:
-    name: Build And Release Plugin（构建并发布插件）
+    name: Build And Release Plugin（Xây dựng và xuất bản plugin)
     runs-on: ubuntu-latest
     needs: [ prepare-context ]
     outputs:
@@ -151,10 +151,10 @@ jobs:
       release_url: ${{ steps.release.outputs.release_url }}
       gitee_release_url: ${{ steps.gitee_release.outputs.gitee_release_url }}
     steps:
-      - name: Checkout（检出代码）
+      - name: Checkout（Kiểm tra mã)
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
-      - name: Setup Java（配置 Java）
+      - name: Setup Java（cấu hình Java）
         uses: actions/setup-java@de7274f081f381c8f8158605e0321c36c376e2e6 # v6.0.1
         with:
           distribution: ${{ env.JAVA_DISTRIBUTION }}
@@ -163,7 +163,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build selected plugin（只构建目标插件）
+      - name: Build selected plugin（Chỉ xây dựng các plugin mục tiêu)
         shell: bash
         run: |
           set -euo pipefail
@@ -173,7 +173,7 @@ jobs:
             clean package \
             -DskipTests
 
-      - name: Package release files（整理发布产物）
+      - name: Package release files（Tổ chức và xuất bản sản phẩm)
         id: package
         shell: bash
         run: |
@@ -198,7 +198,7 @@ jobs:
 
           echo "jar_sha256=${JAR_SHA256}" >> "$GITHUB_OUTPUT"
 
-      - name: Read descriptor metadata（从插件包读取 descriptor）
+      - name: Read descriptor metadata（Đọc từ gói plugin descriptor）
         id: descriptor
         shell: bash
         env:
@@ -206,8 +206,8 @@ jobs:
         run: |
           set -euo pipefail
 
-          # 发布链路只读取构建产物中的 descriptor，
-          # 不在 workflow 里单独维护一套插件兼容字段，避免 pom / jar / catalog 漂移。
+          # Liên kết phát hành chỉ đọc từ sản phẩm xây dựng descriptor，
+          # Không phải ở đây workflow Duy trì một nhóm trường tương thích plug-in riêng biệt để tránh điều này pom / jar / catalog trôi dạt.
           python3 <<'PY'
           import os
           import zipfile
@@ -248,7 +248,7 @@ jobs:
                   fh.write(f"{key}={value}\n")
           PY
 
-      - name: Validate descriptor metadata（校验 tag/pom/descriptor 一致性）
+      - name: Validate descriptor metadata（Kiểm tra tag/pom/descriptor tính nhất quán)
         shell: bash
         env:
           EXPECTED_PLUGIN_ID: ${{ needs.prepare-context.outputs.plugin_id }}
@@ -277,7 +277,7 @@ jobs:
               raise SystemExit(f"Tag mismatch: {expected_tag_name} != {expected_tag_from_version}")
           PY
 
-      - name: Upload dry-run artifacts（上传验证产物）
+      - name: Upload dry-run artifacts（Tải lên các sản phẩm xác minh)
         if: ${{ inputs.dry_run }}
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
@@ -285,7 +285,7 @@ jobs:
           path: dist/*
           retention-days: 7
 
-      - name: Publish GitHub Release（发布 GitHub Release）
+      - name: Publish GitHub Release（giải phóng GitHub Release）
         if: ${{ !inputs.dry_run }}
         id: release
         env:
@@ -327,7 +327,7 @@ jobs:
 
           echo "release_url=https://github.com/${{ github.repository }}/releases/tag/${TAG_NAME}" >> "$GITHUB_OUTPUT"
 
-      - name: Publish Gitee Release（发布 Gitee Release）
+      - name: Publish Gitee Release（giải phóng Gitee Release）
         if: ${{ !inputs.dry_run && inputs.publish_gitee_release }}
         id: gitee_release
         shell: bash
@@ -419,20 +419,20 @@ jobs:
           echo "gitee_release_url=https://gitee.com/lakernote/easy-postman/releases/${TAG_NAME}" >> "$GITHUB_OUTPUT"
 
   update-catalogs:
-    name: Update Catalogs（更新官方目录）
+    name: Update Catalogs（Cập nhật danh mục chính thức)
     if: ${{ (inputs.update_github_catalog || inputs.update_gitee_catalog) && !inputs.dry_run }}
     runs-on: ubuntu-latest
     needs: [ prepare-context, release-plugin ]
     steps:
-      - name: Checkout default branch（检出默认分支）
+      - name: Checkout default branch（Kiểm tra nhánh mặc định)
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           ref: ${{ github.event.repository.default_branch }}
 
-      - name: Update catalog json（更新 catalog 文件）
+      - name: Update catalog json（đổi mới catalog tập tin)
         shell: bash
         env:
-          # catalog 元数据统一来自 release-plugin 阶段解析出的 descriptor 输出。
+          # catalog Siêu dữ liệu được hợp nhất từ release-plugin Phân tích theo từng giai đoạn descriptor đầu ra.
           PLUGIN_ID: ${{ needs.release-plugin.outputs.descriptor_plugin_id }}
           PLUGIN_NAME: ${{ needs.release-plugin.outputs.descriptor_plugin_name }}
           PLUGIN_VERSION: ${{ needs.release-plugin.outputs.descriptor_plugin_version }}
@@ -586,7 +586,7 @@ jobs:
                   raise SystemExit(f"Catalog maxPlatformVersion mismatch in {path}")
           PY
 
-      - name: Commit catalog changes（提交 catalog 更新）
+      - name: Commit catalog changes（nộp catalog đã cập nhật)
         shell: bash
         run: |
           set -euo pipefail

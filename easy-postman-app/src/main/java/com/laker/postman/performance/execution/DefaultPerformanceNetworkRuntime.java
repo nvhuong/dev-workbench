@@ -148,11 +148,11 @@ public final class DefaultPerformanceNetworkRuntime implements PerformanceNetwor
             try {
                 call.cancel();
             } catch (Exception e) {
-                log.debug("取消压测 HTTP Call 失败", e);
+                log.debug("Hủy bỏ bài kiểm tra căng thẳng HTTP Call thất bại", e);
             }
         });
         if (cancelled > 0) {
-            log.info("取消了 {} 个压测 HTTP Call", cancelled);
+            log.info("Đã hủy {} Một bài kiểm tra căng thẳng HTTP Call", cancelled);
         }
     }
 
@@ -161,7 +161,7 @@ public final class DefaultPerformanceNetworkRuntime implements PerformanceNetwor
             try {
                 eventSource.cancel();
             } catch (Exception e) {
-                log.debug("取消 SSE EventSource 失败", e);
+                log.debug("Hủy bỏ SSE EventSource thất bại", e);
             }
         });
     }
@@ -175,7 +175,7 @@ public final class DefaultPerformanceNetworkRuntime implements PerformanceNetwor
             try {
                 webSocket.cancel();
             } catch (Exception e) {
-                log.debug("取消 WebSocket 失败", e);
+                log.debug("Hủy bỏ WebSocket thất bại", e);
             }
         });
     }

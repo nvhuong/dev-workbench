@@ -10,20 +10,20 @@ import java.awt.*;
 import java.util.Locale;
 
 /**
- * 字体管理工具类
- * 负责应用全局字体设置
+ * Công cụ quản lý phông chữ
+ * Chịu trách nhiệm áp dụng cài đặt phông chữ chung
  * <p>
- * 重要说明 - 关于 emoji 显示问题：
- * 在所有操作系统下，emoji 的显示都依赖于字体降级链（font fallback chain）。
- * 当主字体无法显示 emoji 字符时，系统会自动降级到相应的 emoji 字体：
+ * Lưu ý quan trọng - Về emoji Vấn đề hiển thị:
+ * Trong tất cả các hệ điều hành,emoji Việc hiển thị phụ thuộc vào chuỗi hạ cấp phông chữ (font fallback chain）。
+ * Khi phông chữ chính không thể được hiển thị emoji ký tự, hệ thống sẽ tự động hạ cấp xuống ký tự tương ứng emoji Phông chữ: .
  * <ul>
  *   <li>Windows: Segoe UI Emoji</li>
  *   <li>macOS: Apple Color Emoji</li>
  *   <li>Linux: Noto Color Emoji</li>
  * </ul>
  * <p>
- * 使用 new Font() 直接创建字体会丢失降级链，导致 emoji 无法显示。
- * 必须使用 deriveFont() 方法从系统字体派生，以保留字体降级链。
+ * sử dụng new Font() Tạo phông chữ trực tiếp sẽ làm mất chuỗi hạ cấp, dẫn đến emoji Không thể hiển thị.
+ * Phải được sử dụng deriveFont() Phương pháp bắt nguồn từ phông chữ hệ thống để bảo toàn chuỗi hạ cấp phông chữ.
  */
 @Slf4j
 @UtilityClass
@@ -34,7 +34,7 @@ public class FontManager {
     private static volatile Font lookAndFeelDefaultFont;
 
     /**
-     * 应用保存的字体设置到整个应用
+     * Áp dụng cài đặt phông chữ đã lưu cho toàn bộ ứng dụng
      */
     public static void applyFontSettings() {
         try {
@@ -47,16 +47,16 @@ public class FontManager {
     }
 
     /**
-     * 应用指定的字体到整个应用
+     * Áp dụng phông chữ được chỉ định cho toàn bộ ứng dụng
      *
-     * @param fontName 字体名称，空字符串表示使用系统默认
-     * @param fontSize 字体大小
+     * @param fontName Tên phông chữ, chuỗi trống nghĩa là sử dụng mặc định của hệ thống
+     * @param fontSize Cỡ chữ
      */
     public static void applyFont(String fontName, int fontSize) {
         try {
             installFontDefaults(fontName, fontSize);
 
-            // 更新所有已存在的窗口
+            // Cập nhật tất cả các cửa sổ hiện có
             updateExistingWindows();
 
             log.info("Font applied successfully");
@@ -66,8 +66,8 @@ public class FontManager {
     }
 
     /**
-     * 将已保存的字体设置安装到 FlatLaf defaultFont，不立即刷新窗口。
-     * 主题切换会重建 UI defaults，因此切换 Look and Feel 后需要先重装字体，再统一刷新。
+     * Cài đặt cài đặt phông chữ đã lưu vào FlatLaf defaultFont，Đừng làm mới cửa sổ ngay lập tức.
+     * Công tắc chủ đề sẽ được xây dựng lại UI defaults，Vì vậy, chuyển đổi Look and Feel Cuối cùng, bạn cần cài đặt lại các phông chữ rồi làm mới chúng một cách thống nhất.
      */
     public static Font installSavedFontDefaults() {
         String fontName = resolveAllowedSavedUiFontName(SettingManager.getUiFontName(), I18nUtil.currentLocale());
@@ -75,22 +75,22 @@ public class FontManager {
     }
 
     /**
-     * 捕获当前 Look and Feel 安装后的原始 UI 字体。
+     * Nắm bắt hiện tại Look and Feel Bản gốc sau khi cài đặt UI phông chữ.
      * <p>
-     * FlatLaf 切换主题会重建 UIDefaults。用户切换到自定义字体后，Label.font/defaultFont
-     * 可能已经被自定义字体污染；再次选择“系统默认”时不能继续从当前 Label.font 派生，
-     * 否则会把不支持中文的物理字体继续保留下来。
+     * FlatLaf Chuyển đổi chủ đề sẽ xây dựng lại UIDefaults。Sau khi người dùng chuyển sang phông chữ tùy chỉnh.Label.font/defaultFont
+     * Có thể đã bị nhiễm phông chữ tùy chỉnh; chọn lại“Mặc định hệ thống”Không thể tiếp tục từ thời điểm hiện tại Label.font Bắt nguồn,
+     * Nếu không, các phông chữ vật lý không hỗ trợ tiếng Trung sẽ tiếp tục được giữ lại.
      */
     public static void captureLookAndFeelDefaultFont() {
         lookAndFeelDefaultFont = resolveCurrentLookAndFeelFont();
     }
 
     /**
-     * 安装 FlatLaf 推荐的全局 defaultFont，不立即刷新窗口。
+     * Cài đặt FlatLaf Đề xuất toàn cầu defaultFont，Đừng làm mới cửa sổ ngay lập tức.
      *
-     * @param fontName 字体名称，空字符串表示使用系统默认
-     * @param fontSize 字体大小
-     * @return 已安装的字体
+     * @param fontName Tên phông chữ, chuỗi trống nghĩa là sử dụng mặc định của hệ thống
+     * @param fontSize Cỡ chữ
+     * @return Đã cài đặt phông chữ
      */
     public static Font installFontDefaults(String fontName, int fontSize) {
         log.info("Installing font defaults: {} with size: {}", fontName, fontSize);
@@ -100,35 +100,35 @@ public class FontManager {
     }
 
     /**
-     * 创建字体，保留字体降级链以支持 emoji 等特殊字符
+     * Tạo phông chữ, giữ lại chuỗi hạ cấp phông chữ để được hỗ trợ emoji và các ký tự đặc biệt khác
      * <p>
-     * 关键实现策略：
+     * Các chiến lược triển khai chính:
      * <ol>
-     *   <li>优先使用 deriveFont() 从系统字体派生，保留字体降级链</li>
-     *   <li>只有当用户指定了不同的自定义字体时，才使用 new Font()</li>
-     *   <li>使用 new Font() 会丢失降级链，导致 emoji 显示问题（会记录警告日志）</li>
+     *   <li>Ưu tiên sử dụng deriveFont() Bắt nguồn từ phông chữ hệ thống, bảo toàn chuỗi hạ cấp phông chữ</li>
+     *   <li>Chỉ được sử dụng nếu người dùng đã chỉ định một phông chữ tùy chỉnh khác new Font()</li>
+     *   <li>sử dụng new Font() Chuỗi hạ cấp sẽ bị mất, dẫn đến emoji Shows the problem (a warning log will be logged)</li>
      * </ol>
      *
-     * @param fontName 字体名称，空字符串表示使用系统默认
-     * @param style    字体样式（Font.PLAIN, Font.BOLD, Font.ITALIC 或其组合）
-     * @param size     字体大小
-     * @return 创建的字体
+     * @param fontName Tên phông chữ, chuỗi trống nghĩa là sử dụng mặc định của hệ thống
+     * @param style    Kiểu phông chữ (Font.PLAIN, Font.BOLD, Font.ITALIC hoặc sự kết hợp của chúng)
+     * @param size     Cỡ chữ
+     * @return Đã tạo phông chữ
      */
-    @SuppressWarnings("MagicConstant") // style 参数是 int 类型，但实际值是 Font 的样式常量
+    @SuppressWarnings("MagicConstant") // style Các thông số là int loại, nhưng giá trị thực tế là Font các hằng số kiểu dáng
     private static Font createFontWithFallback(String fontName, int style, float size) {
         Font systemDefaultFont = resolveSystemDefaultFont();
 
-        // 步骤2: 如果未指定字体或指定的是系统默认字体，使用 deriveFont 保留降级链
+        // các bước2: Được sử dụng nếu không có phông chữ nào được chỉ định hoặc nếu phông chữ mặc định của hệ thống được chỉ định deriveFont Giữ chuỗi hạ cấp
         if (fontName == null || fontName.isEmpty() ||
                 systemDefaultFont.getName().equals(fontName) || systemDefaultFont.getFamily().equals(fontName)) {
-            // ✅ 正确做法：使用 deriveFont 保留字体降级链，支持 emoji
+            // ✅ Cách tiếp cận đúng: sử dụng deriveFont Giữ nguyên chuỗi hạ cấp phông chữ, được hỗ trợ emoji
             return systemDefaultFont.deriveFont(style, size);
         }
 
-        // 步骤3: 用户指定了自定义字体，创建新字体实例
-        // ⚠️ 警告：直接 new Font() 会丢失字体降级链
-        // 这会导致 emoji 在所有平台（Windows/macOS/Linux）下都可能显示为方框
-        // 建议用户使用系统默认字体以获得最佳的 emoji 和多语言字符支持
+        // các bước3: Người dùng chỉ định phông chữ tùy chỉnh, tạo một phiên bản phông chữ mới
+        // ⚠️ Cảnh báo: trực tiếp new Font() Chuỗi hạ cấp phông chữ sẽ bị mất
+        // Điều này có thể dẫn đến emoji trên tất cả các nền tảng (Windows/macOS/Linux）Những điều sau đây có thể xuất hiện dưới dạng hộp
+        // Người dùng nên sử dụng phông chữ mặc định của hệ thống để có kết quả tối ưu emoji và hỗ trợ ký tự đa ngôn ngữ
         log.warn("Creating font '{}' will lose font fallback chain, emoji and some Unicode characters may not display correctly",
                  fontName);
         return new Font(fontName, style, (int) size);
@@ -180,25 +180,25 @@ public class FontManager {
     }
 
     /**
-     * 更新所有已存在的窗口
+     * Cập nhật tất cả các cửa sổ hiện có
      */
     private static void updateExistingWindows() {
-        // 使用统一的刷新管理器更新所有窗口
+        // Cập nhật tất cả các cửa sổ bằng trình quản lý làm mới thống nhất
         UIRefreshManager.refreshAllWindows();
     }
 
     /**
-     * 递归更新组件及其子组件的字体
+     * Cập nhật đệ quy phông chữ của một thành phần và các thành phần phụ của nó
      * <p>
-     * ⚠️ 注意事项：
+     * ⚠️ Lưu ý:
      * <ul>
-     *   <li>此方法会直接覆盖组件的字体，可能丢失字体降级链</li>
-     *   <li>建议优先使用 {@link #applyFont(String, int)} 来全局更新字体</li>
-     *   <li>此方法适用于需要单独控制特定组件字体的场景</li>
+     *   <li>Phương pháp này sẽ ghi đè trực tiếp lên phông chữ của thành phần, có thể làm mất chuỗi hạ cấp phông chữ</li>
+     *   <li>Nên sử dụng nó đầu tiên {@link #applyFont(String, int)} để cập nhật phông chữ trên toàn cầu</li>
+     *   <li>Phương pháp này phù hợp với các tình huống mà bạn cần kiểm soát riêng phông chữ của một thành phần cụ thể</li>
      * </ul>
      *
-     * @param component 要更新的组件
-     * @param font      新字体（建议使用 deriveFont 创建以保留降级链）
+     * @param component Thành phần cần cập nhật
+     * @param font      Phông chữ mới (được khuyến nghị deriveFont Được tạo để duy trì chuỗi hạ cấp)
      */
     public static void updateComponentFont(Component component, Font font) {
         if (component == null || font == null) {

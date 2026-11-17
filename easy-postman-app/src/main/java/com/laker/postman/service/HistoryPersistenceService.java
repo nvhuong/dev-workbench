@@ -34,18 +34,18 @@ import java.util.Objects;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
- * 历史记录持久化管理器
+ * Người quản lý kiên trì lịch sử
  */
 @Slf4j
 @Component
 public class HistoryPersistenceService {
     private static final String HISTORY_FILE = ConfigPathConstants.REQUEST_HISTORY;
 
-    // 限制单个响应体保存的最大字符数 (10KB)
+    // Giới hạn số lượng ký tự tối đa được lưu trong một nội dung phản hồi (10KB)
     private static final int MAX_BODY_SIZE = 10 * 1024;
-    // 限制单个请求体保存的最大字符数 (10KB)
+    // Giới hạn số lượng ký tự tối đa được lưu trong một nội dung yêu cầu (10KB)
     private static final int MAX_REQUEST_BODY_SIZE = 10 * 1024;
-    // 限制文件大小 (50MB)
+    // Giới hạn kích thước tập tin (50MB)
     private static final long MAX_FILE_SIZE = 50L * 1024 * 1024;
 
     private final List<RequestHistoryItem> historyItems = new CopyOnWriteArrayList<>();
@@ -68,28 +68,28 @@ public class HistoryPersistenceService {
     }
 
     /**
-     * 添加历史记录
+     * Thêm lịch sử
      */
     public RequestHistoryItem addHistory(PreparedRequest request, HttpResponse response, long requestTime) {
         RequestHistoryItem item = new RequestHistoryItem(request, toHistoryResponse(response), requestTime);
-        historyItems.add(0, item); // 添加到开头
+        historyItems.add(0, item); // Thêm vào đầu
 
-        // 限制历史记录数量
+        // Giới hạn số lượng hồ sơ lịch sử
         int maxCount = SettingManager.getMaxHistoryCount();
         while (historyItems.size() > maxCount) {
             historyItems.remove(historyItems.size() - 1);
         }
 
-        // 异步保存
+        // Lưu không đồng bộ
         saveHistoryAsync();
         return item;
     }
 
     /**
-     * 历史只需展示信息：不持有原始字节，识别为文件的响应不保留乱码文本，避免历史列表长期占用内存。
+     * Lịch sử chỉ cần hiển thị thông tin: nó không giữ byte gốc và phản hồi được nhận dạng dưới dạng tệp không giữ lại văn bản bị cắt xén, ngăn danh sách lịch sử chiếm bộ nhớ trong một thời gian dài.
      */
     static HttpResponse toHistoryResponse(HttpResponse response) {
-        // 无法由正文无损还原的文本附件（如非法 UTF-8 的 CSV）同样只保留文件信息，避免历史展示有损正文
+        // Các tệp đính kèm văn bản không thể được khôi phục một cách dễ dàng từ văn bản chính (chẳng hạn như tệp bất hợp pháp UTF-8 của CSV）Đồng thời chỉ giữ lại thông tin tệp để tránh hiển thị lịch sử làm hỏng văn bản
         boolean fileResponse = ResponseFiles.isFileResponse(response)
                 || (ResponseFiles.isTextAttachment(response) && !ResponseFiles.canRestoreBytesFromBody(response));
         if (response == null || (response.rawBodyBytes == null && !fileResponse)) {
@@ -119,14 +119,14 @@ public class HistoryPersistenceService {
     }
 
     /**
-     * 获取所有历史记录
+     * Nhận tất cả lịch sử
      */
     public List<RequestHistoryItem> getHistory() {
         return new ArrayList<>(historyItems);
     }
 
     /**
-     * 清空历史记录
+     * Xóa lịch sử
      */
     public void clearHistory() {
         historyItems.clear();
@@ -134,7 +134,7 @@ public class HistoryPersistenceService {
     }
 
     /**
-     * 删除单条历史记录
+     * Xóa một bản ghi lịch sử duy nhất
      */
     public void removeHistory(RequestHistoryItem item) {
         if (item == null) {
@@ -146,11 +146,11 @@ public class HistoryPersistenceService {
     }
 
     /**
-     * 同步保存历史记录
+     * Đồng bộ hóa và lưu lịch sử
      */
     public void saveHistory() {
         try {
-            // 只保存有限的历史记录
+            // Chỉ có lịch sử giới hạn được lưu lại
             int maxCount = SettingManager.getMaxHistoryCount();
             JSONArray jsonArray = new JSONArray();
 
@@ -161,7 +161,7 @@ public class HistoryPersistenceService {
                 jsonArray.add(jsonItem);
             }
 
-            // 写入文件
+            // Viết vào tập tin
             String jsonString = JSONUtil.toJsonStr(jsonArray);
             Files.writeString(Paths.get(HISTORY_FILE), jsonString, StandardCharsets.UTF_8);
         } catch (IOException e) {
@@ -170,7 +170,7 @@ public class HistoryPersistenceService {
     }
 
     /**
-     * 异步保存历史记录
+     * Lưu lịch sử không đồng bộ
      */
     private void saveHistoryAsync() {
         Thread saveThread = new Thread(this::saveHistory);
@@ -179,7 +179,7 @@ public class HistoryPersistenceService {
     }
 
     /**
-     * 响应临时文件在重启或系统清理后可能已不存在，失效路径不再恢复，避免指向不存在的文件。
+     * Tệp phản hồi tạm thời có thể không còn tồn tại sau khi khởi động lại hoặc dọn dẹp hệ thống và đường dẫn không hợp lệ sẽ không còn được khôi phục để tránh trỏ đến các tệp không tồn tại.
      */
     private static String existingFilePath(String filePath) {
         if (filePath == null || filePath.isBlank()) {
@@ -198,7 +198,7 @@ public class HistoryPersistenceService {
             ResponseFiles.markContentOmitted(response, responseJson.getStr("detectedFileExtension"), null);
             return;
         }
-        // 兼容旧历史：文件内容被当作文本保存成了乱码，按文件头识别后只展示文件信息
+        // Tương thích với lịch sử cũ: Nội dung tệp được lưu dưới dạng văn bản và bị cắt xén, đồng thời chỉ hiển thị thông tin tệp sau khi xác định bằng tiêu đề tệp
         String legacyExtension = ResponseFiles.detectFromLegacyText(response.body);
         if (legacyExtension != null) {
             ResponseFiles.markContentOmitted(response, legacyExtension, null);
@@ -206,7 +206,7 @@ public class HistoryPersistenceService {
     }
 
     /**
-     * 截断过大的body内容
+     * Cắt bớt những cái quá lớnbodynội dung
      */
     private String truncateBody(String body, int maxSize) {
         if (body == null) {
@@ -215,12 +215,12 @@ public class HistoryPersistenceService {
         if (body.length() <= maxSize) {
             return body;
         }
-        // 截断并添加提示信息
-        return body.substring(0, maxSize) + "\n\n... [内容过大，已截断。原始大小: " + body.length() + " 字符] ...";
+        // Cắt bớt và thêm thông tin gợi ý
+        return body.substring(0, maxSize) + "\n\n... [Nội dung quá lớn và đã bị cắt bớt. Kích thước ban đầu: " + body.length() + " nhân vật] ...";
     }
 
     /**
-     * 加载历史记录 - 使用流式读取避免内存溢出
+     * Tải lịch sử - Sử dụng tính năng đọc trực tuyến để tránh tràn bộ nhớ
      */
     private void loadHistory() {
         File file = new File(HISTORY_FILE);
@@ -229,7 +229,7 @@ public class HistoryPersistenceService {
         }
 
         try {
-            // 检查文件大小，如果超过限制则删除文件并重新开始
+            // Kiểm tra kích thước tệp và nếu vượt quá giới hạn, hãy xóa tệp và bắt đầu lại
             long fileSizeInBytes = file.length();
 
             if (fileSizeInBytes > MAX_FILE_SIZE) {
@@ -239,12 +239,12 @@ public class HistoryPersistenceService {
                 return;
             }
 
-            // 如果文件为空，直接返回
+            // Nếu tập tin trống, hãy quay lại trực tiếp
             if (fileSizeInBytes == 0) {
                 return;
             }
 
-            // 使用流式读取，避免一次性加载整个文件到内存
+            // Sử dụng tính năng đọc trực tuyến để tránh tải toàn bộ tệp vào bộ nhớ cùng một lúc
             String jsonString = loadFileContent(file);
             if (jsonString.trim().isEmpty()) {
                 return;
@@ -253,7 +253,7 @@ public class HistoryPersistenceService {
             JSONArray jsonArray = JSONUtil.parseArray(jsonString);
             historyItems.clear();
 
-            // 限制加载的历史记录数量
+            // Giới hạn số lượng lịch sử được tải
             int maxCount = SettingManager.getMaxHistoryCount();
             int loadCount = Math.min(jsonArray.size(), maxCount);
 
@@ -263,7 +263,7 @@ public class HistoryPersistenceService {
                     RequestHistoryItem item = convertFromJson(jsonItem);
                     historyItems.add(item);
                 } catch (Exception e) {
-                    // 忽略无法恢复的历史记录项
+                    // Bỏ qua các mục lịch sử không thể phục hồi
                     log.warn("Failed to restore history item at index {}: {}", i, e.getMessage());
                 }
             }
@@ -272,19 +272,19 @@ public class HistoryPersistenceService {
 
         } catch (OutOfMemoryError e) {
             log.error("Out of memory while loading history file, deleting and starting fresh", e);
-            // 内存溢出，删除文件并重新开始
+            // Hết bộ nhớ, hãy xóa tập tin và bắt đầu lại
             deleteHistoryFile(file);
             historyItems.clear();
         } catch (Exception e) {
             log.error("Failed to load history: {}", e.getMessage(), e);
-            // 加载失败，删除损坏的文件
+            // Tải không thành công, các tập tin bị hỏng đã bị xóa
             deleteHistoryFile(file);
             historyItems.clear();
         }
     }
 
     /**
-     * 使用流式方式读取文件内容，更节省内存
+     * Sử dụng chế độ phát trực tuyến để đọc nội dung tệp, giúp tiết kiệm bộ nhớ
      */
     private String loadFileContent(File file) throws IOException {
         StringBuilder content = new StringBuilder((int) Math.min(file.length(), MAX_FILE_SIZE));
@@ -294,7 +294,7 @@ public class HistoryPersistenceService {
             char[] buffer = new char[8192]; // 8KB buffer
             int charsRead;
             long totalCharsRead = 0;
-            long maxChars = MAX_FILE_SIZE / 2; // 限制读取字符数，防止超大文件
+            long maxChars = MAX_FILE_SIZE / 2; // Giới hạn số lượng ký tự được đọc để ngăn chặn các tệp quá khổ
 
             while ((charsRead = reader.read(buffer)) != -1) {
                 totalCharsRead += charsRead;
@@ -309,7 +309,7 @@ public class HistoryPersistenceService {
     }
 
     /**
-     * 删除历史文件
+     * Xóa các tập tin lịch sử
      */
     private void deleteHistoryFile(File file) {
         try {
@@ -321,24 +321,24 @@ public class HistoryPersistenceService {
     }
 
     /**
-     * 将 RequestHistoryItem 转换为 JSON 对象
+     * Sẽ RequestHistoryItem Chuyển đổi sang  JSON đối tượng
      */
     private JSONObject convertToJson(RequestHistoryItem item) {
         PreparedRequest request = item.getRequest();
         HttpResponse response = item.getResponse();
         JSONObject jsonItem = new JSONObject();
 
-        // 基本信息
+        // Thông tin cơ bản
         jsonItem.set("method", item.getMethod());
         jsonItem.set("url", item.getUrl());
         jsonItem.set("responseCode", item.getResponseCode());
-        jsonItem.set("requestTime", item.getRequestTime()); // 新增请求时间
+        jsonItem.set("requestTime", item.getRequestTime()); // Thêm thời gian yêu cầu
 
-        // 请求信息
+        // Yêu cầu thông tin
         JSONObject requestJson = new JSONObject();
         requestJson.set("method", request.method);
         requestJson.set("url", request.url);
-        // 请求体 - 保留完整内容，历史记录支持重新打开为可编辑请求时需要精确还原
+        // Request body - Bảo toàn nội dung đầy đủ và lịch sử hỗ trợ khôi phục chính xác khi mở lại dưới dạng yêu cầu có thể chỉnh sửa
         String requestBody = "";
         if (request.sentRequestBody != null && !request.sentRequestBody.isEmpty()) {
             requestBody = request.sentRequestBody;
@@ -365,7 +365,7 @@ public class HistoryPersistenceService {
         requestJson.set("prescript", request.prescript);
         requestJson.set("postscript", request.postscript);
 
-        // 请求头 - 优先保存实际发送的sentHeadersList
+        // Tiêu đề yêu cầu - Lưu những cái đã gửi thực tế trướcsentHeadersList
         JSONObject requestHeaders = new JSONObject();
         if (request.sentHeadersList != null && !request.sentHeadersList.isEmpty()) {
             for (HttpHeader header : request.sentHeadersList) {
@@ -383,10 +383,10 @@ public class HistoryPersistenceService {
 
         jsonItem.set("request", requestJson);
 
-        // 响应信息
+        // Thông tin phản hồi
         JSONObject responseJson = new JSONObject();
         responseJson.set("code", response.code);
-        // 限制响应体大小
+        // Giới hạn kích thước cơ thể phản ứng
         boolean fileResponse = ResponseFiles.isFileResponse(response);
         String responseBody = response.body != null && !fileResponse ? response.body : "";
         responseBody = truncateBody(responseBody, MAX_BODY_SIZE);
@@ -407,7 +407,7 @@ public class HistoryPersistenceService {
         responseJson.set("headersSize", response.headersSize);
         responseJson.set("isSse", response.isSse);
 
-        // 响应头
+        // tiêu đề phản hồi
         JSONObject responseHeaders = new JSONObject();
         if (response.headers != null) {
             for (java.util.Map.Entry<String, java.util.List<String>> entry : response.headers.entrySet()) {
@@ -420,7 +420,7 @@ public class HistoryPersistenceService {
         }
         responseJson.set("headers", responseHeaders);
 
-        // 事件信息
+        // thông tin sự kiện
         if (response.httpEventInfo != null) {
             JSONObject eventInfo = new JSONObject();
             eventInfo.set("localAddress", response.httpEventInfo.getLocalAddress());
@@ -488,10 +488,10 @@ public class HistoryPersistenceService {
     }
 
     /**
-     * 从 JSON 对象转换为 RequestHistoryItem
+     * Từ JSON Đối tượng được chuyển đổi thành RequestHistoryItem
      */
     private RequestHistoryItem convertFromJson(JSONObject jsonItem) {
-        // 重建 PreparedRequest
+        // tái thiết PreparedRequest
         PreparedRequest request = new PreparedRequest();
         JSONObject requestJson = jsonItem.getJSONObject("request");
         request.method = requestJson.getStr("method");
@@ -519,7 +519,7 @@ public class HistoryPersistenceService {
         request.formDataList = convertFormDataListFromJson(requestJson.getJSONArray("formDataList"));
         request.urlencodedList = convertUrlencodedListFromJson(requestJson.getJSONArray("urlencodedList"));
 
-        // 重建请求头 - 构建 sentHeadersList 供 HttpHtmlRenderer 使用
+        // Xây dựng lại tiêu đề yêu cầu - Xây dựng sentHeadersList vì HttpHtmlRenderer sử dụng
         JSONObject requestHeaders = requestJson.getJSONObject("headers");
         if (requestHeaders != null && !requestHeaders.isEmpty()) {
             List<HttpHeader> sentHeaders = new ArrayList<>();
@@ -540,7 +540,7 @@ public class HistoryPersistenceService {
             request.sentHeadersList = sentHeaders;
         }
 
-        // 重建 HttpResponse
+        // tái thiết HttpResponse
         HttpResponse response = new HttpResponse();
         JSONObject responseJson = jsonItem.getJSONObject("response");
         response.code = responseJson.getInt("code");
@@ -557,14 +557,14 @@ public class HistoryPersistenceService {
         response.isSse = responseJson.getBool("isSse", false);
         restoreFileInfo(response, responseJson);
 
-        // 重建响应头
+        // Xây dựng lại tiêu đề phản hồi
         response.headers = new LinkedHashMap<>();
         JSONObject responseHeaders = responseJson.getJSONObject("headers");
         if (responseHeaders != null) {
             for (String key : responseHeaders.keySet()) {
                 String value = responseHeaders.getStr(key);
                 List<String> valueList = new ArrayList<>();
-                // 如果值包含逗号，分割为多个值
+                // Nếu giá trị chứa dấu phẩy, hãy chia thành nhiều giá trị
                 String[] values = value.split(", ");
                 for (String v : values) {
                     valueList.add(v.trim());
@@ -573,7 +573,7 @@ public class HistoryPersistenceService {
             }
         }
 
-        // 重建事件信息
+        // Xây dựng lại thông tin sự kiện
         JSONObject eventInfoJson = responseJson.getJSONObject("httpEventInfo");
         if (eventInfoJson != null) {
             response.httpEventInfo = new HttpEventInfo();
@@ -645,7 +645,7 @@ public class HistoryPersistenceService {
             response.httpEventInfo.setThreadName(eventInfoJson.getStr("threadName"));
         }
 
-        // 读取请求时间
+        // Đọc thời gian yêu cầu
         long requestTime = jsonItem.getLong("requestTime", System.currentTimeMillis());
 
         return new RequestHistoryItem(request, response, requestTime);

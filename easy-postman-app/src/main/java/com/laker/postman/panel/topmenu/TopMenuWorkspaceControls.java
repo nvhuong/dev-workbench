@@ -39,7 +39,7 @@ import java.awt.Dimension;
 import java.awt.event.ActionListener;
 
 /**
- * 顶部菜单栏右侧的工作区、环境和 Git 快捷操作区。
+ * Không gian làm việc, Môi trường và ở phía bên phải của thanh menu trên cùng Git Khu vực hoạt động nhanh chóng.
  */
 @Slf4j
 @RequiredArgsConstructor

@@ -66,16 +66,16 @@ public class EasyRequestHeadersTablePanel extends AbstractTablePanel<Map<String,
     }
 
     /**
-     * 设置默认 header 检测
-     * 当用户输入的 key 与默认 header 相同时：
-     * 1. 检测到已存在同名的默认 header
-     * 2. 自动展开默认 headers（如果是隐藏状态）
-     * 3. 清空当前输入
-     * 4. 聚焦到已存在的默认 header 行
+     * Đặt mặc định header phát hiện
+     * Khi người dùng nhập vào key với mặc định header Khi giống nhau: .
+     * 1. Người ta phát hiện ra rằng một tên mặc định có cùng tên đã tồn tại header
+     * 2. Tự động mở rộng theo mặc định headers（nếu nó bị ẩn)
+     * 3. Xóa đầu vào hiện tại
+     * 4. Tập trung vào mặc định hiện có header Được rồi
      */
     private void setupDefaultHeaderDetection() {
         tableModel.addTableModelListener(e -> {
-            // 只处理 Key 列的更新事件
+            // Chỉ xử lý Key Sự kiện cập nhật cột
             if (e.getType() != javax.swing.event.TableModelEvent.UPDATE) {
                 return;
             }
@@ -90,14 +90,14 @@ public class EasyRequestHeadersTablePanel extends AbstractTablePanel<Map<String,
                 return;
             }
 
-            // 延迟处理，避免在编辑过程中触发
+            // Trì hoãn xử lý để tránh kích hoạt trong quá trình chỉnh sửa
             SwingUtilities.invokeLater(() -> handleDefaultHeaderInput(row));
         });
     }
 
     /**
-     * 处理默认 header 输入
-     * 当用户在自定义 header 行输入默认 header 名称时，自动跳转到对应的默认 header 行
+     * Xử lý mặc định header Nhập
+     * Khi người dùng đang tùy chỉnh header Mặc định đầu vào dòng header tên, nó sẽ tự động nhảy về mặc định tương ứng header Được rồi
      */
     private void handleDefaultHeaderInput(int row) {
         if (parentPanel == null) {
@@ -115,7 +115,7 @@ public class EasyRequestHeadersTablePanel extends AbstractTablePanel<Map<String,
                 return;
             }
 
-            // 检查是否是默认 header key
+            // Kiểm tra xem nó có phải là mặc định không header key
             boolean isDefaultKey = DEFAULT_HEADER_KEYS.stream()
                     .anyMatch(defaultKey -> defaultKey.equalsIgnoreCase(inputKey));
 
@@ -123,23 +123,23 @@ public class EasyRequestHeadersTablePanel extends AbstractTablePanel<Map<String,
                 return;
             }
 
-            // 查找是否已存在同名的默认 header（排除当前行）
+            // Tìm xem giá trị mặc định có cùng tên đã tồn tại chưa header（loại trừ hàng hiện tại)
             int existingRow = findExistingHeaderRow(inputKey, row);
             if (existingRow < 0) {
-                // 没有找到已存在的，说明可能是用户想修改默认 header 的值
+                // Không tìm thấy cái nào hiện có, cho biết người dùng có thể muốn thay đổi mặc định header giá trị
                 return;
             }
 
-            // 找到了已存在的默认 header
-            // 1. 清空当前行
+            // Một mặc định hiện có đã được tìm thấy header
+            // 1. Xóa dòng hiện tại
             tableModel.setValueAt("", row, COL_KEY);
             tableModel.setValueAt("", row, COL_VALUE);
             tableModel.setValueAt("", row, COL_DESCRIPTION);
 
-            // 2. 确保默认 headers 可见
+            // 2. Hãy chắc chắn để mặc định headers dễ thấy
             parentPanel.ensureDefaultHeadersVisible();
 
-            // 3. 延迟聚焦到默认 header 行
+            // 3. Trì hoãn lấy nét về mặc định header Được rồi
             focusOnExistingHeader(inputKey);
 
         } catch (Exception ex) {
@@ -148,8 +148,8 @@ public class EasyRequestHeadersTablePanel extends AbstractTablePanel<Map<String,
     }
 
     /**
-     * 聚焦到已存在的 header（带延迟以等待UI更新完成）
-     * 使用 javax.swing.Timer 替代 Thread.sleep，避免阻塞 EDT
+     * Tập trung vào những gì đã tồn tại header（Với sự chậm trễ để chờ đợiUICập nhật hoàn tất)
+     * sử dụng javax.swing.Timer thay thế Thread.sleep，Tránh chặn EDT
      */
     private void focusOnExistingHeader(String headerKey) {
         javax.swing.Timer timer = new javax.swing.Timer(120, e -> parentPanel.focusOnHeader(headerKey));
@@ -158,7 +158,7 @@ public class EasyRequestHeadersTablePanel extends AbstractTablePanel<Map<String,
     }
 
     /**
-     * 查找已存在的 header 行（排除指定行）
+     * Tìm những cái hiện có header hàng (loại trừ các hàng được chỉ định)
      */
     private int findExistingHeaderRow(String key, int excludeRow) {
         for (int i = 0; i < tableModel.getRowCount(); i++) {
@@ -174,7 +174,7 @@ public class EasyRequestHeadersTablePanel extends AbstractTablePanel<Map<String,
         return -1;
     }
 
-    // ========== 实现抽象方法 ==========
+    // ========== Thực hiện các phương pháp trừu tượng ==========
 
     @Override
     protected int getEnabledColumnIndex() {
@@ -206,10 +206,10 @@ public class EasyRequestHeadersTablePanel extends AbstractTablePanel<Map<String,
         if (column != COL_KEY && column != COL_VALUE && column != COL_DESCRIPTION) {
             return false;
         }
-        // 默认 Header 的 Key 列不可编辑（不参与 Tab/Enter 导航）
+        // Mặc định Header của Key Các cột không thể chỉnh sửa được (không tham gia Tab/Enter điều hướng)
         if (column == COL_KEY) {
-            // row 是视图行索引（Tab 导航传入的是 editingRow，即视图行），
-            // tableModel.getValueAt 需要模型行索引——必须转换。
+            // row là chỉ mục hàng xem (Tab Điều hướng được truyền vào là editingRow，tức là xem hàng).
+            // tableModel.getValueAt Yêu cầu chỉ mục hàng mô hình - phải được chuyển đổi.
             int modelRow = row;
             if (table.getRowSorter() != null) {
                 try {
@@ -233,7 +233,7 @@ public class EasyRequestHeadersTablePanel extends AbstractTablePanel<Map<String,
         return !key.isEmpty() || !value.isEmpty() || !description.isEmpty();
     }
 
-    // ========== 初始化方法 ==========
+    // ========== Phương pháp khởi tạo ==========
 
     @Override
     protected boolean isCellEditable(int row, int column) {
@@ -267,7 +267,7 @@ public class EasyRequestHeadersTablePanel extends AbstractTablePanel<Map<String,
 
     @Override
     protected boolean isDeletableRow(int modelRow) {
-        // 默认 header 行不允许删除
+        // Mặc định header Các hàng không được phép xóa
         Object keyObj = tableModel.getValueAt(modelRow, COL_KEY);
         String keyStr = keyObj == null ? "" : keyObj.toString().trim();
         return !DEFAULT_HEADER_KEYS.contains(keyStr);
@@ -315,10 +315,10 @@ public class EasyRequestHeadersTablePanel extends AbstractTablePanel<Map<String,
 
     @Override
     protected void initializeTableUI() {
-        // 调用父类的通用UI配置
+        // Gọi hàm chung của lớp chaUIcấu hình
         super.initializeTableUI();
 
-        // 设置列宽
+        // Đặt chiều rộng cột
         setEnabledColumnWidth(40);
         setDeleteColumnWidth();
 
@@ -327,24 +327,24 @@ public class EasyRequestHeadersTablePanel extends AbstractTablePanel<Map<String,
     }
 
     /**
-     * 设置单元格渲染器和编辑器
-     * - Key 列：使用智能自动补全编辑器，提供常见的 HTTP Header 名称建议
-     * - Value 列：使用上下文感知编辑器，根据 Key 提供对应的值建议
+     * Thiết lập trình kết xuất và trình chỉnh sửa ô
+     * - Key Cột: Sử dụng trình chỉnh sửa tự động hoàn thành thông minh cung cấp thông tin chung HTTP Header Gợi ý tên
+     * - Value Cột: Sử dụng trình soạn thảo nhận biết ngữ cảnh, theo  Key Cung cấp các đề xuất giá trị tương ứng
      */
     private void setupCellRenderersAndEditors() {
-        // Key 列：支持自动补全的编辑器（显示常见 HTTP Header 名称）
+        // Key Cột: Trình chỉnh sửa hỗ trợ tự động hoàn thành (hiển thị common HTTP Header tên)
         setColumnEditor(COL_KEY, new HttpHeaderKeyEasyTextFieldCellEditor(HttpHeaderConstants.COMMON_HEADERS));
 
-        // Value 列：智能编辑器（根据 Key 动态提供建议）
+        // Value Cột: Smart Editor (theo  Key Đưa ra gợi ý một cách linh hoạt)
         setColumnEditor(COL_VALUE, new HttpHeaderValueEasyTextFieldCellEditor(COL_KEY));
 
-        // 设置渲染器以支持变量高亮等功能
+        // Thiết lập trình kết xuất để hỗ trợ các tính năng như đánh dấu biến
         setColumnRenderer(COL_KEY, new EasyTextFieldCellRenderer());
         setColumnRenderer(COL_VALUE, new EasyTextFieldCellRenderer());
         setColumnEditor(COL_DESCRIPTION, new EasySmartValueCellEditor());
         setColumnRenderer(COL_DESCRIPTION, new EasyTextFieldCellRenderer());
 
-        // 删除列使用自定义按钮渲染器
+        // Xóa cột bằng trình kết xuất nút tùy chỉnh
         setColumnRenderer(COL_DELETE, new DeleteButtonRenderer());
     }
 
@@ -373,8 +373,8 @@ public class EasyRequestHeadersTablePanel extends AbstractTablePanel<Map<String,
     }
 
     /**
-     * 从 tableModel 直接读取行数据，不停止当前单元格编辑。
-     * 用于自动保存 / tab 指示器等后台场景，避免打断用户正在进行的输入。
+     * Từ tableModel Đọc dữ liệu hàng trực tiếp mà không dừng chỉnh sửa ô hiện tại.
+     * để lưu tự động / tab Các cảnh nền như chỉ báo để tránh làm gián đoạn quá trình nhập liệu đang diễn ra của người dùng.
      */
     public List<Map<String, Object>> getRowsFromModel() {
         List<Map<String, Object>> rows = new ArrayList<>();

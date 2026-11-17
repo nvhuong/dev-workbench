@@ -17,7 +17,7 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * SSE 生命周期节点属性面板。
+ * SSE Bảng thuộc tính nút vòng đời.
  */
 public class SseStagePropertyPanel extends JPanel {
     public enum Stage {

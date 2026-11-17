@@ -13,14 +13,14 @@ import static com.laker.postman.request.model.RequestBodyTypes.BODY_TYPE_RAW;
 import static org.testng.Assert.*;
 
 /**
- * PostmanCollectionParser 单元测试
- * 测试完整的 Postman Collection 解析功能
+ * PostmanCollectionParser Kiểm tra đơn vị
+ * Kiểm tra hoàn tất Postman Collection chức năng phân tích cú pháp
  */
 public class PostmanCollectionParserTest {
 
     @Test
     public void testParsePostmanCollection_BasicCollection() {
-        // 准备测试数据 - 基本的 Collection
+        // Chuẩn bị dữ liệu thử nghiệm - Cơ bản Collection
         String json = """
                 {
                     "info": {
@@ -39,10 +39,10 @@ public class PostmanCollectionParserTest {
                 }
                 """;
 
-        // 执行解析
+        // Thực hiện phân tích cú pháp
         CollectionParseResult result = PostmanCollectionParser.parsePostmanCollection(json);
 
-        // 验证结果
+        // Xác minh kết quả
         assertNotNull(result);
         assertNotNull(result.getGroup());
         assertEquals(result.getGroup().getName(), "Test Collection");
@@ -51,7 +51,7 @@ public class PostmanCollectionParserTest {
 
     @Test
     public void testParsePostmanCollection_WithFolder() {
-        // 准备测试数据 - 包含文件夹的 Collection
+        // Chuẩn bị dữ liệu thử nghiệm - Chứa các thư mục Collection
         String json = """
                 {
                     "info": {
@@ -82,14 +82,14 @@ public class PostmanCollectionParserTest {
                 }
                 """;
 
-        // 执行解析
+        // Thực hiện phân tích cú pháp
         CollectionParseResult result = PostmanCollectionParser.parsePostmanCollection(json);
 
-        // 验证结果
+        // Xác minh kết quả
         assertNotNull(result);
         assertEquals(result.getChildren().size(), 1);
 
-        // 验证文件夹
+        // Xác minh thư mục
         var folderNode = result.getChildren().get(0);
         assertTrue(folderNode.isGroup());
         assertEquals(folderNode.asGroup().getName(), "User API");
@@ -172,7 +172,7 @@ public class PostmanCollectionParserTest {
 
     @Test
     public void testParsePostmanCollection_ComplexStructure() {
-        // 准备测试数据 - 复杂的嵌套结构
+        // Chuẩn bị dữ liệu thử nghiệm - Cấu trúc lồng nhau phức tạp
         String json = """
                 {
                     "info": {
@@ -209,27 +209,27 @@ public class PostmanCollectionParserTest {
                 }
                 """;
 
-        // 执行解析
+        // Thực hiện phân tích cú pháp
         CollectionParseResult result = PostmanCollectionParser.parsePostmanCollection(json);
 
-        // 验证结果
+        // Xác minh kết quả
         assertNotNull(result);
         assertEquals(result.getChildren().size(), 2);
 
-        // 验证第一个子节点（文件夹）
+        // Xác minh nút con đầu tiên (thư mục)
         var authFolder = result.getChildren().get(0);
         assertTrue(authFolder.isGroup());
         assertEquals(authFolder.asGroup().getName(), "Auth");
         assertEquals(authFolder.getChildren().size(), 1);
 
-        // 验证第二个子节点（请求）
+        // Xác minh nút con thứ hai (yêu cầu)
         var directRequest = result.getChildren().get(1);
         assertTrue(directRequest.isRequest());
     }
 
     @Test
     public void testParsePostmanCollection_WithQueryParams() {
-        // 准备测试数据 - 带查询参数的请求
+        // Chuẩn bị dữ liệu thử nghiệm - Yêu cầu với các tham số truy vấn
         String json = """
                 {
                     "info": {
@@ -253,17 +253,17 @@ public class PostmanCollectionParserTest {
                 }
                 """;
 
-        // 执行解析
+        // Thực hiện phân tích cú pháp
         CollectionParseResult result = PostmanCollectionParser.parsePostmanCollection(json);
 
-        // 验证结果
+        // Xác minh kết quả
         assertNotNull(result);
         assertEquals(result.getChildren().size(), 1);
 
         var requestNode = result.getChildren().get(0);
         assertTrue(requestNode.isRequest());
 
-        // 验证 HttpRequestItem
+        // Xác minh HttpRequestItem
         var req = requestNode.asRequest();
         assertEquals(req.getName(), "Search API");
         assertEquals(req.getMethod(), "GET");
@@ -313,7 +313,7 @@ public class PostmanCollectionParserTest {
 
     @Test
     public void testParsePostmanCollection_WithHeaders() {
-        // 准备测试数据 - 带请求头的请求
+        // Chuẩn bị dữ liệu thử nghiệm - Yêu cầu với tiêu đề yêu cầu
         String json = """
                 {
                     "info": {
@@ -335,10 +335,10 @@ public class PostmanCollectionParserTest {
                 }
                 """;
 
-        // 执行解析
+        // Thực hiện phân tích cú pháp
         CollectionParseResult result = PostmanCollectionParser.parsePostmanCollection(json);
 
-        // 验证结果
+        // Xác minh kết quả
         assertNotNull(result);
         var requestNode = result.getChildren().get(0);
         var req = requestNode.asRequest();
@@ -351,7 +351,7 @@ public class PostmanCollectionParserTest {
 
     @Test
     public void testParsePostmanCollection_WithScripts() {
-        // 准备测试数据 - 带脚本的请求
+        // Chuẩn bị dữ liệu thử nghiệm - Các yêu cầu theo kịch bản
         String json = """
                 {
                     "info": {
@@ -383,10 +383,10 @@ public class PostmanCollectionParserTest {
                 }
                 """;
 
-        // 执行解析
+        // Thực hiện phân tích cú pháp
         CollectionParseResult result = PostmanCollectionParser.parsePostmanCollection(json);
 
-        // 验证结果
+        // Xác minh kết quả
         assertNotNull(result);
         var requestNode = result.getChildren().get(0);
         var req = requestNode.asRequest();
@@ -400,19 +400,19 @@ public class PostmanCollectionParserTest {
 
     @Test
     public void testParsePostmanCollection_InvalidJson() {
-        // 准备测试数据 - 无效的 JSON
+        // Chuẩn bị dữ liệu thử nghiệm - Không hợp lệ JSON
         String json = "invalid json";
 
-        // 执行解析
+        // Thực hiện phân tích cú pháp
         CollectionParseResult result = PostmanCollectionParser.parsePostmanCollection(json);
 
-        // 验证结果 - 应该返回 null
+        // Xác minh kết quả - nên được trả lại null
         assertNull(result);
     }
 
     @Test
     public void testParsePostmanCollection_MissingInfo() {
-        // 准备测试数据 - 缺少 info 字段
+        // Chuẩn bị dữ liệu thử nghiệm - thiếu info lĩnh vực
         String json = """
                 {
                     "item": [
@@ -427,16 +427,16 @@ public class PostmanCollectionParserTest {
                 }
                 """;
 
-        // 执行解析
+        // Thực hiện phân tích cú pháp
         CollectionParseResult result = PostmanCollectionParser.parsePostmanCollection(json);
 
-        // 验证结果 - 应该返回 null
+        // Xác minh kết quả - nên được trả lại null
         assertNull(result);
     }
 
     @Test
     public void testParsePostmanCollection_MissingItem() {
-        // 准备测试数据 - 缺少 item 字段
+        // Chuẩn bị dữ liệu thử nghiệm - thiếu item lĩnh vực
         String json = """
                 {
                     "info": {
@@ -445,16 +445,16 @@ public class PostmanCollectionParserTest {
                 }
                 """;
 
-        // 执行解析
+        // Thực hiện phân tích cú pháp
         CollectionParseResult result = PostmanCollectionParser.parsePostmanCollection(json);
 
-        // 验证结果 - 应该返回 null
+        // Xác minh kết quả - nên được trả lại null
         assertNull(result);
     }
 
     @Test
     public void testParsePostmanCollection_EmptyCollection() {
-        // 准备测试数据 - 空的 Collection
+        // Chuẩn bị dữ liệu thử nghiệm - Trống Collection
         String json = """
                 {
                     "info": {
@@ -464,10 +464,10 @@ public class PostmanCollectionParserTest {
                 }
                 """;
 
-        // 执行解析
+        // Thực hiện phân tích cú pháp
         CollectionParseResult result = PostmanCollectionParser.parsePostmanCollection(json);
 
-        // 验证结果
+        // Xác minh kết quả
         assertNotNull(result);
         assertEquals(result.getGroup().getName(), "Empty Collection");
         assertEquals(result.getChildren().size(), 0);
@@ -475,7 +475,7 @@ public class PostmanCollectionParserTest {
 
     @Test
     public void testParsePostmanCollection_NoCollectionName() {
-        // 准备测试数据 - 无 collection 名称
+        // Chuẩn bị dữ liệu thử nghiệm - Không collection tên
         String json = """
                 {
                     "info": {
@@ -493,10 +493,10 @@ public class PostmanCollectionParserTest {
                 }
                 """;
 
-        // 执行解析
+        // Thực hiện phân tích cú pháp
         CollectionParseResult result = PostmanCollectionParser.parsePostmanCollection(json);
 
-        // 验证结果 - 应该使用默认名称
+        // Xác minh kết quả - Nên sử dụng tên mặc định
         assertNotNull(result);
         assertEquals(result.getGroup().getName(), "Postman");
     }

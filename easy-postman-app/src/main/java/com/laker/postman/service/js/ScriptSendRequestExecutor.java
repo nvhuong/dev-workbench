@@ -20,10 +20,10 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 执行脚本里的 pm.sendRequest。
+ * Thực thi kịch bản pm.sendRequest。
  * <p>
- * 脚本请求不属于当前 Collection 节点，因此没有继承配置；但它仍必须复用发送前收尾逻辑，
- * 确保变量替换、URL 编码和请求体处理规则与普通请求保持一致。
+ * Yêu cầu tập lệnh không hiện hành Collection nút, do đó không có cấu hình nào được kế thừa; nhưng nó vẫn phải sử dụng lại logic gói trước khi gửi.
+ * Hãy chắc chắn rằng các biến được thay thế.URL Các quy tắc mã hóa và xử lý nội dung yêu cầu vẫn giống như các yêu cầu thông thường.
  */
 @Slf4j
 public final class ScriptSendRequestExecutor {
@@ -77,7 +77,7 @@ public final class ScriptSendRequestExecutor {
     }
 
     /**
-     * 从脚本传入的字符串或对象构建一次性 PreparedRequest。
+     * Tạo một cảnh quay từ một chuỗi hoặc đối tượng được truyền vào từ tập lệnh PreparedRequest。
      */
     private static PreparedRequest buildPreparedRequest(Object requestOptions) {
         PreparedRequest preparedRequest = new PreparedRequest();

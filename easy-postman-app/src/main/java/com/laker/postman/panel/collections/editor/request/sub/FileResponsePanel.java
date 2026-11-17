@@ -17,7 +17,7 @@ import java.awt.*;
 import java.io.File;
 
 /**
- * 文件类型响应的概览视图：展示文件名/类型/大小，提供下载、按文本查看，以及下载后打开文件或所在文件夹。
+ * Chế độ xem tổng quan về phản hồi loại tệp: hiển thị tên tệp/loại/Kích thước, cung cấp tính năng tải xuống, xem bằng văn bản và mở tệp hoặc thư mục sau khi tải xuống.
  */
 final class FileResponsePanel extends JPanel {
     private static final int FILE_ICON_SIZE = 44;
@@ -37,7 +37,7 @@ final class FileResponsePanel extends JPanel {
             CommonI18n.get(CommonMessageKeys.BUTTON_DOWNLOAD), true, "icons/download.svg");
     private final JButton viewAsTextButton = ModernButtonFactory.createCompactButton(
             I18nUtil.getMessage(MessageKeys.RESPONSE_FILE_VIEW_AS_TEXT), false, "icons/file-code.svg");
-    // 保存位置与“打开”入口分两行：路径可在窄分栏中省略显示，按钮不会因 FlowLayout 换行而被裁掉
+    // Lưu vị trí với“Mở”Lối vào được chia thành hai dòng: đường dẫn có thể được bỏ qua trong cột hẹp nhưng nút sẽ không hiển thị FlowLayout ngắt dòng và bị cắt bỏ
     private final JPanel savedPanel = new JPanel(new GridBagLayout());
     private final JPanel savedLinksPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 6, 0));
     private final JLabel savedLabel = new JLabel();
@@ -131,7 +131,7 @@ final class FileResponsePanel extends JPanel {
         constraints.insets = new Insets(0, 0, 14, 0);
         add(fileSummaryLabel, constraints);
 
-        // 提示条按内容宽度居中，避免在宽窗口中拉成整行横幅
+        // Chú giải công cụ được căn giữa theo chiều rộng của nội dung để tránh kéo dài thành một dòng biểu ngữ đầy đủ trong cửa sổ rộng
         constraints.gridy = 3;
         constraints.fill = GridBagConstraints.NONE;
         constraints.insets = new Insets(0, 0, 16, 0);
@@ -261,7 +261,7 @@ final class FileResponsePanel extends JPanel {
         }
         try {
             if (isDesktopActionSupported(Desktop.Action.BROWSE_FILE_DIR)) {
-                // 打开所在文件夹并选中文件（macOS / 部分 Linux 桌面支持）
+                // Mở thư mục và chọn tệp (macOS / một phần Linux hỗ trợ máy tính để bàn)
                 Desktop.getDesktop().browseFileDirectory(savedFile);
             } else {
                 File parent = savedFile.getAbsoluteFile().getParentFile();
@@ -292,7 +292,7 @@ final class FileResponsePanel extends JPanel {
     }
 
     /**
-     * 后台保存期间禁用下载按钮，避免重复保存。
+     * Tắt nút tải xuống trong khi lưu nền để tránh lưu nhiều lần.
      */
     void setDownloading(boolean downloading) {
         this.downloading = downloading;
@@ -342,7 +342,7 @@ final class FileResponsePanel extends JPanel {
         }
 
         mismatchPanel.setBackground(ModernColors.getWarningBackgroundColor());
-        // 背景与边框使用相同圆角，避免不透明背景在圆角外露出方角
+        // Sử dụng các góc bo tròn giống nhau cho nền và đường viền để ngăn nền mờ hiển thị các góc vuông bên ngoài các góc bo tròn
         mismatchPanel.putClientProperty(FlatClientProperties.STYLE, "arc: 8");
         mismatchPanel.setBorder(new FlatLineBorder(
                 new Insets(8, 12, 8, 12), ModernColors.getWarningBorderColor(), 1f, 8));

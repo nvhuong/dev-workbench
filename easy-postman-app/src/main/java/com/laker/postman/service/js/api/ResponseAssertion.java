@@ -10,83 +10,83 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 响应断言对象 (pm.response)
+ * Đối tượng xác nhận phản hồi (pm.response)
  * <p>
- * 该类为 JavaScript 后置脚本提供对 HTTP 响应的访问和断言接口，模拟 Postman 的 pm.response 对象。
- * 支持链式断言语法，使测试脚本更加简洁和可读。
+ * This category is JavaScript Các kịch bản sau được cung cấp cho HTTP Giao diện truy cập và xác nhận cho các phản hồi, bị chế nhạo Postman của pm.response đối tượng.
+ * Hỗ trợ cú pháp xác nhận theo chuỗi để làm cho tập lệnh kiểm tra ngắn gọn và dễ đọc hơn.
  * </p>
  *
- * <h3>主要功能：</h3>
+ * <h3>Chức năng chính:</h3>
  * <ul>
- *   <li><b>状态码断言</b>: pm.response.to.have.status(200)</li>
- *   <li><b>响应头断言</b>: pm.response.to.have.header('Content-Type')</li>
- *   <li><b>响应时间断言</b>: pm.expect(pm.response.responseTime).to.be.below(1000)</li>
- *   <li><b>JSON 数据访问</b>: pm.response.json()</li>
- *   <li><b>响应体文本访问</b>: pm.response.text()</li>
- *   <li><b>响应头访问</b>: pm.response.headers.get('Content-Type')</li>
+ *   <li><b>Xác nhận mã trạng thái</b>: pm.response.to.have.status(200)</li>
+ *   <li><b>Xác nhận tiêu đề phản hồi</b>: pm.response.to.have.header('Content-Type')</li>
+ *   <li><b>Khẳng định thời gian đáp ứng</b>: pm.expect(pm.response.responseTime).to.be.below(1000)</li>
+ *   <li><b>JSON Truy cập dữ liệu</b>: pm.response.json()</li>
+ *   <li><b>Truy cập văn bản nội dung phản hồi</b>: pm.response.text()</li>
+ *   <li><b>Truy cập tiêu đề phản hồi</b>: pm.response.headers.get('Content-Type')</li>
  * </ul>
  *
- * <h3>链式断言示例：</h3>
+ * <h3>Ví dụ về các xác nhận có chuỗi:</h3>
  * <pre>{@code
- * // 状态码断言
+ * // Xác nhận mã trạng thái
  * pm.response.to.have.status(200);
  *
- * // 响应头断言
+ * // Xác nhận tiêu đề phản hồi
  * pm.response.to.have.header('Content-Type');
  * pm.response.to.have.header('Authorization');
  *
- * // 响应时间断言
+ * // Khẳng định thời gian đáp ứng
  * pm.expect(pm.response.responseTime).to.be.below(1000);
  *
- * // JSON 数据访问和断言
+ * // JSON Truy cập dữ liệu và xác nhận
  * var jsonData = pm.response.json();
  * pm.expect(jsonData.status).to.equal("success");
  * pm.environment.set("token", jsonData.token);
  *
- * // 响应头访问
+ * // Truy cập tiêu đề phản hồi
  * var contentType = pm.response.headers.get('Content-Type');
  * console.log("Content-Type:", contentType);
  * }</pre>
  *
- * <h3>支持的链式语法：</h3>
+ * <h3>Cú pháp chuỗi được hỗ trợ: .</h3>
  * <ul>
- *   <li>pm.response.to.have.status(code) - 断言状态码</li>
- *   <li>pm.response.to.have.header(name) - 断言响应头存在</li>
- *   <li>pm.expect(value).to.be.below(max) - 断言数值小于指定值</li>
+ *   <li>pm.response.to.have.status(code) - Khẳng định mã trạng thái</li>
+ *   <li>pm.response.to.have.header(name) - Khẳng định rằng tiêu đề phản hồi tồn tại</li>
+ *   <li>pm.expect(value).to.be.below(max) - Khẳng định rằng một giá trị nhỏ hơn một giá trị được chỉ định</li>
  * </ul>
  *
  * @see <a href="https://learning.postman.com/docs/writing-scripts/test-scripts/">Postman Test Scripts</a>
  * @author laker
  */
 public class ResponseAssertion {
-    /** HTTP 响应对象 */
+    /** HTTP đối tượng phản hồi */
     private HttpResponse response;
 
-    /** 响应头访问器 - 对应 pm.response.headers */
+    /** Trình truy cập tiêu đề phản hồi - tương ứng pm.response.headers */
     public Headers headers;
 
-    /** 链式断言语法支持 - 对应 pm.response.to */
+    /** Hỗ trợ cú pháp xác nhận theo chuỗi - tương ứng pm.response.to */
     public ResponseAssertion to = this;
 
-    /** 链式断言语法支持 - 对应 pm.response.to.have */
+    /** Hỗ trợ cú pháp xác nhận theo chuỗi - tương ứng pm.response.to.have */
     public ResponseAssertion have = this;
 
-    /** 链式断言语法支持 - 对应 pm.response.to.be */
+    /** Hỗ trợ cú pháp xác nhận theo chuỗi - tương ứng pm.response.to.be */
     public ResponseAssertion be = this;
 
-    /** 响应时间（毫秒） - 对应 pm.response.responseTime */
+    /** Thời gian đáp ứng (mili giây) - tương ứng pm.response.responseTime */
     public long responseTime;
 
-    /** 响应状态码 - 对应 pm.response.code */
+    /** Mã trạng thái phản hồi - tương ứng pm.response.code */
     public int code;
 
-    /** 响应状态文本 - 对应 pm.response.status */
+    /** Văn bản trạng thái phản hồi - tương ứng pm.response.status */
     public String status;
 
     /**
-     * 构造响应断言对象
+     * Xây dựng một đối tượng xác nhận phản hồi
      *
-     * @param response HTTP 响应对象
+     * @param response HTTP đối tượng phản hồi
      */
     public ResponseAssertion(HttpResponse response) {
         this.response = response;
@@ -97,10 +97,10 @@ public class ResponseAssertion {
     }
 
     /**
-     * 根据状态码获取状态文本
+     * Nhận văn bản trạng thái dựa trên mã trạng thái
      *
-     * @param code HTTP 状态码
-     * @return 状态文本
+     * @param code HTTP mã trạng thái
+     * @return Văn bản trạng thái
      */
     private String getStatusText(int code) {
         switch (code) {
@@ -124,30 +124,30 @@ public class ResponseAssertion {
     }
 
     /**
-     * 获取底层的 HTTP 响应对象
+     * Lấy cơ bản HTTP đối tượng phản hồi
      *
-     * @return HTTP 响应对象
+     * @return HTTP đối tượng phản hồi
      */
     public HttpResponse getHttpResponse() {
         return response;
     }
 
     /**
-     * 返回当前对象以支持链式调用
-     * 对应脚本中的: pm.response.to
+     * Trả về đối tượng hiện tại để hỗ trợ các cuộc gọi theo chuỗi
+     * Tương ứng với kịch bản: pm.response.to
      *
-     * @return 当前 ResponseAssertion 对象
+     * @return hiện tại ResponseAssertion đối tượng
      */
     public ResponseAssertion to() {
         return this;
     }
 
     /**
-     * 断言响应状态码
-     * 对应脚本中的: pm.response.to.have.status(200)
+     * Khẳng định mã trạng thái phản hồi
+     * Tương ứng với kịch bản: pm.response.to.have.status(200)
      *
-     * @param code 期望的状态码
-     * @throws AssertionError 如果实际状态码不匹配
+     * @param code Mã trạng thái mong muốn
+     * @throws AssertionError Nếu mã trạng thái thực tế không khớp
      */
     public void status(int code) {
         if (response == null || response.code != code) {
@@ -156,11 +156,11 @@ public class ResponseAssertion {
     }
 
     /**
-     * 断言响应头存在
-     * 对应脚本中的: pm.response.to.have.header('Content-Type')
+     * Khẳng định rằng tiêu đề phản hồi tồn tại
+     * Tương ứng với kịch bản: pm.response.to.have.header('Content-Type')
      *
-     * @param name 响应头名称（不区分大小写）
-     * @throws AssertionError 如果响应头不存在
+     * @param name Tên tiêu đề phản hồi (không phân biệt chữ hoa chữ thường)
+     * @throws AssertionError Nếu tiêu đề phản hồi không xuất hiện
      */
     public void header(String name) {
         if (response == null || response.headers == null) {
@@ -179,11 +179,11 @@ public class ResponseAssertion {
     }
 
     /**
-     * 断言数值小于指定值（通常用于响应时间）
-     * 对应脚本中的: pm.expect(pm.response.responseTime).to.be.below(1000)
+     * Khẳng định rằng một giá trị nhỏ hơn một giá trị được chỉ định (thường được sử dụng cho thời gian phản hồi)
+     * Tương ứng với kịch bản: pm.expect(pm.response.responseTime).to.be.below(1000)
      *
-     * @param ms 期望的最大值（毫秒）
-     * @throws AssertionError 如果实际值大于或等于指定值
+     * @param ms Giá trị tối đa mong muốn tính bằng mili giây
+     * @throws AssertionError Nếu giá trị thực tế lớn hơn hoặc bằng giá trị được chỉ định
      */
     public void below(long ms) {
         if (response == null || response.costMs >= ms) {
@@ -192,21 +192,21 @@ public class ResponseAssertion {
     }
 
     /**
-     * 获取响应体文本
-     * 对应脚本中的: pm.response.text()
+     * Nhận văn bản nội dung phản hồi
+     * Tương ứng với kịch bản: pm.response.text()
      *
-     * @return 响应体字符串，响应为空则返回 null
+     * @return Chuỗi nội dung phản hồi, được trả về nếu phản hồi trống null
      */
     public String text() {
         return response != null ? response.body : null;
     }
 
     /**
-     * 解析响应体为 JSON 对象
-     * 对应脚本中的: pm.response.json()
+     * Phân tích nội dung phản hồi dưới dạng JSON đối tượng
+     * Tương ứng với kịch bản: pm.response.json()
      *
-     * @return JSON 对象，可在 JavaScript 中访问属性
-     * @throws AssertionError 如果响应体不是有效的 JSON
+     * @return JSON Đối tượng, có sẵn tại JavaScript Truy cập các thuộc tính trong
+     * @throws AssertionError Nếu nội dung phản hồi không hợp lệ JSON
      */
     public Object json() {
         try {
@@ -220,21 +220,21 @@ public class ResponseAssertion {
     }
 
     /**
-     * 获取响应大小信息
-     * 对应脚本中的: pm.response.size()
+     * Nhận thông tin kích thước phản hồi
+     * Tương ứng với kịch bản: pm.response.size()
      *
-     * @return ResponseSize 对象，包含 body 和 header 大小信息
+     * @return ResponseSize Đối tượng chứa body và header thông tin kích thước
      */
     public ResponseSize size() {
         return new ResponseSize(this);
     }
 
     /**
-     * 获取指定名称的响应头值
-     * 对应脚本中的: pm.response.headers.get('Content-Type')
+     * Nhận giá trị tiêu đề phản hồi của tên được chỉ định
+     * Tương ứng với kịch bản: pm.response.headers.get('Content-Type')
      *
-     * @param name 响应头名称（不区分大小写）
-     * @return 响应头值，不存在则返回 null
+     * @param name Tên tiêu đề phản hồi (không phân biệt chữ hoa chữ thường)
+     * @return Giá trị tiêu đề phản hồi, được trả về nếu nó không tồn tại null
      */
     public String getHeader(String name) {
         if (response == null || response.headers == null) return null;
@@ -250,36 +250,36 @@ public class ResponseAssertion {
     }
 
     /**
-     * 创建期望断言对象（Chai.js 风格）
-     * 对应脚本中的: pm.expect(value)
+     * Tạo đối tượng xác nhận kỳ vọng (Chai.js phong cách)
+     * Tương ứng với kịch bản: pm.expect(value)
      *
-     * @param actual 要断言的实际值
-     * @return 期望断言对象，支持链式断言
+     * @param actual Giá trị thực tế cần khẳng định
+     * @return Mong đợi các đối tượng xác nhận, hỗ trợ các xác nhận theo chuỗi
      */
     public Expectation expect(Object actual) {
         return new Expectation(actual);
     }
 
     /**
-     * 响应头访问器 (pm.response.headers)
+     * Trình truy cập tiêu đề phản hồi (pm.response.headers)
      * <p>
-     * 提供便捷的响应头访问接口，支持不区分大小写的响应头名称查询。
+     * Cung cấp giao diện truy cập tiêu đề phản hồi thuận tiện và hỗ trợ truy vấn tên tiêu đề phản hồi không phân biệt chữ hoa chữ thường.
      * </p>
      *
-     * <h3>使用示例：</h3>
+     * <h3>Ví dụ sử dụng:</h3>
      * <pre>{@code
      * var contentType = pm.response.headers.get('Content-Type');
-     * var authorization = pm.response.headers.get('authorization'); // 不区分大小写
+     * var authorization = pm.response.headers.get('authorization'); // Không phân biệt chữ hoa chữ thường
      *
-     * // 检查 header 是否存在
+     * // nghiên cứu header tồn tại
      * if (pm.response.headers.has('Set-Cookie')) {
      *     console.log('Cookie was set');
      * }
      *
-     * // 获取 header 数量
+     * // Lấy header Số lượng
      * var count = pm.response.headers.count();
      *
-     * // 遍历所有 headers
+     * // Đi qua tất cả headers
      * pm.response.headers.each(function(header) {
      *     console.log(header.key + ': ' + header.value);
      * });
@@ -289,38 +289,38 @@ public class ResponseAssertion {
         private final ResponseAssertion responseAssertion;
 
         /**
-         * 构造响应头访问器
+         * Xây dựng trình truy cập tiêu đề phản hồi
          *
-         * @param responseAssertion 响应断言对象
+         * @param responseAssertion Đối tượng xác nhận phản hồi
          */
         public Headers(ResponseAssertion responseAssertion) {
             this.responseAssertion = responseAssertion;
         }
 
         /**
-         * 获取指定名称的响应头值
+         * Nhận giá trị tiêu đề phản hồi của tên được chỉ định
          *
-         * @param name 响应头名称（不区分大小写）
-         * @return 响应头值，不存在则返回 null
+         * @param name Tên tiêu đề phản hồi (không phân biệt chữ hoa chữ thường)
+         * @return Giá trị tiêu đề phản hồi, được trả về nếu nó không tồn tại null
          */
         public String get(String name) {
             return responseAssertion.getHeader(name);
         }
 
         /**
-         * 检查指定名称的响应头是否存在
+         * Kiểm tra xem tiêu đề phản hồi có tên được chỉ định có tồn tại hay không
          *
-         * @param name 响应头名称（不区分大小写）
-         * @return 如果响应头存在返回 true，否则返回 false
+         * @param name Tên tiêu đề phản hồi (không phân biệt chữ hoa chữ thường)
+         * @return Trả về nếu tiêu đề phản hồi tồn tại true，Còn không thì quay lại false
          */
         public boolean has(String name) {
             return responseAssertion.getHeader(name) != null;
         }
 
         /**
-         * 获取响应头的数量
+         * Lấy số lượng tiêu đề phản hồi
          *
-         * @return 响应头数量
+         * @return Số lượng tiêu đề phản hồi
          */
         public int count() {
             if (responseAssertion.response == null || responseAssertion.response.headers == null) {
@@ -330,9 +330,9 @@ public class ResponseAssertion {
         }
 
         /**
-         * 遍历所有响应头
+         * Lặp lại qua tất cả các tiêu đề phản hồi
          *
-         * @param callback 回调函数，接收 header 对象（包含 key 和 value 属性）
+         * @param callback Chức năng gọi lại, nhận header Đối tượng (chứa key và value thuộc tính)
          */
         public void each(org.graalvm.polyglot.Value callback) {
             if (responseAssertion.response == null || responseAssertion.response.headers == null) {
@@ -344,7 +344,7 @@ public class ResponseAssertion {
 
             for (Map.Entry<String, List<String>> entry : responseAssertion.response.headers.entrySet()) {
                 if (entry.getValue() != null && !entry.getValue().isEmpty()) {
-                    // 创建 header 对象
+                    // Tạo header đối tượng
                     HeaderEntry headerEntry = new HeaderEntry(entry.getKey(), entry.getValue().get(0));
                     callback.executeVoid(headerEntry);
                 }
@@ -352,9 +352,9 @@ public class ResponseAssertion {
         }
 
         /**
-         * 获取所有响应头
+         * Nhận tất cả các tiêu đề phản hồi
          *
-         * @return 响应头数组
+         * @return Mảng tiêu đề phản hồi
          */
         public HeaderEntry[] all() {
             if (responseAssertion.response == null || responseAssertion.response.headers == null) {
@@ -372,7 +372,7 @@ public class ResponseAssertion {
     }
 
     /**
-     * Header 条目类，用于表示单个响应头
+     * Header Lớp mục nhập được sử dụng để thể hiện một tiêu đề phản hồi duy nhất
      */
     public static class HeaderEntry {
         public String key;
@@ -390,36 +390,36 @@ public class ResponseAssertion {
     }
 
     /**
-     * 响应大小信息类 (pm.response.size())
+     * Lớp thông tin kích thước phản hồi (pm.response.size())
      * <p>
-     * 提供响应体和响应头的大小信息。
+     * Cung cấp thông tin kích thước nội dung và tiêu đề phản hồi.
      * </p>
      *
-     * <h3>使用示例：</h3>
+     * <h3>Ví dụ sử dụng:</h3>
      * <pre>{@code
      * var responseSize = pm.response.size();
-     * console.log("响应体大小:", responseSize.body, "bytes");
-     * console.log("响应头大小:", responseSize.header, "bytes");
-     * console.log("总大小:", responseSize.total, "bytes");
+     * console.log("Kích thước cơ thể phản ứng:", responseSize.body, "bytes");
+     * console.log("Kích thước tiêu đề phản hồi:", responseSize.header, "bytes");
+     * console.log("Tổng kích thước:", responseSize.total, "bytes");
      * }</pre>
      */
     public static class ResponseSize {
-        /** 响应体大小（字节） */
+        /** Kích thước nội dung phản hồi (byte) */
         public long body;
 
-        /** 响应头大小（字节） */
+        /** Kích thước tiêu đề phản hồi (byte) */
         public long header;
 
-        /** 总大小（字节） */
+        /** Tổng kích thước (byte) */
         public long total;
 
         /**
-         * 构造响应大小对象
+         * Xây dựng một đối tượng kích thước phản hồi
          *
-         * @param responseAssertion 响应断言对象
+         * @param responseAssertion Đối tượng xác nhận phản hồi
          */
         public ResponseSize(ResponseAssertion responseAssertion) {
-            // 压测 metadata-only 模式会统计 bodySize 但不保留 body 文本。
+            // Kiểm tra căng thẳng metadata-only Chế độ sẽ được tính bodySize Nhưng không được bảo lưu body văn bản.
             HttpResponse currentResponse = responseAssertion.response;
             if (currentResponse != null && hasCollectedBodySize(currentResponse)) {
                 this.body = currentResponse.bodySize;
@@ -429,7 +429,7 @@ public class ResponseAssertion {
                 this.body = 0;
             }
 
-            // 计算响应头大小
+            // Tính toán kích thước tiêu đề phản hồi
             this.header = 0;
             if (responseAssertion.response != null && responseAssertion.response.headers != null) {
                 for (Map.Entry<String, List<String>> entry : responseAssertion.response.headers.entrySet()) {
@@ -443,12 +443,12 @@ public class ResponseAssertion {
                             }
                         }
                     }
-                    // 添加 ": " 和 "\r\n" 的大小
+                    // Thêm vào ": " và "\r\n" kích thước
                     this.header += 4;
                 }
             }
 
-            // 总大小
+            // Tổng kích thước
             this.total = this.body + this.header;
         }
 

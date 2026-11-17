@@ -107,7 +107,7 @@ final class PerformanceRemoteRunControlSupport {
         runUiController.initializeProgress(progressLabel, 0);
         runUiController.updateRunStatus(limitLabel, "0", PerformanceRunUiController.REQUEST_STATUS_ICON);
 
-        // 在线程启动前登记运行，确保用户立即停止或退出也能阻止后续分发。
+        // Việc đăng ký một luồng để chạy trước khi nó bắt đầu và đảm bảo rằng người dùng dừng hoặc thoát ngay lập tức cũng có thể ngăn chặn việc phân phối tiếp theo.
         RemoteRunState run = new RemoteRunState("gui-" + System.currentTimeMillis());
         currentRun = run;
         Thread thread = PerformanceThreadFactory.newDaemonThread(
@@ -133,7 +133,7 @@ final class PerformanceRemoteRunControlSupport {
         RemoteRunState run = currentRun;
         stopping.set(true);
         try {
-            // 失败的停止也必须保留；新运行不能掩盖旧 worker 尚未成功停止。
+            // Điểm dừng không thành công cũng phải được giữ lại; những hoạt động mới không thể làm lu mờ những hoạt động cũ worker Việc dừng lại chưa thành công.
             Set<RemoteRunState> runs = new HashSet<>(stoppingRuns);
             if (run != null) {
                 runs.add(run);
@@ -178,7 +178,7 @@ final class PerformanceRemoteRunControlSupport {
             log.error("Remote performance run failed", ex);
             finishFailed(ex, progressLabel, limitLabel);
         } finally {
-            // 保留停止 future，运行线程结束后退出流程仍需等候在途停止请求。
+            // Điểm dừng dành riêng future，Sau khi luồng đang chạy kết thúc, quá trình thoát vẫn cần đợi yêu cầu dừng đang diễn ra.
             run.markFinished();
         }
     }
@@ -186,7 +186,7 @@ final class PerformanceRemoteRunControlSupport {
     private int submitRun(PerformanceRunPlan runPlan,
                           List<PerformanceWorkerEndpoint> workers,
                           RemoteRunState run) throws Exception {
-        // GUI remote 只做 JMeter 风格的控制面分发；plan 中的本地资产路径由用户提前放到每台 worker。
+        // GUI remote Cứ làm đi JMeter phong cách kiểm soát phân phối bề mặt;plan Đường dẫn nội dung cục bộ được người dùng đặt trước trên mỗi thiết bị worker。
         for (PerformanceWorkerEndpoint worker : workers) {
             if (run.isStopRequested()) {
                 return 0;
@@ -208,7 +208,7 @@ final class PerformanceRemoteRunControlSupport {
                         .build());
                 submittedAssignments.add(assignments.get(i));
             } finally {
-                // 先完成提交再发送停止，避免 stop 比 POST /runs 更早到达 worker。
+                // Hoàn thành việc gửi trước rồi gửi dừng để tránh stop So sánh POST /runs Đến sớm hơn worker。
                 run.finishSubmission(worker);
             }
         }
@@ -359,9 +359,9 @@ final class PerformanceRemoteRunControlSupport {
         }
         if (!PerformanceWorkerReportCollector.hasAnyReportData(reports)
                 && PerformanceWorkerReportCollector.hasReportData(lastLiveReport)) {
-            // 远程实时刷新已经拿到过有效报表时，最终 result 偶发空报表不能覆盖用户看到的结果。
+            // Việc làm mới theo thời gian thực từ xa đã được hoàn tất khi nhận được báo cáo hợp lệ result Đôi khi các báo cáo trống không thể ghi đè lên kết quả mà người dùng nhìn thấy.
             reports.add(lastLiveReport);
-            log.warn("使用运行中最后一次有效报表兜底 master 最终报表: runId={}", runId);
+            log.warn("Sử dụng báo cáo hợp lệ cuối cùng trong quá trình chạy để tìm hiểu master Báo cáo cuối cùng: runId={}", runId);
         }
         return PerformanceJsonReportSummaryMapper.merge(runId, "gui-master", status, "GUI", reports);
     }

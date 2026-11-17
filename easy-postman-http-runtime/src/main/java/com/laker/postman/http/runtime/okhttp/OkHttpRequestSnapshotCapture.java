@@ -78,7 +78,7 @@ public class OkHttpRequestSnapshotCapture {
         if (description != null) {
             return new RequestBodySnapshot(description, false);
         }
-        // one-shot/duplex 请求体无法安全重复读取，避免日志预览破坏真实发送。
+        // one-shot/duplex Nội dung yêu cầu không thể được đọc một cách an toàn để ngăn việc xem trước nhật ký hủy quá trình gửi thực tế.
         if (body.isDuplex()) {
             return new RequestBodySnapshot("[duplex request body omitted]", false);
         }
@@ -93,11 +93,11 @@ public class OkHttpRequestSnapshotCapture {
                 body.writeTo(bufferedSink);
                 bufferedSink.flush();
             } catch (BodyPreviewLimitReachedException ignored) {
-                // 只预览前缀，避免大请求体为了日志被完整遍历。
+                // Chỉ xem trước các tiền tố để ngăn chặn việc duyệt hoàn toàn các nội dung yêu cầu lớn để ghi nhật ký.
             }
             return sink.snapshot();
         } catch (Exception e) {
-            return new RequestBodySnapshot("[读取请求体失败: " + e.getMessage() + "]", false);
+            return new RequestBodySnapshot("[Không đọc được nội dung yêu cầu: " + e.getMessage() + "]", false);
         }
     }
 

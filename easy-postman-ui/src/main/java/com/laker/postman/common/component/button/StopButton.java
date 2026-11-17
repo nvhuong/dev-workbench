@@ -9,7 +9,7 @@ import javax.swing.*;
 import java.awt.*;
 
 /**
- * 通用停止按钮，带图标和统一样式。
+ * Nút dừng phổ quát với biểu tượng và phong cách thống nhất.
  */
 public class StopButton extends JButton {
     public StopButton() {

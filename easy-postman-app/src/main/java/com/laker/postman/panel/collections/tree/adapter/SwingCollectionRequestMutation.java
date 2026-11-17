@@ -12,7 +12,7 @@ import java.util.Optional;
 public class SwingCollectionRequestMutation {
 
     /**
-     * 只更新 Swing 树节点里的请求快照；调用方负责持久化和 UI 刷新。
+     * Chỉ cập nhật Swing Ảnh chụp nhanh yêu cầu trong nút cây; người gọi có trách nhiệm kiên trì và UI Làm mới.
      */
     public Optional<Result> updateExistingRequest(DefaultMutableTreeNode rootTreeNode,
                                                   HttpRequestItem editedItem) {

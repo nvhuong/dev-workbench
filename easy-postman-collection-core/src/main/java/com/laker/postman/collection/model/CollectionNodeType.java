@@ -1,7 +1,7 @@
 package com.laker.postman.collection.model;
 
 /**
- * 节点类型枚举
+ * Kiểu liệt kê nút
  */
 public enum CollectionNodeType {
     GROUP,

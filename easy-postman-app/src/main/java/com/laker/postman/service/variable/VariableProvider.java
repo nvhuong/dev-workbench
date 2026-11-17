@@ -5,54 +5,54 @@ import com.laker.postman.variable.VariableType;
 import java.util.Map;
 
 /**
- * 变量提供者接口
+ * Giao diện nhà cung cấp biến
  * <p>
- * 定义了变量提供者的通用行为，所有变量源（执行上下文变量、环境变量、内置函数等）都需要实现此接口
+ * Xác định hành vi chung của các nhà cung cấp biến. Tất cả các nguồn biến (biến ngữ cảnh thực thi, biến môi trường, hàm dựng sẵn, v.v.) cần triển khai giao diện này
  * <p>
- * 设计原则：
+ * Nguyên tắc thiết kế:
  * <ul>
- *   <li>高内聚：每个实现类只负责一种变量源</li>
- *   <li>低耦合：通过接口隔离具体实现</li>
- *   <li>策略模式：可以轻松替换或扩展变量源</li>
+ *   <li>Tính gắn kết cao: Mỗi lớp triển khai chỉ chịu trách nhiệm cho một nguồn biến</li>
+ *   <li>Khớp nối thấp: Tách biệt các triển khai cụ thể thông qua các giao diện</li>
+ *   <li>Mẫu chiến lược: Các nguồn biến đổi có thể dễ dàng thay thế hoặc mở rộng</li>
  * </ul>
  */
 public interface VariableProvider {
 
     /**
-     * 获取变量的值
+     * Lấy giá trị của một biến
      *
-     * @param key 变量名
-     * @return 变量值，不存在则返回 null
+     * @param key tên biến
+     * @return Giá trị biến, trả về nếu không tồn tại null
      */
     String get(String key);
 
     /**
-     * 检查变量是否存在
+     * Kiểm tra xem biến có tồn tại không
      *
-     * @param key 变量名
-     * @return 是否存在
+     * @param key tên biến
+     * @return tồn tại
      */
     boolean has(String key);
 
     /**
-     * 获取所有变量
+     * Nhận tất cả các biến
      *
-     * @return 所有变量的 Map，可能为空但不为 null
+     * @return của tất cả các biến Map，Có thể trống nhưng không null
      */
     Map<String, String> getAll();
 
     /**
-     * 获取变量提供者的优先级
-     * 数值越小优先级越高
+     * Nhận được mức độ ưu tiên của nhà cung cấp biến
+     * Giá trị càng nhỏ thì mức độ ưu tiên càng cao
      *
-     * @return 优先级值
+     * @return giá trị ưu tiên
      */
     int getPriority();
 
     /**
-     * 获取变量提供者的类型
+     * Lấy loại nhà cung cấp biến
      *
-     * @return 变量类型枚举
+     * @return Kiểu liệt kê biến
      */
     VariableType getType();
 }

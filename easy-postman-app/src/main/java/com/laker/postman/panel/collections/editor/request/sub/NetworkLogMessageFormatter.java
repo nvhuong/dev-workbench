@@ -9,10 +9,10 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * 本地化网络日志中由 EasyPostman 生成的固定诊断短语。
+ * Nhật ký web được bản địa hóa bởi EasyPostman Đã sửa lỗi tạo cụm từ chẩn đoán.
  * <p>
- * URL、请求头、Cookie、证书主题、协议值和异常原文等网络数据保持原样；
- * 这里只翻译阶段正文中的固定标签，避免运行时模块直接依赖应用层国际化。
+ * URL、Tiêu đề yêu cầu,Cookie、Dữ liệu mạng như chủ đề chứng chỉ, giá trị giao thức và văn bản ngoại lệ vẫn còn nguyên;
+ * Chỉ các thẻ cố định trong phần nội dung của giai đoạn mới được dịch ở đây để tránh mô-đun thời gian chạy phụ thuộc trực tiếp vào quá trình quốc tế hóa lớp ứng dụng.
  */
 @UtilityClass
 public class NetworkLogMessageFormatter {

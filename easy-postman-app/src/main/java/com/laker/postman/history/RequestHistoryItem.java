@@ -5,7 +5,7 @@ import com.laker.postman.http.runtime.model.PreparedRequest;
 import lombok.Getter;
 
 /**
- * 请求历史项，包含请求和响应的简要信息
+ * Mục lịch sử yêu cầu, chứa thông tin ngắn gọn về các yêu cầu và phản hồi
  */
 @Getter
 public class RequestHistoryItem {

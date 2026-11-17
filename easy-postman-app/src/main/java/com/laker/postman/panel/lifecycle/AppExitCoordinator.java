@@ -19,7 +19,7 @@ public class AppExitCoordinator {
     private boolean exitInProgress;
 
     /**
-     * 显示退出确认对话框，处理未保存内容。
+     * Hiển thị hộp thoại xác nhận thoát để xử lý nội dung chưa được lưu.
      */
     public void exitApplication() {
         if (!SwingUtilities.isEventDispatchThread()) {
@@ -29,14 +29,14 @@ public class AppExitCoordinator {
         if (exitInProgress) {
             return;
         }
-        // 模态保存对话框期间仍可能收到 Quit/窗口关闭事件，避免重复退出流程。
+        // Vẫn có thể được nhận trong hộp thoại lưu phương thức Quit/Sự kiện đóng cửa sổ để tránh quá trình thoát lặp lại.
         exitInProgress = true;
 
-        // 保存所有打开的请求（包括未保存的和已保存的）
+        // Lưu tất cả các yêu cầu đang mở (cả chưa lưu và đã lưu)
         try {
             OpenedRequestTabSessionSaver.saveOpenTabsOnExit();
         } catch (CancelException e) {
-            // 用户取消了保存操作，终止退出
+            // Người dùng đã hủy thao tác lưu và chấm dứt việc thoát
             exitInProgress = false;
             return;
         } catch (RuntimeException e) {
@@ -44,7 +44,7 @@ public class AppExitCoordinator {
             throw e;
         }
 
-        // 保存功能测试配置
+        // Lưu cấu hình kiểm tra chức năng
         try {
             UiSingletonFactory.getExistingInstance(FunctionalPanel.class)
                     .ifPresent(FunctionalPanel::save);
@@ -52,7 +52,7 @@ public class AppExitCoordinator {
             log.error("Failed to save functional test config on exit", e);
         }
 
-        // 保存性能测试配置
+        // Lưu cấu hình kiểm tra hiệu suất
         try {
             UiSingletonFactory.getExistingInstance(PerformancePanel.class)
                     .ifPresent(PerformancePanel::save);
@@ -60,7 +60,7 @@ public class AppExitCoordinator {
             log.error("Failed to save performance test config on exit", e);
         }
 
-        // 所有入口都在确认保存后统一清理；取消退出不会释放仍在使用的面板。
+        // Tất cả các mục sẽ được dọn sạch sau khi xác nhận lưu; việc hủy thoát sẽ không giải phóng các bảng vẫn đang được sử dụng.
         log.info("User chose to exit application");
         MainFrame mainFrame = UiSingletonFactory.getExistingInstance(MainFrame.class).orElse(null);
         if (mainFrame != null) {
@@ -75,7 +75,7 @@ public class AppExitCoordinator {
             }
         }
 
-        // 网络停止请求需要完成后才能退出 JVM，等待放在后台，保持 EDT 可处理事件。
+        // Yêu cầu dừng mạng cần phải được hoàn thành trước khi thoát JVM，Đợi ở chế độ nền và giữ nó EDT Sự kiện có thể được xử lý.
         Thread exitThread = new Thread(() -> {
             try {
                 if (performancePanel != null

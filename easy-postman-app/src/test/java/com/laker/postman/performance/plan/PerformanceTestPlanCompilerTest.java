@@ -32,7 +32,7 @@ import static org.testng.Assert.expectThrows;
 
 public class PerformanceTestPlanCompilerTest {
 
-    @Test(description = "root 编译时只保留 enabled thread group，并跳过 disabled 子节点")
+    @Test(description = "root Chỉ được giữ lại tại thời điểm biên dịch enabled thread group，và bỏ qua disabled nút con")
     public void shouldCompileOnlyEnabledThreadGroupsAndElements() {
         PerformanceTestPlanNode root = new PerformanceTestPlanNode(new PerformanceTreeNode("Plan", NodeType.ROOT));
         root.add(threadGroupNode("disabled group", false));
@@ -52,7 +52,7 @@ public class PerformanceTestPlanCompilerTest {
         assertEquals(((PerformanceTimerElement) groupPlan.getElements().get(0)).getTimerData().delayMs, 20);
     }
 
-    @Test(description = "传入单个 thread group 也应编译成 plan")
+    @Test(description = "Vượt qua trong một duy nhất thread group cũng nên được biên soạn thành plan")
     public void shouldCompileSingleThreadGroupAsPlan() {
         PerformanceTestPlanNode groupNode = threadGroupNode("single group", true);
         groupNode.add(requestNode("request", true, RequestItemProtocolEnum.HTTP));
@@ -64,7 +64,7 @@ public class PerformanceTestPlanCompilerTest {
         assertEquals(plan.getThreadGroups().get(0).getElements().size(), 1);
     }
 
-    @Test(description = "thread group 下的 CSV Data Set 应编译为线程组数据源，不作为执行元素")
+    @Test(description = "thread group Xuống CSV Data Set Nên được biên dịch dưới dạng nguồn dữ liệu nhóm luồng, không phải dưới dạng phần tử thực thi")
     public void shouldCompileCsvDataSetIntoThreadGroupScope() {
         PerformanceTestPlanNode groupNode = threadGroupNode("group", true);
         groupNode.add(csvDataSetNode(
@@ -85,7 +85,7 @@ public class PerformanceTestPlanCompilerTest {
         assertTrue(groupPlan.getElements().get(0) instanceof PerformanceRequestSampler);
     }
 
-    @Test(description = "nested loop、timer、request 应编译成 immutable plan elements")
+    @Test(description = "nested loop、timer、request nên được biên soạn thành immutable plan elements")
     public void shouldCompileNestedLoopTimerAndRequest() {
         PerformanceTestPlanNode groupNode = threadGroupNode("group", true);
         PerformanceTestPlanNode loopNode = loopNode("loop", true, 0);
@@ -103,7 +103,7 @@ public class PerformanceTestPlanCompilerTest {
         assertTrue(loop.getElements().get(1) instanceof PerformanceRequestSampler);
     }
 
-    @Test(description = "request sampler 应保留协议 stage、controller 和 assertion 子元素")
+    @Test(description = "request sampler Thỏa thuận cần được bảo tồn stage、controller và assertion phần tử con")
     public void shouldPreserveProtocolStagesControllersAndAssertions() {
         PerformanceTestPlanNode groupNode = threadGroupNode("group", true);
         PerformanceTestPlanNode requestNode = requestNode("ws request", true, RequestItemProtocolEnum.WEBSOCKET);
@@ -141,7 +141,7 @@ public class PerformanceTestPlanCompilerTest {
         assertEquals(connect.getSsePerformanceData().connectTimeoutMs, 5678);
     }
 
-    @Test(description = "编译应深拷贝 thread group、loop、timer、request、协议阶段、WS data")
+    @Test(description = "Việc biên soạn phải là một bản sao sâu thread group、loop、timer、request、Giai đoạn thỏa thuậnWS data")
     public void shouldDeepCopyAllRuntimeData() {
         PerformanceTestPlanNode groupNode = threadGroupNode("group", true);
         PerformanceTreeNode groupData = (PerformanceTreeNode) groupNode.getUserObject();
@@ -202,7 +202,7 @@ public class PerformanceTestPlanCompilerTest {
         assertEquals(sampler.getWebSocketPerformanceData().connectTimeoutMs, 222);
     }
 
-    @Test(description = "plan 列表和 data getter 不应允许调用方反向修改 plan")
+    @Test(description = "plan danh sách và data getter Không được phép sửa đổi ngược bởi người gọi plan")
     public void shouldExposeImmutablePlanState() {
         PerformanceTestPlanNode groupNode = threadGroupNode("group", true);
         groupNode.add(csvDataSetNode(

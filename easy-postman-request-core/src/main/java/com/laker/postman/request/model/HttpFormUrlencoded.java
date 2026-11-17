@@ -8,7 +8,7 @@ import java.io.Serializable;
 
 /**
  * HTTP Form Urlencoded model with enabled state
- * 用于 application/x-www-form-urlencoded 类型的表单数据
+ * Được sử dụng cho application/x-www-form-urlencoded loại dữ liệu biểu mẫu
  */
 @Data
 @NoArgsConstructor

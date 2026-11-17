@@ -7,7 +7,7 @@ import javax.swing.*;
 import java.awt.*;
 
 /**
- * CSV 数据按钮，带图标和统一样式。
+ * CSV Nút dữ liệu với biểu tượng và phong cách thống nhất.
  */
 public class CSVButton extends JButton {
     public CSVButton() {

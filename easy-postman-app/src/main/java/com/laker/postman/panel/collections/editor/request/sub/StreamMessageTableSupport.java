@@ -44,7 +44,7 @@ final class StreamMessageTableSupport {
     }
 
     static void configureTimeColumn(JTable table, int columnIndex, IntFunction<MessageType> rowTypeProvider) {
-        int headerWidth = headerWidth(table, table.getColumnName(columnIndex), "Time", "时间", "23:59:59.999");
+        int headerWidth = headerWidth(table, table.getColumnName(columnIndex), "Time", "thời gian", "23:59:59.999");
         TableColumn column = table.getColumnModel().getColumn(columnIndex);
         column.setMinWidth(Math.max(118, headerWidth));
         column.setPreferredWidth(Math.max(128, headerWidth));
@@ -56,7 +56,7 @@ final class StreamMessageTableSupport {
     }
 
     static void configureIntervalColumn(JTable table, int columnIndex, IntFunction<MessageType> rowTypeProvider) {
-        int headerWidth = headerWidth(table, table.getColumnName(columnIndex), "Delta", "间隔", "+999 ms", "+14.69 s");
+        int headerWidth = headerWidth(table, table.getColumnName(columnIndex), "Delta", "khoảng thời gian", "+999 ms", "+14.69 s");
         TableColumn column = table.getColumnModel().getColumn(columnIndex);
         column.setMinWidth(Math.max(86, headerWidth));
         column.setPreferredWidth(Math.max(96, headerWidth));
@@ -68,14 +68,14 @@ final class StreamMessageTableSupport {
     }
 
     static void configureContentColumn(JTable table, int columnIndex, int preferredWidth) {
-        int headerWidth = headerWidth(table, table.getColumnName(columnIndex), "Content", "内容");
+        int headerWidth = headerWidth(table, table.getColumnName(columnIndex), "Content", "nội dung");
         TableColumn column = table.getColumnModel().getColumn(columnIndex);
         column.setMinWidth(Math.max(180, headerWidth));
         column.setPreferredWidth(Math.max(preferredWidth, headerWidth));
     }
 
     static void configureAssertionColumn(JTable table, int columnIndex) {
-        int headerWidth = headerWidth(table, table.getColumnName(columnIndex), "Assertion", "断言");
+        int headerWidth = headerWidth(table, table.getColumnName(columnIndex), "Assertion", "khẳng định");
         TableColumn column = table.getColumnModel().getColumn(columnIndex);
         column.setMinWidth(Math.max(96, headerWidth));
         column.setPreferredWidth(Math.max(112, headerWidth));

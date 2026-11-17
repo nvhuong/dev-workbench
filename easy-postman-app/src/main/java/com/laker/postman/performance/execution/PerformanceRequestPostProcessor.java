@@ -73,7 +73,7 @@ final class PerformanceRequestPostProcessor {
             }
         }
         if (!postResult.isSuccess()) {
-            log.error("后置脚本执行失败: {}", postResult.getErrorMessage());
+            log.error("Việc thực thi Postscript không thành công: {}", postResult.getErrorMessage());
             currentErrorMsg = postResult.getErrorMessage();
             currentExecutionFailed = true;
         }

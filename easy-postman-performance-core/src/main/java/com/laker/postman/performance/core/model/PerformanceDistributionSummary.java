@@ -3,7 +3,7 @@ package com.laker.postman.performance.core.model;
 import java.util.concurrent.atomic.LongAdder;
 
 /**
- * 数值分布摘要，对应 Micrometer DistributionSummary 语义，适合记录字节数、消息数等非耗时数量。
+ * Tóm tắt phân phối số, thư từ Micrometer DistributionSummary Ngữ nghĩa, thích hợp để ghi lại số lượng không tốn thời gian như số byte và số lượng tin nhắn.
  */
 final class PerformanceDistributionSummary {
     private final LongAdder count = new LongAdder();

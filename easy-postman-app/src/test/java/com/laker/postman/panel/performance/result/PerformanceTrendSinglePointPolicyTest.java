@@ -14,7 +14,7 @@ public class PerformanceTrendSinglePointPolicyTest {
 
     @Test
     public void shouldShowSingleFiniteSample() {
-        TimeSeries series = new TimeSeries("响应时间");
+        TimeSeries series = new TimeSeries("thời gian đáp ứng");
         series.add(new Millisecond(new Date(1_700_000_000_000L)), 69.0);
         TimeSeriesCollection dataset = new TimeSeriesCollection(series);
 
@@ -23,7 +23,7 @@ public class PerformanceTrendSinglePointPolicyTest {
 
     @Test
     public void shouldHideHistoricalIsolatedPointWhenSeriesAlreadyHasTrendSamples() {
-        TimeSeries series = new TimeSeries("响应时间");
+        TimeSeries series = new TimeSeries("thời gian đáp ứng");
         long base = 1_700_000_000_000L;
         series.add(new Millisecond(new Date(base)), 3_200.0);
         series.add(new Millisecond(new Date(base + 1_000)), null);
@@ -39,7 +39,7 @@ public class PerformanceTrendSinglePointPolicyTest {
 
     @Test
     public void shouldIgnoreEmptySamples() {
-        TimeSeries series = new TimeSeries("响应时间");
+        TimeSeries series = new TimeSeries("thời gian đáp ứng");
         series.add(new Millisecond(new Date(1_700_000_000_000L)), null);
         TimeSeriesCollection dataset = new TimeSeriesCollection(series);
 

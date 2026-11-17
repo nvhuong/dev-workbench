@@ -27,8 +27,8 @@ import java.text.MessageFormat;
 import java.util.List;
 
 /**
- * 现代化客户端证书设置面板
- * 继承 ModernSettingsPanel 获得统一的现代化UI风格
+ * Bảng cài đặt chứng chỉ ứng dụng khách được hiện đại hóa
+ * kế thừa ModernSettingsPanel Nhận được hiện đại hóa thống nhấtUIphong cách
  */
 public class ClientCertificateSettingsPanelModern extends ModernSettingsPanel {
     private static final int SECTION_SPACING = 12;
@@ -51,7 +51,7 @@ public class ClientCertificateSettingsPanelModern extends ModernSettingsPanel {
     protected void buildContent(JPanel contentPanel) {
         pluginInstalled = ClientCertificatePluginAccess.isServiceAvailable();
 
-        // 说明区域
+        // Khu vực mô tả
         JPanel descSection = createDescriptionSection();
         contentPanel.add(descSection);
         contentPanel.add(createVerticalSpace(SECTION_SPACING));
@@ -62,18 +62,18 @@ public class ClientCertificateSettingsPanelModern extends ModernSettingsPanel {
             return;
         }
 
-        // 证书表格区域
+        // Certificate form area
         JPanel tableSection = createModernSection(
                 I18nUtil.getMessage(MessageKeys.CERT_LIST_TITLE),
                 ""
         );
 
-        // 操作按钮栏
+        // Thanh nút hành động
         JPanel actionBar = createActionBar();
         tableSection.add(actionBar);
         tableSection.add(Box.createVerticalStrut(8));
 
-        // 表格
+        // cái bàn
         JScrollPane scrollPane = createTablePanel();
         scrollPane.setAlignmentX(Component.LEFT_ALIGNMENT);
         tableSection.add(scrollPane);
@@ -82,14 +82,14 @@ public class ClientCertificateSettingsPanelModern extends ModernSettingsPanel {
         contentPanel.add(createVerticalSpace(SECTION_SPACING));
 
 
-        // 加载证书数据
+        // Tải dữ liệu chứng chỉ
         loadCertificates();
     }
 
     @Override
     protected void registerListeners() {
-        // 证书设置面板不需要 Save/Apply/Cancel 按钮
-        // 直接隐藏父类的按钮栏
+        // The certificate settings panel is not required Save/Apply/Cancel nút
+        // Trực tiếp ẩn thanh nút của lớp cha
         if (saveBtn != null) saveBtn.setVisible(false);
         if (applyBtn != null) applyBtn.setVisible(false);
         if (cancelBtn != null) {
@@ -123,7 +123,7 @@ public class ClientCertificateSettingsPanelModern extends ModernSettingsPanel {
     }
 
     /**
-     * 创建说明区域
+     * Tạo một khu vực mô tả
      */
     private JPanel createDescriptionSection() {
         JPanel panel = new JPanel();
@@ -166,7 +166,7 @@ public class ClientCertificateSettingsPanelModern extends ModernSettingsPanel {
     }
 
     /**
-     * 创建操作按钮栏
+     * Tạo một thanh nút hành động
      */
     private JPanel createActionBar() {
         JPanel actionBar = new JPanel();
@@ -181,7 +181,7 @@ public class ClientCertificateSettingsPanelModern extends ModernSettingsPanel {
         deleteBtn = createModernButton(I18nUtil.getMessage(MessageKeys.CERT_DELETE), false);
         helpBtn = new JButton(IconUtil.createThemed("icons/help.svg", 16, 16));
         helpBtn.setBorder(new EmptyBorder(0, 0, 0, 0));
-        // 减小按钮尺寸
+        // Giảm kích thước nút
         Dimension btnSize = new Dimension(80, 28);
         addBtn.setPreferredSize(btnSize);
         editBtn.setPreferredSize(btnSize);
@@ -200,7 +200,7 @@ public class ClientCertificateSettingsPanelModern extends ModernSettingsPanel {
     }
 
     /**
-     * 创建表格面板
+     * Tạo một bảng bảng
      */
     private JScrollPane createTablePanel() {
         tableModel = new CertificateTableModel();
@@ -213,49 +213,49 @@ public class ClientCertificateSettingsPanelModern extends ModernSettingsPanel {
         certificateTable.setFont(FontsUtil.getDefaultFontWithOffset(Font.PLAIN, -2));
         ToolWindowSurfaceStyle.applyTableCard(certificateTable);
 
-        // 使用后续列调整模式，让表格填充满可用空间
+        // Sử dụng chế độ thay đổi kích thước cột tiếp theo để điền vào bảng vào khoảng trống có sẵn
         certificateTable.setAutoResizeMode(JTable.AUTO_RESIZE_SUBSEQUENT_COLUMNS);
 
-        // 设置列宽 - 前面几列固定，后面的列自动填充
-        // Enabled 列 - 固定
+        // Đặt chiều rộng cột - Một số cột đầu tiên được cố định và các cột sau sẽ tự động được điền
+        // Enabled cột - đã sửa
         certificateTable.getColumnModel().getColumn(0).setPreferredWidth(70);
         certificateTable.getColumnModel().getColumn(0).setMinWidth(65);
         certificateTable.getColumnModel().getColumn(0).setMaxWidth(80);
 
-        // Name 列 - 固定
+        // Name cột - đã sửa
         certificateTable.getColumnModel().getColumn(1).setPreferredWidth(90);
         certificateTable.getColumnModel().getColumn(1).setMinWidth(70);
         certificateTable.getColumnModel().getColumn(1).setMaxWidth(120);
 
-        // Host 列 - 可变，会自动填充剩余空间
+        // Host cột - Có thể thay đổi, không gian còn lại sẽ được tự động lấp đầy
         certificateTable.getColumnModel().getColumn(2).setPreferredWidth(180);
         certificateTable.getColumnModel().getColumn(2).setMinWidth(100);
 
-        // Port 列 - 固定
+        // Port cột - đã sửa
         certificateTable.getColumnModel().getColumn(3).setPreferredWidth(55);
         certificateTable.getColumnModel().getColumn(3).setMinWidth(50);
         certificateTable.getColumnModel().getColumn(3).setMaxWidth(70);
 
-        // Type 列 - 固定
+        // Type cột - đã sửa
         certificateTable.getColumnModel().getColumn(4).setPreferredWidth(70);
         certificateTable.getColumnModel().getColumn(4).setMinWidth(60);
         certificateTable.getColumnModel().getColumn(4).setMaxWidth(85);
 
-        // 居中显示某些列（但不包括第0列，让它使用默认的Boolean复选框渲染器）
+        // Căn giữa các cột nhất định (nhưng không phải cột 0cột và để nó sử dụng mặc địnhBooleantrình kết xuất hộp kiểm)
         DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
         centerRenderer.setHorizontalAlignment(SwingConstants.CENTER);
-        // 第0列（Enabled）使用默认的Boolean复选框渲染器，不设置自定义渲染器
+        // KHÔNG. 0Cột(Enabled）Sử dụng cái mặc địnhBooleanTrình kết xuất hộp kiểm, không có trình kết xuất tùy chỉnh nào được đặt
         certificateTable.getColumnModel().getColumn(3).setCellRenderer(centerRenderer);
         certificateTable.getColumnModel().getColumn(4).setCellRenderer(centerRenderer);
 
-        // 添加双击编辑监听器
+        // Thêm trình nghe chỉnh sửa nhấp đúp chuột
         certificateTable.addMouseListener(new java.awt.event.MouseAdapter() {
             @Override
             public void mouseClicked(java.awt.event.MouseEvent e) {
                 if (e.getClickCount() == 2) {
                     int row = certificateTable.rowAtPoint(e.getPoint());
                     int col = certificateTable.columnAtPoint(e.getPoint());
-                    // 如果双击的不是启用列（第0列），则打开编辑对话框
+                    // Nếu cột bấm đúp chưa được bật (phần 0cột), hộp thoại chỉnh sửa sẽ mở ra
                     if (row >= 0 && col != 0) {
                         showEditDialog();
                     }
@@ -268,7 +268,7 @@ public class ClientCertificateSettingsPanelModern extends ModernSettingsPanel {
         scrollPane.setPreferredSize(new Dimension(450, 280));
         scrollPane.setMaximumSize(new Dimension(600, 350));
         scrollPane.setMinimumSize(new Dimension(350, 200));
-        // 表格会自动填充空间，不需要横向滚动条
+        // Bảng tự động lấp đầy khoảng trống và không yêu cầu thanh cuộn ngang
         scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
 
@@ -372,7 +372,7 @@ public class ClientCertificateSettingsPanelModern extends ModernSettingsPanel {
     }
 
     /**
-     * 证书表格模型
+     * Certificate form model
      */
     private class CertificateTableModel extends AbstractTableModel {
         private final String[] columnNames = {
@@ -431,7 +431,7 @@ public class ClientCertificateSettingsPanelModern extends ModernSettingsPanel {
 
         @Override
         public boolean isCellEditable(int rowIndex, int columnIndex) {
-            return columnIndex == 0; // 只允许编辑 Enabled 列
+            return columnIndex == 0; // Chỉ được phép chỉnh sửa Enabled cột
         }
 
         @Override
@@ -447,7 +447,7 @@ public class ClientCertificateSettingsPanelModern extends ModernSettingsPanel {
     }
 
     /**
-     * 证书编辑对话框
+     * Certificate editing dialog box
      */
     private static class CertificateEditDialog extends JDialog {
         private final ClientCertificate certificate;
@@ -480,10 +480,10 @@ public class ClientCertificateSettingsPanelModern extends ModernSettingsPanel {
             ToolWindowSurfaceStyle.applyDialogSurface((JPanel) getContentPane());
             ((JPanel) getContentPane()).setBorder(new EmptyBorder(20, 20, 20, 20));
 
-            // 表单面板
+            // Bảng biểu mẫu
             add(createFormPanel(), BorderLayout.CENTER);
 
-            // 按钮面板
+            // Bảng nút
             add(createDialogButtonPanel(), BorderLayout.SOUTH);
 
             setMinimumSize(new Dimension(600, 450));
@@ -498,25 +498,25 @@ public class ClientCertificateSettingsPanelModern extends ModernSettingsPanel {
 
             int row = 0;
 
-            // 名称（可选）
+            // Tên (tùy chọn)
             addFormRow(formPanel, gbc, row++,
                     I18nUtil.getMessage(MessageKeys.CERT_NAME) + ":",
                     nameField = createTextField(30, I18nUtil.getMessage(MessageKeys.CERT_NAME_PLACEHOLDER)),
                     false);
 
-            // 主机名（必填）
+            // Tên máy chủ (bắt buộc)
             addFormRow(formPanel, gbc, row++,
                     I18nUtil.getMessage(MessageKeys.CERT_HOST) + ":",
                     hostField = createTextField(30, I18nUtil.getMessage(MessageKeys.CERT_HOST_PLACEHOLDER)),
                     true);
 
-            // 端口
+            // cổng
             addFormRow(formPanel, gbc, row++,
                     I18nUtil.getMessage(MessageKeys.CERT_PORT) + ":",
                     portField = createTextField(10, I18nUtil.getMessage(MessageKeys.CERT_PORT_PLACEHOLDER)),
                     false);
 
-            // 证书类型
+            // Certificate type
             gbc.gridx = 0;
             gbc.gridy = row;
             gbc.weightx = 0;
@@ -533,7 +533,7 @@ public class ClientCertificateSettingsPanelModern extends ModernSettingsPanel {
             formPanel.add(certTypeCombo, gbc);
             row++;
 
-            // 证书文件（必填）
+            // Certificate file (required)
             gbc.gridx = 0;
             gbc.gridy = row;
             gbc.weightx = 0;
@@ -555,7 +555,7 @@ public class ClientCertificateSettingsPanelModern extends ModernSettingsPanel {
             formPanel.add(certPathBtn, gbc);
             row++;
 
-            // 私钥文件（PEM格式时必填）
+            // Tệp khóa riêng (PEMBắt buộc khi định dạng)
             gbc.gridx = 0;
             gbc.gridy = row;
             gbc.weightx = 0;
@@ -576,7 +576,7 @@ public class ClientCertificateSettingsPanelModern extends ModernSettingsPanel {
             formPanel.add(keyPathBtn, gbc);
             row++;
 
-            // 密码
+            // mật khẩu
             gbc.gridx = 0;
             gbc.gridy = row;
             gbc.weightx = 0;
@@ -589,7 +589,7 @@ public class ClientCertificateSettingsPanelModern extends ModernSettingsPanel {
             formPanel.add(passwordField, gbc);
             row++;
 
-            // 启用
+            // Kích hoạt
             gbc.gridx = 0;
             gbc.gridy = row;
             gbc.weightx = 0;
@@ -678,7 +678,7 @@ public class ClientCertificateSettingsPanelModern extends ModernSettingsPanel {
                     "settings.clientCertificate.file",
                     I18nUtil.getMessage(MessageKeys.CERT_SELECT_FILE));
 
-            // 设置初始目录为当前文本框的文件路径（如果有）
+            // Đặt thư mục ban đầu thành đường dẫn tệp của hộp văn bản hiện tại (nếu có)
             String currentPath = targetField.getText();
             if (currentPath != null && !currentPath.trim().isEmpty()) {
                 File currentFile = new File(currentPath);
@@ -694,7 +694,7 @@ public class ClientCertificateSettingsPanelModern extends ModernSettingsPanel {
         }
 
         private void save() {
-            // 验证主机名
+            // Xác minh tên máy chủ
             String host = hostField.getText().trim();
             if (host.isEmpty()) {
                 showError(I18nUtil.getMessage(MessageKeys.CERT_VALIDATION_HOST_REQUIRED));
@@ -702,7 +702,7 @@ public class ClientCertificateSettingsPanelModern extends ModernSettingsPanel {
                 return;
             }
 
-            // 验证证书文件
+            // Xác minh tệp chứng chỉ
             String certPath = certPathField.getText().trim();
             if (certPath.isEmpty()) {
                 showError(I18nUtil.getMessage(MessageKeys.CERT_VALIDATION_CERT_REQUIRED));
@@ -710,7 +710,7 @@ public class ClientCertificateSettingsPanelModern extends ModernSettingsPanel {
                 return;
             }
 
-            // 验证 PEM 格式需要私钥文件
+            // Xác minh PEM Định dạng này yêu cầu một tệp khóa riêng
             boolean isPEM = I18nUtil.getMessage(MessageKeys.CERT_TYPE_PEM).equals(certTypeCombo.getSelectedItem());
             String keyPath = keyPathField.getText().trim();
             if (isPEM && keyPath.isEmpty()) {
@@ -719,7 +719,7 @@ public class ClientCertificateSettingsPanelModern extends ModernSettingsPanel {
                 return;
             }
 
-            // 验证文件是否存在
+            // Xác minh rằng tập tin tồn tại
             if (!new File(certPath).exists()) {
                 showError(MessageFormat.format(
                         I18nUtil.getMessage(MessageKeys.CERT_VALIDATION_FILE_NOT_FOUND), certPath));
@@ -734,7 +734,7 @@ public class ClientCertificateSettingsPanelModern extends ModernSettingsPanel {
                 return;
             }
 
-            // 保存数据
+            // Lưu dữ liệu
             certificate.setName(nameField.getText().trim());
             certificate.setHost(host);
 

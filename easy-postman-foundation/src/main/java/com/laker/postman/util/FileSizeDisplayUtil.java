@@ -3,17 +3,17 @@ package com.laker.postman.util;
 import lombok.experimental.UtilityClass;
 
 /**
- * 文件大小显示工具类
- * 提供将字节数转换为更友好的显示格式
+ * Lớp công cụ hiển thị kích thước tập tin
+ * Cung cấp chuyển đổi số byte thành định dạng hiển thị thân thiện hơn với người dùng
  */
 @UtilityClass
 public class FileSizeDisplayUtil {
 
     /**
-     * 格式化文件大小显示，自动选择单位，保留两位小数，去除无意义的.00
+     * Hiển thị kích thước tệp được định dạng, tự động chọn đơn vị, giữ lại hai chữ số thập phân và loại bỏ những chữ số vô nghĩa.00
      *
-     * @param sizeBytes 字节数
-     * @return 友好的显示字符串，如 1.23 MB
+     * @param sizeBytes Số byte
+     * @return Các chuỗi hiển thị thân thiện như  1.23 MB
      */
     public static String formatSize(int sizeBytes) {
         return formatSize((long) sizeBytes);
@@ -49,7 +49,7 @@ public class FileSizeDisplayUtil {
     }
 
     /**
-     * 响应体大小的紧凑显示（B / KB 一位小数 / MB 两位小数），响应状态栏、文件概览与历史详情共用。
+     * Hiển thị nhỏ gọn kích thước nội dung phản hồi (B / KB Một chữ số thập phân / MB Hai chữ số thập phân), thanh trạng thái phản hồi, tổng quan về tệp và chi tiết lịch sử được chia sẻ.
      */
     public static String formatCompactSize(long bytes) {
         if (bytes < 1024) {
@@ -62,11 +62,11 @@ public class FileSizeDisplayUtil {
     }
 
     /**
-     * 格式化文件下载进度显示
+     * Tiến trình tải xuống tệp được định dạng được hiển thị
      *
-     * @param totalBytes    已下载字节数
-     * @param contentLength 总字节数
-     * @return 友好的显示字符串
+     * @param totalBytes    Số byte được tải xuống
+     * @param contentLength Tổng số byte
+     * @return Chuỗi hiển thị thân thiện
      */
     public static String formatDownloadSize(int totalBytes, int contentLength) {
         if (contentLength > 0) {

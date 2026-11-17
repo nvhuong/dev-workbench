@@ -139,11 +139,11 @@ public class WorkspaceDetailPanel extends JPanel {
     }
 
     // ──────────────────────────────────────────────────────────────────────────
-    // 交互式路径组件：路径文本 + 复制按钮 + 在文件管理器中打开按钮
+    // Thành phần đường dẫn tương tác: văn bản đường dẫn + Nút sao chép + Nút mở trong trình quản lý tập tin
     // ──────────────────────────────────────────────────────────────────────────
 
     /**
-     * 路径交互组件：路径文本 + 复制按钮 + 在文件管理器中打开按钮，从左向右紧密排列。
+     * Thành phần tương tác đường dẫn: văn bản đường dẫn + Nút sao chép + Các nút Mở trong trình quản lý file được bố trí sát nhau từ trái sang phải.
      */
     private static class PathFieldPanel extends JPanel {
 
@@ -173,7 +173,7 @@ public class WorkspaceDetailPanel extends JPanel {
                 Toolkit.getDefaultToolkit()
                         .getSystemClipboard()
                         .setContents(new StringSelection(path), null);
-                // 临时换绿色 check 图标作为成功反馈
+                // Tạm thời đổi sang màu xanh check biểu tượng như phản hồi thành công
                 btn.setIcon(IconUtil.createColored("icons/check.svg",
                         IconUtil.SIZE_SMALL, IconUtil.SIZE_SMALL, ModernColors.getSuccess()));
                 Timer t = new Timer(1500, ev ->
@@ -210,7 +210,7 @@ public class WorkspaceDetailPanel extends JPanel {
         }
 
         /**
-         * 无边框图标按钮，hover/press 跟随 FlatLaf 主题背景色
+         * Nút biểu tượng không viền,hover/press theo FlatLaf Màu nền chủ đề
          */
         private static JButton makeIconBtn(Icon icon, String tooltip) {
             JButton btn = new JButton(icon);
@@ -223,7 +223,7 @@ public class WorkspaceDetailPanel extends JPanel {
     }
 
     // ──────────────────────────────────────────────────────────────────────────
-    // Git 信息面板
+    // Git Bảng thông tin
     // ──────────────────────────────────────────────────────────────────────────
 
     private JPanel createGitInfoPanel(Workspace workspace) {
@@ -308,7 +308,7 @@ public class WorkspaceDetailPanel extends JPanel {
     }
 
     /**
-     * 向 GridBagLayout 面板追加一行 label + value
+     * Đối với GridBagLayout Bảng điều khiển nối thêm một hàng label + value
      */
     private static void addRow(JPanel panel, int row, String label, String value) {
         JLabel v = new JLabel(value == null ? "" : value);

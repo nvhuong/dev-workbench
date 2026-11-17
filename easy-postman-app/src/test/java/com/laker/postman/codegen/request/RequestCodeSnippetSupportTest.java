@@ -27,7 +27,7 @@ public class RequestCodeSnippetSupportTest {
         item.setUrlencodedList(List.of(
                 new HttpFormUrlencoded(true, "tag", "a%20b"),
                 new HttpFormUrlencoded(true, "tag", "a+b"),
-                new HttpFormUrlencoded(true, "key &=+%20", "中文 ~!*() &="),
+                new HttpFormUrlencoded(true, "key &=+%20", "Tiếng Trung Quốc ~!*() &="),
                 new HttpFormUrlencoded(true, " ", "space key"),
                 new HttpFormUrlencoded(true, "empty", null),
                 new HttpFormUrlencoded(false, "disabled", "hidden"),
@@ -44,7 +44,7 @@ public class RequestCodeSnippetSupportTest {
             decoded.add(URLDecoder.decode(fields[1], StandardCharsets.UTF_8));
         }
         assertEquals(decoded, List.of("tag", "a%20b", "tag", "a+b", "key &=+%20",
-                "中文 ~!*() &=", " ", "space key", "empty", ""));
+                "Tiếng Trung Quốc ~!*() &=", " ", "space key", "empty", ""));
     }
 
     @Test

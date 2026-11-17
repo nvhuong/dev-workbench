@@ -88,7 +88,7 @@ import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 /**
- * 左侧多层级树（用户组-请求-断言-定时器），右侧属性区，底部Tab结果区
+ * Cây đa cấp ở bên trái (nhóm người dùng-yêu cầu-khẳng định-đồng hồ bấm giờ), khu vực thuộc tính bên phải, phía dướiTabKhu vực kết quả
  */
 @Slf4j
 public class PerformancePanel extends UiSingletonPanel {
@@ -112,9 +112,9 @@ public class PerformancePanel extends UiSingletonPanel {
     public static final String WS_CLOSE = "wsClose";
     private JTree performanceTree;
     private DefaultTreeModel treeModel;
-    private JPanel propertyPanel; // 右侧属性区（CardLayout）
+    private JPanel propertyPanel; // Khu vực thuộc tính bên phải (CardLayout）
     private CardLayout propertyCardLayout;
-    private JTabbedPane resultTabbedPane; // 结果Tab
+    private JTabbedPane resultTabbedPane; // kết quảTab
     private ThreadGroupPropertyPanel threadGroupPanel;
     private CsvDataSetPropertyPanel csvDataSetPanel;
     private LoopPropertyPanel loopPanel;
@@ -144,20 +144,20 @@ public class PerformancePanel extends UiSingletonPanel {
     private JButton deletePlanButton;
     private JCheckBox remoteModeCheckBox;
     private JTextField workerEndpointsField;
-    private JCheckBox efficientCheckBox; // 精简明细复选框
-    private JCheckBox trendCheckBox; // 趋势采样开关
-    private JComboBox<String> reportRefreshModeBox; // 报表刷新模式
-    private JLabel progressLabel; // 进度标签
+    private JCheckBox efficientCheckBox; // Hợp lý hóa hộp kiểm chi tiết
+    private JCheckBox trendCheckBox; // Công tắc lấy mẫu xu hướng
+    private JComboBox<String> reportRefreshModeBox; // Chế độ làm mới báo cáo
+    private JLabel progressLabel; // Nhãn tiến độ
     private JLabel limitLabel;
-    private JPanel topPanel; // 顶部工具栏面板，用于主题切换时更新边框
+    private JPanel topPanel; // Bảng thanh công cụ trên cùng được sử dụng để cập nhật đường viền khi chuyển đổi chủ đề
     private long startTime;
     private final transient PerformanceStatsCollector statsCollector = new PerformanceStatsCollector();
     private final transient PerformanceTrendWindowCollector trendWindowCollector = new PerformanceTrendWindowCollector();
 
-    // 定时器管理器 - 统一管理趋势图采样和报表刷新定时器
+    // Người quản lý hẹn giờ - Quản lý thống nhất việc lấy mẫu biểu đồ xu hướng và hẹn giờ làm mới báo cáo
     private transient PerformanceTimerManager timerManager;
 
-    // 精简明细：报表统计完整保留，结果表只保留失败/慢请求详情
+    // Chi tiết được đơn giản hóa: Thống kê báo cáo được giữ lại hoàn toàn và chỉ giữ lại bảng kết quả lỗi/Chi tiết yêu cầu chậm
     private boolean efficientMode = true;
     private boolean trendEnabled = true;
     private boolean reportRealtimeEnabled = false;
@@ -172,10 +172,10 @@ public class PerformancePanel extends UiSingletonPanel {
     private PerformanceResultTablePanel performanceResultTablePanel;
     private PerformanceTrendView performanceTrendPanel;
 
-    // 持久化服务
+    // Dịch vụ kiên trì
     private transient PerformancePersistenceService persistenceService;
 
-    // 当前选中的请求节点
+    // Nút yêu cầu hiện được chọn
     private DefaultMutableTreeNode currentRequestNode;
     private transient PerformanceTreeSupport treeSupport;
     private transient PerformanceRequestSyncSupport requestSyncSupport;
@@ -491,7 +491,7 @@ public class PerformancePanel extends UiSingletonPanel {
             return;
         }
 
-        // 切换 workspace 前取消待保存任务，避免旧性能方案或 CSV 快照延迟写入新 workspace。
+        // chuyển đổi workspace Hủy bỏ các nhiệm vụ đang chờ xử lý trước để tránh các kịch bản hiệu suất cũ hoặc CSV Ảnh chụp trì hoãn viết mới workspace。
         autoSaveSupport.cancel();
         if (running) {
             stopRun();
@@ -972,14 +972,14 @@ public class PerformancePanel extends UiSingletonPanel {
     @Override
     public void updateUI() {
         super.updateUI();
-        // 主题切换时保持工具栏使用无分隔线的卡片内边距。
+        // Giữ các thanh công cụ bằng cách sử dụng phần đệm thẻ mà không có dải phân cách khi chuyển đổi chủ đề.
         if (topPanel != null) {
             PerformancePanelViewFactory.applyToolbarInsets(topPanel);
         }
     }
 
     /**
-     * 选择并定位到第一个Thread Group节点，并触发对应的点击事件
+     * Chọn và nhắm mục tiêu cái đầu tiênThread Groupnút và kích hoạt sự kiện nhấp chuột tương ứng
      */
     private void selectFirstThreadGroup() {
         DefaultMutableTreeNode root = (DefaultMutableTreeNode) treeModel.getRoot();
@@ -989,10 +989,10 @@ public class PerformancePanel extends UiSingletonPanel {
             performanceTree.setSelectionPath(path);
             performanceTree.scrollPathToVisible(path);
 
-            // 触发节点点击事件，确保属性面板显示正确
+            // Kích hoạt sự kiện nhấp vào nút để đảm bảo rằng bảng thuộc tính được hiển thị chính xác
             Object userObj = firstGroup.getUserObject();
             if (userObj instanceof PerformanceTreeNode nodeData && nodeData.type == NodeType.THREAD_GROUP) {
-                // 显示线程组属性面板
+                // Hiển thị bảng thuộc tính nhóm chủ đề
                 propertyCardLayout.show(propertyPanel, THREAD_GROUP);
                 threadGroupPanel.setThreadGroupData(nodeData);
             }
@@ -1043,18 +1043,18 @@ public class PerformancePanel extends UiSingletonPanel {
     }
 
     /**
-     * 设置 Ctrl/Cmd+S 快捷键保存所有配置
+     * cài đặt Ctrl/Cmd+S Phím tắt lưu tất cả các cấu hình
      */
     private void setupSaveShortcut() {
         saveShortcutSupport.install(this, this::handleSaveShortcut);
     }
 
     /**
-     * 处理 Ctrl/Cmd+S 快捷键
-     * 1. 强制提交所有 EasyJSpinner 的值
-     * 2. 保存所有属性面板数据到树节点
-     * 3. 持久化到文件
-     * 4. 显示成功提示
+     * xử lý Ctrl/Cmd+S phím tắt
+     * 1. Buộc nộp tất cả EasyJSpinner giá trị
+     * 2. Lưu tất cả dữ liệu bảng thuộc tính vào các nút cây
+     * 3. Kiên trì nộp hồ sơ
+     * 4. Hiển thị lời nhắc thành công
      */
     private void handleSaveShortcut() {
         autoSaveSupport.cancel();
@@ -1216,16 +1216,16 @@ public class PerformancePanel extends UiSingletonPanel {
         saveConfig();
     }
 
-    // ========== 定时器管理 ==========
+    // ========== Quản lý hẹn giờ ==========
 
     /**
-     * 初始化定时器管理器
+     * Khởi tạo trình quản lý hẹn giờ
      */
     private void initTimerManager() {
         timerManager = new PerformanceTimerManager(() -> running);
     }
 
-    // ========== 执行与停止核心逻辑 ==========
+    // ========== Thực thi và dừng logic cốt lõi ==========
     private void startRun(JLabel progressLabel, JLabel limitLabel) {
         if (isRemoteExecutionSelected()) {
             startRemoteRun(progressLabel, limitLabel);
@@ -1294,7 +1294,7 @@ public class PerformancePanel extends UiSingletonPanel {
             performanceReportPanel.setReportContext(runPlan,
                     runPlan.getEnvironment() == null ? "" : runPlan.getEnvironment().getName());
             if (timerManager != null) {
-                // 远程执行由 worker 轮询刷新趋势和报表，停掉本地 stats 定时器，避免空本地快照覆盖 master 报表。
+                // Thực thi từ xa bằng worker Thăm dò ý kiến ​​để làm mới xu hướng và báo cáo, dừng cục bộ stats Hẹn giờ để tránh ghi đè ảnh chụp nhanh cục bộ trống master Báo cáo.
                 timerManager.stopAll();
             }
             runThread = remoteRunControlSupport.startRun(runPlan, workers, progressLabel, limitLabel);
@@ -1369,17 +1369,17 @@ public class PerformancePanel extends UiSingletonPanel {
     }
 
     /**
-     * 保存当前配置
+     * Lưu cấu hình hiện tại
      */
     private void saveConfig() {
-        // 树节点编辑和属性面板变化都会触发保存，统一防抖减少频繁写盘。
+        // Việc chỉnh sửa nút cây và các thay đổi trong bảng thuộc tính sẽ kích hoạt quá trình lưu và tính năng chống rung thống nhất giúp giảm việc ghi đĩa thường xuyên.
         syncTrendAvailableProtocols();
         autoSaveSupport.requestSave();
     }
 
     private void saveConfigAsync() {
         try {
-            // 保存所有属性面板数据到树节点
+            // Lưu tất cả dữ liệu bảng thuộc tính vào các nút cây
             saveAllPropertyPanelData();
             syncTrendAvailableProtocols();
             persistenceService.saveWorkspaceAsync(currentWorkspaceSnapshot());
@@ -1389,7 +1389,7 @@ public class PerformancePanel extends UiSingletonPanel {
     }
 
     /**
-     * 保存性能测试配置（供外部调用，如退出时）
+     * Lưu cấu hình kiểm tra hiệu năng (đối với các cuộc gọi bên ngoài, chẳng hạn như khi thoát)
      */
     public void save() {
         try {
@@ -1406,10 +1406,10 @@ public class PerformancePanel extends UiSingletonPanel {
     }
 
     /**
-     * 同步最新的 HttpRequestItem 到性能测试树中对应的节点（由 Collections 保存时调用）
-     * 避免用户在 editSubPanel 修改并保存后，PerformancePanel 仍持有旧数据。
+     * Đồng bộ hóa mới nhất HttpRequestItem tới nút tương ứng trong cây kiểm tra hiệu năng (by Collections được gọi khi lưu)
+     * Tránh người dùng editSubPanel Sau khi sửa đổi và lưu,PerformancePanel Dữ liệu cũ vẫn được giữ lại.
      *
-     * @param item 已保存的最新请求数据
+     * @param item Dữ liệu yêu cầu đã lưu mới nhất
      */
     public void syncRequestItem(HttpRequestItem item) {
         requestSyncSupport.syncRequestItem(
@@ -1421,11 +1421,11 @@ public class PerformancePanel extends UiSingletonPanel {
     }
 
     /**
-     * 清理资源（应用退出时调用）
-     * 确保定时器被正确停止，避免资源泄漏
+     * Dọn dẹp tài nguyên (được gọi khi thoát ứng dụng)
+     * Đảm bảo bộ hẹn giờ được dừng chính xác để tránh rò rỉ tài nguyên
      */
     public void cleanup() {
-        // 1. 停止运行中的测试
+        // 1. Dừng chạy thử nghiệm
         if (remoteRunControlSupport != null) {
             remoteRunControlSupport.stopRun();
         }
@@ -1433,7 +1433,7 @@ public class PerformancePanel extends UiSingletonPanel {
             runControlSupport.stopRun();
         }
 
-        // 2. 停止定时器
+        // 2. Dừng đồng hồ bấm giờ
         if (timerManager != null) {
             timerManager.stopAll();
             timerManager.dispose();
@@ -1447,7 +1447,7 @@ public class PerformancePanel extends UiSingletonPanel {
     }
 
     /**
-     * 在后台等待所有远程 worker 的停止请求完成，共用一个退出超时预算。
+     * Chờ tất cả các điều khiển từ xa ở chế độ nền worker Các yêu cầu dừng đã hoàn thành chia sẻ ngân sách hết thời gian chờ thoát chung.
      */
     public boolean awaitRemoteStopOnExit(long timeout, TimeUnit unit)
             throws InterruptedException {
@@ -1533,8 +1533,8 @@ public class PerformancePanel extends UiSingletonPanel {
     }
 
     /**
-     * 从集合中刷新请求数据
-     * 重新加载所有请求的最新配置
+     * Làm mới dữ liệu yêu cầu từ bộ sưu tập
+     * Tải lại cấu hình mới nhất cho tất cả các yêu cầu
      */
     private void refreshRequestsFromCollections() {
         currentRequestNode = requestSyncSupport.refreshRequestsFromCollections(

@@ -9,9 +9,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * 响应区域 Tab 导航控制器。
+ * khu vực phản hồi Tab Bộ điều khiển điều hướng.
  * <p>
- * 负责按钮选中态、横向布局下拉框、HTTP 响应视图动态切换；ResponsePanel 只保留响应内容编排。
+ * Chịu trách nhiệm về trạng thái lựa chọn nút và bố cục theo chiều ngang của hộp thả xuống.HTTP Đáp ứng việc chuyển đổi quan điểm năng động;ResponsePanel Chỉ có bố cục nội dung đáp ứng được giữ lại.
  */
 @RequiredArgsConstructor
 final class ResponseTabNavigationController {

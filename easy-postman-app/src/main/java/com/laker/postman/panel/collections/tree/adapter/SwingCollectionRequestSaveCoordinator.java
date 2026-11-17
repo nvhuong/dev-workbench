@@ -10,9 +10,9 @@ import java.util.Objects;
 import java.util.Optional;
 
 /**
- * Swing 集合树的保存协调器。
- * 核心点：这里允许操作 DefaultMutableTreeNode，但只作为 Swing 适配层使用；
- * 真正无 UI 的集合读写继续走 CollectionDocument，避免领域层再次依赖 Swing。
+ * Swing Lưu điều phối viên cho cây thu thập.
+ * Điểm cốt lõi: Hoạt động được cho phép ở đây DefaultMutableTreeNode，Nhưng chỉ như Swing Sử dụng lớp thích ứng;
+ * Thực sự không có UI Việc sưu tầm đọc và viết vẫn tiếp tục CollectionDocument，Tránh phụ thuộc lớp miền một lần nữa Swing。
  */
 public final class SwingCollectionRequestSaveCoordinator {
     private final DefaultMutableTreeNode rootTreeNode;

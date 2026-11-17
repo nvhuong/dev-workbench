@@ -57,7 +57,7 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * 历史记录面板
+ * Bảng lịch sử
  */
 public class HistoryPanel extends UiSingletonPanel {
     private static final int HISTORY_SIDEBAR_WIDTH = AppToolWindowChrome.DEFAULT_SIDE_WIDTH;
@@ -393,8 +393,8 @@ public class HistoryPanel extends UiSingletonPanel {
     }
 
     /**
-     * 列表项渲染器。
-     * 分组显示日期，条目显示状态码、耗时和时间，避免历史列表只剩 URL。
+     * Trình kết xuất mục danh sách.
+     * Ngày được hiển thị theo nhóm và các mục hiển thị mã trạng thái, thời gian đã trôi qua và thời gian để tránh chỉ để lại danh sách lịch sử URL。
      */
     private class OptimizedHistoryListCellRenderer implements ListCellRenderer<Object> {
         private final Font boldFont;
@@ -573,7 +573,7 @@ public class HistoryPanel extends UiSingletonPanel {
                     String errorHtml = "<html><body style='font-family:monospace;font-size:9px;color:"
                             + ModernColors.toHtmlColor(ModernColors.getTextPrimary()) + ";'>"
                             + "<div style='color:" + ModernColors.toHtmlColor(ModernColors.getError())
-                            + ";'>渲染详情时出错: " + escapeHtml(e.getMessage()) + "</div>"
+                            + ";'>Đã xảy ra lỗi khi hiển thị chi tiết: " + escapeHtml(e.getMessage()) + "</div>"
                             + "</body></html>";
                     htmlMap.put("error", errorHtml);
                 }

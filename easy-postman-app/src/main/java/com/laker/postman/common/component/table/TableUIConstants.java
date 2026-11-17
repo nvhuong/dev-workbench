@@ -8,62 +8,62 @@ import javax.swing.text.JTextComponent;
 import java.awt.*;
 
 /**
- * 表格UI常量类
- * 集中管理表格相关的UI常量，便于统一修改和维护
- * 支持亮色和暗色主题自适应
+ * cái bànUILớp liên tục
+ * Quản lý tập trung các biểu mẫu liên quanUICác hằng số tạo điều kiện thuận lợi cho việc sửa đổi và bảo trì thống nhất
+ * Hỗ trợ thích ứng chủ đề sáng và tối
  */
 public class TableUIConstants {
-    // 文本常量
+    // Văn bản không đổi
     public static final String SELECT_FILE_TEXT = "Select File";
     public static final String FILE_TYPE = "File";
 
-    // 图标大小
+    // Kích thước biểu tượng
     public static final int ICON_SIZE = 14;
 
-    // 边距
+    // Lề
     public static final int PADDING_LEFT = 8;
     public static final int PADDING_RIGHT = 8;
     public static final int PADDING_TOP = 2;
     public static final int PADDING_BOTTOM = 2;
 
     /**
-     * 获取边框颜色 - 主题适配
+     * Lấy màu đường viền - Chuyển thể chủ đề
      */
     public static Color getBorderColor() {
         return ModernColors.getTableGridColor();
     }
 
     /**
-     * 获取悬停颜色 - 主题适配
+     * Lấy màu di chuột - Chuyển thể chủ đề
      */
     public static Color getHoverColor() {
         return ModernColors.getHoverBackgroundColor();
     }
 
     /**
-     * 获取文件按钮文字颜色 - 主题适配
+     * Lấy màu văn bản của nút tập tin - Chuyển thể chủ đề
      */
     public static Color getFileButtonTextColor() {
-        // 主题色在两种模式下都保持一致
+        // Màu sắc chủ đề vẫn nhất quán ở cả hai chế độ
         return ModernColors.getPrimary();
     }
 
     /**
-     * 获取文件选中文字颜色 - 主题适配
+     * Lấy màu văn bản đã chọn của tập tin - Chuyển thể chủ đề
      */
     public static Color getFileSelectedTextColor() {
         return ModernColors.getPrimaryLight();
     }
 
     /**
-     * 获取文件空状态文字颜色 - 主题适配
+     * Lấy màu văn bản trạng thái trống của tập tin - Chuyển thể chủ đề
      */
     public static Color getFileEmptyTextColor() {
         return ModernColors.getTextHint();
     }
 
     /**
-     * 创建标准按钮边框
+     * Tạo đường viền nút tiêu chuẩn
      */
     public static Border createButtonBorder() {
         return BorderFactory.createCompoundBorder(
@@ -73,7 +73,7 @@ public class TableUIConstants {
     }
 
     /**
-     * 创建标准标签边框
+     * Tạo đường viền nhãn tiêu chuẩn
      */
     public static Border createLabelBorder() {
         return BorderFactory.createEmptyBorder(
@@ -81,8 +81,8 @@ public class TableUIConstants {
     }
 
     /**
-     * 创建表格编辑态外框。
-     * 直接返回编辑器组件时使用，替代 FlatTextField 默认 focus/underline 效果。
+     * Tạo khung trạng thái chỉnh sửa biểu mẫu.
+     * Thay vào đó, được sử dụng khi trả về trực tiếp thành phần soạn thảo FlatTextField Mặc định focus/underline Tác dụng.
      */
     public static Border createCellEditorBorder() {
         return BorderFactory.createCompoundBorder(
@@ -92,15 +92,15 @@ public class TableUIConstants {
     }
 
     /**
-     * 创建容器内部输入组件的内边距。
+     * Tạo phần đệm cho thành phần đầu vào bên trong vùng chứa.
      */
     public static Border createCellEditorInnerBorder() {
         return BorderFactory.createEmptyBorder(0, PADDING_LEFT, 0, PADDING_RIGHT);
     }
 
     /**
-     * 创建 form-data Key/Type 分组表头边框。
-     * 该表头是表格结构强调，不应在具体面板里散落 legacy Swing border 组合。
+     * Tạo form-data Key/Type Đường viền tiêu đề nhóm.
+     * Tiêu đề là điểm nhấn của cấu trúc bảng và không nên nằm rải rác trong bảng điều khiển thực tế legacy Swing border sự kết hợp.
      */
     public static Border createFormDataGroupedHeaderBorder(Color gridColor,
                                                           boolean rightBoundary,
@@ -113,7 +113,7 @@ public class TableUIConstants {
     }
 
     /**
-     * 获取指定行的非选中背景色，保持编辑态和渲染态斑马纹一致。
+     * Lấy màu nền chưa được chọn của hàng được chỉ định, giữ cho mẫu ngựa vằn nhất quán giữa trạng thái chỉnh sửa và trạng thái hiển thị.
      */
     public static Color getRowBackground(JTable table, int row) {
         Color base = table.getBackground();
@@ -121,7 +121,7 @@ public class TableUIConstants {
     }
 
     /**
-     * 获取指定单元格背景色，包含选中、悬停、空值和斑马纹状态。
+     * Lấy màu nền của ô được chỉ định, bao gồm các trạng thái đã chọn, di chuột, null và ngựa vằn.
      */
     public static Color getCellBackground(boolean isSelected, boolean isHovered, boolean isEmpty,
                                           JTable table, int row) {
@@ -139,21 +139,21 @@ public class TableUIConstants {
     }
 
     /**
-     * 编辑器直接作为 cell editor 返回时使用。
+     * Trình chỉnh sửa hoạt động trực tiếp như  cell editor Được sử dụng khi trở về.
      */
     public static void styleTextCellEditor(JTextComponent editor, JTable table, int row) {
         styleTextCellEditor(editor, table, row, createCellEditorBorder());
     }
 
     /**
-     * 编辑器放在带外框的容器内时使用。
+     * Được sử dụng khi trình soạn thảo được đặt bên trong một khung chứa.
      */
     public static void styleContainedTextCellEditor(JTextComponent editor, JTable table, int row) {
         styleTextCellEditor(editor, table, row, createCellEditorInnerBorder());
     }
 
     /**
-     * 容器型 cell editor 使用，例如智能多行 editor 和文件 editor。
+     * Loại thùng chứa cell editor Ví dụ, sử dụng multiline thông minh editor và tài liệu editor。
      */
     public static void styleCellEditorContainer(JComponent container, JTable table, int row) {
         Color background = getRowBackground(table, row);
@@ -163,7 +163,7 @@ public class TableUIConstants {
     }
 
     /**
-     * JScrollPane 放在 cell editor 内部时，需要同步 viewport 背景，否则暗色主题会露白。
+     * JScrollPane Mặc nó vào cell editor Trong nội bộ, cần phải đồng bộ hóa viewport nền, nếu không chủ đề tối sẽ hiển thị.
      */
     public static void styleEditorScrollPane(JScrollPane scrollPane, JTable table, int row) {
         Color background = getRowBackground(table, row);
@@ -189,7 +189,7 @@ public class TableUIConstants {
     }
 
     /**
-     * 获取单元格背景色
+     * Lấy màu nền của ô
      */
     public static Color getCellBackground(boolean isSelected, boolean isHovered, boolean isEmpty,
                                           JTable table) {

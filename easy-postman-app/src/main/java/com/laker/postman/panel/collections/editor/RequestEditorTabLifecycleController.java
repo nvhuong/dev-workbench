@@ -11,9 +11,9 @@ import javax.swing.*;
 import java.util.function.BooleanSupplier;
 
 /**
- * 请求编辑器 Tab 生命周期控制器。
+ * Request an editor Tab Bộ điều khiển vòng đời.
  * <p>
- * 新建请求 Tab、维护末尾 +Tab 这些行为不属于面板布局本身，集中后更容易确认 Tab 顺序规则。
+ * Tạo một yêu cầu mới Tab、Kết thúc bảo trì +Tab Bản thân những hành vi này không phải là một phần của bố cục bảng điều khiển và dễ xác nhận hơn khi được tập trung hóa Tab Quy tắc trình tự.
  */
 @RequiredArgsConstructor
 final class RequestEditorTabLifecycleController {

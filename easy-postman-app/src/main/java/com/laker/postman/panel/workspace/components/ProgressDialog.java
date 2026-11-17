@@ -12,8 +12,8 @@ import java.awt.event.ActionEvent;
 import java.util.concurrent.ExecutionException;
 
 /**
- * 带进度显示的对话框基类
- * 提供通用的进度显示、按钮控制等功能
+ * Lớp cơ sở hộp thoại có hiển thị tiến trình
+ * Cung cấp hiển thị tiến trình chung, điều khiển nút và các chức năng khác
  */
 public abstract class ProgressDialog extends JDialog {
 
@@ -32,7 +32,7 @@ public abstract class ProgressDialog extends JDialog {
     }
 
     /**
-     * 初始化对话框
+     * Khởi tạo hộp thoại
      */
     protected void initDialog() {
         ToolWindowSurfaceStyle.applyDialogWindowChrome(this);
@@ -43,43 +43,43 @@ public abstract class ProgressDialog extends JDialog {
     }
 
     /**
-     * 设置布局 - 子类需要实现
+     * Đặt bố cục - Các lớp con cần được thực hiện
      */
     protected abstract void setupLayout();
 
     /**
-     * 设置事件处理器 - 子类需要实现
+     * Đặt trình xử lý sự kiện - Các lớp con cần được thực hiện
      */
     protected abstract void setupEventHandlers();
 
     /**
-     * 验证输入 - 子类需要实现
+     * Xác thực đầu vào - Các lớp con cần được thực hiện
      */
     protected abstract void validateInput() throws IllegalArgumentException;
 
     /**
-     * 获取操作任务 - 子类需要实现
+     * Nhận nhiệm vụ vận hành - Các lớp con cần được thực hiện
      *
-     * @return 返回一个SwingWorker来执行后台任务
+     * @return Trả lại một cáiSwingWorkerđể thực hiện các tác vụ nền
      */
     protected abstract SwingWorker<Void, String> createWorkerTask();
 
     /**
-     * 操作成功后的处理 - 子类可以重写
+     * Xử lý sau khi vận hành thành công - Các lớp con có thể ghi đè
      */
     protected void onOperationSuccess() {
         confirmed = true;
         progressPanel.setProgressText(I18nUtil.getMessage(MessageKeys.PROGRESS_DIALOG_OPERATION_SUCCESS));
         progressPanel.getStatusLabel().setText(I18nUtil.getMessage(MessageKeys.PROGRESS_DIALOG_OPERATION_COMPLETED_CLOSING));
 
-        // 延迟关闭对话框
+        // Trì hoãn việc đóng hộp thoại
         Timer timer = new Timer(1000, e -> dispose());
         timer.setRepeats(false);
         timer.start();
     }
 
     /**
-     * 操作失败后的处理 - 子类可以重写
+     * Phải làm gì sau khi một hoạt động thất bại - Các lớp con có thể ghi đè
      */
     protected void onOperationFailure(Exception e) {
         operationInProgress = false;
@@ -96,12 +96,12 @@ public abstract class ProgressDialog extends JDialog {
     }
 
     /**
-     * 设置输入组件启用状态 - 子类需要实现
+     * Đặt trạng thái kích hoạt thành phần đầu vào - Các lớp con cần được thực hiện
      */
     protected abstract void setInputComponentsEnabled(boolean enabled);
 
     /**
-     * 创建标准按钮面板
+     * Tạo một bảng nút tiêu chuẩn
      */
     protected JPanel createStandardButtonPanel(String confirmText) {
         JPanel panel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 0));
@@ -116,14 +116,14 @@ public abstract class ProgressDialog extends JDialog {
         panel.add(cancelButton);
         panel.add(confirmButton);
 
-        // 设置默认按钮
+        // Đặt nút mặc định
         getRootPane().setDefaultButton(confirmButton);
 
         return panel;
     }
 
     /**
-     * 处理取消操作
+     * Xử lý các hoạt động hủy bỏ
      */
     private void handleCancel(ActionEvent e) {
         if (operationInProgress) {
@@ -144,7 +144,7 @@ public abstract class ProgressDialog extends JDialog {
     }
 
     /**
-     * 取消当前操作
+     * Hủy thao tác hiện tại
      */
     private void cancelCurrentOperation() {
         if (currentWorker != null && !currentWorker.isDone()) {
@@ -153,7 +153,7 @@ public abstract class ProgressDialog extends JDialog {
     }
 
     /**
-     * 处理确认操作
+     * Xử lý các hoạt động xác nhận
      */
     private void handleConfirm(ActionEvent e) {
         try {
@@ -167,31 +167,31 @@ public abstract class ProgressDialog extends JDialog {
     }
 
     /**
-     * 显示进度并开始操作
+     * Hiển thị tiến trình và bắt đầu hoạt động
      */
     private void showProgressAndStartOperation() {
-        // 切换界面状态
+        // Chuyển trạng thái giao diện
         operationInProgress = true;
         progressPanel.setVisible(true);
         confirmButton.setEnabled(false);
 
-        // 禁用所有输入组件
+        // Vô hiệu hóa tất cả các thành phần đầu vào
         setInputComponentsEnabled(false);
 
-        // 重新调整窗口大小
+        // Thay đổi kích thước cửa sổ
         pack();
 
-        // 创建并执行后台任务
+        // Tạo và thực hiện các tác vụ nền
         currentWorker = createWorkerTask();
 
-        // 监听进度变化
+        // Theo dõi những thay đổi tiến độ
         currentWorker.addPropertyChangeListener(evt -> {
             if ("progress".equals(evt.getPropertyName())) {
                 progressPanel.getProgressBar().setValue((Integer) evt.getNewValue());
             }
         });
 
-        // 设置进度更新处理器
+        // Đặt trình xử lý cập nhật tiến trình
         currentWorker.addPropertyChangeListener(evt -> {
             if ("state".equals(evt.getPropertyName()) &&
                     SwingWorker.StateValue.DONE == evt.getNewValue()) {
@@ -203,14 +203,14 @@ public abstract class ProgressDialog extends JDialog {
     }
 
     /**
-     * 处理Worker完成事件
+     * xử lýWorkerSự kiện hoàn chỉnh
      */
     private void handleWorkerCompletion() {
         try {
-            currentWorker.get(); // 检查是否有异常
+            currentWorker.get(); // Kiểm tra xem có bất thường gì không
             onOperationSuccess();
         } catch (ExecutionException ex) {
-            // ExecutionException包装了实际的异常
+            // ExecutionExceptionBao bọc ngoại lệ thực tế
             Throwable cause = ex.getCause();
             if (cause instanceof RuntimeException) {
                 onOperationFailure((RuntimeException) cause);
@@ -218,14 +218,14 @@ public abstract class ProgressDialog extends JDialog {
                 onOperationFailure(new RuntimeException(cause));
             }
         } catch (InterruptedException ex) {
-            // 处理中断异常
-            Thread.currentThread().interrupt(); // 重新设置中断状态
+            // Xử lý các ngoại lệ ngắt
+            Thread.currentThread().interrupt(); // Đặt lại trạng thái ngắt
             onOperationFailure(new RuntimeException(I18nUtil.getMessage(MessageKeys.GIT_DIALOG_USER_CANCELLED), ex));
         }
     }
 
     /**
-     * 显示错误对话框
+     * Hiển thị hộp thoại báo lỗi
      */
     protected void showError(String message) {
         JOptionPane.showMessageDialog(
@@ -238,7 +238,7 @@ public abstract class ProgressDialog extends JDialog {
 
     @Override
     public void dispose() {
-        // 确保清理资源
+        // Đảm bảo dọn sạch tài nguyên
         cancelCurrentOperation();
         super.dispose();
     }

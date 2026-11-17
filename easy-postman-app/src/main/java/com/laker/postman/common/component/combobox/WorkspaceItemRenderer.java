@@ -6,7 +6,7 @@ import javax.swing.*;
 import java.awt.*;
 
 /**
- * 工作区下拉框的渲染器
+ * Trình kết xuất cho menu thả xuống của không gian làm việc
  */
 public class WorkspaceItemRenderer extends DefaultListCellRenderer {
     @Override
@@ -15,7 +15,7 @@ public class WorkspaceItemRenderer extends DefaultListCellRenderer {
 
         if (value instanceof Workspace workspace) {
             label.setText(workspace.getName());
-            // 如果名称太长，使用tooltip显示完整名称
+            // Nếu tên quá dài, hãy sử dụng tooltipHiển thị tên đầy đủ
             if (workspace.getName().length() > 15) {
                 label.setToolTipText(workspace.getName());
             }

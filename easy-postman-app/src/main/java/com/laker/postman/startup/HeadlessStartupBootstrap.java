@@ -16,7 +16,7 @@ public class HeadlessStartupBootstrap {
             if (PluginRuntime.isInitialized()) {
                 return;
             }
-            // Headless 命令只需要插件脚本扩展，不启动 app IOC，避免把工作区/GUI bean 扫描带入 CLI/worker。
+            // Headless Lệnh chỉ yêu cầu phần mở rộng tập lệnh plugin, không yêu cầu khởi động app IOC，Tránh rời khỏi khu vực làm việc/GUI bean Quét và mang vào CLI/worker。
             PluginRuntime.getRegistry().registerService(
                     RequestCollectionImportService.class,
                     new HeadlessRequestCollectionImportService()

@@ -5,10 +5,10 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * 显式脚本执行上下文。
+ * Bối cảnh thực thi tập lệnh rõ ràng.
  * <p>
- * 将一次请求/一次运行需要共享的 execution variables 与 iteration data
- * 从线程本身解耦，方便在跨线程回调场景中显式复用。
+ * Sẽ được yêu cầu một lần/Một lần chạy cần được chia sẻ execution variables Và iteration data
+ * Việc tách khỏi chính luồng sẽ tạo điều kiện thuận lợi cho việc tái sử dụng rõ ràng trong các tình huống gọi lại đa luồng.
  */
 public class ExecutionVariableContext {
 

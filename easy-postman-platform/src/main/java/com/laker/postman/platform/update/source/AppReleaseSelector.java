@@ -10,7 +10,7 @@ import java.util.Comparator;
 import java.util.List;
 
 /**
- * 只选择宿主应用正式版 release，排除插件 release、草稿和预发布。
+ * Chỉ chọn phiên bản chính thức của ứng dụng máy chủ release，Loại trừ các plugin release、Bản nháp và phát hành trước.
  */
 final class AppReleaseSelector {
 

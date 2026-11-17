@@ -27,7 +27,7 @@ import static org.testng.Assert.*;
 
 public class FunctionalPersistenceServiceTest {
 
-    @Test(description = "退出同步保存必须等待旧的异步保存，最终文件保留最新功能测试配置")
+    @Test(description = "Việc thoát khỏi quá trình lưu đồng bộ phải đợi lưu không đồng bộ cũ và tệp cuối cùng vẫn giữ nguyên cấu hình kiểm tra chức năng mới nhất")
     public void synchronousSaveShouldFollowQueuedAsyncSave() throws Exception {
         Path configPath = Files.createTempDirectory("functional-final-save").resolve("functional_config.json");
         TestableFunctionalPersistenceService service = new TestableFunctionalPersistenceService(configPath);
@@ -37,7 +37,7 @@ public class FunctionalPersistenceServiceTest {
         assertEquals(service.loadSnapshot().getRows().get(0).getRequestId(), "latest");
     }
 
-    @Test(description = "清空配置必须排在已经调度的自动保存之后，不能被旧保存重建")
+    @Test(description = "Việc xóa cấu hình phải được lên lịch sau khi tự động lưu theo lịch trình và không thể được xây dựng lại bằng cách lưu cũ")
     public void clearShouldFollowQueuedAsyncSave() throws Exception {
         Path configPath = Files.createTempDirectory("functional-final-clear").resolve("functional_config.json");
         TestableFunctionalPersistenceService service = new TestableFunctionalPersistenceService(configPath);
@@ -47,7 +47,7 @@ public class FunctionalPersistenceServiceTest {
         assertFalse(Files.exists(configPath));
     }
 
-    @Test(description = "功能测试配置路径应跟随当前工作区，便于 Git 工作区同步")
+    @Test(description = "Đường dẫn cấu hình kiểm tra chức năng phải tuân theo không gian làm việc hiện tại để thuận tiện Git Đồng bộ hóa không gian làm việc")
     public void shouldResolveConfigPathFromCurrentWorkspace() throws IOException {
         Path workspaceDir = Files.createTempDirectory("functional-workspace-path");
         Workspace workspace = new Workspace();
@@ -58,7 +58,7 @@ public class FunctionalPersistenceServiceTest {
         assertEquals(service.getConfigFilePath(), workspaceDir.resolve("functional_config.json"));
     }
 
-    @Test(description = "保存功能测试配置时应真实写入当前工作区，便于 Git 同步")
+    @Test(description = "Khi lưu cấu hình kiểm tra chức năng, không gian làm việc hiện tại phải được ghi thực sự để thuận tiện Git đồng bộ")
     public void shouldSaveConfigFileIntoCurrentWorkspace() throws IOException {
         Path workspaceDir = Files.createTempDirectory("functional-workspace-save");
         Workspace workspace = new Workspace();
@@ -93,7 +93,7 @@ public class FunctionalPersistenceServiceTest {
         }
     }
 
-    @Test(description = "异步保存应固定调度时的工作区，避免切换工作区后写错位置")
+    @Test(description = "Việc lưu không đồng bộ sẽ khắc phục vùng làm việc trong quá trình lên lịch để tránh ghi sai vị trí sau khi chuyển đổi vùng làm việc")
     public void shouldSaveAsyncToWorkspaceActiveWhenScheduled() throws Exception {
         Path workspaceA = Files.createTempDirectory("functional-workspace-async-a");
         Path workspaceB = Files.createTempDirectory("functional-workspace-async-b");
@@ -126,7 +126,7 @@ public class FunctionalPersistenceServiceTest {
         assertTrue(Files.readString(configInA).contains("async-users.csv"));
     }
 
-    @Test(description = "应支持保存并恢复 FunctionalPanel CSV 快照")
+    @Test(description = "Nên hỗ trợ lưu và khôi phục FunctionalPanel CSV Ảnh chụp nhanh")
     public void shouldPersistAndLoadCsvState() throws IOException {
         Path tempDir = Files.createTempDirectory("functional-persistence-test");
         Path configPath = tempDir.resolve("functional_config.json");
@@ -160,7 +160,7 @@ public class FunctionalPersistenceServiceTest {
         }
     }
 
-    @Test(description = "应从当前 JSON 结构加载 Functional CSV 状态")
+    @Test(description = "Nên bắt đầu từ hiện tại JSON Tải cấu trúc Functional CSV trạng thái")
     public void shouldLoadCsvStateFromCurrentJsonFixture() throws IOException {
         Path tempDir = Files.createTempDirectory("functional-csv-state");
         Path configPath = tempDir.resolve("functional_config.json");
@@ -178,7 +178,7 @@ public class FunctionalPersistenceServiceTest {
         assertEquals(loadedCsvState.getRows().get(0).get("username"), "alice");
     }
 
-    @Test(description = "Functional CSV 状态应在构造和读取时做防御性拷贝")
+    @Test(description = "Functional CSV Nhà nước nên được sao chép một cách phòng thủ trong quá trình xây dựng và đọc")
     public void shouldDefensivelyCopyFunctionalCsvDataState() {
         List<String> headers = new java.util.ArrayList<>(List.of("username"));
         Map<String, String> originalRow = csvRow("username", "alice");
@@ -243,7 +243,7 @@ public class FunctionalPersistenceServiceTest {
                 latestWrite.get(100, TimeUnit.MILLISECONDS);
                 fail("Synchronous write returned before the queued older save completed");
             } catch (TimeoutException expected) {
-                // 同步保存不能绕过队列，必须等待旧任务完成。
+                // Việc lưu đồng bộ không thể bỏ qua hàng đợi và phải đợi tác vụ cũ hoàn thành.
             }
             releaseOldSave.countDown();
             latestWrite.get(2, TimeUnit.SECONDS);

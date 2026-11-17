@@ -278,8 +278,8 @@ public class PerformanceResultCollectorTest {
                 0L
         ), false);
 
-        assertEquals(statsCollector.snapshot().totalRequests(), 0L, "取消的采样不计入统计");
-        assertEquals(events.size(), 1, "取消的采样仍保留在结果列表");
+        assertEquals(statsCollector.snapshot().totalRequests(), 0L, "Việc lấy mẫu bị hủy không được đưa vào số liệu thống kê");
+        assertEquals(events.size(), 1, "Các mẫu bị hủy vẫn còn trong danh sách kết quả");
         RequestResult result = events.get(0).getSampleResult().toRequestResult();
         assertFalse(result.success);
         assertEquals(result.sentMessages, 12L);
@@ -317,8 +317,8 @@ public class PerformanceResultCollectorTest {
                 0L
         ), true);
 
-        assertEquals(statsCollector.snapshot().totalRequests(), 0L, "取消的采样不计入统计");
-        assertEquals(events.size(), 1, "取消的采样仍保留在结果列表");
+        assertEquals(statsCollector.snapshot().totalRequests(), 0L, "Việc lấy mẫu bị hủy không được đưa vào số liệu thống kê");
+        assertEquals(events.size(), 1, "Các mẫu bị hủy vẫn còn trong danh sách kết quả");
     }
 
     @Test
@@ -351,8 +351,8 @@ public class PerformanceResultCollectorTest {
                 0L
         ), true);
 
-        assertEquals(statsCollector.snapshot().totalRequests(), 0L, "取消的采样不计入统计");
-        assertEquals(events.size(), 1, "取消的采样仍保留在结果列表");
+        assertEquals(statsCollector.snapshot().totalRequests(), 0L, "Việc lấy mẫu bị hủy không được đưa vào số liệu thống kê");
+        assertEquals(events.size(), 1, "Các mẫu bị hủy vẫn còn trong danh sách kết quả");
     }
 
     @Test
@@ -379,9 +379,9 @@ public class PerformanceResultCollectorTest {
         ), false);
 
         PerformanceStatsSnapshot snapshot = statsCollector.snapshot();
-        assertEquals(snapshot.totalRequests(), 0L, "取消的采样不计入统计");
+        assertEquals(snapshot.totalRequests(), 0L, "Việc lấy mẫu bị hủy không được đưa vào số liệu thống kê");
         assertEquals(snapshot.summaries().size(), 0);
-        assertEquals(events.size(), 1, "取消的采样仍保留在结果列表");
+        assertEquals(events.size(), 1, "Các mẫu bị hủy vẫn còn trong danh sách kết quả");
         assertEquals(events.get(0).getSampleResult().getElapsedTimeMs(), 2500L);
         assertFalse(events.get(0).getSampleResult().isSuccessful());
     }

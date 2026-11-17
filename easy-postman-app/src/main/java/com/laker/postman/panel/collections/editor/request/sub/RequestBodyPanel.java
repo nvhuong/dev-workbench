@@ -38,7 +38,7 @@ import java.io.File;
 import java.util.Optional;
 
 /**
- * 请求Body相关的独立面板，支持none、form-data、x-www-form-urlencoded、raw
+ * yêu cầuBodyCác bảng độc lập liên quan được hỗ trợnone、form-data、x-www-form-urlencoded、raw
  */
 @Slf4j
 public class RequestBodyPanel extends JPanel {
@@ -88,26 +88,26 @@ public class RequestBodyPanel extends JPanel {
     private RequestBodyBulkEditSupport bulkEditSupport;
     private final boolean isWebSocketMode;
 
-    private Timer wsTimer; // 定时发送用
-    private WebSocketTimedSendButton wsTimedSendButton; // 定时发送按钮
-    private JTextField wsIntervalField; // 定时间隔输入框
-    private JCheckBox wsClearInputCheckBox; // 清空输入复选框
-    private SearchableTextArea searchableTextArea; // 集成了搜索功能的文本编辑器（HTTP模式）
-    private SearchButton searchButton; // 搜索按钮（HTTP模式）
-    private WrapToggleButton wrapButton; // 换行按钮（HTTP模式）
+    private Timer wsTimer; // Để gửi theo lịch trình
+    private WebSocketTimedSendButton wsTimedSendButton; // Nút gửi theo lịch trình
+    private JTextField wsIntervalField; // Hộp nhập khoảng thời gian
+    private JCheckBox wsClearInputCheckBox; // Xóa hộp kiểm đầu vào
+    private SearchableTextArea searchableTextArea; // Trình soạn thảo văn bản có chức năng tìm kiếm tích hợp (HTTPchế độ)
+    private SearchButton searchButton; // Nút tìm kiếm (HTTPchế độ)
+    private WrapToggleButton wrapButton; // Nút ngắt dòng (HTTPchế độ)
     private boolean editable = true;
     private final UndoManager bodyUndoManager = new UndoManager();
 
     private RequestBodyVariableAutocompleteController autocompleteController;
 
     @Setter
-    private transient ActionListener wsSendActionListener; // 外部注入的发送回调
+    private transient ActionListener wsSendActionListener; // Gọi lại gửi được tiêm bên ngoài
 
     public RequestBodyPanel(RequestItemProtocolEnum protocol) {
         this.isWebSocketMode = protocol.isWebSocketProtocol();
         setLayout(new BorderLayout());
         ToolWindowSurfaceStyle.applyCard(this);
-        // 设置边距
+        // Đặt lề
         setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
         if (isWebSocketMode) {
             initWebSocketBodyPanel();
@@ -117,7 +117,7 @@ public class RequestBodyPanel extends JPanel {
     }
 
     /**
-     * 初始化 HTTP 模式下的 Body 面板
+     * khởi tạo HTTP cách thức Body bảng điều khiển
      */
     private void initHttpBodyPanel() {
         JPanel bodyTypePanel = new JPanel(new BorderLayout());
@@ -148,7 +148,7 @@ public class RequestBodyPanel extends JPanel {
         topPanel.add(rawTypeComboBox);
         topPanel.add(Box.createHorizontalStrut(2));
 
-        // 搜索按钮 - 点击弹出 SearchReplacePanel
+        // Nút tìm kiếm - Bấm vào để bật lên SearchReplacePanel
         searchButton = new SearchButton();
         searchButton.addActionListener(e -> {
             if (searchableTextArea != null) {
@@ -159,7 +159,7 @@ public class RequestBodyPanel extends JPanel {
         topPanel.add(searchButton);
         topPanel.add(Box.createHorizontalStrut(1));
 
-        // 换行按钮
+        // Nút ngắt dòng
         wrapButton = new WrapToggleButton();
         wrapButton.addActionListener(e -> toggleLineWrap());
         topPanel.add(wrapButton);
@@ -201,7 +201,7 @@ public class RequestBodyPanel extends JPanel {
     }
 
     /**
-     * 初始化 WebSocket 模式下的 Body 面板
+     * khởi tạo WebSocket cách thức Body bảng điều khiển
      */
     private void initWebSocketBodyPanel() {
         currentBodyType = BODY_TYPE_RAW;
@@ -228,13 +228,13 @@ public class RequestBodyPanel extends JPanel {
         bodyCardPanel.add(rawPanel, BODY_TYPE_RAW);
         add(bodyCardPanel, BorderLayout.CENTER);
         bodyCardLayout.show(bodyCardPanel, BODY_TYPE_RAW);
-        // WebSocket底部操作按钮
+        // WebSocketCác nút thao tác phía dưới
         JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 8, 8));
         ToolWindowSurfaceStyle.applyCard(bottomPanel);
         wsClearInputCheckBox = new JCheckBox(I18nUtil.getMessage(MessageKeys.WEBSOCKET_PANEL_CHECKBOX_CLEAR));
         bottomPanel.add(wsClearInputCheckBox);
         bottomPanel.add(new JLabel(I18nUtil.getMessage(MessageKeys.WEBSOCKET_PANEL_LABEL_TIMEOUT)));
-        wsIntervalField = new JTextField("1000", 5); // 默认1000ms
+        wsIntervalField = new JTextField("1000", 5); // Mặc định1000ms
         bottomPanel.add(wsIntervalField);
 
         wsTimedSendButton = new WebSocketTimedSendButton();
@@ -272,15 +272,15 @@ public class RequestBodyPanel extends JPanel {
         JPanel panel = new JPanel(new BorderLayout());
         ToolWindowSurfaceStyle.applyCard(panel);
         bodyArea = new VariableAwareSyntaxTextArea();
-        bodyArea.setSyntaxEditingStyle(SyntaxConstants.SYNTAX_STYLE_JSON_WITH_COMMENTS); // 默认JSON高亮
-        bodyArea.setCodeFoldingEnabled(true); // 启用代码折叠
-        bodyArea.setLineWrap(false); // 禁用自动换行以提升大文本性能
+        bodyArea.setSyntaxEditingStyle(SyntaxConstants.SYNTAX_STYLE_JSON_WITH_COMMENTS); // Mặc địnhJSONLàm nổi bật
+        bodyArea.setCodeFoldingEnabled(true); // Kích hoạt tính năng gấp mã
+        bodyArea.setLineWrap(false); // Tắt tính năng ngắt dòng để cải thiện hiệu suất văn bản lớn
         bodyArea.setShowMatchedBracketPopup(false);
-        // 统一加载主题、编辑器字体和缺字回退绘制
+        // Tải thống nhất các chủ đề, phông chữ soạn thảo và bản vẽ dự phòng cho các ký tự bị thiếu
         EditorThemeUtil.loadTheme(bodyArea);
         EditorThemeUtil.installViewportClippedTokenPainter(bodyArea);
 
-        // ====== 添加撤回/重做功能 ======
+        // ====== Đã thêm rút tiền/Làm lại chức năng ======
         bodyArea.getDocument().addUndoableEditListener(bodyUndoManager);
 
         // Undo
@@ -309,15 +309,15 @@ public class RequestBodyPanel extends JPanel {
             }
         });
 
-        // ====== 添加变量自动补全功能 ======
+        // ====== Thêm chức năng tự động hoàn thành biến ======
         autocompleteController = new RequestBodyVariableAutocompleteController(this, bodyArea);
         autocompleteController.install();
 
-        // 使用 SearchableTextArea 包装 bodyArea，集成搜索替换功能
+        // sử dụng SearchableTextArea Bưu kiện bodyArea，Tích hợp chức năng tìm kiếm và thay thế
         searchableTextArea = new SearchableTextArea(bodyArea);
         panel.add(searchableTextArea, BorderLayout.CENTER);
 
-        // ====== 变量高亮和悬浮提示 ======
+        // ====== Các mẹo đánh dấu và di chuột có thể thay đổi ======
         bodyArea.getDocument().addDocumentListener(new DocumentListener() {
             void repaintBadges() {
                 if (bodyArea != null) {
@@ -338,7 +338,7 @@ public class RequestBodyPanel extends JPanel {
             }
         });
         SwingUtilities.invokeLater(bodyArea::repaint);
-        // 悬浮提示
+        // Dấu nhắc di chuột
         bodyArea.addMouseMotionListener(new MouseInputAdapter() {
             @Override
             public void mouseMoved(MouseEvent e) {
@@ -349,15 +349,15 @@ public class RequestBodyPanel extends JPanel {
                     if (pos >= seg.start && pos <= seg.end) {
                         String varName = seg.name;
 
-                        // 获取变量类型和值
+                        // Nhận loại và giá trị biến
                         VariableType varType = VariableResolver.getVariableType(varName);
                         String varValue = VariableResolver.resolveVariable(varName);
 
                         if (varType != null && varValue != null) {
-                            // 变量已定义
+                            // Biến được xác định
                             bodyArea.setToolTipText(RequestBodyVariableTooltipBuilder.variableTooltip(varName, varValue, varType));
                         } else {
-                            // 变量未定义
+                            // Biến không được xác định
                             bodyArea.setToolTipText(RequestBodyVariableTooltipBuilder.undefinedVariableTooltip(varName));
                         }
                         return;
@@ -366,7 +366,7 @@ public class RequestBodyPanel extends JPanel {
                 bodyArea.setToolTipText(null);
             }
         });
-        // 监听 rawTypeComboBox 选项变化，切换高亮风格
+        // màn hình rawTypeComboBox Tùy chọn thay đổi, chuyển đổi kiểu đánh dấu
         if (rawTypeComboBox != null) {
             rawTypeComboBox.addItemListener(e -> {
                 if (e.getStateChange() == ItemEvent.SELECTED) {
@@ -538,7 +538,7 @@ public class RequestBodyPanel extends JPanel {
         }
     }
 
-    // WebSocket发送并根据checkbox清空输入
+    // WebSocketGửi và theo dõicheckboxXóa đầu vào
     private void wsSendAndMaybeClear() {
         if (wsSendActionListener != null) {
             wsSendActionListener.actionPerformed(new ActionEvent(wsSendButton, ActionEvent.ACTION_PERFORMED, null));
@@ -548,11 +548,11 @@ public class RequestBodyPanel extends JPanel {
         }
     }
 
-    // 定时发送逻辑
+    // Logic gửi thời gian
     private void toggleWsTimer() {
-        // 只有已连接WebSocket时才能启动定时器
+        // Chỉ được kết nốiWebSocketđể bắt đầu hẹn giờ
         if (wsSendButton == null || !wsSendButton.isEnabled()) {
-            // 未连接时，直接返回，不允许启动定时器
+            // Khi không được kết nối, nó sẽ quay trở lại trực tiếp và không cho phép khởi động bộ hẹn giờ
             return;
         }
         if (wsTimer != null && wsTimer.isRunning()) {
@@ -565,7 +565,7 @@ public class RequestBodyPanel extends JPanel {
             int interval = 1000;
             try {
                 interval = Integer.parseInt(wsIntervalField.getText().trim());
-                if (interval < 100) interval = 100; // 最小100ms
+                if (interval < 100) interval = 100; // Tối thiểu100ms
             } catch (Exception ignored) {
             }
             wsTimer = new Timer(interval, e -> {
@@ -582,9 +582,9 @@ public class RequestBodyPanel extends JPanel {
     }
 
     /**
-     * WebSocket连接状态变化时调用，控制发送和定时按钮的可用性
+     * WebSocketĐược gọi khi trạng thái kết nối thay đổi, kiểm soát tính khả dụng của các nút gửi và thời gian
      *
-     * @param connected 是否已连接
+     * @param connected được kết nối
      */
     public void setWebSocketConnected(boolean connected) {
         if (wsSendButton != null) wsSendButton.setEnabled(connected);
@@ -716,7 +716,7 @@ public class RequestBodyPanel extends JPanel {
     }
 
     /**
-     * 切换自动换行状态
+     * Chuyển đổi trạng thái ngắt dòng tự động
      */
     private void toggleLineWrap() {
         if (bodyArea != null && wrapButton != null) {
@@ -726,7 +726,7 @@ public class RequestBodyPanel extends JPanel {
     }
 
 
-    // getter方法，供主面板调用
+    // getterPhương thức, được gọi bởi bảng điều khiển chính
     public String getBodyType() {
         return currentBodyType;
     }
@@ -811,11 +811,11 @@ public class RequestBodyPanel extends JPanel {
     }
 
     /**
-     * 程序性加载请求体内容时必须重置撤销历史。
+     * Lịch sử hoàn tác phải được đặt lại khi tải nội dung nội dung yêu cầu theo chương trình.
      * <p>
-     * RSTA 自带一个内部 UndoManager，这里又为了兼容 Ctrl/Cmd 快捷键维护了
-     * bodyUndoManager。切换请求、加载历史请求这类 setText 不是用户编辑，如果不同时清掉
-     * 两个撤销栈，第一次 Ctrl+Z 会撤销“加载动作”，表现为编辑器内容被清空或回到上一个请求。
+     * RSTA Đi kèm với một nội thất UndoManager，Ở đây một lần nữa để tương thích Ctrl/Cmd Các phím tắt đã được duy trì
+     * bodyUndoManager。Chuyển đổi yêu cầu, tải yêu cầu lịch sử, v.v setText Đó không phải là sự chỉnh sửa của người dùng nếu không được xóa cùng lúc
+     * Hai ngăn xếp hoàn tác, lần đầu tiên Ctrl+Z sẽ bị thu hồi“Tải hành động”，Điều này biểu hiện khi nội dung của người chỉnh sửa bị xóa hoặc quay lại yêu cầu trước đó.
      */
     public void setRawBodyText(String text) {
         if (bodyArea == null) {

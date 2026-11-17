@@ -9,7 +9,7 @@ import javax.swing.*;
 import java.awt.*;
 
 /**
- * 通用开始按钮，带图标和统一样式。
+ * Nút khởi động phổ quát với biểu tượng và phong cách thống nhất.
  */
 public class StartButton extends JButton {
     public StartButton() {

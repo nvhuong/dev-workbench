@@ -3,14 +3,14 @@ package com.laker.postman.ioc;
 import java.lang.annotation.*;
 
 /**
- * 标记需要自动注入的字段、构造函数或方法
+ * Đánh dấu các trường, hàm tạo hoặc phương thức yêu cầu chèn tự động
  */
 @Target({ElementType.FIELD, ElementType.CONSTRUCTOR, ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 public @interface Autowired {
     /**
-     * 是否必须，如果为true且找不到对应的bean则抛出异常
+     * Có cần thiết không, nếu vậytrueVà cái tương ứng không thể được tìm thấybeanMột ngoại lệ được ném ra
      */
     boolean required() default true;
 }

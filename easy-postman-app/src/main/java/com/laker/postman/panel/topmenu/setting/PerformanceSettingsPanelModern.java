@@ -10,7 +10,7 @@ import javax.swing.*;
 import java.awt.*;
 
 /**
- * 现代化性能设置面板 - 性能相关配置
+ * Bảng cài đặt hiệu suất hiện đại - Cấu hình liên quan đến hiệu suất
  */
 public class PerformanceSettingsPanelModern extends ModernSettingsPanel {
     private static final int FIELD_SPACING = 8;
@@ -30,13 +30,13 @@ public class PerformanceSettingsPanelModern extends ModernSettingsPanel {
 
     @Override
     protected void buildContent(JPanel contentPanel) {
-        // 性能设置区域
+        // Khu vực cài đặt hiệu suất
         JPanel performanceSection = createModernSection(
                 I18nUtil.getMessage(MessageKeys.SETTINGS_PERFORMANCE_TITLE),
                 ""
         );
 
-        // 最大空闲连接数
+        // Số lượng kết nối nhàn rỗi tối đa
         performanceMaxIdleField = new JTextField(10);
         performanceMaxIdleField.setText(String.valueOf(SettingManager.getPerformanceMaxIdleConnections()));
         JPanel maxIdleRow = createFieldRow(
@@ -47,7 +47,7 @@ public class PerformanceSettingsPanelModern extends ModernSettingsPanel {
         performanceSection.add(maxIdleRow);
         performanceSection.add(createVerticalSpace(FIELD_SPACING));
 
-        // 连接保活时间
+        // Thời gian duy trì kết nối
         performanceKeepAliveField = new JTextField(10);
         performanceKeepAliveField.setText(String.valueOf(SettingManager.getPerformanceKeepAliveSeconds()));
         JPanel keepAliveRow = createFieldRow(
@@ -58,7 +58,7 @@ public class PerformanceSettingsPanelModern extends ModernSettingsPanel {
         performanceSection.add(keepAliveRow);
         performanceSection.add(createVerticalSpace(FIELD_SPACING));
 
-        // 最大并发请求数
+        // Số lượng yêu cầu đồng thời tối đa
         performanceMaxRequestsField = new JTextField(10);
         performanceMaxRequestsField.setText(String.valueOf(SettingManager.getPerformanceMaxRequests()));
         JPanel maxRequestsRow = createFieldRow(
@@ -69,7 +69,7 @@ public class PerformanceSettingsPanelModern extends ModernSettingsPanel {
         performanceSection.add(maxRequestsRow);
         performanceSection.add(createVerticalSpace(FIELD_SPACING));
 
-        // 单主机最大并发数
+        // Số lượng đồng thời tối đa trên một máy chủ
         performanceMaxRequestsPerHostField = new JTextField(10);
         performanceMaxRequestsPerHostField.setText(String.valueOf(SettingManager.getPerformanceMaxRequestsPerHost()));
         JPanel maxRequestsPerHostRow = createFieldRow(
@@ -80,7 +80,7 @@ public class PerformanceSettingsPanelModern extends ModernSettingsPanel {
         performanceSection.add(maxRequestsPerHostRow);
         performanceSection.add(createVerticalSpace(FIELD_SPACING));
 
-        // JS Context 池大小
+        // JS Context Kích thước bể bơi
         jsContextPoolSizeField = new JTextField(10);
         jsContextPoolSizeField.setText(String.valueOf(SettingManager.getPerformanceJsContextPoolSize()));
         JPanel jsContextPoolSizeRow = createFieldRow(
@@ -91,7 +91,7 @@ public class PerformanceSettingsPanelModern extends ModernSettingsPanel {
         performanceSection.add(jsContextPoolSizeRow);
         performanceSection.add(createVerticalSpace(FIELD_SPACING));
 
-        // JS Context 获取超时
+        // JS Context Nhận thời gian chờ
         jsContextAcquireTimeoutField = new JTextField(10);
         jsContextAcquireTimeoutField.setText(String.valueOf(SettingManager.getPerformanceJsContextAcquireTimeoutMs()));
         JPanel jsContextAcquireTimeoutRow = createFieldRow(
@@ -102,7 +102,7 @@ public class PerformanceSettingsPanelModern extends ModernSettingsPanel {
         performanceSection.add(jsContextAcquireTimeoutRow);
         performanceSection.add(createVerticalSpace(FIELD_SPACING));
 
-        // 慢请求阈值
+        // Ngưỡng yêu cầu chậm
         performanceSlowRequestThresholdField = new JTextField(10);
         performanceSlowRequestThresholdField.setText(String.valueOf(SettingManager.getPerformanceSlowRequestThreshold()));
         JPanel slowRequestThresholdRow = createFieldRow(
@@ -113,7 +113,7 @@ public class PerformanceSettingsPanelModern extends ModernSettingsPanel {
         performanceSection.add(slowRequestThresholdRow);
         performanceSection.add(createVerticalSpace(FIELD_SPACING));
 
-        // 精简明细响应体预览上限
+        // Giảm thiểu giới hạn xem trước nội dung phản hồi chi tiết
         responseBodyPreviewLimitField = new JTextField(10);
         responseBodyPreviewLimitField.setText(String.valueOf(SettingManager.getPerformanceResponseBodyPreviewLimitKb()));
         JPanel responseBodyPreviewLimitRow = createFieldRow(
@@ -124,7 +124,7 @@ public class PerformanceSettingsPanelModern extends ModernSettingsPanel {
         performanceSection.add(responseBodyPreviewLimitRow);
         performanceSection.add(createVerticalSpace(FIELD_SPACING));
 
-        // 结果表保留行数上限
+        // Bảng kết quả giữ lại số hàng tối đa
         resultRowLimitField = new JTextField(10);
         resultRowLimitField.setText(String.valueOf(SettingManager.getPerformanceResultRowLimit()));
         JPanel resultRowLimitRow = createFieldRow(
@@ -135,7 +135,7 @@ public class PerformanceSettingsPanelModern extends ModernSettingsPanel {
         performanceSection.add(resultRowLimitRow);
         performanceSection.add(createVerticalSpace(FIELD_SPACING));
 
-        // 趋势图采样间隔
+        // Khoảng thời gian lấy mẫu biểu đồ xu hướng
         trendSamplingField = new JTextField(10);
         trendSamplingField.setText(String.valueOf(SettingManager.getTrendSamplingIntervalSeconds()));
         JPanel trendSamplingRow = createFieldRow(
@@ -146,7 +146,7 @@ public class PerformanceSettingsPanelModern extends ModernSettingsPanel {
         performanceSection.add(trendSamplingRow);
         performanceSection.add(createVerticalSpace(FIELD_SPACING));
 
-        // 事件日志开关
+        // Chuyển đổi nhật ký sự kiện
         eventLoggingCheckBox = new JCheckBox(I18nUtil.getMessage(MessageKeys.SETTINGS_PERFORMANCE_EVENT_LOGGING));
         eventLoggingCheckBox.setSelected(SettingManager.isPerformanceEventLoggingEnabled());
         JPanel eventLoggingRow = createCheckBoxRow(
@@ -160,7 +160,7 @@ public class PerformanceSettingsPanelModern extends ModernSettingsPanel {
 
         setupValidators();
 
-        // 跟踪所有组件的初始值
+        // Theo dõi các giá trị ban đầu cho tất cả các thành phần
         trackComponentValue(performanceMaxIdleField);
         trackComponentValue(performanceKeepAliveField);
         trackComponentValue(performanceMaxRequestsField);
@@ -281,7 +281,7 @@ public class PerformanceSettingsPanelModern extends ModernSettingsPanel {
     }
 
     private void saveSettings(boolean closeAfterSave) {
-        // 验证所有字段
+        // Xác thực tất cả các trường
         if (!validateAllFields()) {
             NotificationCenter.showError(
                     I18nUtil.getMessage(MessageKeys.SETTINGS_VALIDATION_ERROR_MESSAGE));
@@ -289,7 +289,7 @@ public class PerformanceSettingsPanelModern extends ModernSettingsPanel {
         }
 
         try {
-            // 保存性能设置
+            // Lưu cài đặt hiệu suất
             SettingManager.setPerformanceMaxIdleConnections(Integer.parseInt(performanceMaxIdleField.getText().trim()));
             SettingManager.setPerformanceKeepAliveSeconds(Integer.parseInt(performanceKeepAliveField.getText().trim()));
             SettingManager.setPerformanceMaxRequests(Integer.parseInt(performanceMaxRequestsField.getText().trim()));
@@ -303,7 +303,7 @@ public class PerformanceSettingsPanelModern extends ModernSettingsPanel {
             SettingManager.setPerformanceEventLoggingEnabled(eventLoggingCheckBox.isSelected());
             JsScriptExecutor.reconfigureContextPoolFromSettings();
 
-            // 重新跟踪当前值
+            // Truy xuất giá trị hiện tại
             originalValues.clear();
             trackComponentValue(performanceMaxIdleField);
             trackComponentValue(performanceKeepAliveField);
@@ -320,7 +320,7 @@ public class PerformanceSettingsPanelModern extends ModernSettingsPanel {
 
             NotificationCenter.showSuccess(I18nUtil.getMessage(MessageKeys.SETTINGS_SAVE_SUCCESS_MESSAGE));
 
-            // 根据参数决定是否关闭对话框
+            // Xác định có nên đóng hộp thoại hay không dựa trên các tham số
             if (closeAfterSave) {
                 Window window = SwingUtilities.getWindowAncestor(this);
                 if (window instanceof JDialog dialog) {

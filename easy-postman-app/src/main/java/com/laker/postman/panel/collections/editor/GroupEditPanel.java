@@ -38,14 +38,14 @@ import static com.laker.postman.request.model.RequestAuthTypes.AUTH_TYPE_INHERIT
 import static com.laker.postman.request.model.RequestAuthTypes.AUTH_TYPE_NONE;
 
 /**
- * 分组编辑面板 - 现代化版本
- * 在右侧主面板显示，参考 Postman 的设计
- * 复用 AuthTabPanel 和 ScriptPanel 组件
+ * Bảng chỉnh sửa nhóm - Phiên bản hiện đại hóa
+ * Hiển thị trong bảng điều khiển chính bên phải, để tham khảo Postman thiết kế
+ * Tái sử dụng AuthTabPanel và ScriptPanel thành phần
  * <p>
- * 设计说明：
- * - 参考 Postman，采用即时自动保存模式，无需显式保存按钮
- * - 数据变化时自动保存到模型并持久化
- * - 无需脏数据追踪和红点提示（Postman 的 Collection/Folder 设置也没有红点）
+ * Mô tả thiết kế:
+ * - Tham khảo Postman，Với chế độ tự động lưu ngay lập tức, không cần phải có nút lưu rõ ràng
+ * - Khi dữ liệu thay đổi, nó sẽ tự động được lưu vào mô hình và được duy trì
+ * - Không cần theo dõi dữ liệu bẩn và cảnh báo chấm đỏ (tệp Postman của Collection/Folder Không có dấu chấm màu đỏ trong cài đặt)
  */
 public class GroupEditPanel extends JPanel {
     @Getter
@@ -69,7 +69,7 @@ public class GroupEditPanel extends JPanel {
     private IndicatorTabComponent authTabIndicator;
     private IndicatorTabComponent scriptsTabIndicator;
 
-    // 原始数据快照，用于检测变化
+    // Ảnh chụp nhanh dữ liệu thô để phát hiện các thay đổi
     private String originalName;
     private String originalDescription;
     private String originalAuthType;
@@ -84,9 +84,9 @@ public class GroupEditPanel extends JPanel {
     private List<HttpHeader> originalHeaders;
     private List<Variable> originalVariables;
 
-    // 防抖定时器
+    // Hẹn giờ chống rung
     private Timer autoSaveTimer;
-    private static final int AUTO_SAVE_DELAY = 300; // 300ms 延迟保存（平衡响应速度和性能）
+    private static final int AUTO_SAVE_DELAY = 300; // 300ms Lưu chậm (cân bằng khả năng phản hồi và hiệu suất)
 
     public GroupEditPanel(DefaultMutableTreeNode groupNode, RequestGroup group, Runnable onSave) {
         this.groupNode = groupNode;
@@ -99,14 +99,14 @@ public class GroupEditPanel extends JPanel {
         setupTabIndicatorListeners();
         setupSaveShortcut();
 
-        // 初始化tab指示器状态
+        // khởi tạotabTrạng thái chỉ báo
         SwingUtilities.invokeLater(this::updateTabIndicators);
     }
 
     private void initAutoSaveTimer() {
-        // 创建防抖定时器，避免频繁保存
+        // Tạo bộ hẹn giờ chống rung để tránh lưu thường xuyên
         autoSaveTimer = new Timer(AUTO_SAVE_DELAY, e -> {
-            autoSaveGroupData(false);  // 定时器自动触发，不停止编辑
+            autoSaveGroupData(false);  // Bộ hẹn giờ tự động kích hoạt và không ngừng chỉnh sửa
             autoSaveTimer.stop();
         });
         autoSaveTimer.setRepeats(false);
@@ -116,11 +116,11 @@ public class GroupEditPanel extends JPanel {
         setLayout(new BorderLayout(0, 0));
         styleCardSurface(this);
 
-        // 顶部标题栏
+        // Thanh tiêu đề hàng đầu
         JPanel headerPanel = createHeaderPanel();
         add(headerPanel, BorderLayout.NORTH);
 
-        // 中间内容区域 - 使用 Tabs
+        // Khu vực nội dung trung bình - sử dụng Tabs
         tabbedPane = new JTabbedPane();
         styleCardSurface(tabbedPane);
         tabbedPane.setFont(FontsUtil.getDefaultFontWithOffset(Font.PLAIN, +1));
@@ -128,7 +128,7 @@ public class GroupEditPanel extends JPanel {
         // General Tab
         tabbedPane.addTab(I18nUtil.getMessage(MessageKeys.GROUP_EDIT_TAB_GENERAL), createGeneralPanel());
 
-        // Headers Tab - 公共请求头配置
+        // Headers Tab - Cấu hình tiêu đề yêu cầu công khai
         headersPanel = new EasyRequestHttpHeadersPanel(AppRequestHeaderDefaults.generatedHeaderPolicy());
         JPanel headersWrapperPanel = new JPanel(new BorderLayout());
         styleCardSurface(headersWrapperPanel);
@@ -145,7 +145,7 @@ public class GroupEditPanel extends JPanel {
         tabbedPane.addTab(I18nUtil.getMessage(MessageKeys.TAB_HEADERS), headersWrapperPanel);
         tabbedPane.setTabComponentAt(1, headersTabIndicator);
 
-        // Variables Tab - 分组级别的变量
+        // Variables Tab - Các biến cấp độ nhóm
         variablesPanel = new EasyVariablesPanel();
         JPanel variablesWrapperPanel = new JPanel(new BorderLayout());
         styleCardSurface(variablesWrapperPanel);
@@ -163,7 +163,7 @@ public class GroupEditPanel extends JPanel {
         tabbedPane.setTabComponentAt(2, variablesTabIndicator);
 
 
-        // Authorization Tab - 复用 AuthTabPanel
+        // Authorization Tab - Tái sử dụng AuthTabPanel
         authTabPanel = new AuthTabPanel();
         JPanel authWrapperPanel = new JPanel(new BorderLayout());
         styleCardSurface(authWrapperPanel);
@@ -179,7 +179,7 @@ public class GroupEditPanel extends JPanel {
         tabbedPane.addTab(I18nUtil.getMessage(MessageKeys.TAB_AUTHORIZATION), authWrapperPanel);
         tabbedPane.setTabComponentAt(3, authTabIndicator);
 
-        // Scripts Tab - 复用 ScriptPanel
+        // Scripts Tab - Tái sử dụng ScriptPanel
         scriptPanel = new ScriptPanel();
         JPanel scriptWrapperPanel = new JPanel(new BorderLayout());
         styleCardSurface(scriptWrapperPanel);
@@ -204,7 +204,7 @@ public class GroupEditPanel extends JPanel {
         styleCardSurface(headerPanel);
         headerPanel.setBorder(new EmptyBorder(15, 20, 15, 20));
 
-        // 左侧：标题
+        // Bên trái: tiêu đề
         JPanel leftPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 0));
         leftPanel.setOpaque(false);
 
@@ -214,7 +214,7 @@ public class GroupEditPanel extends JPanel {
 
         headerPanel.add(leftPanel, BorderLayout.WEST);
 
-        // 底部分隔线
+        // Bộ chia đáy
         JSeparator separator = new JSeparator();
         separator.setForeground(ModernColors.getBorderLightColor());
         JPanel separatorPanel = new JPanel(new BorderLayout());
@@ -250,27 +250,27 @@ public class GroupEditPanel extends JPanel {
         gbc.fill = GridBagConstraints.NONE;
         nameField = new EasyTextField(30);
         nameField.setPreferredSize(new Dimension(300, 32));
-        nameField.setFont(FontsUtil.getDefaultFontWithOffset(Font.PLAIN, +1)); // 比标准字体大1号
+        nameField.setFont(FontsUtil.getDefaultFontWithOffset(Font.PLAIN, +1)); // Lớn hơn kích thước phông chữ tiêu chuẩn1Không
         formPanel.add(nameField, gbc);
 
-        // 水平填充
+        // Điền theo chiều ngang
         gbc.gridx = 2;
         gbc.weightx = 1.0;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         formPanel.add(Box.createHorizontalGlue(), gbc);
 
-        // Description Markdown Editor - 占据两行 (gridy 0 和 1)
+        // Description Markdown Editor - Chiếm hai dòng (gridy 0 và 1)
         gbc.gridx = 0;
         gbc.gridy = 1;
-        gbc.gridwidth = 3;  // 占据所有列
-        gbc.gridheight = 2; // 占据两行
+        gbc.gridwidth = 3;  // Chiếm tất cả các cột
+        gbc.gridheight = 2; // Chiếm hai dòng
         gbc.weightx = 1.0;
         gbc.weighty = 1.0;
         gbc.fill = GridBagConstraints.BOTH;
         gbc.anchor = GridBagConstraints.WEST;
 
         descriptionEditor = new MarkdownEditorPanel();
-        // 使用最小尺寸而不是固定尺寸，让编辑器自适应容器大小
+        // Sử dụng kích thước tối thiểu thay vì kích thước cố định để cho phép trình chỉnh sửa thích ứng với kích thước vùng chứa
         descriptionEditor.setMinimumSize(new Dimension(600, 250));
         descriptionEditor.setPreferredSize(new Dimension(800, 350));
         formPanel.add(descriptionEditor, gbc);
@@ -306,10 +306,10 @@ public class GroupEditPanel extends JPanel {
     }
 
     /**
-     * 设置自动保存监听器
+     * Thiết lập trình nghe tự động lưu
      */
     private void setupAutoSaveListeners() {
-        // 监听名称字段变化
+        // Theo dõi các thay đổi của trường tên
         nameField.getDocument().addDocumentListener(new DocumentListener() {
             public void insertUpdate(DocumentEvent e) {
                 triggerAutoSave();
@@ -324,7 +324,7 @@ public class GroupEditPanel extends JPanel {
             }
         });
 
-        // 监听描述字段变化
+        // Theo dõi các thay đổi của trường mô tả
         descriptionEditor.addDocumentListener(new DocumentListener() {
             public void insertUpdate(DocumentEvent e) {
                 triggerAutoSave();
@@ -339,39 +339,39 @@ public class GroupEditPanel extends JPanel {
             }
         });
 
-        // 监听认证面板变化
+        // Giám sát các thay đổi của bảng xác thực
         authTabPanel.addDirtyListener(this::triggerAutoSave);
 
-        // 监听脚本面板变化
+        // Giám sát các thay đổi của bảng tập lệnh
         scriptPanel.addDirtyListeners(this::triggerAutoSave);
 
-        // 监听请求头面板变化
+        // Giám sát các thay đổi của bảng tiêu đề yêu cầu
         headersPanel.addTableModelListener(e -> triggerAutoSave());
 
-        // 监听变量面板变化
+        // Theo dõi những thay đổi trong bảng biến
         variablesPanel.addTableModelListener(e -> triggerAutoSave());
     }
 
     /**
-     * 设置 tab 指示器监听器
+     * cài đặt tab Người nghe chỉ báo
      */
     private void setupTabIndicatorListeners() {
 
-        // 监听请求头面板变化
+        // Giám sát các thay đổi của bảng tiêu đề yêu cầu
         headersPanel.addTableModelListener(e -> updateTabIndicators());
 
-        // 监听变量面板变化
+        // Theo dõi những thay đổi trong bảng biến
         variablesPanel.addTableModelListener(e -> updateTabIndicators());
 
-        // 监听认证面板变化
+        // Giám sát các thay đổi của bảng xác thực
         authTabPanel.addDirtyListener(this::updateTabIndicators);
 
-        // 监听脚本面板变化
+        // Giám sát các thay đổi của bảng tập lệnh
         scriptPanel.addDirtyListeners(this::updateTabIndicators);
     }
 
     /**
-     * 更新所有 tab 的内容指示器
+     * Cập nhật tất cả tab chỉ số nội dung
      */
     private void updateTabIndicators() {
         SwingUtilities.invokeLater(() -> {
@@ -392,46 +392,46 @@ public class GroupEditPanel extends JPanel {
 
 
     /**
-     * 检查 Headers tab 是否有内容
+     * nghiên cứu Headers tab Có nội dung hay không
      */
     private boolean hasHeadersContent() {
         List<HttpHeader> headers = headersPanel.getHeadersListFromModel();
         if (headers == null || headers.isEmpty()) {
             return false;
         }
-        // 检查是否有非空的 header
+        // Kiểm tra xem có giá trị nào không rỗng không header
         return headers.stream().anyMatch(header ->
                 header.getKey() != null && !header.getKey().trim().isEmpty()
         );
     }
 
     /**
-     * 检查 Variables tab 是否有内容
+     * nghiên cứu Variables tab Có nội dung hay không
      */
     private boolean hasVariablesContent() {
         List<Variable> variables = variablesPanel.getVariableListFromModel();
         if (variables == null || variables.isEmpty()) {
             return false;
         }
-        // 检查是否有非空的变量
+        // Kiểm tra xem có biến nào không trống không
         return variables.stream().anyMatch(variable ->
                 variable.getKey() != null && !variable.getKey().trim().isEmpty()
         );
     }
 
     /**
-     * 检查 Auth tab 是否有内容
+     * nghiên cứu Auth tab Có nội dung hay không
      */
     private boolean hasAuthContent() {
         String authType = authTabPanel.getAuthType();
-        // 如果认证类型不是 "inherit" 或 "none"，则认为有内容
+        // Nếu loại xác thực không có "inherit" hoặc "none"，Nó được coi là có nội dung
         return authType != null &&
                 !AUTH_TYPE_INHERIT.equals(authType) &&
                 !AUTH_TYPE_NONE.equals(authType);
     }
 
     /**
-     * 检查 Scripts tab 是否有内容
+     * nghiên cứu Scripts tab Có nội dung hay không
      */
     private boolean hasScriptsContent() {
         String prescript = scriptPanel.getPrescript();
@@ -444,32 +444,32 @@ public class GroupEditPanel extends JPanel {
     }
 
     /**
-     * 设置保存快捷键 (Command+S / Ctrl+S)
+     * Đặt phím tắt lưu (Command+S / Ctrl+S)
      */
     private void setupSaveShortcut() {
-        // 获取快捷键修饰符（Mac 使用 Command，其他系统使用 Ctrl）
+        // Nhận công cụ sửa đổi phím tắt (Mac sử dụng Command，được sử dụng bởi các hệ thống khác Ctrl）
         int modifierKey = Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx();
 
-        // 创建 KeyStroke (Cmd+S / Ctrl+S)
+        // Tạo KeyStroke (Cmd+S / Ctrl+S)
         KeyStroke saveKeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_S, modifierKey);
 
-        // 绑定快捷键到 InputMap
+        // Liên kết các phím tắt với InputMap
         InputMap inputMap = getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
         ActionMap actionMap = getActionMap();
 
         String actionKey = "saveGroup";
         inputMap.put(saveKeyStroke, actionKey);
 
-        // 定义快捷键动作：立即保存（绕过防抖）
+        // Xác định hành động phím tắt: lưu ngay lập tức (bỏ qua chống rung)
         actionMap.put(actionKey, new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                // 停止防抖定时器
+                // Dừng bộ hẹn giờ chống rung
                 if (autoSaveTimer.isRunning()) {
                     autoSaveTimer.stop();
                 }
-                // 先将焦点从 cell editor 转移到面板自身，触发 terminateEditOnFocusLost
-                // 机制让正在编辑的 cell 值提交到 model，再用 invokeLater 执行保存。
+                // Hãy tập trung trước cell editor Di chuyển đến bảng điều khiển, kích hoạt terminateEditOnFocusLost
+                // Cơ chế cho phép bạn chỉnh sửa cell Giá trị được gửi tới model，Sử dụng lại invokeLater Thực hiện lưu.
                 GroupEditPanel.this.requestFocusInWindow();
                 SwingUtilities.invokeLater(() -> {
                     autoSaveGroupData(true);
@@ -480,10 +480,10 @@ public class GroupEditPanel extends JPanel {
     }
 
     /**
-     * 触发自动保存（防抖）
+     * Kích hoạt tự động lưu (chống rung)
      */
     private void triggerAutoSave() {
-        // 重启防抖定时器
+        // Khởi động lại bộ hẹn giờ chống rung
         if (autoSaveTimer.isRunning()) {
             autoSaveTimer.restart();
         } else {
@@ -492,28 +492,28 @@ public class GroupEditPanel extends JPanel {
     }
 
     /**
-     * 自动保存分组数据
+     * Tự động lưu dữ liệu được nhóm
      *
-     * @param forceSave true = 手动触发（Cmd+S），先提交正在编辑的 cell 再保存；
-     *                  false = 定时器自动触发，直接读 model 不打断 Tab 导航。
+     * @param forceSave true = Trình kích hoạt thủ công (Cmd+S），Gửi những gì bạn đang chỉnh sửa đầu tiên cell Lưu lại;
+     *                  false = Bộ đếm thời gian được tự động kích hoạt và đọc trực tiếp model Đừng ngắt lời Tab điều hướng.
      */
     private void autoSaveGroupData(boolean forceSave) {
         if (forceSave) {
-            // 手动保存：提交当前正在编辑的 cell，确保最新输入也被保存
+            // Lưu thủ công: Gửi nội dung hiện đang được chỉnh sửa cell，Đảm bảo đầu vào mới nhất cũng được lưu
             headersPanel.stopCellEditing();
             variablesPanel.stopCellEditing();
         }
 
-        // 先检查是否有修改
+        // Đầu tiên hãy kiểm tra xem có bất kỳ sửa đổi nào không
         if (!isModified()) {
-            return; // 没有修改，不需要保存
+            return; // Không sửa đổi, không cần lưu
         }
 
         String newName = nameField.getText().trim();
 
-        // 验证名称
+        // Xác minh tên
         if (newName.isEmpty()) {
-            // 恢复原名称
+            // Khôi phục tên gốc
             nameField.setText(group.getName());
             JOptionPane.showMessageDialog(this,
                     I18nUtil.getMessage(MessageKeys.GROUP_EDIT_NAME_EMPTY),
@@ -522,10 +522,10 @@ public class GroupEditPanel extends JPanel {
             return;
         }
 
-        // 检查名称是否改变
+        // Kiểm tra xem tên đã thay đổi chưa
         boolean nameChanged = !safeEquals(group.getName(), newName);
 
-        // 保存数据到模型
+        // Lưu dữ liệu vào mô hình
         group.setName(newName);
         group.setDescription(descriptionEditor.getText());
         group.setAuthType(authTabPanel.getAuthType());
@@ -540,25 +540,25 @@ public class GroupEditPanel extends JPanel {
         group.setHeaders(headersPanel.getHeadersListFromModel());
         group.setVariables(variablesPanel.getVariableListFromModel());
 
-        // 通知保存完成（触发持久化）
+        // Thông báo rằng quá trình lưu đã hoàn tất (kích hoạt tính bền bỉ)
         if (onSave != null) {
             onSave.run();
         }
         UiSingletonFactory.getInstance(RequestEditorPanel.class).refreshSelectedRequestExecutionScope();
 
-        // 如果名称改变了，更新 Tab 标题
+        // Nếu tên thay đổi, hãy cập nhật Tab tiêu đề
         if (nameChanged) {
             SwingUtilities.invokeLater(() -> UiSingletonFactory.getInstance(
                     RequestEditorPanel.class
             ).updateGroupTabTitle(this, newName));
         }
 
-        // 更新原始数据快照
+        // Cập nhật ảnh chụp nhanh dữ liệu gốc
         updateOriginalSnapshot();
     }
 
     /**
-     * 检查数据是否被修改
+     * Kiểm tra xem dữ liệu đã được sửa đổi chưa
      */
     private boolean isModified() {
         if (!safeEquals(originalName, nameField.getText())) return true;
@@ -578,7 +578,7 @@ public class GroupEditPanel extends JPanel {
     }
 
     /**
-     * 安全的字符串比较（处理 null 情况）
+     * So sánh chuỗi an toàn (xử lý null Tình trạng)
      */
     private boolean safeEquals(String a, String b) {
         if (a == null && b == null) return true;
@@ -587,7 +587,7 @@ public class GroupEditPanel extends JPanel {
     }
 
     /**
-     * 比较两个 Headers 列表是否相同
+     * So sánh hai Headers Các danh sách có giống nhau không?
      */
     private boolean headersEquals(List<HttpHeader> a, List<HttpHeader> b) {
         if (a == null && b == null) return true;
@@ -604,7 +604,7 @@ public class GroupEditPanel extends JPanel {
     }
 
     /**
-     * 比较两个 Variables 列表是否相同
+     * So sánh hai Variables Các danh sách có giống nhau không?
      */
     private boolean variablesEquals(List<Variable> a,
                                     List<Variable> b) {
@@ -622,7 +622,7 @@ public class GroupEditPanel extends JPanel {
     }
 
     /**
-     * 更新原始数据快照
+     * Cập nhật ảnh chụp nhanh dữ liệu gốc
      */
     private void updateOriginalSnapshot() {
         originalName = nameField.getText();
@@ -668,17 +668,17 @@ public class GroupEditPanel extends JPanel {
             variablesPanel.setVariableList(group.getVariables());
         }
 
-        // 如果 headers 中有超过 4 个请求头，默认选中第二个 tab (Headers)
+        // nếu headers Có nhiều hơn thế 4 tiêu đề yêu cầu, tiêu đề thứ hai được chọn theo mặc định tab (Headers)
         if (group.getHeaders() != null && group.getHeaders().size() > 4) {
             tabbedPane.setSelectedIndex(1);
         }
 
-        // 如果 variables 中有变量，默认选中第三个 tab (Variables)
+        // nếu variables Có các biến trong , biến thứ ba được chọn theo mặc định tab (Variables)
         if (CollUtil.isNotEmpty(group.getVariables())) {
             tabbedPane.setSelectedIndex(2);
         }
 
-        // 初始化原始数据快照
+        // Khởi tạo ảnh chụp nhanh dữ liệu thô
         updateOriginalSnapshot();
     }
 }

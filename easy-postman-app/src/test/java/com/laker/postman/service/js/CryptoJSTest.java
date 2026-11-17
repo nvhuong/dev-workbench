@@ -6,34 +6,34 @@ import org.testng.annotations.Test;
 import static org.testng.Assert.*;
 
 /**
- * CryptoJS 功能测试 - 使用 TestNG
+ * CryptoJS Kiểm tra chức năng - sử dụng TestNG
  */
 public class CryptoJSTest {
 
-    @Test(description = "使用 CryptoJS（自动加载）")
+    @Test(description = "sử dụng CryptoJS（được tải tự động)")
     public void testDirectUsage() {
         try (Context context = Context.newBuilder("js")
                 .allowAllAccess(true)
                 .allowNativeAccess(true)
                 .build()) {
 
-            // 注入库
+            // Thư viện tiêm
             JsLibraryLoader.injectBuiltinLibraries(context);
 
-            // 测试 AES 加密
+            // Bài kiểm tra AES Mã hóa
             String script = """
                     var encrypted = CryptoJS.AES.encrypt('Hello World', 'secret key 123');
                     encrypted.toString();
                     """;
 
             String result = context.eval("js", script).asString();
-            assertNotNull(result, "加密结果不应为空");
-            assertFalse(result.isEmpty(), "加密结果不应为空字符串");
-            System.out.println("✅ 加密成功: " + result);
+            assertNotNull(result, "Kết quả mã hóa không được để trống");
+            assertFalse(result.isEmpty(), "Kết quả mã hóa không được là một chuỗi trống");
+            System.out.println("✅ Mã hóa thành công: " + result);
         }
     }
 
-    @Test(description = "原始脚本（完整功能）")
+    @Test(description = "Kịch bản gốc (đầy đủ chức năng)")
     public void testOriginalScript() {
         try (Context context = Context.newBuilder("js")
                 .allowAllAccess(true)
@@ -42,25 +42,25 @@ public class CryptoJSTest {
                 .err(System.err)
                 .build()) {
 
-            // 注入库和 polyfill
+            // Tiêm thư viện và  polyfill
             JsLibraryLoader.injectBuiltinLibraries(context);
             JsPolyfillInjector.injectAll(context);
 
-            // 您的原始脚本（简化版）
+            // Tập lệnh gốc của bạn (phiên bản đơn giản hóa)
             String script = """
                     var secret_key = "1234567890123456";
                     var app_code = "myapp";
                     var app_secret = "mysecret";
                     var password = "mypassword";
-                    
-                    // 测试 btoa
+
+                    // Bài kiểm tra btoa
                     var authz_header = "Basic " + btoa(app_code + ":" + app_secret);
                     console.log("Authorization: " + authz_header);
-                    
-                    // 测试 CryptoJS
+
+                    // Bài kiểm tra CryptoJS
                     var key = CryptoJS.enc.Latin1.parse(secret_key);
                     var iv = key;
-                    
+
                     var encrypted = CryptoJS.AES.encrypt(
                         password,
                         key,
@@ -70,21 +70,21 @@ public class CryptoJSTest {
                             padding: CryptoJS.pad.ZeroPadding
                         }
                     );
-                    
+
                     console.log("Encrypted: " + encrypted.toString());
-                    
-                    // 测试 encodeURIComponent
+
+                    // Bài kiểm tra encodeURIComponent
                     var encrypted_password = encodeURIComponent(encrypted.toString());
                     console.log("Encrypted & Encoded: " + encrypted_password);
-                    
+
                     encrypted_password;
                     """;
 
             String result = context.eval("js", script).asString();
-            assertNotNull(result, "最终结果不应为空");
-            assertFalse(result.isEmpty(), "最终结果不应为空字符串");
-            assertTrue(result.contains("%"), "URL 编码后应包含 %");
-            System.out.println("✅ 最终结果: " + result);
+            assertNotNull(result, "Kết quả cuối cùng không được để trống");
+            assertFalse(result.isEmpty(), "Kết quả cuối cùng không được là một chuỗi trống");
+            assertTrue(result.contains("%"), "URL Nên được bao gồm sau khi mã hóa %");
+            System.out.println("✅ Kết quả cuối cùng: " + result);
         }
     }
 }

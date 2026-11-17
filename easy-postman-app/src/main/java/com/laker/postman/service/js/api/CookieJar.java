@@ -6,15 +6,15 @@ import org.graalvm.polyglot.Value;
 /**
  * Cookie Jar API
  * <p>
- * 提供类似 Postman 的 Cookie Jar 功能，支持异步回调方式操作 Cookie。
+ * Cung cấp tương tự Postman của Cookie Jar Chức năng, hỗ trợ hoạt động gọi lại không đồng bộ Cookie。
  * </p>
  *
- * <h3>使用示例：</h3>
+ * <h3>Ví dụ sử dụng:</h3>
  * <pre>{@code
- * // 获取 Cookie Jar
+ * // Lấy Cookie Jar
  * var jar = pm.cookies.jar();
  *
- * // 设置 Cookie
+ * // cài đặt Cookie
  * jar.set(pm.request.url, {
  *     name: "session_id",
  *     value: "abc123"
@@ -26,7 +26,7 @@ import org.graalvm.polyglot.Value;
  *     }
  * });
  *
- * // 获取 Cookie
+ * // Lấy Cookie
  * jar.get(pm.request.url, 'session_id', function(error, cookie) {
  *     if (error) {
  *         console.error('Failed to get cookie:', error);
@@ -35,7 +35,7 @@ import org.graalvm.polyglot.Value;
  *     }
  * });
  *
- * // 删除 Cookie
+ * // xóa bỏ Cookie
  * jar.unset(pm.request.url, 'session_id', function(error) {
  *     if (error) {
  *         console.error('Failed to delete cookie:', error);
@@ -44,7 +44,7 @@ import org.graalvm.polyglot.Value;
  *     }
  * });
  *
- * // 获取所有 Cookie
+ * // Nhận tất cả chúng Cookie
  * jar.getAll(pm.request.url, function(error, cookies) {
  *     if (error) {
  *         console.error('Failed to get cookies:', error);
@@ -53,7 +53,7 @@ import org.graalvm.polyglot.Value;
  *     }
  * });
  *
- * // 清空所有 Cookie
+ * // Xóa mọi thứ Cookie
  * jar.clear(pm.request.url, function(error) {
  *     if (error) {
  *         console.error('Failed to clear cookies:', error);
@@ -72,16 +72,16 @@ public class CookieJar {
     }
 
     /**
-     * 设置 Cookie（支持回调）
+     * cài đặt Cookie（cuộc gọi lại được hỗ trợ)
      *
-     * @param url      目标 URL（当前实现忽略，支持 String 或 UrlWrapper）
-     * @param cookie   Cookie 对象或名称
-     * @param callback 回调函数
+     * @param url      Mục tiêu URL（Việc triển khai hiện tại bỏ qua và hỗ trợ điều này String hoặc UrlWrapper）
+     * @param cookie   Cookie Đối tượng hoặc tên
+     * @param callback chức năng gọi lại
      */
     public void set(Object url, Value cookie, Value callback) {
         try {
             if (cookie.isString()) {
-                // 如果第二个参数是字符串，则假定它是 cookie 名称，需要第三个参数是值
+                // Nếu đối số thứ hai là một chuỗi thì nó được coi là như vậy cookie Tên, yêu cầu tham số thứ ba là giá trị
                 throw new IllegalArgumentException("set() requires a cookie object, not a string");
             } else if (cookie.hasMembers()) {
                 cookieApi.set(cookie);
@@ -93,23 +93,23 @@ public class CookieJar {
     }
 
     /**
-     * 设置 Cookie（3 参数版本：url, name, value）
+     * cài đặt Cookie（3 Phiên bản tham số: .url, name, value）
      *
-     * @param url   目标 URL（支持 String 或 UrlWrapper）
-     * @param name  Cookie 名称
-     * @param value Cookie 值
+     * @param url   Mục tiêu URL（Hỗ trợ String hoặc UrlWrapper）
+     * @param name  Cookie tên
+     * @param value Cookie giá trị
      */
     public void set(Object url, String name, String value) {
         cookieApi.set(name, value);
     }
 
     /**
-     * 设置 Cookie（4 参数版本：url, name, value, callback）
+     * cài đặt Cookie（4 Phiên bản tham số: .url, name, value, callback）
      *
-     * @param url      目标 URL（支持 String 或 UrlWrapper）
-     * @param name     Cookie 名称
-     * @param value    Cookie 值
-     * @param callback 回调函数
+     * @param url      Mục tiêu URL（Hỗ trợ String hoặc UrlWrapper）
+     * @param name     Cookie tên
+     * @param value    Cookie giá trị
+     * @param callback chức năng gọi lại
      */
     public void set(Object url, String name, String value, Value callback) {
         try {
@@ -121,11 +121,11 @@ public class CookieJar {
     }
 
     /**
-     * 获取 Cookie（支持回调）
+     * Lấy Cookie（cuộc gọi lại được hỗ trợ)
      *
-     * @param url      目标 URL（当前实现忽略，支持 String 或 UrlWrapper）
-     * @param name     Cookie 名称
-     * @param callback 回调函数，接收 (error, cookie) 参数
+     * @param url      Mục tiêu URL（Việc triển khai hiện tại bỏ qua và hỗ trợ điều này String hoặc UrlWrapper）
+     * @param name     Cookie tên
+     * @param callback Chức năng gọi lại, nhận (error, cookie) các thông số
      */
     public void get(Object url, String name, Value callback) {
         try {
@@ -137,26 +137,26 @@ public class CookieJar {
     }
 
     /**
-     * 删除 Cookie（2 参数版本：url, name，无回调）
+     * xóa bỏ Cookie（2 Phiên bản tham số: .url, name，không gọi lại)
      *
-     * @param url  目标 URL（当前实现忽略，支持 String 或 UrlWrapper）
-     * @param name Cookie 名称
+     * @param url  Mục tiêu URL（Việc triển khai hiện tại bỏ qua và hỗ trợ điều này String hoặc UrlWrapper）
+     * @param name Cookie tên
      */
     public void unset(Object url, String name) {
         try {
             cookieApi.delete(name);
         } catch (Exception e) {
-            // 无回调时，静默处理错误或记录日志
+            // Khi không có lệnh gọi lại, lỗi sẽ được xử lý âm thầm hoặc được ghi lại
             log.error("Failed to delete cookie: " + e.getMessage(), e);
         }
     }
 
     /**
-     * 删除 Cookie（3 参数版本：url, name, callback）
+     * xóa bỏ Cookie（3 Phiên bản tham số: .url, name, callback）
      *
-     * @param url      目标 URL（当前实现忽略，支持 String 或 UrlWrapper）
-     * @param name     Cookie 名称
-     * @param callback 回调函数
+     * @param url      Mục tiêu URL（Việc triển khai hiện tại bỏ qua và hỗ trợ điều này String hoặc UrlWrapper）
+     * @param name     Cookie tên
+     * @param callback chức năng gọi lại
      */
     public void unset(Object url, String name, Value callback) {
         try {
@@ -168,10 +168,10 @@ public class CookieJar {
     }
 
     /**
-     * 获取所有 Cookie（支持回调）
+     * Nhận tất cả chúng Cookie（cuộc gọi lại được hỗ trợ)
      *
-     * @param url      目标 URL（当前实现忽略，支持 String 或 UrlWrapper）
-     * @param callback 回调函数，接收 (error, cookies) 参数
+     * @param url      Mục tiêu URL（Việc triển khai hiện tại bỏ qua và hỗ trợ điều này String hoặc UrlWrapper）
+     * @param callback Chức năng gọi lại, nhận (error, cookies) các thông số
      */
     public void getAll(Object url, Value callback) {
         try {
@@ -183,10 +183,10 @@ public class CookieJar {
     }
 
     /**
-     * 清空所有 Cookie（支持回调）
+     * Xóa mọi thứ Cookie（cuộc gọi lại được hỗ trợ)
      *
-     * @param url      目标 URL（当前实现忽略，支持 String 或 UrlWrapper）
-     * @param callback 回调函数
+     * @param url      Mục tiêu URL（Việc triển khai hiện tại bỏ qua và hỗ trợ điều này String hoặc UrlWrapper）
+     * @param callback chức năng gọi lại
      */
     public void clear(Object url, Value callback) {
         try {
@@ -198,10 +198,10 @@ public class CookieJar {
     }
 
     /**
-     * 调用回调函数（单参数：error）
+     * Gọi hàm gọi lại (tham số đơn: .error）
      *
-     * @param callback 回调函数
-     * @param error    错误信息，null 表示成功
+     * @param callback chức năng gọi lại
+     * @param error    thông báo lỗi,null Cho biết sự thành công
      */
     private void invokeCallback(Value callback, String error) {
         if (callback != null && callback.canExecute()) {
@@ -210,11 +210,11 @@ public class CookieJar {
     }
 
     /**
-     * 调用回调函数（双参数：error, result）
+     * Gọi hàm gọi lại (hai tham số: .error, result）
      *
-     * @param callback 回调函数
-     * @param error    错误信息，null 表示成功
-     * @param result   结果数据
+     * @param callback chức năng gọi lại
+     * @param error    thông báo lỗi,null Cho biết sự thành công
+     * @param result   Dữ liệu kết quả
      */
     private void invokeCallback(Value callback, String error, Object result) {
         if (callback != null && callback.canExecute()) {

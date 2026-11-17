@@ -4,74 +4,74 @@ import cn.hutool.json.JSONArray;
 import cn.hutool.json.JSONObject;
 
 /**
- * 更新源接口 - 定义统一的版本检查和发布信息获取规范
+ * Cập nhật giao diện nguồn - Xác định các thông số kỹ thuật thu thập thông tin phát hành và kiểm tra phiên bản thống nhất
  *
- * <p>不同的更新源（GitHub、Gitee 等）需要实现此接口，提供统一的访问方式。</p>
+ * <p>Các nguồn cập nhật khác nhau (GitHub、Gitee v.v.) cần triển khai giao diện này để cung cấp phương thức truy cập thống nhất.</p>
  */
 public interface UpdateSource {
 
-    /** 发布信息中标记来源的内部字段。 */
+    /** Trường nội bộ để đánh dấu nguồn trong thông báo phát hành. */
     String SOURCE_METADATA_KEY = "_source";
 
     /**
-     * 获取更新源的名称
+     * Lấy tên của nguồn cập nhật
      *
-     * @return 更新源名称（如 "GitHub", "Gitee"）
+     * @return Cập nhật tên nguồn (ví dụ "GitHub", "Gitee"）
      */
     String getName();
 
     /**
-     * 获取最新版本的 API URL
+     * Nhận phiên bản mới nhất API URL
      *
-     * @return API 地址
+     * @return API địa chỉ
      */
     String getApiUrl();
 
     /**
-     * 获取按发布时间从新到旧排列的所有版本 API URL
+     * Nhận tất cả các phiên bản được sắp xếp theo ngày phát hành từ mới nhất đến cũ nhất API URL
      *
-     * @return 所有版本的 API 地址
+     * @return Tất cả các phiên bản API địa chỉ
      */
     String getAllReleasesApiUrl();
 
     /**
-     * 获取网页版发布页面 URL
+     * Nhận trang phát hành web URL
      *
-     * @return 网页版发布页面地址
+     * @return Địa chỉ trang phát hành web
      */
     String getWebUrl();
 
     /**
-     * 测试更新源的连接速度
+     * Kiểm tra tốc độ kết nối của nguồn cập nhật
      *
-     * @return 响应时间（毫秒），如果连接失败返回 Long.MAX_VALUE
+     * @return Thời gian phản hồi (mili giây), được trả về nếu kết nối không thành công Long.MAX_VALUE
      */
     long testConnectionSpeed();
 
     /**
-     * 获取最新版本发布信息
+     * Nhận thông tin phát hành phiên bản mới nhất
      *
-     * @return 发布信息的 JSON 对象，如果获取失败返回 null
+     * @return Công bố thông tin JSON Đối tượng, được trả lại nếu việc mua lại không thành công null
      */
     JSONObject fetchLatestReleaseInfo();
 
     /**
-     * 按发布标签获取单个版本信息。
+     * Nhận thông tin phiên bản riêng lẻ theo nhãn phát hành.
      *
-     * <p>不支持按标签查询的自定义更新源可以保留默认实现。</p>
+     * <p>Các nguồn cập nhật tùy chỉnh không hỗ trợ truy vấn theo thẻ có thể giữ nguyên cách triển khai mặc định.</p>
      *
-     * @param tagName 完整发布标签，例如 {@code v6.3.1}
-     * @return 对应发布信息；标签不存在、请求失败或当前更新源不支持时返回 {@code null}
+     * @param tagName Thẻ phát hành đầy đủ, ví dụ {@code v6.3.1}
+     * @return Thông tin phát hành tương ứng; được trả về khi thẻ không tồn tại, yêu cầu không thành công hoặc nguồn cập nhật hiện tại không hỗ trợ thẻ đó {@code null}
      */
     default JSONObject fetchReleaseByTag(String tagName) {
         return null;
     }
 
     /**
-     * 获取所有版本发布信息
+     * Nhận tất cả thông tin phát hành phiên bản
      *
-     * @param limit 限制返回的版本数量，0 表示不限制
-     * @return 发布信息的 JSON 数组，如果获取失败返回 null
+     * @param limit Giới hạn số lượng phiên bản được trả về.0 Cho biết không có hạn chế
+     * @return Công bố thông tin JSON Mảng, được trả về nếu quá trình thu thập không thành công null
      */
     JSONArray fetchAllReleases(int limit);
 }

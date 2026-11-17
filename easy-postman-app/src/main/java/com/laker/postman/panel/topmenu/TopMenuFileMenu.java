@@ -26,7 +26,7 @@ import java.io.File;
 import java.io.IOException;
 
 /**
- * 顶部文件菜单。
+ * Trình đơn tập tin hàng đầu.
  */
 @Slf4j
 @UtilityClass

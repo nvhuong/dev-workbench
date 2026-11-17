@@ -4,8 +4,8 @@
 
 # EasyPostman
 
-**开源 Postman 风格接口调试 + JMeter 风格性能测试桌面工具**<br>
-*本地优先 · Git 工作区 · 无头 CLI · 内置 MCP Server*
+**Nguồn mở Postman Gỡ lỗi giao diện kiểu + JMeter Công cụ máy tính để bàn kiểm tra hiệu suất phong cách**<br>
+*Ưu tiên địa phương · Git khu vực làm việc · Không đầu CLI · Tích hợp sẵn MCP Server*
 
 [![GitHub license](https://img.shields.io/github/license/lakernote/easy-postman?style=flat-square)](https://github.com/lakernote/easy-postman/blob/master/LICENSE)
 [![GitHub release](https://img.shields.io/github/v/release/lakernote/easy-postman?style=flat-square&color=brightgreen)](https://github.com/lakernote/easy-postman/releases)
@@ -14,52 +14,52 @@
 [![Java](https://img.shields.io/badge/Java-21+-ED8B00?style=flat-square&logo=openjdk&logoColor=white)](https://openjdk.org/)
 [![Platform](https://img.shields.io/badge/Platform-Windows%20%7C%20macOS%20%7C%20Linux-0078D4?style=flat-square)](https://github.com/lakernote/easy-postman/releases)
 
-[English](README.md) · [📦 下载](#-下载与安装) · [🤖 安装 MCP](#-mcp-server) · [📖 文档](#-文档) · [💬 讨论区](https://github.com/lakernote/easy-postman/discussions) · 微信：`lakernote`
+[English](README.md) · [📦 tải về](#-Tải xuống và cài đặt) · [🤖 Cài đặt MCP](#-mcp-server) · [📖 Tài liệu](#-Tài liệu) · [💬 Bảng thảo luận](https://github.com/lakernote/easy-postman/discussions) · Wechat: .`lakernote`
 
 </div>
 
 ---
 
-## EasyPostman 是什么
+## EasyPostman Nó là gì vậy?
 
-EasyPostman 把 **Postman 风格的接口调试**和 **JMeter 风格的性能测试**放进同一个 Java 21 桌面应用。集合、环境和测试数据默认保存在本地，也可以用 Git 工作区协作；同一份工作区还能通过 CLI 在 CI 中运行，或通过 MCP 交给 Codex、Claude Desktop、Cursor 等 AI 客户端调用。
+EasyPostman Bó **Postman gỡ lỗi giao diện phong cách**và **JMeter thử nghiệm hiệu suất phong cách**Đặt trong cùng một Java 21 Ứng dụng máy tính để bàn. Dữ liệu thu thập, môi trường và thử nghiệm được lưu cục bộ theo mặc định và có sẵn Git Cộng tác không gian làm việc; cùng một không gian làm việc vẫn có thể đi qua CLI Vào CI Chạy vào hoặc vượt qua MCP Đưa nó cho Codex、Claude Desktop、Cursor Đợi đã AI Cuộc gọi của khách hàng.
 
-| 核心能力 | 说明 |
+| năng lực cốt lõi | Mô tả |
 |---|---|
-| 🔌 API 调试 | HTTP/HTTPS、SSE、WebSocket、认证、Cookie、多种 Body、响应查看与网络日志 |
-| 🧩 集合与脚本 | Postman v2.1 / cURL 导入、环境变量、前后置脚本、断言、请求链路 |
-| ⚡ 性能测试 | 线程组、定时器、提取器、实时指标、PDF 报告和 master/worker 分布式执行 |
-| 🏢 本地与 Git 工作区 | 每个工作区独立保存集合、环境和设置，数据由用户自己掌控 |
-| 🤖 MCP 与无头 CLI | AI 调用已保存的 API；CI 运行集合、功能测试和压测计划 |
+| 🔌 API gỡ lỗi | HTTP/HTTPS、SSE、WebSocket、Chứng nhận,Cookie、Khác nhau Body、Xem phản hồi và nhật ký web |
+| 🧩 Bộ sưu tập và kịch bản | Postman v2.1 / cURL Nhập khẩu, biến môi trường, tập lệnh trước và sau, xác nhận, liên kết yêu cầu |
+| ⚡ Kiểm tra hiệu suất | Nhóm chủ đề, bộ tính giờ, bộ trích xuất, số liệu thời gian thực,PDF Báo cáo và master/worker Thực thi phân tán |
+| 🏢 Địa phương so với Git khu vực làm việc | Mỗi không gian làm việc chứa các bộ sưu tập, môi trường và cài đặt độc lập, để lại dữ liệu dưới sự kiểm soát của người dùng |
+| 🤖 MCP Không có đầu CLI | AI Nhớ lại đã lưu API；CI Chạy các bộ sưu tập, kiểm tra chức năng và kế hoạch kiểm tra căng thẳng |
 
-📖 [查看完整功能列表](docs/FEATURES_zh.md)
+📖 [Xem danh sách tính năng đầy đủ](docs/FEATURES_zh.md)
 
-## 🖼️ 界面预览
+## 🖼️ Xem trước giao diện
 
 <table>
   <tr>
-    <th width="50%">Postman 风格接口调试</th>
-    <th width="50%">JMeter 风格性能测试</th>
+    <th width="50%">Postman Gỡ lỗi giao diện kiểu</th>
+    <th width="50%">JMeter Kiểm tra hiệu suất phong cách</th>
   </tr>
   <tr>
-    <td><a href="docs/collections.png"><img src="docs/collections.png" alt="接口集合和响应查看器" width="100%"></a></td>
-    <td><a href="docs/performance-trend.png"><img src="docs/performance-trend.png" alt="性能趋势面板" width="100%"></a></td>
+    <td><a href="docs/collections.png"><img src="docs/collections.png" alt="Giao diện thu thập và xem phản hồi" width="100%"></a></td>
+    <td><a href="docs/performance-trend.png"><img src="docs/performance-trend.png" alt="Bảng xu hướng hiệu suất" width="100%"></a></td>
   </tr>
   <tr>
-    <th width="50%">脚本、断言与代码片段</th>
-    <th width="50%">Git 工作区协作</th>
+    <th width="50%">Tập lệnh, xác nhận và đoạn mã</th>
+    <th width="50%">Git Cộng tác không gian làm việc</th>
   </tr>
   <tr>
-    <td><a href="docs/script-snippets.png"><img src="docs/script-snippets.png" alt="脚本代码片段和编辑器支持" width="100%"></a></td>
-    <td><a href="docs/workspaces-gitcommit.png"><img src="docs/workspaces-gitcommit.png" alt="Git 工作区管理" width="100%"></a></td>
+    <td><a href="docs/script-snippets.png"><img src="docs/script-snippets.png" alt="Đoạn mã và hỗ trợ biên tập" width="100%"></a></td>
+    <td><a href="docs/workspaces-gitcommit.png"><img src="docs/workspaces-gitcommit.png" alt="Git Quản lý không gian làm việc" width="100%"></a></td>
   </tr>
 </table>
 
-📸 [查看完整截图集](docs/SCREENSHOTS_zh.md)
+📸 [Kiểm tra bộ ảnh chụp màn hình đầy đủ](docs/SCREENSHOTS_zh.md)
 
-## 📦 下载与安装
+## 📦 Tải xuống và cài đặt
 
-从 **[GitHub Releases](https://github.com/lakernote/easy-postman/releases)** 下载最新版本；国内用户也可以使用 **[Gitee Releases](https://gitee.com/lakernote/easy-postman/releases)**。原生安装包和 Windows 便携版已包含运行时，桌面端和 MCP 都不用另装 Java；只有跨平台 JAR 需要 Java 21+。
+Từ **[GitHub Releases](https://github.com/lakernote/easy-postman/releases)** Tải xuống phiên bản mới nhất; người dùng trong nước cũng có thể sử dụng nó **[Gitee Releases](https://gitee.com/lakernote/easy-postman/releases)**。Gói cài đặt gốc và Windows Phiên bản di động đã bao gồm thời gian chạy, máy tính để bàn và MCP Không cần phải cài đặt bất cứ điều gì khác Java；Chỉ đa nền tảng JAR Cần thiết Java 21+。
 
 ### Windows WinGet
 
@@ -67,43 +67,43 @@ EasyPostman 把 **Postman 风格的接口调试**和 **JMeter 风格的性能测
 winget install --id Laker.EasyPostman --exact
 ```
 
-升级：
+Nâng cấp:
 
 ```powershell
 winget upgrade --id Laker.EasyPostman --exact
 ```
 
-### 如何选择安装包
+### Cách chọn gói cài đặt
 
-| 平台 | 文件 |
+| nền tảng | tập tin |
 |---|---|
-| macOS Apple Silicon | `EasyPostman-{版本号}-macos-arm64.dmg` |
-| macOS Intel | `EasyPostman-{版本号}-macos-x86_64.dmg` |
-| Windows 安装版 / 便携版 | `EasyPostman-{版本号}-windows-x64.exe` / `-portable.zip` |
-| Debian / Ubuntu x64 | `EasyPostman-{版本号}-linux-amd64.deb` |
-| Debian / Ubuntu ARM64 | `EasyPostman-{版本号}-linux-arm64.deb`；旧版 `dpkg` 不兼容时使用 `-compat.deb` |
-| RHEL / Rocky / CentOS / Fedora | `EasyPostman-{版本号}-1.x86_64.rpm` 或 `-1.aarch64.rpm` |
-| 跨平台 JAR | `easy-postman-{版本号}.jar`，需要 Java 21+ |
+| macOS Apple Silicon | `EasyPostman-{Số phiên bản}-macos-arm64.dmg` |
+| macOS Intel | `EasyPostman-{Số phiên bản}-macos-x86_64.dmg` |
+| Windows Phiên bản cài đặt / Phiên bản di động | `EasyPostman-{Số phiên bản}-windows-x64.exe` / `-portable.zip` |
+| Debian / Ubuntu x64 | `EasyPostman-{Số phiên bản}-linux-amd64.deb` |
+| Debian / Ubuntu ARM64 | `EasyPostman-{Số phiên bản}-linux-arm64.deb`；Phiên bản cũ `dpkg` Được sử dụng khi không tương thích `-compat.deb` |
+| RHEL / Rocky / CentOS / Fedora | `EasyPostman-{Số phiên bản}-1.x86_64.rpm` hoặc `-1.aarch64.rpm` |
+| Đa nền tảng JAR | `easy-postman-{Số phiên bản}.jar`，Cần thiết Java 21+ |
 
-首次启动若遇到 Windows SmartScreen 或 macOS Gatekeeper 提示，请选择“仍要运行”或右键应用后选择“打开”。项目未购买商业代码签名证书，所有源代码均可公开审查。
+Nếu gặp phải khi bắt đầu lần đầu tiên Windows SmartScreen hoặc macOS Gatekeeper Nhắc nhở, vui lòng chọn“Vẫn phải chạy”Hoặc nhấn chuột phải để áp dụng và chọn“Mở”。Dự án không mua chứng chỉ ký mã thương mại và tất cả mã nguồn đều có thể được xem xét công khai.
 
 ## 🤖 MCP Server
 
-EasyPostman 的 MCP 已包含在全部发布包中，**不用单独下载 MCP，也不用手工启动服务**。推荐使用原生安装包或 Windows 便携版：其中已经包含 `EasyPostmanMCP` 和 JRE，用户不用另装 Java。
+EasyPostman của MCP Bao gồm trong tất cả các gói phát hành.**Không cần phải tải xuống riêng biệt MCP，Không cần phải khởi động dịch vụ theo cách thủ công**。Nên sử dụng gói cài đặt gốc hoặc Windows Phiên bản di động: đã được bao gồm `EasyPostmanMCP` và JRE，Người dùng không cần phải cài đặt riêng Java。
 
-### 推荐安装方式
+### Phương pháp cài đặt được đề xuất
 
-1. 从 [Releases](https://github.com/lakernote/easy-postman/releases) 安装原生包，或解压 Windows 便携版。
-2. 在 Codex、Claude Desktop 或 Cursor 中添加本地 STDIO MCP Server，`command` 使用对应启动器：
+1. Từ [Releases](https://github.com/lakernote/easy-postman/releases) Cài đặt gói gốc hoặc giải nén nó Windows Phiên bản di động.
+2. Vào Codex、Claude Desktop hoặc Cursor Thêm địa phương STDIO MCP Server，`command` Sử dụng trình khởi chạy tương ứng: .
 
-| 平台 | `command` |
+| nền tảng | `command` |
 |---|---|
 | macOS | `/Applications/EasyPostman.app/Contents/MacOS/EasyPostmanMCP` |
-| Windows 安装版 | `C:\Program Files\EasyPostman\EasyPostmanMCP.exe` |
-| Windows 便携版 | 解压目录中的 `EasyPostmanMCP.exe`，例如 `D:\Tools\EasyPostman\EasyPostmanMCP.exe` |
+| Windows Phiên bản cài đặt | `C:\Program Files\EasyPostman\EasyPostmanMCP.exe` |
+| Windows Phiên bản di động | Giải nén thư mục `EasyPostmanMCP.exe`，Ví dụ `D:\Tools\EasyPostman\EasyPostmanMCP.exe` |
 | Linux DEB / RPM | `/opt/easypostman/bin/EasyPostmanMCP` |
 
-macOS 的核心配置如下，其他平台只需替换 `command`：
+macOS Cấu hình cốt lõi như sau, các nền tảng khác chỉ cần thay thế `command`：
 
 ```json
 {
@@ -112,17 +112,17 @@ macOS 的核心配置如下，其他平台只需替换 `command`：
 }
 ```
 
-Codex CLI 可直接执行：
+Codex CLI Có thể thực hiện trực tiếp:
 
 ```bash
 codex mcp add easy-postman -- /Applications/EasyPostman.app/Contents/MacOS/EasyPostmanMCP
 ```
 
-3. 保存后重启 MCP 客户端并新建对话，可用这句话验证：`请使用 EasyPostman MCP 列出所有工作区，不要执行任何接口。`
+3. Lưu và sau đó khởi động lại MCP Client và tạo một cuộc trò chuyện mới, bạn có thể sử dụng câu này để xác minh:`Hãy sử dụng EasyPostman MCP Liệt kê tất cả các không gian làm việc mà không thực hiện bất kỳ giao diện nào.`
 
-默认 `args` 为空，不需要配置工作区目录。客户端为一次 MCP 连接启动一个进程，并在多次 Tool 调用间复用它；不是每调用一个 API 就重新启动一次。Windows 便携版要保留整个解压目录，不能只复制 `EasyPostmanMCP.exe`。
+Mặc định `args` Nếu nó trống thì không cần cấu hình thư mục không gian làm việc. Khách hàng một lần MCP Kết nối bắt đầu một quá trình và chạy nhiều lần Tool Tái sử dụng nó giữa các cuộc gọi; không phải một cuộc gọi API Chỉ cần khởi động lại một lần.Windows Phiên bản di động phải giữ lại toàn bộ thư mục đã giải nén chứ không chỉ sao chép `EasyPostmanMCP.exe`。
 
-如果只下载跨平台 JAR，则使用下面的备用配置，并确保 Java 21+ 可用：
+Nếu bạn chỉ tải xuống đa nền tảng JAR，Sau đó sử dụng cấu hình thay thế bên dưới và đảm bảo Java 21+ Có sẵn:
 
 ```json
 {
@@ -131,30 +131,30 @@ codex mcp add easy-postman -- /Applications/EasyPostman.app/Contents/MacOS/EasyP
 }
 ```
 
-MCP 默认读取 EasyPostman 已登记的工作区；AI 可通过 `list_workspaces` 获取 `workspaceId`，再为每次调用选择工作区和环境。桌面端与 MCP 是独立进程，可以同时运行；MCP 不会切换桌面页面或修改桌面端当前选择。
+MCP Đọc mặc định EasyPostman Đã đăng ký không gian làm việc;AI Có thể vượt qua `list_workspaces` Lấy `workspaceId`，Sau đó chọn không gian làm việc và môi trường cho mỗi cuộc gọi. Máy tính để bàn và  MCP Đây là một quá trình độc lập và có thể chạy cùng lúc;MCP Nó sẽ không chuyển trang màn hình nền hoặc sửa đổi lựa chọn hiện tại trên màn hình nền.
 
-如需只授权一个工作区，原生启动器可在 `args` 中传入工作区绝对路径；JAR 方式则在 `"serve"` 后追加。该目录中应包含 `collections.json`，`environments.json` 可选。
+Để chỉ ủy quyền cho một không gian làm việc, trình khởi chạy gốc có sẵn ở định dạng  `args` Vượt qua đường dẫn tuyệt đối của không gian làm việc;JAR Phương pháp là `"serve"` được bổ sung sau. Thư mục này nên chứa `collections.json`，`environments.json` Không bắt buộc.
 
-Claude Desktop、Cursor 等 JSON 配置客户端通常把上面的对象放在 `mcpServers.easy-postman` 下。Codex 也可以使用 MCP Server 设置或 `config.toml`。参考 [Codex MCP 官方文档](https://developers.openai.com/codex/mcp/)。
+Claude Desktop、Cursor Đợi đã JSON Việc cấu hình máy khách thường đặt các đối tượng trên vào `mcpServers.easy-postman` Xuống.Codex Cũng có sẵn MCP Server Đặt hoặc `config.toml`。Tham khảo [Codex MCP Tài liệu chính thức](https://developers.openai.com/codex/mcp/)。
 
-### AI 可以做什么
+### AI Có thể làm được gì
 
-AI 可以列出工作区、集合、环境和已保存请求，并通过 `run_request` 或 `run_collection` 为本次调用选择工作区与环境后执行 HTTP API。环境变量值不会被枚举；接口响应体会返回给 MCP 客户端，因此不要把含敏感业务数据的工作区授权给不可信客户端。
+AI Không gian làm việc, bộ sưu tập, môi trường và yêu cầu đã lưu có thể được liệt kê và thông qua `run_request` hoặc `run_collection` Chọn không gian làm việc và môi trường cho cuộc gọi này và thực hiện nó HTTP API。Giá trị biến môi trường sẽ không được liệt kê; phần thân phản hồi giao diện sẽ được trả về MCP khách hàng, do đó, không ủy quyền các không gian làm việc chứa dữ liệu kinh doanh nhạy cảm cho các khách hàng không đáng tin cậy.
 
-MCP 只能发现并执行授权工作区里已保存的 HTTP 请求，不能临时拼装任意 URL。接口响应体会返回给 MCP 客户端，执行请求也可能产生真实业务副作用，因此生产工作区只应授权给可信客户端。
+MCP Chỉ những thứ được lưu trong không gian làm việc được ủy quyền mới có thể được phát hiện và thực thi HTTP Yêu cầu không thể được ngẫu hứng URL。Phần thân phản hồi giao diện sẽ được trả về MCP Với khách hàng, việc thực hiện các yêu cầu cũng có thể có những tác dụng phụ thực sự đối với hoạt động kinh doanh, vì vậy, không gian làm việc sản xuất chỉ nên được ủy quyền cho những khách hàng đáng tin cậy.
 
-📖 [MCP 完整安装、工具、架构与安全边界](docs/MCP_SERVER_DESIGN_zh.md)
+📖 [MCP Hoàn tất cài đặt, công cụ, kiến ​​trúc và ranh giới bảo mật](docs/MCP_SERVER_DESIGN_zh.md)
 
-## 🚀 快速开始
+## 🚀 Bắt đầu nhanh chóng
 
-桌面端的基本流程：
+Quy trình cơ bản trên máy tính để bàn:
 
-1. 创建本地工作区，或连接一个 Git 工作区。
-2. 创建或导入集合，选择环境。
-3. 输入 URL、参数和认证信息，然后发送请求。
-4. 按需添加脚本、断言、功能测试或性能测试计划。
+1. Tạo một không gian làm việc cục bộ hoặc kết nối với một không gian làm việc Git khu vực làm việc.
+2. Tạo hoặc nhập bộ sưu tập, chọn môi trường.
+3. Nhập URL、thông số và thông tin xác thực, sau đó gửi yêu cầu.
+4. Thêm tập lệnh, xác nhận, kiểm tra chức năng hoặc kế hoạch kiểm tra hiệu suất nếu cần.
 
-从源码运行：
+Chạy từ nguồn: .
 
 ```bash
 git clone https://github.com/lakernote/easy-postman.git
@@ -163,55 +163,55 @@ mvn -pl easy-postman-app -am -DskipTests clean package
 java -jar easy-postman-app/target/easy-postman-*.jar
 ```
 
-📖 [完整构建指南](docs/BUILD_zh.md)
+📖 [Hướng dẫn xây dựng hoàn chỉnh](docs/BUILD_zh.md)
 
-## 🧪 无头 CLI
+## 🧪 Không đầu CLI
 
-同一个 JAR 可以直接运行 EasyPostman 原生工作区，不需要导出集合或环境：
+Cùng một JAR Có thể chạy trực tiếp EasyPostman Không gian làm việc gốc, không cần xuất bộ sưu tập hoặc môi trường:
 
 ```bash
 java -jar easy-postman.jar collection run /srv/api-workspace -c "Basic HTTP Examples" -e "Dev Env"
 java -jar easy-postman.jar functional run /srv/api-workspace --bail --out target/result.json
 ```
 
-- [Collection CLI 完整指南](docs/COLLECTION_CLI_zh.md)
-- [Functional CLI 完整指南](docs/FUNCTIONAL_CLI_zh.md)
-- [集群压测指南](docs/PERFORMANCE_CLUSTER_LOAD_TEST_zh.md)
+- [Collection CLI Hướng dẫn đầy đủ](docs/COLLECTION_CLI_zh.md)
+- [Functional CLI Hướng dẫn đầy đủ](docs/FUNCTIONAL_CLI_zh.md)
+- [Hướng dẫn kiểm tra căng thẳng cụm](docs/PERFORMANCE_CLUSTER_LOAD_TEST_zh.md)
 
-## 📚 文档
+## 📚 Tài liệu
 
-| 文档 | 内容 |
+| Tài liệu | nội dung |
 |---|---|
-| [功能详细说明](docs/FEATURES_zh.md) | API 调试、脚本、Mock、性能测试和工作区能力 |
-| [MCP Server](docs/MCP_SERVER_DESIGN_zh.md) | 安装、Tool 参数、工作区/环境选择、架构和安全边界 |
-| [Collection CLI](docs/COLLECTION_CLI_zh.md) | 集合无头运行、变量、迭代数据、上传和 CI 退出码 |
-| [Functional CLI](docs/FUNCTIONAL_CLI_zh.md) | 按 `functional_config.json` 执行功能测试 |
-| [插件架构](docs/PLUGINS_zh.md) | 插件开发、在线与离线安装 |
-| [脚本 API](docs/SCRIPT_API_REFERENCE_zh.md) | 请求前和测试脚本参考 |
-| [构建指南](docs/BUILD_zh.md) | 源码构建和原生安装包 |
-| [常见问题](docs/FQA.MD) | 安装和使用问题 |
+| [Mô tả chi tiết các chức năng](docs/FEATURES_zh.md) | API Gỡ lỗi, viết kịch bản,Mock、Kiểm tra hiệu suất và khả năng làm việc |
+| [MCP Server](docs/MCP_SERVER_DESIGN_zh.md) | Cài đặt,Tool Các thông số, không gian làm việc/Lựa chọn môi trường, kiến trúc và ranh giới an ninh |
+| [Collection CLI](docs/COLLECTION_CLI_zh.md) | Bộ sưu tập các lần chạy không đầu, các biến, dữ liệu lặp, tải lên và CI Mã thoát |
+| [Functional CLI](docs/FUNCTIONAL_CLI_zh.md) | Nhấn `functional_config.json` Thực hiện kiểm tra chức năng |
+| [Kiến trúc plug-in](docs/PLUGINS_zh.md) | Phát triển plug-in, cài đặt trực tuyến và ngoại tuyến |
+| [kịch bản API](docs/SCRIPT_API_REFERENCE_zh.md) | Yêu cầu trước và tham khảo tập lệnh thử nghiệm |
+| [Hướng dẫn xây dựng](docs/BUILD_zh.md) | Xây dựng mã nguồn và gói cài đặt gốc |
+| [Câu hỏi thường gặp](docs/FQA.MD) | Vấn đề cài đặt và sử dụng |
 
-## 🛠️ 开发与贡献
+## 🛠️ Phát triển và Đóng góp
 
 ```bash
-# 快速编译
+# Biên soạn nhanh
 mvn -q -pl easy-postman-app -am -DskipTests compile
 
-# 全量构建与测试
+# Được xây dựng và thử nghiệm đầy đủ
 mvn clean package
 ```
 
-欢迎提交 Bug、建议、文档和代码：[创建 Issue](https://github.com/lakernote/easy-postman/issues/new/choose) · [贡献指南](.github/CONTRIBUTING.md)
+Đệ trình đều được chào đón Bug、Gợi ý, tài liệu và mã: .[Tạo Issue](https://github.com/lakernote/easy-postman/issues/new/choose) · [Nguyên tắc đóng góp](.github/CONTRIBUTING.md)
 
-## 🙏 致谢与支持
+## 🙏 Cảm ơn và hỗ trợ
 
-EasyPostman 使用了 [FlatLaf](https://github.com/JFormDesigner/FlatLaf)、[RSyntaxTextArea](https://github.com/bobbylight/RSyntaxTextArea)、[OkHttp](https://github.com/square/okhttp) 等优秀开源项目。
+EasyPostman đã sử dụng [FlatLaf](https://github.com/JFormDesigner/FlatLaf)、[RSyntaxTextArea](https://github.com/bobbylight/RSyntaxTextArea)、[OkHttp](https://github.com/square/okhttp) và các dự án nguồn mở xuất sắc khác.
 
-如果项目对你有帮助，欢迎 [Star](https://github.com/lakernote/easy-postman)、[参与讨论](https://github.com/lakernote/easy-postman/discussions) 或添加微信 `lakernote` 交流。
+Nếu dự án hữu ích cho bạn, xin chào mừng bạn [Star](https://github.com/lakernote/easy-postman)、[Tham gia vào các cuộc thảo luận](https://github.com/lakernote/easy-postman/discussions) Hoặc thêm WeChat `lakernote` giao tiếp.
 
 <div align="center">
 
-**让接口调试像 Postman 一样顺手，让性能测试像 JMeter 一样完整**
+**Hãy để giao diện gỡ lỗi như thế nào Postman Cũng dễ sử dụng như kiểm tra hiệu suất JMeter Cũng như đầy đủ**
 
 Made with ❤️ by [laker](https://github.com/lakernote)
 

@@ -13,8 +13,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.concurrent.TimeUnit;
 
 /**
- * macOS fullWindowContent 模式下菜单栏覆盖了原生标题栏，空白区域的双击被 Swing 接收，
- * 原生“双击标题栏缩放”只在标题文字上生效。这里在菜单栏空白处补齐该行为，并遵循系统偏好设置。
+ * macOS fullWindowContent Ở chế độ, thanh menu bao phủ thanh tiêu đề gốc và việc nhấp đúp vào vùng trống sẽ bị chặn Swing tiếp quản,
+ * bản địa“Bấm đúp vào thanh tiêu đề để phóng to”Chỉ có hiệu lực trên văn bản tiêu đề. Hành vi này được hoàn thành trong khoảng trống của thanh menu và tuân theo các tùy chọn hệ thống.
  */
 @Slf4j
 class MacTitleBarDoubleClickHandler extends MouseAdapter {

@@ -9,8 +9,8 @@ import javax.swing.*;
 import java.awt.*;
 
 /**
- * 关闭按钮
- * 用于关闭对话框或面板
+ * Nút đóng
+ * Được sử dụng để đóng hộp thoại hoặc bảng điều khiển
  */
 public class CloseButton extends JButton {
     public CloseButton() {

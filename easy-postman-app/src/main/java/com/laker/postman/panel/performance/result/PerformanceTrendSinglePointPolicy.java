@@ -4,7 +4,7 @@ import lombok.experimental.UtilityClass;
 import org.jfree.data.xy.XYDataset;
 
 /**
- * 趋势图默认只画线；仅当整条序列暂时只有一个有效样本时补一个点，避免历史孤点被误读成异常峰值。
+ * Biểu đồ xu hướng mặc định chỉ vẽ các đường; chỉ thêm một điểm khi toàn bộ chuỗi chỉ có một mẫu hợp lệ tạm thời để tránh các điểm biệt lập lịch sử bị hiểu sai là các đỉnh bất thường.
  */
 @UtilityClass
 class PerformanceTrendSinglePointPolicy {

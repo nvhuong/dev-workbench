@@ -10,8 +10,8 @@ public class KafkaPlugin implements EasyPostmanPlugin {
 
     @Override
     public void onLoad(PluginContext context) {
-        // 插件入口类本身不做复杂业务，它的核心任务是把“Kafka 能力清单”注册给宿主。
-        // 宿主后面会分别把这些能力接到脚本、Toolbox、补全和 Snippet 等不同位置。
+        // Bản thân lớp mục nhập trình cắm thêm không thực hiện các công việc phức tạp, nhiệm vụ cốt lõi của nó là thực hiện“Kafka Danh sách năng lực”Đăng ký với chủ nhà.
+        // Máy chủ sẽ kết nối các khả năng này với các tập lệnh sau.Toolbox、Hoàn thành tổng Snippet Chờ các địa điểm khác nhau.
         context.registerI18nBundle(KafkaI18n.BUNDLE_NAME);
         context.registerScriptApi("kafka", ScriptKafkaApi::new);
         PluginContributionSupport.registerToolbox(
@@ -55,13 +55,13 @@ public class KafkaPlugin implements EasyPostmanPlugin {
                 context,
                 t(MessageKeys.SNIPPET_EXAMPLE_KAFKA_ASSERT_TITLE),
                 t(MessageKeys.SNIPPET_EXAMPLE_KAFKA_ASSERT_DESC),
-                "// Kafka 查询 + 断言\nvar kafka = pm.plugin('kafka');\nvar records = kafka.poll({\n    bootstrapServers: pm.environment.get('kafkaBootstrap') || 'localhost:9092',\n    topic: pm.environment.get('kafkaTopic') || 'demo-topic',\n    groupId: 'easy-postman-script-' + Date.now(),\n    autoOffsetReset: 'earliest',\n    pollTimeoutMs: 1000,\n    maxMessages: 20\n});\n\npm.test('Kafka records should not be empty', function () {\n    pm.expect(records.length).to.be.above(0);\n});\n\nconsole.log('Kafka records count:', records.length);"
+                "// Kafka Truy vấn + khẳng định\nvar kafka = pm.plugin('kafka');\nvar records = kafka.poll({\n    bootstrapServers: pm.environment.get('kafkaBootstrap') || 'localhost:9092',\n    topic: pm.environment.get('kafkaTopic') || 'demo-topic',\n    groupId: 'easy-postman-script-' + Date.now(),\n    autoOffsetReset: 'earliest',\n    pollTimeoutMs: 1000,\n    maxMessages: 20\n});\n\npm.test('Kafka records should not be empty', function () {\n    pm.expect(records.length).to.be.above(0);\n});\n\nconsole.log('Kafka records count:', records.length);"
         );
         PluginContributionSupport.registerExampleSnippet(
                 context,
                 t(MessageKeys.SNIPPET_EXAMPLE_KAFKA_SEND_ASSERT_TITLE),
                 t(MessageKeys.SNIPPET_EXAMPLE_KAFKA_SEND_ASSERT_DESC),
-                "// Kafka 发送 + 断言\nvar kafka = pm.plugin('kafka');\nvar kafkaTopic = pm.environment.get('kafkaTopic') || 'demo-topic';\nvar kafkaResp = kafka.send({\n    bootstrapServers: pm.environment.get('kafkaBootstrap') || 'localhost:9092',\n    topic: kafkaTopic,\n    key: 'order-1001',\n    value: JSON.stringify({ orderId: 1001, status: 'CREATED', source: 'easy-postman' })\n});\n\npm.test('Kafka send success', function () {\n    pm.expect(kafkaResp.topic).to.equal(kafkaTopic);\n    pm.expect(kafkaResp.offset).to.be.least(0);\n});\n\nconsole.log('Kafka send metadata:', JSON.stringify(kafkaResp));"
+                "// Kafka gửi + khẳng định\nvar kafka = pm.plugin('kafka');\nvar kafkaTopic = pm.environment.get('kafkaTopic') || 'demo-topic';\nvar kafkaResp = kafka.send({\n    bootstrapServers: pm.environment.get('kafkaBootstrap') || 'localhost:9092',\n    topic: kafkaTopic,\n    key: 'order-1001',\n    value: JSON.stringify({ orderId: 1001, status: 'CREATED', source: 'easy-postman' })\n});\n\npm.test('Kafka send success', function () {\n    pm.expect(kafkaResp.topic).to.equal(kafkaTopic);\n    pm.expect(kafkaResp.offset).to.be.least(0);\n});\n\nconsole.log('Kafka send metadata:', JSON.stringify(kafkaResp));"
         );
     }
 }

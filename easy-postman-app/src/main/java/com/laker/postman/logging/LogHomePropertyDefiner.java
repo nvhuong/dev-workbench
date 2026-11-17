@@ -7,7 +7,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 /**
- * 根据运行形态解析日志目录，确保便携版日志写入程序所在目录下的 logs。
+ * Phân tích thư mục nhật ký theo trạng thái đang chạy và đảm bảo rằng nó nằm trong thư mục chứa trình ghi nhật ký phiên bản di động logs。
  */
 public class LogHomePropertyDefiner extends PropertyDefinerBase {
 
@@ -17,7 +17,7 @@ public class LogHomePropertyDefiner extends PropertyDefinerBase {
         try {
             Files.createDirectories(logDir);
         } catch (Exception ignored) {
-            // 目录创建失败时交由 logback 在后续初始化阶段报告具体错误。
+            // Xử lý khi tạo thư mục không thành công logback Báo cáo lỗi cụ thể trong các giai đoạn khởi tạo tiếp theo.
         }
         return logDir.toString();
     }

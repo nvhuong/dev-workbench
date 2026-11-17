@@ -4,10 +4,10 @@ import com.laker.postman.http.runtime.model.HttpEventInfo;
 import com.laker.postman.http.runtime.model.HttpResponse;
 
 /**
- * 结果表的 JMeter 风格计时：开始时间、首字节（Latency）和连接耗时（Connect）。
+ * Bảng kết quả JMeter Thời gian kiểu: thời gian bắt đầu, byte đầu tiên (Latency）và thời gian kết nối (Connect）。
  * <p>
- * 首字节和连接都从请求发起（排队开始）计算，与持续时间同一基准；
- * 连接包含排队、DNS、TCP 与 TLS，复用连接时接近 0。未知值用 -1 表示。
+ * Cả byte đầu tiên và kết nối đều được tính từ khi bắt đầu yêu cầu (bắt đầu xếp hàng), trên cùng cơ sở với thời lượng;
+ * Các kết nối bao gồm xếp hàng,DNS、TCP Và TLS，Đóng khi kết nối ghép kênh 0。Được sử dụng cho các giá trị không xác định -1 bày tỏ.
  */
 public record ResultTiming(long startTimeMs, long latencyMs, long connectMs) {
 
@@ -34,7 +34,7 @@ public record ResultTiming(long startTimeMs, long latencyMs, long connectMs) {
         }
         long latencyMs = elapsed(base, info.getResponseHeadersStart());
         long connectMs = elapsed(base, info.getRequestHeadersStart());
-        // 耗时用单调时钟、事件用墙钟，取整可能差 1ms；保持 JMeter 语义：连接 ≤ 首字节 ≤ 耗时。
+        // Sử dụng đồng hồ đơn điệu cho các sự kiện tốn thời gian và đồng hồ treo tường cho các sự kiện. Việc làm tròn có thể khác nhau 1ms；Giữ JMeter Semantics: connection ≤ Byte đầu tiên ≤ Tốn thời gian.
         if (latencyMs >= 0 && response.costMs > 0) {
             latencyMs = Math.min(latencyMs, response.costMs);
         }

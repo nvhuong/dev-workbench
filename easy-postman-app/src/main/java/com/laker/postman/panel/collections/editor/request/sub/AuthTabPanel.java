@@ -21,9 +21,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * 认证Tab面板 - 现代化版本
- * 使用专业的布局和现代化配色方案
- * 支持亮色和暗色主题自适应
+ * Chứng nhậnTabbảng điều khiển - Phiên bản hiện đại hóa
+ * Sử dụng bố cục chuyên nghiệp và cách phối màu hiện đại
+ * Hỗ trợ thích ứng chủ đề sáng và tối
  */
 public class AuthTabPanel extends JPanel {
     private static final String AUTH_TYPE_INHERIT = RequestAuthTypes.AUTH_TYPE_INHERIT;
@@ -50,7 +50,7 @@ public class AuthTabPanel extends JPanel {
         ToolWindowSurfaceStyle.applyCard(this);
         setBorder(new EmptyBorder(8, 10, 8, 10));
 
-        // 初始化所有字段
+        // Khởi tạo tất cả các trường
         typeCombo = new JComboBox<>(AuthType.values());
         typeCombo.setRenderer(new DefaultListCellRenderer() {
             @Override
@@ -108,7 +108,7 @@ public class AuthTabPanel extends JPanel {
         setFieldSize(apiKeyPlacementCombo, 250);
         apiKeyPlacementCombo.setFont(FontsUtil.getDefaultFontWithOffset(Font.PLAIN, -1));
 
-        // 顶部：认证类型选择
+        // Trên cùng: Lựa chọn loại xác thực
         JPanel topPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 3));
         topPanel.setOpaque(false);
         JLabel typeLabel = new JLabel(I18nUtil.getMessage(MessageKeys.AUTH_TYPE_LABEL));
@@ -118,7 +118,7 @@ public class AuthTabPanel extends JPanel {
         topPanel.add(typeCombo);
         add(topPanel, BorderLayout.NORTH);
 
-        // 中间：各种认证类型的配置面板（使用 CardLayout）
+        // Giữa: Bảng cấu hình cho các loại xác thực khác nhau (using CardLayout）
         JPanel cardPanel = new JPanel(new CardLayout());
         ToolWindowSurfaceStyle.applyCard(cardPanel);
 
@@ -142,7 +142,7 @@ public class AuthTabPanel extends JPanel {
 
         add(cardPanel, BorderLayout.CENTER);
 
-        // 监听认证类型切换
+        // Giám sát chuyển đổi loại xác thực
         typeCombo.addActionListener(e -> {
             AuthType previousType = currentType;
             currentType = (AuthType) typeCombo.getSelectedItem();
@@ -152,7 +152,7 @@ public class AuthTabPanel extends JPanel {
             fireDirty();
         });
 
-        // 监听文本框内容变化
+        // Theo dõi thay đổi nội dung hộp văn bản
         DocumentListener docListener = new DocumentListener() {
             public void insertUpdate(DocumentEvent e) {
                 fireDirty();
@@ -175,7 +175,7 @@ public class AuthTabPanel extends JPanel {
         apiKeyValueField.getDocument().addDocumentListener(docListener);
         apiKeyPlacementCombo.addActionListener(e -> fireDirty());
 
-        // 默认显示继承面板
+        // Bảng kế thừa được hiển thị theo mặc định
         ((CardLayout) cardPanel.getLayout()).show(cardPanel, AUTH_TYPE_INHERIT);
     }
 
@@ -248,7 +248,7 @@ public class AuthTabPanel extends JPanel {
     }
 
     /**
-     * 创建 Inherit Auth 面板
+     * Tạo Inherit Auth bảng điều khiển
      */
     private JPanel createInheritPanel() {
         JPanel panel = new JPanel(new BorderLayout());
@@ -264,7 +264,7 @@ public class AuthTabPanel extends JPanel {
     }
 
     /**
-     * 创建 No Auth 面板
+     * Tạo No Auth bảng điều khiển
      */
     private JPanel createNoAuthPanel() {
         JPanel panel = new JPanel(new BorderLayout());
@@ -280,7 +280,7 @@ public class AuthTabPanel extends JPanel {
     }
 
     /**
-     * 创建 API Key 面板
+     * Tạo API Key bảng điều khiển
      */
     private JPanel createApiKeyPanel() {
         JPanel panel = new JPanel(new BorderLayout());
@@ -357,21 +357,21 @@ public class AuthTabPanel extends JPanel {
     }
 
     /**
-     * 创建 Basic Auth 面板
+     * Tạo Basic Auth bảng điều khiển
      */
     private JPanel createBasicAuthPanel() {
         JPanel panel = new JPanel(new BorderLayout());
         ToolWindowSurfaceStyle.applyCard(panel);
         panel.setBorder(new EmptyBorder(8, 0, 0, 0));
 
-        // 顶部：描述信息
+        // Top: Thông tin mô tả
         panel.add(createInfoPanel(
                 I18nUtil.getMessage(MessageKeys.AUTH_TYPE_BASIC),
                 I18nUtil.getMessage(MessageKeys.AUTH_TYPE_BASIC_DESC),
                 false
         ), BorderLayout.NORTH);
 
-        // 中间：输入字段
+        // Giữa: trường đầu vào
         JPanel formPanel = new JPanel(new GridBagLayout());
         ToolWindowSurfaceStyle.applyCard(formPanel);
         formPanel.setBorder(new EmptyBorder(8, 0, 0, 0));
@@ -394,7 +394,7 @@ public class AuthTabPanel extends JPanel {
         gbc.fill = GridBagConstraints.NONE;
         formPanel.add(usernameField, gbc);
 
-        // 添加水平填充空间
+        // Thêm không gian đệm ngang
         gbc.gridx = 2;
         gbc.weightx = 1.0;
         gbc.fill = GridBagConstraints.HORIZONTAL;
@@ -415,13 +415,13 @@ public class AuthTabPanel extends JPanel {
         gbc.fill = GridBagConstraints.NONE;
         formPanel.add(passwordField, gbc);
 
-        // 添加水平填充空间
+        // Thêm không gian đệm ngang
         gbc.gridx = 2;
         gbc.weightx = 1.0;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         formPanel.add(Box.createHorizontalGlue(), gbc);
 
-        // 填充剩余垂直空间
+        // Lấp đầy không gian dọc còn lại
         gbc.gridx = 0;
         gbc.gridy = 2;
         gbc.gridwidth = 3;
@@ -435,21 +435,21 @@ public class AuthTabPanel extends JPanel {
     }
 
     /**
-     * 创建 Bearer Token 面板
+     * Tạo Bearer Token bảng điều khiển
      */
     private JPanel createBearerPanel() {
         JPanel panel = new JPanel(new BorderLayout());
         ToolWindowSurfaceStyle.applyCard(panel);
         panel.setBorder(new EmptyBorder(8, 0, 0, 0));
 
-        // 顶部：描述信息
+        // Top: Thông tin mô tả
         panel.add(createInfoPanel(
                 I18nUtil.getMessage(MessageKeys.AUTH_TYPE_BEARER),
                 I18nUtil.getMessage(MessageKeys.AUTH_TYPE_BEARER_DESC),
                 false
         ), BorderLayout.NORTH);
 
-        // 中间：输入字段
+        // Giữa: trường đầu vào
         JPanel formPanel = new JPanel(new GridBagLayout());
         ToolWindowSurfaceStyle.applyCard(formPanel);
         formPanel.setBorder(new EmptyBorder(8, 0, 0, 0));
@@ -472,13 +472,13 @@ public class AuthTabPanel extends JPanel {
         gbc.fill = GridBagConstraints.NONE;
         formPanel.add(tokenField, gbc);
 
-        // 添加水平填充空间
+        // Thêm không gian đệm ngang
         gbc.gridx = 2;
         gbc.weightx = 1.0;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         formPanel.add(Box.createHorizontalGlue(), gbc);
 
-        // 填充剩余垂直空间
+        // Lấp đầy không gian dọc còn lại
         gbc.gridx = 0;
         gbc.gridy = 1;
         gbc.gridwidth = 3;
@@ -492,7 +492,7 @@ public class AuthTabPanel extends JPanel {
     }
 
     /**
-     * 创建 Digest Auth 面板
+     * Tạo Digest Auth bảng điều khiển
      */
     private JPanel createDigestAuthPanel() {
         JPanel panel = new JPanel(new BorderLayout());
@@ -639,7 +639,7 @@ public class AuthTabPanel extends JPanel {
     }
 
     /**
-     * 注册脏数据监听器
+     * Đăng ký một trình nghe dữ liệu bẩn
      */
     public void addDirtyListener(Runnable listener) {
         if (listener != null) dirtyListeners.add(listener);

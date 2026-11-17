@@ -13,33 +13,33 @@ import javax.swing.plaf.ComboBoxUI;
 import java.awt.*;
 
 /**
- * 增强型下拉框组件
+ * Thành phần hộp thả xuống nâng cao
  * <p>
- * 特性：
- * - 根据当前选中项动态调整宽度，节省空间，可限制最小/最大宽度（超出最大宽度时 tooltip 显示完整内容）
- * - 支持固定宽度模式
- * - 自动适配 FlatLaf 主题
- * - 统一的字体和样式
+ * Các tính năng:
+ * - Tự động điều chỉnh độ rộng theo mục đang được chọn, tiết kiệm không gian và giảm thiểu hạn chế/Chiều rộng tối đa (khi vượt quá chiều rộng tối đa tooltip Hiển thị đầy đủ nội dung)
+ * - Hỗ trợ chế độ chiều rộng cố định
+ * - Tự động thích ứng FlatLaf chủ đề
+ * - Phông chữ và phong cách thống nhất
  * </p>
  *
- * @param <E> 下拉框项的类型
+ * @param <E> Loại mục hộp thả xuống
  */
 public class EasyComboBox<E> extends JComboBox<E> {
 
     /**
-     * 宽度模式
+     * chế độ chiều rộng
      */
     public enum WidthMode {
         /**
-         * 根据当前选中项动态调整宽度
+         * Tự động điều chỉnh độ rộng dựa trên mục hiện được chọn
          */
         DYNAMIC,
         /**
-         * 根据所有选项中最长的项固定宽度
+         * Đã sửa chiều rộng dựa trên mục dài nhất trong tất cả các tùy chọn
          */
         FIXED_MAX,
         /**
-         * 手动指定固定宽度
+         * Chỉ định chiều rộng cố định theo cách thủ công
          */
         FIXED_CUSTOM
     }
@@ -48,30 +48,30 @@ public class EasyComboBox<E> extends JComboBox<E> {
 
     private WidthMode widthMode = WidthMode.DYNAMIC;
     private int customWidth = -1;
-    /** DYNAMIC 模式宽度下限（未缩放），≤0 表示使用默认行为 */
+    /** DYNAMIC Giới hạn dưới của chiều rộng chế độ (không chia tỷ lệ).≤0 Cho biết việc sử dụng hành vi mặc định */
     private int minDynamicWidth = -1;
-    /** DYNAMIC 模式宽度上限（未缩放），≤0 表示不限制 */
+    /** DYNAMIC Độ rộng chế độ tối đa (không chia tỷ lệ), .≤0 Cho biết không có hạn chế */
     private int maxDynamicWidth = -1;
-    /** 固定高度（未缩放），≤0 表示使用 LAF 计算高度 */
+    /** Chiều cao cố định (không chia tỷ lệ).≤0 Cho biết sử dụng LAF Tính chiều cao */
     private int fixedHeight = -1;
 
-    /** model 内容变化计数，用于判断尺寸缓存是否过期 */
+    /** model Số lượng thay đổi nội dung, được sử dụng để xác định xem bộ đệm kích thước đã hết hạn hay chưa */
     private int modelVersion;
     private JList<E> measureList;
     private SizeKey cachedKey;
     private DynamicLayout cachedLayout;
 
     /**
-     * 创建默认的动态宽度下拉框
+     * Tạo hộp thả xuống có chiều rộng động mặc định
      */
     public EasyComboBox() {
         this(WidthMode.DYNAMIC);
     }
 
     /**
-     * 创建指定宽度模式的下拉框
+     * Tạo hộp thả xuống với chế độ chiều rộng được chỉ định
      *
-     * @param widthMode 宽度模式
+     * @param widthMode chế độ chiều rộng
      */
     public EasyComboBox(WidthMode widthMode) {
         super();
@@ -80,10 +80,10 @@ public class EasyComboBox<E> extends JComboBox<E> {
     }
 
     /**
-     * 创建指定宽度模式和选项的下拉框
+     * Tạo một hộp thả xuống với các tùy chọn và chế độ chiều rộng được chỉ định
      *
-     * @param items     下拉框选项
-     * @param widthMode 宽度模式
+     * @param items     Tùy chọn hộp thả xuống
+     * @param widthMode chế độ chiều rộng
      */
     public EasyComboBox(E[] items, WidthMode widthMode) {
         super(items);
@@ -92,19 +92,19 @@ public class EasyComboBox<E> extends JComboBox<E> {
     }
 
     /**
-     * 创建动态宽度的下拉框
+     * Tạo hộp thả xuống có chiều rộng động
      *
-     * @param items 下拉框选项
+     * @param items Tùy chọn hộp thả xuống
      */
     public EasyComboBox(E[] items) {
         this(items, WidthMode.DYNAMIC);
     }
 
     /**
-     * 创建指定固定宽度的下拉框
+     * Tạo một hộp thả xuống có chiều rộng cố định được chỉ định
      *
-     * @param items 下拉框选项
-     * @param width 固定宽度（像素）
+     * @param items Tùy chọn hộp thả xuống
+     * @param width Chiều rộng cố định (pixel)
      */
     public EasyComboBox(E[] items, int width) {
         super(items);
@@ -116,7 +116,7 @@ public class EasyComboBox<E> extends JComboBox<E> {
     private void initComponent() {
         setFont(FontsUtil.getDefaultFont(Font.PLAIN));
         setFocusable(false);
-        // 选中项变化时 BasicComboBoxUI 不会重新布局，DYNAMIC 模式需手动触发
+        // Khi mục đã chọn thay đổi BasicComboBoxUI Sẽ không có sự sắp xếp lại.DYNAMIC Chế độ này cần được kích hoạt bằng tay
         addItemListener(e -> {
             if (isDynamicSizing()) {
                 revalidate();
@@ -142,7 +142,7 @@ public class EasyComboBox<E> extends JComboBox<E> {
 
     @Override
     public Dimension getMaximumSize() {
-        // BoxLayout 会用 getMaximumSize() 限制组件，让它等于 preferredSize 即可
+        // BoxLayout Sẽ sử dụng nó getMaximumSize() Ràng buộc thành phần sao cho nó bằng  preferredSize Thế thôi
         return getPreferredSize();
     }
 
@@ -154,7 +154,7 @@ public class EasyComboBox<E> extends JComboBox<E> {
     }
 
     /**
-     * 选中项因最大宽度被截断时显示完整内容，否则显示外部设置的 tooltip。
+     * Khi mục đã chọn bị cắt bớt do chiều rộng tối đa, nội dung đầy đủ sẽ được hiển thị, nếu không thì cài đặt bên ngoài sẽ được hiển thị tooltip。
      */
     @Override
     public String getToolTipText() {
@@ -167,13 +167,13 @@ public class EasyComboBox<E> extends JComboBox<E> {
     @Override
     public void setToolTipText(String text) {
         super.setToolTipText(text);
-        // super 在 text 为 null 时会注销 ToolTipManager，截断提示仍需要它
+        // super Vào text vì null sẽ bị đăng xuất ToolTipManager，Nó vẫn được yêu cầu cho các gợi ý cắt ngắn
         registerToolTipIfNeeded();
     }
 
     /**
-     * 设置 DYNAMIC 模式的宽度范围（未缩放像素，按 UI 缩放）。
-     * 设置了最大宽度后，选中项被截断时 tooltip 显示完整内容。
+     * cài đặt DYNAMIC Phạm vi chiều rộng của mẫu (pixel không được chia tỷ lệ, theo  UI phóng).
+     * Sau khi đặt chiều rộng tối đa, mục đã chọn sẽ bị cắt bớt tooltip Hiển thị đầy đủ nội dung.
      */
     public void setDynamicWidthRange(int minWidth, int maxWidth) {
         this.minDynamicWidth = minWidth;
@@ -183,7 +183,7 @@ public class EasyComboBox<E> extends JComboBox<E> {
     }
 
     /**
-     * 设置固定高度（未缩放像素，按 UI 缩放），≤0 恢复为 LAF 计算的高度。
+     * Đặt chiều cao cố định (pixel chưa được chia tỷ lệ, nhấn UI phóng),≤0 Trở lại LAF Chiều cao tính toán.
      */
     public void setFixedHeight(int height) {
         this.fixedHeight = height;
@@ -191,9 +191,9 @@ public class EasyComboBox<E> extends JComboBox<E> {
     }
 
     /**
-     * 设置宽度模式
+     * Đặt chế độ chiều rộng
      *
-     * @param widthMode 宽度模式
+     * @param widthMode chế độ chiều rộng
      */
     public void setWidthMode(WidthMode widthMode) {
         this.widthMode = widthMode;
@@ -201,9 +201,9 @@ public class EasyComboBox<E> extends JComboBox<E> {
     }
 
     /**
-     * 设置自定义固定宽度
+     * Đặt chiều rộng cố định tùy chỉnh
      *
-     * @param width 宽度（像素）
+     * @param width Chiều rộng (pixel)
      */
     public void setCustomWidth(int width) {
         this.widthMode = WidthMode.FIXED_CUSTOM;
@@ -214,7 +214,7 @@ public class EasyComboBox<E> extends JComboBox<E> {
     @Override
     public void updateUI() {
         super.updateUI();
-        // 主题切换后重建测量用 JList，使其 UI 与当前主题一致
+        // Được sử dụng để xây dựng lại các phép đo sau khi chuyển đổi chủ đề JList，Làm được UI Phù hợp với chủ đề hiện tại
         measureList = null;
     }
 
@@ -249,8 +249,8 @@ public class EasyComboBox<E> extends JComboBox<E> {
     }
 
     /**
-     * 按需计算并缓存 DYNAMIC 尺寸。缓存以影响尺寸的状态快照为键，
-     * 不依赖事件失效，因此组件未加入容器、主题切换等场景下也不会过期，且不会在 UI 安装过程中提前计算。
+     * Tính toán và lưu trữ theo yêu cầu DYNAMIC kích cỡ. Bộ đệm được khóa bằng ảnh chụp nhanh trạng thái ảnh hưởng đến kích thước.
+     * Nó không phụ thuộc vào sự hết hạn của sự kiện, vì vậy thành phần sẽ không hết hạn ngay cả khi nó không được thêm vào vùng chứa, chuyển đổi chủ đề, v.v. và sẽ không được sử dụng UI Tính toán trước thời gian trong quá trình cài đặt.
      */
     private DynamicLayout dynamicLayout() {
         SizeKey key = new SizeKey(getUI(), getFont(), getRenderer(), getPrototypeDisplayValue(), getBorder(),
@@ -266,9 +266,9 @@ public class EasyComboBox<E> extends JComboBox<E> {
     }
 
     /**
-     * super 首选宽度 = max(参照宽度（prototype 或最宽项）+ 装饰（内边距、箭头按钮、边框），LAF 最小宽度)，
-     * 据此推导装饰宽度，无需临时替换 model。super 已被 LAF 最小宽度兜底时，任一选项宽度也都不超过该值，直接取兜底值。
-     * 设置了 prototype 时沿用其宽度（JComboBox 语义），否则按选中项宽度，最后限制在 [min, max] 区间。
+     * super Chiều rộng ưa thích = max(Chiều rộng tham chiếu (prototype hoặc mục rộng nhất)+ Trang trí (phần đệm, nút mũi tên, đường viền), .LAF Chiều rộng tối thiểu)，
+     * Chiều rộng trang trí bắt nguồn từ điều này mà không cần phải thay thế tạm thời model。super Đã được LAF Khi chiều rộng tối thiểu là đáy, chiều rộng của bất kỳ tùy chọn nào sẽ không vượt quá giá trị này và giá trị đáy được lấy trực tiếp.
+     * Cài đặt prototype Khi sử dụng chiều rộng của nó (JComboBox Ngữ nghĩa), nếu không thì theo chiều rộng mục đã chọn và cuối cùng được giới hạn ở [min, max] khoảng thời gian.
      */
     private DynamicLayout calcDynamicLayout() {
         Dimension superSize = super.getPreferredSize();
@@ -296,8 +296,8 @@ public class EasyComboBox<E> extends JComboBox<E> {
     }
 
     /**
-     * FlatLaf 对下拉框有最小宽度（ComboBox.minimumWidth，可被 style / JComponent.minimumWidth 覆盖），
-     * 与 FlatComboBoxUI#getMinimumSize 保持一致；其它 LAF 无此限制。
+     * FlatLaf Có chiều rộng tối thiểu cho hộp thả xuống (ComboBox.minimumWidth，Có thể được style / JComponent.minimumWidth che phủ),
+     * Và FlatComboBoxUI#getMinimumSize Hãy nhất quán; khác LAF Không có hạn chế như vậy.
      */
     private int lafMinimumWidth() {
         if (!(getUI() instanceof FlatComboBoxUI flatUI)) {

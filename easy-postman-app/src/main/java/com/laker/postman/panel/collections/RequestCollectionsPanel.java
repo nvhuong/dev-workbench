@@ -11,7 +11,7 @@ import javax.swing.*;
 import java.awt.*;
 
 /**
- * 请求集合工作区，左侧展示集合树，右侧展示请求编辑器。
+ * Không gian làm việc thu thập yêu cầu hiển thị cây bộ sưu tập ở bên trái và trình chỉnh sửa yêu cầu ở bên phải.
  */
 public class RequestCollectionsPanel extends UiSingletonPanel {
     private static final int DEFAULT_DIVIDER_LOCATION = AppToolWindowChrome.DEFAULT_SIDE_WIDTH;

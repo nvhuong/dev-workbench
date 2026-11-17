@@ -15,7 +15,7 @@ import java.util.Optional;
 public class SwingSavedResponseTreeMutation {
 
     /**
-     * 同步更新编辑器请求对象、树节点请求对象，以及树下的保存响应子节点。
+     * Cập nhật đồng bộ đối tượng yêu cầu soạn thảo, đối tượng yêu cầu nút cây và lưu các nút con phản hồi dưới gốc cây.
      */
     public Optional<Result> appendSavedResponse(DefaultMutableTreeNode rootTreeNode,
                                                 HttpRequestItem editorRequestItem,

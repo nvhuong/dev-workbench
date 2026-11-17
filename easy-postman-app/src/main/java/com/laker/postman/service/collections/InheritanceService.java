@@ -12,10 +12,10 @@ import lombok.extern.slf4j.Slf4j;
 import java.util.List;
 
 /**
- * Collection 继承应用服务。
+ * Collection Kế thừa các dịch vụ ứng dụng.
  *
- * <p>负责按请求 ID 找到父分组链，刷新本次请求的执行变量作用域，并把 collection-core
- * 的继承规则应用到最新的请求草稿上。</p>
+ * <p>Chịu trách nhiệm về các yêu cầu báo chí ID Tìm chuỗi nhóm chính, làm mới phạm vi biến thực thi của yêu cầu này và đặt nó collection-core
+ * Các quy tắc kế thừa được áp dụng cho bản nháp yêu cầu mới nhất.</p>
  *
  * @author laker
  * @since 4.3.22
@@ -27,17 +27,17 @@ public class InheritanceService {
     private final CollectionRequestRepository requestRepository;
 
     /**
-     * 创建继承服务（使用默认实现）
+     * Tạo một dịch vụ kế thừa (sử dụng triển khai mặc định)
      */
     public InheritanceService() {
         this(new ActiveCollectionRequestRepository());
     }
 
     /**
-     * 应用分组继承规则
+     * Áp dụng quy tắc kế thừa nhóm
      *
-     * @param item 原始请求项（最新的，包含最新 url/params）
-     * @return 应用了继承后的请求项
+     * @param item Mục yêu cầu ban đầu (mới nhất, bao gồm cả mới nhất url/params）
+     * @return Các mục yêu cầu kế thừa được áp dụng
      */
     public HttpRequestItem applyInheritance(HttpRequestItem item) {
         if (item == null) {
@@ -48,14 +48,14 @@ public class InheritanceService {
             List<RequestGroup> groupChain = findGroupChain(item.getId());
             refreshExecutionScope(groupChain);
             if (groupChain.isEmpty()) {
-                log.trace("请求 [{}] 不在 Collections 树中或无父分组，使用原始配置", item.getName());
+                log.trace("yêu cầu [{}] Không phải ở đây Collections Các nhóm trong cây hoặc không có nhóm cha, hãy sử dụng cấu hình ban đầu", item.getName());
                 return item;
             }
 
-            log.debug("为请求 [{}] 应用分组继承", item.getName());
+            log.debug("cho yêu cầu [{}] Áp dụng kế thừa nhóm", item.getName());
             return CollectionInheritance.apply(item, groupChain);
         } catch (Exception e) {
-            log.debug("应用继承时发生异常（将使用原始配置）: {}", e.getMessage());
+            log.debug("Đã xảy ra ngoại lệ khi áp dụng tính kế thừa (cấu hình gốc sẽ được sử dụng): {}", e.getMessage());
             return item;
         }
     }

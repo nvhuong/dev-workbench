@@ -180,7 +180,7 @@ public class WebSocketScenarioExecutor {
         Object messageLock = new Object();
         class WebSocketScenarioSession {
             private final long startTimeMs = System.currentTimeMillis();
-            // 同一 WS 会话必须用稳定 key 贯穿 open/send/receive/close；OkHttp 回调对象和 runtime 连接对象不一定相同。
+            // Giống nhau WS Phiên phải ổn định key Thông qua open/send/receive/close；OkHttp đối tượng gọi lại và runtime Các đối tượng kết nối không nhất thiết phải giống nhau.
             private final Object metricsKey = new Object();
             private final CountDownLatch openLatch = new CountDownLatch(1);
             private final AtomicBoolean closingSocket = new AtomicBoolean(false);

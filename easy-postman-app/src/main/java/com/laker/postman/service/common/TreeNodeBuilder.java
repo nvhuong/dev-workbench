@@ -7,8 +7,8 @@ import com.laker.postman.service.collections.CollectionTreeNodes;
 import javax.swing.tree.DefaultMutableTreeNode;
 
 /**
- * TreeNode 构建工具类
- * 统一的 UI 层转换逻辑，将解析结果转换为 Swing TreeNode
+ * TreeNode Xây dựng các lớp công cụ
+ * thống nhất UI Logic chuyển đổi lớp, chuyển đổi kết quả phân tích cú pháp thành Swing TreeNode
  */
 public class TreeNodeBuilder {
 
@@ -17,16 +17,16 @@ public class TreeNodeBuilder {
     }
 
     /**
-     * 从解析结果构建 TreeNode
+     * Được xây dựng từ các kết quả được phân tích cú pháp TreeNode
      *
-     * @param parseResult 解析结果
+     * @param parseResult Phân tích kết quả
      * @return TreeNode
      */
     public static DefaultMutableTreeNode buildFromParseResult(CollectionParseResult parseResult) {
-        // 创建分组节点
+        // Tạo các nút nhóm
         DefaultMutableTreeNode groupNode = CollectionTreeNodes.groupNode(parseResult.getGroup());
 
-        // 递归构建子节点
+        // Xây dựng các nút con theo cách đệ quy
         for (CollectionNode child : parseResult.getChildren()) {
             DefaultMutableTreeNode childNode = buildFromCollectionNode(child);
             groupNode.add(childNode);
@@ -36,17 +36,17 @@ public class TreeNodeBuilder {
     }
 
     /**
-     * 递归构建 TreeNode
+     * Xây dựng đệ quy TreeNode
      *
-     * @param node Collection 节点
+     * @param node Collection nút
      * @return TreeNode
      */
     private static DefaultMutableTreeNode buildFromCollectionNode(CollectionNode node) {
         if (node.isGroup()) {
-            // 分组节点
+            // Các nút nhóm
             DefaultMutableTreeNode groupNode = CollectionTreeNodes.groupNode(node.asGroup());
 
-            // 递归处理子节点
+            // Xử lý các nút con theo cách đệ quy
             for (CollectionNode child : node.getChildren()) {
                 groupNode.add(buildFromCollectionNode(child));
             }

@@ -22,7 +22,7 @@ import java.util.HexFormat;
 import java.util.List;
 
 /**
- * 插件安装服务。
+ * Dịch vụ cài đặt plug-in.
  */
 @Slf4j
 @UtilityClass
@@ -60,8 +60,8 @@ public class PluginInstallerService {
         PluginInstallController controller = installController == null
                 ? new PluginInstallController()
                 : installController;
-        // 市场安装不是“下载完就算成功”。
-        // 必须经历下载 -> descriptor 校验 -> sha256 校验 -> 兼容性校验 -> 落盘安装 这条完整链路。
+        // Cài đặt thị trường là không“Việc tải xuống được coi là thành công”。
+        // Phải trải qua quá trình tải xuống -> descriptor Kiểm tra -> sha256 Kiểm tra -> Kiểm tra khả năng tương thích -> Bỏ cài đặt Liên kết đầy đủ này.
         Path tempJar = downloadToTempFile(entry, listener, controller);
         try {
             controller.checkCancelled();
@@ -120,8 +120,8 @@ public class PluginInstallerService {
         Files.createDirectories(packageDir);
         Path targetPath = targetDir.resolve(buildTargetFileName(descriptor));
         Path packagePath = packageDir.resolve(buildTargetFileName(descriptor));
-        // installed 目录是“运行时扫描入口”，packages 目录更像“保留的原始安装包仓库”。
-        // 两边各留一份，便于运行和后续管理操作解耦。
+        // installed Thư mục là“Quét các mục trong thời gian chạy”，packages Thư mục giống như hơn“Kho lưu trữ gói cài đặt gốc được giữ lại”。
+        // Để lại một bản mỗi bên để thuận tiện cho việc tách rời các hoạt động điều hành và quản lý tiếp theo.
         if (!sourceJar.toAbsolutePath().normalize().equals(packagePath.toAbsolutePath().normalize())) {
             Files.copy(sourceJar, packagePath, StandardCopyOption.REPLACE_EXISTING);
         }
@@ -281,7 +281,7 @@ public class PluginInstallerService {
     }
 
     private static void validateCompatibility(PluginDescriptor descriptor) {
-        // 安装阶段先拦截不兼容插件，避免出现“安装成功但重启后被运行时跳过”的假成功状态。
+        // Trong giai đoạn cài đặt, trước tiên hãy chặn các plugin không tương thích để tránh chúng“Quá trình cài đặt thành công nhưng bị bỏ qua trong thời gian chạy sau khi khởi động lại”trạng thái thành công sai.
         PluginCompatibility compatibility = PluginRuntime.evaluateCompatibility(descriptor);
         if (compatibility.compatible()) {
             return;

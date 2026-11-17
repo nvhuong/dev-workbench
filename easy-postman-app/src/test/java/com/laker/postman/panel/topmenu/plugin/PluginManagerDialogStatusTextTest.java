@@ -12,17 +12,17 @@ import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 
 public class PluginManagerDialogStatusTextTest {
-    private boolean originalChinese;
+    private boolean originalVietnamese;
 
     @BeforeMethod
     public void useEnglishLocale() {
-        originalChinese = I18nUtil.isChinese();
+        originalVietnamese = I18nUtil.isVietnamese();
         I18nUtil.setLocale("en");
     }
 
     @AfterMethod
     public void restoreLocale() {
-        I18nUtil.setLocale(originalChinese ? "zh" : "en");
+        I18nUtil.setLocale(originalVietnamese ? "vi" : "en");
     }
 
     @Test

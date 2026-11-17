@@ -4,19 +4,19 @@ import lombok.Builder;
 import lombok.Value;
 
 /**
- * 报告中的 HTTP 字节指标。
+ * trong báo cáo HTTP Chỉ báo byte.
  */
 @Value
 public class PerformanceJsonReportBytes {
-    // 发送总字节数：请求头 + 请求体
+    // Tổng số byte đã gửi: tiêu đề yêu cầu + Request body
     long sentBytes;
-    // 接收总字节数：响应头 + 响应体
+    // Tổng số byte nhận được: tiêu đề phản hồi + cơ quan phản ứng
     long receivedBytes;
-    // 发送速率：sentBytes / sample 时间窗口，展示时可换算为 KB/s
+    // Tỷ lệ gửi:sentBytes / sample Cửa sổ thời gian có thể được chuyển đổi sang khi hiển thị KB/s
     double sentBytesPerSecond;
-    // 接收速率：receivedBytes / sample 时间窗口，展示时可换算为 KB/s
+    // Tỷ lệ nhận:receivedBytes / sample Cửa sổ thời gian có thể được chuyển đổi sang khi hiển thị KB/s
     double receivedBytesPerSecond;
-    // 平均接收字节数：receivedBytes / total，对齐 JMeter Avg. Bytes
+    // Số byte trung bình nhận được:receivedBytes / total，Căn chỉnh JMeter Avg. Bytes
     long avgReceivedBytes;
 
     @Builder

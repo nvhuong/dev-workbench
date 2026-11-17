@@ -10,7 +10,7 @@ import com.laker.postman.service.WorkspaceService;
 import lombok.experimental.UtilityClass;
 
 /**
- * GUI 启动分支的宿主运行时初始化。
+ * GUI Bắt đầu khởi tạo thời gian chạy máy chủ của nhánh.
  */
 @UtilityClass
 class GuiStartupBootstrap {
@@ -25,7 +25,7 @@ class GuiStartupBootstrap {
     }
 
     void initPluginRuntime() {
-        // 插件加载期间可能查询宿主桥接服务，因此必须先注册宿主能力再初始化插件运行时。
+        // Dịch vụ cầu nối máy chủ có thể được truy vấn trong quá trình tải trình cắm, vì vậy các khả năng của máy chủ phải được đăng ký trước khi khởi chạy thời gian chạy trình cắm.
         PluginRuntime.getRegistry().registerService(
                 RequestCollectionImportService.class,
                 new AppSwingRequestCollectionImportService()

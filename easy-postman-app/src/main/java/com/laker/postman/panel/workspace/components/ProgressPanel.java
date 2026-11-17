@@ -10,8 +10,8 @@ import javax.swing.*;
 import java.awt.*;
 
 /**
- * 进度显示面板公共组件
- * 用于显示操作进度和状态信息
+ * Thành phần công khai của bảng hiển thị tiến trình
+ * Được sử dụng để hiển thị tiến trình hoạt động và thông tin trạng thái
  */
 public class ProgressPanel extends JPanel {
 
@@ -42,7 +42,7 @@ public class ProgressPanel extends JPanel {
         titleLabel.setFont(FontsUtil.getDefaultFontWithOffset(Font.BOLD, -1));
         add(titleLabel, BorderLayout.NORTH);
 
-        // 状态标签
+        // nhãn trạng thái
         JPanel statusPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         statusPanel.setOpaque(false);
         statusPanel.add(statusLabel);
@@ -55,14 +55,14 @@ public class ProgressPanel extends JPanel {
     }
 
     /**
-     * 设置进度文本
+     * Đặt văn bản tiến trình
      */
     public void setProgressText(String text) {
         progressBar.setString(text);
     }
 
     /**
-     * 重置进度面板状态
+     * Đặt lại trạng thái bảng tiến trình
      */
     public void reset() {
         progressBar.setValue(0);

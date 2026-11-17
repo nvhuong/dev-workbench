@@ -5,8 +5,8 @@ import javax.swing.*;
 import java.awt.*;
 
 /**
- * Markdown 编辑器工具面板
- * 提供 Markdown 编辑和实时预览功能
+ * Markdown Bảng công cụ soạn thảo
+ * cung cấp Markdown Khả năng chỉnh sửa và xem trước trực tiếp
  */
 public class MarkdownToolPanel extends JPanel {
 
@@ -19,35 +19,35 @@ public class MarkdownToolPanel extends JPanel {
     private void initUI() {
         ToolboxWorkbench.applyRoot(this);
 
-        // 创建 Markdown 编辑器
+        // Tạo Markdown Biên tập viên
         markdownEditor = new MarkdownEditorPanel();
 
-        // 设置示例内容
+        // Thiết lập nội dung mẫu
         String sampleContent = """
-                # 欢迎使用 Markdown 编辑器
-                
-                这是一个功能强大的 Markdown 编辑工具，支持实时预览。
-                
-                ## 支持的语法
-                
-                ### 文本格式
-                - **粗体** 使用 `**文本**`
-                - _斜体_ 使用 `_文本_`
-                - ~~删除线~~ 使用 `~~文本~~`
-                - `行内代码` 使用反引号
-                
-                ### 列表
-                1. 有序列表
-                2. 第二项
-                
-                - 无序列表
-                - 另一项
-                
-                ### 任务列表
-                - [x] 已完成的任务
-                - [ ] 待办事项
-                
-                ### 代码块
+                # Chào mừng Markdown Biên tập viên
+
+                Đây là một trong những mạnh mẽ Markdown Công cụ chỉnh sửa hỗ trợ xem trước theo thời gian thực.
+
+                ## Cú pháp được hỗ trợ
+
+                ### Định dạng văn bản
+                - **In đậm** sử dụng `**văn bản**`
+                - _in nghiêng_ sử dụng `_văn bản_`
+                - ~~Gạch ngang~~ sử dụng `~~văn bản~~`
+                - `Mã nội tuyến` Sử dụng dấu tích ngược
+
+                ### danh sách
+                1. Danh sách đặt hàng
+                2. Mục 2
+
+                - Danh sách không có thứ tự
+                - Một mặt hàng khác
+
+                ### Danh sách nhiệm vụ
+                - [x] Nhiệm vụ đã hoàn thành
+                - [ ] Danh sách việc cần làm
+
+                ### khối mã
                 ```java
                 public class Example {
                     public static void main(String[] args) {
@@ -55,17 +55,17 @@ public class MarkdownToolPanel extends JPanel {
                     }
                 }
                 ```
-                
-                ### 表格
-                | 功能 | 状态 |
+
+                ### cái bàn
+                | Chức năng | trạng thái |
                 | --- | --- |
-                | 实时预览 | ✅ |
-                | 语法高亮 | ✅ |
-                | 导出 HTML | ✅ |
-                
+                | Xem trước trực tiếp | ✅ |
+                | Syntax highlighting | ✅ |
+                | Xuất khẩu HTML | ✅ |
+
                 ---
-                
-                开始编辑您的 Markdown 文档吧！
+
+                Bắt đầu chỉnh sửa của bạn Markdown Hãy ghi lại nó! .
                 """;
 
         markdownEditor.setText(sampleContent);

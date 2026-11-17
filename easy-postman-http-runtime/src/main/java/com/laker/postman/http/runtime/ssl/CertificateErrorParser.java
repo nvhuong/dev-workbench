@@ -5,18 +5,18 @@ import lombok.extern.slf4j.Slf4j;
 import java.security.cert.CertificateException;
 
 /**
- * 证书错误信息解析器
- * 负责将各种证书异常转换为易读的错误信息
+ * Certificate error message parser
+ * Chịu trách nhiệm chuyển đổi các ngoại lệ chứng chỉ khác nhau thành thông báo lỗi mà con người có thể đọc được
  */
 @Slf4j
 public class CertificateErrorParser {
 
     private CertificateErrorParser() {
-        // 工具类，隐藏构造函数
+        // Lớp tiện ích, hàm tạo ẩn
     }
 
     /**
-     * 解析证书异常，返回错误类型
+     * Ngoại lệ trong việc phân tích chứng chỉ, trả về loại lỗi
      */
     public static SSLException.SSLErrorType parseErrorType(CertificateException e) {
         String message = e.getMessage();
@@ -41,7 +41,7 @@ public class CertificateErrorParser {
     }
 
     /**
-     * 提取用户友好的错误信息
+     * Trích xuất các thông báo lỗi thân thiện với người dùng
      */
     public static String extractUserFriendlyMessage(CertificateException e) {
         SSLException.SSLErrorType errorType = parseErrorType(e);

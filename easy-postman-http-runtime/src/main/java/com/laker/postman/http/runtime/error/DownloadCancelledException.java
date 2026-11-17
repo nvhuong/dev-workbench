@@ -7,8 +7,8 @@ import lombok.Getter;
 import java.io.IOException;
 
 /**
- * 下载取消异常
- * 当用户主动取消下载时抛出此异常，表示这是正常的用户行为，而非错误
+ * Việc tải xuống bị hủy một cách bất thường
+ * Ngoại lệ này được đưa ra khi người dùng chủ động hủy tải xuống, cho biết rằng đây là hành vi bình thường của người dùng chứ không phải lỗi
  */
 public class DownloadCancelledException extends IOException {
     @Getter

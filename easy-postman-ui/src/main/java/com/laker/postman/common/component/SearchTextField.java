@@ -24,8 +24,8 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
 /**
- * 通用搜索输入框组件，带搜索图标、占位符、清除按钮、大小写敏感和整词匹配选项。
- * 使用 FlatLaf 官方的图标样式。
+ * Thành phần đầu vào tìm kiếm chung với biểu tượng tìm kiếm, trình giữ chỗ, nút xóa, phân biệt chữ hoa chữ thường và các tùy chọn khớp toàn bộ từ.
+ * sử dụng FlatLaf Phong cách biểu tượng chính thức .
  */
 public class SearchTextField extends FlatTextField {
     static final int DEFAULT_WIDTH = 220;
@@ -41,13 +41,13 @@ public class SearchTextField extends FlatTextField {
     private final UndoManager undoManager = new UndoManager();
     /**
      * -- GETTER --
-     * 获取大小写敏感状态
+     * Nhận trạng thái phân biệt chữ hoa chữ thường
      */
     @Getter
     private boolean caseSensitive = false;
     /**
      * -- GETTER --
-     * 获取整词匹配状态
+     * Nhận trạng thái khớp toàn bộ từ
      */
     @Getter
     private boolean wholeWord = false;
@@ -61,13 +61,13 @@ public class SearchTextField extends FlatTextField {
         setMaximumSize(new Dimension(MAX_WIDTH, DEFAULT_HEIGHT));
         setMinimumSize(new Dimension(MIN_WIDTH, DEFAULT_HEIGHT));
 
-        // 创建选项按钮工具栏
+        // Tạo một thanh công cụ nút tùy chọn
         initOptionsToolbar();
 
-        // 撤销/重做功能
+        // Hoàn tác/Làm lại chức năng
         Document doc = getDocument();
         doc.addUndoableEditListener(e -> undoManager.addEdit(e.getEdit()));
-        // 撤销快捷键 (Cmd+Z / Ctrl+Z)
+        // Hoàn tác phím tắt (Cmd+Z / Ctrl+Z)
         getInputMap().put(KeyStroke.getKeyStroke("control Z"), "Undo");
         getInputMap().put(KeyStroke.getKeyStroke("meta Z"), "Undo");
         getActionMap().put("Undo", new AbstractAction() {
@@ -82,7 +82,7 @@ public class SearchTextField extends FlatTextField {
                 }
             }
         });
-        // 重做快捷键 (Ctrl+Y / Cmd+Shift+Z)
+        // Làm lại các phím tắt (Ctrl+Y / Cmd+Shift+Z)
         getInputMap().put(KeyStroke.getKeyStroke("control Y"), "Redo");
         getInputMap().put(KeyStroke.getKeyStroke("meta shift Z"), "Redo");
         getActionMap().put("Redo", new AbstractAction() {
@@ -100,8 +100,8 @@ public class SearchTextField extends FlatTextField {
     }
 
     /**
-     * 初始化选项按钮工具栏（大小写敏感、整词匹配）
-     * 使用 JToolBar 和 SVG 图标，与 FlatLaf 官方 Demo 一致
+     * Khởi tạo thanh công cụ nút tùy chọn (phân biệt chữ hoa chữ thường, khớp toàn bộ từ)
+     * sử dụng JToolBar và SVG biểu tượng, với FlatLaf chính thức Demo nhất quán
      */
     private void initOptionsToolbar() {
         JToggleButton caseSensitiveButton = createOptionButton(
@@ -126,7 +126,7 @@ public class SearchTextField extends FlatTextField {
             firePropertyChange("wholeWord", !wholeWord, wholeWord);
         });
 
-        // 使用 JToolBar 作为容器，这是 FlatLaf 官方推荐的方式
+        // sử dụng JToolBar Là một container, đây là FlatLaf Phương pháp chính thức được đề xuất
         JToolBar toolbar = new JToolBar();
         toolbar.setFloatable(false);
         toolbar.setOpaque(false);
@@ -135,7 +135,7 @@ public class SearchTextField extends FlatTextField {
         toolbar.add(caseSensitiveButton);
         toolbar.add(wholeWordButton);
 
-        // 设置为 trailing component
+        // Đặt thành  trailing component
         putClientProperty(FlatClientProperties.TEXT_FIELD_TRAILING_COMPONENT, toolbar);
     }
 
@@ -156,9 +156,9 @@ public class SearchTextField extends FlatTextField {
     }
 
     /**
-     * 设置搜索无结果状态：无结果时输入框变红，有结果时恢复正常（同 IDEA 行为）。
+     * Đặt trạng thái tìm kiếm không có kết quả: ô nhập chuyển sang màu đỏ khi không có kết quả và trở về bình thường khi có kết quả (giống như IDEA Hành vi).
      *
-     * @param noResult true=无结果（红色边框），false=有结果或清空（恢复正常）
+     * @param noResult true=Không có kết quả (viền đỏ).false=Có kết quả hoặc rõ ràng (trở lại bình thường)
      */
     public void setNoResult(boolean noResult) {
         putClientProperty(FlatClientProperties.OUTLINE, noResult ? FlatClientProperties.OUTLINE_ERROR : null);

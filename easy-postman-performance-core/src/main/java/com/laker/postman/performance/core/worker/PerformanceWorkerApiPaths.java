@@ -4,7 +4,7 @@ import lombok.experimental.UtilityClass;
 
 @UtilityClass
 public class PerformanceWorkerApiPaths {
-    // worker server 和 master/client 共用同一份路径定义，避免文档或客户端遗漏版本化 base path。
+    // worker server và master/client Chia sẻ cùng một định nghĩa đường dẫn để tránh thiếu phiên bản trong tài liệu hoặc ứng dụng khách base path。
     public static final String API_PREFIX = "/api/performance/v1";
     public static final String HEALTH = API_PREFIX + "/health";
     public static final String RUNS = API_PREFIX + "/runs";

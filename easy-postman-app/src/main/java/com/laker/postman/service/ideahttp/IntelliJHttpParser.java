@@ -32,36 +32,36 @@ import static com.laker.postman.request.model.RequestBodyTypes.BODY_TYPE_NONE;
 import static com.laker.postman.request.model.RequestBodyTypes.BODY_TYPE_RAW;
 
 /**
- * IntelliJ IDEA HTTP Client 文件解析器
- * 负责解析 .http 文件格式（IntelliJ IDEA HTTP Client / REST Client 格式），转换为内部数据结构
- * 此类只负责解析，不涉及 UI 层的 TreeNode 组装
+ * IntelliJ IDEA HTTP Client Trình phân tích tệp
+ * Chịu trách nhiệm phân tích .http Định dạng tệp (IntelliJ IDEA HTTP Client / REST Client format), được chuyển đổi thành cấu trúc dữ liệu nội bộ
+ * Lớp này chỉ chịu trách nhiệm phân tích cú pháp và không liên quan UI lớp TreeNode Lắp ráp
  */
 @Slf4j
 @UtilityClass
 public class IntelliJHttpParser {
-    // 匹配请求分隔符：### 开头的注释
+    // Dấu phân cách yêu cầu khớp: .### Ghi chú ở đầu
     private static final Pattern REQUEST_SEPARATOR_PATTERN = Pattern.compile("^###\\s*(.+)$");
-    // 匹配 HTTP 方法 + URL + 可选 HTTP 版本，支持自定义方法
+    // cuộc thi đấu HTTP phương pháp + URL + Không bắt buộc HTTP phiên bản, hỗ trợ các phương pháp tùy chỉnh
     private static final Pattern HTTP_METHOD_PATTERN = Pattern.compile(
             "^([A-Z][A-Z0-9_-]*)\\s+(.+?)(?:\\s+(HTTP/1\\.1|HTTP/2(?:\\s*\\(Prior Knowledge\\))?))?$"
     );
-    // 匹配头部：Key: Value
+    // Tiêu đề trận đấu: .Key: Value
     private static final Pattern HEADER_PATTERN = Pattern.compile("^([^:]+):\\s*(.+)$");
-    // 匹配单行注释：# 开头
+    // Khớp với nhận xét một dòng: .# Bắt đầu
     private static final Pattern COMMENT_PATTERN = Pattern.compile("^#\\s*(.*)$");
-    // 匹配请求名称注解：# @name RequestName
+    // Chú thích tên yêu cầu khớp: .# @name RequestName
     private static final Pattern REQUEST_NAME_PATTERN = Pattern.compile("^#\\s*@name\\s*(?:=\\s*)?(.+)$");
-    // 匹配变量定义：@变量名=值
+    // So khớp định nghĩa biến: .@tên biến=giá trị
     private static final Pattern VARIABLE_PATTERN = Pattern.compile("^@([a-zA-Z_][a-zA-Z0-9_]*)\\s*=\\s*(.*)$");
-    // 匹配请求行末尾的内联 response handler
+    // Khớp với dòng nội tuyến ở cuối dòng yêu cầu response handler
     private static final Pattern INLINE_RESPONSE_HANDLER_PATTERN = Pattern.compile("^(.*?)\\s+>\\s*\\{%\\s*(.*?)\\s*%}\\s*$");
 
     /**
-     * 解析 HTTP 文件，返回包含分组信息和请求列表的解析结果
+     * phân tích HTTP Tệp, trả về kết quả phân tích cú pháp chứa thông tin nhóm và danh sách yêu cầu
      *
-     * @param content  HTTP 文件内容
-     * @param filename 文件名（可选），用于生成更友好的组名
-     * @return CollectionParseResult，如果解析失败返回 null
+     * @param content  HTTP Nội dung tập tin
+     * @param filename Tên tệp (tùy chọn), được sử dụng để tạo tên nhóm thân thiện hơn với người dùng
+     * @return CollectionParseResult，Trả về nếu phân tích cú pháp không thành công null
      */
     public static CollectionParseResult parseHttpFile(String content, String filename) {
         try {
@@ -70,23 +70,23 @@ public class IntelliJHttpParser {
                 return null;
             }
 
-            // 创建分组 - 优先使用文件名，否则使用国际化的组名和格式化的时间戳
+            // Tạo nhóm - Tên tệp được sử dụng đầu tiên, nếu không thì tên nhóm được quốc tế hóa và dấu thời gian được định dạng sẽ được sử dụng
             String groupName;
             if (filename != null && !filename.trim().isEmpty()) {
-                // 移除文件扩展名
+                // Xóa phần mở rộng tập tin
                 groupName = filename.replaceAll("\\.http$", "").trim();
             } else {
-                // 使用默认的国际化组名
+                // Sử dụng tên nhóm được quốc tế hóa mặc định
                 String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
                 groupName = I18nUtil.getMessage(MessageKeys.COLLECTIONS_IMPORT_HTTP_DEFAULT_GROUP, timestamp);
             }
 
             RequestGroup collectionGroup = new RequestGroup(groupName);
 
-            // 按行分割
+            // Chia theo hàng
             String[] lines = content.split("\n");
 
-            // 解析环境变量和请求
+            // Phân tích các biến môi trường và yêu cầu
             ParseContext context = parseHttpContent(lines);
 
             List<HttpRequestItem> validRequests = new ArrayList<>();
@@ -101,7 +101,7 @@ public class IntelliJHttpParser {
                 return null;
             }
 
-            // 如果有解析出的变量，将它们添加到 RequestGroup 的 variables 字段中（分组级别的变量）
+            // Nếu có các biến được phân tích cú pháp, hãy thêm chúng vào RequestGroup của variables trường (một biến ở cấp độ nhóm)
             if (!context.variables.isEmpty()) {
                 for (Map.Entry<String, String> entry : context.variables.entrySet()) {
                     Variable variable = new Variable(true, entry.getKey(), entry.getValue());
@@ -109,7 +109,7 @@ public class IntelliJHttpParser {
                 }
             }
 
-            // 创建解析结果
+            // Tạo kết quả phân tích cú pháp
             return CollectionParseResult.createFlat(collectionGroup, validRequests);
 
         } catch (Exception e) {
@@ -119,7 +119,7 @@ public class IntelliJHttpParser {
     }
 
     /**
-     * 解析上下文，包含请求列表和变量映射
+     * Phân tích ngữ cảnh, bao gồm danh sách yêu cầu và ánh xạ biến
      */
     private static class ParseContext {
         List<HttpRequestItem> requests = new ArrayList<>();
@@ -127,7 +127,7 @@ public class IntelliJHttpParser {
     }
 
     /**
-     * 解析 HTTP 文件内容，提取变量和请求
+     * phân tích HTTP Nội dung tập tin, trích xuất các biến và yêu cầu
      */
     private static ParseContext parseHttpContent(String[] lines) {
         ParseContext context = new ParseContext();
@@ -136,11 +136,11 @@ public class IntelliJHttpParser {
     }
 
     /**
-     * 解析 HTTP 请求列表
+     * phân tích HTTP Danh sách yêu cầu
      *
-     * @param lines     文件行数组
-     * @param variables 用于存储解析出的变量定义
-     * @return 请求列表
+     * @param lines     Mảng các dòng tập tin
+     * @param variables Được sử dụng để lưu trữ các định nghĩa biến được phân tích cú pháp
+     * @return Danh sách yêu cầu
      */
     private static List<HttpRequestItem> parseHttpRequests(String[] lines, Map<String, String> variables) {
         List<HttpRequestItem> requests = new ArrayList<>();
@@ -159,10 +159,10 @@ public class IntelliJHttpParser {
             String line = lines[i];
             String trimmedLine = line.trim();
 
-            // 跳过空行
+            // Bỏ qua các dòng trống
             if (trimmedLine.isEmpty()) {
                 if (inBody && bodyBuilder != null) {
-                    // 空行可能是 body 的一部分
+                    // Có thể có dòng trống body một phần của
                     bodyBuilder.append("\n");
                 }
                 continue;
@@ -186,7 +186,7 @@ public class IntelliJHttpParser {
                 }
             }
 
-            // 检查是否是变量定义（@ 开头）
+            // Kiểm tra xem đó có phải là định nghĩa biến (@ đầu)
             Matcher variableMatcher = VARIABLE_PATTERN.matcher(trimmedLine);
             if (variableMatcher.matches()) {
                 String varName = variableMatcher.group(1).trim();
@@ -195,7 +195,7 @@ public class IntelliJHttpParser {
                 continue;
             }
 
-            // JetBrains 官方支持 # @name 指定请求名称
+            // JetBrains Hỗ trợ chính thức # @name Chỉ định tên yêu cầu
             Matcher requestNameMatcher = REQUEST_NAME_PATTERN.matcher(trimmedLine);
             if (requestNameMatcher.matches()) {
                 pendingRequestName = requestNameMatcher.group(1).trim();
@@ -220,44 +220,44 @@ public class IntelliJHttpParser {
                 continue;
             }
 
-            // 跳过单行注释（# 开头，但不是 ###）
+            // Bỏ qua các nhận xét một dòng (# Bắt đầu, nhưng không ###）
             if (COMMENT_PATTERN.matcher(trimmedLine).matches() && !trimmedLine.startsWith("###")) {
                 continue;
             }
 
-            // 检查响应处理脚本开始（> {% ... %} 格式）
+            // Kiểm tra tập lệnh xử lý phản hồi bắt đầu (> {% ... %} định dạng)
             if (trimmedLine.startsWith(">") && trimmedLine.contains("{%")) {
-                // 如果在 body 中遇到响应脚本，说明 body 已结束
+                // Nếu vào body Tập lệnh phản hồi gặp phải trong , mô tả body Đã kết thúc
                 if (inBody) {
                     inBody = false;
                 }
-                // 初始化响应脚本 builder
+                // Khởi tạo tập lệnh phản hồi builder
                 if (responseScriptBuilder == null) {
                     responseScriptBuilder = new StringBuilder();
                 } else if (!responseScriptBuilder.isEmpty()) {
                     responseScriptBuilder.append("\n");
                 }
-                // 提取脚本内容（去掉 > {% 和 %}）
-                String scriptLine = trimmedLine.substring(1).trim(); // 去掉 >
+                // Trích xuất nội dung tập lệnh (remove > {% và %}）
+                String scriptLine = trimmedLine.substring(1).trim(); // Xóa >
                 if (scriptLine.startsWith("{%") && scriptLine.endsWith("%}")) {
-                    // 单行脚本
+                    // Kịch bản một dòng
                     scriptLine = scriptLine.substring(2, scriptLine.length() - 2).trim();
                     responseScriptBuilder.append(scriptLine);
                 } else if (scriptLine.startsWith("{%")) {
-                    // 多行脚本开始
+                    // Kịch bản nhiều dòng bắt đầu
                     scriptLine = scriptLine.substring(2).trim();
                     responseScriptBuilder.append(scriptLine);
                     inResponseScript = true;
                 } else {
-                    // 未知格式，跳过
+                    // Định dạng không xác định, bỏ qua
                 }
                 continue;
             }
 
-            // 如果在响应脚本模式中，继续收集多行脚本
+            // Nếu ở chế độ tập lệnh phản hồi, hãy tiếp tục thu thập tập lệnh nhiều dòng
             if (inResponseScript) {
                 if (trimmedLine.endsWith("%}")) {
-                    // 脚本结束
+                    // Kịch bản kết thúc
                     String scriptLine = trimmedLine;
                     if (scriptLine.endsWith("%}")) {
                         scriptLine = scriptLine.substring(0, scriptLine.length() - 2).trim();
@@ -267,26 +267,26 @@ public class IntelliJHttpParser {
                     }
                     inResponseScript = false;
                 } else {
-                    // 继续收集脚本内容
+                    // Tiếp tục thu thập nội dung kịch bản
                     responseScriptBuilder.append("\n").append(trimmedLine);
                 }
                 continue;
             }
 
-            // 检查是否是请求分隔符（### 开头的注释）
+            // Kiểm tra xem đó có phải là dấu phân cách yêu cầu (### Lưu ý ở đầu)
             Matcher separatorMatcher = REQUEST_SEPARATOR_PATTERN.matcher(trimmedLine);
             if (separatorMatcher.matches()) {
-                // 保存上一个请求
+                // Lưu yêu cầu trước đó
                 if (currentRequest != null) {
                     finishRequest(currentRequest, bodyBuilder, contentType, boundary);
-                    // 处理响应脚本
+                    // Xử lý các kịch bản phản hồi
                     if (responseScriptBuilder != null && !responseScriptBuilder.isEmpty()) {
                         String convertedScript = convertResponseScriptToPostman(responseScriptBuilder.toString());
                         currentRequest.setPostscript(convertedScript);
                     }
                     requests.add(currentRequest);
                 }
-                // 开始新请求
+                // Bắt đầu một yêu cầu mới
                 String requestName = separatorMatcher.group(1).trim();
                 currentRequest = new HttpRequestItem();
                 currentRequest.setId(UUID.randomUUID().toString());
@@ -300,10 +300,10 @@ public class IntelliJHttpParser {
                 continue;
             }
 
-            // 检查是否是 HTTP 方法行（如果没有当前请求，自动创建一个）
+            // Kiểm tra xem có HTTP Hàng phương thức (tự động tạo một hàng nếu không có yêu cầu hiện tại)
             Matcher methodMatcher = HTTP_METHOD_PATTERN.matcher(trimmedLine);
             if (methodMatcher.matches()) {
-                // 如果还没有当前请求，先创建一个（支持没有 ### 分隔符的情况）
+                // Nếu chưa có yêu cầu hiện tại, hãy tạo một yêu cầu trước (không có hỗ trợ nào ### dấu phân cách)
                 if (currentRequest == null) {
                     currentRequest = new HttpRequestItem();
                     currentRequest.setId(UUID.randomUUID().toString());
@@ -332,28 +332,28 @@ public class IntelliJHttpParser {
                 continue;
             }
 
-            // 如果没有当前请求，跳过
+            // Nếu không có yêu cầu hiện tại, hãy bỏ qua nó
             if (currentRequest == null) {
                 continue;
             }
 
-            // 检查是否是 Content-Type 头部（可能影响 body 解析）
-            // 只有在未进入 body 时才作为请求头处理
+            // Kiểm tra xem có Content-Type Đầu (có thể ảnh hưởng body phân tích)
+            // Chỉ khi không được nhập body Chỉ khi đó nó mới được xử lý như một tiêu đề yêu cầu
             if (trimmedLine.toLowerCase().startsWith("content-type:") && !inBody) {
                 Matcher contentTypeMatcher = HEADER_PATTERN.matcher(trimmedLine);
                 if (contentTypeMatcher.matches()) {
                     String originalContentType = contentTypeMatcher.group(2).trim();
                     contentType = originalContentType.toLowerCase();
 
-                    // 检查是否是 multipart/form-data 并提取 boundary
-                    // 注意：boundary 是大小写敏感的，所以要从原始值中提取
+                    // Kiểm tra xem có multipart/form-data và trích xuất boundary
+                    // Lưu ý:boundary Nó phân biệt chữ hoa chữ thường nên được trích xuất từ giá trị ban đầu
                     if (contentType.contains("multipart/form-data")) {
-                        // 使用不区分大小写的匹配来找到 boundary 参数
+                        // Được tìm thấy bằng cách sử dụng kết hợp không phân biệt chữ hoa chữ thường boundary các thông số
                         Pattern boundaryPattern = Pattern.compile("boundary=([^;\\s]+)", Pattern.CASE_INSENSITIVE);
                         Matcher boundaryMatcher = boundaryPattern.matcher(originalContentType);
                         if (boundaryMatcher.find()) {
                             boundary = boundaryMatcher.group(1).trim();
-                            // 移除可能的引号
+                            // Loại bỏ các trích dẫn có thể
                             if (boundary.startsWith("\"") && boundary.endsWith("\"")) {
                                 boundary = boundary.substring(1, boundary.length() - 1);
                             }
@@ -368,16 +368,16 @@ public class IntelliJHttpParser {
                 }
             }
 
-            // 检查是否是头部行
+            // Kiểm tra xem đó có phải là hàng tiêu đề không
             Matcher headerMatcher = HEADER_PATTERN.matcher(trimmedLine);
             if (headerMatcher.matches() && !inBody) {
                 String headerName = headerMatcher.group(1).trim();
                 String headerValue = headerMatcher.group(2).trim();
-                // 处理 Authorization 头部
+                // xử lý Authorization cái đầu
                 if ("Authorization".equalsIgnoreCase(headerName)) {
                     parseAuthorization(currentRequest, headerValue);
                 } else {
-                    // 添加到头部列表
+                    // Thêm vào danh sách tiêu đề
                     if (currentRequest.getHeadersList() == null) {
                         currentRequest.setHeadersList(new ArrayList<>());
                     }
@@ -386,7 +386,7 @@ public class IntelliJHttpParser {
                 continue;
             }
 
-            // 其他情况视为 body 内容
+            // Các tình huống khác được cho là như vậy body nội dung
             if (currentRequest.getMethod() != null &&
                     ("POST".equals(currentRequest.getMethod()) ||
                             "PUT".equals(currentRequest.getMethod()) ||
@@ -403,10 +403,10 @@ public class IntelliJHttpParser {
             }
         }
 
-        // 保存最后一个请求
+        // Lưu yêu cầu cuối cùng
         if (currentRequest != null) {
             finishRequest(currentRequest, bodyBuilder, contentType, boundary);
-            // 处理响应脚本
+            // Xử lý các kịch bản phản hồi
             if (responseScriptBuilder != null && !responseScriptBuilder.isEmpty()) {
                 String convertedScript = convertResponseScriptToPostman(responseScriptBuilder.toString());
                 currentRequest.setPostscript(convertedScript);
@@ -512,42 +512,42 @@ public class IntelliJHttpParser {
     }
 
     /**
-     * 完成请求解析，设置 body 和其他属性
+     * Hoàn tất việc phân tích và thiết lập yêu cầu body và các thuộc tính khác
      */
     private static void finishRequest(HttpRequestItem request, StringBuilder bodyBuilder, String contentType, String boundary) {
-        // 设置协议类型
+        // Đặt loại giao thức
         if (HttpRequestProtocol.isWebSocketUrl(request.getUrl())) {
             request.setProtocol(RequestItemProtocolEnum.WEBSOCKET);
         } else {
             request.setProtocol(RequestItemProtocolEnum.HTTP);
         }
 
-        // 处理 body
+        // xử lý body
         if (bodyBuilder != null && !bodyBuilder.isEmpty()) {
             String body = bodyBuilder.toString().trim();
             if (!body.isEmpty()) {
-                // 根据 Content-Type 处理 body
+                // theo Content-Type xử lý body
                 if (contentType != null && contentType.contains("multipart/form-data")) {
-                    // 解析 multipart/form-data 格式
+                    // phân tích multipart/form-data định dạng
                     parseMultipartFormData(request, body, boundary);
                 } else if (contentType != null && contentType.contains("application/x-www-form-urlencoded")) {
-                    // 解析 urlencoded 格式
+                    // phân tích urlencoded định dạng
                     parseUrlencodedBody(request, body);
                 } else {
-                    // 默认作为 raw body
+                    // Mặc định là  raw body
                     request.setBody(body);
                     request.setBodyType(BODY_TYPE_RAW);
                 }
             } else {
-                // body 为空
+                // body trống rỗng
                 request.setBodyType(BODY_TYPE_NONE);
             }
         } else {
-            // 没有 body
+            // Không body
             request.setBodyType(BODY_TYPE_NONE);
         }
 
-        // 如果没有设置名称，使用 URL
+        // Nếu không có tên nào được đặt, nó sẽ được sử dụng URL
         String unnamedRequest = I18nUtil.getMessage(MessageKeys.COLLECTIONS_IMPORT_HTTP_UNNAMED_REQUEST);
         if (request.getName() == null || request.getName().isEmpty() || unnamedRequest.equals(request.getName())) {
             try {
@@ -570,8 +570,8 @@ public class IntelliJHttpParser {
     }
 
     /**
-     * 将 IntelliJ HTTP Client 的响应脚本转换为 Postman 风格的脚本
-     * 例如：client.global.set("token", response.body.token) -> pm.environment.set("token", pm.response.json().token)
+     * Sẽ IntelliJ HTTP Client Tập lệnh phản hồi được chuyển đổi thành  Postman kịch bản phong cách
+     * Ví dụ:client.global.set("token", response.body.token) -> pm.environment.set("token", pm.response.json().token)
      */
     private static String convertResponseScriptToPostman(String httpClientScript) {
         if (httpClientScript == null || httpClientScript.trim().isEmpty()) {
@@ -589,34 +589,34 @@ public class IntelliJHttpParser {
 
             String convertedLine = line;
 
-            // 转换 client.global.set 为 pm.environment.set
+            // Chuyển thành client.global.set vì pm.environment.set
             if (line.contains("client.global.set")) {
                 convertedLine = line.replace("client.global.set", "pm.environment.set");
 
-                // 转换 response.body 为 pm.response.json()
-                // 例如：response.body.token -> pm.response.json().token
+                // Chuyển thành response.body vì pm.response.json()
+                // Ví dụ:response.body.token -> pm.response.json().token
                 convertedLine = convertedLine.replaceAll("response\\.body\\.(\\w+)", "pm.response.json().$1");
 
-                // 如果只有 response.body（没有属性访问），转换为 pm.response.json()
+                // Nếu chỉ response.body（không có quyền truy cập thuộc tính), được chuyển đổi thành  pm.response.json()
                 convertedLine = convertedLine.replace("response.body", "pm.response.json()");
             }
 
-            // 转换 client.global.get 为 pm.environment.get
+            // Chuyển thành client.global.get vì pm.environment.get
             if (line.contains("client.global.get")) {
                 convertedLine = convertedLine.replace("client.global.get", "pm.environment.get");
             }
 
-            // 转换 client.test 为 pm.test
+            // Chuyển thành client.test vì pm.test
             if (line.contains("client.test")) {
                 convertedLine = convertedLine.replace("client.test", "pm.test");
             }
 
-            // 转换 response.status 为 pm.response.code
+            // Chuyển thành response.status vì pm.response.code
             if (line.contains("response.status")) {
                 convertedLine = convertedLine.replace("response.status", "pm.response.code");
             }
 
-            // 转换 response.headers 为 pm.response.headers
+            // Chuyển thành response.headers vì pm.response.headers
             if (line.contains("response.headers")) {
                 convertedLine = convertedLine.replace("response.headers", "pm.response.headers");
             }
@@ -631,16 +631,16 @@ public class IntelliJHttpParser {
     }
 
     /**
-     * 解析 application/x-www-form-urlencoded 格式的 body
+     * phân tích application/x-www-form-urlencoded định dạng body
      */
     private static void parseUrlencodedBody(HttpRequestItem request, String body) {
         List<HttpFormUrlencoded> urlencodedList = new ArrayList<>();
 
-        // 处理多行格式（每行可能以 & 结尾）
-        // 先移除所有换行符和多余的空格，然后按 & 分割
-        String normalizedBody = body.replaceAll("\\s*&\\s*\\n\\s*", "&")  // 处理 & 后换行
-                .replaceAll("\\n\\s*", "&")           // 处理换行（视为 & 分隔）
-                .replaceAll("&+", "&");              // 移除重复的 &
+        // Xử lý các định dạng nhiều dòng (mỗi dòng có thể bắt đầu bằng  & kết thúc)
+        // Đầu tiên hãy xóa tất cả các dòng mới và khoảng trắng thừa, sau đó nhấn  & sự phân đoạn
+        String normalizedBody = body.replaceAll("\\s*&\\s*\\n\\s*", "&")  // xử lý & Ngắt dòng sau
+                .replaceAll("\\n\\s*", "&")           // Xử lý các dòng mới (được coi là  & tách ra)
+                .replaceAll("&+", "&");              // Loại bỏ các bản sao &
 
         String[] pairs = normalizedBody.split("&");
         for (String pair : pairs) {
@@ -649,7 +649,7 @@ public class IntelliJHttpParser {
                 continue;
             }
 
-            // 处理 key = value 或 key=value 格式
+            // xử lý key = value hoặc key=value định dạng
             int equalsIndex = pair.indexOf('=');
             if (equalsIndex > 0) {
                 String name = pair.substring(0, equalsIndex).trim();
@@ -658,7 +658,7 @@ public class IntelliJHttpParser {
                     urlencodedList.add(new HttpFormUrlencoded(true, name, value));
                 }
             } else if (!pair.contains("=")) {
-                // 没有等号，视为单独的 key
+                // Nếu không có dấu bằng thì nó được coi là riêng biệt key
                 urlencodedList.add(new HttpFormUrlencoded(true, pair, ""));
             }
         }
@@ -667,12 +667,12 @@ public class IntelliJHttpParser {
     }
 
     /**
-     * 解析 multipart/form-data 格式的 body
+     * phân tích multipart/form-data định dạng body
      */
     private static void parseMultipartFormData(HttpRequestItem request, String body, String boundary) {
         if (boundary == null || boundary.isEmpty()) {
-            log.warn("multipart/form-data 缺少 boundary，无法解析");
-            // 降级为 raw body
+            log.warn("multipart/form-data thiếu boundary，Không thể phân tích cú pháp");
+            // Đã hạ cấp xuống raw body
             request.setBody(body);
             request.setBodyType(BODY_TYPE_RAW);
             return;
@@ -680,24 +680,24 @@ public class IntelliJHttpParser {
 
         List<HttpFormData> formDataList = new ArrayList<>();
 
-        // 添加 -- 前缀到 boundary（如果还没有）
+        // Thêm vào -- tiền tố tới boundary（nếu bạn chưa có)
         String fullBoundary = boundary.startsWith("--") ? boundary : "--" + boundary;
 
-        // 使用正则表达式分割，匹配边界前面可能有换行符的情况
-        // 分割模式：可选的换行符 + boundary
+        // Sử dụng biểu thức chính quy để phân chia và có thể có các ký tự dòng mới ở phía trước ranh giới khớp
+        // Chế độ phân chia: ký tự dòng mới tùy chọn + boundary
         String splitPattern = "(?:\\r?\\n)?" + Pattern.quote(fullBoundary);
         String[] parts = body.split(splitPattern);
 
 
         for (String part : parts) {
             part = part.trim();
-            // 跳过空 part 和结束标志
+            // Bỏ qua trống part và dấu hiệu kết thúc
             if (part.isEmpty() || part.equals("--")) {
                 continue;
             }
 
             try {
-                // 将 part 按行分割
+                // Sẽ part Chia theo hàng
                 String[] lines = part.split("\\r?\\n");
 
                 String fieldName = null;
@@ -705,35 +705,35 @@ public class IntelliJHttpParser {
                 StringBuilder contentBuilder = new StringBuilder();
                 boolean foundDoubleNewline = false;
 
-                // 解析 Content-Disposition 头部
+                // phân tích Content-Disposition cái đầu
                 Pattern dispositionPattern = Pattern.compile(
                         "Content-Disposition:\\s*form-data;\\s*name=\"([^\"]+)\"(?:;\\s*filename=\"([^\"]+)\")?",
                         Pattern.CASE_INSENSITIVE
                 );
 
                 int lineIndex = 0;
-                // 先处理所有头部（Content-Disposition, Content-Type等）
+                // Xử lý tất cả các tiêu đề trước (Content-Disposition, Content-TypeChờ đợi)
                 for (; lineIndex < lines.length; lineIndex++) {
                     String line = lines[lineIndex];
 
-                    // 检查是否是空行（表示头部结束）
+                    // Kiểm tra xem đó có phải là dòng trống không (cho biết phần cuối của tiêu đề)
                     if (line.trim().isEmpty()) {
                         foundDoubleNewline = true;
-                        lineIndex++; // 跳过空行
+                        lineIndex++; // Bỏ qua các dòng trống
                         break;
                     }
 
-                    // 解析 Content-Disposition
+                    // phân tích Content-Disposition
                     Matcher dispositionMatcher = dispositionPattern.matcher(line);
                     if (dispositionMatcher.find()) {
                         fieldName = dispositionMatcher.group(1);
                         fileName = dispositionMatcher.group(2);
                     }
 
-                    // 其他头部（如 Content-Type）我们暂时忽略，只关注 Content-Disposition
+                    // Các tiêu đề khác (ví dụ: Content-Type）Chúng tôi bỏ qua nó bây giờ và chỉ chú ý Content-Disposition
                 }
 
-                // 收集内容（空行之后的所有行）
+                // Thu thập nội dung (tất cả các dòng sau dòng trống)
                 if (foundDoubleNewline && fieldName != null) {
                     for (; lineIndex < lines.length; lineIndex++) {
                         if (!contentBuilder.isEmpty()) {
@@ -744,27 +744,27 @@ public class IntelliJHttpParser {
 
                     String value = contentBuilder.toString().trim();
 
-                    // 检查是否是文件引用（< ./filename 格式）
+                    // Kiểm tra xem đó có phải là tệp tham chiếu (< ./filename định dạng)
                     if (value.startsWith("<")) {
                         value = value.substring(1).trim();
                     }
 
-                    // 判断是文件还是文本字段
+                    // Xác định xem đó là một tập tin hay một trường văn bản
                     if (fileName != null && !fileName.isEmpty()) {
-                        // 文件字段
+                        // Trường tệp
                         formDataList.add(new HttpFormData(true, fieldName, HttpFormData.TYPE_FILE, value.isEmpty() ? fileName : value));
                     } else {
-                        // 文本字段
+                        // Trường văn bản
                         formDataList.add(new HttpFormData(true, fieldName, HttpFormData.TYPE_TEXT, value));
                     }
                 }
             } catch (Exception e) {
-                log.warn("解析 multipart part 失败: " + e.getMessage(), e);
+                log.warn("phân tích multipart part thất bại: " + e.getMessage(), e);
             }
         }
 
         if (formDataList.isEmpty()) {
-            log.warn("multipart/form-data 解析结果为空，降级为 raw body");
+            log.warn("multipart/form-data Kết quả phân tích cú pháp trống, bị hạ cấp xuống raw body");
             request.setBody(body);
             request.setBodyType(BODY_TYPE_RAW);
         } else {
@@ -774,7 +774,7 @@ public class IntelliJHttpParser {
     }
 
     /**
-     * 解析 Authorization 头部
+     * phân tích Authorization cái đầu
      */
     private static void parseAuthorization(HttpRequestItem request, String authValue) {
         if (authValue.startsWith("Basic ")) {

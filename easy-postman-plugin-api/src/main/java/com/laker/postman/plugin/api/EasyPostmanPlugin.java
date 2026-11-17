@@ -1,23 +1,23 @@
 package com.laker.postman.plugin.api;
 
 /**
- * EasyPostman 插件入口。
+ * EasyPostman Mục nhập trình cắm.
  */
 public interface EasyPostmanPlugin {
 
     /**
-     * 插件加载时调用，用于注册扩展点。
+     * Được gọi khi plug-in được tải, dùng để đăng ký các điểm mở rộng.
      */
     void onLoad(PluginContext context);
 
     /**
-     * 所有扩展注册完成后调用。
+     * Được gọi sau khi tất cả các đăng ký mở rộng đã được hoàn thành.
      */
     default void onStart() {
     }
 
     /**
-     * 应用退出时调用。
+     * Được gọi khi ứng dụng thoát.
      */
     default void onStop() {
     }

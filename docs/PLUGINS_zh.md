@@ -1,24 +1,24 @@
-# EasyPostman 插件开发、更新与发布指南
+# EasyPostman Hướng dẫn phát triển, cập nhật và xuất bản plug-in
 
-这份文档面向两类人：
+Tài liệu này dành cho hai loại người:
 
-- 想看懂当前插件机制是怎么工作的维护者
-- 正在开发、更新、发布插件的开发者
+- Người bảo trì muốn hiểu cơ chế plug-in hiện tại hoạt động như thế nào
+- Các nhà phát triển đang phát triển, cập nhật và phát hành các phần bổ trợ
 
-如果你只关心一句话，可以先记住这 4 点：
+Nếu bạn chỉ quan tâm đến một câu, bạn có thể nhớ câu này trước 4 Điểm:
 
-1. 插件是单独的 JAR，不和宿主一起绑死发版
-2. 插件元数据的单一真源是各插件自己的 `pom.xml`
-3. GitHub Actions 只负责读取产物、校验一致性、发布和回写 catalog
-4. 本地验证优先走“构建插件 JAR -> 插件管理安装 -> 重启验证”这条路径
+1. Các plugin là riêng biệt JAR，Không buộc phiên bản tóc cùng với chủ nhà
+2. Nguồn thông tin chính xác duy nhất cho siêu dữ liệu plugin là của riêng mỗi plugin `pom.xml`
+3. GitHub Actions Chỉ chịu trách nhiệm đọc sản phẩm, xác minh tính nhất quán, xuất bản và viết lại catalog
+4. Ưu tiên xác minh địa phương“Xây dựng plugin JAR -> Cài đặt quản lý plug-in -> Khởi động lại xác minh”con đường này
 
-如果你当前更想看 runtime 内核实现，而不是开发/发布流程，可以直接先读：
+Nếu bạn muốn xem nó bây giờ runtime Triển khai hạt nhân chứ không phải phát triển/Đối với quá trình phát hành, bạn có thể đọc trực tiếp: .
 
 - [PLUGIN_RUNTIME_ARCHITECTURE_zh.md](./PLUGIN_RUNTIME_ARCHITECTURE_zh.md)
 
-## 1. 组件分层和原理
+## 1. Phân lớp thành phần và nguyên tắc
 
-当前插件体系分成 7 层：
+Hệ thống plug-in hiện tại được chia thành 7 lớp:
 
 ```text
 easy-postman-parent
@@ -37,180 +37,180 @@ easy-postman-parent
     └── plugin-decompiler
 ```
 
-### 1.1 每层负责什么
+### 1.1 Mỗi lớp chịu trách nhiệm gì?
 
 - `easy-postman-plugin-api`
-  - 插件对宿主暴露的稳定 SPI
-  - 包含 `EasyPostmanPlugin`、`PluginContext`、`PluginDescriptor`
-  - 插件服务契约也放在这里，例如 `GitPluginService`、`ClientCertificatePluginService`、`RequestCollectionImportService`
-  - 新插件的入口类必须实现这里的接口
+  - Tính ổn định của plugin tiếp xúc với máy chủ SPI
+  - Chứa `EasyPostmanPlugin`、`PluginContext`、`PluginDescriptor`
+  - Hợp đồng dịch vụ plugin cũng được đặt ở đây chẳng hạn `GitPluginService`、`ClientCertificatePluginService`、`RequestCollectionImportService`
+  - Lớp đầu vào của plug-in mới phải triển khai giao diện ở đây
 - `easy-postman-foundation`
-  - 宿主和插件共享的基础工具、消息 key、公共模型
-  - 插件需要和宿主共享非 UI DTO、enum、常量、路径、JSON、系统、设置工具或通用解析/格式化工具时，优先放这里
+  - Các công cụ và thông báo cơ bản được chia sẻ bởi máy chủ và trình cắm key、Mô hình đại chúng
+  - Plug-in cần được chia sẻ với máy chủ UI DTO、enum、Các hằng số, đường dẫn,JSON、Hệ thống, công cụ thiết lập hoặc phân tích cú pháp chung/Khi định dạng các công cụ, hãy đặt chúng ở đây trước tiên
 - `easy-postman-platform`
-  - 宿主平台框架能力，例如 IOC 和更新发现核心
-  - 不是普通插件 SPI；插件需要扩展宿主时仍应优先依赖 `easy-postman-plugin-api`
+  - Khả năng của khung nền tảng máy chủ, ví dụ: IOC và cập nhật lõi khám phá
+  - Không phải là một plug-in thông thường SPI；Các plugin vẫn phải ưu tiên cho các phần phụ thuộc khi chúng cần mở rộng máy chủ `easy-postman-plugin-api`
 - `easy-postman-ui`
-  - 插件和宿主公用的 UI 基础组件和视觉常量
-  - 插件面板如果需要复用统一 UI 风格、按钮、搜索框、表格或基础输入控件，优先依赖这一层
+  - Phổ biến cho các plug-in và máy chủ UI Các thành phần cơ bản và hằng số trực quan
+  - Bảng plug-in có thể được tái sử dụng và thống nhất nếu cần UI Kiểu, nút, hộp tìm kiếm, bảng hoặc điều khiển nhập cơ bản trước tiên dựa vào lớp này
 - `easy-postman-plugin-runtime`
-  - 负责扫描、读取 descriptor、版本兼容校验、类加载、生命周期调用、扩展点注册和 registry
-  - 可以把它理解成插件运行时内核
+  - Chịu trách nhiệm quét và đọc descriptor、Xác minh tính tương thích của phiên bản, tải lớp, gọi vòng đời, đăng ký điểm mở rộng và registry
+  - Nó có thể được hiểu là kernel thời gian chạy plug-in
 - `easy-postman-app`
-  - 宿主应用本身
-  - 从 runtime 和 registry 里消费插件注册出来的能力
+  - Bản thân ứng dụng máy chủ
+  - Từ runtime và registry Khả năng đăng ký plug-in tiêu dùng
 - `easy-postman-plugins`
-  - 通常是官方插件 JAR 集合
-  - `plugin-client-cert`、`plugin-capture`、`plugin-redis`、`plugin-kafka`、`plugin-decompiler` 这类 `plugin-*` 是普通运行时插件
-  - `plugin-manager` 是例外：它是宿主 app 直接依赖的宿主侧插件管理辅助模块，负责 catalog 解析、在线/离线安装门面和安装来源记录，不是 runtime 扫描加载的普通插件
+  - Thông thường các plugin chính thức JAR tập trung
+  - `plugin-client-cert`、`plugin-capture`、`plugin-redis`、`plugin-kafka`、`plugin-decompiler` Loại điều này `plugin-*` Nó là một plug-in thời gian chạy phổ biến
+  - `plugin-manager` Ngoại lệ là: đó là máy chủ app Chịu trách nhiệm về mô-đun phụ trợ quản lý plug-in phía máy chủ phụ thuộc trực tiếp catalog Phân tích, trực tuyến/Không có mặt tiền cài đặt ngoại tuyến và bản ghi nguồn cài đặt runtime Quét các plugin phổ biến đã tải
 
-### 1.2 插件是怎么被宿主加载的
+### 1.2 Cách máy chủ tải trình cắm
 
-真实运行链路大致是：
+Liên kết chạy thực tế là khoảng:
 
 ```text
-本地 JAR / 远程 catalog
-  -> plugin-manager 负责安装和下载
-  -> 安装版插件 JAR 进入数据目录下的 plugins/installed 和 plugins/packages
-  -> 便携版默认写入程序根目录下的 plugins 和 plugins/packages，方便离线拷贝
-  -> runtime 扫描插件目录
-  -> 读取 META-INF/easy-postman/*.properties
-  -> 解析 PluginDescriptor
-  -> 校验 app 版本 + platform 版本兼容性
-  -> 为每个插件创建独立 URLClassLoader
-  -> 反射创建 entryClass
-  -> 调用 onLoad(context)
-  -> 插件向 registry 注册脚本 API / Toolbox / 补全 / Snippet / Service
-  -> 宿主消费这些能力
+địa phương JAR / Điều khiển từ xa catalog
+  -> plugin-manager Chịu trách nhiệm cài đặt và tải xuống
+  -> Phiên bản đã cài đặt của plug-in JAR Nhập thư mục dữ liệu plugins/installed và plugins/packages
+  -> Phiên bản di động được ghi vào thư mục gốc của chương trình theo mặc định plugins và plugins/packages，Thuận tiện cho việc sao chép ngoại tuyến
+  -> runtime Quét thư mục plugin
+  -> Đọc META-INF/easy-postman/*.properties
+  -> phân tích PluginDescriptor
+  -> Kiểm tra app Phiên bản + platform Khả năng tương thích của phiên bản
+  -> Tạo các plugin riêng biệt cho từng plugin URLClassLoader
+  -> Sự tạo phản xạ entryClass
+  -> gọi onLoad(context)
+  -> Hướng cắm registry Đăng ký kịch bản API / Toolbox / Hoàn thành / Snippet / Service
+  -> Chủ nhà tiêu thụ những khả năng này
 ```
 
-关键点：
+Những điểm chính:
 
-- 插件不是直接依赖宿主内部实现，而是通过 `PluginContext` 声明能力
-- 插件之间不共享类加载器，避免依赖冲突污染宿主
-- `easy-postman-plugin-runtime` 负责插件扫描、加载、生命周期和 registry；`plugin-manager` 只负责安装/catalog 侧的宿主辅助能力
-- 普通插件不得依赖 `easy-postman-app`；宿主 app 可以依赖 `easy-postman-plugins/plugin-manager` 这个目录特例
-- 同一 `plugin.id` 存在多个版本时，运行时只会选择最高版本加载
-- 安装阶段就会做兼容性拦截，避免出现“安装成功但运行时跳过”的假成功状态
+- Các plug-in không phụ thuộc trực tiếp vào việc triển khai nội bộ của máy chủ mà thông qua `PluginContext` Khai báo khả năng
+- Các trình nạp lớp không được chia sẻ giữa các plug-in để tránh xung đột phụ thuộc làm ảnh hưởng đến máy chủ
+- `easy-postman-plugin-runtime` Chịu trách nhiệm quét, tải plugin, vòng đời và registry；`plugin-manager` Chỉ chịu trách nhiệm cài đặt/catalog Khả năng phụ trợ của chủ nhà bên
+- Không được dựa vào các plug-in thông thường `easy-postman-app`；chủ nhà app Có thể dựa vào `easy-postman-plugins/plugin-manager` Thư mục này là một trường hợp đặc biệt
+- Giống nhau `plugin.id` Khi có nhiều phiên bản, chỉ phiên bản cao nhất mới được chọn để tải khi chạy
+- Việc chặn khả năng tương thích sẽ được thực hiện trong giai đoạn cài đặt để tránh điều đó“Cài đặt thành công nhưng thời gian chạy bị bỏ qua”trạng thái thành công sai
 
-### 1.3 插件能扩展哪些能力
+### 1.3 Plug-in có thể mở rộng những khả năng nào?
 
-当前 `PluginContext` 支持这几类扩展点：
+hiện tại `PluginContext` Hỗ trợ các loại điểm mở rộng này:
 
 - `registerScriptApi`
-  - 给脚本环境暴露 `pm.plugin("xxx")`
+  - Tiếp xúc với môi trường kịch bản `pm.plugin("xxx")`
 - `registerService`
-  - 给宿主侧访问层按类型取服务
+  - Nhận dịch vụ theo loại từ lớp truy cập phía máy chủ
 - `registerToolboxContribution`
-  - 往 Toolbox 增加面板
+  - Đi Toolbox Thêm bảng
 - `registerScriptCompletionContributor`
-  - 给脚本编辑器增加自动补全
+  - Thêm tính năng tự động hoàn thành vào trình chỉnh sửa tập lệnh
 - `registerSnippet`
-  - 增加脚本片段
+  - Thêm đoạn mã script
 
-以 `plugin-kafka` 为例，`KafkaPlugin` 在 `onLoad` 里一次性注册了：
+qua `plugin-kafka` Ví dụ,`KafkaPlugin` Vào `onLoad` Đăng ký một lần:
 
 - `pm.plugin("kafka")`
-- Kafka Toolbox 面板
-- Kafka 相关脚本补全
-- Kafka 示例片段
+- Kafka Toolbox bảng điều khiển
+- Kafka Hoàn thành tập lệnh liên quan
+- Kafka Đoạn mẫu
 
-也就是说，插件入口类的职责不是“自己跑业务逻辑”，而是“在加载时把能力挂到宿主上”。
+Nói cách khác, đó không phải là trách nhiệm của lớp đầu vào plug-in“Tự mình chạy logic kinh doanh”，Đúng hơn“Đính kèm khả năng vào máy chủ khi tải”。
 
-## 2. 版本模型和兼容性
+## 2. Mô hình phiên bản và khả năng tương thích
 
-### 2.1 为什么要区分 app 和 platform
+### 2.1 Tại sao chúng ta phải phân biệt app và platform
 
-当前体系里有两种版本边界：
+Có hai ranh giới phiên bản trong hệ thống hiện tại: .
 
 - `app version`
-  - 宿主 EasyPostman 的发行版版本
-  - 例如 `5.3.16`
+  - chủ nhà EasyPostman phiên bản phát hành
+  - Ví dụ `5.3.16`
 - `plugin platform version`
-  - 插件 SPI / 运行时装配边界版本
-  - 当前由根 `pom.xml` 里的 `plugin.platform.version` 管理
+  - plugin SPI / Các phiên bản ranh giới được tập hợp trong thời gian chạy
+  - Hiện tại bằng root `pom.xml` bên trong `plugin.platform.version` quản lý
 
-简单理解：
+Hiểu đơn giản:
 
-- `platform` 管“这套插件接口还能不能接上”
-- `app` 管“当前宿主有没有插件依赖的具体功能”
+- `platform` Ống“Giao diện plug-in này vẫn có thể được kết nối chứ?”
+- `app` Ống“Máy chủ hiện tại có các chức năng cụ thể mà plug-in phụ thuộc vào không?”
 
-再细一点说：
+Để giải thích thêm một chút:
 
-- 根 `pom.xml` 里的 `revision`
-  - 是宿主发行版版本
-  - 会随着宿主正常发版、补丁、非插件改动持续递增
-- 插件 `pom.xml` 里的 `host.version`
-  - 默认跟随 `${revision}`
-  - 作用只是“编译时依赖哪一版宿主平台包”
-- 根 `pom.xml` 里的 `plugin.platform.version`
-  - 是运行时插件平台版本
-  - 作用是表达“当前 runtime / SPI 装配边界有没有发生不兼容变化”
+- gốc `pom.xml` bên trong `revision`
+  - Là phiên bản phân phối máy chủ
+  - Nó sẽ tiếp tục tăng với các bản phát hành, bản vá lỗi thông thường và các thay đổi không phải plugin của máy chủ
+- plugin `pom.xml` bên trong `host.version`
+  - Theo mặc định `${revision}`
+  - Hiệu quả là duy nhất“Phiên bản nào của gói nền tảng máy chủ phụ thuộc vào thời điểm biên dịch”
+- gốc `pom.xml` bên trong `plugin.platform.version`
+  - Là phiên bản nền tảng plug-in thời gian chạy
+  - Chức năng là biểu thức“hiện tại runtime / SPI Có bất kỳ thay đổi không tương thích nào đối với ranh giới lắp ráp không?”
 
-为什么 `plugin.min/maxPlatformVersion` 不能直接写 `${revision}`：
+Tại sao `plugin.min/maxPlatformVersion` Nó không thể được viết trực tiếp `${revision}`：
 
-- `revision` 变化太频繁，很多变化和插件 SPI 无关
-- 如果把 platform 兼容范围直接绑到 `revision`，会把很多其实还能加载的老插件误判成“不兼容”
-- 所以必须把“宿主发版节奏”和“插件平台兼容边界”拆成两个版本概念分别维护
+- `revision` Thay đổi quá thường xuyên, nhiều biến thể và plugin SPI Không có gì để làm
+- Nếu đặt platform Phạm vi tương thích được gắn trực tiếp với `revision`，Nhiều plug-in cũ thực sự có thể tải được sẽ bị đánh giá sai“Không tương thích”
+- Vì vậy nó phải được đặt“Nhịp điệu giải phóng máy chủ”và“Ranh giới tương thích nền tảng plug-in”Khái niệm này được chia thành hai phiên bản và được duy trì riêng biệt
 
-### 2.2 什么时候改 platform version
+### 2.2 Khi nào cần thay đổi platform version
 
-只有插件装配边界或插件可依赖的公共平台 API 发生不兼容变化时，才应该提升 `plugin.platform.version`，例如：
+Chỉ có các ranh giới tập hợp trình cắm thêm hoặc các nền tảng chung mà các trình cắm thêm có thể phụ thuộc vào API Khuyến mãi chỉ nên diễn ra khi xảy ra những thay đổi không tương thích `plugin.platform.version`，Ví dụ:
 
-- `PluginContext` 有不兼容修改
-- `PluginDescriptor` 语义发生破坏性变化
-- runtime 的装配方式变了，老插件会失效
-- 某类扩展点契约被替换
-- 插件以 `provided` 方式依赖的平台模块（例如 `easy-postman-plugin-api`、`easy-postman-foundation`、`easy-postman-ui`）删除或重命名公开类/方法，旧插件会出现 `NoClassDefFoundError`、`NoSuchMethodError` 或其他 linkage 错误
+- `PluginContext` Có những sửa đổi không tương thích
+- `PluginDescriptor` Semantics undergo disruptive changes
+- runtime Phương pháp lắp ráp đã thay đổi và trình cắm cũ sẽ không hợp lệ
+- Một số loại hợp đồng điểm gia hạn được thay thế
+- Trình cắm bắt đầu bằng  `provided` Các mô-đun nền tảng phụ thuộc vào chế độ (ví dụ: `easy-postman-plugin-api`、`easy-postman-foundation`、`easy-postman-ui`）Xóa hoặc đổi tên lớp công khai/phương pháp này, plugin cũ sẽ xuất hiện `NoClassDefFoundError`、`NoSuchMethodError` hoặc khác linkage sai lầm
 
-如果只是：
+Nếu chỉ:
 
-- 宿主修了一个普通 bug
-- 宿主发了一个补丁版本
-- 某个插件自己新增功能
+- Chủ nhà trồng một cây bình thường bug
+- Máy chủ đã phát hành một phiên bản vá lỗi
+- Một plug-in thêm chức năng mới của riêng nó
 
-通常都不应该 bump `plugin.platform.version`。
+Thông thường thì không nên bump `plugin.platform.version`。
 
-### 2.3 什么时候加 min/maxAppVersion
+### 2.3 Khi nào cần thêm min/maxAppVersion
 
-只有插件确实依赖某个宿主能力时，才建议加：
+Chỉ khi plug-in thực sự phụ thuộc vào khả năng nhất định của máy chủ thì mới nên thêm:
 
-- 宿主新增了一个插件要调用的 API/service
-- 宿主某个 UI 容器、入口或事件只在新版本存在
-- 插件明确不支持某个老宿主版本
+- Máy chủ đã thêm một plug-in mới để gọi API/service
+- Tiếp đón ai đó UI Vùng chứa, cổng hoặc sự kiện chỉ tồn tại trong các phiên bản mới
+- Plugin rõ ràng không hỗ trợ phiên bản máy chủ cũ hơn
 
-如果插件只是普通扩展，通常只写 `min/maxPlatformVersion` 就够了。
+Điều này thường chỉ được viết nếu plugin chỉ là một tiện ích mở rộng thông thường `min/maxPlatformVersion` Thế là đủ rồi.
 
-### 2.4 当前 descriptor 和 catalog 的关系
+### 2.4 hiện tại descriptor và catalog mối quan hệ
 
-当前规则是：
+Các quy định hiện hành là:
 
-- 插件自己的 `pom.xml` 维护元数据
-- Maven 过滤生成 `META-INF/easy-postman/*.properties`
-- GitHub Actions 从构建好的 JAR 里读取 descriptor
-- workflow 再把 descriptor 内容同步回 `catalog.json`
+- Hãy tự mình cắm vào `pom.xml` Duy trì siêu dữ liệu
+- Maven Tạo bộ lọc `META-INF/easy-postman/*.properties`
+- GitHub Actions Từ xây dựng đến tốt JAR Đọc bên trong descriptor
+- workflow Lại descriptor Nội dung được đồng bộ trở lại `catalog.json`
 
-所以真正的顺序是：
+Vậy thứ tự thực sự là:
 
 ```text
 pom.xml -> descriptor -> release asset -> catalog
 ```
 
-不是：
+KHÔNG:
 
 ```text
-workflow 手写字段 -> catalog -> 再反推插件
+workflow Lĩnh vực chữ viết tay -> catalog -> Sau đó đẩy plug-in trở lại
 ```
 
-这能避免多处手填导致漂移。
+Điều này tránh bị trôi do trám nhiều lần bằng tay.
 
-## 3. 开发一个新插件应该怎么做
+## 3. Cách phát triển một plug-in mới
 
-下面按当前仓库的真实做法给出最短路径。
+Con đường ngắn nhất được đưa ra dưới đây dựa trên thực tiễn thực tế của kho hiện tại.
 
-### 3.1 新建模块
+### 3.1 Tạo một mô-đun mới
 
-普通官方插件建议在 `easy-postman-plugins/` 下新建：
+Các plug-in chính thức chung được khuyến nghị `easy-postman-plugins/` Tạo mới dưới:
 
 ```text
 easy-postman-plugins/plugin-xxx
@@ -219,19 +219,19 @@ easy-postman-plugins/plugin-xxx
 └── src/main/resources/META-INF/easy-postman/plugin-xxx.properties
 ```
 
-然后把模块加入聚合构建。
+Sau đó thêm mô-đun vào bản dựng tổng hợp.
 
-不要把 `easy-postman-plugins/plugin-manager` 当作普通插件模板。它留在 `easy-postman-plugins` 下是历史路径和发布组织选择；新的宿主侧插件管理库不应默认继续放到 `easy-postman-plugins/*`，后续可迁到更清晰的模块名或目录。
+Đừng đặt nó `easy-postman-plugins/plugin-manager` Hãy coi nó như một mẫu plug-in bình thường. Nó ở lại `easy-postman-plugins` Sau đây là lộ trình lịch sử và lựa chọn tổ chức phát hành; thư viện quản lý plug-in phía máy chủ mới không nên tiếp tục được đặt theo mặc định `easy-postman-plugins/*`，Bạn có thể chuyển sang tên mô-đun hoặc thư mục rõ ràng hơn sau này.
 
-### 3.2 写插件 `pom.xml`
+### 3.2 Viết một trình cắm thêm `pom.xml`
 
-推荐直接参考现有官方插件，例如：
+Bạn nên tham khảo trực tiếp các plugin chính thức hiện có, chẳng hạn như: .
 
 - `easy-postman-plugins/plugin-capture/pom.xml`
 - `easy-postman-plugins/plugin-kafka/pom.xml`
 - `easy-postman-plugins/plugin-redis/pom.xml`
 
-至少要有这些字段：
+Ít nhất các trường này là bắt buộc: .
 
 ```xml
 <version>5.3.16</version>
@@ -248,46 +248,46 @@ easy-postman-plugins/plugin-xxx
 </properties>
 ```
 
-说明：
+Mô tả:
 
 - `host.version`
-  - 编译时依赖哪一版宿主平台包
-  - 官方插件默认跟随 `${revision}`，这样能直接对齐当前 `api / foundation / ui` 的编译输入
-  - 如果只是宿主正常发版，这里跟随即可；它不负责表达运行兼容范围
+  - Phiên bản nào của gói nền tảng máy chủ phụ thuộc vào thời điểm biên dịch
+  - Plug-in chính thức tuân theo mặc định `${revision}`，Điều này có thể trực tiếp căn chỉnh dòng điện `api / foundation / ui` đầu vào biên dịch
+  - Nếu chỉ có chủ nhà phát hành phiên bản bình thường thì hãy theo dõi tại đây; nó không chịu trách nhiệm thể hiện phạm vi tương thích hoạt động
 - `plugin.id`
-  - 插件唯一 ID
-  - 发布、安装、升级都靠它识别
+  - Chỉ có trình cắm ID
+  - Xuất bản, cài đặt và nâng cấp đều dựa vào nó để nhận dạng
 - `plugin.entryClass`
-  - 插件入口类
+  - Lớp đầu vào plug-in
 - `plugin.min/maxPlatformVersion`
-  - 当前官方插件默认都绑定到根 `pom.xml` 的 `plugin.platform.version`
-  - 它表达的是运行时插件平台兼容范围，不是宿主发行版号
-  - 只有插件机制本身发生破坏性变化时才应该调整
+  - Hiện tại, các plug-in chính thức đều có quyền root theo mặc định `pom.xml` của `plugin.platform.version`
+  - Nó thể hiện phạm vi tương thích nền tảng plug-in thời gian chạy, không phải số phát hành máy chủ
+  - Chỉ nên thực hiện điều chỉnh nếu có những thay đổi đột phá đối với chính cơ chế plugin
 
-如果你发现“版本不合适”，按下面判断：
+Nếu bạn tìm ra“Phiên bản không phù hợp”，Xét xử theo nội dung sau:
 
-- 编译不过，因为插件要依赖新的宿主 `api / foundation / ui`
-  - 调整或跟随 `host.version`
-- 运行时老宿主缺少插件依赖的新功能
-  - 增加或调整 `plugin.minAppVersion`
-- runtime / SPI 契约变了，老插件会装配失败
-  - 先提升根 `pom.xml` 的 `plugin.platform.version`
-  - 再调整插件的 `plugin.min/maxPlatformVersion`
-- 只是插件自己改了功能或修了 bug
-  - 通常只改插件自己的 `<version>`
+- Nó không biên dịch được vì plug-in phụ thuộc vào máy chủ mới `api / foundation / ui`
+  - Điều chỉnh hoặc làm theo `host.version`
+- Trong thời gian chạy, máy chủ cũ thiếu các tính năng mới mà các plug-in phụ thuộc vào
+  - Thêm hoặc điều chỉnh `plugin.minAppVersion`
+- runtime / SPI Nếu hợp đồng thay đổi, plug-in cũ sẽ không cài đặt được
+  - Nhấc rễ trước `pom.xml` của `plugin.platform.version`
+  - Điều chỉnh lại plug-in `plugin.min/maxPlatformVersion`
+- Chỉ là plug-in đó đã thay đổi chức năng hoặc đã được sửa chữa bug
+  - Thông thường chỉ có bản thân plug-in được sửa đổi `<version>`
 
-如果插件确实依赖宿主特定功能，可以额外加：
+Nếu trình cắm phụ thuộc vào chức năng dành riêng cho máy chủ, bạn có thể thêm bổ sung:
 
 ```xml
 <plugin.minAppVersion>5.3.16</plugin.minAppVersion>
 <plugin.maxAppVersion>5.4.0</plugin.maxAppVersion>
 ```
 
-但要注意，当前官方 descriptor 模板默认没有把这两个字段写进去；你需要同时更新 descriptor 模板。
+Nhưng hãy lưu ý rằng nó hiện là chính thức descriptor Theo mặc định, mẫu không bao gồm hai trường này; bạn cần cập nhật chúng cùng một lúc descriptor bản mẫu.
 
-### 3.3 写 descriptor 模板
+### 3.3 Viết descriptor bản mẫu
 
-示例：
+Ví dụ:
 
 ```properties
 plugin.id=${plugin.id}
@@ -300,29 +300,29 @@ plugin.minPlatformVersion=${plugin.minPlatformVersion}
 plugin.maxPlatformVersion=${plugin.maxPlatformVersion}
 ```
 
-如果你要使用 `minAppVersion` / `maxAppVersion`，记得把它们也加进模板。
+Nếu bạn muốn sử dụng `minAppVersion` / `maxAppVersion`，Hãy nhớ thêm chúng vào mẫu.
 
-当前设计原则是：
+Nguyên tắc thiết kế hiện nay là:
 
-- descriptor 是构建产物的一部分
-- descriptor 的真实值来自 `pom.xml`
-- 不要在 descriptor 里手工写死版本和兼容范围
+- descriptor là một phần của sản phẩm xây dựng
+- descriptor Giá trị thực sự của đến từ  `pom.xml`
+- Đừng ở đó descriptor Phiên bản và phạm vi tương thích được lập trình thủ công
 
-### 3.4 写入口类
+### 3.4 Viết lớp đầu vào
 
-入口类必须实现 `EasyPostmanPlugin`：
+Lớp đầu vào phải được thực hiện `EasyPostmanPlugin`：
 
 ```java
 public class XxxPlugin implements EasyPostmanPlugin {
 
     @Override
     public void onLoad(PluginContext context) {
-        // 注册扩展点
+        // Đăng ký điểm mở rộng
     }
 }
 ```
 
-常见模式：
+Các mẫu phổ biến:
 
 ```java
 context.registerScriptApi("xxx", ScriptXxxApi::new);
@@ -331,352 +331,352 @@ context.registerScriptCompletionContributor(...);
 context.registerSnippet(...);
 ```
 
-建议：
+Khuyến nghị:
 
 - `onLoad`
-  - 只做注册，不做重量级初始化
+  - Chỉ đăng ký được thực hiện, không có việc khởi tạo nặng nào được thực hiện
 - `onStart`
-  - 放真正需要启动时执行的逻辑
+  - Đặt logic thực sự cần được thực thi khi khởi động
 - `onStop`
-  - 做资源释放
+  - Thực hiện giải phóng tài nguyên
 
-### 3.5 依赖应该怎么选
+### 3.5 Cách chọn phụ thuộc
 
-优先规则：
+Quy định ưu tiên:
 
-- 插件契约依赖 `easy-postman-plugin-api`
-- 共享非 UI 基础类型和工具依赖 `easy-postman-foundation`
-- 共享 Swing 组件、字体、图标、颜色和通知 UI 依赖 `easy-postman-ui`
-- 不要直接反向依赖 `easy-postman-app` 内部类
-- 第三方库如果插件自身需要，跟随插件一起打进插件 JAR
-- 宿主已经提供、且插件只需要编译期引用的依赖，优先用 `provided`
+- Phụ thuộc hợp đồng plug-in `easy-postman-plugin-api`
+- Chia sẻ không UI Các loại cơ sở và phụ thuộc công cụ `easy-postman-foundation`
+- Chia sẻ Swing Thành phần, phông chữ, biểu tượng, màu sắc và thông báo UI phụ thuộc `easy-postman-ui`
+- Đừng dựa trực tiếp vào sự phụ thuộc ngược lại `easy-postman-app` Lớp bên trong
+- Nếu chính plugin đó cần thư viện của bên thứ ba thì thư viện đó sẽ được bao gồm trong plugin cùng với plugin JAR
+- Các phần phụ thuộc đã được máy chủ cung cấp và phần bổ trợ chỉ cần được tham chiếu trong quá trình biên dịch sẽ được sử dụng trước tiên `provided`
 
-### 3.6 新插件开发 checklist
+### 3.6 Phát triển plug-in mới checklist
 
-建议按这个清单走：
+Nên làm theo danh sách này:
 
-1. 新建 `plugin-xxx` 模块
-2. 配好 `pom.xml`
-3. 写 descriptor 模板
-4. 写入口类并实现 `EasyPostmanPlugin`
-5. 注册需要的扩展点
-6. 本地打包生成 JAR
-7. 本地安装验证
-8. 补测试
-9. 再走 GitHub 发布
+1. Mới `plugin-xxx` mô-đun
+2. Kết hợp tốt `pom.xml`
+3. Viết descriptor bản mẫu
+4. Viết lớp đầu vào và thực hiện nó `EasyPostmanPlugin`
+5. Đăng ký các điểm mở rộng cần thiết
+6. Được đóng gói và tạo ra tại địa phương JAR
+7. Xác minh cài đặt cục bộ
+8. Thử nghiệm bổ sung
+9. Đi lần nữa GitHub giải phóng
 
-## 4. 更新一个已有插件应该怎么做
+## 4. Cách cập nhật plugin hiện có
 
-更新已有插件，优先回答这 3 个问题：
+Cập nhật các plug-in hiện có, hãy trả lời phần này trước 3 Câu hỏi:
 
-1. 这次是插件自己的功能更新，还是平台兼容边界变化
-2. 需要不需要提升插件版本
-3. 需不需要调整 app/platform 兼容范围
+1. Lần này là bản cập nhật chức năng của chính trình cắm hoặc thay đổi về ranh giới tương thích nền tảng
+2. Không cần phải nâng cấp phiên bản plug-in
+3. Có cần phải điều chỉnh không? app/platform Phạm vi tương thích
 
-### 4.1 最常见的更新：插件功能更新
+### 4.1 Các bản cập nhật phổ biến nhất: Cập nhật tính năng plug-in
 
-如果只是：
+Nếu chỉ:
 
-- 新增一个脚本 API 方法
-- 新增一个 Toolbox 功能
-- 修插件自己的 bug
-- 调整插件自己的 UI
+- Thêm một kịch bản mới API phương pháp
+- Thêm một cái mới Toolbox Chức năng
+- Tự sửa chữa plug-in bug
+- Tự mình tinh chỉnh plugin UI
 
-通常只需要：
+Thông thường chỉ:
 
-1. 修改 `plugin-xxx` 代码
-2. 提升该插件自己的 `<version>`
-3. 重新构建和验证
+1. Ôn lại `plugin-xxx` mã
+2. Quảng cáo chính plugin đó `<version>`
+3. Xây dựng lại và xác nhận
 
-一般不需要改：
+Nói chung là không cần thay đổi:
 
-- 宿主 `revision`
+- chủ nhà `revision`
 - `plugin.platform.version`
 
-### 4.2 需要调整兼容范围的更新
+### 4.2 Các bản cập nhật yêu cầu điều chỉnh phạm vi tương thích
 
-如果插件依赖了新的宿主能力：
+Nếu plugin dựa vào khả năng lưu trữ mới: .
 
-1. 在插件 `pom.xml` 里新增或调整 `plugin.minAppVersion`
-2. 在 descriptor 模板里同步加上 `plugin.minAppVersion`
-3. 本地验证老版本宿主确实不再适配
+1. trong phần bổ trợ `pom.xml` Thêm hoặc điều chỉnh `plugin.minAppVersion`
+2. Vào descriptor Đã thêm đồng bộ vào mẫu `plugin.minAppVersion`
+3. Xác minh cục bộ rằng phiên bản cũ của máy chủ thực sự không còn phù hợp
 
-如果是插件平台边界变了（SPI、runtime 装配方式，或插件可依赖平台模块的公开 API 被破坏）：
+Nếu ranh giới nền tảng plug-in đã thay đổi (SPI、runtime Các phương pháp lắp ráp hoặc phần bổ trợ có thể dựa vào khả năng hiển thị của các mô-đun nền tảng API bị phá hủy):
 
-1. 先提升根 `pom.xml` 里的 `plugin.platform.version`
-2. 再更新受影响插件的 `plugin.min/maxPlatformVersion`
-3. 验证旧插件被正确判为不兼容
+1. Nhấc rễ trước `pom.xml` bên trong `plugin.platform.version`
+2. Sau đó cập nhật các plugin bị ảnh hưởng `plugin.min/maxPlatformVersion`
+3. Xác minh rằng các plugin cũ được đánh giá chính xác là không tương thích
 
-不要因为下面这些情况去改 `plugin.platform.version`：
+Đừng thay đổi nó vì những tình huống sau đây `plugin.platform.version`：
 
-- 宿主 `revision` 从 `5.3.16` 升到 `5.3.17`
-- 宿主修了普通 bug，但插件 SPI 没变
-- 某个插件自己新增了一个工具面板或脚本 API
+- chủ nhà `revision` Từ `5.3.16` tăng lên `5.3.17`
+- Ký chủ đã đạt được trạng thái tu luyện bình thường bug，Nhưng plugin SPI Không có gì thay đổi
+- Một trình cắm thêm sẽ thêm bảng công cụ hoặc tập lệnh mới của riêng nó API
 
-### 4.3 更新已有插件的推荐顺序
+### 4.3 Thứ tự đề xuất để cập nhật các plugin hiện có
 
 ```text
-改代码
-  -> 决定是否 bump 插件版本
-  -> 决定是否修改 min/maxAppVersion
-  -> 决定是否修改 min/maxPlatformVersion
-  -> 本地构建
-  -> 本地安装验证
-  -> dry run 发布
-  -> 正式发布
+Thay đổi mã
+  -> Quyết định xem bump Phiên bản plugin
+  -> Quyết định có nên sửa đổi hay không min/maxAppVersion
+  -> Quyết định có nên sửa đổi hay không min/maxPlatformVersion
+  -> Xây dựng tại địa phương
+  -> Xác minh cài đặt cục bộ
+  -> dry run giải phóng
+  -> Chính thức phát hành
 ```
 
-## 5. 在 GitHub 发布插件应该怎么做
+## 5. Vào GitHub Phải làm gì khi xuất bản một plug-in
 
-当前官方插件独立发版走：
+Plug-in chính thức hiện tại được phát hành độc lập tại:
 
 - `.github/workflows/plugin-release.yml`
 
-### 5.1 正式发布前你要先改什么
+### 5.1 Bạn cần thay đổi điều gì trước khi phát hành chính thức?
 
-至少确认下面几件事：
+Đảm bảo ít nhất những điều sau:
 
-1. 目标插件的 `pom.xml` 版本已经提升
-2. descriptor 模板字段齐全
-3. 本地构建通过
-4. 本地验证通过
-5. 如果涉及兼容性变化，`min/maxAppVersion` 或 `min/maxPlatformVersion` 已正确更新
+1. plugin mục tiêu `pom.xml` Phiên bản đã được nâng cấp
+2. descriptor Các trường mẫu đã hoàn tất
+3. Thẻ xây dựng địa phương
+4. Xác minh địa phương đã được thông qua
+5. Nếu có liên quan đến những thay đổi về khả năng tương thích, .`min/maxAppVersion` hoặc `min/maxPlatformVersion` Đã cập nhật chính xác
 
-### 5.2 workflow 会做什么
+### 5.2 workflow Nó sẽ làm gì
 
-这个 workflow 当前会做：
+Cái này workflow Hiện đang làm:
 
-1. 只构建你选中的插件模块
-2. 产出单插件 JAR
-3. 计算 JAR 的 `sha256`
-4. 从 JAR 内的 descriptor 读取插件元数据
-5. 校验 `plugin id / version / tag` 一致性
-6. 发布 GitHub Release
-7. 可选发布 Gitee Release
-8. 可选更新 GitHub / Gitee catalog
+1. Chỉ xây dựng các mô-đun plugin bạn đã chọn
+2. Đầu ra plugin duy nhất JAR
+3. Tính toán JAR của `sha256`
+4. Từ JAR bên trong descriptor Đọc siêu dữ liệu plugin
+5. Kiểm tra `plugin id / version / tag` tính nhất quán
+6. giải phóng GitHub Release
+7. Tùy chọn xuất bản Gitee Release
+8. Cập nhật tùy chọn GitHub / Gitee catalog
 
-### 5.3 workflow 的关键约束
+### 5.3 workflow những ràng buộc chính
 
-当前正式发版有这几个规则：
+Phiên bản chính thức hiện tại có các quy tắc sau:
 
-- 正式发版只能从默认分支触发
-- 非 `dry_run` 情况下，官方 GitHub catalog 必须一起更新
-- workflow 不再自己维护兼容字段，而是从 JAR descriptor 读取
+- Bản phát hành chính thức chỉ có thể được kích hoạt từ nhánh mặc định
+- Không `dry_run` trường hợp, chính thức GitHub catalog phải được cập nhật cùng nhau
+- workflow Không còn tự mình duy trì các trường tương thích nữa mà từ  JAR descriptor Đọc
 
-### 5.4 推荐发布步骤
+### 5.4 Các bước xuất bản được đề xuất
 
-建议每次都按这个顺序：
+Nên làm theo thứ tự này mọi lúc:
 
-1. 本地改完代码和版本
-2. 本地构建并验证
-3. 在 GitHub Actions 手动触发 `plugin-release.yml`
-4. 先跑一次 `dry_run=true`
-5. 确认产物、descriptor、版本都对
-6. 再跑正式发布
+1. Mã và phiên bản đã được thay đổi cục bộ
+2. Xây dựng và xác minh tại địa phương
+3. Vào GitHub Actions Kích hoạt thủ công `plugin-release.yml`
+4. Chạy một lần đầu tiên `dry_run=true`
+5. Xác nhận sản phẩm.descriptor、Tất cả các phiên bản đều đúng
+6. Chạy lại để phát hành chính thức
 
-### 5.5 workflow_dispatch 参数怎么选
+### 5.5 workflow_dispatch Cách chọn tham số
 
-你通常只需要关心这些输入：
+Bạn thường chỉ cần quan tâm đến những đầu vào này: .
 
 - `plugin`
-  - 选择要发布的插件，例如 `capture`、`kafka`
+  - Chọn plugin để xuất bản, ví dụ `capture`、`kafka`
 - `dry_run`
-  - 建议先 `true`
+  - Đề nghị đầu tiên `true`
 - `publish_gitee_release`
-  - 是否同步 Gitee Release
+  - Có đồng bộ hóa hay không Gitee Release
 - `update_github_catalog`
-  - 是否回写 GitHub catalog
+  - Có nên viết lại không GitHub catalog
 - `update_gitee_catalog`
-  - 是否回写 Gitee catalog
+  - Có nên viết lại không Gitee catalog
 - `release_notes`
-  - 可选
+  - Không bắt buộc
 
-### 5.6 发布后会得到什么
+### 5.6 Những gì bạn nhận được khi xuất bản
 
-正式发布后，通常会得到：
+Sau khi phát hành chính thức, bạn thường nhận được:
 
-- 一个单插件 JAR 附件
-- 一个 `.sha256.txt` 文件
-- 一条 GitHub Release
-- 更新后的 `plugin-catalog/catalog-github.json`
-- 如开启 Gitee，同步得到对应 Gitee Release 和 catalog 更新
+- Một plugin duy nhất JAR Tệp đính kèm
+- một `.sha256.txt` tập tin
+- Một miếng GitHub Release
+- Đã cập nhật `plugin-catalog/catalog-github.json`
+- Nếu bật Gitee，Đồng bộ hóa là tương ứng Gitee Release và catalog đổi mới
 
-## 6. 本地怎么验证
+## 6. Cách xác minh cục bộ
 
-本地验证建议分成 4 层，不要只做编译通过。
+Xác minh địa phương được khuyến khích 4 Lớp, không chỉ biên dịch và chuyển.
 
-### 6.1 第一层：构建通过
+### 6.1 Cấp độ 1: Xây dựng đã thông qua
 
-构建单个插件：
+Xây dựng một plugin duy nhất: .
 
 ```bash
 mvn -pl easy-postman-plugins/plugin-kafka -am clean package -DskipTests
 ```
 
-构建多个插件：
+Xây dựng nhiều plugin:
 
 ```bash
 mvn -pl easy-postman-plugins/plugin-kafka,easy-postman-plugins/plugin-redis -am clean package -DskipTests
 ```
 
-### 6.2 第二层：检查 descriptor 是否正确
+### 6.2 Cấp độ 2: Kiểm tra descriptor Có đúng không?
 
-至少检查两处：
+Kiểm tra ít nhất hai nơi:
 
-1. 构建输出目录
+1. Xây dựng thư mục đầu ra
 
 ```text
 easy-postman-plugins/plugin-kafka/target/classes/META-INF/easy-postman/plugin-kafka.properties
 ```
 
-2. 最终 JAR 内的 descriptor
+2. cuối cùng JAR bên trong descriptor
 
-你需要确认：
+Bạn cần xác nhận:
 
 - `plugin.id`
 - `plugin.version`
 - `plugin.entryClass`
 - `plugin.description`
 - `plugin.min/maxPlatformVersion`
-- 如有需要，`plugin.min/maxAppVersion`
+- Nếu cần thiết,`plugin.min/maxAppVersion`
 
-这一层的目标是确认：
+Mục tiêu của lớp này là xác định:
 
-- `pom.xml` -> descriptor 模板 -> 构建产物
-  没有漂移
+- `pom.xml` -> descriptor bản mẫu -> Xây dựng sản phẩm
+  Không trôi dạt
 
-### 6.3 第三层：安装验证
+### 6.3 Cấp độ thứ ba: xác minh cài đặt
 
-最推荐的本地验证方式：
+Phương thức xác thực cục bộ được khuyên dùng nhất:
 
-1. 打开 EasyPostman
-2. 进入插件管理
-3. 选择“安装本地 JAR”
-4. 选中刚打出来的插件 JAR
-5. 重启应用
-6. 验证插件能力是否真的出现
+1. Mở EasyPostman
+2. Nhập quản lý plug-in
+3. Chọn“Cài đặt cục bộ JAR”
+4. Chọn plug-in bạn vừa gõ JAR
+5. Khởi động lại ứng dụng
+6. Xác minh rằng khả năng của trình cắm thêm thực sự xuất hiện
 
-按插件类型，至少要检查：
+Theo loại plugin, hãy kiểm tra ít nhất: .
 
-- Toolbox 面板是否出现
-- `pm.xxx` 是否可用
-- 脚本补全是否出现
-- Snippet 是否出现
-- 禁用 / 启用 / 卸载后状态是否正确
+- Toolbox Liệu bảng điều khiển có xuất hiện hay không
+- `pm.xxx` có sẵn
+- Việc hoàn thành tập lệnh có xuất hiện hay không
+- Snippet xuất hiện
+- Tàn tật / Kích hoạt / Trạng thái có đúng sau khi gỡ cài đặt không?
 
-### 6.4 第四层：兼容性验证
+### 6.4 Cấp độ 4: Xác minh tính tương thích
 
-如果这次改动涉及兼容范围，建议专门验证：
+Nếu thay đổi này liên quan đến phạm vi tương thích, bạn nên xác minh cụ thể:
 
-- 不兼容插件在安装阶段是否被拦截
-- 兼容插件是否能正常安装和加载
-- 插件管理界面的兼容文案是否符合预期
-- 市场列表里的安装按钮是否被正确禁用或允许
+- Liệu các plug-in không tương thích có bị chặn trong giai đoạn cài đặt hay không
+- Liệu các plug-in tương thích có thể được cài đặt và tải bình thường hay không
+- Liệu bản sao tương thích của giao diện quản lý plug-in có đáp ứng được mong đợi hay không
+- Nút cài đặt trong danh sách thị trường đã được tắt hoặc cho phép đúng cách
 
-### 6.5 可选：开发期扫描目录
+### 6.5 Tùy chọn: Quét thư mục trong quá trình phát triển
 
-当前还支持一个开发期附加扫描目录：
+Một thư mục quét giai đoạn phát triển bổ sung hiện được hỗ trợ: .
 
 - `-DeasyPostman.plugins.dir=/your/path`
 
-它适合：
+Nó phù hợp cho:
 
-- 调试额外插件目录
-- 企业预置插件目录验证
+- Gỡ lỗi thư mục plugin bổ sung
+- Xác minh thư mục plug-in cài sẵn của doanh nghiệp
 
-但对单插件开发来说，最稳定的验证路径仍然是“构建 JAR 后通过插件管理安装”。
+Nhưng đối với việc phát triển một plug-in duy nhất, vẫn là con đường xác minh ổn định nhất“Xây dựng JAR Sau đó cài đặt nó thông qua quản lý plug-in”。
 
-## 7. 用户安装和分发方式
+## 7. Phương pháp cài đặt và phân phối của người dùng
 
-虽然这份文档更偏开发者，但用户安装方式最好也统一理解。
+Mặc dù tài liệu này thiên về nhà phát triển hơn nhưng tốt nhất người dùng nên có hiểu biết thống nhất về phương pháp cài đặt.
 
-当前对用户只保留 2 条路径：
+Hiện chỉ dành riêng cho người dùng 2 đường dẫn:
 
-1. 本地安装
-   - 直接安装单个插件 JAR
-2. 在线安装
-   - 通过远程 `catalog.json` 加载并安装
+1. Cài đặt cục bộ
+   - Cài đặt trực tiếp các plugin riêng lẻ JAR
+2. Cài đặt trực tuyến
+   - thông qua điều khiển từ xa `catalog.json` Tải và cài đặt
 
-当前官方 catalog：
+Hiện tại chính thức catalog：
 
 - GitHub
   - `https://raw.githubusercontent.com/lakernote/easy-postman/master/plugin-catalog/catalog-github.json`
 - Gitee
   - `https://gitee.com/lakernote/easy-postman/raw/master/plugin-catalog/catalog-gitee.json`
 
-### 7.1 为什么本地和在线都保留
+### 7.1 Tại sao cả địa phương và trực tuyến vẫn còn
 
-因为两者解决的是不同问题：
+Bởi vì cả hai giải quyết các vấn đề khác nhau:
 
-- 本地 JAR
-  - 适合开发联调、手工分发、最低心智成本安装
-- 在线 catalog
-  - 适合长期维护、官方分发、团队内网插件源
+- địa phương JAR
+  - Thích hợp cho việc gỡ lỗi chung trong quá trình phát triển, phân phối thủ công và cài đặt với chi phí tinh thần thấp nhất
+- trực tuyến catalog
+  - Thích hợp để bảo trì dài hạn, phân phối chính thức và nguồn plug-in mạng nội bộ của nhóm
 
-### 7.2 当前目录结构的意义
+### 7.2 Ý nghĩa của cấu trúc thư mục hiện tại
 
-用户机器上默认会看到两个目录：
+Theo mặc định, bạn sẽ thấy hai thư mục trên máy của người dùng: .
 
 - `EasyPostman/plugins/installed/`
 - `EasyPostman/plugins/packages/`
 
-含义：
+Ý nghĩa:
 
 - `installed/`
-  - 当前用于实际加载的副本
+  - Bản sao hiện đang được sử dụng để tải thực tế
 - `packages/`
-  - 保留包副本
-  - 为重装、升级和某些文件锁场景做缓冲
+  - Giữ một bản sao của gói
+  - Bộ đệm để cài đặt lại, nâng cấp và các tình huống khóa tệp nhất định
 
-## 8. 常见问题
+## 8. Câu hỏi thường gặp
 
-### Q1：开发一个插件，最少要写哪些文件
+### Q1：Các tệp tối thiểu cần ghi khi phát triển một trình cắm thêm là gì?
 
-至少这些：
+Ít nhất là những điều này:
 
 1. `plugin-xxx/pom.xml`
 2. `src/main/java/.../XxxPlugin.java`
 3. `src/main/resources/META-INF/easy-postman/plugin-xxx.properties`
 
-如果插件有 UI 或脚本 API，再加对应类。
+Nếu plugin có nó UI hoặc kịch bản API，Thêm các danh mục tương ứng.
 
-### Q2：更新插件一定要改宿主版本吗
+### Q2：Tôi có cần thay đổi phiên bản máy chủ để cập nhật plug-in không?
 
-不一定，通常不用。
+Không nhất thiết, thường không được sử dụng.
 
-大多数情况下：
+Trong hầu hết các trường hợp:
 
-- 只改插件代码
-- 只提升插件自己的 `<version>`
+- Chỉ thay đổi mã plug-in
+- Chỉ cải thiện plugin của riêng mình `<version>`
 
-只有插件机制本身发生不兼容变化时，才需要改 `plugin.platform.version`。
+Những thay đổi chỉ cần thiết khi bản thân cơ chế plug-in trải qua những thay đổi không tương thích `plugin.platform.version`。
 
-### Q3：为什么 GitHub Actions 不直接维护兼容性字段
+### Q3：Tại sao GitHub Actions Các trường tương thích không được duy trì trực tiếp
 
-因为兼容性定义应该属于插件自己，而不是 workflow。
+Bởi vì định nghĩa tương thích phải thuộc về chính plugin chứ không phải  workflow。
 
-当前正确的数据流是：
+Luồng dữ liệu chính xác hiện tại là: .
 
-- 插件 `pom.xml` 定义元数据
-- Maven 生成 descriptor
-- workflow 从 JAR descriptor 读取并校验
-- workflow 更新 catalog
+- plugin `pom.xml` Xác định siêu dữ liệu
+- Maven phát ra descriptor
+- workflow Từ JAR descriptor Đọc và xác minh
+- workflow đổi mới catalog
 
-这样不容易出现多处手填漂移。
+Điều này làm cho nó ít có khả năng xảy ra nhiều hiện tượng trôi dạt bằng tay.
 
-### Q4：本地验证为什么不推荐直接手拷文件
+### Q4：Tại sao không nên sao chép trực tiếp các tệp để xác minh cục bộ?
 
-因为插件管理这条路径会顺带验证：
+Vì đường dẫn quản lý plug-in sẽ được xác minh bằng cách:
 
-- JAR 是否有效
-- descriptor 是否可读
-- 兼容性是否满足
-- 安装来源是否被记录
+- JAR Nó có hợp lệ không?
+- descriptor Nó có thể đọc được không
+- Liệu khả năng tương thích có được đáp ứng hay không
+- Nguồn cài đặt có được ghi lại hay không
 
-这比手工复制更接近真实用户路径。
+Điều này gần với đường dẫn người dùng thực hơn là sao chép thủ công.
 
-### Q5：我应该如何描述这套插件体系
+### Q5：Tôi nên mô tả hệ thống plug-in này như thế nào
 
-推荐统一成一句话：
+Lời đề nghị được thống nhất thành một câu:
 
-> EasyPostman 的插件以单 JAR 为交付单元，通过稳定的插件 API、独立的插件运行时和远程 catalog 机制，实现独立开发、独立升级和独立发布。
+> EasyPostman Plug-in này là duy nhất JAR Đối với các đơn vị giao hàng, thông qua các plugin ổn định API、Thời gian chạy plugin độc lập và từ xa catalog cơ chế để đạt được sự phát triển độc lập, nâng cấp độc lập và phát hành độc lập.

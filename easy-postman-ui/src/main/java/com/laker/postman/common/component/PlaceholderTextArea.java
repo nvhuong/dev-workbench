@@ -6,7 +6,7 @@ import javax.swing.*;
 import java.awt.*;
 
 /**
- * 支持 Placeholder 提示文字的 JTextArea。
+ * Hỗ trợ Placeholder Văn bản nhắc nhở JTextArea。
  * PlaceholderTextArea area = new PlaceholderTextArea(3, 0);
  * area.setPlaceholder("key1:value1\nkey2:value2");
  */

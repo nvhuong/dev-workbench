@@ -3,8 +3,8 @@ package com.laker.postman.ioc;
 
 import java.lang.annotation.*;
 
-/* 标记一个方法在Bean初始化后执行
- * 该方法会在依赖注入完成后自动调用
+/* Đánh dấu một phương thức trong BeanThực hiện sau khi khởi tạo
+ * This method will be called automatically after dependency injection is completed
  */
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)

@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * 批量执行的历史记录
- * 记录所有轮次的执行结果
+ * Lịch sử thực hiện hàng loạt
+ * Ghi lại kết quả thực hiện của tất cả các vòng
  */
 public class BatchExecutionHistory {
     private final List<IterationResult> iterations = new ArrayList<>();

@@ -19,7 +19,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Hash计算工具面板
+ * HashBảng công cụ tính toán
  */
 @Slf4j
 public class HashPanel extends JPanel {
@@ -42,18 +42,18 @@ public class HashPanel extends JPanel {
     private void initUI() {
         ToolboxWorkbench.applyRoot(this);
 
-        // 顶部工具栏
+        // Thanh công cụ trên cùng
         add(createToolbar(), BorderLayout.NORTH);
 
-        // 中间分割面板
+        // Bảng chia đôi ở giữa
         add(createMainPanel(), BorderLayout.CENTER);
 
-        // 底部状态栏
+        // Thanh trạng thái phía dưới
         add(createStatusBar(), BorderLayout.SOUTH);
     }
 
     private JPanel createToolbar() {
-        // 算法按钮面板
+        // Bảng nút thuật toán
         JPanel algorithmPanel = ToolboxWorkbench.optionsRow();
         algorithmPanel.add(new JLabel(I18nUtil.getMessage(MessageKeys.TOOLBOX_HASH_OUTPUT) + ":"));
 
@@ -123,7 +123,7 @@ public class HashPanel extends JPanel {
                 copyBtn,
                 clearBtn);
 
-        // 默认选中MD5按钮
+        // Được chọn theo mặc địnhMD5nút
         updateButtonStates("MD5");
 
         return ToolboxWorkbench.stackedTop(
@@ -133,7 +133,7 @@ public class HashPanel extends JPanel {
     }
 
     private JSplitPane createMainPanel() {
-        // 输入区域
+        // Khu vực đầu vào
         inputArea = new JTextArea();
         inputArea.setLineWrap(true);
         inputArea.setWrapStyleWord(true);
@@ -141,7 +141,7 @@ public class HashPanel extends JPanel {
         inputArea.setMargin(new Insets(5, 5, 5, 5));
         ToolWindowSurfaceStyle.applyTextComponentInput(inputArea);
 
-        // 添加实时计算功能
+        // Thêm khả năng tính toán thời gian thực
         inputArea.getDocument().addDocumentListener(new DocumentListener() {
             @Override
             public void insertUpdate(DocumentEvent e) {
@@ -166,7 +166,7 @@ public class HashPanel extends JPanel {
                 inputScroll
         );
 
-        // 输出区域
+        // khu vực đầu ra
         outputArea = new JTextArea();
         outputArea.setLineWrap(true);
         outputArea.setEditable(false);
@@ -298,7 +298,7 @@ public class HashPanel extends JPanel {
                     .setContents(new StringSelection(text), null);
             updateStatus("✓ Copied to clipboard");
 
-            // 短暂显示复制成功提示
+            // Lời nhắc sao chép thành công sẽ được hiển thị nhanh chóng
             Timer timer = new Timer(2000, e -> updateStatus(" "));
             timer.setRepeats(false);
             timer.start();
@@ -312,7 +312,7 @@ public class HashPanel extends JPanel {
     }
 
     private void setupKeyBindings() {
-        // Ctrl+Enter / Cmd+Enter 计算
+        // Ctrl+Enter / Cmd+Enter Tính toán
         KeyStroke calculateKeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_ENTER,
                 Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx());
         inputArea.getInputMap(JComponent.WHEN_FOCUSED).put(calculateKeyStroke, "calculate");
@@ -327,7 +327,7 @@ public class HashPanel extends JPanel {
             }
         });
 
-        // Ctrl+L / Cmd+L 清空
+        // Ctrl+L / Cmd+L Trống
         KeyStroke clearKeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_L,
                 Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx());
         inputArea.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(clearKeyStroke, "clear");

@@ -1,7 +1,7 @@
 package com.laker.postman.http.runtime.ssl;
 
 /**
- * SSL相关异常的统一封装
+ * SSLĐóng gói thống nhất các ngoại lệ liên quan
  */
 public class SSLException extends RuntimeException {
 
@@ -22,26 +22,26 @@ public class SSLException extends RuntimeException {
     }
 
     /**
-     * SSL错误类型枚举
+     * SSLLoại lỗi enum
      */
     public enum SSLErrorType {
-        /** 证书过期 */
+        /** The certificate has expired */
         CERTIFICATE_EXPIRED("Certificate expired"),
-        /** 证书未生效 */
+        /** The certificate is not valid */
         CERTIFICATE_NOT_YET_VALID("Certificate not yet valid"),
-        /** 不受信任的证书 */
+        /** Chứng chỉ không đáng tin cậy */
         UNTRUSTED_CERTIFICATE("Untrusted certificate"),
-        /** 主机名不匹配 */
+        /** Tên máy chủ không khớp */
         HOSTNAME_MISMATCH("Hostname mismatch"),
-        /** 证书链不完整 */
+        /** The certificate chain is incomplete */
         INCOMPLETE_CHAIN("Incomplete certificate chain"),
-        /** 自签名证书 */
+        /** Giấy chứng nhận tự ký */
         SELF_SIGNED_CERTIFICATE("Self-signed certificate"),
-        /** 证书路径验证失败 */
+        /** Certification path verification failed */
         PATH_VALIDATION_FAILED("Certificate path validation failed"),
-        /** SSL配置错误 */
+        /** SSLLỗi cấu hình */
         CONFIGURATION_ERROR("SSL configuration error"),
-        /** 未知SSL错误 */
+        /** Không rõSSLsai lầm */
         UNKNOWN("Unknown SSL error");
 
         private final String description;

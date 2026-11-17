@@ -31,7 +31,7 @@ public class LoadingOverlay extends JComponent {
     }
 
     /**
-     * 显示加载遮罩
+     * Hiển thị mặt nạ tải
      */
     public void showLoading() {
         this.isVisible = true;
@@ -42,14 +42,14 @@ public class LoadingOverlay extends JComponent {
     }
 
     /**
-     * 显示加载遮罩。执行状态由 spinner 和取消按钮表达，不再绘制居中文案。
+     * Hiển thị mặt nạ tải. Trạng thái thực hiện bao gồm spinner và hủy biểu thức nút, không còn vẽ bản sao ở giữa.
      */
     public void showLoading(String message) {
         showLoading();
     }
 
     /**
-     * 隐藏加载遮罩
+     * Ẩn mặt nạ tải
      */
     public void hideLoading() {
         this.isVisible = false;
@@ -58,14 +58,14 @@ public class LoadingOverlay extends JComponent {
     }
 
     /**
-     * 检查是否正在显示
+     * Kiểm tra xem nó có hiển thị không
      */
     public boolean isLoading() {
         return isVisible;
     }
 
     /**
-     * 保留旧接口兼容调用方，当前遮罩不展示文案。
+     * Giao diện cũ vẫn tương thích với người gọi và mặt nạ hiện tại không hiển thị bản sao.
      */
     public void setMessage(String message) {
         repaint();
@@ -79,11 +79,11 @@ public class LoadingOverlay extends JComponent {
 
         Graphics2D g2d = (Graphics2D) g.create();
         try {
-            // 启用抗锯齿
+            // Kích hoạt tính năng khử răng cưa
             g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
             g2d.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
 
-            // 绘制半透明背景遮罩 - 主题适配
+            // Vẽ mặt nạ nền bán trong suốt - Chuyển thể chủ đề
             Color overlayColor = LoadingOverlayTheme.overlay();
             g2d.setColor(overlayColor);
             g2d.fillRect(0, 0, getWidth(), getHeight());
@@ -98,8 +98,8 @@ public class LoadingOverlay extends JComponent {
 
     @Override
     public boolean contains(int x, int y) {
-        // loading overlay 只负责视觉提示，不应该抢占底层组件的鼠标命中。
-        // 这样即使正在执行请求，用户仍然可以切换 response tab 或查看旧内容。
+        // loading overlay Nó chỉ chịu trách nhiệm về các tín hiệu thị giác và không được chặn trước các lần truy cập chuột từ các thành phần cơ bản.
+        // Bằng cách này, người dùng vẫn có thể chuyển đổi ngay cả khi yêu cầu đang được thực thi response tab Hoặc xem nội dung cũ hơn.
         return false;
     }
 

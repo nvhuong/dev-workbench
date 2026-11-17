@@ -3,20 +3,20 @@ package com.laker.postman.util;
 import lombok.experimental.UtilityClass;
 
 /**
- * 时间显示工具类
- * 提供将毫秒时间转换为更友好的显示格式
+ * Lớp công cụ hiển thị thời gian
+ * Cung cấp chuyển đổi thời gian mili giây thành định dạng hiển thị thân thiện hơn
  */
 @UtilityClass
 public class TimeDisplayUtil {
 
     /**
-     * 将毫秒时间转换为更友好的显示格式
-     * - 小于1秒显示为 "xx ms"
-     * - 小于1分钟显示为 "x.xx s"
-     * - 大于等于1分钟显示为 "xm xs"
+     * Chuyển đổi thời gian mili giây sang định dạng hiển thị thân thiện hơn
+     * - Ít hơn1Giây được hiển thị dưới dạng  "xx ms"
+     * - Ít hơn1Phút được hiển thị dưới dạng  "x.xx s"
+     * - Lớn hơn hoặc bằng1Phút được hiển thị dưới dạng  "xm xs"
      *
-     * @param elapsedTimeMillis 毫秒时间
-     * @return 格式化后的时间字符串
+     * @param elapsedTimeMillis thời gian mili giây
+     * @return Chuỗi thời gian được định dạng
      */
     public static String formatElapsedTime(long elapsedTimeMillis) {
         if (elapsedTimeMillis < 1000) {

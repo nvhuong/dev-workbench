@@ -18,7 +18,7 @@ import static org.testng.Assert.assertTrue;
 
 public class PerformanceTreeRulesTest {
 
-    @Test(description = "共享树规则应统一约束协议阶段节点的放置位置")
+    @Test(description = "Quy tắc cây chia sẻ phải hạn chế thống nhất vị trí của các nút trong giai đoạn giao thức")
     public void shouldApplyProtocolStagePlacementRules() {
         DefaultMutableTreeNode wsRequest = newRequestNode(RequestItemProtocolEnum.WEBSOCKET);
         DefaultMutableTreeNode wsLoop = newLoopNode();
@@ -38,7 +38,7 @@ public class PerformanceTreeRulesTest {
         assertFalse(PerformanceTreeRules.canAcceptChild(wsRequest, newNode(NodeType.EXTRACTOR)));
     }
 
-    @Test(description = "CSV Data Set 只能挂在线程组下，作为线程组作用域配置")
+    @Test(description = "CSV Data Set Nó chỉ có thể được treo trong một nhóm luồng và được định cấu hình làm phạm vi nhóm luồng")
     public void shouldOnlyAcceptCsvDataSetUnderThreadGroup() {
         DefaultMutableTreeNode root = newNode(NodeType.ROOT);
         DefaultMutableTreeNode threadGroup = newNode(NodeType.THREAD_GROUP);
@@ -51,7 +51,7 @@ public class PerformanceTreeRulesTest {
         assertFalse(PerformanceTreeRules.canAcceptChild(loop, newNode(NodeType.CSV_DATA_SET)));
     }
 
-    @Test(description = "Condition 控制器应和 Loop 一样作为轻量容器，可挂请求或 WebSocket 步骤")
+    @Test(description = "Condition Bộ điều khiển phản hồi Loop Là một thùng chứa nhẹ, bạn có thể gắn kết các yêu cầu hoặc WebSocket các bước")
     public void shouldAcceptConditionControllerWhereLoopControllerIsAccepted() {
         DefaultMutableTreeNode threadGroup = newNode(NodeType.THREAD_GROUP);
         DefaultMutableTreeNode requestContainerCondition = newConditionNode();
@@ -67,7 +67,7 @@ public class PerformanceTreeRulesTest {
         assertFalse(PerformanceTreeRules.canAcceptChild(wsCondition, newNode(NodeType.WS_CONNECT)));
     }
 
-    @Test(description = "Simple 控制器应和 Loop 一样作为无配置分组容器")
+    @Test(description = "Simple Bộ điều khiển phản hồi Loop Tương tự như vùng chứa nhóm không có cấu hình")
     public void shouldAcceptSimpleControllerWhereLoopControllerIsAccepted() {
         DefaultMutableTreeNode threadGroup = newNode(NodeType.THREAD_GROUP);
         DefaultMutableTreeNode requestContainerSimple = newNode(NodeType.SIMPLE);
@@ -83,7 +83,7 @@ public class PerformanceTreeRulesTest {
         assertFalse(PerformanceTreeRules.canAcceptChild(wsSimple, newNode(NodeType.WS_CONNECT)));
     }
 
-    @Test(description = "Once Only 控制器应只作为请求容器，不作为 WebSocket 步骤容器")
+    @Test(description = "Once Only Bộ điều khiển chỉ nên hoạt động như một thùng chứa các yêu cầu chứ không phải là một thùng chứa WebSocket Thùng đựng bước")
     public void shouldAcceptOnceOnlyControllerOnlyAsRequestContainer() {
         DefaultMutableTreeNode threadGroup = newNode(NodeType.THREAD_GROUP);
         DefaultMutableTreeNode onceOnly = newNode(NodeType.ONCE_ONLY);

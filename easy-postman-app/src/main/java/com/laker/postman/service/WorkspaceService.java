@@ -26,8 +26,8 @@ import java.util.List;
 import java.util.UUID;
 
 /**
- * 工作区服务类
- * 负责工作区的创建、管理、Git操作等核心功能
+ * Lớp dịch vụ không gian làm việc
+ * Chịu trách nhiệm tạo và quản lý không gian làm việc.Gitcác chức năng cốt lõi như hoạt động
  */
 @Slf4j
 public class WorkspaceService {
@@ -51,14 +51,14 @@ public class WorkspaceService {
     }
 
     /**
-     * 获取所有工作区
+     * Nhận tất cả các không gian làm việc
      */
     public List<Workspace> getAllWorkspaces() {
         return new ArrayList<>(workspaces);
     }
 
     /**
-     * 创建新工作区
+     * Tạo một không gian làm việc mới
      */
     public void createWorkspace(Workspace workspace) throws Exception {
         if (WorkspaceStorageUtil.isDefaultWorkspace(workspace)) {
@@ -66,12 +66,12 @@ public class WorkspaceService {
         }
         validateWorkspace(workspace);
 
-        // 生成唯一ID
+        // Tạo sự độc đáoID
         workspace.setId(UUID.randomUUID().toString());
         workspace.setCreatedAt(System.currentTimeMillis());
         workspace.setUpdatedAt(System.currentTimeMillis());
 
-        // 对于非Git克隆模式，创建本地目录
+        // Đối với khôngGitChế độ sao chép, tạo một thư mục cục bộ
         if (workspace.getType() != WorkspaceType.GIT || workspace.getGitRepoSource() != GitRepoSource.CLONED) {
             Path workspacePath = Paths.get(workspace.getPath());
             if (!Files.exists(workspacePath)) {
@@ -79,12 +79,12 @@ public class WorkspaceService {
             }
         }
 
-        // 根据工作区类型执行相应操作
+        // Thực hiện các hành động thích hợp dựa trên loại không gian làm việc
         if (workspace.getType() == WorkspaceType.GIT) {
             handleGitWorkspace(workspace);
         }
 
-        // 添加到工作区列表并保存
+        // Thêm vào danh sách không gian làm việc và lưu
         workspaces.add(workspace);
         saveWorkspaces();
 
@@ -92,14 +92,14 @@ public class WorkspaceService {
     }
 
     /**
-     * 处理Git工作区创建
+     * xử lýGitĐã tạo không gian làm việc
      */
     private void handleGitWorkspace(Workspace workspace) throws Exception {
         requireGitService().prepareGitWorkspace(workspace);
     }
 
     /**
-     * 验证工作区参数
+     * Xác minh các tham số không gian làm việc
      */
     private void validateWorkspace(Workspace workspace) throws IllegalArgumentException {
         if (workspace.getName() == null || workspace.getName().trim().isEmpty()) {
@@ -128,7 +128,7 @@ public class WorkspaceService {
             }
         }
 
-        // 检查路径是否已被其他工作区使用
+        // Kiểm tra xem đường dẫn đã được sử dụng bởi không gian làm việc khác chưa
         String normalizedPath = Paths.get(workspace.getPath()).toAbsolutePath().normalize().toString();
         boolean pathExists = workspaces.stream()
                 .anyMatch(w -> Paths.get(w.getPath()).toAbsolutePath().normalize().toString().equals(normalizedPath));
@@ -137,17 +137,17 @@ public class WorkspaceService {
             throw new IllegalArgumentException("Path is already used by another workspace");
         }
 
-        // 对于Git克隆模式，检查目标目录是否已存在且不为空
+        // Đối vớiGitỞ chế độ sao chép, hãy kiểm tra xem thư mục đích đã tồn tại chưa và có trống không
         if (workspace.getType() == WorkspaceType.GIT && workspace.getGitRepoSource() == GitRepoSource.CLONED) {
             Path targetPath = Paths.get(workspace.getPath());
             if (Files.exists(targetPath)) {
                 try {
-                    // 检查目录是否为空
+                    // Kiểm tra xem thư mục có trống không
                     boolean isEmpty = Files.list(targetPath).findAny().isEmpty();
                     if (!isEmpty) {
                         throw new IllegalArgumentException("Target directory is not empty: " + workspace.getPath());
                     }
-                    // 如果目录存在但为空，删除它让Git克隆重新创建
+                    // Nếu thư mục tồn tại nhưng trống, hãy xóa nóGitSao chép và tạo lại
                     Files.delete(targetPath);
                 } catch (IOException e) {
                     throw new IllegalArgumentException("Cannot access target directory: " + workspace.getPath());
@@ -157,7 +157,7 @@ public class WorkspaceService {
     }
 
     /**
-     * 切换工作区
+     * Chuyển đổi không gian làm việc
      */
     public void switchWorkspace(String workspaceId) {
         Workspace workspace = workspaces.stream()
@@ -171,7 +171,7 @@ public class WorkspaceService {
     }
 
     /**
-     * 从 EasyPostman 中移除工作区记录，保留本地目录及其中的所有文件。
+     * Từ EasyPostman Xóa bản ghi không gian làm việc khỏi thư mục, giữ lại thư mục cục bộ và tất cả các tệp trong đó.
      */
     public void removeWorkspace(String workspaceId) {
         Workspace workspace = workspaces.stream()
@@ -185,13 +185,13 @@ public class WorkspaceService {
         List<Workspace> remainingWorkspaces = new ArrayList<>(workspaces);
         remainingWorkspaces.removeIf(w -> w.getId().equals(workspaceId));
 
-        // 先持久化，保存失败时保持内存状态和 UI 不变。
+        // Trước tiên hãy kiên trì và giữ trạng thái bộ nhớ nếu quá trình lưu không thành công UI không thay đổi.
         WorkspaceStorageUtil.saveWorkspaces(remainingWorkspaces);
         workspaces = remainingWorkspaces;
 
-        // 如果移除的是当前工作区，切换到默认工作区
+        // Nếu không gian làm việc hiện tại bị xóa, hãy chuyển sang không gian làm việc mặc định
         if (currentWorkspace != null && currentWorkspace.getId().equals(workspaceId)) {
-            // 优先切换到默认工作区，找不到则取列表第一个，确保 currentWorkspace 不为 null
+            // Chuyển về không gian làm việc mặc định trước, nếu không tìm thấy thì lấy cái đầu tiên trong danh sách, đảm bảo currentWorkspace Không null
             currentWorkspace = getDefaultWorkspace();
             if (currentWorkspace != null) {
                 WorkspaceStorageUtil.saveCurrentWorkspace(currentWorkspace.getId());
@@ -212,7 +212,7 @@ public class WorkspaceService {
     }
 
     /**
-     * 重命名工作区
+     * Đổi tên không gian làm việc
      */
     public void renameWorkspace(String workspaceId, String newName) {
         Workspace workspace = workspaces.stream()
@@ -234,7 +234,7 @@ public class WorkspaceService {
     }
 
     /**
-     * Git操作：拉取更新
+     * GitHành động: Kéo cập nhật
      */
     public GitOperationResult pullUpdates(String workspaceId) throws Exception {
         Workspace workspace = getWorkspaceById(workspaceId);
@@ -244,7 +244,7 @@ public class WorkspaceService {
     }
 
     /**
-     * Git操作：推送变更
+     * GitHành động: Đẩy các thay đổi
      */
     public GitOperationResult pushChanges(String workspaceId) throws Exception {
         Workspace workspace = getWorkspaceById(workspaceId);
@@ -254,7 +254,7 @@ public class WorkspaceService {
     }
 
     /**
-     * 强制推送变更（覆盖远程变更）
+     * Buộc thay đổi đẩy (ghi đè các thay đổi từ xa)
      */
     public GitOperationResult forcePushChanges(String workspaceId) throws Exception {
         Workspace workspace = getWorkspaceById(workspaceId);
@@ -264,7 +264,7 @@ public class WorkspaceService {
     }
 
     /**
-     * 暂存本地变更
+     * Giai đoạn thay đổi cục bộ
      */
     public GitOperationResult stashChanges(String workspaceId) throws Exception {
         Workspace workspace = getWorkspaceById(workspaceId);
@@ -274,7 +274,7 @@ public class WorkspaceService {
     }
 
     /**
-     * 恢复暂存的变更
+     * Hoàn nguyên các thay đổi theo giai đoạn
      */
     public GitOperationResult popStashChanges(String workspaceId) throws Exception {
         Workspace workspace = getWorkspaceById(workspaceId);
@@ -284,7 +284,7 @@ public class WorkspaceService {
     }
 
     /**
-     * 强制拉取更新（丢弃本地变更）
+     * Buộc cập nhật kéo (loại bỏ các thay đổi cục bộ)
      */
     public GitOperationResult forcePullUpdates(String workspaceId) throws Exception {
         Workspace workspace = getWorkspaceById(workspaceId);
@@ -294,7 +294,7 @@ public class WorkspaceService {
     }
 
     /**
-     * Git操作：提交变更
+     * GitHành động: Cam kết thay đổi
      */
     public GitOperationResult commitChanges(String workspaceId, String message) throws Exception {
         Workspace workspace = getWorkspaceById(workspaceId);
@@ -304,7 +304,7 @@ public class WorkspaceService {
     }
 
     /**
-     * 获取两个 commit 之间的变更文件列表
+     * Nhận hai commit Danh sách các tập tin đã thay đổi giữa
      */
     public List<String> getChangedFilesBetweenCommits(String workspaceId, String oldCommitId, String newCommitId) throws Exception {
         Workspace workspace = getWorkspaceById(workspaceId);
@@ -322,7 +322,7 @@ public class WorkspaceService {
     }
 
     /**
-     * 根据ID获取工作区
+     * theoIDNhận không gian làm việc
      */
     private Workspace getWorkspaceById(String workspaceId) {
         return workspaces.stream()
@@ -332,7 +332,7 @@ public class WorkspaceService {
     }
 
     /**
-     * 加载工作区配置
+     * Tải cấu hình không gian làm việc
      */
     private void loadWorkspaces() {
         try {
@@ -346,7 +346,7 @@ public class WorkspaceService {
                         .orElse(null);
             }
 
-            // 如果没有当前工作区但有工作区列表，设置第一个为当前工作区
+            // Nếu không có không gian làm việc hiện tại nhưng có danh sách các không gian làm việc, hãy đặt không gian làm việc đầu tiên làm không gian làm việc hiện tại
             boolean storedWorkspaceSelected = currentWorkspace != null;
             if (currentWorkspace == null && !workspaces.isEmpty()) {
                 currentWorkspace = workspaces.get(0);
@@ -362,7 +362,7 @@ public class WorkspaceService {
         } catch (Exception e) {
             log.error("Failed to load workspaces", e);
             workspaces = new ArrayList<>();
-            // 加载失败时也要保证内存中有默认工作区，避免后续逻辑空指针
+            // Khi tải không thành công, cũng cần đảm bảo rằng có một không gian làm việc mặc định trong bộ nhớ để tránh các con trỏ null logic tiếp theo
             Workspace defaultWs = WorkspaceStorageUtil.getDefaultWorkspace();
             workspaces.add(defaultWs);
             currentWorkspace = defaultWs;
@@ -370,7 +370,7 @@ public class WorkspaceService {
     }
 
     /**
-     * 保存工作区配置
+     * Lưu cấu hình không gian làm việc
      */
     private void saveWorkspaces() {
         try {
@@ -381,7 +381,7 @@ public class WorkspaceService {
     }
 
     /**
-     * 为 Git 工作区新增远程仓库或更新已有 origin。
+     * vì Git Thêm kho từ xa mới vào không gian làm việc hoặc cập nhật kho hiện có origin。
      */
     public void addRemoteRepository(String workspaceId, String remoteUrl, String remoteBranch,
                                     GitAuthType authType, String username, String password, String token) throws Exception {
@@ -405,7 +405,7 @@ public class WorkspaceService {
     }
 
     /**
-     * 获取远程仓库状态信息
+     * Nhận thông tin trạng thái kho từ xa
      */
     public RemoteStatus getRemoteStatus(String workspaceId) throws Exception {
         Workspace workspace = getWorkspaceById(workspaceId);
@@ -413,8 +413,8 @@ public class WorkspaceService {
     }
 
     /**
-     * 将本地工作区转换为Git工作区
-     * 复用现有的Git初始化逻辑
+     * Chuyển đổi không gian làm việc cục bộ sang Gitkhu vực làm việc
+     * Tái sử dụng những cái hiện cóGitLogic khởi tạo
      */
     public void convertLocalToGit(Workspace workspace, String localBranch) throws Exception {
         requireGitService().convertLocalToGit(workspace, localBranch);
@@ -422,11 +422,11 @@ public class WorkspaceService {
     }
 
     /**
-     * 保存工作区顺序（拖拽排序后调用）
+     * Lưu thứ tự không gian làm việc (được gọi sau khi sắp xếp kéo)
      */
     public void saveWorkspaceOrder(List<String> idOrder) {
         try {
-            // 根据idOrder重新排序workspaces列表
+            // theoidOrderSắp xếp lạiworkspacesdanh sách
             List<Workspace> sortedWorkspaces = new ArrayList<>();
             for (String id : idOrder) {
                 for (Workspace ws : workspaces) {
@@ -437,17 +437,17 @@ public class WorkspaceService {
                 }
             }
 
-            // 添加可能遗漏的工作区（防止数据丢失）
+            // Thêm không gian làm việc có thể bị thiếu (ngăn ngừa mất dữ liệu)
             for (Workspace ws : workspaces) {
                 if (!sortedWorkspaces.contains(ws)) {
                     sortedWorkspaces.add(ws);
                 }
             }
 
-            // 更新工作区列表
+            // Cập nhật danh sách không gian làm việc
             workspaces = sortedWorkspaces;
 
-            // 持久化到文件
+            // Kiên trì nộp hồ sơ
             saveWorkspaces();
 
             log.debug("Workspace order saved successfully");
@@ -457,11 +457,11 @@ public class WorkspaceService {
     }
 
     /**
-     * 获取工作区的 Git 提交历史
+     * Nhận không gian làm việc Git Cam kết lịch sử
      *
-     * @param workspaceId 工作区ID
-     * @param maxCount    最大返回数量，0表示返回所有
-     * @return Git 提交信息列表
+     * @param workspaceId khu vực làm việcID
+     * @param maxCount    Số lượng hoàn trả tối đa,0Cho biết trả lại tất cả
+     * @return Git Gửi danh sách thông tin
      */
     public List<GitCommitInfo> getGitHistory(String workspaceId, int maxCount) throws Exception {
         Workspace workspace = getWorkspaceById(workspaceId);
@@ -469,13 +469,13 @@ public class WorkspaceService {
     }
 
     /**
-     * 恢复工作区到指定的 Git 提交版本
-     * 使用 reset + commit 方式，保留完整的历史记录
+     * Khôi phục không gian làm việc về không gian làm việc đã chỉ định Git Gửi phiên bản
+     * sử dụng reset + commit cách để giữ một lịch sử đầy đủ
      *
-     * @param workspaceId  工作区ID
-     * @param commitId     提交ID
-     * @param createBackup 是否在恢复前创建备份提交（保存未提交的更改）
-     * @return 操作结果
+     * @param workspaceId  khu vực làm việcID
+     * @param commitId     nộpID
+     * @param createBackup Có tạo các cam kết dự phòng hay không (lưu các thay đổi chưa được cam kết) trước khi khôi phục
+     * @return Kết quả hoạt động
      */
     public GitOperationResult restoreToCommit(String workspaceId, String commitId, boolean createBackup) throws Exception {
         Workspace workspace = getWorkspaceById(workspaceId);
@@ -485,11 +485,11 @@ public class WorkspaceService {
     }
 
     /**
-     * 查看指定提交的详细信息
+     * Xem chi tiết của một cam kết được chỉ định
      *
-     * @param workspaceId 工作区ID
-     * @param commitId    提交ID
-     * @return 提交详细信息
+     * @param workspaceId khu vực làm việcID
+     * @param commitId    nộpID
+     * @return Gửi chi tiết
      */
     public String getCommitDetails(String workspaceId, String commitId) throws Exception {
         Workspace workspace = getWorkspaceById(workspaceId);

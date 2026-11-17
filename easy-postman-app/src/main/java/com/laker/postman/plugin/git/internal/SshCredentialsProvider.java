@@ -20,8 +20,8 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * SSH认证提供者
- * 使用 Apache MINA SSHD 实现SSH密钥认证
+ * SSHNhà cung cấp xác thực
+ * sử dụng Apache MINA SSHD hoàn thànhSSHXác thực khóa
  */
 @Slf4j
 public class SshCredentialsProvider implements TransportConfigCallback {
@@ -29,11 +29,11 @@ public class SshCredentialsProvider implements TransportConfigCallback {
     private final String privateKeyPath;
     private final String passphrase;
 
-    // 缓存SSH会话工厂，避免每次都创建新的实例
+    // Bộ nhớ đệmSSHNhà máy phiên để tránh tạo phiên bản mới mỗi lần
     // Key: privateKeyPath, Value: SshSessionFactory
     private static final Map<String, SshSessionFactory> SESSION_FACTORY_CACHE = new ConcurrentHashMap<>();
 
-    // 用于在应用关闭时清理资源
+    // Được sử dụng để dọn dẹp tài nguyên khi đóng ứng dụng
     static {
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             log.info("Cleaning up SSH session factories...");
@@ -63,8 +63,8 @@ public class SshCredentialsProvider implements TransportConfigCallback {
     }
 
     /**
-     * 获取或创建SSH会话工厂（带缓存）
-     * 这样可以避免每次Git操作都创建新的executor线程池
+     * Nhận hoặc tạoSSHNhà máy phiên (có bộ đệm)
+     * Điều này có thể tránh được mọi lúcGitHoạt động tạo ra những cái mớiexecutorNhóm chủ đề
      */
     @SneakyThrows
     private SshSessionFactory getOrCreateSshSessionFactory() {
@@ -77,10 +77,10 @@ public class SshCredentialsProvider implements TransportConfigCallback {
                         (session, resourceKey, retryIndex) -> passphrase);
 
                 return new SshdSessionFactoryBuilder()
-//                      .setPreferredAuthentications("publickey") // 可选 使用公钥认证
-                        .setDefaultKeysProvider(ignoredSshDirBecauseWeUseAnInMemorySetOfKeyPairs -> keyPairs) // 设置密钥提供者
-                        .setHomeDirectory(FS.DETECTED.userHome()) //设置用户主目录 影响.ssh/known_hosts 等
-                        .setSshDirectory(new File(FS.DETECTED.userHome(), ".ssh")) //设置.ssh目录
+//                      .setPreferredAuthentications("publickey") // Không bắt buộc Sử dụng xác thực khóa công khai
+                        .setDefaultKeysProvider(ignoredSshDirBecauseWeUseAnInMemorySetOfKeyPairs -> keyPairs) // Đặt nhà cung cấp khóa
+                        .setHomeDirectory(FS.DETECTED.userHome()) //Đặt thư mục chính của người dùng ảnh hưởng.ssh/known_hosts Đợi đã
+                        .setSshDirectory(new File(FS.DETECTED.userHome(), ".ssh")) //cài đặt.sshThư mục
                         .build(null);
             } catch (Exception e) {
                 log.error("Failed to create SSH session factory for key: {}", privateKeyPath, e);
@@ -90,8 +90,8 @@ public class SshCredentialsProvider implements TransportConfigCallback {
     }
 
     /**
-     * 清除指定私钥的缓存
-     * 当用户更换SSH密钥时可调用此方法
+     * Xóa bộ đệm cho khóa riêng được chỉ định
+     * Khi người dùng thay đổiSSHPhương pháp này có thể được gọi khi lấy được khóa
      */
     public static void clearCache(String privateKeyPath) {
         SshSessionFactory factory = SESSION_FACTORY_CACHE.remove(privateKeyPath);

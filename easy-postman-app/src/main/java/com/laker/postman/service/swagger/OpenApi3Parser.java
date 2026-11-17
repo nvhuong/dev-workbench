@@ -29,8 +29,8 @@ import static com.laker.postman.request.model.RequestBodyTypes.BODY_TYPE_FORM_UR
 import static com.laker.postman.request.model.RequestBodyTypes.BODY_TYPE_RAW;
 
 /**
- * OpenAPI 3.x 格式解析器
- * 支持 OpenAPI 3.0.x 和 3.1.x
+ * OpenAPI 3.x Trình phân tích cú pháp định dạng
+ * Hỗ trợ OpenAPI 3.0.x và 3.1.x
  */
 @Slf4j
 @UtilityClass
@@ -51,7 +51,7 @@ class OpenApi3Parser {
         JSONArray servers = openApiRoot.getJSONArray("servers");
         String baseUrl = (servers != null && !servers.isEmpty()) ? "{{baseUrl}}" : "";
         if (!baseUrl.isEmpty()) {
-            log.debug("检测到 {} 个服务器配置，请求URL将使用 {{{{baseUrl}}}} 变量", servers.size());
+            log.debug("được phát hiện {} Cấu hình máy chủ, yêu cầuURLsẽ được sử dụng {{{{baseUrl}}}} các biến", servers.size());
         }
 
         JSONObject components = openApiRoot.getJSONObject("components");
@@ -59,7 +59,7 @@ class OpenApi3Parser {
 
         JSONObject paths = openApiRoot.getJSONObject("paths");
         if (paths == null || paths.isEmpty()) {
-            log.warn("OpenAPI 文件中没有定义任何路径");
+            log.warn("OpenAPI Không có đường dẫn nào được xác định trong tệp");
             return result;
         }
 
@@ -311,7 +311,7 @@ class OpenApi3Parser {
     }
 
     private static void parseSecurity(JSONObject openApiRoot, JSONObject operation, HttpRequestItem req, JSONObject securitySchemes) {
-        // OpenAPI 允许在根节点声明全局认证；操作节点显式声明时才覆盖全局配置。
+        // OpenAPI Xác thực toàn cầu được phép khai báo trên nút gốc; cấu hình chung chỉ bị ghi đè khi được khai báo rõ ràng trên nút hoạt động.
         JSONArray security = operation.containsKey("security")
                 ? operation.getJSONArray("security")
                 : openApiRoot.getJSONArray("security");
@@ -383,11 +383,11 @@ class OpenApi3Parser {
     private static void parseServersToEnvironments(JSONObject openApiRoot, CollectionParseResult result, String apiTitle) {
         JSONArray servers = openApiRoot.getJSONArray("servers");
         if (servers == null || servers.isEmpty()) {
-            log.debug("OpenAPI 文件中没有定义 servers，跳过环境变量创建");
+            log.debug("OpenAPI Không có định nghĩa trong tập tin servers，Bỏ qua việc tạo biến môi trường");
             return;
         }
 
-        log.info("解析到 {} 个服务器配置，将创建对应的环境变量", servers.size());
+        log.info("được phân tích cú pháp thành {} Với mỗi cấu hình máy chủ, các biến môi trường tương ứng sẽ được tạo", servers.size());
         for (int i = 0; i < servers.size(); i++) {
             JSONObject server = servers.getJSONObject(i);
             String url = resolveServerUrl(server);

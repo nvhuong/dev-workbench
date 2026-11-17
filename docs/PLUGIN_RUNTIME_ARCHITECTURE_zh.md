@@ -1,22 +1,22 @@
-# EasyPostman 插件 Runtime 架构说明
+# EasyPostman plugin Runtime Mô tả kiến ​​trúc
 
-这份文档聚焦 `easy-postman-plugin-runtime` 在当前重构后的实现结构。
+Tài liệu này tập trung vào `easy-postman-plugin-runtime` Cấu trúc triển khai sau khi tái cấu trúc hiện tại.
 
-它不重复讲“怎么开发插件”或“怎么发布插件”，而是回答下面几个问题：
+Nó không lặp lại chính nó“Cách phát triển plug-in”hoặc“Cách xuất bản plugin”，Thay vào đó hãy trả lời những câu hỏi sau:
 
-- runtime 现在分成了哪些职责块
-- 插件从安装到加载的真实链路是什么
-- 宿主如何消费插件贡献
-- 当前冲突策略和测试覆盖到了哪里
-- 后面继续演进时，优先改哪里
+- runtime Những khối trách nhiệm nào bây giờ được chia thành
+- Liên kết thực sự từ cài đặt đến tải plugin là gì
+- Cách máy chủ sử dụng đóng góp của plugin
+- Chính sách xung đột hiện tại và phạm vi kiểm tra là gì?
+- Khi chúng tôi tiếp tục phát triển sau này, chúng tôi sẽ ưu tiên thay đổi ở đâu
 
-相关总览文档见：
+Để biết các tài liệu tổng quan có liên quan, xem:
 
 - [PLUGINS_zh.md](./PLUGINS_zh.md)
 
-## 1. 当前结构
+## 1. cấu trúc hiện tại
 
-当前 runtime 相关的主类可以按职责理解为：
+hiện tại runtime Các lớp chính có liên quan có thể được hiểu theo trách nhiệm của chúng:
 
 ```text
 easy-postman-plugin-runtime
@@ -34,44 +34,44 @@ easy-postman-plugin-runtime
 └── PluginVersionComparator
 ```
 
-### 1.1 每个类负责什么
+### 1.1 Mỗi lớp chịu trách nhiệm về việc gì
 
 - `PluginRuntime`
-  - 运行时总编排入口
-  - 协调启动、关闭、候选选择、生命周期收尾
-  - 对外暴露 `initialize()`、`shutdown()`、`getInstalledPlugins()` 等静态入口
+  - Mục nhập điều phối tổng thời gian chạy
+  - Phối hợp khởi động, tắt máy, lựa chọn ứng viên và kết thúc vòng đời
+  - tiếp xúc với thế giới bên ngoài `initialize()`、`shutdown()`、`getInstalledPlugins()` Chờ nhập tĩnh
 - `PluginScanner`
-  - 扫描插件目录
-  - 读取插件 jar 内的 descriptor
-  - 生成磁盘层的 `PluginFileInfo`
+  - Quét thư mục plugin
+  - Đọc plugin jar bên trong descriptor
+  - Tạo lớp đĩa `PluginFileInfo`
 - `PluginCandidateResolver`
-  - 从扫描结果里选出真正应该加载的插件
-  - 处理禁用、待卸载、兼容性过滤、同 `plugin.id` 多版本择优
+  - Chọn các plugin thực sự cần được tải từ kết quả quét
+  - Xử lý bị vô hiệu hóa, đang chờ gỡ cài đặt, lọc khả năng tương thích và đồng bộ hóa `plugin.id` Chọn tốt nhất trong số nhiều phiên bản
 - `PluginLoader`
-  - 创建 `URLClassLoader`
-  - 反射实例化插件入口类
-  - 调用 `onLoad()` / `onStart()` / `onStop()`
-  - 把 `PluginContext` 注册动作接到 `PluginRegistry`
+  - Tạo `URLClassLoader`
+  - Sự phản chiếu khởi tạo lớp mục nhập trình cắm thêm
+  - gọi `onLoad()` / `onStart()` / `onStop()`
+  - Bó `PluginContext` Đã nhận được hành động đăng ký `PluginRegistry`
 - `PluginRegistry`
-  - 保存插件注册出来的脚本 API、服务、Toolbox、补全、Snippet
-  - 宿主运行时从这里消费插件能力
+  - Lưu tập lệnh được plug-in đăng ký API、dịch vụ,Toolbox、Hoàn thành,Snippet
+  - Thời gian chạy máy chủ sử dụng các khả năng của trình cắm từ đây
 - `PluginStateStore`
-  - 维护禁用插件和待卸载插件状态
+  - Duy trì trạng thái của các plugin bị vô hiệu hóa và các plugin sẽ được gỡ cài đặt
 - `PluginPlatformSettingsStore`
-  - 底层 JSON 持久化
+  - Tầng trệt JSON Kiên trì
 - `PluginRuntimePaths`
-  - 统一运行时数据目录、安装目录、包缓存目录
+  - Hợp nhất thư mục dữ liệu thời gian chạy, thư mục cài đặt và thư mục bộ đệm gói
 - `RuntimeVersionResolver`
-  - 解析 app version 和 plugin platform version
-  - 打包态优先读资源，开发态回退读 `pom.xml`
+  - phân tích app version và plugin platform version
+  - Trạng thái đóng gói đọc tài nguyên trước tiên và trạng thái phát triển quay lại đọc tài nguyên `pom.xml`
 
-## 2. 真实加载链路
+## 2. Liên kết tải thực sự
 
-当前插件加载链路可以简化成：
+Liên kết tải plug-in hiện tại có thể được đơn giản hóa thành:
 
 ```text
-PluginManager / 本地放入 jar
-  -> plugins/installed 和 plugins/packages
+PluginManager / Đặt tại địa phương jar
+  -> plugins/installed và plugins/packages
   -> StartupCoordinator.prepareMainFrame()
   -> PluginRuntime.initialize()
   -> cleanupPendingUninstallPlugins()
@@ -80,32 +80,32 @@ PluginManager / 本地放入 jar
   -> PluginCandidateResolver.resolveLoadCandidates()
   -> PluginLoader.loadPluginJar()
   -> plugin.onLoad(context)
-  -> PluginRegistry 收集贡献
+  -> PluginRegistry Thu thập các khoản đóng góp
   -> PluginLoader.startPlugins()
-  -> 宿主 UI / 脚本 / plugin.host 访问层消费贡献
+  -> chủ nhà UI / kịch bản / plugin.host Đóng góp tiêu thụ của lớp truy cập
 ```
 
-这里有几个关键设计点：
+Dưới đây là một số điểm thiết kế chính: .
 
-- 安装和加载分离
-  - `easy-postman-plugin-runtime` 只负责扫描、descriptor 解析、classloader、registry、生命周期和“当前进程应该加载谁”
-  - `easy-postman-plugins/*` 通常是官方插件 JAR，由 runtime 按 descriptor 加载
-  - `easy-postman-plugins/plugin-manager` 是宿主侧插件管理辅助模块，宿主 app 可直接依赖它来做 catalog 解析、下载、落盘、校验和安装来源记录
-  - `plugin-manager` 不是由 runtime 加载的普通插件，也不应作为新普通插件或新宿主侧插件管理库的默认目录模板；它保留在 `easy-postman-plugins` 下只是历史路径和发布组织选择
-- 扫描和选择分离
-  - `PluginScanner` 负责“看见什么”
-  - `PluginCandidateResolver` 负责“最终选谁”
-- 注册和消费分离
-  - 插件只在 `onLoad()` 里声明能力
-  - 宿主稍后再从 `PluginRegistry` 统一读取
+- Cài đặt và tải được tách biệt
+  - `easy-postman-plugin-runtime` Chỉ chịu trách nhiệm quét.descriptor Phân tích,classloader、registry、vòng đời và“Ai sẽ được tải bởi quy trình hiện tại”
+  - `easy-postman-plugins/*` Thông thường các plugin chính thức JAR，Bởi runtime Nhấn descriptor trọng tải
+  - `easy-postman-plugins/plugin-manager` Nó là một mô-đun phụ trợ quản lý plug-in ở phía máy chủ, máy chủ app Bạn có thể dựa vào nó trực tiếp catalog Phân tích, tải xuống, tải xuống, xác minh và cài đặt các bản ghi nguồn
+  - `plugin-manager` Không bằng runtime Không nên sử dụng plugin thông thường đã tải làm mẫu thư mục mặc định cho các plugin thông thường mới hoặc thư viện quản lý plugin phía máy chủ mới; nó vẫn còn ở trong `easy-postman-plugins` Sau đây chỉ là con đường lịch sử và lựa chọn tổ chức phát hành
+- Quá trình quét và lựa chọn được tách biệt
+  - `PluginScanner` Chịu trách nhiệm“Xem cái gì đó”
+  - `PluginCandidateResolver` Chịu trách nhiệm“Cuối cùng chọn ai”
+- Đăng ký và tiêu thụ được tách ra
+  - Chỉ có plugin `onLoad()` tuyên bố khả năng
+  - Chủ nhà sẽ quay lại sau `PluginRegistry` Đọc thống nhất
 
-## 3. 宿主消费链路
+## 3. Liên kết tiêu thụ máy chủ
 
-宿主 app 层已经不再四处直连 `PluginRuntime.getRegistry()`，而是统一收口到：
+chủ nhà app Các lớp không còn được kết nối trực tiếp ở mọi nơi `PluginRuntime.getRegistry()`，Thay vào đó, tất cả đều kết thúc bằng:
 
 - [PluginAccess.java](../easy-postman-app/src/main/java/com/laker/postman/plugin/host/PluginAccess.java)
 
-当前消费关系大致是：
+Mối quan hệ tiêu dùng hiện nay đại khái là:
 
 ```text
 PluginRegistry
@@ -117,23 +117,23 @@ PluginRegistry
     -> ClientCertificatePluginAccess.getService(...)
 ```
 
-这样做的价值是：
+Giá trị của việc làm này là:
 
-- app 层不用到处依赖 `PluginRuntime`
-- 未来如果 registry 或 runtime 实现变化，app 改动面会小很多
+- app Các lớp không cần phải phụ thuộc vào mọi thứ `PluginRuntime`
+- tương lai nếu registry hoặc runtime Để đạt được sự thay đổi,app Phạm vi thay đổi sẽ nhỏ hơn nhiều
 
-## 4. 插件入口模式
+## 4. Chế độ nhập plug-in
 
-插件入口类当前建议只做“能力声明”，不做复杂业务。
+Hiện tại chúng tôi khuyên bạn chỉ nên sử dụng lớp mục nhập trình cắm thêm“Tuyên bố về Năng lực”，Đừng làm những việc phức tạp.
 
-官方插件已经开始统一走：
+Các plug-in chính thức đã bắt đầu được thống nhất:
 
 - `PluginContributionSupport`
 - `RedisI18n` / `KafkaI18n`
 
-宿主侧消费统一走 `com.laker.postman.plugin.host.PluginAccess`。
+Tiêu thụ phía chủ nhà được thống nhất `com.laker.postman.plugin.host.PluginAccess`。
 
-例如 `KafkaPlugin` / `RedisPlugin` 的 `onLoad()` 现在更接近：
+Ví dụ `KafkaPlugin` / `RedisPlugin` của `onLoad()` Bây giờ gần hơn:
 
 ```text
 registerScriptApi
@@ -142,89 +142,89 @@ registerScriptCompletionContributor
 registerExampleSnippet
 ```
 
-这比原来直接在入口类里手写大量 `ToolboxContribution` / `ShorthandCompletion` / `SnippetDefinition` 更容易 review。
+Việc này tốn nhiều công sức hơn so với việc viết trực tiếp vào lớp đầu vào `ToolboxContribution` / `ShorthandCompletion` / `SnippetDefinition` dễ dàng hơn review。
 
-## 5. 当前冲突策略
+## 5. Chiến lược xung đột hiện tại
 
 ### 5.1 Script API alias / service type
 
-`PluginRegistry` 目前对两类冲突做了基础保护：
+`PluginRegistry` Hiện tại, biện pháp bảo vệ cơ bản được cung cấp cho hai loại xung đột:
 
-- 脚本 API alias 冲突
-- service type 冲突
+- kịch bản API alias xung đột
+- service type xung đột
 
-当前策略是：
+Chiến lược hiện tại là:
 
-- 保持兼容：后注册覆盖前注册
-- 不再静默：会打 `warn` 日志
-- 日志会带 owner 信息，指出“哪个插件覆盖了哪个插件”
+- Luôn tương thích: Đăng ký sau sẽ ghi đè đăng ký trước
+- Không còn im lặng: Sẽ chiến đấu `warn` Nhật ký
+- Nhật ký sẽ được mang đến owner thông tin, chỉ ra“Plugin nào ghi đè plugin nào”
 
-也就是说，现在 registry 已经会记录：
+Đó là, bây giờ registry Đã ghi:
 
-- 某个 script API alias 属于哪个 pluginId
-- 某个 service type 属于哪个 pluginId
+- Người nào đó script API alias Nó thuộc về cái nào pluginId
+- Người nào đó service type Nó thuộc về cái nào pluginId
 
-这一步还不是最终方案，但已经足够让冲突可观测。
+Bước này không phải là giải pháp cuối cùng nhưng cũng đủ để khiến xung đột có thể được quan sát.
 
-### 5.2 还没做的部分
+### 5.2 Những phần chưa được thực hiện
 
-下面这些冲突目前还没有统一治理：
+Các xung đột sau đây hiện không có sự quản lý thống nhất:
 
-- `ToolboxContribution` 的重复 `id`
-- `SnippetDefinition` 的重复标题或语义冲突
-- `ScriptCompletionContributor` 的重复补全项
+- `ToolboxContribution` của sự lặp lại `id`
+- `SnippetDefinition` Tiêu đề trùng lặp hoặc xung đột ngữ nghĩa
+- `ScriptCompletionContributor` Hoàn thành trùng lặp cho
 
-这些可以后续再做。
+Những việc này có thể được thực hiện sau.
 
-## 6. 当前测试覆盖
+## 6. Phạm vi kiểm tra hiện tại
 
-runtime 测试目前主要在：
+runtime Các bài kiểm tra hiện nay chủ yếu ở:
 
 - [PluginRuntimeTest.java](../easy-postman-plugin-runtime/src/test/java/com/laker/postman/plugin/runtime/PluginRuntimeTest.java)
 - [PluginRegistryTest.java](../easy-postman-plugin-runtime/src/test/java/com/laker/postman/plugin/runtime/PluginRegistryTest.java)
 
-已经覆盖的关键行为包括：
+Các hành vi chính đã được đề cập bao gồm:
 
-- 重新启用插件时会清理 pending uninstall
-- 自定义数据目录会生效
-- plugin platform version 独立于 app version
-- 不兼容平台版本会被拒绝
-- pending uninstall 文件清理
-- 同一 `plugin.id` 多版本时只加载最高版本
-- 最新版本不兼容时，回退到次新兼容版本
-- 某个插件加载失败时，其他插件继续加载
-- `shutdown()` 会调用插件 `onStop()`
-- registry 对 alias/type 的重复注册遵循“后注册覆盖前注册”
-- registry 会保留最新注册者的 owner 信息
+- Nó sẽ được dọn sạch khi kích hoạt lại plugin pending uninstall
+- Thư mục dữ liệu tùy chỉnh sẽ có hiệu lực
+- plugin platform version độc lập với app version
+- Các phiên bản nền tảng không tương thích sẽ bị từ chối
+- pending uninstall Làm sạch tập tin
+- Giống nhau `plugin.id` Khi có nhiều phiên bản thì chỉ tải phiên bản cao nhất
+- Khi phiên bản mới nhất không tương thích, hãy quay lại phiên bản tương thích nhất tiếp theo
+- Khi một trình cắm không tải được, các trình cắm khác sẽ tiếp tục tải
+- `shutdown()` Plug-in sẽ được gọi `onStop()`
+- registry Vâng alias/type Lặp lại đăng ký theo sau“Đăng ký sau ghi đè đăng ký trước”
+- registry Những người đăng ký mới nhất sẽ được giữ lại owner thông tin
 
-## 7. 当前仍然存在的限制
+## 7. Hiện tại vẫn còn những hạn chế
 
-这轮重构之后，结构已经清楚很多，但 runtime 还不是终点版本。
+Sau vòng tái cấu trúc này, cấu trúc đã trở nên rõ ràng hơn nhiều runtime Đây chưa phải là phiên bản cuối cùng.
 
-目前仍然存在这些限制：
+Những hạn chế này vẫn còn tồn tại:
 
-- `PluginRuntime` 仍然是静态全局入口
-  - 测试虽然可控，但还不是真正的实例化 runtime
-- registry 对 UI 贡献没有 owner 级别追踪
-  - 暂时只追踪了 script API 和 service
-- 不支持真正的热卸载
-  - 当前启用/禁用/卸载仍以“下次启动生效”思路为主
-- `PluginPlatformSettingsStore` 还是插件平台状态的 key-value JSON 包装
-  - 还没有 typed state model
+- `PluginRuntime` Vẫn là một mục toàn cầu tĩnh
+  - Mặc dù việc kiểm thử có thể kiểm soát được nhưng nó vẫn chưa phải là một sự khởi tạo thực sự runtime
+- registry Vâng UI Số đóng góp owner Theo dõi cấp độ
+  - Hiện tại chỉ theo dõi thôi script API và service
+- Việc gỡ cài đặt thực sự nóng không được hỗ trợ
+  - Hiện đã được kích hoạt/Tàn tật/Gỡ cài đặt vẫn hoạt động“Nó sẽ có hiệu lực vào lần tiếp theo bạn khởi động nó”Ý tưởng chiếm ưu thế
+- `PluginPlatformSettingsStore` Nó vẫn là một nền tảng plug-in key-value JSON Bưu kiện
+  - Chưa typed state model
 
-## 8. 后续演进建议
+## 8. Đề xuất cho sự phát triển tiếp theo
 
-如果继续演进，建议优先级如下：
+Nếu quá trình phát triển tiếp tục, các ưu tiên được đề xuất như sau:
 
-1. 给 `ToolboxContribution` / `SnippetDefinition` / completion 也补 owner 追踪
-2. 把 `PluginRuntime` 从静态入口再包一层实例化 facade
-3. 给 `PluginStateStore` 引入 typed state model，而不只是字符串集合
-4. 评估是否支持无需重启的热启停
-5. 把当前冲突策略整理成对插件开发者可见的契约文档
+1. Đưa cho `ToolboxContribution` / `SnippetDefinition` / completion Cũng trang điểm owner Theo dõi
+2. Bó `PluginRuntime` Bao bọc một lớp khởi tạo khác từ mục nhập tĩnh facade
+3. Đưa cho `PluginStateStore` Giới thiệu typed state model，thay vì chỉ là một tập hợp các chuỗi
+4. Evaluate whether to support hot start and stop without restarting
+5. Sắp xếp chính sách xung đột hiện tại thành tài liệu hợp đồng hiển thị cho các nhà phát triển phần bổ trợ
 
-## 9. 阅读顺序建议
+## 9. Đọc gợi ý đặt hàng
 
-如果要顺着代码理解现在这套 runtime，推荐顺序是：
+Nếu bạn muốn làm theo mã để hiểu bộ hiện tại runtime，Thứ tự được đề xuất là:
 
 1. [PluginRuntime.java](../easy-postman-plugin-runtime/src/main/java/com/laker/postman/plugin/runtime/PluginRuntime.java)
 2. [PluginScanner.java](../easy-postman-plugin-runtime/src/main/java/com/laker/postman/plugin/runtime/PluginScanner.java)

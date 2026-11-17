@@ -14,55 +14,55 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
 /**
- * 轻量级IOC容器
- * 负责管理所有的Bean实例，支持依赖注入
+ * NhẹIOCthùng chứa
+ * Chịu trách nhiệm quản lý tất cảBeanVí dụ, hỗ trợ chèn phụ thuộc
  */
 @Slf4j
 public class ApplicationContext {
     /**
-     * 单例实例
+     * Ví dụ Singleton
      */
     private static volatile ApplicationContext instance;
 
     /**
-     * Bean定义注册表 key: beanName, value: BeanDefinition
+     * BeanXác định sổ đăng ký key: beanName, value: BeanDefinition
      */
     private final Map<String, BeanDefinition> beanDefinitionMap = new ConcurrentHashMap<>();
 
     /**
-     * Bean类型索引 key: class type, value: beanName list
+     * BeanChỉ mục loại key: class type, value: beanName list
      */
     private final Map<Class<?>, List<String>> typeIndexMap = new ConcurrentHashMap<>();
 
     /**
-     * ========== 三级缓存机制（解决循环依赖） ==========
+     * ========== Cơ chế bộ đệm ba cấp (để giải quyết các phụ thuộc vòng tròn) ==========
      */
 
     /**
-     * 一级缓存：单例对象缓存
-     * 存放完全初始化好的Bean实例
+     * Bộ đệm cấp 1: Bộ đệm đối tượng Singleton
+     * Lưu trữ được khởi tạo đầy đủBeanVí dụ
      */
     private final Map<String, Object> singletonObjects = new ConcurrentHashMap<>();
 
     /**
-     * 二级缓存：早期单例对象缓存
-     * 存放提前暴露的Bean实例（已实例化但未初始化完成）
+     * Bộ đệm cấp hai: bộ đệm đối tượng đơn lẻ sớm
+     * Lưu trữ những tiếp xúc trướcBeanSơ thẩm (được khởi tạo nhưng chưa được khởi tạo)
      */
     private final Map<String, Object> earlySingletonObjects = new ConcurrentHashMap<>();
 
     /**
-     * 三级缓存：单例工厂缓存
-     * 存放Bean工厂，用于获取提前暴露的Bean实例
+     * Bộ đệm cấp 3: bộ đệm nhà máy đơn
+     * Lưu trữBeanNhà máy để có được tiếp xúc sớmBeanVí dụ
      */
     private final Map<String, ObjectFactory<?>> singletonFactories = new ConcurrentHashMap<>();
 
     /**
-     * 正在创建的Bean集合，用于标记Bean创建状态
+     * đang được tạo raBeanBộ sưu tập để gắn thẻBeanTạo trạng thái
      */
     private final Set<String> singletonsCurrentlyInCreation = ConcurrentHashMap.newKeySet();
 
     /**
-     * 保存带有@PreDestroy方法的Bean实例，用于容器关闭时调用
+     * Lưu với@PreDestroyphương phápBeanVí dụ, thường được gọi khi vùng chứa được đóng lại
      */
     private final Map<Object, List<Method>> preDestroyMethods = new ConcurrentHashMap<>();
 
@@ -70,7 +70,7 @@ public class ApplicationContext {
     }
 
     /**
-     * 获取IOC容器单例实例
+     * LấyIOCVí dụ đơn lẻ của vùng chứa
      */
     public static ApplicationContext getInstance() {
         if (instance == null) {
@@ -84,7 +84,7 @@ public class ApplicationContext {
     }
 
     /**
-     * 扫描指定包下的所有类，注册带有@Component注解的类
+     * Quét tất cả các lớp trong gói được chỉ định và đăng ký chúng@ComponentLớp được chú thích
      */
     public void scan(String... basePackages) {
         for (String basePackage : basePackages) {
@@ -97,7 +97,7 @@ public class ApplicationContext {
     }
 
     /**
-     * 扫描包
+     * Quét gói
      */
     private void scanPackage(String basePackage) throws Exception {
         String packagePath = basePackage.replace('.', '/');
@@ -118,7 +118,7 @@ public class ApplicationContext {
     }
 
     /**
-     * 扫描JAR文件中的类
+     * quétJARlớp trong tập tin
      */
     private void scanJar(URL resource, String packagePath) {
         try {
@@ -130,7 +130,7 @@ public class ApplicationContext {
                 java.util.jar.JarEntry entry = entries.nextElement();
                 String entryName = entry.getName();
 
-                // 只处理.class文件且在指定包路径下的类
+                // Chỉ xử lý.classtệp và lớp trong đường dẫn gói đã chỉ định
                 if (entryName.endsWith(".class") && entryName.startsWith(packagePath)) {
                     String className = entryName.replace('/', '.').replace(".class", "");
                     try {
@@ -151,7 +151,7 @@ public class ApplicationContext {
     }
 
     /**
-     * 递归扫描文件
+     * Quét các tập tin đệ quy
      */
     private void scanFile(File file, String packageName) {
         if (!file.exists()) {
@@ -181,14 +181,14 @@ public class ApplicationContext {
     }
 
     /**
-     * 注册Bean
+     * Đăng kýBean
      */
     private void registerBean(Class<?> clazz) {
         Component component = clazz.getAnnotation(Component.class);
         String beanName = component.value();
 
         if (beanName.isEmpty()) {
-            // 默认使用类名首字母小写作为bean名称
+            // Theo mặc định, chữ cái đầu tiên của tên lớp là chữ thườngbeantên
             beanName = getBeanName(clazz);
         }
         BeanDefinition existingDefinition = beanDefinitionMap.get(beanName);
@@ -201,7 +201,7 @@ public class ApplicationContext {
                     + existingDefinition.getBeanClass().getName() + " and " + clazz.getName());
         }
 
-        // 检查作用域：默认为单例，除非明确指定为 prototype
+        // Phạm vi kiểm tra: Mặc định là singleton trừ khi được chỉ định rõ ràng prototype
         boolean singleton = true;
         if (clazz.isAnnotationPresent(Scope.class)) {
             Scope scope = clazz.getAnnotation(Scope.class);
@@ -212,10 +212,10 @@ public class ApplicationContext {
 
         beanDefinitionMap.put(beanName, beanDefinition);
 
-        // 建立类型索引
+        // Tạo một chỉ mục loại
         indexType(clazz, beanName);
 
-        // 同时索引所有接口和父类
+        // Lập chỉ mục đồng thời tất cả các giao diện và lớp cha
         indexInterfaces(clazz, beanName);
 
         log.debug("Registered bean: {} -> {} (singleton={})", beanName, clazz.getName(), singleton);
@@ -234,16 +234,16 @@ public class ApplicationContext {
     }
 
     /**
-     * 索引接口和父类
+     * Giao diện chỉ mục và lớp cha
      */
     private void indexInterfaces(Class<?> clazz, String beanName) {
-        // 索引接口
+        // Giao diện chỉ mục
         Class<?>[] interfaces = clazz.getInterfaces();
         for (Class<?> iface : interfaces) {
             indexType(iface, beanName);
         }
 
-        // 索引父类
+        // Chỉ mục lớp cha mẹ
         Class<?> superClass = clazz.getSuperclass();
         if (superClass != null && superClass != Object.class) {
             indexType(superClass, beanName);
@@ -262,16 +262,16 @@ public class ApplicationContext {
     }
 
     /**
-     * 手动注册Bean实例
+     * Đăng ký thủ côngBeanVí dụ
      */
     public void registerBean(String beanName, Object bean) {
         BeanDefinition beanDefinition = new BeanDefinition(beanName, bean.getClass(), true);
         beanDefinitionMap.put(beanName, beanDefinition);
 
-        // 直接放入一级缓存（已经是完整的Bean实例）
+        // Trực tiếp vào bộ đệm cấp đầu tiên (đã hoàn tấtBeanVí dụ)
         singletonObjects.put(beanName, bean);
 
-        // 建立类型索引
+        // Tạo một chỉ mục loại
         indexType(bean.getClass(), beanName);
         indexInterfaces(bean.getClass(), beanName);
 
@@ -279,7 +279,7 @@ public class ApplicationContext {
     }
 
     /**
-     * 根据名称获取Bean
+     * Nhận nó theo tênBean
      */
     @SuppressWarnings("unchecked")
     public <T> T getBean(String beanName) {
@@ -292,7 +292,7 @@ public class ApplicationContext {
     }
 
     /**
-     * 根据类型获取Bean
+     * Nhận dựa trên loạiBean
      */
     public <T> T getBean(Class<T> requiredType) {
         List<String> beanNames = typeIndexMap.get(requiredType);
@@ -309,49 +309,49 @@ public class ApplicationContext {
     }
 
     /**
-     * 根据BeanDefinition获取Bean实例（支持三级缓存）
+     * theoBeanDefinitionLấyBeanInstance (hỗ trợ bộ đệm cấp 3)
      */
     private Object getBean(BeanDefinition beanDefinition) {
         String beanName = beanDefinition.getName();
 
         if (beanDefinition.isSingleton()) {
-            // 使用三级缓存获取单例Bean
+            // Sử dụng bộ đệm cấp ba để lấy singletonBean
             return getSingleton(beanName, () -> createBean(beanDefinition));
         } else {
-            // 非单例直接创建
+            // Các trường hợp không đơn lẻ được tạo trực tiếp
             return createBean(beanDefinition);
         }
     }
 
     /**
-     * 获取单例Bean（三级缓存核心方法）
+     * Lấy đĩa đơnBean（Phương pháp lõi bộ đệm cấp 3)
      *
-     * @param beanName         Bean名称
-     * @param singletonFactory Bean工厂
-     * @return Bean实例
+     * @param beanName         Beantên
+     * @param singletonFactory Beannhà máy
+     * @return BeanVí dụ
      */
     private Object getSingleton(String beanName, ObjectFactory<?> singletonFactory) {
-        // 1. 先从一级缓存获取完全初始化的Bean
+        // 1. Trước tiên hãy lấy cái được khởi tạo đầy đủ từ bộ đệm cấp đầu tiênBean
         Object singletonObject = singletonObjects.get(beanName);
 
-        // 2. 如果一级缓存没有，且Bean正在创建中（说明存在循环依赖）
+        // 2. Nếu bộ đệm cấp đầu tiên không tồn tại vàBeanĐang được tạo (cho biết có sự phụ thuộc vòng tròn)
         if (singletonObject == null && singletonsCurrentlyInCreation.contains(beanName)) {
-            // 加锁保证线程安全
+            // Khóa đảm bảo an toàn cho sợi
             synchronized (this.singletonObjects) {
-                // 双重检查
+                // Kiểm tra lại
                 singletonObject = singletonObjects.get(beanName);
                 if (singletonObject == null) {
-                    // 从二级缓存获取早期引用
+                    // Nhận tài liệu tham khảo sớm từ bộ đệm L2
                     singletonObject = earlySingletonObjects.get(beanName);
 
-                    // 3. 如果二级缓存也没有，从三级缓存获取
+                    // 3. Nếu bộ đệm cấp hai không có nó, nó sẽ được lấy từ bộ đệm cấp ba
                     if (singletonObject == null) {
                         ObjectFactory<?> factory = singletonFactories.get(beanName);
                         if (factory != null) {
                             try {
-                                // 从工厂获取早期引用
+                                // Nhận tài liệu tham khảo sớm từ nhà máy
                                 singletonObject = factory.getObject();
-                                // 放入二级缓存，移除三级缓存
+                                // Đặt nó vào bộ đệm cấp hai và xóa bộ đệm cấp ba
                                 earlySingletonObjects.put(beanName, singletonObject);
                                 singletonFactories.remove(beanName);
                                 log.debug("Resolved circular dependency for bean: {}", beanName);
@@ -369,36 +369,36 @@ public class ApplicationContext {
                     "Circular constructor dependency cannot be resolved before bean instantiation is complete");
         }
 
-        // 4. 如果所有缓存都没有，创建新的Bean
+        // 4. Nếu tất cả bộ đệm đều bị thiếu, hãy tạo bộ đệm mớiBean
         if (singletonObject == null) {
-            // 使用同步锁保证单例Bean只被创建一次
+            // Sử dụng khóa đồng bộ hóa để đảm bảo tính đơn lẻBeanChỉ được tạo một lần
             synchronized (this.singletonObjects) {
-                // 再次检查缓存（可能其他线程已创建）
+                // Kiểm tra lại bộ đệm (có thể các luồng khác đã tạo nó)
                 singletonObject = singletonObjects.get(beanName);
                 if (singletonObject == null) {
-                    // 标记Bean正在创建
+                    // đánh dấuBeanĐang tạo
                     singletonsCurrentlyInCreation.add(beanName);
 
                     try {
-                        // 调用工厂方法创建Bean
+                        // Tạo bằng cách gọi phương thức xuất xưởngBean
                         singletonObject = singletonFactory.getObject();
 
-                        // 从二级缓存移除（如果存在）
+                        // Đã xóa khỏi bộ đệm cấp hai nếu có
                         earlySingletonObjects.remove(beanName);
-                        // 从三级缓存移除（如果存在）
+                        // Đã xóa khỏi bộ đệm L3 nếu có
                         singletonFactories.remove(beanName);
-                        // 放入一级缓存
+                        // Đưa vào bộ đệm cấp đầu tiên
                         singletonObjects.put(beanName, singletonObject);
 
                         log.debug("Created and cached singleton bean: {}", beanName);
                     } catch (Exception e) {
-                        // 创建失败，清理状态
+                        // Tạo không thành công, trạng thái dọn dẹp
                         singletonsCurrentlyInCreation.remove(beanName);
                         earlySingletonObjects.remove(beanName);
                         singletonFactories.remove(beanName);
                         throw new BeanCreationException(beanName, e);
                     } finally {
-                        // 创建完成，移除创建标记
+                        // Khi tạo xong, hãy xóa dấu tạo
                         singletonsCurrentlyInCreation.remove(beanName);
                     }
                 }
@@ -409,7 +409,7 @@ public class ApplicationContext {
     }
 
     /**
-     * 创建Bean实例（支持三级缓存解决循环依赖）
+     * TạoBeanVí dụ (hỗ trợ bộ đệm cấp ba để giải quyết các phụ thuộc vòng tròn)
      */
     private Object createBean(BeanDefinition beanDefinition) {
         String beanName = beanDefinition.getName();
@@ -436,7 +436,7 @@ public class ApplicationContext {
             return instance;
 
         } catch (BeanCreationException e) {
-            // 直接重新抛出 BeanCreationException
+            // Chỉ cần ném lại BeanCreationException
             throw e;
         } catch (Exception e) {
             throw new BeanCreationException(beanName, e);
@@ -444,7 +444,7 @@ public class ApplicationContext {
     }
 
     /**
-     * 方法注入
+     * Phương pháp tiêm
      */
     private void injectMethods(Object instance) {
         Class<?> clazz = instance.getClass();
@@ -495,18 +495,18 @@ public class ApplicationContext {
     }
 
     /**
-     * 实例化Bean（使用构造函数）
-     * 支持以下策略：
-     * 1. 如果有@Autowired注解的构造函数，优先使用
-     * 2. 如果只有一个构造函数（且有参数），自动使用该构造函数进行依赖注入
-     * 3. 如果有多个构造函数，尝试使用无参构造函数
-     * 4. 如果没有无参构造函数且没有@Autowired标注的构造函数，抛出异常
+     * Khởi tạoBean（sử dụng hàm tạo)
+     * Các chiến lược sau đây được hỗ trợ:
+     * 1. Nếu vậy@AutowiredCác hàm tạo có chú thích được ưu tiên
+     * 2. Nếu chỉ có một hàm tạo (có tham số), hàm tạo này sẽ tự động được sử dụng để chèn phần phụ thuộc
+     * 3. Nếu có nhiều hàm tạo, hãy thử sử dụng hàm tạo không có đối số
+     * 4. Nếu không có hàm tạo không tham số và không có@AutowiredHàm tạo có chú thích sẽ đưa ra một ngoại lệ
      */
     private Object instantiateBean(Class<?> beanClass) throws Exception {
         Constructor<?>[] constructors = beanClass.getDeclaredConstructors();
         Constructor<?> targetConstructor = null;
 
-        // 策略1: 查找带@Autowired的构造函数
+        // Chiến lược1: Tìm ban nhạc@Autowiredhàm tạo của
         for (Constructor<?> constructor : constructors) {
             if (constructor.isAnnotationPresent(Autowired.class)) {
                 targetConstructor = constructor;
@@ -515,13 +515,13 @@ public class ApplicationContext {
             }
         }
 
-        // 策略2: 如果没有@Autowired标注的构造函数，但只有一个构造函数（且有参数），自动使用
+        // Chiến lược2: Nếu không@AutowiredHàm tạo có chú thích, nhưng chỉ có một hàm tạo (có tham số), được sử dụng tự động
         if (targetConstructor == null && constructors.length == 1 && constructors[0].getParameterCount() > 0) {
             targetConstructor = constructors[0];
             log.debug("Using single constructor with parameters for {}", beanClass.getSimpleName());
         }
 
-        // 使用找到的构造函数进行依赖注入
+        // Sử dụng hàm tạo được tìm thấy để chèn phần phụ thuộc
         if (targetConstructor != null) {
             Class<?>[] paramTypes = targetConstructor.getParameterTypes();
             Object[] params = new Object[paramTypes.length];
@@ -545,14 +545,14 @@ public class ApplicationContext {
             return targetConstructor.newInstance(params);
         }
 
-        // 策略3: 使用无参构造函数
+        // Chiến lược3: Sử dụng hàm tạo không có đối số
         try {
             Constructor<?> defaultConstructor = beanClass.getDeclaredConstructor();
             defaultConstructor.setAccessible(true);
             log.debug("Using default no-arg constructor for {}", beanClass.getSimpleName());
             return defaultConstructor.newInstance();
         } catch (NoSuchMethodException e) {
-            // 策略4: 如果没有找到合适的构造函数，抛出异常
+            // Chiến lược4: Nếu không tìm thấy hàm tạo phù hợp, một ngoại lệ sẽ được đưa ra
             throw new BeanCreationException(
                     beanClass.getSimpleName(),
                     "No suitable constructor found. Please provide either: " +
@@ -565,22 +565,22 @@ public class ApplicationContext {
     }
 
     /**
-     * 获取早期Bean引用（用于解决循环依赖）
-     * 这个方法返回的是实例化但未完全初始化的Bean
+     * Nhận nó sớmBeanTài liệu tham khảo (được sử dụng để giải quyết các phụ thuộc vòng tròn)
+     * Những gì phương thức này trả về được khởi tạo nhưng không được khởi tạo đầy đủBean
      *
-     * @param beanName Bean名称
-     * @param bean     Bean实例
-     * @return 早期Bean引用
+     * @param beanName Beantên
+     * @param bean     BeanVí dụ
+     * @return Những ngày đầuBeanTrích dẫn
      */
     private Object getEarlyBeanReference(String beanName, Object bean) {
-        // 这里可以返回代理对象（如果需要AOP）
-        // 目前直接返回原始对象
+        // Ở đây một đối tượng proxy có thể được trả về (nếu cầnAOP）
+        // Hiện tại đối tượng ban đầu được trả lại trực tiếp
         log.debug("Getting early reference for bean: {}", beanName);
         return bean;
     }
 
     /**
-     * 字段注入
+     * Tiêm hiện trường
      */
     private void injectFields(Object instance) {
         Class<?> clazz = instance.getClass();
@@ -622,7 +622,7 @@ public class ApplicationContext {
     }
 
     /**
-     * 调用@PostConstruct方法
+     * gọi@PostConstructphương pháp
      */
     private void invokePostConstruct(Object instance) {
         Class<?> clazz = instance.getClass();
@@ -632,7 +632,7 @@ public class ApplicationContext {
 
             for (Method method : methods) {
                 if (method.isAnnotationPresent(PostConstruct.class)) {
-                    // 验证方法签名
+                    // Xác minh chữ ký phương thức
                     if (method.getParameterCount() != 0) {
                         throw new BeanCreationException(
                                 instance.getClass().getSimpleName(),
@@ -659,7 +659,7 @@ public class ApplicationContext {
     }
 
     /**
-     * 调用InitializingBean接口的afterPropertiesSet方法
+     * gọiInitializingBeangiao diệnafterPropertiesSetphương pháp
      */
     private void invokeInitializingBean(Object instance) {
         if (instance instanceof InitializingBean initializingBean) {
@@ -678,7 +678,7 @@ public class ApplicationContext {
     }
 
     /**
-     * 注册@PreDestroy方法
+     * Đăng ký@PreDestroyphương pháp
      */
     private void registerPreDestroyMethods(Object instance) {
         List<Method> destroyMethods = new ArrayList<>();
@@ -710,10 +710,10 @@ public class ApplicationContext {
     }
 
     /**
-     * 销毁所有Bean，调用@PreDestroy方法和DisposableBean接口
+     * Tiêu diệt tất cảBean，gọi@PreDestroyphương pháp vàDisposableBeangiao diện
      */
     public void destroy() {
-        // 1. 先调用所有@PreDestroy方法
+        // 1. Hãy gọi tất cả trước@PreDestroyphương pháp
         for (Map.Entry<Object, List<Method>> entry : preDestroyMethods.entrySet()) {
             Object instance = entry.getKey();
             List<Method> methods = entry.getValue();
@@ -729,7 +729,7 @@ public class ApplicationContext {
             }
         }
 
-        // 2. 然后调用DisposableBean接口的destroy方法
+        // 2. Sau đó gọiDisposableBeangiao diệndestroyphương pháp
         for (Object instance : singletonObjects.values()) {
             if (instance instanceof DisposableBean disposableBean) {
                 try {
@@ -748,7 +748,7 @@ public class ApplicationContext {
     }
 
     /**
-     * 获取Bean名称（类名首字母小写）
+     * LấyBeanTên (chữ cái đầu tiên của tên lớp là chữ thường)
      */
     private String getBeanName(Class<?> clazz) {
         String simpleName = clazz.getSimpleName();
@@ -756,21 +756,21 @@ public class ApplicationContext {
     }
 
     /**
-     * 获取所有Bean名称
+     * Nhận tất cả chúngBeantên
      */
     public Set<String> getBeanNames() {
         return new HashSet<>(beanDefinitionMap.keySet());
     }
 
     /**
-     * 检查是否包含指定名称的Bean
+     * Kiểm tra xem tên được chỉ định có được bao gồm hay khôngBean
      */
     public boolean containsBean(String beanName) {
         return beanDefinitionMap.containsKey(beanName);
     }
 
     /**
-     * 检查指定Bean是否为单例
+     * Kiểm tra chỉ địnhBeanCho dù đó là một singleton
      */
     public boolean isSingleton(String beanName) {
         BeanDefinition beanDefinition = beanDefinitionMap.get(beanName);
@@ -778,10 +778,10 @@ public class ApplicationContext {
     }
 
     /**
-     * 清空容器
+     * Làm trống thùng chứa
      */
     public void clear() {
-        // 先销毁所有Bean
+        // Phá hủy mọi thứ trước tiênBean
         destroy();
 
         beanDefinitionMap.clear();

@@ -17,7 +17,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 
 /**
- * 单个请求编辑子面板，包含 URL、方法选择、Headers、Body 和响应展示
+ * Bảng điều khiển chỉnh sửa yêu cầu duy nhất, bao gồm URL、Lựa chọn phương pháp,Headers、Body và hiển thị đáp ứng
  */
 public class RequestEditSubPanel extends JPanel {
     private static final int MAX_REDIRECT_COUNT = 10;
@@ -38,7 +38,7 @@ public class RequestEditSubPanel extends JPanel {
     private final HttpRequestItem savedResponseOwner;
 
     private RequestViewComponents view;
-    // 主面板只保留“编排”和“状态持有”，具体行为拆给各个职责明确的协作者，避免再次演变成巨型类。
+    // Bảng điều khiển chính chỉ còn lại“Sự sắp xếp”và“Trạng thái giữ nguyên”，Giao các hành vi cụ thể cho cộng tác viên với trách nhiệm rõ ràng để tránh phát triển thành các lớp học khổng lồ một lần nữa.
     private final RequestPreparationFeedbackPresenter requestPreparationFeedbackPresenter = new RequestPreparationFeedbackPresenter();
     private final RequestEditorSendPreparationController sendPreparationController =
             RequestEditorSendPreparationController.createDefault(
@@ -56,10 +56,10 @@ public class RequestEditSubPanel extends JPanel {
     private final SavedResponseUiController savedResponseUiController = new SavedResponseUiController(new CollectionTreeEditorGateway());
     private RequestSavedResponseController savedResponseController;
 
-    // 数据加载标志，防止加载时触发自动保存和联动更新
+    // Cờ tải dữ liệu để ngăn kích hoạt tính năng lưu tự động và cập nhật được liên kết trong khi tải
     private boolean isLoadingData = false;
 
-    // 保存最后一次请求和响应，用于保存响应功能
+    // Lưu yêu cầu và phản hồi cuối cùng, dùng để lưu chức năng phản hồi
     private PreparedRequest lastRequest;
     private HttpResponse lastResponse;
 
@@ -80,7 +80,7 @@ public class RequestEditSubPanel extends JPanel {
     }
 
     /**
-     * 判断当前面板是否是保存的响应标签页
+     * Xác định xem bảng hiện tại có phải là tab phản hồi đã lưu hay không
      */
     public boolean isSavedResponseTab() {
         return panelType == RequestEditSubPanelType.SAVED_RESPONSE;
@@ -112,7 +112,7 @@ public class RequestEditSubPanel extends JPanel {
     }
 
     /**
-     * 普通请求编辑面板构造函数
+     * Trình xây dựng bảng chỉnh sửa yêu cầu thông thường
      */
     public RequestEditSubPanel(String id, RequestItemProtocolEnum protocol) {
         this(id, protocol, false);
@@ -135,7 +135,7 @@ public class RequestEditSubPanel extends JPanel {
     }
 
     /**
-     * 保存的响应面板构造函数
+     * Trình tạo bảng phản hồi đã lưu
      */
     public RequestEditSubPanel(SavedResponse savedResponse) {
         this(savedResponse, null);
@@ -147,7 +147,7 @@ public class RequestEditSubPanel extends JPanel {
     }
 
     /**
-     * 完整构造函数
+     * Trình xây dựng hoàn chỉnh
      */
     private RequestEditSubPanel(String id, RequestItemProtocolEnum protocol, RequestEditSubPanelType panelType,
                                 SavedResponse savedResponse,
@@ -177,7 +177,7 @@ public class RequestEditSubPanel extends JPanel {
                 () -> ensureEditorInitialized(true)
         );
         setLayout(new BorderLayout());
-        setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5)); // 设置边距为5
+        setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5)); // Đặt lề thành 5
         ToolWindowSurfaceStyle.applyCard(this);
         if (!this.deferEditorInitialization) {
             initializeEditorUiIfNeeded(false);
@@ -191,8 +191,8 @@ public class RequestEditSubPanel extends JPanel {
     }
 
     public void ensureEditorInitialized(boolean animatePlaceholderTransition) {
-        // 占位页升级为真实编辑器时允许做局部淡出，但过渡层只能是 layeredPane 上的纯绘制快照。
-        // 这样既保留平滑感，也不影响底层 JSplitPane 的 hover / resize cursor。
+        // Khi trang giữ chỗ được nâng cấp lên trình chỉnh sửa thực, cho phép làm mờ một phần, nhưng chỉ có thể làm mờ lớp chuyển tiếp layeredPane Ảnh chụp nhanh vẽ thuần túy được bật.
+        // Điều này duy trì độ mịn mà không ảnh hưởng đến lớp bên dưới JSplitPane của hover / resize cursor。
         if (editorInitialized) {
             return;
         }
@@ -327,7 +327,7 @@ public class RequestEditSubPanel extends JPanel {
     }
 
     /**
-     * 更新所有tab的内容指示器
+     * Cập nhật tất cảtabchỉ số nội dung
      */
     private void updateTabIndicators() {
         if (requestTabStateController == null) {
@@ -338,7 +338,7 @@ public class RequestEditSubPanel extends JPanel {
 
 
     /**
-     * 设置原始请求数据（脏数据检测）
+     * Đặt dữ liệu yêu cầu thô (phát hiện dữ liệu bẩn)
      */
     public void setOriginalRequestItem(HttpRequestItem item) {
         dataController.setOriginalRequestItem(item);
@@ -349,24 +349,24 @@ public class RequestEditSubPanel extends JPanel {
     }
 
     /**
-     * 判断当前表单内容是否被修改（与原始请求对比）
-     * 注意：比较时排除 response 字段，因为它是历史响应数据，不属于表单编辑内容
+     * Xác định xem nội dung biểu mẫu hiện tại có bị sửa đổi hay không (so với yêu cầu ban đầu)
+     * Lưu ý: Loại trừ khi so sánh response vì đây là dữ liệu phản hồi lịch sử và không phải là một phần của nội dung chỉnh sửa biểu mẫu
      */
     public boolean isModified() {
         return dataController.isModified();
     }
 
     /**
-     * 从 tableModel 直接读取数据构建 HttpRequestItem，不调用 stopCellEditing。
-     * 专供 isModified() / updateTabDirty() 等后台比较场景使用，
-     * 避免在 TableModelListener 回调中打断用户正在进行的单元格编辑。
+     * Từ tableModel Đọc dữ liệu trực tiếp để xây dựng HttpRequestItem，Không được gọi stopCellEditing。
+     * Độc quyền có sẵn isModified() / updateTabDirty() Đợi kịch bản so sánh nền được sử dụng.
+     * Tránh vào TableModelListener Làm gián đoạn quá trình chỉnh sửa ô của người dùng trong lệnh gọi lại.
      */
     private HttpRequestItem getCurrentRequestFromModel() {
         return dataController.currentRequestFromModel();
     }
 
     /**
-     * 检查脏状态并更新tab标题
+     * Kiểm tra trạng thái bẩn và cập nhậttabtiêu đề
      */
     private void updateTabDirty() {
         if (runtimeController == null) {
@@ -420,7 +420,7 @@ public class RequestEditSubPanel extends JPanel {
         SwingUtilities.invokeLater(() -> UiSingletonFactory.getInstance(RequestEditorPanel.class).pinTransientTab());
     }
 
-    // WebSocket消息发送逻辑
+    // WebSocketLogic gửi tin nhắn
     private void sendWebSocketMessage() {
         if (runtimeController != null) {
             runtimeController.sendWebSocketMessage();
@@ -428,7 +428,7 @@ public class RequestEditSubPanel extends JPanel {
     }
 
     /**
-     * 更新表单内容（用于切换请求或保存后刷新）
+     * Update form content (for switching requests or refreshing after saving)
      */
     public void initPanelData(HttpRequestItem item) {
         dataController.initPanelData(item);
@@ -438,14 +438,14 @@ public class RequestEditSubPanel extends JPanel {
     }
 
     /**
-     * 获取当前表单内容封装为HttpRequestItem
+     * Lấy nội dung biểu mẫu hiện tại được gói gọn dưới dạngHttpRequestItem
      */
     public HttpRequestItem getCurrentRequest() {
         return dataController.currentRequest();
     }
 
     /**
-     * 关闭标签页前释放网络资源，避免后台连接在 UI 被移除后继续存活。
+     * Giải phóng tài nguyên mạng trước khi đóng tab để tránh kết nối nền UI Sống sót sau khi bị loại bỏ.
      */
     public void disposeResources() {
         if (runtimeController != null) {
@@ -457,7 +457,7 @@ public class RequestEditSubPanel extends JPanel {
     }
 
     /**
-     * 如果 URL 没有协议，按当前协议和用户配置补全。
+     * nếu URL Nếu không có giao thức, nó sẽ được hoàn thành dựa trên giao thức hiện tại và cấu hình người dùng.
      */
     private void autoPrependHttpsIfNeeded() {
         if (runtimeController == null) {
@@ -489,7 +489,7 @@ public class RequestEditSubPanel extends JPanel {
     }
 
     /**
-     * 加载保存的响应到面板
+     * Tải phản hồi đã lưu vào bảng điều khiển
      */
     public void loadSavedResponse(SavedResponse savedResponse) {
         if (savedResponse == null) {
@@ -500,9 +500,9 @@ public class RequestEditSubPanel extends JPanel {
     }
 
     /**
-     * 动态更新布局方向（用于全局布局切换）
+     * Tự động cập nhật hướng bố cục (để chuyển đổi bố cục chung)
      *
-     * @param isVertical true=垂直布局，false=水平布局
+     * @param isVertical true=bố cục dọc,false=Bố cục ngang
      */
     public void updateLayoutOrientation(boolean isVertical) {
         if (!editorInitialized) {
@@ -531,7 +531,7 @@ public class RequestEditSubPanel extends JPanel {
     }
 
     /**
-     * 检测并解析 cURL 命令
+     * Phát hiện và phân tích cURL Đặt hàng
      */
     private void detectAndParseCurl() {
         ensureEditorInitialized();

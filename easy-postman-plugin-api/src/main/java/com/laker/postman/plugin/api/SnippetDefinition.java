@@ -1,7 +1,7 @@
 package com.laker.postman.plugin.api;
 
 /**
- * 代码片段定义。
+ * Định nghĩa đoạn mã.
  */
 public record SnippetDefinition(
         String categoryId,

@@ -126,7 +126,7 @@ final class RequestExecutionState implements HttpCallTracker {
     }
 
     void disposeOpenConnections() {
-        // 关闭请求标签时统一释放网络句柄，避免 UI 消失后 SSE/WS/Worker 仍在后台持有状态。
+        // Nhả tay cầm mạng một cách thống nhất khi đóng thẻ yêu cầu để tránh điều này UI Sau khi biến mất SSE/WS/Worker Vẫn giữ trạng thái ở chế độ nền.
         disposed = true;
 
         RealtimeConnectionHandle eventSource = currentEventSource;

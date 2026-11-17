@@ -20,8 +20,8 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * Cron表达式工具面板
- * 支持 Spring/Quartz (6/7位) 和 Linux Crontab (5位) 两种模式切换
+ * CronBảng công cụ biểu hiện
+ * Hỗ trợ Spring/Quartz (6/7Chút) và Linux Crontab (5Chút) Chuyển đổi giữa hai chế độ
  */
 @Slf4j
 public class CronPanel extends JPanel {

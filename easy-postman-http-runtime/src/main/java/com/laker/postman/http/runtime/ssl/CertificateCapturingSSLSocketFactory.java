@@ -12,14 +12,14 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * 自定义 SSLSocketFactory，用于捕获SSL握手过程中的证书信息
+ * Tùy chỉnh SSLSocketFactory，để bắt giữSSLThông tin chứng chỉ trong quá trình bắt tay
  */
 @Slf4j
 public class CertificateCapturingSSLSocketFactory extends SSLSocketFactory {
 
     private final SSLSocketFactory delegate;
 
-    // 用于传递最近捕获的证书（作为备用方案），按线程隔离避免并发串数据
+    // Được sử dụng để chuyển chứng chỉ được thu thập gần đây nhất (dưới dạng dự phòng), với tính năng cách ly theo từng luồng để tránh dữ liệu chuỗi đồng thời
     private static final ThreadLocal<List<Certificate>> lastCapturedCertificates =
             ThreadLocal.withInitial(Collections::emptyList);
 
@@ -28,7 +28,7 @@ public class CertificateCapturingSSLSocketFactory extends SSLSocketFactory {
     }
 
     /**
-     * 获取最近捕获的证书（备用方案）
+     * Nhận chứng chỉ được chụp gần đây nhất (thay thế)
      */
     public static List<Certificate> getLastCapturedCertificates() {
         return new ArrayList<>(lastCapturedCertificates.get());
@@ -87,12 +87,12 @@ public class CertificateCapturingSSLSocketFactory extends SSLSocketFactory {
     }
 
     /**
-     * 包装 SSLSocket 以捕获证书信息
+     * Bưu kiện SSLSocket để nắm bắt thông tin chứng chỉ
      */
     private SSLSocket wrapSocket(SSLSocket socket) {
         socket.setUseClientMode(true);
 
-        // 添加握手监听器来捕获证书信息
+        // Thêm trình nghe bắt tay để nắm bắt thông tin chứng chỉ
         socket.addHandshakeCompletedListener(event -> {
             try {
                 captureCertificates(event);
@@ -105,7 +105,7 @@ public class CertificateCapturingSSLSocketFactory extends SSLSocketFactory {
     }
 
     /**
-     * 从握手事件中捕获证书信息
+     * Nắm bắt thông tin chứng chỉ từ các sự kiện bắt tay
      */
     private void captureCertificates(HandshakeCompletedEvent event) {
         try {
@@ -115,7 +115,7 @@ public class CertificateCapturingSSLSocketFactory extends SSLSocketFactory {
             log.debug("SSL Handshake completed - Protocol: {}, Cipher: {}, SessionId: {}",
                     session.getProtocol(), session.getCipherSuite(), sessionId);
 
-            // 从 SSLSession 中获取证书
+            // Từ SSLSession Nhận giấy chứng nhận
             Certificate[] certs = session.getPeerCertificates();
             if (certs != null && certs.length > 0) {
                 List<Certificate> certList = new ArrayList<>(java.util.Arrays.asList(certs));
@@ -124,7 +124,7 @@ public class CertificateCapturingSSLSocketFactory extends SSLSocketFactory {
                 log.debug("Captured {} certificates from SSLSession (SessionId: {})",
                         certs.length, sessionId);
 
-                // 记录第一个证书的详情
+                // Ghi lại các chi tiết của chứng chỉ đầu tiên
                 if (certs[0] instanceof java.security.cert.X509Certificate x509) {
                     log.debug("Certificate Subject: {}",
                             x509.getSubjectX500Principal().getName());
@@ -142,7 +142,7 @@ public class CertificateCapturingSSLSocketFactory extends SSLSocketFactory {
     }
 
     /**
-     * 将字节数组转换为十六进制字符串
+     * Chuyển đổi mảng byte thành chuỗi thập lục phân
      */
     private static String bytesToHex(byte[] bytes) {
         if (bytes == null || bytes.length == 0) {

@@ -42,11 +42,11 @@ public class GoRequestCodeGeneratorTest {
         HttpRequestItem request = request();
         request.setMethod("POST");
         request.setBodyType(RequestBodyTypes.BODY_TYPE_RAW);
-        request.setBody("\"\\\n\r\t\b\f\u0000\u001f\u007f中文😀\u2028\ufeff");
+        request.setBody("\"\\\n\r\t\b\f\u0000\u001f\u007fTiếng Trung Quốc😀\u2028\ufeff");
 
         String code = GoRequestCodeGenerator.generate(request);
 
-        assertTrue(code.contains("strings.NewReader(\"\\\"\\\\\\n\\r\\t\\b\\f\\u0000\\u001f\\u007f中文😀\\u2028\\ufeff\")"), code);
+        assertTrue(code.contains("strings.NewReader(\"\\\"\\\\\\n\\r\\t\\b\\f\\u0000\\u001f\\u007fTiếng Trung Quốc😀\\u2028\\ufeff\")"), code);
         assertFalse(code.contains("\ufeff"), code);
         request.setBody("  \n");
         assertTrue(GoRequestCodeGenerator.generate(request).contains("strings.NewReader(\"  \\n\")"));
@@ -63,7 +63,7 @@ public class GoRequestCodeGeneratorTest {
         request.setBodyType(RequestBodyTypes.BODY_TYPE_FORM_URLENCODED);
         request.setUrlencodedList(Arrays.asList(
                 new HttpFormUrlencoded(true, "tag", "a%20b"),
-                new HttpFormUrlencoded(true, "tag", "中文 &"),
+                new HttpFormUrlencoded(true, "tag", "Tiếng Trung Quốc &"),
                 new HttpFormUrlencoded(true, "empty", null),
                 new HttpFormUrlencoded(false, "disabled", "ignored"),
                 new HttpFormUrlencoded(true, "", "ignored"), null));
@@ -141,7 +141,7 @@ public class GoRequestCodeGeneratorTest {
         HttpRequestItem request = request();
         request.setBodyType(RequestBodyTypes.BODY_TYPE_FORM_DATA);
         request.setFormDataList(Arrays.asList(
-                new HttpFormData(true, "note", HttpFormData.TYPE_TEXT, "中文\ntext"),
+                new HttpFormData(true, "note", HttpFormData.TYPE_TEXT, "Tiếng Trung Quốc\ntext"),
                 new HttpFormData(true, "empty", HttpFormData.TYPE_TEXT, null),
                 new HttpFormData(true, "files", HttpFormData.TYPE_FILE, "a.bin"),
                 new HttpFormData(true, "files", HttpFormData.TYPE_FILE, "b.bin"),
@@ -149,7 +149,7 @@ public class GoRequestCodeGeneratorTest {
 
         String code = GoRequestCodeGenerator.generate(request);
 
-        assertTrue(code.contains("writer.WriteField(\"note\", \"中文\\ntext\")"), code);
+        assertTrue(code.contains("writer.WriteField(\"note\", \"Tiếng Trung Quốc\\ntext\")"), code);
         assertTrue(code.contains("writer.WriteField(\"empty\", \"\")"), code);
         assertTrue(code.contains("addFilePart(writer, \"files\", \"a.bin\", \"application/octet-stream\")"), code);
         assertTrue(code.contains("addFilePart(writer, \"files\", \"b.bin\", \"application/octet-stream\")"), code);
@@ -166,11 +166,11 @@ public class GoRequestCodeGeneratorTest {
     public void shouldQuoteUnicodeMultipartNamesWithoutExtendedParameters() {
         HttpRequestItem request = request();
         request.setBodyType(RequestBodyTypes.BODY_TYPE_FORM_DATA);
-        request.setFormDataList(List.of(new HttpFormData(true, "附件", HttpFormData.TYPE_FILE, "/tmp/图片.png")));
+        request.setFormDataList(List.of(new HttpFormData(true, "Tệp đính kèm", HttpFormData.TYPE_FILE, "/tmp/hình ảnh.png")));
 
         String code = GoRequestCodeGenerator.generate(request);
 
-        assertTrue(code.contains("addFilePart(writer, \"附件\", \"/tmp/图片.png\""), code);
+        assertTrue(code.contains("addFilePart(writer, \"Tệp đính kèm\", \"/tmp/hình ảnh.png\""), code);
         assertTrue(code.contains("strings.NewReplacer(\"\\\\\", \"\\\\\\\\\", \"\\\"\", \"\\\\\\\"\", \"\\r\", \"%0D\", \"\\n\", \"%0A\")"), code);
         assertTrue(code.contains("quoteEscaper.Replace(fieldName)"), code);
         assertTrue(code.contains("fmt.Sprintf(`form-data; name=\"%s\"; filename=\"%s\"`"), code);
@@ -203,10 +203,10 @@ public class GoRequestCodeGeneratorTest {
         HttpRequestItem request = request();
         request.setAuthType(AuthType.BASIC.getConstant());
         request.setAuthUsername("{{username}}");
-        request.setAuthPassword("密码");
+        request.setAuthPassword("mật khẩu");
 
         String code = GoRequestCodeGenerator.generate(request);
-        assertTrue(code.contains("req.SetBasicAuth(\"{{username}}\", \"密码\")"), code);
+        assertTrue(code.contains("req.SetBasicAuth(\"{{username}}\", \"mật khẩu\")"), code);
 
         request.setHeadersList(List.of(new HttpHeader(true, "authorization", "Custom explicit"),
                 new HttpHeader(true, "Host", "virtual.example.com")));

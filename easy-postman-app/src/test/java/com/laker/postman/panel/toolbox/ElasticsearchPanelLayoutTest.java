@@ -44,7 +44,7 @@ public class ElasticsearchPanelLayoutTest extends AbstractSwingUiTest {
     public void connectionActionsShouldUseLabeledCompactButtons() {
         Locale originalLocale = I18nUtil.currentLocale();
         try {
-            assertConnectionActionsUseLabeledButtons(Locale.CHINESE);
+            assertConnectionActionsUseLabeledButtons(Locale.forLanguageTag("vi"));
             assertConnectionActionsUseLabeledButtons(Locale.ENGLISH);
         } finally {
             I18nUtil.setLocale(originalLocale);
@@ -65,7 +65,7 @@ public class ElasticsearchPanelLayoutTest extends AbstractSwingUiTest {
     public void queryToolbarActionsShouldUseSharedSvgButtonsWithTooltips() {
         Locale originalLocale = I18nUtil.currentLocale();
         try {
-            assertQueryToolbarActionsUseIconButtons(Locale.CHINESE);
+            assertQueryToolbarActionsUseIconButtons(Locale.forLanguageTag("vi"));
             assertQueryToolbarActionsUseIconButtons(Locale.ENGLISH);
         } finally {
             I18nUtil.setLocale(originalLocale);
@@ -76,7 +76,7 @@ public class ElasticsearchPanelLayoutTest extends AbstractSwingUiTest {
     public void executeActionShouldUseShortTextWithFullTooltipAcrossLocales() throws Exception {
         Locale originalLocale = I18nUtil.currentLocale();
         try {
-            assertExecuteActionUsesShortText(Locale.CHINESE);
+            assertExecuteActionUsesShortText(Locale.forLanguageTag("vi"));
             assertExecuteActionUsesShortText(Locale.ENGLISH);
         } finally {
             I18nUtil.setLocale(originalLocale);
@@ -87,7 +87,7 @@ public class ElasticsearchPanelLayoutTest extends AbstractSwingUiTest {
     public void leftSidebarTabsShouldUseCompactLocalizedTitlesAcrossLocales() {
         Locale originalLocale = I18nUtil.currentLocale();
         try {
-            assertLeftSidebarTabsUseCompactTitle(Locale.CHINESE);
+            assertLeftSidebarTabsUseCompactTitle(Locale.forLanguageTag("vi"));
             assertLeftSidebarTabsUseCompactTitle(Locale.ENGLISH);
         } finally {
             I18nUtil.setLocale(originalLocale);

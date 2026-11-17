@@ -20,19 +20,19 @@ import java.util.concurrent.TimeUnit;
 import static com.laker.postman.request.util.HttpUrlUtil.extractBaseUri;
 
 /**
- * OkHttpClient 管理器，按传输配置共享连接池和 OkHttpClient。
- * OkHttp 的连接池会按 Address 隔离不同目标，Client 无需再按 host 重复创建；
- * mTLS、代理和 SSL 模式仍通过缓存 key 隔离。
+ * OkHttpClient Trình quản lý, nhóm kết nối dùng chung và mỗi cấu hình truyền tải OkHttpClient。
+ * OkHttp Nhóm kết nối sẽ nhấn Address Cô lập các mục tiêu khác nhau.Client Không cần phải nhấn lại host Tạo nhiều lần;
+ * mTLS、Đại lý và SSL Các mẫu vẫn vượt qua bộ đệm key sự cách ly.
  */
 @Slf4j
 public class OkHttpClientManager {
-    // 相同传输配置共享 Client，避免访问大量域名后无限累积 Dispatcher/ConnectionPool。
+    // Cấu hình vận chuyển tương tự được chia sẻ Client，Tránh tích lũy không giới hạn sau khi truy cập một số lượng lớn tên miền Dispatcher/ConnectionPool。
     private static final Map<String, OkHttpClient> clientMap = new ConcurrentHashMap<>();
-    // 连接池参数
+    // Thông số nhóm kết nối
     private static final int MAX_IDLE_CONNECTIONS = 6;
     private static final long KEEP_ALIVE_DURATION = 90L;
 
-    // Dispatcher 并发参数（OkHttp默认：maxRequests=64, maxRequestsPerHost=5）
+    // Dispatcher Các tham số đồng thời (OkHttpMặc định: .maxRequests=64, maxRequestsPerHost=5）
     private static final int DEFAULT_MAX_REQUESTS = 64;
     private static final int DEFAULT_MAX_REQUESTS_PER_HOST = 5;
 
@@ -40,7 +40,7 @@ public class OkHttpClientManager {
     // OkHttp sends a synthetic challenge with this scheme before opening an HTTPS tunnel.
     private static final String PREEMPTIVE_CHALLENGE_SCHEME = "OkHttp-Preemptive";
 
-    // 全局 CookieManager，支持标准 CookiePolicy
+    // Bức tranh lớn CookieManager，Hỗ trợ tiêu chuẩn CookiePolicy
     private static final CookieManager GLOBAL_COOKIE_MANAGER = new CookieManager(null, CookiePolicy.ACCEPT_ALL);
     private static final JavaNetCookieJar GLOBAL_COOKIE_JAR = new JavaNetCookieJar(GLOBAL_COOKIE_MANAGER);
 
@@ -55,7 +55,7 @@ public class OkHttpClientManager {
     }
 
     /**
-     * 清理所有客户端缓存，用于代理设置更改后强制重新创建客户端
+     * Xóa tất cả bộ nhớ đệm của máy khách để buộc tạo lại máy khách sau khi thay đổi cài đặt proxy
      */
     public static void clearClientCache() {
         for (OkHttpClient client : clientMap.values()) {
@@ -76,7 +76,7 @@ public class OkHttpClientManager {
     }
 
     /**
-     * 获取或创建指定 baseUri 的 OkHttpClient 实例
+     * Nhận hoặc tạo quy định baseUri của OkHttpClient Ví dụ
      */
     public static OkHttpClient getClient(String baseUri, boolean followRedirects) {
         return getClient(baseUri, followRedirects, HttpRequestProxyPolicy.DEFAULT);
@@ -142,7 +142,7 @@ public class OkHttpClientManager {
     }
 
     /**
-     * 基于目标 URL 获取已应用全局代理/SSL 配置的客户端，并按需覆盖超时参数。
+     * Dựa trên mục tiêu URL Nhận đại lý toàn cầu được áp dụng/SSL Định cấu hình máy khách và ghi đè các tham số thời gian chờ nếu cần.
      */
     public static OkHttpClient getClientForUrl(String url,
                                                boolean followRedirects,
@@ -197,7 +197,7 @@ public class OkHttpClientManager {
     }
 
     /**
-     * 配置网络代理
+     * Cấu hình proxy mạng
      */
     private static void configureProxy(OkHttpClient.Builder builder, String baseUri, HttpRequestProxyPolicy proxyPolicy) {
         HttpRequestProxyPolicy resolvedProxyPolicy = HttpRequestProxyPolicy.normalize(proxyPolicy);
@@ -317,7 +317,7 @@ public class OkHttpClientManager {
     }
 
     /**
-     * 配置SSL设置（统一处理所有HTTPS连接的SSL配置）
+     * cấu hìnhSSLCài đặt (Xử lý tất cả trong mộtHTTPSĐã kết nốiSSLcấu hình)
      */
     private static OkHttpClient createClient(String baseUri,
                                              boolean followRedirects,

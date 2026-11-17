@@ -13,9 +13,9 @@ import java.util.Set;
 import java.util.function.Predicate;
 
 /**
- * 插件候选选择器。
+ * Bộ chọn ứng viên plugin.
  * <p>
- * 负责从扫描结果里挑出真正应该被 runtime 加载的那一批插件。
+ * Chịu trách nhiệm chọn ra những cái thật từ kết quả quét runtime Hàng loạt plugin đã được tải.
  * </p>
  */
 @Slf4j

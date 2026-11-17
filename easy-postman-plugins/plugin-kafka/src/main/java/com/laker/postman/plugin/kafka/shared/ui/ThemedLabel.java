@@ -5,7 +5,7 @@ import java.awt.*;
 import java.util.function.Supplier;
 
 /**
- * 前景色按语义色动态取值的标签：亮/暗主题切换后无需重新 setForeground，绘制时即取当前主题颜色。
+ * Nhãn có màu nền trước được thay đổi linh hoạt theo màu ngữ nghĩa: sáng/Không cần thiết lập lại sau khi chuyển sang chủ đề tối setForeground，Màu chủ đề hiện tại được lấy khi vẽ.
  */
 public class ThemedLabel extends JLabel {
 

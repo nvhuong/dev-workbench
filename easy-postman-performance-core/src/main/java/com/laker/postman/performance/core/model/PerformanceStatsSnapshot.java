@@ -54,13 +54,13 @@ public final class PerformanceStatsSnapshot {
             long success,
             long fail,
             double successRate,
-            // QPS：请求数 /（最后一个样本结束时间 - 第一个样本开始时间）
+            // QPS：Số lượng yêu cầu /（Thời gian kết thúc mẫu cuối cùng - thời gian bắt đầu mẫu đầu tiên)
             double samplesPerSecond,
-            // 第一个样本开始时间，用于 master 合并 worker 时按全局窗口重算 QPS
+            // Thời gian bắt đầu mẫu đầu tiên, cho master hợp nhất worker Tính toán lại theo cửa sổ toàn cầu QPS
             long firstSampleStartTimeMs,
-            // 最后一个样本结束时间，用于 master 合并 worker 时按全局窗口重算 QPS
+            // Thời gian kết thúc mẫu cuối cùng, cho master hợp nhất worker Tính toán lại theo cửa sổ toàn cầu QPS
             long lastSampleEndTimeMs,
-            // 请求耗时统计：只统计 sampler/request 本身，不包含前置脚本、后置脚本、断言和 UI 渲染
+            // Yêu cầu số liệu thống kê tốn thời gian: chỉ thống kê sampler/request Bản thân nó không bao gồm tiền kịch bản, hậu kịch bản, xác nhận và UI kết xuất
             DurationStats durationStats,
             long sentMessages,
             long receivedMessages,
@@ -68,15 +68,15 @@ public final class PerformanceStatsSnapshot {
             double sendRate,
             double receiveRate,
             double matchedRate,
-            // 发送字节数：请求头 + 请求体
+            // Số byte được gửi: tiêu đề yêu cầu + Request body
             long sentBytes,
-            // 接收字节数：响应头 + 响应体
+            // Số byte nhận được: tiêu đề phản hồi + cơ quan phản ứng
             long receivedBytes,
-            // 发送字节速率：sentBytes / sample 时间窗口，UI 可按 KB/s 展示
+            // Tốc độ byte gửi: .sentBytes / sample cửa sổ thời gian,UI Có thể ép được KB/s hiển thị
             double sentBytesPerSecond,
-            // 接收字节速率：receivedBytes / sample 时间窗口，UI 可按 KB/s 展示
+            // Nhận tốc độ byte:receivedBytes / sample cửa sổ thời gian,UI Có thể ép được KB/s hiển thị
             double receivedBytesPerSecond,
-            // 平均接收字节数：receivedBytes / total，用于对齐 JMeter Avg. Bytes 口径
+            // Số byte trung bình nhận được:receivedBytes / total，được sử dụng để căn chỉnh JMeter Avg. Bytes tầm cỡ
             long avgReceivedBytes,
             long avgFirstMessageLatencyMs,
             DurationStats firstMessageLatencyStats

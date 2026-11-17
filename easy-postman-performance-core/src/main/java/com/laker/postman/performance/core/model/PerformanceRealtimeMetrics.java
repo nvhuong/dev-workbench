@@ -26,11 +26,11 @@ public class PerformanceRealtimeMetrics {
     private final Map<Object, StreamSessionMetrics> sseSessionStarts = new ConcurrentHashMap<>();
     private final AtomicInteger activeWebSocketSessions = new AtomicInteger();
     private final AtomicInteger peakWebSocketSessions = new AtomicInteger();
-    // 趋势采样只需要平均活跃时长，维护 startTime 总和可避免每秒遍历全部活跃连接。
+    // Lấy mẫu xu hướng chỉ yêu cầu thời gian hoạt động và bảo trì trung bình startTime Tổng kết tránh việc duyệt qua tất cả các kết nối đang hoạt động mỗi giây.
     private final AtomicLong webSocketActiveSessionStartTotalMs = new AtomicLong();
     private final AtomicInteger activeSseSessions = new AtomicInteger();
     private final AtomicInteger peakSseSessions = new AtomicInteger();
-    // 实时报告仍可读取 session map 生成明细，趋势路径只走 O(1) 聚合。
+    // Báo cáo trực tiếp vẫn có thể được đọc session map Tạo chi tiết, đường dẫn xu hướng chỉ đi O(1) sự polyme hóa.
     private final AtomicLong sseActiveSessionStartTotalMs = new AtomicLong();
 
     private final AtomicLong lastSampleTimeMs = new AtomicLong();
@@ -204,7 +204,7 @@ public class PerformanceRealtimeMetrics {
     }
 
     /**
-     * 读取流式协议实时窗口并推进上次计数，QPS/消息速率类指标不能重复读取。
+     * Đọc cửa sổ thời gian thực của giao thức truyền phát và tiến tới số đếm cuối cùng.QPS/Chỉ báo tốc độ tin nhắn không thể được đọc nhiều lần.
      */
     public synchronized Sample drainWindow(long nowMs) {
         long previousSampleTimeMs = lastSampleTimeMs.getAndSet(nowMs);

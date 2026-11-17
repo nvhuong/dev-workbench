@@ -4,25 +4,25 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 
 /**
- * 变量信息
+ * Thông tin biến đổi
  * <p>
- * 用于在UI中展示变量的完整信息（名称、值、类型）
+ * Được sử dụng trongUIHiển thị thông tin đầy đủ về biến (tên, giá trị, loại)
  */
 @Data
 @AllArgsConstructor
 public class VariableInfo {
     /**
-     * 变量名
+     * tên biến
      */
     private String name;
 
     /**
-     * 变量值
+     * giá trị thay đổi
      */
     private String value;
 
     /**
-     * 变量类型
+     * Loại biến
      */
     private VariableType type;
 }

@@ -4,7 +4,7 @@ import lombok.experimental.UtilityClass;
 
 @UtilityClass
 public class PerformanceRunStatus {
-    // 这些值会进入 CLI result.json 和 worker HTTP/JSON 协议，新增状态时先确认 master/GUI 聚合语义。
+    // Những giá trị này sẽ đi vào CLI result.json và worker HTTP/JSON Thỏa thuận, xác nhận trước khi thêm trạng thái mới master/GUI Ngữ nghĩa tổng hợp.
     public static final String PENDING = "PENDING";
     public static final String RUNNING = "RUNNING";
     public static final String SUCCESS = "SUCCESS";

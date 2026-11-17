@@ -10,26 +10,26 @@ import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 
 public class NetworkLogMessageFormatterTest {
-    private boolean originalChinese;
+    private boolean originalVietnamese;
 
     @BeforeMethod
-    public void useChineseLocale() {
-        originalChinese = I18nUtil.isChinese();
+    public void useVietnameseLocale() {
+        originalVietnamese = I18nUtil.isVietnamese();
         I18nUtil.setLocale("zh");
     }
 
     @AfterMethod
     public void restoreLocale() {
-        I18nUtil.setLocale(originalChinese ? "zh" : "en");
+        I18nUtil.setLocale(originalVietnamese ? "vi" : "en");
     }
 
     @Test
     public void shouldLocalizeStageDisplayNameWithoutChangingTechnicalName() {
         assertEquals(NetworkLogStage.CALL_START.getStageName(), "RequestStart");
-        assertEquals(NetworkLogStage.CALL_START.getDisplayName(), "请求开始");
-        assertEquals(NetworkLogStage.CALL_END.getDisplayName(), "请求结束");
-        assertEquals(NetworkLogStage.REQUEST_COMPLETE.getDisplayName(), "请求流程完成");
-        assertEquals(NetworkLogStage.CONNECTION_RELEASED.getDisplayName(), "连接占用已释放");
+        assertEquals(NetworkLogStage.CALL_START.getDisplayName(), "Yêu cầu bắt đầu");
+        assertEquals(NetworkLogStage.CALL_END.getDisplayName(), "Yêu cầu kết thúc");
+        assertEquals(NetworkLogStage.REQUEST_COMPLETE.getDisplayName(), "Quá trình yêu cầu đã hoàn tất");
+        assertEquals(NetworkLogStage.CONNECTION_RELEASED.getDisplayName(), "Kết nối bị chiếm dụng đã được giải phóng");
     }
 
     @Test
@@ -38,21 +38,21 @@ public class NetworkLogMessageFormatterTest {
                 NetworkLogEventStage.FOLLOW_UP_DECISION,
                 "Follow-up: true, response: 401, next: GET https://example.test/private");
 
-        assertEquals(formatted, "后续请求：GET https://example.test/private（响应码 401）");
+        assertEquals(formatted, "Yêu cầu tiếp theo: .GET https://example.test/private（Mã phản hồi 401）");
         assertEquals(NetworkLogMessageFormatter.format(NetworkLogEventStage.FOLLOW_UP_DECISION,
                 "Follow-up: false, response: 200, next: none"), "");
     }
 
     @Test
     public void shouldLocalizeProxyConfigurationAndPreserveRouteDetails() {
-        assertEquals(NetworkLogStage.PROXY_SELECT.getDisplayName(), "代理配置");
+        assertEquals(NetworkLogStage.PROXY_SELECT.getDisplayName(), "Cấu hình đại lý");
         String formatted = NetworkLogMessageFormatter.format(
                 NetworkLogEventStage.PROXY_SELECT,
                 "requestPolicy=DEFAULT, appProxyEnabled=false, appProxyMode=MANUAL, "
                         + "clientProxy=DIRECT, directHttpSocketFactoryJvmSocksBypass=true, "
                         + "manualProxyConfig=NOT_USED");
 
-        assertEquals(formatted, "客户端代理：直连 · 请求策略：使用默认值");
+        assertEquals(formatted, "Proxy khách hàng: kết nối trực tiếp · Chính sách yêu cầu: Sử dụng giá trị mặc định");
     }
 
     @Test
@@ -61,12 +61,12 @@ public class NetworkLogMessageFormatterTest {
                         "requestPolicy=USE_PROXY, appProxyEnabled=true, appProxyMode=SYSTEM, "
                                 + "clientProxy=SYSTEM_SELECTOR, directHttpSocketFactoryJvmSocksBypass=true, "
                                 + "manualProxyConfig=NOT_USED"),
-                "客户端代理：系统代理选择器 · 请求策略：使用代理");
+                "Proxy máy khách: Bộ chọn proxy hệ thống · Chiến lược yêu cầu: Sử dụng proxy");
         assertEquals(NetworkLogMessageFormatter.format(NetworkLogEventStage.PROXY_SELECT,
                         "requestPolicy=NO_PROXY, appProxyEnabled=true, appProxyMode=MANUAL, "
                                 + "clientProxy=SOCKS:127.0.0.1:1080, directHttpSocketFactoryJvmSocksBypass=true, "
                                 + "manualProxyConfig=FIELDS_PRESENT"),
-                "客户端代理：SOCKS:127.0.0.1:1080 · 请求策略：不使用代理");
+                "Đại lý khách hàng: .SOCKS:127.0.0.1:1080 · Request policy: Do not use a proxy");
     }
 
     @Test
@@ -76,7 +76,7 @@ public class NetworkLogMessageFormatterTest {
                         + "clientProxy=HTTP:proxy,internal:8080, directHttpSocketFactoryJvmSocksBypass=true, "
                         + "manualProxyConfig=FIELDS_PRESENT");
 
-        assertEquals(formatted, "客户端代理：HTTP:proxy,internal:8080 · 请求策略：使用代理");
+        assertEquals(formatted, "Đại lý khách hàng: .HTTP:proxy,internal:8080 · Chiến lược yêu cầu: Sử dụng proxy");
     }
 
     @Test
@@ -85,11 +85,11 @@ public class NetworkLogMessageFormatterTest {
                 + "clientProxy=DIRECT, directHttpSocketFactoryJvmSocksBypass=true, manualProxyConfig=";
 
         assertTrue(NetworkLogMessageFormatter.format(NetworkLogEventStage.PROXY_SELECT,
-                diagnostic + "MISSING_HOST").contains("手动代理配置：缺少主机"));
+                diagnostic + "MISSING_HOST").contains("Cấu hình proxy thủ công: Thiếu máy chủ"));
         assertTrue(NetworkLogMessageFormatter.format(NetworkLogEventStage.PROXY_SELECT,
-                diagnostic + "INVALID_HOST").contains("手动代理配置：主机格式无效"));
+                diagnostic + "INVALID_HOST").contains("Cấu hình proxy thủ công: Định dạng máy chủ không hợp lệ"));
         assertTrue(NetworkLogMessageFormatter.format(NetworkLogEventStage.PROXY_SELECT,
-                diagnostic + "INVALID_PORT").contains("手动代理配置：端口无效"));
+                diagnostic + "INVALID_PORT").contains("Cấu hình proxy thủ công: Cổng không hợp lệ"));
     }
 
     @Test
@@ -98,16 +98,16 @@ public class NetworkLogMessageFormatterTest {
                 "requestPolicy=DEFAULT, appProxyEnabled=false, appProxyMode=MANUAL, "
                         + "clientProxy=DIRECT, directHttpSocketFactoryJvmSocksBypass=false, "
                         + "manualProxyConfig=NOT_USED"),
-                "客户端代理：直连 · 请求策略：使用默认值\n底层 Socket 未绕过 JVM SOCKS 设置");
+                "Proxy khách hàng: kết nối trực tiếp · Chính sách yêu cầu: Sử dụng giá trị mặc định\nTầng trệt Socket Không được bỏ qua JVM SOCKS cài đặt");
     }
 
     @Test
     public void shouldDistinguishReusedAndNewConnectionWithoutRepeatingReleaseRoute() {
         String route = "proxy=DIRECT, protocol=h2, remote=example.test:443";
         assertEquals(NetworkLogMessageFormatter.format(NetworkLogEventStage.CONNECTION_ACQUIRED,
-                "Connection reused: " + route), "复用连接：" + route);
+                "Connection reused: " + route), "Kết nối đa kênh:" + route);
         assertEquals(NetworkLogMessageFormatter.format(NetworkLogEventStage.CONNECTION_ACQUIRED,
-                "Connection acquired: " + route), "新连接：" + route);
+                "Connection acquired: " + route), "Kết nối mới:" + route);
         assertEquals(NetworkLogMessageFormatter.format(NetworkLogEventStage.CONNECTION_RELEASED,
                 "Connection use released"), "");
         assertEquals(NetworkLogMessageFormatter.format(NetworkLogEventStage.CALL_END, "done"), "");
@@ -117,11 +117,11 @@ public class NetworkLogMessageFormatterTest {
     public void shouldLocalizeDirectRouteInterceptionWarning() {
         String formatted = NetworkLogMessageFormatter.format(NetworkLogEventStage.ROUTE_INTERCEPTED,
                 "Direct route intercepted: local=127.0.0.1:53000, remote=10.175.180.2:80");
-        assertTrue(formatted.startsWith("直连疑似被截获：本地地址 127.0.0.1:53000"), formatted);
-        assertTrue(formatted.contains("目标 10.175.180.2:80"), formatted);
+        assertTrue(formatted.startsWith("Kết nối trực tiếp bị nghi ngờ bị chặn: địa chỉ cục bộ 127.0.0.1:53000"), formatted);
+        assertTrue(formatted.contains("Mục tiêu 10.175.180.2:80"), formatted);
         assertEquals(NetworkLogStage.fromEventStage(NetworkLogEventStage.ROUTE_INTERCEPTED),
                 NetworkLogStage.ROUTE_INTERCEPTED);
-        assertEquals(NetworkLogStage.ROUTE_INTERCEPTED.getDisplayName(), "直连疑似被截获");
+        assertEquals(NetworkLogStage.ROUTE_INTERCEPTED.getDisplayName(), "Kết nối trực tiếp bị nghi ngờ đã bị chặn");
     }
 
     @Test
@@ -131,12 +131,12 @@ public class NetworkLogMessageFormatterTest {
             assertEquals(NetworkLogMessageFormatter.format(NetworkLogEventStage.REQUEST_HEADERS_END,
                     leadingNewline + "HTTP/2 header view (regular headers and :authority):"
                             + headers),
-                    leadingNewline + "HTTP/2 请求头视图（常规头与 :authority）：" + headers);
+                    leadingNewline + "HTTP/2 Yêu cầu xem tiêu đề (tiêu đề thông thường so với tiêu đề tiêu đề) :authority）：" + headers);
             assertEquals(NetworkLogMessageFormatter.format(NetworkLogEventStage.REQUEST_HEADERS_END,
                     leadingNewline + "Header snapshot:" + headers),
-                    leadingNewline + "请求头快照：" + headers);
+                    leadingNewline + "Yêu cầu chụp nhanh tiêu đề: ." + headers);
             assertEquals(NetworkLogMessageFormatter.format(NetworkLogEventStage.REQUEST_HEADERS_END,
-                    leadingNewline + "Headers unchanged"), leadingNewline + "请求头未变化");
+                    leadingNewline + "Headers unchanged"), leadingNewline + "Tiêu đề yêu cầu không thay đổi");
         }
     }
 
@@ -148,7 +148,7 @@ public class NetworkLogMessageFormatterTest {
             for (String leadingNewline : new String[]{"", "\n"}) {
                 assertEquals(NetworkLogMessageFormatter.format(stage,
                         leadingNewline + "HTTP/2 200\nWait: 1000ms" + headers),
-                        leadingNewline + "HTTP/2 200\n等待响应：1000ms" + headers);
+                        leadingNewline + "HTTP/2 200\nĐang chờ phản hồi:1000ms" + headers);
             }
         }
         assertEquals(NetworkLogMessageFormatter.format(NetworkLogEventStage.RESPONSE_HEADERS_END,
@@ -158,15 +158,15 @@ public class NetworkLogMessageFormatterTest {
     @Test
     public void shouldDistinguishRetryFromTerminalFailure() {
         assertEquals(NetworkLogMessageFormatter.format(NetworkLogEventStage.RETRY_DECISION,
-                "Retry: true, reason: connection reset"), "继续重试：是 · 原因：connection reset");
+                "Retry: true, reason: connection reset"), "Tiếp tục thử lại: Có · lý do:connection reset");
         assertEquals(NetworkLogMessageFormatter.format(NetworkLogEventStage.RETRY_DECISION,
-                "Retry: false, reason: canceled"), "继续重试：否 · 原因：canceled");
+                "Retry: false, reason: canceled"), "Tiếp tục thử lại: Không · lý do:canceled");
     }
 
     @Test
     public void shouldExplainUnavailablePreviewWithoutChangingRealRequestBody() {
         assertEquals(NetworkLogMessageFormatter.format(NetworkLogEventStage.REQUEST_BODY_START,
-                "Request body preview unavailable"), "请求体预览不可用");
+                "Request body preview unavailable"), "Yêu cầu xem trước nội dung không có sẵn");
         String actualBody = "\nRequest body preview unavailable";
         assertEquals(NetworkLogMessageFormatter.format(NetworkLogEventStage.REQUEST_BODY_START, actualBody), actualBody);
     }
@@ -177,25 +177,25 @@ public class NetworkLogMessageFormatterTest {
                         "Redirect #1\nStatus: 302\nFrom: POST https://example.test/redirect\n"
                                 + "To: GET https://other.test/get\nCross-Origin: true\n"
                                 + "Removed Headers: Authorization, Cookie\nMethod Changed: POST → GET"),
-                "第 1 次重定向\n状态码：302\n来源：POST https://example.test/redirect\n"
-                        + "目标：GET https://other.test/get\n跨源：是\n"
-                        + "已移除请求头：Authorization, Cookie\n请求方法变更：POST → GET");
+                "KHÔNG.  1 chuyển hướng\nMã trạng thái:302\nnguồn:POST https://example.test/redirect\n"
+                        + "Mục tiêu:GET https://other.test/get\nNguồn gốc chéo: Có\n"
+                        + "Đã xóa tiêu đề yêu cầu: .Authorization, Cookie\nYêu cầu thay đổi phương thức:POST → GET");
         assertEquals(NetworkLogMessageFormatter.format(NetworkLogEventStage.REQUEST_COMPLETE,
                         "Status: 200\nFinal: GET https://other.test/get\nRedirects: 1\nTotal: 457ms"),
-                "状态码：200\n最终请求：GET https://other.test/get\n重定向次数：1\n总耗时：457ms");
+                "Mã trạng thái:200\nYêu cầu cuối cùng: .GET https://other.test/get\nSố lần chuyển hướng:1\nTổng thời gian thực hiện:457ms");
     }
 
     @Test
     public void shouldExplainWhyRedirectWasNotFollowed() {
         assertEquals(NetworkLogMessageFormatter.format(NetworkLogEventStage.REDIRECT,
                         "Redirect stopped: disabled, status: 302"),
-                "未继续跟随：已关闭重定向（状态码 302）");
+                "Không theo dõi: Chuyển hướng đã đóng (mã trạng thái 302）");
         assertEquals(NetworkLogMessageFormatter.format(NetworkLogEventStage.REDIRECT,
                         "Redirect stopped: missing Location, status: 302"),
-                "未继续跟随：缺少 Location 响应头（状态码 302）");
+                "Không theo dõi: thiếu Location Tiêu đề phản hồi (mã trạng thái 302）");
         assertEquals(NetworkLogMessageFormatter.format(NetworkLogEventStage.REDIRECT,
                         "Redirect stopped: max redirects reached, status: 302, max: 20"),
-                "未继续跟随：已达到重定向次数上限（状态码 302）\n重定向次数上限：20");
+                "Không tiếp tục theo dõi: Đã đạt đến số lượng chuyển hướng tối đa (mã trạng thái 302）\nSố lần chuyển hướng tối đa:20");
     }
 
     @Test
@@ -215,7 +215,7 @@ public class NetworkLogMessageFormatterTest {
     @Test
     public void shouldLocalizeUnavailableProxyDiagnostics() {
         assertEquals(NetworkLogMessageFormatter.format(NetworkLogEventStage.PROXY_SELECT,
-                "proxy diagnostics unavailable"), "无法获取代理诊断信息");
+                "proxy diagnostics unavailable"), "Không thể lấy được thông tin chẩn đoán tác nhân");
     }
 
     @Test
@@ -227,10 +227,10 @@ public class NetworkLogMessageFormatterTest {
                         + " subject: CN=example.test\n"
                         + "SSL certificate verify ok.\n");
 
-        assertTrue(formatted.contains("SSL 连接：TLS_1_2"));
-        assertTrue(formatted.contains("服务器证书："));
-        assertTrue(formatted.contains("主题： CN=example.test"));
-        assertTrue(formatted.contains("SSL 证书校验通过。"));
+        assertTrue(formatted.contains("SSL Sự liên quan:TLS_1_2"));
+        assertTrue(formatted.contains("Chứng chỉ máy chủ: ."));
+        assertTrue(formatted.contains("chủ đề: CN=example.test"));
+        assertTrue(formatted.contains("SSL Certificate verification passed."));
     }
 
     @Test
@@ -238,13 +238,13 @@ public class NetworkLogMessageFormatterTest {
         String tlsConnection = "TLSv1.2 / TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256";
         assertEquals(NetworkLogMessageFormatter.format(NetworkLogEventStage.SECURE_CONNECT_END,
                         "TLS connection: " + tlsConnection + "\nVerification: disabled"),
-                "TLS 连接：" + tlsConnection + "\n证书校验：已关闭");
+                "TLS Sự liên quan:" + tlsConnection + "\nCertificate verification: closed");
         assertEquals(NetworkLogMessageFormatter.format(NetworkLogEventStage.SECURE_CONNECT_END,
                         "TLS connection: " + tlsConnection + "\nVerification: passed"),
-                "TLS 连接：" + tlsConnection + "\n证书校验：通过");
+                "TLS Sự liên quan:" + tlsConnection + "\nCertificate verification: passed");
         assertEquals(NetworkLogMessageFormatter.format(NetworkLogEventStage.SECURE_CONNECT_END,
                         "TLS connection: " + tlsConnection + "\nVerification: enabled"),
-                "TLS 连接：" + tlsConnection + "\n证书校验：已启用");
+                "TLS Sự liên quan:" + tlsConnection + "\nCertificate Verification: Enabled");
     }
 
     @Test
@@ -254,9 +254,9 @@ public class NetworkLogMessageFormatterTest {
                                 + "Server certificate:\n subject: CN=example.test issuer: literal text\n"
                                 + " start date: 2026-01-01T00:00:00Z\n expire date: 2027-01-01T00:00:00Z\n"
                                 + " issuer: CN=Test CA\n⚠️  Certificate Warning: certificate expired"),
-                "TLS 连接：TLSv1.3 / TLS_AES_128_GCM_SHA256\n证书校验：已关闭\n"
-                        + "服务器证书：\n主题： CN=example.test issuer: literal text\n"
-                        + "开始日期： 2026-01-01T00:00:00Z\n到期日期： 2027-01-01T00:00:00Z\n"
-                        + "颁发者： CN=Test CA\n⚠️  证书警告：certificate expired");
+                "TLS Sự liên quan:TLSv1.3 / TLS_AES_128_GCM_SHA256\nCertificate verification: closed\n"
+                        + "Chứng chỉ máy chủ: .\nchủ đề: CN=example.test issuer: literal text\n"
+                        + "ngày bắt đầu: 2026-01-01T00:00:00Z\nNgày hết hạn: 2027-01-01T00:00:00Z\n"
+                        + "Phát hành bởi: CN=Test CA\n⚠️  Certificate warning: .certificate expired");
     }
 }

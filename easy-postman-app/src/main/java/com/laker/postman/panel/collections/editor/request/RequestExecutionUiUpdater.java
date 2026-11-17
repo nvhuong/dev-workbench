@@ -34,8 +34,8 @@ final class RequestExecutionUiUpdater implements WebSocketConnectionUi {
         if (baseHttpProtocol.getAsBoolean()) {
             responsePanel.setResponseBodyEnabled(false);
         }
-        // 普通 HTTP 请求发送时保留上一份响应内容，避免当前响应标签页先被清空后再重绘造成闪烁。
-        // 流式协议仍沿用清空策略，防止新旧消息混在一起。
+        // bình thường HTTP Giữ nguyên nội dung phản hồi trước đó khi yêu cầu được gửi để tránh hiện tượng nhấp nháy do tab phản hồi hiện tại bị xóa trước rồi mới vẽ lại.
+        // Giao thức truyền phát vẫn sử dụng chiến lược thanh toán bù trừ để ngăn các tin nhắn mới và cũ bị trộn lẫn với nhau.
         if (!baseHttpProtocol.getAsBoolean() || effectiveWebSocketProtocol.getAsBoolean()) {
             responsePanel.clearAll();
         }

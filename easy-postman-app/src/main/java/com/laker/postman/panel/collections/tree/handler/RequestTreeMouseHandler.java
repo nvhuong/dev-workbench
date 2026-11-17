@@ -22,8 +22,8 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
 /**
- * 请求树鼠标事件处理器
- * 负责处理树节点的单击、双击和右键菜单
+ * Yêu cầu xử lý sự kiện chuột cây
+ * Chịu trách nhiệm xử lý menu nhấp chuột một lần, nhấp đúp và nhấp chuột phải của các nút cây
  */
 public class RequestTreeMouseHandler extends MouseAdapter {
     private final JTree requestTree;
@@ -49,7 +49,7 @@ public class RequestTreeMouseHandler extends MouseAdapter {
         this.clickResolver = new CollectionTreeClickResolver(requestTree);
     }
 
-    // ==================== hover 追踪 ====================
+    // ==================== hover Theo dõi ====================
 
     @Override
     public void mouseMoved(MouseEvent e) {
@@ -74,7 +74,7 @@ public class RequestTreeMouseHandler extends MouseAdapter {
     }
 
     /**
-     * 根据鼠标位置动态设置 tooltip
+     * Tự động thiết lập dựa trên vị trí chuột tooltip
      */
     private void updateTooltip(MouseEvent e) {
         CollectionTreeClickTarget target = clickResolver.resolve(e.getX(), e.getY());
@@ -97,11 +97,11 @@ public class RequestTreeMouseHandler extends MouseAdapter {
         }
     }
 
-    // ==================== 点击处理 ====================
+    // ==================== Nhấp vào Quá trình ====================
 
     @Override
     public void mousePressed(MouseEvent e) {
-        // 主题/字体刷新可能让 Swing UI 监听器排到本监听器之后，不能依赖它清除上次点击的保护。
+        // chủ đề/Có thể làm mới phông chữ Swing UI Trình nghe được xếp hàng sau trình nghe này và không thể dựa vào đó để xóa tính năng bảo vệ của lần nhấp cuối cùng.
         coordinator.finishRequestCreationSelection();
         if (SwingUtilities.isLeftMouseButton(e) && e.getClickCount() == 1) {
             handleLeftSingleClick(e);
@@ -113,7 +113,7 @@ public class RequestTreeMouseHandler extends MouseAdapter {
     }
 
     /**
-     * mouseReleased 中拦截 Add/More 按钮区域的点击，避免触发节点展开/收起等默认行为
+     * mouseReleased Đánh chặn Add/More Nhấp vào khu vực nút để tránh kích hoạt mở rộng nút/Hành vi mặc định như sụp đổ
      */
     @Override
     public void mouseReleased(MouseEvent e) {
@@ -152,7 +152,7 @@ public class RequestTreeMouseHandler extends MouseAdapter {
     }
 
     private void handleGroupAddRequestClick(DefaultMutableTreeNode groupNode) {
-        // addHttpRequestDirectly 会选中新请求，mouseReleased 后结束选中保护。
+        // addHttpRequestDirectly Yêu cầu mới sẽ được chọn.mouseReleased Sau đó kết thúc bảo vệ đã chọn.
         coordinator.addHttpRequestDirectly(groupNode);
     }
 
@@ -162,7 +162,7 @@ public class RequestTreeMouseHandler extends MouseAdapter {
     }
 
     /**
-     * 弹出 group 专属菜单（新增请求、新增分组等）
+     * bật lên group Menu độc quyền (yêu cầu mới, nhóm mới, v.v.)
      */
     private void showGroupActionMenu(DefaultMutableTreeNode groupNode, int x, int y) {
         JPopupMenu menu = new JPopupMenu();
@@ -208,7 +208,7 @@ public class RequestTreeMouseHandler extends MouseAdapter {
     }
 
     /**
-     * 处理单击事件：临时打开请求或分组
+     * Xử lý các sự kiện nhấp chuột: tạm thời mở một yêu cầu hoặc nhóm
      */
     private void openTargetTransiently(CollectionTreeClickTarget target) {
         DefaultMutableTreeNode node = target.node();
@@ -223,7 +223,7 @@ public class RequestTreeMouseHandler extends MouseAdapter {
     }
 
     /**
-     * 处理双击事件：打开请求或分组编辑面板
+     * Xử lý sự kiện nhấp đúp: Mở bảng chỉnh sửa yêu cầu hoặc nhóm
      */
     private void handleDoubleClick(MouseEvent e) {
         CollectionTreeClickTarget target = clickResolver.resolve(e.getX(), e.getY());
@@ -240,23 +240,23 @@ public class RequestTreeMouseHandler extends MouseAdapter {
                 return;
             }
             openActions.openFixedGroup(node, group);
-            e.consume(); // 阻止展开/收起
+            e.consume(); // Ngăn chặn sự mở rộng/Bỏ đi
         } else if (CollectionTreeNodes.isSavedResponse(node)) {
-            // 双击保存的响应：打开固定 Tab
+            // Bấm đúp vào câu trả lời đã lưu: Mở ghim Tab
             CollectionTreeNodes.savedResponse(node).ifPresent(this::handleSavedResponseDoubleClick);
             e.consume();
         }
     }
 
     /**
-     * 处理右键点击：显示弹出菜单
+     * Xử lý nhấp chuột phải: Hiển thị menu bật lên
      */
     private void handleRightClick(MouseEvent e) {
         int row = clickResolver.rowAtY(e.getY());
         if (row != -1) {
             TreePath clickedPath = requestTree.getPathForRow(row);
-            // 只有当点击的路径未被选中时，才设置为当前选中项
-            // 如果点击的路径已经被选中，则保持当前的多选状态
+            // Chỉ khi đường dẫn được nhấp không được chọn, nó sẽ được đặt làm mục hiện được chọn
+            // Nếu đường dẫn được nhấp đã được chọn thì trạng thái đa lựa chọn hiện tại sẽ được duy trì
             if (clickedPath != null && !requestTree.isPathSelected(clickedPath)) {
                 requestTree.setSelectionPath(clickedPath);
             }
@@ -267,7 +267,7 @@ public class RequestTreeMouseHandler extends MouseAdapter {
     }
 
     /**
-     * 处理分组点击事件
+     * Xử lý các sự kiện nhấp vào nhóm
      */
     private void toggleGroupAndOpenTransiently(CollectionTreeClickTarget target) {
         if (target.isExpansionHandle()) {
@@ -290,21 +290,21 @@ public class RequestTreeMouseHandler extends MouseAdapter {
     }
 
     /**
-     * 处理请求点击事件
+     * Xử lý các sự kiện nhấp chuột yêu cầu
      */
     private void handleRequestClick(HttpRequestItem item) {
         openActions.openTransientRequest(item);
     }
 
     /**
-     * 处理保存的响应单击事件：临时打开
+     * Xử lý các phản hồi đã lưu cho các sự kiện nhấp chuột: Mở tạm thời
      */
     private void handleSavedResponseClick(SavedResponse savedResponse) {
         openActions.openTransientSavedResponse(savedResponse);
     }
 
     /**
-     * 处理保存的响应双击事件：打开固定 Tab
+     * Xử lý các phản hồi đã lưu cho các sự kiện nhấp đúp: ghim mở Tab
      */
     private void handleSavedResponseDoubleClick(SavedResponse savedResponse) {
         openActions.openFixedSavedResponse(savedResponse);

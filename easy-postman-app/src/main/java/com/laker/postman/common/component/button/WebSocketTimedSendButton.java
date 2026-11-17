@@ -9,7 +9,7 @@ import javax.swing.*;
 import java.awt.*;
 
 /**
- * WebSocket 定时发送按钮
+ * WebSocket Nút gửi theo lịch trình
  */
 public class WebSocketTimedSendButton extends JButton {
     public WebSocketTimedSendButton() {

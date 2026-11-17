@@ -7,7 +7,7 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * HTTP 请求头常量和工具类
+ * HTTP Yêu cầu các hằng tiêu đề và các lớp tiện ích
  */
 @UtilityClass
 public class HttpHeaderConstants {
@@ -18,8 +18,8 @@ public class HttpHeaderConstants {
     public static final String EASY_CONTENT_ENCODING = "Easy-Content-Encoding";
 
     /**
-     * 常见的HTTP请求头列表（按字母顺序排列）
-     * 参考 Postman 和标准 HTTP 规范
+     * chungHTTPDanh sách tiêu đề yêu cầu (theo thứ tự bảng chữ cái)
+     * Tham khảo Postman và tiêu chuẩn HTTP đặc điểm kỹ thuật
      */
     public static final List<String> COMMON_HEADERS = Collections.unmodifiableList(Arrays.asList(
             // A
@@ -78,7 +78,7 @@ public class HttpHeaderConstants {
             "Via",
             // W
             "Warning",
-            // X (常见的自定义头)
+            // X (Tiêu đề tùy chỉnh phổ biến)
             "X-Requested-With",
             "X-Forwarded-For",
             "X-Forwarded-Host",
@@ -91,7 +91,7 @@ public class HttpHeaderConstants {
     ));
 
     /**
-     * 常见的 Content-Type 值
+     * chung Content-Type giá trị
      */
     public static final List<String> COMMON_CONTENT_TYPES = Collections.unmodifiableList(Arrays.asList(
             "application/json",
@@ -110,7 +110,7 @@ public class HttpHeaderConstants {
     ));
 
     /**
-     * 常见的 Accept 值
+     * chung Accept giá trị
      */
     public static final List<String> COMMON_ACCEPT_VALUES = Collections.unmodifiableList(Arrays.asList(
             "*/*",
@@ -122,7 +122,7 @@ public class HttpHeaderConstants {
     ));
 
     /**
-     * 常见的 Accept-Encoding 值
+     * chung Accept-Encoding giá trị
      */
     public static final List<String> COMMON_ACCEPT_ENCODING_VALUES = Collections.unmodifiableList(Arrays.asList(
             "gzip, deflate, br",
@@ -134,7 +134,7 @@ public class HttpHeaderConstants {
     ));
 
     /**
-     * 常见的 Cache-Control 值
+     * chung Cache-Control giá trị
      */
     public static final List<String> COMMON_CACHE_CONTROL_VALUES = Collections.unmodifiableList(Arrays.asList(
             "no-cache",
@@ -147,7 +147,7 @@ public class HttpHeaderConstants {
     ));
 
     /**
-     * 常见的 Connection 值
+     * chung Connection giá trị
      */
     public static final List<String> COMMON_CONNECTION_VALUES = Collections.unmodifiableList(Arrays.asList(
             "keep-alive",
@@ -156,14 +156,14 @@ public class HttpHeaderConstants {
     ));
 
     /**
-     * 根据请求头名称获取对应的常见值列表
+     * Nhận danh sách giá trị chung tương ứng dựa trên tên tiêu đề yêu cầu
      */
     public static List<String> getCommonValuesForHeader(String headerName) {
         if (headerName == null || headerName.trim().isEmpty()) {
             return Collections.emptyList();
         }
 
-        // 大小写不敏感匹配，支持用户输入 content-type / Content-Type 等形式
+        // Kết hợp không phân biệt chữ hoa chữ thường hỗ trợ đầu vào của người dùng content-type / Content-Type v.v. hình thức
         String normalizedHeader = headerName.trim().toLowerCase(java.util.Locale.ROOT);
 
         return switch (normalizedHeader) {

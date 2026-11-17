@@ -5,23 +5,23 @@ import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * Windows 版本检测器 - 判断是便携版还是安装版
+ * Windows Trình kiểm tra phiên bản - Xác định xem đó là phiên bản di động hay phiên bản cài đặt
  */
 @Slf4j
 @UtilityClass
 public class WindowsVersionDetector {
 
     /**
-     * 检测是否为便携版
+     * Kiểm tra xem nó có phải là phiên bản di động không
      *
-     * <p>判断依据：</p>
+     * <p>Căn cứ xét xử:</p>
      * <ol>
-     *   <li>检查应用根目录是否存在 .portable 标识文件（优先级最高）</li>
-     *   <li>检查是否从 Program Files 或 AppData 目录运行（安装版特征）</li>
-     *   <li>默认认为是安装版</li>
+     *   <li>Kiểm tra xem thư mục gốc của ứng dụng có tồn tại không .portable Tệp nhận dạng (ưu tiên cao nhất)</li>
+     *   <li>Kiểm tra xem có từ không Program Files hoặc AppData Chạy thư mục (tính năng phiên bản cài đặt)</li>
+     *   <li>Mặc định được coi là phiên bản cài đặt</li>
      * </ol>
      *
-     * @return true 表示便携版，false 表示安装版
+     * @return true Cho biết phiên bản di động.false Cho biết phiên bản cài đặt
      */
     public static boolean isPortableVersion() {
         try {

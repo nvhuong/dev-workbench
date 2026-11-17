@@ -56,23 +56,23 @@ public class FunctionalPanel extends UiSingletonPanel {
     private JTable table;
     private FunctionalRunnerTableModel tableModel;
     private StartButton runBtn;
-    private StopButton stopBtn;    // 停止按钮
-    private JLabel timeLabel;     // 执行时间标签
-    private JLabel progressLabel; // 进度标签
-    private long startTime;       // 记录开始时间
-    private Timer executionTimer; // 执行时间计时器
-    private volatile boolean isStopped = false; // 停止标志
+    private StopButton stopBtn;    // Nút dừng
+    private JLabel timeLabel;     // Thẻ thời gian thực hiện
+    private JLabel progressLabel; // Nhãn tiến độ
+    private long startTime;       // Ghi lại thời gian bắt đầu
+    private Timer executionTimer; // Hẹn giờ thực hiện
+    private volatile boolean isStopped = false; // Dấu hiệu dừng lại
     private volatile int executionGeneration = 0;
 
-    // CSV 数据管理面板
+    // CSV Bảng quản lý dữ liệu
     private CsvDataPanel csvDataPanel;
 
-    // 批量执行历史记录
+    // Lịch sử thực hiện hàng loạt
     private transient BatchExecutionHistory executionHistory;
     private JTabbedPane mainTabbedPane;
     private ExecutionResultsPanel resultsPanel;
 
-    // 持久化服务
+    // Dịch vụ kiên trì
     private transient FunctionalPersistenceService persistenceService;
     private final transient CollectionRequestLookup requestLookup = new CollectionRequestLookup();
     private final transient DebouncedSaveSupport autoSaveSupport = new DebouncedSaveSupport(500, this::saveAsync);
@@ -87,10 +87,10 @@ public class FunctionalPanel extends UiSingletonPanel {
     protected void initUI() {
         setLayout(new BorderLayout());
         ToolWindowSurfaceStyle.applyBackground(this);
-        // 移除硬编码 setPreferredSize，改用最小尺寸约束，让父容器自适应分配
+        // Loại bỏ mã hóa cứng setPreferredSize，Thay vào đó, hãy sử dụng các ràng buộc về kích thước tối thiểu và để vùng chứa chính phân bổ một cách thích ứng
         setMinimumSize(new Dimension(500, 300));
 
-        // 创建主选项卡面板
+        // Tạo bảng tab chính
         mainTabbedPane = new JTabbedPane();
         ToolWindowSurfaceStyle.applyTabbedPaneCard(mainTabbedPane);
         mainTabbedPane.setBorder(BorderFactory.createEmptyBorder());
@@ -119,26 +119,26 @@ public class FunctionalPanel extends UiSingletonPanel {
     }
 
     private JPanel createTopPanel() {
-        // 改用 FlowLayout 弹性布局，避免固定高度
+        // Sử dụng thay thế FlowLayout Bố trí linh hoạt để tránh chiều cao cố định
         JPanel topPanel = new JPanel(new BorderLayout(6, 0));
         topPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 8, 0));
         topPanel.setOpaque(false);
 
-        // 初始化 CSV 数据面板
+        // khởi tạo CSV Bảng dữ liệu
         csvDataPanel = new CsvDataPanel();
         csvDataPanel.setChangeListener(this::scheduleSave);
 
-        // 左侧按钮组
+        // Nhóm nút trái
         topPanel.add(createButtonPanel(), BorderLayout.WEST);
 
-        // 中间 CSV 状态面板（无数据时自然折叠）
+        // giữa CSV Bảng trạng thái (thu gọn tự nhiên khi không có dữ liệu)
         topPanel.add(csvDataPanel, BorderLayout.CENTER);
 
-        // 右侧：执行时间 + 进度（紧凑排列）
+        // Đúng: thời gian thực hiện + Tiến độ (sắp xếp nhỏ gọn)
         JPanel rightPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 8, 0));
         rightPanel.setOpaque(false);
 
-        // 执行时间
+        // Thời gian thực hiện
         timeLabel = new JLabel("0 ms");
         timeLabel.setFont(FontsUtil.getDefaultFont(Font.BOLD));
         JLabel timeIcon = new JLabel(new FlatSVGIcon("icons/time.svg", 16, 16)
@@ -146,12 +146,12 @@ public class FunctionalPanel extends UiSingletonPanel {
         rightPanel.add(timeIcon);
         rightPanel.add(timeLabel);
 
-        // 分隔符
+        // dải phân cách
         JSeparator sep = new JSeparator(SwingConstants.VERTICAL);
         sep.setPreferredSize(new Dimension(1, 16));
         rightPanel.add(sep);
 
-        // 进度
+        // tiến bộ
         progressLabel = new JLabel("0/0");
         progressLabel.setFont(FontsUtil.getDefaultFont(Font.BOLD));
         JLabel taskIcon = new JLabel(new FlatSVGIcon("icons/functional.svg", 16, 16)
@@ -173,7 +173,7 @@ public class FunctionalPanel extends UiSingletonPanel {
         });
 
         stopBtn = new StopButton();
-        stopBtn.setEnabled(false); // 初始禁用，执行时才启用
+        stopBtn.setEnabled(false); // Bị vô hiệu hóa ban đầu và được kích hoạt khi thực thi
         stopBtn.addActionListener(e -> {
             isStopped = true;
             stopBtn.setEnabled(false);
@@ -199,7 +199,7 @@ public class FunctionalPanel extends UiSingletonPanel {
         return ToolWindowActionToolbar.inlineLeft(loadBtn, runBtn, stopBtn, refreshBtn, clearBtn);
     }
 
-    // 批量运行
+    // Chạy theo đợt
     private void runSelectedRequests() {
         isStopped = false;
         int rowCount = tableModel.getRowCount();
@@ -209,7 +209,7 @@ public class FunctionalPanel extends UiSingletonPanel {
             return;
         }
 
-        // 检查是否使用 CSV 数据
+        // Kiểm tra nếu sử dụng CSV dữ liệu
         int iterations = 1;
         if (csvDataPanel.hasData()) {
             iterations = csvDataPanel.getRowCount();
@@ -231,7 +231,7 @@ public class FunctionalPanel extends UiSingletonPanel {
 
         clearRunResults(rowCount);
         runBtn.setEnabled(false);
-        stopBtn.setEnabled(true); // 开始执行时启用 Stop
+        stopBtn.setEnabled(true); // Kích hoạt khi bắt đầu thực hiện Stop
 
         progressLabel.setText("0/" + totalExecutions);
 
@@ -263,24 +263,24 @@ public class FunctionalPanel extends UiSingletonPanel {
         int totalFinished = 0;
 
         for (int iteration = 0; iteration < iterations && isExecutionActive(generation); iteration++) {
-            // 获取当前迭代的 CSV 数据
+            // Lấy lần lặp hiện tại CSV dữ liệu
             Map<String, String> currentCsvRow = getCsvDataForIteration(iteration);
             Map<String, String> currentIterationData = IterationDataRuntimeSupport.prepare(currentCsvRow);
             ExecutionVariableContext iterationContext = new ExecutionVariableContext();
             iterationContext.setIterationInfo(iteration, iterations);
             iterationContext.replaceIterationData(currentIterationData);
 
-            // 创建当前迭代的结果记录
+            // Tạo một bản ghi về kết quả của lần lặp hiện tại
             IterationResult iterationResult = new IterationResult(iteration, currentIterationData);
 
             totalFinished = processIterationRequests(rowCount, selectedCount, iterations, totalFinished,
                     iterationResult, currentIterationData, iterationContext, generation);
 
-            // 完成当前迭代并添加到历史记录（无论是否停止，都要保存当前迭代的结果）
+            // Hoàn thành lần lặp hiện tại và thêm vào lịch sử (lưu kết quả của lần lặp hiện tại dù có dừng hay không)
             iterationResult.complete();
             currentHistory.addIteration(iterationResult);
 
-            // 实时更新结果面板
+            // Cập nhật theo thời gian thực cho bảng kết quả
             SwingUtilities.invokeLater(() -> {
                 if (isExecutionGenerationCurrent(generation)) {
                     resultsPanel.updateExecutionHistory(currentHistory);
@@ -349,7 +349,7 @@ public class FunctionalPanel extends UiSingletonPanel {
             return totalFinished;
         }
 
-        // 找到当前行的索引
+        // Tìm chỉ mục của hàng hiện tại
         int rowIndex = -1;
         for (int i = 0; i < tableModel.getRowCount(); i++) {
             if (tableModel.getRow(i) == row) {
@@ -358,7 +358,7 @@ public class FunctionalPanel extends UiSingletonPanel {
             }
         }
 
-        // 高亮当前执行的行
+        // Đánh dấu dòng hiện đang thực hiện
         final int currentRowIndex = rowIndex;
         if (currentRowIndex >= 0) {
             SwingUtilities.invokeLater(() -> {
@@ -378,7 +378,7 @@ public class FunctionalPanel extends UiSingletonPanel {
             return totalFinished;
         }
 
-        // 更新表格中的执行结果
+        // Cập nhật kết quả thực hiện vào bảng
         if (currentRowIndex >= 0) {
             row.status = result.getStatus();
             row.cost = result.getCost();
@@ -393,7 +393,7 @@ public class FunctionalPanel extends UiSingletonPanel {
             });
         }
 
-        // 记录请求结果到执行历史
+        // Ghi lại kết quả yêu cầu vào lịch sử thực hiện
         RequestResult requestResult = new RequestResult(
                 row.requestItem.getName(),
                 row.requestItem.getMethod(),
@@ -426,16 +426,16 @@ public class FunctionalPanel extends UiSingletonPanel {
             runBtn.setEnabled(true);
             stopBtn.setEnabled(false);
 
-            // 停止计时器
+            // Dừng đồng hồ bấm giờ
             stopExecutionTimer();
 
-            // 最终更新结果面板
+            // Cuối cùng cập nhật bảng kết quả
             resultsPanel.updateExecutionHistory(currentHistory);
 
-            // 无论是正常完成还是用户停止，都切换到结果面板显示已执行的结果
-            mainTabbedPane.setSelectedIndex(1); // 切换到执行结果面板
+            // Cho dù người dùng hoàn thành bình thường hay dừng lại, hãy chuyển sang bảng kết quả để hiển thị kết quả thực hiện
+            mainTabbedPane.setSelectedIndex(1); // Chuyển sang bảng kết quả thực hiện
 
-            // 自动选择第一个迭代节点并展开详细信息
+            // Tự động chọn nút lặp đầu tiên và mở rộng chi tiết
             SwingUtilities.invokeLater(() -> resultsPanel.selectFirstIteration());
         });
     }
@@ -446,21 +446,21 @@ public class FunctionalPanel extends UiSingletonPanel {
         }
     }
 
-    // 更新执行时间显示
+    // Cập nhật hiển thị thời gian thực hiện
     private void updateExecutionTime() {
         long currentTime = System.currentTimeMillis();
         long elapsedTime = currentTime - startTime;
         timeLabel.setText(TimeDisplayUtil.formatElapsedTime(elapsedTime));
     }
 
-    // 重置进度和时间显示
+    // Đặt lại tiến trình và hiển thị thời gian
     private void resetProgress() {
-        // 如果计时器在运行，停止它
+        // Nếu bộ hẹn giờ đang chạy, hãy dừng nó lại
         if (executionTimer != null && executionTimer.isRunning()) {
             executionTimer.stop();
         }
 
-        // 重置标签文本
+        // Đặt lại văn bản nhãn
         timeLabel.setText("0 ms");
         progressLabel.setText("0/0");
     }
@@ -470,19 +470,19 @@ public class FunctionalPanel extends UiSingletonPanel {
         table = new JTable(tableModel) {
             @Override
             public boolean isCellEditable(int row, int column) {
-                return column == 0; // 只允许第一列（选中列）可编辑
+                return column == 0; // Chỉ được phép chỉnh sửa cột đầu tiên (cột đã chọn)
             }
         };
         table.setRowHeight(28);
-        table.setFont(FontsUtil.getDefaultFont(Font.PLAIN)); // 使用用户设置的字体大小
-        table.getTableHeader().setFont(FontsUtil.getDefaultFontWithOffset(Font.BOLD, +1)); // 比标准字体大1号（粗体）
+        table.setFont(FontsUtil.getDefaultFont(Font.PLAIN)); // Sử dụng cỡ chữ do người dùng đặt
+        table.getTableHeader().setFont(FontsUtil.getDefaultFontWithOffset(Font.BOLD, +1)); // Lớn hơn kích thước phông chữ tiêu chuẩn1số (in đậm)
 
-        // 添加表头点击监听器，点击"选择"列表头时全选/反选
+        // Thêm trình nghe nhấp chuột tiêu đề và nhấp chuột"Chọn"Chọn tất cả các tiêu đề danh sách/Cuộc bầu cử phản đối
         table.getTableHeader().addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
                 int column = table.columnAtPoint(e.getPoint());
-                if (column == 0) { // 点击选择列
+                if (column == 0) { // Bấm để chọn một cột
                     boolean hasSelected = tableModel.hasSelectedRows();
                     tableModel.setAllSelected(!hasSelected);
                     scheduleSave();
@@ -501,7 +501,7 @@ public class FunctionalPanel extends UiSingletonPanel {
         table.setDragEnabled(true);
         table.setDropMode(DropMode.INSERT_ROWS);
         TableRowTransferHandler transferHandler = new TableRowTransferHandler(table);
-        transferHandler.setOnRowOrderChanged(this::scheduleSave); // 拖拽完成后自动持久化
+        transferHandler.setOnRowOrderChanged(this::scheduleSave); // Tự động duy trì sau khi kéo xong
         table.setTransferHandler(transferHandler);
 
         JScrollPane scrollPane = new JScrollPane(table);
@@ -511,35 +511,35 @@ public class FunctionalPanel extends UiSingletonPanel {
 
     private void setTableColumnWidths() {
         if (table.getColumnModel().getColumnCount() > 0) {
-            // Select column (✓) - 固定宽度，不需要太宽
+            // Select column (✓) - Chiều rộng cố định, không cần quá rộng
             table.getColumnModel().getColumn(0).setMinWidth(45);
             table.getColumnModel().getColumn(0).setMaxWidth(55);
             table.getColumnModel().getColumn(0).setPreferredWidth(50);
 
-            // Name column - 相对灵活，可以较宽
+            // Name column - Tương đối linh hoạt và có thể rộng hơn
             table.getColumnModel().getColumn(1).setMinWidth(120);
             table.getColumnModel().getColumn(1).setPreferredWidth(180);
 
-            // URL column - 最宽的列，可以占据更多空间
+            // URL column - Cột rộng nhất, có thể chiếm nhiều không gian hơn
             table.getColumnModel().getColumn(2).setMinWidth(150);
             table.getColumnModel().getColumn(2).setPreferredWidth(250);
 
-            // Method column - 需要足够宽度显示 "Method"（6个字符）+ 内容（DELETE最长7个字符）
+            // Method column - Cần đủ chiều rộng để hiển thị "Method"（6ký tự)+ nội dung(DELETEdài nhất7ký tự)
             table.getColumnModel().getColumn(3).setMinWidth(75);
             table.getColumnModel().getColumn(3).setMaxWidth(90);
             table.getColumnModel().getColumn(3).setPreferredWidth(80);
 
-            // Status column - 需要足够宽度显示 "Status"（6个字符）+ 状态码（3位数）
+            // Status column - Cần đủ chiều rộng để hiển thị "Status"（6ký tự)+ Mã trạng thái (3số chữ số)
             table.getColumnModel().getColumn(4).setMinWidth(70);
             table.getColumnModel().getColumn(4).setMaxWidth(85);
             table.getColumnModel().getColumn(4).setPreferredWidth(75);
 
-            // Time column - 需要足够宽度显示 "Time"（4个字符）+ 时间（如 "123 ms"）
+            // Time column - Cần đủ chiều rộng để hiển thị "Time"（4ký tự)+ thời gian (ví dụ: "123 ms"）
             table.getColumnModel().getColumn(5).setMinWidth(75);
             table.getColumnModel().getColumn(5).setMaxWidth(100);
             table.getColumnModel().getColumn(5).setPreferredWidth(85);
 
-            // Result column - 需要足够宽度显示 "Result"（6个字符）+ emoji
+            // Result column - Cần đủ chiều rộng để hiển thị "Result"（6ký tự)+ emoji
             table.getColumnModel().getColumn(6).setMinWidth(65);
             table.getColumnModel().getColumn(6).setMaxWidth(80);
             table.getColumnModel().getColumn(6).setPreferredWidth(70);
@@ -581,35 +581,35 @@ public class FunctionalPanel extends UiSingletonPanel {
     }
 
     /**
-     * 根据状态码应用颜色 - 只设置文字颜色
+     * Áp dụng màu dựa trên mã trạng thái - Chỉ đặt màu văn bản
      */
     private void applyStatusColors(Component c, String status) {
         Color foreground = ModernColors.getTextPrimary();
 
         if (ERROR.equalsIgnoreCase(status)) {
-            // 错误状态：使用错误色
+            // Tình trạng lỗi: Sử dụng sai màu
             foreground = ModernColors.getErrorDark();
         } else {
-            // 尝试解析状态码
+            // Hãy thử phân tích mã trạng thái
             try {
                 int code = Integer.parseInt(status);
                 if (code >= 200 && code < 300) {
-                    // 成功：使用绿色
+                    // Thành công: Sử dụng màu xanh lá cây
                     foreground = ModernColors.getSuccessDark();
                 } else if (code >= 400 && code < 500) {
-                    // 客户端错误：使用警告色
+                    // Lỗi máy khách: sử dụng màu cảnh báo
                     foreground = ModernColors.getWarningDarker();
                 } else if (code >= 500) {
-                    // 服务器错误：使用错误色
+                    // Lỗi máy chủ: Sử dụng sai màu
                     foreground = ModernColors.getErrorDarker();
                 }
             } catch (NumberFormatException e) {
-                // 非数字状态（如错误消息）
+                // Trạng thái không phải là số (chẳng hạn như thông báo lỗi)
                 foreground = ModernColors.getErrorDark();
             }
 
         }
-        // 只设置文字颜色
+        // Chỉ đặt màu văn bản
         c.setForeground(foreground);
     }
 
@@ -640,17 +640,17 @@ public class FunctionalPanel extends UiSingletonPanel {
     @Override
     protected void registerListeners() {
         RequestSaveEventPublisher.register(this::syncRequestItem);
-        // 添加表格鼠标监听器
+        // Thêm trình nghe chuột bảng
         table.addMouseListener(new java.awt.event.MouseAdapter() {
             @Override
             public void mouseClicked(java.awt.event.MouseEvent e) {
                 int row = table.rowAtPoint(e.getPoint());
                 if (row < 0) return;
 
-                if (SwingUtilities.isRightMouseButton(e)) { // 右键 - 只显示菜单
+                if (SwingUtilities.isRightMouseButton(e)) { // Nhấp chuột phải - Chỉ có menu được hiển thị
                     table.setRowSelectionInterval(row, row);
                     showTableContextMenu(e, row);
-                } else if (e.getClickCount() == 2 && SwingUtilities.isLeftMouseButton(e)) { // 左键双击
+                } else if (e.getClickCount() == 2 && SwingUtilities.isLeftMouseButton(e)) { // Nhấp đúp chuột trái
                     showRequestDetail(row);
                 }
             }
@@ -658,17 +658,17 @@ public class FunctionalPanel extends UiSingletonPanel {
     }
 
     /**
-     * 显示请求详情
+     * Hiển thị chi tiết yêu cầu
      */
     private void showRequestDetail(int rowIndex) {
         RunnerRowData row = tableModel.getRow(rowIndex);
         if (row != null && row.requestItem != null) {
-            // 打开请求编辑面板
+            // Mở bảng chỉnh sửa yêu cầu
             RequestEditorPanel editPanel =
                     UiSingletonFactory.getInstance(RequestEditorPanel.class);
             editPanel.showOrCreateTab(row.requestItem);
 
-            // 切换到Collections标签
+            // Chuyển sangCollectionsNhãn
             SidebarTabPanel sidebarPanel =
                     UiSingletonFactory.getInstance(SidebarTabPanel.class);
             sidebarPanel.getTabbedPane().setSelectedIndex(0);
@@ -676,21 +676,21 @@ public class FunctionalPanel extends UiSingletonPanel {
     }
 
     /**
-     * 显示表格右键菜单
+     * Hiển thị bảng menu chuột phải
      */
     private void showTableContextMenu(java.awt.event.MouseEvent e, int rowIndex) {
         JPopupMenu menu = new JPopupMenu();
         ToolWindowSurfaceStyle.applyPopupMenuCard(menu);
         RunnerRowData row = tableModel.getRow(rowIndex);
 
-        // 查看详情
+        // Xem chi tiết
         JMenuItem viewItem = new JMenuItem(I18nUtil.getMessage(MessageKeys.FUNCTIONAL_MENU_VIEW_DETAIL));
         viewItem.addActionListener(evt -> showRequestDetail(rowIndex));
         menu.add(viewItem);
 
         menu.addSeparator();
 
-        // 勾选 / 取消勾选
+        // Kiểm tra / Bỏ chọn
         if (row != null) {
             String toggleText = row.selected
                     ? I18nUtil.getMessage(MessageKeys.FUNCTIONAL_MENU_UNCHECK)
@@ -706,7 +706,7 @@ public class FunctionalPanel extends UiSingletonPanel {
 
         menu.addSeparator();
 
-        // 上移
+        // Di chuyển lên
         JMenuItem upItem = new JMenuItem(I18nUtil.getMessage(MessageKeys.FUNCTIONAL_MENU_MOVE_UP));
         upItem.setEnabled(rowIndex > 0);
         upItem.addActionListener(evt -> {
@@ -716,7 +716,7 @@ public class FunctionalPanel extends UiSingletonPanel {
         });
         menu.add(upItem);
 
-        // 下移
+        // Di chuyển xuống
         JMenuItem downItem = new JMenuItem(I18nUtil.getMessage(MessageKeys.FUNCTIONAL_MENU_MOVE_DOWN));
         downItem.setEnabled(rowIndex < tableModel.getRowCount() - 1);
         downItem.addActionListener(evt -> {
@@ -728,7 +728,7 @@ public class FunctionalPanel extends UiSingletonPanel {
 
         menu.addSeparator();
 
-        // 移除当前行
+        // Xóa hàng hiện tại
         JMenuItem deleteItem = new JMenuItem(I18nUtil.getMessage(MessageKeys.FUNCTIONAL_MENU_REMOVE));
         deleteItem.addActionListener(evt -> {
             tableModel.removeRow(rowIndex);
@@ -742,12 +742,12 @@ public class FunctionalPanel extends UiSingletonPanel {
         menu.show(e.getComponent(), e.getX(), e.getY());
     }
 
-    // 弹出选择请求/分组对话框
+    // Một yêu cầu lựa chọn bật lên/Hộp thoại nhóm
     private void showLoadRequestsDialog() {
         RequestSelectionDialogSupport.showMultiSelectRequestDialog(
                 selected -> {
                     if (selected == null || selected.isEmpty()) return;
-                    // 过滤只保留HTTP类型的请求
+                    // Lọc để chỉ giữ lạiHTTPloại yêu cầu
                     List<HttpRequestItem> httpOnlyList = selected.stream()
                             .filter(reqItem -> reqItem.getProtocol() != null && reqItem.getProtocol().isHttpProtocol())
                             .toList();
@@ -760,9 +760,9 @@ public class FunctionalPanel extends UiSingletonPanel {
         );
     }
 
-    // 加载选中的请求到表格
+    // Tải các yêu cầu đã chọn vào bảng
     public void loadRequests(List<HttpRequestItem> requests) {
-        // 构建已有请求的 ID 集合，用于去重
+        // Xây dựng đã được yêu cầu ID Bộ sưu tập, được sử dụng để chống trùng lặp
         Set<String> existingIds = tableModel.getAllRows().stream()
                 .filter(r -> r != null && r.requestItem != null && r.requestItem.getId() != null)
                 .map(r -> r.requestItem.getId())
@@ -772,11 +772,11 @@ public class FunctionalPanel extends UiSingletonPanel {
         for (HttpRequestItem item : requests) {
             if (item.getId() != null && existingIds.contains(item.getId())) {
                 skippedCount++;
-                continue; // 跳过已存在的请求，避免重复
+                continue; // Bỏ qua các yêu cầu hiện có để tránh trùng lặp
             }
             tableModel.addRow(new RunnerRowData(item));
             if (item.getId() != null) {
-                existingIds.add(item.getId()); // 同批次中也去重
+                existingIds.add(item.getId()); // Các bản sao cũng bị loại bỏ khỏi cùng một đợt
             }
         }
 
@@ -786,12 +786,12 @@ public class FunctionalPanel extends UiSingletonPanel {
 
         table.setEnabled(true);
         runBtn.setEnabled(true);
-        // 加载请求后保存配置
+        // Lưu cấu hình sau khi tải yêu cầu
         scheduleSave();
     }
 
     /**
-     * 加载保存的配置
+     * Tải cấu hình đã lưu
      */
     private void loadSaved() {
         try {
@@ -819,7 +819,7 @@ public class FunctionalPanel extends UiSingletonPanel {
         executionGeneration++;
         isStopped = true;
         stopExecutionTimer();
-        // 切换 workspace 前取消待保存任务，避免旧 workspace 的 CSV/行配置延迟写到新 workspace。
+        // chuyển đổi workspace Hủy các tác vụ đang chờ xử lý trước khi lưu để tránh những tác vụ cũ workspace của CSV/Cấu hình hàng được ghi thành mới với độ trễ workspace。
         autoSaveSupport.cancel();
         tableModel.clear();
         table.clearSelection();
@@ -847,10 +847,10 @@ public class FunctionalPanel extends UiSingletonPanel {
     }
 
     /**
-     * 同步最新的 HttpRequestItem 到表格中对应的行（由 Collections 保存时调用）
-     * 避免用户在 editSubPanel 修改并保存后，FunctionalPanel 仍持有旧数据。
+     * Đồng bộ hóa mới nhất HttpRequestItem đến hàng tương ứng trong bảng (bằng  Collections được gọi khi lưu)
+     * Tránh người dùng editSubPanel Sau khi sửa đổi và lưu,FunctionalPanel Dữ liệu cũ vẫn được giữ lại.
      *
-     * @param item 已保存的最新请求数据
+     * @param item Dữ liệu yêu cầu đã lưu mới nhất
      */
     public void syncRequestItem(HttpRequestItem item) {
         if (item == null || item.getId() == null) return;
@@ -869,7 +869,7 @@ public class FunctionalPanel extends UiSingletonPanel {
     }
 
     /**
-     * 保存当前配置
+     * Lưu cấu hình hiện tại
      */
     public void save() {
         try {
@@ -887,7 +887,7 @@ public class FunctionalPanel extends UiSingletonPanel {
     }
 
     private void scheduleSave() {
-        // 表格和 CSV 面板变更较频繁，统一走防抖保存，降低连续编辑时的落盘压力。
+        // Bảng và CSV Việc thay đổi bảng điều khiển diễn ra thường xuyên và tính năng lưu chống rung được thực hiện một cách thống nhất nhằm giảm áp lực tải trong quá trình chỉnh sửa liên tục.
         autoSaveSupport.requestSave();
     }
 
@@ -962,8 +962,8 @@ public class FunctionalPanel extends UiSingletonPanel {
     }
 
     /**
-     * 从集合中刷新请求数据
-     * 重新加载所有请求的最新配置
+     * Làm mới dữ liệu yêu cầu từ bộ sưu tập
+     * Tải lại cấu hình mới nhất cho tất cả các yêu cầu
      */
     private void refreshRequestsFromCollections() {
         List<RunnerRowData> currentRows = tableModel.getAllRows();
@@ -984,16 +984,16 @@ public class FunctionalPanel extends UiSingletonPanel {
                 continue;
             }
 
-            // 通过ID从集合中查找最新的请求配置
+            // vượt quaIDTìm cấu hình yêu cầu mới nhất từ bộ sưu tập
             HttpRequestItem latestRequestItem = requestLookup.findRequestItemById(row.requestItem.getId()).orElse(null);
 
             if (latestRequestItem == null) {
-                // 请求在集合中已被删除
+                // Yêu cầu đã bị xóa khỏi bộ sưu tập
                 log.warn("Request with ID {} not found in collections", row.requestItem.getId());
                 rowsToRemove.add(i);
                 removedCount++;
             } else {
-                // 更新请求数据
+                // Cập nhật dữ liệu yêu cầu
                 try {
                     row.requestItem = latestRequestItem;
                     row.name = latestRequestItem.getName();
@@ -1006,23 +1006,23 @@ public class FunctionalPanel extends UiSingletonPanel {
             }
         }
 
-        // 移除不存在的请求（从后往前删除，避免索引变化）
+        // Xóa các yêu cầu không tồn tại (xóa từ sau ra trước để tránh thay đổi chỉ mục)
         for (int i = rowsToRemove.size() - 1; i >= 0; i--) {
             tableModel.removeRow(rowsToRemove.get(i));
         }
 
-        // 刷新表格显示
+        // Làm mới màn hình bảng
         tableModel.fireTableDataChanged();
 
-        // 保存更新后的配置
+        // Lưu cấu hình đã cập nhật
         scheduleSave();
 
-        // 更新按钮状态
+        // Cập nhật trạng thái nút
         if (tableModel.getRowCount() == 0) {
             runBtn.setEnabled(false);
         }
 
-        // 显示刷新结果
+        // Hiển thị kết quả làm mới
         if (removedCount > 0) {
             NotificationCenter.showWarning(I18nUtil.getMessage(MessageKeys.FUNCTIONAL_MSG_REFRESH_WARNING, removedCount));
         } else {

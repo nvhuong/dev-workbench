@@ -1,18 +1,18 @@
 {
 	"project_id": "test123",
-	"name": "ApiPost测试集合",
-	"intro": "用于单元测试的简化版ApiPost集合",
+	"name": "ApiPostBộ sưu tập thử nghiệm",
+	"intro": "Một phiên bản đơn giản hóa để thử nghiệm đơn vịApiPosttập trung",
 	"global": {
 		"envs": [
 			{
 				"env_id": "1",
-				"name": "默认环境",
+				"name": "Môi trường mặc định",
 				"is_private": -1,
 				"sort": 0,
 				"server_list": [
 					{
 						"server_id": "1",
-						"name": "默认服务",
+						"name": "Dịch vụ mặc định",
 						"sort": 0,
 						"uri": ""
 					}
@@ -23,7 +23,7 @@
 		"servers": [
 			{
 				"server_id": "1",
-				"name": "默认服务",
+				"name": "Dịch vụ mặc định",
 				"sort": 1000
 			}
 		],
@@ -64,14 +64,14 @@
 			"project_id": "test123",
 			"parent_id": "0",
 			"target_type": "api",
-			"name": "获取用户列表",
+			"name": "Lấy danh sách người dùng",
 			"version": 1,
 			"sort": 100,
 			"method": "GET",
 			"url": "https://api.example.com/users",
 			"protocol": "http/1.1",
 			"mark_id": "1",
-			"description": "获取所有用户",
+			"description": "Nhận tất cả người dùng",
 			"request": {
 				"auth": {
 					"type": "basic",
@@ -131,11 +131,11 @@
 			"project_id": "test123",
 			"parent_id": "0",
 			"target_type": "folder",
-			"name": "用户管理",
+			"name": "Quản lý người dùng",
 			"version": 1,
 			"sort": 200,
 			"server_id": "0",
-			"description": "用户管理相关接口",
+			"description": "Giao diện liên quan đến quản lý người dùng",
 			"request": {
 				"auth": {
 					"type": "inherit",
@@ -172,14 +172,14 @@
 			"project_id": "test123",
 			"parent_id": "folder001",
 			"target_type": "api",
-			"name": "创建用户",
+			"name": "Tạo người dùng",
 			"version": 1,
 			"sort": 300,
 			"method": "POST",
 			"url": "https://api.example.com/users",
 			"protocol": "http/1.1",
 			"mark_id": "1",
-			"description": "创建新用户",
+			"description": "Tạo người dùng mới",
 			"request": {
 				"auth": {
 					"type": "inherit",
@@ -222,7 +222,7 @@
 				"example": [
 					{
 						"expect": {
-							"name": "成功响应",
+							"name": "Phản hồi thành công",
 							"code": "200",
 							"content_type": "json"
 						},
@@ -242,14 +242,14 @@
 			"project_id": "test123",
 			"parent_id": "folder001",
 			"target_type": "api",
-			"name": "更新用户",
+			"name": "Cập nhật người dùng",
 			"version": 1,
 			"sort": 400,
 			"method": "PUT",
 			"url": "https://api.example.com/users/{{userId}}",
 			"protocol": "http/1.1",
 			"mark_id": "1",
-			"description": "更新用户信息",
+			"description": "Cập nhật thông tin người dùng",
 			"request": {
 				"auth": {
 					"type": "bearer",
@@ -304,11 +304,11 @@
 			"project_id": "test123",
 			"parent_id": "0",
 			"target_type": "folder",
-			"name": "订单管理",
+			"name": "Quản lý đơn hàng",
 			"version": 1,
 			"sort": 500,
 			"server_id": "0",
-			"description": "订单相关接口",
+			"description": "Giao diện liên quan đến đơn hàng",
 			"request": {
 				"auth": {
 					"type": "bearer",
@@ -345,14 +345,14 @@
 			"project_id": "test123",
 			"parent_id": "folder002",
 			"target_type": "api",
-			"name": "查询订单",
+			"name": "Kiểm tra thứ tự",
 			"version": 1,
 			"sort": 600,
 			"method": "GET",
 			"url": "https://api.example.com/orders/{{orderId}}",
 			"protocol": "http/1.1",
 			"mark_id": "1",
-			"description": "根据ID查询订单",
+			"description": "theoIDKiểm tra thứ tự",
 			"request": {
 				"auth": {
 					"type": "inherit",

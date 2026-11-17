@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.function.Consumer;
 
 /**
- * 侧边栏底部操作区，只负责组件创建和状态刷新。
+ * Vùng thao tác ở cuối thanh bên chỉ chịu trách nhiệm tạo thành phần và làm mới trạng thái.
  */
 final class SidebarBottomBar {
     private static final String TOOLTIP_COLLAPSE_SIDEBAR = "Collapse sidebar";

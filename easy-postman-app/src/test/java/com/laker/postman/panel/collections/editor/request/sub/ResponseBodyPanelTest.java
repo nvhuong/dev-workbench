@@ -93,7 +93,7 @@ public class ResponseBodyPanelTest extends AbstractSwingUiTest {
         JPopupMenu popupMenu = panel.getResponseBodyPane().getPopupMenu();
 
         assertFalse(hasAnyMenuItem(popupMenu, "Undo", "Can't Redo", "Cut", "Paste", "Delete",
-                "撤销", "无法恢复", "剪切", "粘贴", "删除"));
+                "Hoàn tác", "Không thể phục hồi", "Cắt", "Dán", "xóa bỏ"));
         assertTrue(hasMenuItem(popupMenu, UiI18n.get(UiMessageKeys.EDITOR_POPUP_COPY_SELECTED)));
         assertTrue(hasMenuItem(popupMenu, UiI18n.get(UiMessageKeys.EDITOR_POPUP_COPY_ALL)));
         assertTrue(hasMenuItem(popupMenu, UiI18n.get(UiMessageKeys.EDITOR_POPUP_SELECT_ALL)));
@@ -351,9 +351,9 @@ public class ResponseBodyPanelTest extends AbstractSwingUiTest {
 
     @Test
     public void shouldWriteResponseBodyInsteadOfFormattedEditorText() throws Exception {
-        String json = "{\"b\":1,\"a\":\"中文\"}";
+        String json = "{\"b\":1,\"a\":\"Tiếng Trung Quốc\"}";
         ResponseBodyPanel panel = createPanelWithResponse(responseWithBody(json));
-        SwingUtilities.invokeAndWait(() -> panel.getResponseBodyPane().setText("{\n  \"a\": \"中文\"\n}"));
+        SwingUtilities.invokeAndWait(() -> panel.getResponseBodyPane().setText("{\n  \"a\": \"Tiếng Trung Quốc\"\n}"));
         Path target = Files.createTempFile("easy-postman-response-", ".json");
         try {
             panel.writeResponseBody(target.toFile());

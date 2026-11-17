@@ -5,9 +5,9 @@ import javax.swing.Timer;
 import java.util.Objects;
 
 /**
- * Swing 场景下的防抖保存辅助类。
+ * Swing Lớp phụ trợ tiết kiệm chống rung tại hiện trường.
  * <p>
- * 所有 Timer 操作都收敛到 EDT，避免 UI 事件连续触发时频繁落盘。
+ * Tất cả Timer Hoạt động đã hội tụ EDT，tránh UI Lệnh được đặt thường xuyên khi sự kiện được kích hoạt liên tục.
  */
 public class DebouncedSaveSupport {
     private final Timer timer;

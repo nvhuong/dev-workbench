@@ -7,10 +7,10 @@ import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 /**
- * 插件贡献注册辅助工具。
+ * Hỗ trợ đăng ký đóng góp plug-in.
  * <p>
- * 把多个官方插件里重复出现的注册样板代码收敛到一起，
- * 让插件入口类更聚焦在“声明自己提供哪些能力”。
+ * Tập hợp các mã mẫu đăng ký xuất hiện lặp đi lặp lại trong nhiều plugin chính thức.
+ * Hãy để lớp mục nhập plug-in được tập trung hơn“Tuyên bố những khả năng bạn cung cấp”。
  * </p>
  */
 public final class PluginContributionSupport {

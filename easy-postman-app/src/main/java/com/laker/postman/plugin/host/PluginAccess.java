@@ -13,10 +13,10 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * app 层访问插件运行时能力的统一入口。
+ * app Một điểm vào thống nhất để truy cập lớp vào các khả năng thời gian chạy của trình cắm thêm.
  * <p>
- * UI、脚本上下文、宿主服务适配都通过这里拿插件贡献，避免在各处直接耦合 PluginRuntime。
- * 后续如果运行时实现调整，这里可以作为唯一收口点。
+ * UI、Bối cảnh tập lệnh và việc điều chỉnh dịch vụ máy chủ đều được đóng góp bởi các phần bổ trợ ở đây để tránh sự ghép nối trực tiếp ở mọi nơi PluginRuntime。
+ * Nếu các điều chỉnh được thực hiện trong thời gian chạy sau đó thì điều này có thể được sử dụng làm điểm kết thúc duy nhất.
  * </p>
  */
 public final class PluginAccess {

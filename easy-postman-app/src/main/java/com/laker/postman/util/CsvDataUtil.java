@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * CSV 数据处理工具类
+ * CSV Lớp công cụ xử lý dữ liệu
  */
 @Slf4j
 @UtilityClass
@@ -26,21 +26,21 @@ public class CsvDataUtil {
     }
 
     /**
-     * 读取 CSV 文件数据
+     * Đọc CSV Dữ liệu tập tin
      *
-     * @param csvFile CSV 文件
-     * @return 数据列表，每行数据用 Map 表示
+     * @param csvFile CSV tập tin
+     * @return Danh sách dữ liệu, được sử dụng cho từng hàng dữ liệu Map bày tỏ
      */
     public static List<Map<String, String>> readCsvData(File csvFile) {
         if (csvFile == null || !csvFile.exists() || !csvFile.isFile()) {
-            log.warn("CSV 文件不存在或无效: {}", csvFile);
+            log.warn("CSV Tệp không tồn tại hoặc không hợp lệ: {}", csvFile);
             return new ArrayList<>();
         }
 
         try {
             String content = FileUtil.readString(csvFile, StandardCharsets.UTF_8);
             if (content == null || content.trim().isEmpty()) {
-                log.warn("CSV 文件内容为空: {}", csvFile.getAbsolutePath());
+                log.warn("CSV Nội dung tập tin trống: {}", csvFile.getAbsolutePath());
                 return new ArrayList<>();
             }
 
@@ -48,14 +48,14 @@ public class CsvDataUtil {
             List<String> headers = csvTextData.headers();
             List<List<String>> rows = csvTextData.rows();
             if (headers.isEmpty()) {
-                log.warn("CSV 文件没有数据行: {}", csvFile.getAbsolutePath());
+                log.warn("CSV Tệp không có dòng dữ liệu: {}", csvFile.getAbsolutePath());
                 return new ArrayList<>();
             }
 
             List<Map<String, String>> dataList = new ArrayList<>();
 
             for (List<String> row : rows) {
-                // 使用LinkedHashMap保持列的顺序
+                // sử dụngLinkedHashMapGiữ thứ tự các cột
                 Map<String, String> rowData = new LinkedHashMap<>();
 
                 for (int j = 0; j < headers.size() && j < row.size(); j++) {
@@ -67,20 +67,20 @@ public class CsvDataUtil {
                 dataList.add(rowData);
             }
 
-            log.debug("成功读取 CSV 文件: {}, 数据行数: {}", csvFile.getAbsolutePath(), dataList.size());
+            log.debug("Đọc thành công CSV tập tin: {}, Số lượng hàng dữ liệu: {}", csvFile.getAbsolutePath(), dataList.size());
             return dataList;
 
         } catch (Exception e) {
-            log.error("读取 CSV 文件失败: {}", csvFile.getAbsolutePath(), e);
+            log.error("Đọc CSV Tệp không thành công: {}", csvFile.getAbsolutePath(), e);
             return new ArrayList<>();
         }
     }
 
     /**
-     * 验证 CSV 文件格式
+     * Xác minh CSV Định dạng tập tin
      *
-     * @param csvFile CSV 文件
-     * @return 验证结果信息
+     * @param csvFile CSV tập tin
+     * @return Thông tin kết quả xác minh
      */
     public static String validateCsvFile(File csvFile) {
         if (csvFile == null || !csvFile.exists()) {
@@ -108,10 +108,10 @@ public class CsvDataUtil {
     }
 
     /**
-     * 获取 CSV 文件的列头信息
+     * Lấy CSV Thông tin tiêu đề cột của tập tin
      *
-     * @param csvFile CSV 文件
-     * @return 列头列表
+     * @param csvFile CSV tập tin
+     * @return Danh sách các tiêu đề cột
      */
     public static List<String> getCsvHeaders(File csvFile) {
         try {
@@ -122,14 +122,14 @@ public class CsvDataUtil {
 
             return parseCsvText(content).headers();
         } catch (Exception e) {
-            log.error("获取 CSV 列头失败: {}", csvFile.getAbsolutePath(), e);
+            log.error("Lấy CSV Tiêu đề cột không thành công: {}", csvFile.getAbsolutePath(), e);
             return new ArrayList<>();
         }
     }
 
     /**
-     * 解析标准逗号分隔的 CSV 文本。
-     * 第一行作为列头，后续各行为数据行。
+     * Phân tách bằng dấu phẩy chuẩn CSV văn bản.
+     * Hàng đầu tiên đóng vai trò là tiêu đề cột và các hàng tiếp theo đóng vai trò là hàng dữ liệu.
      */
     public static CsvTextData parseCsvText(String content) {
         if (content == null || content.trim().isEmpty()) {

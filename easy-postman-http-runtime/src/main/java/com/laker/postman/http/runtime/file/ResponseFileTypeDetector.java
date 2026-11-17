@@ -15,18 +15,18 @@ import java.util.zip.DataFormatException;
 import java.util.zip.Inflater;
 
 /**
- * 根据响应体开头的字节识别文件类型，结果只用于界面提示和默认文件名。
+ * Loại tệp được xác định dựa trên các byte ở đầu phần nội dung phản hồi và kết quả chỉ được sử dụng cho lời nhắc giao diện và tên tệp mặc định.
  * <p>
- * 只看文件头和开头一小段内容（最多 {@link #HEAD_BYTES} 字节），不遍历压缩包目录或复合文档结构：识别不了时返回 {@code null}，
- * 任何异常都不会抛出。下载始终保存原始字节，与识别结果无关。
+ * Chỉ nhìn vào tiêu đề tập tin và một đoạn nhỏ ở đầu (nhiều nhất là  {@link #HEAD_BYTES} byte), không đi qua thư mục gói nén hoặc cấu trúc tài liệu phức hợp: nó sẽ được trả về nếu không thể xác định được {@code null}，
+ * Không có ngoại lệ sẽ được ném. Tải xuống luôn lưu byte thô, bất kể kết quả nhận dạng.
  * </p>
  */
 @UtilityClass
 public class ResponseFileTypeDetector {
 
-    /** 识别时最多查看的字节数。 */
+    /** The maximum number of bytes viewed during identification. */
     static final int HEAD_BYTES = 64 * 1024;
-    /** WHATWG MIME Sniffing 判断二进制时查看的字节数。 */
+    /** WHATWG MIME Sniffing Số byte cần xem xét khi đánh giá nhị phân. */
     private static final int BINARY_SNIFF_BYTES = 1445;
 
     private static final byte[] PDF = ascii("%PDF-");
@@ -49,7 +49,7 @@ public class ResponseFileTypeDetector {
     private static final byte[] UTF16_BE_BOM = {(byte) 0xFE, (byte) 0xFF};
     private static final byte[] UTF16_LE_BOM = {(byte) 0xFF, (byte) 0xFE};
 
-    /** Office Open XML：ZIP 中的条目名紧跟在本地文件头之后，按名称即可区分。 */
+    /** Office Open XML：ZIP Tên mục nhập theo sau tiêu đề tệp cục bộ và có thể được phân biệt theo tên. */
     private static final byte[] OOXML_CONTENT_TYPES = ascii("[Content_Types].xml");
     private static final byte[][] OOXML_PARTS = {
             ascii("xl/workbook.bin"), ascii("xl/workbook.xml"), ascii("word/document.xml"), ascii("ppt/presentation.xml")
@@ -58,7 +58,7 @@ public class ResponseFileTypeDetector {
 
     private static final byte[] OFD_ENTRY = ascii("OFD.xml");
 
-    /** OOXML：[Content_Types].xml 中主部件的内容类型，可确定标准格式及宏/模板变体。 */
+    /** OOXML：[Content_Types].xml Loại nội dung của thành phần chính, xác định các định dạng và macro tiêu chuẩn/Các biến thể của mẫu. */
     private static final Map<String, String> OOXML_MAIN_TYPES = Map.ofEntries(
             Map.entry("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml", ".xlsx"),
             Map.entry("application/vnd.ms-excel.sheet.binary.macroEnabled.main", ".xlsb"),
@@ -77,23 +77,23 @@ public class ResponseFileTypeDetector {
             Map.entry("application/vnd.openxmlformats-officedocument.presentationml.template.main+xml", ".potx"),
             Map.entry("application/vnd.ms-powerpoint.template.macroEnabled.main+xml", ".potm"));
 
-    /** ODF/EPUB：规范要求第一个条目是未压缩的 mimetype 文件，其内容按 {@link FileExtensionUtil} 映射扩展名。 */
+    /** ODF/EPUB：Đặc điểm kỹ thuật yêu cầu mục đầu tiên không được nén mimetype tập tin và nội dung của nó {@link FileExtensionUtil} Phần mở rộng bản đồ. */
     private static final byte[] ODF_MIMETYPE_ENTRY = ascii("mimetype");
 
-    /** 旧版 Office 复合文档（OLE2）：流名以 UTF-16LE 存放在目录中；Book 是 Excel 5/95 的工作簿流。 */
+    /** Phiên bản cũ Office Tài liệu tổng hợp (OLE2）：Nổi tiếng vì UTF-16LE Được lưu trữ trong thư mục;Book Vâng Excel 5/95 luồng sổ làm việc. */
     private static final byte[][] OLE2_STREAMS = {
             utf16le("WordDocument"), utf16le("PowerPoint Document"), utf16le("Workbook"), utf16le("Book")
     };
     private static final String[] OLE2_EXTENSIONS = {".doc", ".ppt", ".xls", ".xls"};
 
-    /** OOXML 共有的基础扩展名，用于列出容器兼容的后缀。 */
+    /** OOXML Phần mở rộng cơ sở phổ biến được sử dụng để liệt kê các hậu tố tương thích với vùng chứa. */
     private static final Set<String> OOXML_EXTENSIONS_ALL = Set.of(
             ".xlsx", ".xlsm", ".xlsb", ".xltx", ".xltm", ".xlam", ".docx", ".docm", ".dotx", ".dotm",
             ".pptx", ".pptm", ".ppsx", ".ppsm", ".potx", ".potm");
 
     /**
-     * 只识别到通用容器时，可以保留的已有扩展名（允许列表）：这些格式本身就是 ZIP / OLE2 容器，
-     * 文件头无法进一步区分。其余后缀（.yaml/.exe/.mp4/.png 等）都以识别结果为准。
+     * Các tiện ích mở rộng hiện có có thể được giữ lại (danh sách được phép) khi chỉ các vùng chứa chung được nhận dạng: chính các định dạng này ZIP / OLE2 thùng chứa,
+     * Tiêu đề tập tin không thể được phân biệt thêm. Các hậu tố còn lại (.yaml/.exe/.mp4/.png v.v.) phải tuân theo kết quả công nhận.
      */
     private static final Map<String, Set<String>> CONTAINER_COMPATIBLE = Map.of(
             ".zip", union(OOXML_EXTENSIONS_ALL, Set.of(
@@ -102,19 +102,19 @@ public class ResponseFileTypeDetector {
                     ".epub", ".ofd", ".xps", ".oxps", ".3mf", ".kmz", ".cbz", ".sketch", ".xmind", ".idml",
                     ".pbix", ".pbit", ".twbx", ".hwpx", ".usdz", ".pages", ".numbers", ".key",
                     ".odt", ".ods", ".odp", ".odg", ".odc", ".odf", ".odb", ".odm", ".ott", ".ots", ".otp", ".otg")),
-            // OLE2：Outlook 邮件、安装包、Visio/Publisher/Project、WPS/韩文 Office，以及加密后的 OOXML
+            // OLE2：Outlook Email, gói cài đặt,Visio/Publisher/Project、WPS/Hàn Quốc Office，Và được mã hóa OOXML
             ".bin", union(OOXML_EXTENSIONS_ALL, Set.of(
                     ".msg", ".msi", ".msp", ".vsd", ".pub", ".mpp", ".wps", ".et", ".dps", ".hwp",
                     ".doc", ".dot", ".xls", ".xlt", ".xla", ".ppt", ".pps", ".pot")));
 
-    /** 同一格式的不同写法，始终保留已有扩展名。 */
+    /** Các cách viết khác nhau có cùng định dạng luôn giữ lại phần mở rộng hiện có. */
     private static final Map<String, Set<String>> SYNONYMS = Map.of(
             ".jpg", Set.of(".jpeg", ".jpe", ".jfif"),
             ".gz", Set.of(".tgz", ".gzip"));
 
     /**
-     * Office 宏/模板变体：识别结果未确认（只按关键字认出基础格式 .xlsx、或 OLE2 的 .xls）时，
-     * 保留更具体的已有扩展名（.xlsm）；已由 [Content_Types].xml 确认时以识别结果为准。
+     * Office Vĩ mô/Biến thể mẫu: Kết quả nhận dạng không được xác nhận (chỉ định dạng cơ bản được nhận dạng theo từ khóa .xlsx、hoặc OLE2 của .xls）giờ,
+     * Giữ các tiện ích mở rộng hiện có cụ thể hơn (.xlsm）；Đã thực hiện [Content_Types].xml Kết quả nhận dạng sẽ được ưu tiên áp dụng khi xác nhận.
      */
     private static final Map<String, Set<String>> OFFICE_VARIANTS = Map.of(
             ".xlsx", Set.of(".xlsm", ".xltx", ".xltm", ".xlam"),
@@ -125,24 +125,24 @@ public class ResponseFileTypeDetector {
             ".ppt", Set.of(".pps", ".pot"));
 
     /**
-     * 识别结果。
+     * Recognition results.
      *
-     * @param extension 识别出的扩展名（含点）
-     * @param exact     是否已确定到具体子类型；为 {@code false} 时可能是更具体的 Office 宏/模板变体
+     * @param extension Recognized extension (including dot)
+     * @param exact     Liệu loại phụ cụ thể đã được xác định hay chưa; vâng {@code false} có thể cụ thể hơn Office Vĩ mô/Các biến thể của mẫu
      */
     public record Detection(String extension, boolean exact) {
     }
 
     /**
-     * 返回识别出的扩展名（含点），无法确定时返回 {@code null}。
-     * ZIP、OLE2 无法确定具体文档类型时分别返回 {@code .zip}、{@code .bin}。
+     * Trả về phần mở rộng được nhận dạng (bao gồm cả dấu chấm), nếu không thể xác định được {@code null}。
+     * ZIP、OLE2 Nếu không thể xác định được loại tài liệu cụ thể, nó sẽ được trả về riêng {@code .zip}、{@code .bin}。
      */
     public static String detectExtension(byte[] bytes) {
         return extensionOf(detect(bytes));
     }
 
     /**
-     * 识别内容，无法确定时返回 {@code null}，不会抛出异常。
+     * Xác định nội dung và trả lại nếu không thể xác định được {@code null}，Không có ngoại lệ sẽ được ném.
      */
     public static Detection detect(byte[] bytes) {
         if (bytes == null || bytes.length < 3) {
@@ -156,14 +156,14 @@ public class ResponseFileTypeDetector {
     }
 
     /**
-     * 识别已落盘的响应文件，只读取开头 {@link #HEAD_BYTES} 字节；读取失败时返回 {@code null}。
+     * Identify the response file that has been placed on disk and only read the beginning {@link #HEAD_BYTES} Byte; được trả về nếu đọc không thành công {@code null}。
      */
     public static String detectExtension(Path file) {
         return extensionOf(detect(file));
     }
 
     /**
-     * 识别已落盘的响应文件，只读取开头 {@link #HEAD_BYTES} 字节；读取失败时返回 {@code null}。
+     * Identify the response file that has been placed on disk and only read the beginning {@link #HEAD_BYTES} Byte; được trả về nếu đọc không thành công {@code null}。
      */
     public static Detection detect(Path file) {
         if (file == null) {
@@ -181,13 +181,13 @@ public class ResponseFileTypeDetector {
     }
 
     /**
-     * 调和已有扩展名（来自 Content-Type 或 URL）与文件头识别结果，返回应使用的扩展名：
+     * Blend đã có phần mở rộng (từ  Content-Type hoặc URL）Với kết quả nhận dạng tiêu đề tệp, hãy trả về phần mở rộng nên sử dụng:
      * <ul>
-     *     <li>两者一致或互为同一格式的写法（.jpeg/.jpg），保留已有扩展名</li>
-     *     <li>识别结果未确认子类型、已有扩展名是其宏/模板变体（识别 .xlsx、已有 .xlsm）时，保留已有扩展名</li>
-     *     <li>只识别到通用容器（.zip/.bin）时，仅保留允许列表中的容器格式（.jar、.docx、.msg 等）</li>
-     *     <li>其余情况以文件头为准（/photo.png 实际是 PDF → .pdf；声明 .xlsx 实际是 .xlsm → .xlsm；
-     *     声明 .xlsm 而 [Content_Types].xml 确认是标准 xlsx → .xlsx）</li>
+     *     <li>Cả hai đều nhất quán hoặc được viết ở cùng định dạng (.jpeg/.jpg），Giữ các tiện ích mở rộng hiện có</li>
+     *     <li>The recognition result is that the subtype is not confirmed and the existing extension is its macro/biến thể mẫu (được xác định .xlsx、Đã có rồi .xlsm）, phần mở rộng hiện tại được giữ lại</li>
+     *     <li>Chỉ các vùng chứa phổ quát (.zip/.bin）Khi , chỉ các định dạng vùng chứa từ danh sách được phép (.jar、.docx、.msg Chờ đợi)</li>
+     *     <li>Trong các trường hợp khác, tiêu đề tệp sẽ chiếm ưu thế (/photo.png Trên thực tế là có PDF → .pdf；tuyên bố .xlsx Trên thực tế là có .xlsm → .xlsm；
+     *     tuyên bố .xlsm Và [Content_Types].xml Xác nhận là tiêu chuẩn xlsx → .xlsx）</li>
      * </ul>
      */
     public static String reconcile(String claimedExtension, Detection detection) {
@@ -209,14 +209,14 @@ public class ResponseFileTypeDetector {
     }
 
     /**
-     * 按未确认子类型的识别结果调和，见 {@link #reconcile(String, Detection)}。
+     * Đối chiếu kết quả nhận dạng theo kiểu con chưa được xác nhận, xem {@link #reconcile(String, Detection)}。
      */
     public static String reconcile(String claimedExtension, String detectedExtension) {
         return reconcile(claimedExtension, detectedExtension == null ? null : new Detection(detectedExtension, false));
     }
 
     /**
-     * 识别结果只是通用容器（.zip/.bin），无法确定具体格式。
+     * The recognition result is only a general container (.zip/.bin），Không thể xác định định dạng chính xác.
      */
     public static boolean isGenericContainer(String extension) {
         return extension != null && CONTAINER_COMPATIBLE.containsKey(extension);
@@ -229,8 +229,8 @@ public class ResponseFileTypeDetector {
     }
 
     /**
-     * 按 WHATWG MIME Sniffing 的二进制判定：开头一段内容里出现文本中不会出现的控制字节时视为二进制。
-     * 带 UTF-8/UTF-16 BOM 的内容视为文本。
+     * Nhấn WHATWG MIME Sniffing Phán quyết nhị phân: Khi một byte điều khiển không xuất hiện trong văn bản lại xuất hiện trong đoạn đầu tiên, nó được coi là nhị phân.
+     * mang đến UTF-8/UTF-16 BOM Nội dung được coi là văn bản.
      */
     public static boolean looksBinary(byte[] bytes) {
         if (bytes == null || bytes.length == 0) {
@@ -257,7 +257,7 @@ public class ResponseFileTypeDetector {
         if (startsWith(bytes, ZIP) || startsWith(bytes, ZIP_EMPTY)) {
             return detectZip(bytes);
         }
-        // OLE2 无法区分 .xls 与 .xlt 等模板
+        // OLE2 Không thể phân biệt được .xls Và .xlt và các mẫu khác
         return new Detection(extension, !startsWith(bytes, OLE2));
     }
 
@@ -311,7 +311,7 @@ public class ResponseFileTypeDetector {
         return new Detection(contains(bytes, OFD_ENTRY) ? ".ofd" : ".zip", true);
     }
 
-    /** 第一个条目名为 mimetype 且未压缩时，返回其内容。 */
+    /** Mục đầu tiên được đặt tên mimetype Khi giải nén, nội dung của nó sẽ được trả về. */
     private static String odfMimeType(byte[] bytes) {
         if (bytes.length < 38 || u16(bytes, 8) != 0 || !regionMatches(bytes, 30, ODF_MIMETYPE_ENTRY)
                 || u16(bytes, 26) != ODF_MIMETYPE_ENTRY.length) {
@@ -325,7 +325,7 @@ public class ResponseFileTypeDetector {
         return new String(bytes, start, size, StandardCharsets.US_ASCII);
     }
 
-    /** 在开头一段内找到 [Content_Types].xml 的本地文件头并解压，按主部件内容类型确定具体格式。 */
+    /** Tìm thấy trong đoạn mở đầu [Content_Types].xml tiêu đề tệp cục bộ và giải nén nó, đồng thời xác định định dạng cụ thể theo loại nội dung của thành phần chính. */
     private static String ooxmlVariant(byte[] bytes) {
         int header = contentTypesLocalHeader(bytes);
         if (header < 0) {
@@ -363,7 +363,7 @@ public class ResponseFileTypeDetector {
         return null;
     }
 
-    /** 条目名紧跟在 30 字节的本地文件头之后；返回该文件头的偏移，找不到时返回 -1。 */
+    /** Tên mục nhập sau 30 byte sau tiêu đề tệp cục bộ; trả về phần bù của tiêu đề tệp nếu không tìm thấy -1。 */
     private static int contentTypesLocalHeader(byte[] bytes) {
         int limit = Math.min(bytes.length, HEAD_BYTES) - OOXML_CONTENT_TYPES.length;
         for (int name = 30; name <= limit; name++) {
@@ -405,7 +405,7 @@ public class ResponseFileTypeDetector {
         return true;
     }
 
-    /** 只在开头 {@link #HEAD_BYTES} 字节内查找，内存中的大响应体也只扫描这一段。 */
+    /** Chỉ lúc đầu thôi {@link #HEAD_BYTES} Tìm kiếm trong byte và chỉ quét phần này của nội dung phản hồi lớn trong bộ nhớ. */
     private static boolean contains(byte[] bytes, byte[] target) {
         int limit = Math.min(bytes.length, HEAD_BYTES) - target.length;
         for (int i = 0; i <= limit; i++) {

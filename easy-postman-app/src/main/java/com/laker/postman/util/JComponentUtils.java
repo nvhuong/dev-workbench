@@ -9,29 +9,29 @@ import java.awt.*;
 public class JComponentUtils {
 
     /**
-     * 超出宽度显示省略号（...）。默认icon/padding宽度为30px，最小宽度为200px。
+     * Hình elip (.) được hiển thị vượt quá chiều rộng...）。Mặc địnhicon/paddingChiều rộng là 30px，Chiều rộng tối thiểu là200px。
      *
-     * @param text      原始文本
-     * @param component 用于计算宽度的组件（如JList、JLabel等）
-     * @return 适配宽度的文本，超出部分自动省略并加...，否则原文
+     * @param text      Văn bản gốc
+     * @param component Thành phần được sử dụng để tính chiều rộng (ví dụJList、JLabelChờ đợi)
+     * @return Văn bản vừa với chiều rộng sẽ tự động được bỏ qua và thêm vào...，Nếu không thì văn bản gốc
      */
     public static String ellipsisText(String text, JComponent component) {
         return ellipsisText(text, component, 30, 200);
     }
 
     /**
-     * 超出宽度显示省略号（...），可自定义icon/padding宽度和最小宽度。
+     * Hình elip (.) được hiển thị vượt quá chiều rộng...），Có thể tùy chỉnhicon/paddingchiều rộng và chiều rộng tối thiểu.
      *
-     * @param text          原始文本
-     * @param component     用于计算宽度的组件（如JList、JLabel等）
-     * @param reservedWidth 预留宽度（如icon和padding，单位px）在计算文本最大宽度时，会减去30像素，剩下的空间才用于显示文本
-     * @param minWidth      最小宽度（单位px），表示即使组件宽度为0，也假定有200像素可用来显示文本。
-     * @return 适配宽度的文本，超出部分自动省略并加...，否则原文
+     * @param text          Văn bản gốc
+     * @param component     Thành phần được sử dụng để tính chiều rộng (ví dụJList、JLabelChờ đợi)
+     * @param reservedWidth Chiều rộng dành riêng (ví dụiconvàpadding，đơn vịpx）Điều này được trừ khi tính chiều rộng văn bản tối đa30pixel và không gian còn lại được sử dụng để hiển thị văn bản
+     * @param minWidth      Chiều rộng tối thiểu (đơn vịpx），Chỉ ra rằng ngay cả khi chiều rộng thành phần là0，Người ta cũng cho rằng có200Pixel có thể được sử dụng để hiển thị văn bản.
+     * @return Văn bản vừa với chiều rộng sẽ tự động được bỏ qua và thêm vào...，Nếu không thì văn bản gốc
      */
     public static String ellipsisText(String text, JComponent component, int reservedWidth, int minWidth) {
         if (text == null) return null;
-        FontMetrics fm = component.getFontMetrics(component.getFont()); // 获取字体度量
-        int maxWidth = component.getWidth() > 0 ? component.getWidth() - reservedWidth : minWidth; // 预留icon和padding
+        FontMetrics fm = component.getFontMetrics(component.getFont()); // Lấy số liệu phông chữ
+        int maxWidth = component.getWidth() > 0 ? component.getWidth() - reservedWidth : minWidth; // Kín đáoiconvàpadding
         if (maxWidth <= 0) return text;
         String ellipsis = "...";
         int width = fm.stringWidth(text);

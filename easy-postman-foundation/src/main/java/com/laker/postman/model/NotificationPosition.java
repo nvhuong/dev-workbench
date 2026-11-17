@@ -5,8 +5,8 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 /**
- * 通知位置枚举
- * 包含位置的顺序索引和国际化键
+ * Thông báo liệt kê vị trí
+ * Chứa chỉ mục tuần tự về vị trí và khóa quốc tế hóa
  */
 @Getter
 @RequiredArgsConstructor
@@ -23,7 +23,7 @@ public enum NotificationPosition {
     private final String i18nKey;
 
     /**
-     * 根据索引获取位置
+     * Nhận vị trí dựa trên chỉ số
      */
     public static NotificationPosition fromIndex(int index) {
         for (NotificationPosition position : values()) {
@@ -31,17 +31,17 @@ public enum NotificationPosition {
                 return position;
             }
         }
-        return BOTTOM_RIGHT; // 默认右下角
+        return BOTTOM_RIGHT; // Mặc định là góc dưới bên phải
     }
 
     /**
-     * 根据名称获取位置
+     * Nhận vị trí dựa trên tên
      */
     public static NotificationPosition fromName(String name) {
         try {
             return valueOf(name);
         } catch (IllegalArgumentException e) {
-            return BOTTOM_RIGHT; // 默认右下角
+            return BOTTOM_RIGHT; // Mặc định là góc dưới bên phải
         }
     }
 }

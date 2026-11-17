@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.function.Consumer;
 
 /**
- * 管理主窗口启动期间的一次性事件和回调通知。
+ * Quản lý thông báo sự kiện và cuộc gọi lại một lần trong khi khởi động cửa sổ chính.
  */
 class MainFrameStartupLifecycle {
     private boolean mainContentLoaded;

@@ -171,7 +171,7 @@ final class PerformanceRunControlSupport {
         stopRunStatusTimer();
         timerManager.stopAll();
 
-        flushPendingAndCharts("完成时", true);
+        flushPendingAndCharts("Khi hoàn thành", true);
         statisticsCoordinator.updateFinalReportWithStatsSync();
         refreshFinalRunStatus();
 
@@ -189,7 +189,7 @@ final class PerformanceRunControlSupport {
     }
 
     private void flushUiAfterStop() {
-        flushPendingAndCharts("停止时", false);
+        flushPendingAndCharts("khi dừng lại", false);
         statisticsCoordinator.updateFinalReportWithStatsSync();
     }
 
@@ -254,7 +254,7 @@ final class PerformanceRunControlSupport {
         try {
             performanceResultTablePanel.flushPendingResults();
         } catch (Exception e) {
-            log.warn("{}刷新结果树失败", phase, e);
+            log.warn("{}Không thể làm mới cây kết quả", phase, e);
         }
 
         try {
@@ -262,7 +262,7 @@ final class PerformanceRunControlSupport {
             statisticsCoordinator.sampleTrendDataSync(finalTrendSampleTimeMs(terminalTimeMs));
             statisticsCoordinator.appendTerminalIdleTrendPointSync(terminalTimeMs);
         } catch (Exception e) {
-            log.warn("{}最后一次趋势图采样失败", phase, e);
+            log.warn("{}Việc lấy mẫu biểu đồ xu hướng cuối cùng không thành công", phase, e);
         }
     }
 

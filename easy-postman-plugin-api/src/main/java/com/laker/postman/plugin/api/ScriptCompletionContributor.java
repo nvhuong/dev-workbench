@@ -1,7 +1,7 @@
 package com.laker.postman.plugin.api;
 
 /**
- * 向脚本编辑器追加补全项。
+ * Nối các mục hoàn thành vào trình chỉnh sửa tập lệnh.
  */
 @FunctionalInterface
 public interface ScriptCompletionContributor {

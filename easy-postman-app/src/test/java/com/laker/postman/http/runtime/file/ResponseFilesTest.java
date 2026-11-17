@@ -45,9 +45,9 @@ public class ResponseFilesTest {
 
         HttpResponse failed = withContentType("application/pdf");
         failed.body = "Response incomplete: unexpected end of stream";
-        assertFalse(ResponseFiles.isFileResponse(failed), "下载失败时 body 是错误提示，应按文本保留");
+        assertFalse(ResponseFiles.isFileResponse(failed), "Khi tải xuống không thành công body Đó là một thông báo lỗi và phải được giữ dưới dạng văn bản");
         failed.fileAttachment = true;
-        assertFalse(ResponseFiles.isTextAttachment(failed), "二进制类型的失败响应也不是文本附件");
+        assertFalse(ResponseFiles.isTextAttachment(failed), "Phản hồi lỗi thuộc loại nhị phân cũng không phải là tệp đính kèm văn bản");
     }
 
     @Test

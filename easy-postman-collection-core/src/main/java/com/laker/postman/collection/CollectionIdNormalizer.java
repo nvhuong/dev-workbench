@@ -16,17 +16,17 @@ import java.util.UUID;
 import java.util.function.Consumer;
 
 /**
- * 保证集合内分组、请求、Example（SavedResponse）的 ID 唯一。
+ * Đảm bảo nhóm, yêu cầu trong một bộ sưu tập.Example（SavedResponse）của ID chỉ một.
  * <p>
- * 编辑器 Tab 按 ID 查找已打开的请求/Example，ID 重复会导致点击后停留在另一个 Tab（issue #194）。
- * 历史版本的 Postman 导入曾把 {@code _postman_previewlanguage}（如 json）当作 Example ID，
- * 重复导入同一份 EasyPostman JSON 也会带来重复的请求/Example ID。
+ * Biên tập viên Tab Nhấn ID Tìm các yêu cầu mở/Example，ID Trùng lặp sẽ khiến nhấp chuột ở lại một cái khác Tab（issue #194）。
+ * phiên bản lịch sử Postman Nhập khẩu một lần {@code _postman_previewlanguage}（Chẳng hạn như json）Như Example ID，
+ * Nhập cùng một bản sao nhiều lần EasyPostman JSON Nó cũng sẽ mang lại những yêu cầu trùng lặp/Example ID。
  */
 @UtilityClass
 public class CollectionIdNormalizer {
 
     /**
-     * 集合中已占用的 ID，按节点类型分开记录。
+     * Đã có trong bộ sưu tập ID，Tách các bản ghi theo loại nút.
      */
     public record UsedIds(Set<String> groups, Set<String> requests, Set<String> examples) {
         public static UsedIds empty() {
@@ -39,7 +39,7 @@ public class CollectionIdNormalizer {
     }
 
     /**
-     * 收集文档中所有非空白 ID。
+     * Thu thập tất cả các khoảng trống không trống trong tài liệu ID。
      */
     public static UsedIds collectIds(CollectionDocument document) {
         UsedIds ids = UsedIds.empty();
@@ -58,18 +58,18 @@ public class CollectionIdNormalizer {
     }
 
     /**
-     * 为空白或重复的 ID 重新分配 UUID，首次出现的 ID 保持不变。
+     * Để trống hoặc trùng lặp ID phân phối lại UUID，xuất hiện lần đầu tiên ID vẫn không thay đổi.
      *
-     * @return 被重新分配 ID 的节点数量
+     * @return được bổ nhiệm lại ID số lượng nút
      */
     public static int ensureUniqueIds(CollectionDocument document) {
         return ensureUniqueIds(document, UsedIds.empty());
     }
 
     /**
-     * 为空白、重复或与 {@code reserved} 冲突的 ID 重新分配 UUID，用于导入到已有集合时避免跨文档冲突。
+     * Để trống, lặp lại hoặc AND {@code reserved} Xung đột ID phân phối lại UUID，Được sử dụng để tránh xung đột tài liệu chéo khi nhập vào bộ sưu tập hiện có.
      *
-     * @return 被重新分配 ID 的节点数量
+     * @return được bổ nhiệm lại ID số lượng nút
      */
     public static int ensureUniqueIds(CollectionDocument document, UsedIds reserved) {
         UsedIds seen = reserved == null ? UsedIds.empty() : reserved.copy();
@@ -102,7 +102,7 @@ public class CollectionIdNormalizer {
     }
 
     /**
-     * 深拷贝请求，并为请求及其 Example 分配新 ID，避免与源请求冲突。
+     * Sao chép sâu yêu cầu, và cho yêu cầu và yêu cầu của nó Example Chỉ định mới ID，Tránh xung đột với yêu cầu xuất xứ.
      */
     public static HttpRequestItem copyRequestWithNewIds(HttpRequestItem source) {
         HttpRequestItem copy = JsonUtil.deepCopy(source, HttpRequestItem.class);
@@ -114,7 +114,7 @@ public class CollectionIdNormalizer {
     }
 
     /**
-     * 当前 ID 可用时登记并返回 null，否则登记并返回一个新的 UUID。
+     * hiện tại ID Đăng ký và quay lại khi có sẵn null，Nếu không thì đăng ký và trả lại một cái mới UUID。
      */
     private static String uniqueId(String id, Set<String> seen) {
         if (id != null && !id.isBlank() && seen.add(id)) {

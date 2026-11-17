@@ -29,7 +29,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 左侧标签页面板
+ * Bảng điều khiển trang tab ở bên trái
  */
 @Slf4j
 public class SidebarTabPanel extends UiSingletonPanel {
@@ -41,35 +41,35 @@ public class SidebarTabPanel extends UiSingletonPanel {
     private SidebarBottomBar bottomBar;
     private SidebarConsoleArea consoleArea;
     private RequestSideAssistantPanel requestSideAssistantPanel;
-    private boolean sidebarExpanded = false; // 侧边栏展开状态
-    private CookieManagerDialog cookieManagerDialog; // Cookie管理器对话框实例
-    private GlobalVariablesDialog globalVariablesDialog; // 全局变量对话框实例
-    private int lastSelectedIndex = -1; // 记录上一次选中的索引，用于优化颜色更新
+    private boolean sidebarExpanded = false; // Thanh bên được mở rộng
+    private CookieManagerDialog cookieManagerDialog; // CookieVí dụ về hộp thoại trình quản lý
+    private GlobalVariablesDialog globalVariablesDialog; // Ví dụ về hộp thoại biến toàn cục
+    private int lastSelectedIndex = -1; // Ghi lại chỉ mục được chọn cuối cùng để tối ưu hóa cập nhật màu
 
-    // 字体缓存，避免重复创建
-    private Font normalFont;      // PLAIN 12 - Tab文本和版本号共用
-    private Font boldFont;        // BOLD 12 - Tab文本选中态和底部栏共用
-    // 自适应宽高缓存
-    private int calculatedExpandedTabWidth = -1; // 计算后的展开状态tab宽度
-    private int calculatedCollapsedTabWidth = -1; // 计算后的收起状态tab宽度
-    private int calculatedExpandedTabHeight = -1; // 计算后的展开状态tab高度
-    private int calculatedCollapsedTabHeight = -1; // 计算后的收起状态tab高度
+    // Bộ nhớ đệm phông chữ để tránh tạo trùng lặp
+    private Font normalFont;      // PLAIN 12 - TabVăn bản và số phiên bản được chia sẻ
+    private Font boldFont;        // BOLD 12 - TabTrạng thái chọn văn bản được chia sẻ với thanh dưới cùng
+    // Bộ đệm chiều rộng và chiều cao thích ứng
+    private int calculatedExpandedTabWidth = -1; // Trạng thái mở rộng được tính toántabChiều rộng
+    private int calculatedCollapsedTabWidth = -1; // Trạng thái thu gọn được tính toántabChiều rộng
+    private int calculatedExpandedTabHeight = -1; // Trạng thái mở rộng được tính toántabchiều cao
+    private int calculatedCollapsedTabHeight = -1; // Trạng thái thu gọn được tính toántabchiều cao
     private SidebarTabComponentFactory tabComponentFactory;
 
     @Override
     protected void initUI() {
         refreshSidebarFonts();
-        // 先读取侧边栏展开状态
+        // Đầu tiên hãy đọc trạng thái mở rộng thanh bên
         sidebarExpanded = SettingManager.isSidebarExpanded();
         setLayout(new BorderLayout());
         ToolWindowSurfaceStyle.applyBackground(this);
 
-        // 创建标签页
+        // Tạo một trang tab
         tabbedPane = createSidebarTabbedPane();
         reloadTabInfosFromSettings();
         installVisibleTabs(Map.of());
 
-        // 默认设置选中第一个标签
+        // Cài đặt mặc định chọn nhãn đầu tiên
         if (tabbedPane.getTabCount() > 0) {
             tabbedPane.setSelectedIndex(0);
         }
@@ -130,7 +130,7 @@ public class SidebarTabPanel extends UiSingletonPanel {
     }
 
     /**
-     * 切换侧边栏展开/收起状态
+     * Chuyển đổi mở rộng thanh bên/Trạng thái thu gọn
      */
     private void toggleSidebarExpansion() {
         sidebarExpanded = !sidebarExpanded;
@@ -140,7 +140,7 @@ public class SidebarTabPanel extends UiSingletonPanel {
     }
 
     /**
-     * 切换布局方向
+     * Chuyển hướng bố trí
      */
     private void toggleLayoutOrientation() {
         boolean currentVertical = SettingManager.isLayoutVertical();
@@ -149,7 +149,7 @@ public class SidebarTabPanel extends UiSingletonPanel {
 
         bottomBar.updateLayoutToggleState(newVertical);
 
-        // 更新所有已打开的标签页的布局
+        // Cập nhật bố cục của tất cả các tab đang mở
         try {
             RequestEditorPanel editPanel = UiSingletonFactory.getInstance(RequestEditorPanel.class);
             editPanel.updateAllTabsLayout(newVertical);
@@ -159,24 +159,24 @@ public class SidebarTabPanel extends UiSingletonPanel {
     }
 
     /**
-     * 显示 Cookie 管理器对话框
+     * trình diễn Cookie Hộp thoại quản lý
      */
     private void showCookieManagerDialog() {
-        // 如果对话框已存在且可见，则将其置于前台
+        // Nếu hộp thoại đã tồn tại và hiển thị, nó sẽ được đưa lên nền trước
         if (cookieManagerDialog != null && cookieManagerDialog.isVisible()) {
             cookieManagerDialog.toFront();
             cookieManagerDialog.requestFocus();
             return;
         }
 
-        // 创建新对话框
+        // Tạo một hộp thoại mới
         Window window = SwingUtilities.getWindowAncestor(this);
         cookieManagerDialog = new CookieManagerDialog(window);
         cookieManagerDialog.setVisible(true);
     }
 
     /**
-     * 显示全局变量对话框
+     * Hiển thị hộp thoại Biến toàn cục
      */
     private void showGlobalVariablesDialog() {
         if (globalVariablesDialog == null) {
@@ -204,7 +204,7 @@ public class SidebarTabPanel extends UiSingletonPanel {
         resetTabLayoutCache();
         syncSidebarExpandedFromSettings();
 
-        // updateUI 会重置自定义 UI，需要重新应用。
+        // updateUI Các tùy chỉnh sẽ được đặt lại UI，Cần phải được áp dụng lại.
         if (tabbedPane != null) {
             recreateTabbedPaneUI();
         }
@@ -221,14 +221,14 @@ public class SidebarTabPanel extends UiSingletonPanel {
     }
 
     /**
-     * 重新创建 TabbedPane 的自定义 UI
-     * 用于在 updateUI() 后恢复自定义的选中状态视觉效果
+     * Tái tạo TabbedPane của sự tùy biến UI
+     * Được sử dụng trong updateUI() Sau đó khôi phục hiệu ứng hình ảnh trạng thái đã chọn tùy chỉnh
      */
     private void recreateTabbedPaneUI() {
-        // 应用自定义 UI
+        // Áp dụng tùy chỉnh UI
         applySidebarTabbedPaneUi(tabbedPane);
 
-        // 强制刷新 UI,确保自定义渲染立即生效
+        // Buộc làm mới UI,Đảm bảo hiển thị tùy chỉnh có hiệu lực ngay lập tức
         tabbedPane.revalidate();
         tabbedPane.repaint();
     }
@@ -239,7 +239,7 @@ public class SidebarTabPanel extends UiSingletonPanel {
         SwingUtilities.invokeLater(this::initializeAllTabSelectionStyles);
         PerformanceUiWarmup.schedule();
 
-        // 注册快捷键
+        // Đăng ký phím tắt
         registerTabShortcuts();
     }
 
@@ -250,18 +250,18 @@ public class SidebarTabPanel extends UiSingletonPanel {
     }
 
     /**
-     * 注册 Tab 快捷键
-     * Ctrl/Cmd + 1-7 切换到对应的 Tab
+     * Đăng ký Tab phím tắt
+     * Ctrl/Cmd + 1-7 Chuyển sang cái tương ứng Tab
      */
     private void registerTabShortcuts() {
-        int modifier = Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx(); // Mac用Cmd，Windows用Ctrl
+        int modifier = Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx(); // MacSử dụngCmd，WindowsSử dụngCtrl
 
-        // 为每个 Tab 注册快捷键 Ctrl/Cmd + 数字
+        // cho mỗi người Tab Đăng ký phím tắt Ctrl/Cmd + con số
         for (int i = 0; i < Math.min(tabInfos.size(), 9); i++) {
             final int tabIndex = i;
-            int keyCode = KeyEvent.VK_1 + i; // VK_1 到 VK_9
+            int keyCode = KeyEvent.VK_1 + i; // VK_1 Đến VK_9
 
-            // 注册快捷键到输入映射
+            // Đăng ký các phím tắt để ánh xạ đầu vào
             String actionKey = "switchToTab" + (i + 1);
             getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(
                     KeyStroke.getKeyStroke(keyCode, modifier), actionKey
@@ -278,7 +278,7 @@ public class SidebarTabPanel extends UiSingletonPanel {
     }
 
     /**
-     * 初始化所有 tab 的选中样式（在首次加载时调用，展开和收起状态都需要）。
+     * Khởi tạo tất cả tab Kiểu đã chọn (được gọi khi tải lần đầu, bắt buộc cho cả trạng thái mở rộng và thu gọn).
      */
     private void initializeAllTabSelectionStyles() {
         int selectedIndex = tabbedPane.getSelectedIndex();
@@ -289,28 +289,28 @@ public class SidebarTabPanel extends UiSingletonPanel {
     }
 
     /**
-     * 更新发生变化的 tab 选中样式（展开和收起状态都支持）。
-     * 优化：只更新当前和之前选中的 tab，避免遍历所有 tab
+     * Cập nhật các thay đổi tab Kiểu đã chọn (được hỗ trợ ở cả trạng thái mở rộng và thu gọn).
+     * Tối ưu hóa: Chỉ cập nhật các mục đã chọn hiện tại và trước đó tab，Tránh lặp đi lặp lại mọi thứ tab
      */
     private void updateChangedTabSelectionStyles() {
         int selectedIndex = tabbedPane.getSelectedIndex();
 
-        // 更新之前选中的 tab（如果存在）
+        // Cập nhật đã chọn trước đó tab（nếu có)
         if (lastSelectedIndex >= 0 && lastSelectedIndex < tabbedPane.getTabCount()) {
             updateSingleTabSelectionStyle(lastSelectedIndex, false);
         }
 
-        // 更新当前选中的 tab
+        // Cập nhật cái hiện được chọn tab
         if (selectedIndex >= 0 && selectedIndex < tabbedPane.getTabCount()) {
             updateSingleTabSelectionStyle(selectedIndex, true);
         }
 
-        // 记录当前选中的索引
+        // Ghi lại chỉ mục hiện được chọn
         lastSelectedIndex = selectedIndex;
     }
 
     /**
-     * 更新单个 tab 的图标、标题字体和标题颜色。
+     * Cập nhật đơn tab biểu tượng, phông chữ tiêu đề và màu tiêu đề.
      */
     private void updateSingleTabSelectionStyle(int tabIndex, boolean isSelected) {
         Component tabComponent = tabbedPane.getTabComponentAt(tabIndex);
@@ -320,10 +320,10 @@ public class SidebarTabPanel extends UiSingletonPanel {
         tabComponentFactory().updateSelection(tabComponent, sidebarTab, isSelected);
     }
 
-    // Tab切换时才加载真正的面板内容
+    // TabNội dung bảng thực chỉ được tải khi chuyển đổi
     private void handleTabChange() {
         int selectedIndex = tabbedPane.getSelectedIndex();
-        ensureTabComponentLoaded(selectedIndex); // 懒加载当前选中的tab内容
+        ensureTabComponentLoaded(selectedIndex); // Tải chậm cái hiện được chọntabnội dung
         SidebarTab selectedTab = getSidebarTabAt(selectedIndex);
         if (selectedTab == SidebarTab.ENVIRONMENTS) {
             Component comp = SidebarTabContentHost.contentOf(tabbedPane.getComponentAt(selectedIndex));
@@ -345,13 +345,13 @@ public class SidebarTabPanel extends UiSingletonPanel {
         }
         Component comp = host.content();
         if (comp == null || comp.getClass() == JPanel.class) {
-            JPanel realPanel = info.getPanel(); // 懒加载真正的面板内容
+            JPanel realPanel = info.getPanel(); // Tải chậm nội dung bảng điều khiển thực tế
             host.setContent(realPanel);
         }
     }
 
     /**
-     * 创建侧边栏专用标签页
+     * Tạo một tab thanh bên chuyên dụng
      */
     private JTabbedPane createSidebarTabbedPane() {
         JTabbedPane pane = new JTabbedPane(SwingConstants.LEFT, JTabbedPane.SCROLL_TAB_LAYOUT) {
@@ -453,8 +453,8 @@ public class SidebarTabPanel extends UiSingletonPanel {
     }
 
     /**
-     * 计算展开状态下的tab宽度
-     * 基于最长的tab标题文本宽度动态计算
+     * Tính toán ở trạng thái mở rộngtabChiều rộng
+     * Dựa trên dài nhấttabChiều rộng văn bản tiêu đề được tính toán linh hoạt
      */
     private int calculateExpandedTabWidth() {
         if (calculatedExpandedTabWidth > 0) {
@@ -463,7 +463,7 @@ public class SidebarTabPanel extends UiSingletonPanel {
 
         int maxWidth = 0;
         JLabel tempLabel = new JLabel();
-        tempLabel.setFont(boldFont); // 使用粗体字体计算，因为选中时会变粗
+        tempLabel.setFont(boldFont); // Sử dụng phông chữ đậm để tính toán vì chúng trở nên đậm hơn khi được chọn
 
         for (TabInfo info : tabInfos) {
             tempLabel.setText(info.getTitle());
@@ -477,8 +477,8 @@ public class SidebarTabPanel extends UiSingletonPanel {
     }
 
     /**
-     * 计算收起状态下的tab宽度
-     * 基于最宽的图标宽度动态计算
+     * Tính trạng thái gấptabChiều rộng
+     * Tính toán động dựa trên chiều rộng biểu tượng rộng nhất
      */
     private int calculateCollapsedTabWidth() {
         if (calculatedCollapsedTabWidth > 0) {
@@ -498,8 +498,8 @@ public class SidebarTabPanel extends UiSingletonPanel {
     }
 
     /**
-     * 计算展开状态下的tab高度
-     * 基于最高的图标高度和字体高度动态计算
+     * Tính toán ở trạng thái mở rộngtabchiều cao
+     * Tính toán động dựa trên chiều cao biểu tượng và chiều cao phông chữ cao nhất
      */
     private int calculateExpandedTabHeight(int fontHeight) {
         if (calculatedExpandedTabHeight > 0) {
@@ -519,8 +519,8 @@ public class SidebarTabPanel extends UiSingletonPanel {
     }
 
     /**
-     * 计算收起状态下的tab高度
-     * 基于图标高度和上下边距
+     * Tính trạng thái gấptabchiều cao
+     * Dựa trên chiều cao biểu tượng và lề trên và dưới
      */
     private int calculateCollapsedTabHeight() {
         if (calculatedCollapsedTabHeight > 0) {
@@ -572,7 +572,7 @@ public class SidebarTabPanel extends UiSingletonPanel {
     }
 
     /**
-     * 重新创建标签页以应用新的展开/收起状态
+     * Tạo lại tab để áp dụng bản mở rộng mới/Trạng thái thu gọn
      */
     private void recreateTabbedPane() {
         if (consoleArea != null) {
@@ -583,7 +583,7 @@ public class SidebarTabPanel extends UiSingletonPanel {
 
         Map<SidebarTab, Component> loadedPanels = collectLoadedPanels();
 
-        // 创建新的 TabbedPane
+        // Tạo cái mới TabbedPane
         tabbedPane = createSidebarTabbedPane();
         tabComponentFactory = null;
         reloadTabInfosFromSettings();
@@ -600,7 +600,7 @@ public class SidebarTabPanel extends UiSingletonPanel {
 
         initializeAllTabSelectionStyles();
 
-        // 刷新UI
+        // Làm mớiUI
         revalidate();
         repaint();
     }
@@ -653,19 +653,19 @@ public class SidebarTabPanel extends UiSingletonPanel {
     }
 
     /**
-     * 根据当前语言获取合适的 Tab 标题字体
-     * 英文使用小一号字体，避免 Tab 标题文本过长
-     * 注意：此方法仅用于 Tab 标题，底部栏组件（Console、Cookie、版本号）使用标准字体
+     * Lấy cái thích hợp dựa trên ngôn ngữ hiện tại Tab Phông chữ tiêu đề
+     * Sử dụng cỡ chữ nhỏ hơn bằng tiếng Anh để tránh Tab Văn bản tiêu đề quá dài
+     * LƯU Ý: Phương pháp này dành cho  Tab Tiêu đề, thành phần thanh dưới cùng (Console、Cookie、số phiên bản) bằng cách sử dụng phông chữ tiêu chuẩn
      *
-     * @param style 字体样式 (Font.PLAIN, Font.BOLD, Font.ITALIC)
-     * @return Font 对象
+     * @param style Kiểu phông chữ (Font.PLAIN, Font.BOLD, Font.ITALIC)
+     * @return Font đối tượng
      */
     private Font getLanguageAwareFont(int style) {
-        if (I18nUtil.isChinese()) {
-            // 中文标题在侧边栏中略收小，避免展开态显得过重。
+        if (I18nUtil.isVietnamese()) {
+            // Tiêu đề tiếng Việt nhỏ hơn một chút để vừa với thanh bên khi mở rộng.
             return FontsUtil.getDefaultFontWithOffset(style, -2);
         } else {
-            // 英文使用小字体
+            // Tiếng Anh sử dụng phông chữ nhỏ
             return FontsUtil.getDefaultFontWithOffset(style, -3);
         }
     }

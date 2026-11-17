@@ -7,8 +7,8 @@ import javax.swing.*;
 import java.awt.*;
 
 /**
- * 下一个按钮
- * 用于搜索结果导航中的下一个匹配项
+ * Nút tiếp theo
+ * Được sử dụng cho kết quả phù hợp tiếp theo trong điều hướng kết quả tìm kiếm
  */
 public class NextButton extends JButton {
     public NextButton() {

@@ -45,7 +45,7 @@ public final class PerformanceTrendWindowCollector {
     }
 
     /**
-     * 读取当前趋势窗口并清空窗口累计值，调用方必须把它当作一次性采样。
+     * Đọc cửa sổ xu hướng hiện tại và xóa giá trị tích lũy của cửa sổ. Người gọi phải coi nó như một mẫu một lần.
      */
     public PerformanceTrendSnapshot drainWindowSnapshot(int activeUsers,
                                                         int activeWebSocketConnections,

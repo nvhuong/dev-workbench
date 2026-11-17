@@ -8,9 +8,9 @@ import java.awt.*;
 import java.util.function.BooleanSupplier;
 
 /**
- * 请求编辑器 Tab 初始化调度器。
+ * Request an editor Tab Khởi tạo bộ lập lịch.
  * <p>
- * 编辑器内容采用延迟初始化，调度逻辑集中在这里，避免面板布局代码混入启动恢复和预热细节。
+ * Nội dung trình chỉnh sửa sử dụng quá trình khởi tạo bị trì hoãn và logic lập lịch tập trung ở đây để tránh mã bố cục bảng điều khiển bị trộn vào các chi tiết khởi động và làm nóng trước.
  */
 @RequiredArgsConstructor
 final class RequestEditorTabInitializationScheduler {

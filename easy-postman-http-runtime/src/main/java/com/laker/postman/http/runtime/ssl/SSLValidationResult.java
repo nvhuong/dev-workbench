@@ -5,7 +5,7 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * SSL验证结果封装类
+ * SSLLớp đóng gói kết quả xác minh
  */
 public class SSLValidationResult {
     private final boolean valid;

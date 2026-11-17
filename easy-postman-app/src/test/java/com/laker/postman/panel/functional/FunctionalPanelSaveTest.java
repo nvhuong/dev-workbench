@@ -32,7 +32,7 @@ import static org.testng.Assert.assertTrue;
 
 public class FunctionalPanelSaveTest {
 
-    @Test(description = "显式保存提交表格编辑后应取消编辑事件重新触发的防抖保存")
+    @Test(description = "Lưu rõ ràng sau khi gửi chỉnh sửa biểu mẫu sẽ hủy lưu chống rung được kích hoạt lại bởi sự kiện chỉnh sửa")
     public void shouldCancelAutosaveScheduledByCellEditingCommit() throws Exception {
         FunctionalPanel panel = newPanelWithoutInit();
         FunctionalRunnerTableModel tableModel = new FunctionalRunnerTableModel();
@@ -60,7 +60,7 @@ public class FunctionalPanelSaveTest {
         );
     }
 
-    @Test(description = "Collections 保存同步到 FunctionalPanel 时应刷新表格行的请求快照")
+    @Test(description = "Collections Lưu đồng bộ hóa vào FunctionalPanel Ảnh chụp nhanh được yêu cầu của các hàng trong bảng phải được làm mới")
     public void shouldRefreshRowWhenSyncingCollectionItem() throws Exception {
         FunctionalPanel panel = newPanelWithoutInit();
         FunctionalRunnerTableModel tableModel = new FunctionalRunnerTableModel();
@@ -78,7 +78,7 @@ public class FunctionalPanelSaveTest {
         assertEquals(row.requestItem.getUrl(), "https://new.example.com");
     }
 
-    @Test(description = "FunctionalPanel 保存时应将 UI CSV 快照转换为功能持久化状态")
+    @Test(description = "FunctionalPanel nên lưu lại khi lưu UI CSV Ảnh chụp nhanh được chuyển đổi sang trạng thái liên tục chức năng")
     public void shouldSaveFunctionalCsvDataStateFromCsvPanelSnapshot() throws Exception {
         FunctionalPanel panel = newPanelWithoutInit();
         FunctionalRunnerTableModel tableModel = new FunctionalRunnerTableModel();

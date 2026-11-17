@@ -16,7 +16,7 @@ import java.awt.Toolkit;
 import java.awt.event.KeyEvent;
 
 /**
- * 顶部设置菜单。
+ * Menu cài đặt hàng đầu.
  */
 @UtilityClass
 class TopMenuSettingsMenu {

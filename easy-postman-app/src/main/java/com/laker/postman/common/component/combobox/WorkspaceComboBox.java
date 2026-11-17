@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.function.Consumer;
 
 /**
- * 工作区下拉框组件
+ * Thành phần hộp thả xuống không gian làm việc
  */
 public class WorkspaceComboBox extends MenuBarComboBox<Workspace> {
     private boolean isUpdating = false;
@@ -28,7 +28,7 @@ public class WorkspaceComboBox extends MenuBarComboBox<Workspace> {
     }
 
     /**
-     * 重新加载工作区列表
+     * Tải lại danh sách không gian làm việc
      */
     public void reload() {
         isUpdating = true;
@@ -43,14 +43,14 @@ public class WorkspaceComboBox extends MenuBarComboBox<Workspace> {
                 addItem(workspace);
             }
 
-            // 设置当前选中的工作区
+            // Đặt không gian làm việc hiện được chọn
             if (currentWorkspace != null) {
                 setSelectedItem(currentWorkspace);
             } else if (getItemCount() > 0) {
                 setSelectedIndex(0);
             }
         } catch (Exception e) {
-            // 加载失败时静默处理
+            // Xử lý âm thầm khi tải không thành công
         } finally {
             isUpdating = false;
         }

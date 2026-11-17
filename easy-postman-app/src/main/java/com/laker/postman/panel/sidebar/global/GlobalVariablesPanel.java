@@ -32,7 +32,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * 全局变量管理面板。
+ * Bảng quản lý biến toàn cầu.
  */
 @Slf4j
 public class GlobalVariablesPanel extends JPanel {

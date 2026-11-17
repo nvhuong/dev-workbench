@@ -5,7 +5,7 @@ import lombok.experimental.UtilityClass;
 import java.awt.Dimension;
 
 /**
- * 主窗口尺寸策略，区分首启默认尺寸和用户可缩放的最小尺寸。
+ * Chính sách kích thước cửa sổ chính phân biệt giữa kích thước mặc định khi khởi động và kích thước tối thiểu mà người dùng có thể thay đổi kích thước.
  */
 @UtilityClass
 class MainWindowSizePolicy {
@@ -22,8 +22,8 @@ class MainWindowSizePolicy {
     private static final Dimension DEFAULT_SIZE_WXGA = new Dimension(1100, 700);
 
     /**
-     * 应用布局在常规显示器上的设计下限。实际最小尺寸还会受所有显示器可用工作区约束，
-     * 避免主屏生成的最小尺寸在较小副屏上导致窗口无法还原或缩放。
+     * Giới hạn dưới đối với thiết kế bố cục ứng dụng trên màn hình thông thường. Kích thước tối thiểu thực tế cũng tùy thuộc vào không gian làm việc có sẵn của tất cả các màn hình.
+     * Ngăn kích thước tối thiểu do màn hình chính tạo ra khiến cửa sổ không thể khôi phục hoặc thu nhỏ trên màn hình phụ nhỏ hơn.
      */
     private static final Dimension DESIGN_MINIMUM_SIZE = new Dimension(1100, 700);
 

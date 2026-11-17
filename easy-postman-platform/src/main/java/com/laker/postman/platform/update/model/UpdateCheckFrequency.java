@@ -1,13 +1,13 @@
 package com.laker.postman.platform.update.model;
 
 /**
- * 更新检查频率枚举
+ * Cập nhật bảng liệt kê tần suất kiểm tra
  */
 public enum UpdateCheckFrequency {
-    STARTUP("startup", 0),   // 每次启动
-    DAILY("daily", 1),       // 每日
-    WEEKLY("weekly", 7),     // 每周
-    MONTHLY("monthly", 30);  // 每月
+    STARTUP("startup", 0),   // mỗi khi nó bắt đầu
+    DAILY("daily", 1),       // hằng ngày
+    WEEKLY("weekly", 7),     // hàng tuần
+    MONTHLY("monthly", 30);  // mỗi tháng
 
     private final String code;
     private final int days;
@@ -26,7 +26,7 @@ public enum UpdateCheckFrequency {
     }
 
     /**
-     * 是否每次启动都检查
+     * Có nên kiểm tra mỗi lần khởi động hay không
      */
     public boolean isAlwaysCheck() {
         return this == STARTUP;
@@ -38,6 +38,6 @@ public enum UpdateCheckFrequency {
                 return frequency;
             }
         }
-        return DAILY; // 默认每日
+        return DAILY; // Mặc định là hàng ngày
     }
 }

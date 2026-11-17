@@ -4,16 +4,16 @@ import cn.hutool.json.JSONObject;
 import lombok.Data;
 
 /**
- * 更新信息封装类
+ * Cập nhật lớp đóng gói thông tin
  */
 @Data
 public class UpdateInfo {
 
     public enum Status {
-        UPDATE_AVAILABLE,           // 有新版本可用（且有对应平台的安装包）
-        UPDATE_AVAILABLE_NO_ASSET,  // 有新版本可用，但无对应平台的安装包（资源尚未上传）
-        NO_UPDATE,                  // 没有更新
-        CHECK_FAILED                // 检查失败
+        UPDATE_AVAILABLE,           // Đã có phiên bản mới (và có gói cài đặt cho nền tảng tương ứng)
+        UPDATE_AVAILABLE_NO_ASSET,  // Đã có phiên bản mới nhưng chưa có gói cài đặt cho nền tảng tương ứng (tài nguyên chưa được tải lên)
+        NO_UPDATE,                  // Không có cập nhật
+        CHECK_FAILED                // Kiểm tra không thành công
     }
 
     private final Status status;
@@ -31,7 +31,7 @@ public class UpdateInfo {
     }
 
     /**
-     * 创建有更新可用的信息
+     * Tạo thông tin cập nhật khi nó có sẵn
      */
     public static UpdateInfo updateAvailable(String currentVersion, String latestVersion, JSONObject releaseInfo) {
         return new UpdateInfo(Status.UPDATE_AVAILABLE, currentVersion, latestVersion,
@@ -39,7 +39,7 @@ public class UpdateInfo {
     }
 
     /**
-     * 创建有更新可用但无平台安装包的信息（资源尚未上传或不支持当前平台）
+     * Tạo thông tin có bản cập nhật nhưng không có gói cài đặt nền tảng (tài nguyên chưa được tải lên hoặc không hỗ trợ nền tảng hiện tại)
      */
     public static UpdateInfo updateAvailableNoAsset(String currentVersion, String latestVersion, JSONObject releaseInfo) {
         return new UpdateInfo(Status.UPDATE_AVAILABLE_NO_ASSET, currentVersion, latestVersion,
@@ -47,35 +47,35 @@ public class UpdateInfo {
     }
 
     /**
-     * 创建无更新的信息
+     * Tạo thông tin mà không cần cập nhật
      */
     public static UpdateInfo noUpdateAvailable(String message) {
         return new UpdateInfo(Status.NO_UPDATE, null, null, message, null);
     }
 
     /**
-     * 创建检查失败的信息
+     * Tạo một thông báo kiểm tra thất bại
      */
     public static UpdateInfo checkFailed(String errorMessage) {
         return new UpdateInfo(Status.CHECK_FAILED, null, null, errorMessage, null);
     }
 
     /**
-     * 是否有更新可用
+     * Có bản cập nhật không?
      */
     public boolean isUpdateAvailable() {
         return status == Status.UPDATE_AVAILABLE;
     }
 
     /**
-     * 是否有更新可用但无安装包（资源尚未上传）
+     * Có bản cập nhật nhưng không có gói cài đặt (tài nguyên chưa được tải lên)
      */
     public boolean isUpdateAvailableNoAsset() {
         return status == Status.UPDATE_AVAILABLE_NO_ASSET;
     }
 
     /**
-     * 检查是否失败
+     * Kiểm tra xem nó có thất bại không
      */
     public boolean isCheckFailed() {
         return status == Status.CHECK_FAILED;

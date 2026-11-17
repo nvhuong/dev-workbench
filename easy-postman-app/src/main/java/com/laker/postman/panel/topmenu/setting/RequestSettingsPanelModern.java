@@ -16,7 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * 现代化请求设置面板
+ * Bảng cài đặt yêu cầu hiện đại hóa
  */
 @Slf4j
 public class RequestSettingsPanelModern extends ModernSettingsPanel {

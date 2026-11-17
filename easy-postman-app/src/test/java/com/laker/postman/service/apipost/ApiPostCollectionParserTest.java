@@ -12,8 +12,8 @@ import static com.laker.postman.request.model.RequestBodyTypes.BODY_TYPE_RAW;
 import static org.testng.Assert.*;
 
 /**
- * ApiPostCollectionParser 单元测试
- * 测试 ApiPost Collection 解析功能
+ * ApiPostCollectionParser Kiểm tra đơn vị
+ * Bài kiểm tra ApiPost Collection chức năng phân tích cú pháp
  */
 public class ApiPostCollectionParserTest {
 
@@ -119,7 +119,7 @@ public class ApiPostCollectionParserTest {
                   "global": {
                     "envs": [
                       {
-                        "name": "开发环境",
+                        "name": "môi trường phát triển",
                         "server_list": [
                           {
                             "uri": "https://dev.example.com"
@@ -175,7 +175,7 @@ public class ApiPostCollectionParserTest {
         assertEquals(result.getEnvironments().size(), 1);
 
         Environment env = result.getEnvironments().get(0);
-        assertEquals(env.getName(), "开发环境");
+        assertEquals(env.getName(), "môi trường phát triển");
         assertEquals(env.getVariable("baseUrl"), "https://dev.example.com");
         assertEquals(env.getVariable("token"), "abc");
 

@@ -4,8 +4,8 @@ import lombok.Getter;
 import org.fife.ui.rsyntaxtextarea.SyntaxConstants;
 
 /**
- * 语法类型枚举，统一管理语法高亮类型
- * 添加新的语法类型只需在此枚举中添加一项即可
+ * Bảng liệt kê kiểu cú pháp, quản lý thống nhất các kiểu tô sáng cú pháp
+ * Việc thêm một kiểu cú pháp mới chỉ cần thêm một mục vào bảng liệt kê này
  */
 @Getter
 public enum SyntaxType {
@@ -26,7 +26,7 @@ public enum SyntaxType {
     }
 
     /**
-     * 获取所有显示名称数组（用于下拉框）
+     * Nhận một mảng tất cả các tên hiển thị (đối với hộp thả xuống)
      */
     public static String[] getDisplayNames() {
         SyntaxType[] values = values();
@@ -38,7 +38,7 @@ public enum SyntaxType {
     }
 
     /**
-     * 根据索引获取语法类型
+     * Lấy loại cú pháp dựa trên chỉ mục
      */
     public static SyntaxType getByIndex(int index) {
         SyntaxType[] values = values();
@@ -49,7 +49,7 @@ public enum SyntaxType {
     }
 
     /**
-     * 根据语法样式获取语法类型
+     * Lấy loại cú pháp dựa trên kiểu cú pháp
      */
     public static SyntaxType getBySyntaxStyle(String syntaxStyle) {
         if (syntaxStyle == null) {
@@ -64,7 +64,7 @@ public enum SyntaxType {
     }
 
     /**
-     * 获取索引位置
+     * Lấy vị trí chỉ mục
      */
     public int getIndex() {
         return ordinal();

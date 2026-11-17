@@ -105,12 +105,12 @@ public class RequestCodeSnippetGeneratorTest {
         item.setAuthType(AuthType.BASIC.getConstant());
         item.setAuthUsername("{{username}}");
         item.setAuthPassword("{{password}}");
-        VariablesService.getInstance().attachContextMap(Map.of("username", "用户", "password", "p:a'ss"));
+        VariablesService.getInstance().attachContextMap(Map.of("username", "Người dùng", "password", "p:a'ss"));
         try {
             String template = RequestCodeSnippetGenerator.generate(item, language, false);
             assertTrue(template.contains("{{username}}"), template);
             assertTrue(template.contains("{{password}}"), template);
-            String encoded = Base64.getEncoder().encodeToString("用户:p:a'ss".getBytes(StandardCharsets.UTF_8));
+            String encoded = Base64.getEncoder().encodeToString("Người dùng:p:a'ss".getBytes(StandardCharsets.UTF_8));
 
             String resolved = RequestCodeSnippetGenerator.generate(item, language, true);
             assertTrue(resolved.contains("Basic " + encoded), resolved);
@@ -152,11 +152,11 @@ public class RequestCodeSnippetGeneratorTest {
         HttpRequestItem item = request();
         item.setAuthType(AuthType.BASIC.getConstant());
         item.setAuthUsername("{{username}}");
-        item.setAuthPassword("密码");
+        item.setAuthPassword("mật khẩu");
 
         String generated = RequestCodeSnippetGenerator.generate(item, RequestCodeSnippetLanguage.PYTHON_REQUESTS);
 
-        assertTrue(generated.contains("auth=('{{username}}'.encode('utf-8'), '密码'.encode('utf-8'))"), generated);
+        assertTrue(generated.contains("auth=('{{username}}'.encode('utf-8'), 'mật khẩu'.encode('utf-8'))"), generated);
     }
 
     @Test(dataProvider = "languages")

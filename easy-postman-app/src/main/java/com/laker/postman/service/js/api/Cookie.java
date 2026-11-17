@@ -1,54 +1,54 @@
 package com.laker.postman.service.js.api;
 
 /**
- * Cookie 数据对象
+ * Cookie đối tượng dữ liệu
  * <p>
- * 表示一个 HTTP Cookie，包含所有标准 Cookie 属性。
+ * đại diện cho một HTTP Cookie，Tất cả các tiêu chuẩn bao gồm Cookie tài sản.
  * </p>
  */
 public class Cookie {
     /**
-     * Cookie 名称
+     * Cookie tên
      */
     public String name;
 
     /**
-     * Cookie 值
+     * Cookie giá trị
      */
     public String value;
 
     /**
-     * Cookie 所属域名
+     * Cookie Tên miền mà nó thuộc về
      */
     public String domain;
 
     /**
-     * Cookie 路径
+     * Cookie con đường
      */
     public String path;
 
     /**
-     * Cookie 过期时间
+     * Cookie Thời gian hết hạn
      */
     public String expires;
 
     /**
-     * Cookie 最大生存时间（秒）
+     * Cookie Thời gian tồn tại tối đa (giây)
      */
     public Integer maxAge;
 
     /**
-     * 是否仅在 HTTPS 连接中发送
+     * Có phải nó chỉ trong HTTPS Đã gửi trong khi kết nối
      */
     public Boolean secure;
 
     /**
-     * 是否禁止 JavaScript 访问
+     * Nó có bị cấm không? JavaScript thăm
      */
     public Boolean httpOnly;
 
     /**
-     * SameSite 属性 (Strict/Lax/None)
+     * SameSite tài sản (Strict/Lax/None)
      */
     public String sameSite;
 

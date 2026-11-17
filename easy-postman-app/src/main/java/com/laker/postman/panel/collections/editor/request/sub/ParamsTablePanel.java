@@ -60,7 +60,7 @@ public class ParamsTablePanel extends AbstractTablePanel<HttpParam> {
         return new ParamsTablePanel(true);
     }
 
-    // ========== 实现抽象方法 ==========
+    // ========== Thực hiện các phương pháp trừu tượng ==========
 
     @Override
     protected int getEnabledColumnIndex() {
@@ -119,13 +119,13 @@ public class ParamsTablePanel extends AbstractTablePanel<HttpParam> {
         return !key.isEmpty() || !value.isEmpty() || !description.isEmpty();
     }
 
-    // ========== 初始化方法 ==========
+    // ========== Phương pháp khởi tạo ==========
     @Override
     protected void initializeTableUI() {
-        // 调用父类的通用UI配置
+        // Gọi hàm chung của lớp chaUIcấu hình
         super.initializeTableUI();
 
-        // 设置列宽
+        // Đặt chiều rộng cột
         if (generatedFromUrl) {
             setGeneratedFromUrlColumnWidths();
         } else {
@@ -207,8 +207,8 @@ public class ParamsTablePanel extends AbstractTablePanel<HttpParam> {
     }
 
     /**
-     * 从 tableModel 直接读取，不停止单元格编辑。
-     * 用于 tab 指示器等后台场景，避免打断用户正在进行的输入（如 Tab 导航）。
+     * Từ tableModel Đọc trực tiếp mà không dừng chỉnh sửa ô.
+     * Được sử dụng cho tab Các cảnh nền như chỉ báo để tránh làm gián đoạn quá trình nhập liệu đang diễn ra của người dùng (ví dụ: Tab điều hướng).
      */
     public List<HttpParam> getParamsListFromModel() {
         List<HttpParam> paramsList = new ArrayList<>();

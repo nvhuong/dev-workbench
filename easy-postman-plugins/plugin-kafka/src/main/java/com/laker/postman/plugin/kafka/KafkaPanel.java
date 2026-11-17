@@ -48,7 +48,7 @@ import java.util.function.Supplier;
 import static com.laker.postman.plugin.kafka.KafkaI18n.t;
 
 /**
- * Kafka 工具面板：Topic 浏览 + 发送消息 + 实时消费。
+ * Kafka Bảng công cụ: .Topic Duyệt qua + Gửi tin nhắn + Tiêu thụ trong thời gian thực.
  */
 @Slf4j
 public class KafkaPanel extends JPanel {
@@ -69,23 +69,23 @@ public class KafkaPanel extends JPanel {
     private final AtomicReference<SwingWorker<Void, List<KafkaConsumedMessage>>> consumeWorkerRef = new AtomicReference<>();
     private final AtomicReference<KafkaConsumer<String, String>> runningConsumerRef = new AtomicReference<>();
     /**
-     * 缓存可复用的 Producer，避免每次发送都重建连接
+     * Bộ nhớ đệm có thể tái sử dụng được Producer，Tránh thiết lập lại kết nối mỗi lần bạn gửi
      */
     private final AtomicReference<KafkaProducer<String, String>> cachedProducerRef = new AtomicReference<>();
     /**
-     * 缓存 Producer 对应的配置签名，配置变更时重建
+     * Bộ nhớ đệm Producer Chữ ký cấu hình tương ứng được xây dựng lại khi cấu hình thay đổi
      */
     private volatile String cachedProducerConfigSignature;
     private final KafkaConnectionProfileStore connectionProfileStore;
     private final Map<String, KafkaConnectionProfile> connectionProfilesByName = new LinkedHashMap<>();
     private boolean loadingConnectionProfiles;
     /**
-     * Topic 加载代次（仅在 EDT 读写）。每次连接/刷新与断开都会递增，后台任务完成时代次不一致则丢弃结果，
-     * 避免断开后或被新刷新取代的旧任务把界面改回"已连接"。
+     * Topic Tạo tải (chỉ trong  EDT đọc và viết). mỗi khi bạn kết nối/Cả làm mới và ngắt kết nối sẽ được tăng lên. Nếu thời gian hoàn thành tác vụ nền không nhất quán, kết quả sẽ bị loại bỏ.
+     * Tránh thay đổi lại giao diện sau khi các tác vụ cũ bị ngắt kết nối hoặc được thay thế bằng các lần làm mới mới"Đã kết nối"。
      */
     private int topicLoadGeneration;
     /**
-     * 最近一次成功加载 Topic 的地址；未连接时为 null。用于作废加载后恢复准确的连接状态。
+     * Lần tải thành công cuối cùng Topic Địa chỉ; khi không được kết nối null。Được sử dụng để khôi phục trạng thái kết nối chính xác sau khi vô hiệu hóa tải.
      */
     private String connectedBootstrap;
 
@@ -445,14 +445,14 @@ public class KafkaPanel extends JPanel {
     }
 
     private void loadTopics() {
-        // 任何新的连接/刷新提交（包括随后校验失败的）都先作废进行中的旧任务，避免旧配置的结果被当作当前状态
+        // bất kỳ kết nối mới nào/Làm mới các lần gửi (bao gồm cả các lỗi xác minh tiếp theo) trước tiên sẽ vô hiệu hóa các tác vụ cũ đang được thực hiện để ngăn kết quả của cấu hình cũ được coi là trạng thái hiện tại
         invalidatePendingTopicLoad();
         String bootstrap = connectionPanel.bootstrapField.getText().trim();
         if (bootstrap.isBlank()) {
             NotificationCenter.showWarning(t(MessageKeys.TOOLBOX_KAFKA_ERR_HOST_REQUIRED));
             return;
         }
-        // 在 EDT 预先读取所有 UI 字段（含 passwordField），避免非 EDT 线程读取 Swing 组件
+        // Vào EDT Đọc tất cả trước UI các trường (bao gồm passwordField），Tránh không EDT Đọc chủ đề Swing thành phần
         final Properties baseProps;
         try {
             baseProps = buildCommonClientProperties();
@@ -532,7 +532,7 @@ public class KafkaPanel extends JPanel {
     }
 
     /**
-     * 仅验证当前表单配置能否连通集群，不加载 Topic、不改变已连接状态，适合保存配置前确认或已连接时验证另一组参数。
+     * Nó chỉ xác minh xem cấu hình biểu mẫu hiện tại có thể kết nối với cụm và không tải nó hay không Topic、Không thay đổi trạng thái kết nối, phù hợp để xác nhận trước khi lưu cấu hình hoặc xác minh bộ thông số khác khi kết nối.
      */
     private void testConnection() {
         final Properties baseProps;
@@ -555,8 +555,8 @@ public class KafkaPanel extends JPanel {
                     props.put(AdminClientConfig.REQUEST_TIMEOUT_MS_CONFIG, TIMEOUT_MS);
                     props.put(AdminClientConfig.DEFAULT_API_TIMEOUT_MS_CONFIG, TIMEOUT_MS);
                     try (AdminClient adminClient = AdminClient.create(props)) {
-                        // Apache Kafka 仅在 includeClusterAuthorizedOperations=true 时校验 Cluster Describe；
-                        // 兜底兼容更严格的第三方授权实现：认证已通过只是缺少集群描述权限，不应判定为连接失败
+                        // Apache Kafka Chỉ trong includeClusterAuthorizedOperations=true Xác minh thời gian Cluster Describe；
+                        // Hoàn toàn tương thích với việc triển khai ủy quyền của bên thứ ba nghiêm ngặt hơn: xác thực đã thành công nhưng thiếu quyền mô tả cụm và không được coi là lỗi kết nối
                         DescribeClusterResult cluster = adminClient.describeCluster();
                         try {
                             String clusterId = cluster.clusterId().get(ADMIN_FUTURE_WAIT_MS, TimeUnit.MILLISECONDS);
@@ -645,7 +645,7 @@ public class KafkaPanel extends JPanel {
             return;
         }
 
-        // 在 EDT 预先读取所有 UI 字段（含 passwordField），避免非 EDT 线程读取 Swing 组件
+        // Vào EDT Đọc tất cả trước UI các trường (bao gồm passwordField），Tránh không EDT Đọc chủ đề Swing thành phần
         final Properties baseProps;
         try {
             baseProps = buildCommonClientProperties();
@@ -695,7 +695,7 @@ public class KafkaPanel extends JPanel {
                     log.warn("Send kafka message interrupted", ex);
                 } catch (Exception ex) {
                     Throwable cause = unwrapException(ex);
-                    // 发送失败时关闭缓存的 Producer，下次重建
+                    // Bộ nhớ đệm bị đóng khi gửi không thành công Producer，Xây dựng lại lần sau
                     closeAndClearCachedProducer();
                     producerPanel.statusLabel.setForegroundSupplier(ModernColors::getError);
                     producerPanel.statusLabel.setText(t(MessageKeys.TOOLBOX_KAFKA_STATUS_SEND_FAILED, describeFailure(cause)));
@@ -708,8 +708,8 @@ public class KafkaPanel extends JPanel {
     }
 
     /**
-     * 获取或创建可复用的 KafkaProducer。
-     * 配置变更时自动关闭旧 Producer 并重建。
+     * Nhận hoặc tạo một tài liệu có thể tái sử dụng KafkaProducer。
+     * Tự động đóng cũ khi cấu hình thay đổi Producer và xây dựng lại.
      */
     private synchronized KafkaProducer<String, String> getOrCreateProducer(Properties producerProps, String producerConfigSignature) {
         KafkaProducer<String, String> existing = cachedProducerRef.get();
@@ -734,7 +734,7 @@ public class KafkaPanel extends JPanel {
     }
 
     /**
-     * 发送失败或断开连接时，关闭并清理缓存的 Producer
+     * Khi gửi không thành công hoặc bị ngắt kết nối, hãy đóng và xóa bộ nhớ đệm Producer
      */
     private synchronized void closeAndClearCachedProducer() {
         KafkaProducer<String, String> producer = cachedProducerRef.getAndSet(null);
@@ -779,7 +779,7 @@ public class KafkaPanel extends JPanel {
             return;
         }
 
-        // 在 EDT 预先读取所有 UI 字段（含 passwordField），避免非 EDT 线程读取 Swing 组件
+        // Vào EDT Đọc tất cả trước UI các trường (bao gồm passwordField），Tránh không EDT Đọc chủ đề Swing thành phần
         final Properties baseProps;
         try {
             baseProps = buildCommonClientProperties();
@@ -788,7 +788,7 @@ public class KafkaPanel extends JPanel {
             return;
         }
 
-        // groupId 为空时生成临时唯一 groupId，避免干扰生产环境消费组
+        // groupId Tạo một giá trị duy nhất tạm thời khi trống groupId，Tránh can thiệp vào môi trường sản xuất của nhóm người tiêu dùng
         String configuredGroupId = consumerPanel.groupIdField.getText().trim();
         final String finalGroupId = configuredGroupId.isBlank()
                 ? "easy-postman-consumer-" + System.currentTimeMillis()
@@ -936,12 +936,12 @@ public class KafkaPanel extends JPanel {
         }
         int removeCount = consumedMessages.size() - maxView;
         consumedMessages.subList(0, removeCount).clear();
-        // 超出上限后全量重建表格（保证表格与 consumedMessages 同步）
+        // Sau khi vượt quá giới hạn trên, bảng sẽ được xây dựng lại hoàn toàn (để đảm bảo bảng phù hợp với consumedMessages đồng bộ)
         rebuildMessageTable();
     }
 
     /**
-     * 全量重建消息表格（用于 trim 后或 clear 后）
+     * Xây dựng lại hoàn toàn bảng tin nhắn (for trim Sau hoặc clear mặt sau)
      */
     private void rebuildMessageTable() {
         MessageRowKey selectedKey = selectedMessageRowKey();
@@ -961,11 +961,11 @@ public class KafkaPanel extends JPanel {
 
     private void refreshMessageTable() {
         int tableRowCount = consumerPanel.messageTablePanel.getTotalRowCount();
-        // 若 consumedMessages 因 trim 缩减，或用户已排序，则全量重建以保持表格视图顺序正确
+        // giống consumedMessages bởi vì trim Nếu giảm bớt hoặc người dùng đã sắp xếp, toàn bộ bảng sẽ được xây dựng lại để duy trì đúng thứ tự của chế độ xem bảng
         if (consumedMessages.size() < tableRowCount || consumerPanel.messageTablePanel.hasActiveSort()) {
             rebuildMessageTable();
         } else {
-            // 增量追加新行，避免无排序场景下持续消费时频繁重建表格
+            // Tăng dần thêm các hàng mới để tránh việc tái tạo bảng thường xuyên trong quá trình sử dụng liên tục trong các trường hợp chưa được sắp xếp
             for (int i = tableRowCount; i < consumedMessages.size(); i++) {
                 KafkaConsumedMessage item = consumedMessages.get(i);
                 consumerPanel.messageTablePanel.addRow(new Object[]{
@@ -979,7 +979,7 @@ public class KafkaPanel extends JPanel {
                 });
             }
         }
-        // 自动滚动到最新行
+        // Tự động cuộn đến hàng mới nhất
         if (consumerPanel.messageTablePanel.getTable().getRowCount() > 0) {
             int last = consumerPanel.messageTablePanel.getTable().getRowCount() - 1;
             consumerPanel.messageTablePanel.getTable().scrollRectToVisible(
@@ -1151,7 +1151,7 @@ public class KafkaPanel extends JPanel {
         props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
         props.put(ConsumerConfig.GROUP_ID_CONFIG, groupId);
         props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, consumeStartMode.autoOffsetReset());
-        // 禁用自动提交：工具类消费不应修改服务端 group offset
+        // Tắt tính năng gửi tự động: Việc sử dụng công cụ sẽ không sửa đổi máy chủ group offset
         props.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, "false");
         props.put(ConsumerConfig.MAX_POLL_RECORDS_CONFIG, String.valueOf(maxPollRecords));
         return props;
@@ -1205,7 +1205,7 @@ public class KafkaPanel extends JPanel {
     }
 
     /**
-     * 递增加载代次使进行中的 Topic 加载结果失效；若确有加载在进行，恢复按钮并把状态还原为当前真实连接状态。
+     * Tăng cường quá trình tạo tải đang diễn ra Topic Kết quả tải không hợp lệ; nếu thực sự đang tải, hãy nhấn nút khôi phục và khôi phục trạng thái về trạng thái kết nối thực hiện tại.
      */
     private void invalidatePendingTopicLoad() {
         topicLoadGeneration++;

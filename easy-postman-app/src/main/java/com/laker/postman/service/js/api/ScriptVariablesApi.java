@@ -12,10 +12,10 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
- * 脚本中的 pm.variables API。
+ * trong kịch bản pm.variables API。
  * <p>
- * set/unset/clear 作用于当前执行上下文变量。
- * get/has/toObject/replaceIn 按应用内变量优先级读取，行为与 {{variable}} 解析保持一致。
+ * set/unset/clear Hành động trên các biến bối cảnh thực thi hiện tại.
+ * get/has/toObject/replaceIn Việc đọc theo mức độ ưu tiên của biến trong ứng dụng hoạt động giống như {{variable}} Việc phân tích cú pháp vẫn nhất quán.
  */
 public class ScriptVariablesApi {
     private final boolean includeIterationData;

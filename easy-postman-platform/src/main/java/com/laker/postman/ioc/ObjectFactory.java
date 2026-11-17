@@ -1,17 +1,17 @@
 package com.laker.postman.ioc;
 
 /**
- * 对象工厂接口
- * 用于延迟创建对象，支持循环依赖解决
+ * Giao diện nhà máy đối tượng
+ * Được sử dụng để tạo các đối tượng một cách lười biếng và hỗ trợ độ phân giải phụ thuộc vòng tròn
  */
 @FunctionalInterface
 public interface ObjectFactory<T> {
 
     /**
-     * 获取对象实例
+     * Lấy ví dụ đối tượng
      *
-     * @return 对象实例
-     * @throws Exception 如果获取失败
+     * @return Ví dụ đối tượng
+     * @throws Exception Nếu việc mua lại không thành công
      */
     T getObject() throws Exception;
 }

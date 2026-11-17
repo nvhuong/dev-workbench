@@ -156,7 +156,7 @@ public class StandardEditorTokenPainterTest {
         host.setFont(primaryFont);
         host.putClientProperty(EditorFontProperties.FALLBACK_FONT_CLIENT_PROPERTY,
                 new AllGlyphFont(fallbackFont.getName(), fallbackFont.getStyle(), fallbackFont.getSize()));
-        Token token = token("ab汉cd");
+        Token token = token("abTiếng Trung Quốccd");
         RecordingGraphics2D graphics = graphicsWithClip(0, 0, 200, 40);
 
         new StandardEditorTokenPainter()
@@ -240,7 +240,7 @@ public class StandardEditorTokenPainterTest {
         host.putClientProperty(EditorFontProperties.FALLBACK_FONT_CLIENT_PROPERTY,
                 new AllGlyphFont(fallbackFont.getName(), fallbackFont.getStyle(), fallbackFont.getSize()));
         host.setWhitespaceVisible(true);
-        Token token = token("汉 字");
+        Token token = token("Tiếng Trung Quốc Tính cách");
         RecordingGraphics2D graphics = graphicsWithClip(0, 0, 200, 40);
 
         new StandardEditorTokenPainter()
@@ -260,7 +260,7 @@ public class StandardEditorTokenPainterTest {
         host.putClientProperty(EditorFontProperties.FALLBACK_FONT_CLIENT_PROPERTY,
                 new AllGlyphFont(fallbackFont.getName(), fallbackFont.getStyle(), fallbackFont.getSize()));
         host.setPaintTabLines(true);
-        Token token = token("        汉");
+        Token token = token("        Tiếng Trung Quốc");
         RecordingGraphics2D graphics = graphicsWithClip(0, 0, 200, 40);
 
         new StandardEditorTokenPainter().paint(
@@ -297,7 +297,7 @@ public class StandardEditorTokenPainterTest {
         FallbackAwareRSyntaxTextArea host = new FallbackAwareRSyntaxTextArea();
         host.setFont(primaryFont);
         host.putClientProperty(EditorFontProperties.FALLBACK_FONT_CLIENT_PROPERTY, fallbackFont);
-        host.setText("汉".repeat(100));
+        host.setText("Tiếng Trung Quốc".repeat(100));
         host.setSize(3_000, 80);
 
         Token token = ((RSyntaxDocument) host.getDocument()).getTokenListForLine(0);
@@ -319,7 +319,7 @@ public class StandardEditorTokenPainterTest {
         FallbackAwareRSyntaxTextArea host = new FallbackAwareRSyntaxTextArea();
         host.setFont(primaryFont);
         host.putClientProperty(EditorFontProperties.FALLBACK_FONT_CLIENT_PROPERTY, fallbackFont);
-        FontMetrics fallbackMetrics = host.getFontMetrics(host.getFontForToken(token("汉")));
+        FontMetrics fallbackMetrics = host.getFontMetrics(host.getFontForToken(token("Tiếng Trung Quốc")));
 
         assertTrue(host.getLineHeight() >= fallbackMetrics.getHeight());
         assertTrue(host.getMaxAscent() >= fallbackMetrics.getMaxAscent());
@@ -332,7 +332,7 @@ public class StandardEditorTokenPainterTest {
         FallbackAwareRSyntaxTextArea host = new FallbackAwareRSyntaxTextArea();
         host.setFont(primaryFont);
         host.putClientProperty(EditorFontProperties.FALLBACK_FONT_CLIENT_PROPERTY, fallbackFont);
-        Token token = token("a".repeat(600) + "汉");
+        Token token = token("a".repeat(600) + "Tiếng Trung Quốc");
         RecordingGraphics2D graphics = graphicsWithClip(0, 0, 10_000, 40);
 
         float paintedEnd = new ViewportClippedTokenPainter()

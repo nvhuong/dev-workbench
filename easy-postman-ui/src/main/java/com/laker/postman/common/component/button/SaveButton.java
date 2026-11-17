@@ -9,7 +9,7 @@ import javax.swing.*;
 import java.awt.*;
 
 /**
- * 通用保存按钮，带图标和统一样式。
+ * Nút lưu phổ quát với biểu tượng và phong cách thống nhất.
  */
 public class SaveButton extends JButton {
     public SaveButton() {

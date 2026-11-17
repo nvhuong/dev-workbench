@@ -13,13 +13,13 @@ public class AssertionTypeI18nTest {
     @Test
     public void shouldHaveEnglishAndChineseLabelsForAllTypes() {
         ResourceBundle en = ResourceBundle.getBundle("messages", Locale.ENGLISH);
-        ResourceBundle zh = ResourceBundle.getBundle("messages", Locale.CHINESE);
+        ResourceBundle zh = ResourceBundle.getBundle("messages", Locale.forLanguageTag("vi"));
 
         assertEquals(en.getString(MessageKeys.PERFORMANCE_ASSERTION_TYPE_RESPONSE_CODE), "Response Code");
         assertEquals(en.getString(MessageKeys.PERFORMANCE_ASSERTION_TYPE_CONTAINS), "Contains");
         assertEquals(en.getString(MessageKeys.PERFORMANCE_ASSERTION_TYPE_JSON_PATH), "JSONPath");
-        assertEquals(zh.getString(MessageKeys.PERFORMANCE_ASSERTION_TYPE_RESPONSE_CODE), "响应码");
-        assertEquals(zh.getString(MessageKeys.PERFORMANCE_ASSERTION_TYPE_CONTAINS), "包含内容");
+        assertEquals(zh.getString(MessageKeys.PERFORMANCE_ASSERTION_TYPE_RESPONSE_CODE), "Mã phản hồi");
+        assertEquals(zh.getString(MessageKeys.PERFORMANCE_ASSERTION_TYPE_CONTAINS), "Chứa nội dung");
         assertEquals(zh.getString(MessageKeys.PERFORMANCE_ASSERTION_TYPE_JSON_PATH), "JSONPath");
     }
 }

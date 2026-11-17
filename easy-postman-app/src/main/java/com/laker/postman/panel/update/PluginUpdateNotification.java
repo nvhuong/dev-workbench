@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.function.Consumer;
 
 /**
- * 插件更新通知弹窗。
+ * Cửa sổ bật lên thông báo cập nhật plug-in.
  */
 @Slf4j
 public class PluginUpdateNotification {

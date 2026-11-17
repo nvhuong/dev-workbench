@@ -89,7 +89,7 @@ public class PerformancePanelViewFactoryTest extends AbstractSwingUiTest {
         assertEquals(resultSection.resultTabbedPane().getSelectedIndex(), PerformancePanelViewFactory.RESULT_TAB_TREND);
         assertTrue(resultSection.trendButton().isSelected());
         assertTrue(resultSection.resultTabbedPane().getUI().getClass().getSimpleName().contains("HiddenResultTabs"));
-        assertFalse(hasText(resultSection.resultPanel(), "结果视图"));
+        assertFalse(hasText(resultSection.resultPanel(), "Xem kết quả"));
         assertFalse(hasText(resultSection.resultPanel(), "Result View"));
         Container resultSwitcher = resultSection.trendButton().getParent();
         assertSame(resultSwitcher.getComponent(0), resultSection.trendButton());

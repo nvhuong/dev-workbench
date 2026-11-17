@@ -31,51 +31,51 @@ import static com.laker.postman.request.model.RequestBodyTypes.BODY_TYPE_FORM_UR
 import static com.laker.postman.request.model.RequestBodyTypes.BODY_TYPE_RAW;
 
 /**
- * HAR (HTTP Archive) 格式解析器
- * 负责解析 HAR 1.2 格式的文件，转换为内部数据结构
+ * HAR (HTTP Archive) Trình phân tích cú pháp định dạng
+ * Chịu trách nhiệm phân tích HAR 1.2 tập tin định dạng, được chuyển đổi thành cấu trúc dữ liệu nội bộ
  */
 @Slf4j
 public class HarParser {
     /**
-     * 私有构造函数，防止实例化
+     * Nhà xây dựng riêng để ngăn chặn việc khởi tạo
      */
     private HarParser() {
         throw new UnsupportedOperationException("Utility class cannot be instantiated");
     }
 
     /**
-     * 解析 HAR JSON 文件，返回根节点
+     * phân tích HAR JSON tập tin, trả về nút gốc
      *
-     * @param json HAR JSON 字符串
-     * @return 集合根节点，如果解析失败返回 null
+     * @param json HAR JSON chuỗi
+     * @return Nút gốc của bộ sưu tập, được trả về nếu phân tích cú pháp không thành công null
      */
     public static DefaultMutableTreeNode parseHar(String json) {
         try {
             JSONObject harRoot = JSONUtil.parseObj(json);
             if (!harRoot.containsKey("log")) {
-                log.error("HAR文件格式错误：缺少 log 字段");
+                log.error("HARLỗi định dạng tệp: thiếu log lĩnh vực");
                 return null;
             }
 
             JSONObject logObj = harRoot.getJSONObject("log");
             String version = logObj.getStr("version", "");
             if (!"1.2".equals(version)) {
-                log.warn("HAR版本不是1.2，当前版本: {}", version);
+                log.warn("HARphiên bản thì không1.2，Phiên bản hiện tại: {}", version);
             }
 
-            // 创建分组节点
+            // Tạo các nút nhóm
             String groupName = "HAR Import " + System.currentTimeMillis();
             RequestGroup collectionGroup = new RequestGroup(groupName);
             DefaultMutableTreeNode collectionNode = CollectionTreeNodes.groupNode(collectionGroup);
 
-            // 解析 entries
+            // phân tích entries
             JSONArray entries = logObj.getJSONArray("entries");
             if (entries == null || entries.isEmpty()) {
-                log.warn("HAR文件中没有请求条目");
+                log.warn("HARKhông có mục yêu cầu trong tập tin");
                 return collectionNode;
             }
 
-            // 遍历所有条目
+            // Lặp lại qua tất cả các mục
             for (Object entryObj : entries) {
                 JSONObject entry = (JSONObject) entryObj;
                 HttpRequestItem requestItem = parseHarEntry(entry);
@@ -86,13 +86,13 @@ public class HarParser {
 
             return collectionNode;
         } catch (Exception e) {
-            log.error("解析HAR文件失败", e);
+            log.error("phân tíchHARTệp không thành công", e);
             return null;
         }
     }
 
     /**
-     * 解析单个 HAR entry 为 HttpRequestItem
+     * Phân tích một đơn HAR entry vì HttpRequestItem
      */
     private static HttpRequestItem parseHarEntry(JSONObject entry) {
         try {
@@ -101,27 +101,27 @@ public class HarParser {
 
             JSONObject request = entry.getJSONObject("request");
             if (request == null) {
-                log.warn("HAR entry 缺少 request 字段");
+                log.warn("HAR entry thiếu request lĩnh vực");
                 return null;
             }
 
-            // 方法
+            // phương pháp
             req.setMethod(request.getStr("method", "GET"));
 
             // URL
             String url = request.getStr("url", "");
             if (url.isEmpty()) {
-                log.warn("HAR entry 的 URL 为空");
+                log.warn("HAR entry của URL trống rỗng");
                 return null;
             }
             req.setUrl(url);
 
-            // 请求名称（从 comment 或 URL 提取）
+            // Tên yêu cầu (từ comment hoặc URL khai thác)
             String comment = entry.getStr("comment", "");
             if (!comment.isEmpty()) {
                 req.setName(comment);
             } else {
-                // 从 URL 提取名称
+                // Từ URL Trích xuất tên
                 try {
                     URI uri = new URI(url);
                     String path = uri.getPath();
@@ -148,7 +148,7 @@ public class HarParser {
                     JSONObject hObj = (JSONObject) h;
                     String name = hObj.getStr("name", "");
                     String value = hObj.getStr("value", "");
-                    // 检查是否是认证头
+                    // Kiểm tra xem đó có phải là tiêu đề xác thực hay không
                     if ("Authorization".equalsIgnoreCase(name)) {
                         if (value.startsWith("Basic ")) {
                             req.setAuthType(AUTH_TYPE_BASIC);
@@ -194,7 +194,7 @@ public class HarParser {
                     req.setBody(text);
                     req.setBodyType(BODY_TYPE_RAW);
                 } else if (mimeType.contains("application/x-www-form-urlencoded")) {
-                    // 解析 urlencoded 数据
+                    // phân tích urlencoded dữ liệu
                     List<HttpFormUrlencoded> urlencodedList = new ArrayList<>();
                     JSONArray params = postData.getJSONArray("params");
                     if (params != null && !params.isEmpty()) {
@@ -205,7 +205,7 @@ public class HarParser {
                             urlencodedList.add(new HttpFormUrlencoded(true, name, value));
                         }
                     } else if (!text.isEmpty()) {
-                        // 如果没有 params 数组，尝试从 text 解析
+                        // Nếu không params Mảng, thử từ text phân tích
                         String[] pairs = text.split("&");
                         for (String pair : pairs) {
                             String[] kv = pair.split("=", 2);
@@ -217,7 +217,7 @@ public class HarParser {
                     req.setUrlencodedList(urlencodedList);
                     req.setBodyType(BODY_TYPE_FORM_URLENCODED);
                 } else if (mimeType.contains("multipart/form-data")) {
-                    // 解析 multipart/form-data
+                    // phân tích multipart/form-data
                     List<HttpFormData> formDataList = new ArrayList<>();
                     JSONArray params = postData.getJSONArray("params");
                     if (params != null && !params.isEmpty()) {
@@ -236,23 +236,23 @@ public class HarParser {
                     req.setFormDataList(formDataList);
                     req.setBodyType(BODY_TYPE_FORM_DATA);
                 } else if (!text.isEmpty()) {
-                    // 其他类型作为 raw body
+                    // Các loại khác như raw body
                     req.setBody(text);
                     req.setBodyType(BODY_TYPE_RAW);
                 }
             }
             return req;
         } catch (Exception e) {
-            log.error("解析HAR entry失败", e);
+            log.error("phân tíchHAR entrythất bại", e);
             return null;
         }
     }
 
     /**
-     * 解析 Basic Auth
+     * phân tích Basic Auth
      *
-     * @param value Basic Auth 值，格式为 "Basic base64(username:password)"
-     * @return 包含用户名和密码的 Pair 对象
+     * @param value Basic Auth Giá trị, ở định dạng "Basic base64(username:password)"
+     * @return Chứa tên người dùng và mật khẩu Pair đối tượng
      */
     private static Pair<String, String> parseBasicAuth(String value) {
         String credentials = value.substring(6).trim();
@@ -260,14 +260,14 @@ public class HarParser {
         try {
             decoded = new String(Base64.getDecoder().decode(credentials));
         } catch (IllegalArgumentException e) {
-            log.error("解析 Basic auth 信息失败 value: {}", value, e);
+            log.error("phân tích Basic auth Tin nhắn không thành công value: {}", value, e);
             return null;
         }
         String[] parts = decoded.split(":", 2);
         if (parts.length == 2) {
             return new Pair<>(parts[0], parts[1]);
         } else {
-            log.error("解析 Basic auth 信息失败 value: {}", value);
+            log.error("phân tích Basic auth Tin nhắn không thành công value: {}", value);
             return null;
         }
     }

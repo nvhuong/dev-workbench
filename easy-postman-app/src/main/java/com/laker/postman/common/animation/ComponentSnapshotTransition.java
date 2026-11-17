@@ -5,9 +5,9 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 
 /**
- * 组件级快照淡出过渡。
- * 在根窗口的 layeredPane 上仅覆盖目标组件所在区域，
- * 适合 request 编辑器这类局部骨架 -> 真实内容的平滑切换。
+ * Chuyển đổi mờ dần ảnh chụp nhanh cấp thành phần.
+ * trong cửa sổ gốc layeredPane Chỉ có khu vực đặt thành phần mục tiêu mới được bao phủ.
+ * thích hợp request Một bộ xương một phần chẳng hạn như trình soạn thảo -> Chuyển đổi mượt mà của nội dung thực.
  */
 public final class ComponentSnapshotTransition {
 
@@ -148,8 +148,8 @@ public final class ComponentSnapshotTransition {
 
         @Override
         public boolean contains(int x, int y) {
-            // 组件级过渡层同样只负责绘制，不能参与鼠标命中。
-            // 这样下面真实编辑器里的 JSplitPane / Tab / 输入框交互才不会被挡住。
+            // Lớp chuyển tiếp cấp thành phần cũng chỉ chịu trách nhiệm vẽ và không thể tham gia đánh chuột.
+            // Giống như thế này trong trình soạn thảo thực sự bên dưới JSplitPane / Tab / Tương tác hộp đầu vào sẽ không bị chặn.
             return false;
         }
 

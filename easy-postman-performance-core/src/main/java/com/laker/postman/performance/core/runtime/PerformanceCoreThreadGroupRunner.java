@@ -156,14 +156,14 @@ public final class PerformanceCoreThreadGroupRunner<C> {
             }
 
             if (!terminated || !runningSupplier.getAsBoolean()) {
-                log.warn("线程池未能在预期时间内完成，强制关闭剩余线程");
+                log.warn("Nhóm luồng không thể hoàn thành trong thời gian dự kiến, buộc các luồng còn lại phải tắt");
                 markDrainTimedOut(terminated);
                 List<Runnable> pendingTasks = executor.shutdownNow();
-                log.debug("已取消 {} 个待执行任务", pendingTasks.size());
+                log.debug("Đã hủy {} các nhiệm vụ cần thực hiện", pendingTasks.size());
                 if (!executor.awaitTermination(3, TimeUnit.SECONDS)) {
-                    log.warn("部分线程在强制关闭后仍未终止，这是正常的，线程会在网络操作完成后自动退出");
+                    log.warn("Một số chủ đề không bị chấm dứt sau khi buộc phải tắt máy. Điều này là bình thường. Các chủ đề sẽ tự động thoát sau khi hoạt động mạng hoàn tất");
                 } else {
-                    log.info("所有线程已成功终止");
+                    log.info("Tất cả các chủ đề đã kết thúc thành công");
                 }
             }
         } catch (InterruptedException exception) {
@@ -176,7 +176,7 @@ public final class PerformanceCoreThreadGroupRunner<C> {
                         .build());
                 log.error(exception.getMessage(), exception);
             } else {
-                log.debug("固定线程模式已停止");
+                log.debug("Chế độ chủ đề cố định đã dừng");
             }
         }
     }
@@ -256,25 +256,25 @@ public final class PerformanceCoreThreadGroupRunner<C> {
         try {
             boolean schedulerTerminated = scheduler.awaitTermination(totalDuration + 10L, TimeUnit.SECONDS);
             if (!schedulerTerminated || !runningSupplier.getAsBoolean()) {
-                log.warn("递增模式调度器未能正常终止，强制关闭");
+                log.warn("Bộ lập lịch chế độ tăng dần không kết thúc bình thường và buộc phải đóng");
                 scheduler.shutdownNow();
             }
 
             executor.shutdown();
             boolean executorTerminated = executor.awaitTermination(tg.maxInFlightWaitSeconds, TimeUnit.SECONDS);
             if (!executorTerminated || !runningSupplier.getAsBoolean()) {
-                log.warn("递增模式执行器未能正常终止，强制关闭");
+                log.warn("Trình thực thi chế độ tăng dần không kết thúc bình thường và buộc phải tắt");
                 markDrainTimedOut(executorTerminated);
                 executor.shutdownNow();
                 if (!executor.awaitTermination(3, TimeUnit.SECONDS)) {
-                    log.warn("递增模式部分线程在强制关闭后仍未终止");
+                    log.warn("Một số luồng ở chế độ tăng dần không bị chấm dứt sau khi buộc phải tắt máy");
                 }
             }
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             scheduler.shutdownNow();
             executor.shutdownNow();
-            log.error("递增线程执行中断", e);
+            log.error("Tăng số lần ngắt thực thi luồng", e);
         }
     }
 
@@ -358,11 +358,11 @@ public final class PerformanceCoreThreadGroupRunner<C> {
         try {
             boolean schedulerTerminated = scheduler.awaitTermination(totalTime + 10L, TimeUnit.SECONDS);
             if (!schedulerTerminated || !runningSupplier.getAsBoolean()) {
-                log.warn("尖刺模式调度器未能正常终止，强制关闭");
+                log.warn("Bộ lập lịch chế độ tăng đột biến không kết thúc bình thường và buộc phải đóng");
                 scheduler.shutdownNow();
             }
 
-            awaitWindowedWorkers("尖刺模式", threadEndTimes.keySet(), tg.maxInFlightWaitSeconds);
+            awaitWindowedWorkers("Chế độ đột biến", threadEndTimes.keySet(), tg.maxInFlightWaitSeconds);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             scheduler.shutdownNow();
@@ -371,7 +371,7 @@ public final class PerformanceCoreThreadGroupRunner<C> {
                     thread.interrupt();
                 }
             }
-            log.error("尖刺模式执行中断", e);
+            log.error("Việc thực thi chế độ Spike bị gián đoạn", e);
         }
     }
 
@@ -448,11 +448,11 @@ public final class PerformanceCoreThreadGroupRunner<C> {
         try {
             boolean schedulerTerminated = scheduler.awaitTermination(totalTime + 10L, TimeUnit.SECONDS);
             if (!schedulerTerminated || !runningSupplier.getAsBoolean()) {
-                log.warn("阶梯模式调度器未能正常终止，强制关闭");
+                log.warn("Bộ lập lịch chế độ bậc thang không kết thúc bình thường và buộc phải đóng");
                 scheduler.shutdownNow();
             }
 
-            awaitWindowedWorkers("阶梯模式", threadEndTimes.keySet(), tg.maxInFlightWaitSeconds);
+            awaitWindowedWorkers("Chế độ thang", threadEndTimes.keySet(), tg.maxInFlightWaitSeconds);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             scheduler.shutdownNow();
@@ -461,7 +461,7 @@ public final class PerformanceCoreThreadGroupRunner<C> {
                     thread.interrupt();
                 }
             }
-            log.error("阶梯模式执行中断", e);
+            log.error("Việc thực thi chế độ Ladder bị gián đoạn", e);
         }
     }
 
@@ -720,7 +720,7 @@ public final class PerformanceCoreThreadGroupRunner<C> {
             return;
         }
 
-        log.warn("{}仍有 {} 个请求未在 {} 秒内完成，将强制取消", modeName, unfinished.size(), maxWaitSeconds);
+        log.warn("{}Vẫn còn đó {} yêu cầu không có sẵn {} Hoàn thành trong vòng vài giây, nó sẽ bị buộc phải hủy bỏ", modeName, unfinished.size(), maxWaitSeconds);
         markDrainTimedOut(false);
         unfinished.forEach(Thread::interrupt);
         long cleanupDeadlineNanos = System.nanoTime() + TimeUnit.SECONDS.toNanos(3L);
@@ -770,7 +770,7 @@ public final class PerformanceCoreThreadGroupRunner<C> {
         long lastLogTime = lastIterationFailureLogTime.get();
         if (now - lastLogTime >= ITERATION_FAILURE_LOG_INTERVAL_MS
                 && lastIterationFailureLogTime.compareAndSet(lastLogTime, now)) {
-            log.warn("压测迭代执行异常，虚拟用户将继续执行（期间另有 {} 次异常被抑制）",
+            log.warn("Quá trình thực hiện lặp lại kiểm tra căng thẳng là bất thường và người dùng ảo sẽ tiếp tục thực thi (nếu không thì trong khoảng thời gian đó {} ngoại lệ bị loại bỏ)",
                     suppressedIterationFailures.getAndSet(0L), exception);
         } else {
             suppressedIterationFailures.incrementAndGet();
@@ -804,7 +804,7 @@ public final class PerformanceCoreThreadGroupRunner<C> {
                     progressSequence.incrementAndGet()
             ));
         } catch (Exception e) {
-            log.warn("压测进度事件监听器执行失败", e);
+            log.warn("Trình xử lý sự kiện tiến trình kiểm tra căng thẳng không thể thực thi được", e);
         }
     }
 
@@ -812,7 +812,7 @@ public final class PerformanceCoreThreadGroupRunner<C> {
         try {
             currentResultSink().onError(error);
         } catch (Exception e) {
-            log.warn("压测错误事件监听器执行失败", e);
+            log.warn("Trình xử lý sự kiện lỗi kiểm tra căng thẳng không thể thực thi được", e);
         }
     }
 

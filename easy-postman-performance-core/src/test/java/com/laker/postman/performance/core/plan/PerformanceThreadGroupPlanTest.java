@@ -13,7 +13,7 @@ import static org.testng.Assert.assertEquals;
 
 public class PerformanceThreadGroupPlanTest {
 
-    @Test(description = "运行时应按虚拟用户索引只取对应的 CSV 行副本")
+    @Test(description = "Khi chạy, chỉ những cái tương ứng mới được tìm nạp theo chỉ mục người dùng ảo CSV sao chép dòng")
     public void shouldReturnCsvRowForVirtualUserWithoutExposingPlanState() {
         PerformanceThreadGroupPlan groupPlan = new PerformanceThreadGroupPlan(
                 "group",
@@ -36,7 +36,7 @@ public class PerformanceThreadGroupPlanTest {
         assertEquals(groupPlan.csvRowForVirtualUser(1).get("userId"), "u2");
     }
 
-    @Test(description = "file-source CSV 应按 worker 全局 offset 读取本地同路径文件")
+    @Test(description = "file-source CSV nên được nhấn worker Bức tranh lớn offset Đọc các tập tin cục bộ với cùng một đường dẫn")
     public void shouldLoadFileSourceCsvRowsForVirtualUserOffset() throws Exception {
         Path csvPath = Files.createTempFile("ep-performance-users", ".csv");
         Files.writeString(csvPath, "userId,token\nu0,t0\nu1,t1\nu2,t2\n");

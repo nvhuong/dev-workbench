@@ -1,7 +1,7 @@
 package com.laker.postman.ioc;
 
 /**
- * Bean创建失败异常
+ * BeanTạo ngoại lệ không thành công
  */
 public class BeanCreationException extends BeanException {
 

@@ -111,7 +111,7 @@ public class RequestSideAssistantPanelLayoutTest extends AbstractSwingUiTest {
         JComboBox<?> language = findComponent(panel, JComboBox.class);
         panel.setSize(240, 500);
 
-        for (Locale locale : List.of(Locale.ENGLISH, Locale.CHINESE)) {
+        for (Locale locale : List.of(Locale.ENGLISH, Locale.forLanguageTag("vi"))) {
             ResourceBundle bundle = ResourceBundle.getBundle("messages", locale);
             resolveVariables.setText(bundle.getString(MessageKeys.REQUEST_ASSISTANT_CODE_RESOLVE_VARIABLES));
             layoutRecursively(panel);

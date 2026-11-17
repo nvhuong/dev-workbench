@@ -14,8 +14,8 @@ import java.awt.*;
 import java.io.Serial;
 
 /**
- * 启动欢迎窗口（Splash Window），用于主程序加载时的过渡。
- * 使用无边框 JFrame 代替 JWindow，降低 macOS 上首次创建顶层窗口的额外开销。
+ * Khởi chạy cửa sổ chào mừng (Splash Window），Được sử dụng để chuyển tiếp khi chương trình chính được tải.
+ * Sử dụng không viền JFrame thay vào đó JWindow，thấp hơn macOS Chi phí bổ sung của việc tạo cửa sổ cấp cao nhất lần đầu tiên.
  */
 @Slf4j
 class SplashWindow extends JFrame {
@@ -32,7 +32,7 @@ class SplashWindow extends JFrame {
     }
 
     /**
-     * 在 EDT 线程中初始化 UI 组件。
+     * Vào EDT Được khởi tạo trong chuỗi UI thành phần.
      */
     public void init() {
         try {
@@ -42,20 +42,20 @@ class SplashWindow extends JFrame {
                 SwingUtilities.invokeAndWait(this::initUI);
             }
         } catch (InterruptedException e) {
-            Thread.currentThread().interrupt(); // 恢复中断状态
-            log.error("初始化 SplashWindow 被中断", e);
+            Thread.currentThread().interrupt(); // Khôi phục trạng thái bị gián đoạn
+            log.error("khởi tạo SplashWindow đã bị gián đoạn", e);
             dispose();
             throw new SplashWindowInitializationException("Failed to initialize splash window", e);
         } catch (Exception e) {
-            log.error("初始化 SplashWindow 失败", e);
-            // 如果初始化失败，确保窗口被正确释放
+            log.error("khởi tạo SplashWindow thất bại", e);
+            // Nếu quá trình khởi tạo không thành công, hãy đảm bảo cửa sổ được giải phóng chính xác
             dispose();
             throw new SplashWindowInitializationException("Failed to initialize splash window", e);
         }
     }
 
     /**
-     * 初始化 UI 组件
+     * khởi tạo UI thành phần
      */
     private void initUI() {
         JPanel content = createContentPanel();
@@ -63,7 +63,7 @@ class SplashWindow extends JFrame {
     }
 
     /**
-     * 创建主要内容面板
+     * Tạo bảng nội dung chính
      */
     private JPanel createContentPanel() {
         JPanel content = createSplashContentPanel();
@@ -77,10 +77,10 @@ class SplashWindow extends JFrame {
     }
 
     /**
-     * 创建Logo面板
+     * TạoLogobảng điều khiển
      */
     private JPanel createLogoPanel() {
-        // 创建容器面板，用于绘制圆形背景
+        // Tạo một bảng chứa để vẽ nền hình tròn
         JPanel logoContainer = new JPanel() {
             @Serial
             private static final long serialVersionUID = 1L;
@@ -91,27 +91,27 @@ class SplashWindow extends JFrame {
                 Graphics2D g2 = (Graphics2D) g.create();
                 g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-                int size = 100; // 缩小圆形尺寸
+                int size = 100; // Giảm kích thước vòng tròn
                 int x = (getWidth() - size) / 2;
                 int y = (getHeight() - size) / 2;
 
-                // 绘制外层光晕
+                // Sơn quầng sáng bên ngoài
                 g2.setColor(getDecorativeDotColor(25));
                 g2.fillOval(x - 6, y - 6, size + 12, size + 12);
 
-                // 绘制中层光晕
+                // Vẽ một ánh sáng ở mức độ trung bình
                 g2.setColor(getDecorativeDotColor(40));
                 g2.fillOval(x - 4, y - 4, size + 8, size + 8);
 
-                // 绘制圆形背景
+                // Vẽ nền hình tròn
                 g2.setColor(getDecorativeDotColor(95));
                 g2.fillOval(x, y, size, size);
 
-                // 绘制内部微妙阴影，增加立体感
+                // Sơn nội thất với các bóng tinh tế để thêm kích thước
                 g2.setColor(getDecorativeDotColor(15));
                 g2.fillOval(x + 2, y + 2, size - 4, size - 4);
 
-                // 绘制边框高光
+                // Vẽ các điểm nổi bật ở đường viền
                 g2.setColor(ModernColors.withAlpha(ModernColors.getTextInverse(), 120));
                 g2.setStroke(new BasicStroke(2f));
                 g2.drawOval(x + 1, y + 1, size - 2, size - 2);
@@ -121,7 +121,7 @@ class SplashWindow extends JFrame {
         };
         logoContainer.setOpaque(false);
         logoContainer.setLayout(new BorderLayout());
-        // 调整容器尺寸（100 + 12 = 112，设为 120 留边距）
+        // Thay đổi kích thước vùng chứa (100 + 12 = 112，Đặt thành 120 để lại lề)
         logoContainer.setPreferredSize(new Dimension(120, 120));
 
         Image scaledImage = Icons.LOGO.getImage().getScaledInstance(80, 80, Image.SCALE_SMOOTH);
@@ -134,19 +134,19 @@ class SplashWindow extends JFrame {
     }
 
     /**
-     * 创建应用信息面板
+     * Tạo bảng thông tin ứng dụng
      */
     private JPanel createInfoPanel() {
         JPanel infoPanel = new JPanel(new GridLayout(2, 1, 0, 1));
         infoPanel.setOpaque(false);
 
-        // 应用名称
+        // Tên ứng dụng
         JLabel appNameLabel = new JLabel(I18nUtil.getMessage(MessageKeys.APP_NAME), SwingConstants.CENTER);
         appNameLabel.setFont(FontsUtil.getDefaultFontWithOffset(Font.BOLD, 8));
         appNameLabel.setForeground(getTextColor());
         infoPanel.add(appNameLabel);
 
-        // 版本号
+        // Số phiên bản
         JLabel versionLabel = new JLabel(SystemUtil.getCurrentVersion(), SwingConstants.CENTER);
         versionLabel.setFont(FontsUtil.getDefaultFontWithOffset(Font.BOLD, 4));
         versionLabel.setForeground(getTextColor());
@@ -156,51 +156,51 @@ class SplashWindow extends JFrame {
     }
 
     /**
-     * 创建状态面板
+     * Tạo bảng trạng thái
      */
     private JPanel createStatusPanel() {
         JPanel bottomPanel = new JPanel(new BorderLayout(0, 3));
         bottomPanel.setOpaque(false);
         statusLabel = new JLabel(I18nUtil.getMessage(MessageKeys.SPLASH_STATUS_STARTING), SwingConstants.CENTER);
-        statusLabel.setFont(FontsUtil.getDefaultFontWithOffset(Font.PLAIN, 3)); // 比标准字体大3号
+        statusLabel.setFont(FontsUtil.getDefaultFontWithOffset(Font.PLAIN, 3)); // Lớn hơn kích thước phông chữ tiêu chuẩn3Không
         statusLabel.setForeground(getTextColor());
         bottomPanel.add(statusLabel, BorderLayout.CENTER);
         return bottomPanel;
     }
 
     /**
-     * 初始化窗口
+     * Cửa sổ khởi tạo
      */
     private void initializeWindow(JPanel content) {
         setContentPane(content);
-        setSize(340, 250); // 设置窗口大小
-        setLocationRelativeTo(null);  // 居中显示
+        setSize(340, 250); // Đặt kích thước cửa sổ
+        setLocationRelativeTo(null);  // Hiển thị ở giữa
 
         setupWindowProperties();
 
-        setVisible(true); // 显示窗口
+        setVisible(true); // Hiển thị cửa sổ
         log.info("Splash window is visible");
     }
 
     /**
-     * 安全设置窗口属性
+     * Thuộc tính cửa sổ cài đặt bảo mật
      */
     private void setupWindowProperties() {
         try {
-            setBackground(new Color(0, 0, 0, 0)); // 透明背景
+            setBackground(new Color(0, 0, 0, 0)); // Nền trong suốt
         } catch (Exception e) {
-            log.warn("设置透明背景失败，使用默认背景", e);
+            log.warn("Không thể đặt nền trong suốt, nền mặc định được sử dụng", e);
         }
 
         try {
-            setAlwaysOnTop(true); // 窗口总在最上层
+            setAlwaysOnTop(true); // Cửa sổ luôn ở trên cùng
         } catch (Exception e) {
-            log.warn("设置窗口置顶失败", e);
+            log.warn("Không thể đặt cửa sổ lên trên cùng", e);
         }
     }
 
     private static JPanel createSplashContentPanel() {
-        JPanel content = new JPanel() { // 自定义面板，绘制渐变背景和圆角
+        JPanel content = new JPanel() { // Tùy chỉnh bảng điều khiển, vẽ nền gradient và các góc tròn
             @Override
             protected void paintComponent(Graphics g) {
                 super.paintComponent(g);
@@ -215,10 +215,10 @@ class SplashWindow extends JFrame {
                         getWidth(), getHeight(), gradientEnd
                 );
                 g2d.setPaint(gp);
-                // 圆角背景
+                // Nền các góc tròn
                 g2d.fillRoundRect(0, 0, getWidth(), getHeight(), 32, 32);
 
-                // 添加微妙的光泽效果
+                // Thêm hiệu ứng bóng tinh tế
                 Color highlightStart = ModernColors.withAlpha(ModernColors.getTextInverse(), 40);
                 Color highlightEnd = ModernColors.withAlpha(ModernColors.getTextInverse(), 0);
                 GradientPaint glossPaint = new GradientPaint(
@@ -236,9 +236,9 @@ class SplashWindow extends JFrame {
                 g2d.dispose();
             }
         };
-        content.setLayout(new BorderLayout(0, 10)); // 使用 BorderLayout 布局
-        content.setOpaque(false); // 设置透明背景
-        content.setBorder(BorderFactory.createEmptyBorder(24, 24, 24, 24)); // 设置内边距
+        content.setLayout(new BorderLayout(0, 10)); // sử dụng BorderLayout cách trình bày
+        content.setOpaque(false); // Đặt nền trong suốt
+        content.setBorder(BorderFactory.createEmptyBorder(24, 24, 24, 24)); // Đặt phần đệm
         return content;
     }
 
@@ -249,7 +249,7 @@ class SplashWindow extends JFrame {
     }
 
     /**
-     * 更新状态标签
+     * Cập nhật nhãn trạng thái
      */
     private void updateStatusLabel(String statusKey) {
         if (!isDisposed && statusLabel != null) {
@@ -262,7 +262,7 @@ class SplashWindow extends JFrame {
     }
 
     /**
-     * 处理主窗口加载错误
+     * Xử lý lỗi tải cửa sổ chính
      */
     void handleMainFrameLoadError(Throwable e) {
         if (e instanceof InterruptedException) {
@@ -272,12 +272,12 @@ class SplashWindow extends JFrame {
     }
 
     /**
-     * 启动渐隐动画
+     * Bắt đầu hoạt ảnh mờ dần
      */
     void startFadeOutAnimation(MainFrame mainFrame, StartupCoordinator startupCoordinator) {
         if (isDisposed) return;
 
-        // 先显示主窗口；一旦启动占位符稳定绘制完成就尽快退场，不再阻塞等待主内容完全加载。
+        // Cửa sổ chính được hiển thị đầu tiên; Sau khi hoàn thành bản vẽ ổn định của trình giữ chỗ, nó sẽ thoát ra càng sớm càng tốt mà không bị chặn và chờ nội dung chính được tải đầy đủ.
         startupCoordinator.showMainFrameAndLoadContent(mainFrame);
         startupCoordinator.runAfterStartupShellReady(
                 mainFrame,
@@ -296,7 +296,7 @@ class SplashWindow extends JFrame {
     }
 
     /**
-     * 安全释放资源
+     * Giải phóng tài nguyên một cách an toàn
      */
     private void disposeSafely() {
         if (isDisposed) return;
@@ -310,7 +310,7 @@ class SplashWindow extends JFrame {
     }
 
     /**
-     * 重写dispose方法，确保资源完全释放
+     * Viết lạidisposephương pháp để đảm bảo rằng tài nguyên được giải phóng đầy đủ
      */
     @Override
     public void dispose() {
@@ -322,14 +322,14 @@ class SplashWindow extends JFrame {
     }
 
     /**
-     * 获取主题适配的文字颜色
+     * Nhận màu văn bản phù hợp với chủ đề
      */
     private Color getTextColor() {
         return ModernColors.withAlpha(ModernColors.getTextInverse(), 220);
     }
 
     /**
-     * 获取主题适配的装饰点颜色
+     * Lấy màu điểm trang trí phù hợp với chủ đề
      */
     private Color getDecorativeDotColor(int alpha) {
         return ModernColors.withAlpha(ModernColors.getTextInverse(), alpha);

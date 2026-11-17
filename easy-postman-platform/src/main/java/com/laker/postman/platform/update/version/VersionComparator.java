@@ -3,17 +3,17 @@ package com.laker.postman.platform.update.version;
 import lombok.experimental.UtilityClass;
 
 /**
- * 版本比较工具
+ * Công cụ so sánh phiên bản
  */
 @UtilityClass
 public class VersionComparator {
 
     /**
-     * 比较两个版本号
+     * So sánh hai số phiên bản
      *
-     * @param v1 版本1（可以带 'v' 前缀）
-     * @param v2 版本2（可以带 'v' 前缀）
-     * @return 正数表示 v1 > v2，0 表示相等，负数表示 v1 < v2
+     * @param v1 Phiên bản1（Bạn có thể mang nó 'v' tiền tố)
+     * @param v2 Phiên bản2（Bạn có thể mang nó 'v' tiền tố)
+     * @return Biểu thị dưới dạng số dương v1 > v2，0 Biểu thị sự bằng nhau và số âm v1 < v2
      */
     public static int compare(String v1, String v2) {
         if (v1 == null || v2 == null) {
@@ -38,7 +38,7 @@ public class VersionComparator {
     }
 
     /**
-     * 移除版本号前缀（如 'v'）
+     * Xóa tiền tố số phiên bản (ví dụ: 'v'）
      */
     private static String removeVersionPrefix(String version) {
         return version.startsWith("v") ? version.substring(1) : version;
@@ -84,7 +84,7 @@ public class VersionComparator {
     }
 
     /**
-     * 安全解析整数（移除非数字字符）
+     * Phân tích số nguyên một cách an toàn (xóa các ký tự không phải số)
      */
     private static int parseIntSafely(String s) {
         try {
@@ -95,7 +95,7 @@ public class VersionComparator {
     }
 
     /**
-     * 判断版本1是否大于版本2
+     * Đánh giá phiên bản1Nó có lớn hơn phiên bản không2
      */
     public static boolean isNewer(String v1, String v2) {
         return compare(v1, v2) > 0;

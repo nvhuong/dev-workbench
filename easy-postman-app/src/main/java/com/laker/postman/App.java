@@ -3,7 +3,7 @@ package com.laker.postman;
 import com.laker.postman.startup.AppLauncher;
 
 /**
- * 应用主入口。
+ * Lối vào chính của ứng dụng.
  */
 public final class App {
     private static final String MCP_COMMAND = "mcp";

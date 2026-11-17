@@ -29,7 +29,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 /**
- * 负责处理重定向链
+ * Chịu trách nhiệm xử lý chuỗi chuyển hướng
  */
 @Slf4j
 public class HttpRedirectExecutor {
@@ -52,7 +52,7 @@ public class HttpRedirectExecutor {
                                              SseResponseCallback callback,
                                              HttpCallTracker callTracker) throws Exception {
         MonotonicStopwatch flowTimer = NetworkLogSupport.isEnabled(req) ? MonotonicStopwatch.start() : null;
-        // 创建工作副本
+        // Tạo một bản sao làm việc
         PreparedRequest workingReq = req.shallowCopy();
         deduplicateLogDetails(workingReq);
 
@@ -67,8 +67,8 @@ public class HttpRedirectExecutor {
             return resp;
         }
 
-        // 重定向链由 HttpRedirectExecutor 统一处理，底层单次 OkHttp call 不能再自动跟随。
-        // 否则 3xx 响应会被 OkHttp 吞掉，后续的重定向日志、跨域敏感头清理和最大跳转次数都会失效。
+        // Chuyển hướng liên kết bởi HttpRedirectExecutor Xử lý thống nhất, một lần ở phía dưới OkHttp call Không thể tự động theo dõi được nữa.
+        // Ngược lại 3xx Câu trả lời sẽ là OkHttp Nếu nuốt phải, nhật ký chuyển hướng tiếp theo, việc dọn dẹp tiêu đề nhạy cảm giữa các miền và số lần nhảy tối đa sẽ trở nên không hợp lệ.
         workingReq.followRedirects = false;
 
         URL prevUrl = new URL(HttpUrlUtil.normalizeIpv6Url(workingReq.url));
@@ -77,7 +77,7 @@ public class HttpRedirectExecutor {
         while (true) {
             HttpResponse resp = executeAndSyncRequestMetadata(req, workingReq, callback, callTracker);
 
-            // 判断是否重定向
+            // Xác định xem có nên chuyển hướng hay không
             RedirectInfo info = buildRedirectInfo(workingReq.url, resp);
             if (isRedirectStatus(info.statusCode) && info.location != null && !info.location.isBlank()) {
                 if (redirectCount >= maxRedirects) {
@@ -91,7 +91,7 @@ public class HttpRedirectExecutor {
 
                 redirectCount++;
 
-                // 基于当前请求创建下一次重定向请求
+                // Tạo yêu cầu chuyển hướng tiếp theo dựa trên yêu cầu hiện tại
                 PreparedRequest redirectReq = prepareRedirectRequest(workingReq, nextUrl.toString(), info.statusCode, isCrossDomain);
                 logRedirect(workingReq, redirectReq, info, redirectCount, nextUrl.toString(), isCrossDomain);
                 workingReq = redirectReq;
@@ -181,7 +181,7 @@ public class HttpRedirectExecutor {
                         .build()
         );
 
-        // 更新原始请求对象的 OkHttp 相关字段，UI 和诊断导出需要看到最后一次实际发送快照。
+        // Cập nhật đối tượng yêu cầu ban đầu OkHttp Các lĩnh vực liên quan,UI Và quá trình xuất chẩn đoán cần xem ảnh chụp nhanh thực tế cuối cùng được gửi.
         originalReq.sentUrl = workingReq.sentUrl;
         originalReq.sentMethod = workingReq.sentMethod;
         originalReq.sentHeadersList = workingReq.sentHeadersList;
@@ -192,7 +192,7 @@ public class HttpRedirectExecutor {
     }
 
     /**
-     * 构建重定向信息
+     * Xây dựng thông tin chuyển hướng
      */
     private static RedirectInfo buildRedirectInfo(String url, HttpResponse resp) {
         RedirectInfo info = new RedirectInfo();
@@ -205,7 +205,7 @@ public class HttpRedirectExecutor {
     }
 
     /**
-     * 准备重定向请求
+     * Chuẩn bị yêu cầu chuyển hướng
      */
     static PreparedRequest prepareRedirectRequest(PreparedRequest currentReq, String newUrl, int statusCode, boolean isCrossDomain) {
         PreparedRequest redirectReq = currentReq.shallowCopy();
@@ -213,7 +213,7 @@ public class HttpRedirectExecutor {
         boolean redirectToGet = shouldRedirectToGet(statusCode, redirectReq.method);
         boolean preserveRequestBody = !redirectToGet && !"HEAD".equalsIgnoreCase(redirectReq.method);
 
-        // 根据状态码处理 method 和 body
+        // Xử lý theo mã trạng thái method và body
         if (!preserveRequestBody) {
             // 301/302 only permit the historical POST -> GET rewrite.
             // 303 changes every method except HEAD to GET; 307/308 preserve it.
@@ -226,7 +226,7 @@ public class HttpRedirectExecutor {
             redirectReq.urlencodedList = null;
         }
 
-        // 处理 headers：移除特定 header
+        // xử lý headers：Loại bỏ cụ thể header
         redirectReq.headersList = cleanHeadersList(
                 redirectReq.headersList,
                 isCrossDomain,
@@ -258,7 +258,7 @@ public class HttpRedirectExecutor {
 
 
     /**
-     * 清理 List 结构的 headersList
+     * Dọn dẹp List Kết cấu headersList
      */
     static List<HttpHeader> cleanHeadersList(List<HttpHeader> headersList,
                                              boolean isCrossDomain,
@@ -295,7 +295,7 @@ public class HttpRedirectExecutor {
     }
 
     /**
-     * 记录重定向日志
+     * Ghi lại nhật ký chuyển hướng
      */
     private static void logRedirect(PreparedRequest request,
                                     PreparedRequest redirectRequest,

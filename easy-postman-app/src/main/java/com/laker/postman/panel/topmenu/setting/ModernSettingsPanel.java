@@ -26,8 +26,8 @@ import java.util.Map;
 import java.util.function.Predicate;
 
 /**
- * 现代化设置面板基类
- * 提供统一的现代化UI风格和交互体验
+ * Lớp cơ sở của bảng cài đặt hiện đại
+ * Cung cấp hiện đại hóa thống nhấtUIphong cách và trải nghiệm tương tác
  */
 public abstract class ModernSettingsPanel extends JPanel {
     protected static final int COMPACT_FIELD_LABEL_MIN_WIDTH = 120;
@@ -45,55 +45,55 @@ public abstract class ModernSettingsPanel extends JPanel {
     protected final Map<JComponent, Object> originalValues = new HashMap<>();
     private JScrollPane contentScrollPane;
 
-    // 状态管理
+    // Quản lý trạng thái
     protected boolean hasUnsavedChanges = false;
     private JLabel unsavedChangesLabel;
     private boolean initialized;
 
     /**
-     * 获取主题适配的设置对话框背景色
+     * Lấy màu nền của hộp thoại cài đặt phù hợp với chủ đề
      */
     protected Color getBackgroundColor() {
         return ModernColors.getDialogChromeBackgroundColor();
     }
 
     /**
-     * 获取主题适配的输入框背景色
+     * Lấy màu nền của hộp nhập liệu phù hợp với chủ đề
      */
     protected Color getInputBackgroundColor() {
         return ModernColors.getInputBackgroundColor();
     }
 
     /**
-     * 获取主题适配的主文本颜色
+     * Lấy màu văn bản chính phù hợp với chủ đề
      */
     protected Color getTextPrimaryColor() {
         return ModernColors.getTextPrimary();
     }
 
     /**
-     * 获取主题适配的次要文本颜色
+     * Lấy màu văn bản phụ thích ứng với chủ đề
      */
     protected Color getTextSecondaryColor() {
         return ModernColors.getTextSecondary();
     }
 
     /**
-     * 获取主题适配的滚动条轨道颜色
+     * Nhận màu của rãnh thanh cuộn được điều chỉnh theo chủ đề
      */
     protected Color getScrollbarTrackColor() {
         return ModernColors.getScrollbarTrackColor();
     }
 
     /**
-     * 获取主题适配的滚动条滑块颜色
+     * Nhận màu thanh trượt thanh cuộn thích ứng với chủ đề
      */
     protected Color getScrollbarThumbColor() {
         return ModernColors.getScrollbarThumbColor();
     }
 
     /**
-     * 获取主题适配的滚动条滑块悬停颜色
+     * Nhận màu di chuột của thanh cuộn được điều chỉnh theo chủ đề
      */
     protected Color getScrollbarThumbHoverColor() {
         return ModernColors.getScrollbarThumbHoverColor();
@@ -128,20 +128,20 @@ public abstract class ModernSettingsPanel extends JPanel {
         setLayout(new BorderLayout(0, 0));
         ToolWindowSurfaceStyle.applyDialogSurface(this);
 
-        // 创建主容器
+        // Tạo vùng chứa chính
         JPanel mainContainer = new JPanel(new BorderLayout(0, 0));
         ToolWindowSurfaceStyle.applyDialogSurface(mainContainer);
 
-        // 主内容区域
+        // Khu vực nội dung chính
         JPanel contentPanel = new ViewportWidthTrackingPanel();
         contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.Y_AXIS));
         ToolWindowSurfaceStyle.applyDialogSurface(contentPanel);
         contentPanel.setBorder(new EmptyBorder(20, 24, 16, 24));
 
-        // 子类实现具体内容
+        // Các lớp con thực hiện nội dung cụ thể
         buildContent(contentPanel);
 
-        // 滚动面板
+        // Bảng điều khiển cuộn
         contentScrollPane = new JScrollPane(contentPanel);
         contentScrollPane.setBorder(BorderFactory.createEmptyBorder());
         contentScrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
@@ -150,10 +150,10 @@ public abstract class ModernSettingsPanel extends JPanel {
         ToolWindowSurfaceStyle.applyDialogScrollPane(contentScrollPane);
         customizeScrollBar(contentScrollPane);
 
-        // 组装主容器
+        // Lắp ráp thùng chứa chính
         mainContainer.add(contentScrollPane, BorderLayout.CENTER);
 
-        // 底部按钮栏
+        // Thanh nút dưới cùng
         JPanel buttonBar = createModernButtonBar();
 
         add(mainContainer, BorderLayout.CENTER);
@@ -184,24 +184,24 @@ public abstract class ModernSettingsPanel extends JPanel {
     }
 
     /**
-     * 子类实现此方法来构建具体的设置内容
+     * Các lớp con triển khai phương pháp này để xây dựng các cài đặt cụ thể
      */
     protected abstract void buildContent(JPanel contentPanel);
 
     /**
-     * 子类实现此方法来注册监听器
+     * Các lớp con thực hiện phương thức này để đăng ký người nghe
      */
     protected abstract void registerListeners();
 
     /**
-     * 创建现代化的区域面板
+     * Tạo bảng vùng hiện đại
      */
     protected JPanel createModernSection(String title, String description) {
         return new SettingsSectionPanel(title, description);
     }
 
     /**
-     * 创建现代化的字段行（标签 + 输入框）
+     * Tạo các hàng trường hiện đại (nhãn + hộp nhập liệu)
      */
     protected SettingsFieldRow createFieldRow(String labelText, String tooltip, JComponent inputComponent) {
         styleInputComponent(inputComponent);
@@ -211,7 +211,7 @@ public abstract class ModernSettingsPanel extends JPanel {
     }
 
     /**
-     * 创建自定义列宽的字段行，用于局部表单在不截断当前语言标签的前提下收紧输入列。
+     * Tạo các hàng trường có chiều rộng cột tùy chỉnh cho các biểu mẫu một phần để thắt chặt các cột đầu vào mà không cần cắt bớt nhãn ngôn ngữ hiện tại.
      */
     protected SettingsFieldRow createFieldRow(String labelText,
                                               String tooltip,
@@ -242,7 +242,7 @@ public abstract class ModernSettingsPanel extends JPanel {
     }
 
     /**
-     * 创建现代化的复选框行
+     * Tạo một hàng hộp kiểm hiện đại
      */
     protected JPanel createCheckBoxRow(JCheckBox checkBox, String tooltip) {
         return new SettingsCheckBoxRow(checkBox, tooltip);
@@ -250,14 +250,14 @@ public abstract class ModernSettingsPanel extends JPanel {
 
 
     /**
-     * 样式化输入组件
+     * Các thành phần đầu vào được tạo kiểu
      */
     private void styleInputComponent(JComponent component) {
         SettingsInputStyle.apply(component);
     }
 
     /**
-     * 创建现代化的按钮栏
+     * Tạo một thanh nút hiện đại
      */
     private JPanel createModernButtonBar() {
         JPanel buttonBar = new JPanel(new BorderLayout(12, 0));
@@ -285,7 +285,7 @@ public abstract class ModernSettingsPanel extends JPanel {
                 I18nUtil.getMessage(MessageKeys.SETTINGS_DIALOG_APPLY),
                 false
         );
-        applyBtn.setEnabled(false); // 初始禁用
+        applyBtn.setEnabled(false); // Ban đầu bị vô hiệu hóa
 
         saveBtn = createModernButton(
                 I18nUtil.getMessage(MessageKeys.SETTINGS_DIALOG_SAVE),
@@ -301,14 +301,14 @@ public abstract class ModernSettingsPanel extends JPanel {
     }
 
     /**
-     * 创建现代化按钮
+     * Tạo các nút hiện đại
      */
     protected JButton createModernButton(String text, boolean isPrimary) {
         return ModernButtonFactory.createButton(text, isPrimary);
     }
 
     /**
-     * 表单内操作按钮：宽度随当前语言文案计算，避免切换语言后文字被截断。
+     * Các nút thao tác trên biểu mẫu: Độ rộng được tính dựa trên bản sao ngôn ngữ hiện tại để tránh văn bản bị cắt bớt sau khi chuyển đổi ngôn ngữ.
      */
     protected JButton createActionButton(String text, String tooltip, boolean primary) {
         JButton button = createModernButton(text, primary);
@@ -328,7 +328,7 @@ public abstract class ModernSettingsPanel extends JPanel {
     }
 
     /**
-     * 添加间距
+     * Thêm khoảng cách
      */
     protected Component createVerticalSpace(int height) {
         return Box.createVerticalStrut(height);
@@ -347,14 +347,14 @@ public abstract class ModernSettingsPanel extends JPanel {
     }
 
     /**
-     * 设置验证器
+     * Thiết lập trình xác nhận
      */
     protected void setupValidator(JTextField field, Predicate<String> validator, String errorMessage) {
         validators.put(field, SettingsTextFieldValidator.install(field, validator, errorMessage));
     }
 
     /**
-     * 验证所有字段
+     * Xác thực tất cả các trường
      */
     protected boolean validateAllFields() {
         for (Map.Entry<JTextField, SettingsTextFieldValidator> entry : validators.entrySet()) {
@@ -368,7 +368,7 @@ public abstract class ModernSettingsPanel extends JPanel {
     }
 
     /**
-     * 自定义滚动条样式
+     * Phong cách thanh cuộn tùy chỉnh
      */
     private void customizeScrollBar(JScrollPane scrollPane) {
         scrollPane.getVerticalScrollBar().setUI(new javax.swing.plaf.basic.BasicScrollBarUI() {
@@ -419,7 +419,7 @@ public abstract class ModernSettingsPanel extends JPanel {
         });
     }
 
-    // 工具方法
+    // Phương pháp công cụ
     protected boolean isInteger(String s) {
         try {
             Integer.parseInt(s);
@@ -433,10 +433,10 @@ public abstract class ModernSettingsPanel extends JPanel {
         return isInteger(s) && Integer.parseInt(s) >= 0;
     }
 
-    // ==================== 状态管理方法 ====================
+    // ==================== Các phương pháp quản lý nhà nước ====================
 
     /**
-     * 记录组件的原始值
+     * Ghi lại giá trị ban đầu của thành phần
      */
     protected void trackComponentValue(JComponent component) {
         if (component instanceof JTextField) {
@@ -467,7 +467,7 @@ public abstract class ModernSettingsPanel extends JPanel {
     }
 
     /**
-     * 检查是否有未保存的更改
+     * Kiểm tra các thay đổi chưa được lưu
      */
     protected void checkForChanges() {
         boolean hasChanges = false;
@@ -501,7 +501,7 @@ public abstract class ModernSettingsPanel extends JPanel {
     }
 
     /**
-     * 设置未保存更改状态
+     * Đặt trạng thái thay đổi chưa được lưu
      */
     protected void setHasUnsavedChanges(boolean hasChanges) {
         this.hasUnsavedChanges = hasChanges;
@@ -514,7 +514,7 @@ public abstract class ModernSettingsPanel extends JPanel {
             applyBtn.setEnabled(hasChanges);
         }
 
-        // 更新父窗口标题（如果是对话框）
+        // Cập nhật tiêu đề cửa sổ chính (nếu đó là hộp thoại)
         Window window = SwingUtilities.getWindowAncestor(this);
         if (window instanceof JDialog && hasChanges) {
             JDialog dialog = (JDialog) window;
@@ -532,7 +532,7 @@ public abstract class ModernSettingsPanel extends JPanel {
     }
 
     /**
-     * 放弃更改
+     * Hủy bỏ các thay đổi
      */
     protected void discardChanges() {
         for (Map.Entry<JComponent, Object> entry : originalValues.entrySet()) {
@@ -551,7 +551,7 @@ public abstract class ModernSettingsPanel extends JPanel {
     }
 
     /**
-     * 确认放弃更改
+     * Xác nhận để loại bỏ thay đổi
      */
     protected boolean confirmDiscardChanges() {
         if (!hasUnsavedChanges) {

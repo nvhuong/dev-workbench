@@ -11,7 +11,7 @@ import javax.swing.border.EmptyBorder;
 import java.awt.*;
 
 /**
- * 现代化更新对话框 - 简洁清晰的更新提示
+ * Hộp thoại cập nhật hiện đại - Lời nhắc cập nhật ngắn gọn và rõ ràng
  */
 public class ModernUpdateDialog extends JDialog {
 

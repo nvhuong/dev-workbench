@@ -31,13 +31,13 @@ public final class KafkaPanelSupport {
     private static final DateTimeFormatter TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS");
 
     /**
-     * Admin/Producer 客户端超时。远程 SASL 握手 + 元数据 + 连接 advertised broker 在慢网络下 3 秒不够。
+     * Admin/Producer Khách hàng đã hết thời gian chờ. Điều khiển từ xa SASL bắt tay + siêu dữ liệu + kết nối advertised broker Trên một mạng chậm 3 Giây là không đủ.
      */
     public static final int CLIENT_TIMEOUT_MS = 10_000;
 
     /**
-     * 外层 Future 等待额外宽限，确保 Kafka 客户端自身的超时（带具体原因）先于
-     * 无信息的 java.util.concurrent.TimeoutException 触发。
+     * lớp ngoài Future Chờ thêm ân sủng, chắc chắn rồi Kafka Thời gian chờ của chính khách hàng (có lý do cụ thể) xảy ra trước đó
+     * Không có thông tin java.util.concurrent.TimeoutException kích hoạt.
      */
     public static final long FUTURE_WAIT_GRACE_MS = 5_000;
 
@@ -72,7 +72,7 @@ public final class KafkaPanelSupport {
     }
 
     /**
-     * 构建 Admin/Producer/Consumer 共用的连接属性（bootstrap、client.id、security.protocol、SASL JAAS）。
+     * Xây dựng Admin/Producer/Consumer Thuộc tính kết nối được chia sẻ (bootstrap、client.id、security.protocol、SASL JAAS）。
      */
     public static Properties buildClientProperties(String bootstrapServers,
                                                    String clientId,

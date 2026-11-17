@@ -9,22 +9,22 @@ import java.text.DecimalFormat;
 import java.text.ParseException;
 
 /**
- * 增强版 JSpinner，自动提交输入
+ * Phiên bản nâng cao JSpinner，Tự động gửi đầu vào
  *
- * <h2>功能特性</h2>
+ * <h2>Các tính năng chức năng</h2>
  * <ul>
- *   <li>实时生效：输入停止300ms后自动提交（防抖）</li>
- *   <li>失焦提交：点击其他控件时立即提交</li>
- *   <li>回车提交：按回车键立即提交并跳转焦点</li>
- *   <li>异常处理：输入无效时自动恢复到上一个有效值</li>
+ *   <li>Hiệu quả trong thời gian thực: dừng đầu vào300msSau đó tự động gửi (chống rung)</li>
+ *   <li>Gửi ngoài tiêu điểm: Gửi ngay lập tức khi các điều khiển khác được nhấp vào</li>
+ *   <li>Enter để gửi: Nhấn phím Enter để gửi ngay và chuyển tiêu điểm</li>
+ *   <li>Xử lý ngoại lệ: Tự động khôi phục về giá trị hợp lệ cuối cùng khi đầu vào không hợp lệ</li>
  * </ul>
  *
- * <h2>用户体验</h2>
+ * <h2>Trải nghiệm người dùng</h2>
  * <ul>
- *   <li>✓ 输入后等待300ms → 自动提交</li>
- *   <li>✓ 点击其他控件 → 立即提交</li>
- *   <li>✓ 点击空白区域 → 300ms后自动提交</li>
- *   <li>✓ 按回车键 → 立即提交并跳转</li>
+ *   <li>✓ Đợi sau khi vào300ms → Gửi tự động</li>
+ *   <li>✓ Bấm vào các điều khiển khác → Gửi ngay bây giờ</li>
+ *   <li>✓ Bấm vào một khu vực trống → 300mstự động gửi</li>
+ *   <li>✓ Nhấn phím Enter → Gửi và nhảy ngay bây giờ</li>
  * </ul>
  *
  * @author laker
@@ -33,31 +33,31 @@ import java.text.ParseException;
 public class EasyJSpinner extends JSpinner {
 
     /**
-     * 防抖延迟时间（毫秒）
+     * Thời gian trễ chống rung (mili giây)
      */
     private static final int DEBOUNCE_DELAY = 300;
 
     /**
-     * 防抖 Timer
+     * Chống rung Timer
      */
     private final Timer debounceTimer;
 
     /**
-     * 使用数据模型创建 EasyJSpinner
+     * Được tạo bằng cách sử dụng các mô hình dữ liệu EasyJSpinner
      *
-     * @param model Spinner 的数据模型
+     * @param model Spinner mô hình dữ liệu
      */
     public EasyJSpinner(SpinnerModel model) {
         super(model);
 
-        // 创建防抖 Timer
+        // Tạo khả năng chống rung Timer
         this.debounceTimer = new Timer(DEBOUNCE_DELAY, e -> commitValue());
         this.debounceTimer.setRepeats(false);
 
-        // 配置参数输入保持原始整数显示，避免默认格式化成 2,000。
+        // Đầu vào tham số cấu hình duy trì hiển thị số nguyên thô để tránh định dạng mặc định 2,000。
         initNumberFormat();
 
-        // 初始化自动提交功能
+        // Khởi tạo chức năng gửi tự động
         initAutoCommit();
     }
 
@@ -75,7 +75,7 @@ public class EasyJSpinner extends JSpinner {
     }
 
     /**
-     * 初始化自动提交功能
+     * Khởi tạo chức năng gửi tự động
      */
     private void initAutoCommit() {
         JComponent editor = getEditor();
@@ -85,43 +85,43 @@ public class EasyJSpinner extends JSpinner {
 
         JFormattedTextField textField = ((DefaultEditor) editor).getTextField();
 
-        // 设置焦点丢失行为：保持当前编辑内容（避免自动恢复到旧值）
-        // PERSIST 模式下，失焦时会尝试提交，但不会自动恢复
+        // Đặt hành vi mất tiêu điểm: giữ các chỉnh sửa hiện tại (tránh tự động hoàn nguyên về giá trị cũ)
+        // PERSIST Ở chế độ này, việc gửi sẽ được thử khi mất tiêu điểm nhưng sẽ không được khôi phục tự động
         textField.setFocusLostBehavior(JFormattedTextField.PERSIST);
 
-        // 1. 文本变化监听：输入停止后自动提交（带防抖）
+        // 1. Giám sát thay đổi văn bản: Tự động gửi sau khi dừng nhập liệu (có tính năng chống rung)
         textField.getDocument().addDocumentListener(new DocumentListener() {
             @Override
             public void insertUpdate(DocumentEvent e) {
-                // 用户正在输入时，延迟提交
+                // Trì hoãn việc gửi trong khi người dùng đang gõ
                 debounceTimer.restart();
             }
 
             @Override
             public void removeUpdate(DocumentEvent e) {
-                // 用户正在删除时，延迟提交
+                // Trì hoãn việc gửi trong khi người dùng đang xóa
                 debounceTimer.restart();
             }
 
             @Override
             public void changedUpdate(DocumentEvent e) {
-                // 文本属性变化时，延迟提交
+                // Trì hoãn việc gửi khi thuộc tính văn bản thay đổi
                 debounceTimer.restart();
             }
         });
 
-        // 2. 失焦监听：焦点离开时立即提交
+        // 2. Giám sát ngoài tiêu điểm: Gửi ngay khi tiêu điểm rời đi
         textField.addFocusListener(new FocusAdapter() {
             @Override
             public void focusLost(FocusEvent e) {
-                debounceTimer.stop();  // 停止防抖
-                commitValue();         // 立即提交
+                debounceTimer.stop();  // Dừng chống rung
+                commitValue();         // Gửi ngay bây giờ
             }
         });
 
-        // 3. 回车键监听：立即提交并跳转焦点
+        // 3. Nhập key nghe: Gửi ngay và nhảy tập trung
         textField.addActionListener(e -> {
-            debounceTimer.stop();  // 停止防抖
+            debounceTimer.stop();  // Dừng chống rung
             if (commitValue()) {
                 textField.transferFocus();
             }
@@ -129,17 +129,17 @@ public class EasyJSpinner extends JSpinner {
     }
 
     /**
-     * 提交当前值
+     * Gửi giá trị hiện tại
      *
-     * <p>改进策略：
+     * <p>Chiến lược cải tiến:
      * <ul>
-     *   <li>保存并恢复光标位置</li>
-     *   <li>提交失败时不做任何操作，保持用户输入</li>
-     *   <li>避免在用户输入过程中的异常格式化</li>
-     *   <li>使用延迟执行确保光标位置正确恢复</li>
+     *   <li>Lưu và khôi phục vị trí con trỏ</li>
+     *   <li>Nếu việc gửi không thành công, không làm gì cả và giữ nguyên thông tin đầu vào của người dùng</li>
+     *   <li>Tránh định dạng không mong muốn trong quá trình nhập của người dùng</li>
+     *   <li>Sử dụng việc trì hoãn thực thi để đảm bảo rằng vị trí con trỏ được khôi phục chính xác</li>
      * </ul>
      *
-     * @return 是否提交成功
+     * @return Liệu việc gửi có thành công hay không
      */
     private boolean commitValue() {
         JComponent editor = getEditor();
@@ -149,46 +149,46 @@ public class EasyJSpinner extends JSpinner {
 
         JFormattedTextField textField = ((DefaultEditor) editor).getTextField();
 
-        // 保存当前光标位置和文本
+        // Lưu vị trí con trỏ hiện tại và văn bản
         int caretPosition = textField.getCaretPosition();
         String currentText = textField.getText();
 
         try {
-            // 尝试提交编辑
+            // Hãy thử gửi bản chỉnh sửa
             commitEdit();
 
-            // 提交成功后，使用 invokeLater 确保在所有格式化完成后再恢复光标
+            // Sử dụng sau khi gửi thành công invokeLater Đảm bảo khôi phục con trỏ sau khi hoàn tất mọi định dạng
             SwingUtilities.invokeLater(() -> {
                 try {
                     String newText = textField.getText();
-                    // 计算合适的光标位置
+                    // Tính toán vị trí con trỏ thích hợp
                     int newCaretPos;
                     if (newText.equals(currentText)) {
-                        // 文本未变化，恢复原光标位置
+                        // Văn bản không thay đổi và vị trí con trỏ ban đầu được khôi phục
                         newCaretPos = Math.min(caretPosition, newText.length());
                     } else {
-                        // 文本已格式化，将光标放在末尾
+                        // Văn bản đã được định dạng, đặt con trỏ ở cuối
                         newCaretPos = newText.length();
                     }
                     textField.setCaretPosition(newCaretPos);
                 } catch (Exception e) {
-                    // 忽略光标设置异常，不影响功能
+                    // Bỏ qua các ngoại lệ cài đặt con trỏ và không ảnh hưởng đến chức năng
                 }
             });
 
             return true;
         } catch (ParseException | IllegalArgumentException ex) {
-            // 提交失败（例如：输入无效或超出范围）
-            // 保持当前文本和光标位置不变，让用户继续编辑
-            // 这避免了输入过程中的异常格式化（例如 "10001" -> "0010"）
+            // Gửi không thành công (ví dụ: dữ liệu nhập không hợp lệ hoặc nằm ngoài phạm vi)
+            // Giữ văn bản hiện tại và vị trí con trỏ không thay đổi, cho phép người dùng tiếp tục chỉnh sửa
+            // Điều này tránh định dạng bất thường trong quá trình nhập (ví dụ: "10001" -> "0010"）
             return false;
         }
     }
 
     /**
-     * 停止防抖并立即提交当前编辑文本。
+     * Dừng chống rung và chuyển giao văn bản hiện đang được chỉnh sửa ngay lập tức.
      *
-     * @return 当前编辑文本是否成功提交到 spinner 模型
+     * @return Liệu văn bản đã chỉnh sửa hiện tại có được gửi tới thành công hay không spinner Người mẫu
      */
     public boolean commitCurrentEdit() {
         debounceTimer.stop();
@@ -196,7 +196,7 @@ public class EasyJSpinner extends JSpinner {
     }
 
     /**
-     * 先提交编辑文本，再读取当前模型值。
+     * Gửi văn bản chỉnh sửa trước, sau đó đọc giá trị mô hình hiện tại.
      */
     public Object getCommittedValue() {
         commitCurrentEdit();
@@ -204,14 +204,14 @@ public class EasyJSpinner extends JSpinner {
     }
 
     /**
-     * 先提交编辑文本，再按 int 读取当前值。
+     * Gửi văn bản đã chỉnh sửa trước, sau đó nhấn int Đọc giá trị hiện tại.
      */
     public int getCommittedIntValue() {
         return ((Number) getCommittedValue()).intValue();
     }
 
     /**
-     * 强制提交当前值（用于 Ctrl/Cmd+S 保存时）
+     * Buộc gửi giá trị hiện tại (đối với  Ctrl/Cmd+S khi lưu)
      */
     public void forceCommit() {
         commitCurrentEdit();

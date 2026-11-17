@@ -74,7 +74,7 @@ class PluginRuntimePaths {
         }
 
         Path root;
-        // 测试和开发调试可显式覆盖数据目录，避免污染用户真实目录。
+        // Việc gỡ lỗi kiểm tra và phát triển có thể ghi đè lên thư mục dữ liệu một cách rõ ràng để tránh làm ô nhiễm thư mục thực của người dùng.
         String override = System.getProperty("easyPostman.data.dir");
         if (override != null && !override.isBlank()) {
             root = Paths.get(override.trim());

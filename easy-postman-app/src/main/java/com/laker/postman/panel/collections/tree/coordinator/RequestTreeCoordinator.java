@@ -51,8 +51,8 @@ import java.util.List;
 import static com.laker.postman.panel.collections.tree.CollectionTreePanel.*;
 
 /**
- * 请求树交互协调器。
- * 集中编排树节点变更、对话框、持久化和相关面板联动。
+ * Request tree interaction coordinator.
+ * Điều phối tập trung các thay đổi nút cây, hộp thoại, tính bền vững và liên kết bảng điều khiển liên quan.
  */
 @Slf4j
 public class RequestTreeCoordinator {
@@ -61,23 +61,23 @@ public class RequestTreeCoordinator {
     private final List<HttpRequestItem> copiedRequests = new ArrayList<>();
 
     /**
-     * 待保护的树路径：addHttpRequestDirectly 创建新请求后设置此值。
-     * 仅在本次鼠标点击内防止 BasicTreeUI 覆盖新请求的选中状态，
-     * mouseReleased 后由 finishRequestCreationSelection 清除。
+     * Đường cây cần bảo vệ: .addHttpRequestDirectly Đặt giá trị này sau khi tạo yêu cầu mới.
+     * Chỉ bị chặn trong lần nhấp chuột này BasicTreeUI Ghi đè trạng thái đã chọn cho các yêu cầu mới.
+     * mouseReleased Sau đó bởi finishRequestCreationSelection Thông thoáng.
      */
     private TreePath pendingSelectPath = null;
 
     public RequestTreeCoordinator(JTree requestTree, CollectionTreePanel leftPanel) {
         this.requestTree = requestTree;
         this.leftPanel = leftPanel;
-        // 注册选中守卫：只要 pendingSelectPath 不为 null，就拦截任何外部对选中状态的覆盖
+        // Đăng ký bảo vệ đã chọn: chỉ pendingSelectPath Không null，Chỉ cần chặn bất kỳ ghi đè bên ngoài nào của trạng thái đã chọn
         requestTree.addTreeSelectionListener(e -> {
             TreePath guard = pendingSelectPath;
             if (guard == null) return;
             TreePath current = requestTree.getSelectionPath();
             if (!guard.equals(current)) {
-                // BasicTreeUI 或其他代码把选中改掉了，立刻纠正回来
-                pendingSelectPath = null; // 先清除，避免递归
+                // BasicTreeUI Hoặc mã khác đã thay đổi lựa chọn, hãy sửa ngay
+                pendingSelectPath = null; // Xóa trước để tránh đệ quy
                 requestTree.setSelectionPath(guard);
                 requestTree.scrollPathToVisible(guard);
             }
@@ -85,7 +85,7 @@ public class RequestTreeCoordinator {
     }
 
     /**
-     * 显示添加分组对话框
+     * Hiển thị hộp thoại Thêm nhóm
      */
     public void showAddGroupDialog(DefaultMutableTreeNode parentNode) {
         if (!canContainGroup(parentNode)) return;
@@ -99,12 +99,12 @@ public class RequestTreeCoordinator {
     }
 
     /**
-     * 在指定节点下添加分组
+     * Thêm một nhóm dưới nút được chỉ định
      */
     private void addGroupToNode(DefaultMutableTreeNode parentNode, String groupName) {
         if (!canContainGroup(parentNode)) return;
         RequestGroup group = new RequestGroup(groupName);
-        // 参考 Postman：第一层 Collection 默认 No Auth，子层 Folder 默认 Inherit auth from parent
+        // Tham khảo Postman：Cấp độ đầu tiên Collection Mặc định No Auth，lớp phụ Folder Mặc định Inherit auth from parent
         boolean isRootLevel = ROOT.equals(String.valueOf(parentNode.getUserObject()));
         if (isRootLevel) {
             group.setAuthType(AuthType.NONE.getConstant());
@@ -133,7 +133,7 @@ public class RequestTreeCoordinator {
     }
 
     /**
-     * 在选中节点下添加分组
+     * Thêm một nhóm dưới nút đã chọn
      */
     public void addGroupUnderSelected() {
         DefaultMutableTreeNode selectedNode = getSelectedNode();
@@ -142,7 +142,7 @@ public class RequestTreeCoordinator {
     }
 
     /**
-     * 显示添加请求对话框
+     * Hiển thị hộp thoại Thêm yêu cầu
      */
     public void showAddRequestDialog(DefaultMutableTreeNode groupNode) {
         if (!CollectionTreeNodes.isGroup(groupNode)) return;
@@ -151,7 +151,7 @@ public class RequestTreeCoordinator {
     }
 
     /**
-     * 直接在指定分组下创建一个默认 HTTP GET 请求，不弹对话框（类似 Postman 点击 "+" 的行为）
+     * Tạo một mặc định trực tiếp trong nhóm được chỉ định HTTP GET Yêu cầu, không hiện hộp thoại (tương tự Postman Bấm vào "+" hành vi)
      */
     public void addHttpRequestDirectly(DefaultMutableTreeNode groupNode) {
         if (!CollectionTreeNodes.isGroup(groupNode)) return;
@@ -164,8 +164,8 @@ public class RequestTreeCoordinator {
         leftPanel.getCollectionTreePersistence().saveCurrentTree();
 
         TreePath newPath = new TreePath(reqNode.getPath());
-        // 设置保护路径：TreeSelectionListener 会拦截 BasicTreeUI 在 mouseReleased 里
-        // 触发的 selectPathForEvent，保证最终选中停留在新请求节点上
+        // Đặt đường dẫn bảo vệ:TreeSelectionListener Sẽ chặn BasicTreeUI Vào mouseReleased bên trong
+        // Đã kích hoạt selectPathForEvent，Lựa chọn cuối cùng được đảm bảo ở trên nút được yêu cầu mới
         pendingSelectPath = newPath;
         UiSingletonFactory.getInstance(RequestEditorPanel.class).showOrCreateTab(item);
         tree.setSelectionPath(newPath);
@@ -173,7 +173,7 @@ public class RequestTreeCoordinator {
     }
 
     /**
-     * 完成本次新增请求的选中保护，避免影响下一次点击的文件夹或请求。
+     * Hoàn thành việc bảo vệ lựa chọn cho yêu cầu mới này để tránh ảnh hưởng đến thư mục hoặc yêu cầu được nhấp tiếp theo.
      */
     public void finishRequestCreationSelection() {
         TreePath newPath = pendingSelectPath;
@@ -186,7 +186,7 @@ public class RequestTreeCoordinator {
 
 
     /**
-     * 重命名选中的项（分组、请求或保存的响应）
+     * Đổi tên mục đã chọn (nhóm, yêu cầu hoặc phản hồi đã lưu)
      */
     public void renameSelectedItem() {
         DefaultMutableTreeNode selectedNode = getSelectedNode();
@@ -202,7 +202,7 @@ public class RequestTreeCoordinator {
     }
 
     /**
-     * 重命名分组
+     * Đổi tên nhóm
      */
     private void renameGroup(DefaultMutableTreeNode selectedNode) {
         RequestGroup group = CollectionTreeNodes.group(selectedNode).orElse(null);
@@ -225,7 +225,7 @@ public class RequestTreeCoordinator {
     }
 
     /**
-     * 更新分组名称
+     * Cập nhật tên nhóm
      */
     private void updateGroupName(DefaultMutableTreeNode node, RequestGroup group, String newName) {
         group.setName(newName);
@@ -235,7 +235,7 @@ public class RequestTreeCoordinator {
     }
 
     /**
-     * 重命名请求
+     * Yêu cầu đổi tên
      */
     private void renameRequest(DefaultMutableTreeNode selectedNode) {
         HttpRequestItem item = CollectionTreeNodes.request(selectedNode).orElse(null);
@@ -258,19 +258,19 @@ public class RequestTreeCoordinator {
     }
 
     /**
-     * 更新请求名称
+     * Cập nhật tên yêu cầu
      */
     private void updateRequestName(DefaultMutableTreeNode node, HttpRequestItem item, String newName) {
         item.setName(newName);
         leftPanel.getTreeModel().nodeChanged(node);
         leftPanel.getCollectionTreePersistence().saveCurrentTree();
 
-        // 同步更新已打开Tab的标题
+        // Cập nhật đồng bộ hóa đang bậtTabtiêu đề
         updateOpenedTabsTitle(item, newName);
     }
 
     /**
-     * 更新已打开Tab的标题
+     * Cập nhật đang được bậtTabtiêu đề
      */
     private void updateOpenedTabsTitle(HttpRequestItem item, String newName) {
         RequestEditorPanel editPanel = UiSingletonFactory.getInstance(RequestEditorPanel.class);
@@ -291,7 +291,7 @@ public class RequestTreeCoordinator {
     }
 
     /**
-     * 重命名保存的响应
+     * Đổi tên phản hồi đã lưu
      */
     private void renameSavedResponse(DefaultMutableTreeNode selectedNode) {
         SavedResponse savedResponse = CollectionTreeNodes.savedResponse(selectedNode).orElse(null);
@@ -314,19 +314,19 @@ public class RequestTreeCoordinator {
     }
 
     /**
-     * 更新保存的响应名称
+     * Cập nhật tên phản hồi đã lưu
      */
     private void updateSavedResponseName(DefaultMutableTreeNode node, SavedResponse savedResponse, String newName) {
         savedResponse.setName(newName);
         leftPanel.getTreeModel().nodeChanged(node);
         leftPanel.getCollectionTreePersistence().saveCurrentTree();
 
-        // 同步更新已打开Tab的标题
+        // Cập nhật đồng bộ hóa đang bậtTabtiêu đề
         updateOpenedSavedResponseTabsTitle(savedResponse, newName);
     }
 
     /**
-     * 更新已打开的保存响应Tab的标题
+     * Cập nhật phản hồi lưu đã mởTabtiêu đề
      */
     private void updateOpenedSavedResponseTabsTitle(SavedResponse savedResponse, String newName) {
         RequestEditorPanel editPanel = UiSingletonFactory.getInstance(RequestEditorPanel.class);
@@ -348,7 +348,7 @@ public class RequestTreeCoordinator {
     }
 
     /**
-     * 删除选中的项（支持多选）
+     * Xóa các mục đã chọn (hỗ trợ nhiều lựa chọn)
      */
     public void deleteSelectedItem() {
         TreePath[] selectedPaths = requestTree.getSelectionPaths();
@@ -363,7 +363,7 @@ public class RequestTreeCoordinator {
     }
 
     /**
-     * 过滤可删除的节点
+     * Lọc các nút có thể bị xóa
      */
     private List<DefaultMutableTreeNode> filterDeletableNodes(TreePath[] paths) {
         List<DefaultMutableTreeNode> nodes = new ArrayList<>();
@@ -377,7 +377,7 @@ public class RequestTreeCoordinator {
     }
 
     /**
-     * 确认删除
+     * Xác nhận xóa
      */
     private boolean confirmDelete(int count) {
         String message = count == 1
@@ -395,7 +395,7 @@ public class RequestTreeCoordinator {
     }
 
     /**
-     * 执行删除操作
+     * Thực hiện thao tác xóa
      */
     private void performDelete(List<DefaultMutableTreeNode> nodesToDelete) {
         List<TreePath> expandedPaths = TreeStateHelper.saveExpandedPaths(requestTree);
@@ -403,12 +403,12 @@ public class RequestTreeCoordinator {
         RequestEditorPanel editPanel = UiSingletonFactory.getInstance(RequestEditorPanel.class);
         JTabbedPane tabbedPane = editPanel.getTabbedPane();
 
-        // 关闭相关Tab
+        // Liên quan chặt chẽTab
         for (DefaultMutableTreeNode node : nodesToDelete) {
             closeTabsForNode(node, tabbedPane);
         }
 
-        // 删除节点
+        // Xóa nút
         for (DefaultMutableTreeNode node : nodesToDelete) {
             DefaultMutableTreeNode parent = (DefaultMutableTreeNode) node.getParent();
             if (parent != null) {
@@ -419,7 +419,7 @@ public class RequestTreeCoordinator {
         leftPanel.getTreeModel().reload();
         TreeStateHelper.restoreExpandedPaths(requestTree, expandedPaths, leftPanel.getRootTreeNode());
 
-        // 调整Tab选中状态
+        // Điều chỉnhTabtrạng thái đã chọn
         if (tabbedPane.getTabCount() > 1) {
             tabbedPane.setSelectedIndex(tabbedPane.getTabCount() - 2);
         }
@@ -428,12 +428,12 @@ public class RequestTreeCoordinator {
     }
 
     /**
-     * 关闭节点相关的Tab
+     * Đóng nút liên quanTab
      */
     private void closeTabsForNode(DefaultMutableTreeNode node, JTabbedPane tabbedPane) {
         HttpRequestItem item = CollectionTreeNodes.request(node).orElse(null);
         if (item != null) {
-            // 清空保存的响应列表，确保删除时不会保留已保存的响应
+            // Xóa danh sách các câu trả lời đã lưu để đảm bảo rằng các câu trả lời đã lưu không được giữ lại khi bị xóa
             if (item.getResponse() != null) {
                 item.getResponse().clear();
             }
@@ -441,13 +441,13 @@ public class RequestTreeCoordinator {
         } else if (CollectionTreeNodes.isGroup(node)) {
             closeTabsForGroup(node, tabbedPane);
         } else if (CollectionTreeNodes.isSavedResponse(node)) {
-            // 处理删除保存的响应节点
+            // Xử lý việc xóa các nút phản hồi đã lưu
             deleteSavedResponseNode(node);
         }
     }
 
     /**
-     * 关闭请求的Tab
+     * Đóng yêu cầuTab
      */
     private void closeRequestTabs(HttpRequestItem item, JTabbedPane tabbedPane) {
         RequestEditorPanel requestEditPanel = UiSingletonFactory.getInstance(RequestEditorPanel.class);
@@ -463,7 +463,7 @@ public class RequestTreeCoordinator {
     }
 
     /**
-     * 递归关闭分组下所有请求的Tab
+     * Đệ quy đóng tất cả các yêu cầu trong nhómTab
      */
     private void closeTabsForGroup(DefaultMutableTreeNode groupNode, JTabbedPane tabbedPane) {
         for (int i = 0; i < groupNode.getChildCount(); i++) {
@@ -473,7 +473,7 @@ public class RequestTreeCoordinator {
     }
 
     /**
-     * 复制选中的请求（创建副本）
+     * Sao chép yêu cầu đã chọn (tạo bản sao)
      */
     public void duplicateSelectedRequests() {
         TreePath[] selectedPaths = requestTree.getSelectionPaths();
@@ -493,7 +493,7 @@ public class RequestTreeCoordinator {
     }
 
     /**
-     * 收集复制信息
+     * Thu thập thông tin sao chép
      */
     private List<RequestCopyInfo> collectCopyInfos(TreePath[] paths) {
         List<RequestCopyInfo> infos = new ArrayList<>();
@@ -510,7 +510,7 @@ public class RequestTreeCoordinator {
     }
 
     /**
-     * 创建复制的请求
+     * Tạo một yêu cầu nhân rộng
      */
     private void createDuplicateRequest(RequestCopyInfo info) {
         HttpRequestItem copy = copyWithSuffix(info.item);
@@ -521,7 +521,7 @@ public class RequestTreeCoordinator {
     }
 
     /**
-     * 复制选中的请求到剪贴板
+     * Sao chép yêu cầu đã chọn vào clipboard
      */
     public void copySelectedRequests() {
         TreePath[] selectedPaths = requestTree.getSelectionPaths();
@@ -545,7 +545,7 @@ public class RequestTreeCoordinator {
     }
 
     /**
-     * 粘贴请求
+     * Dán yêu cầu
      */
     public void pasteRequests() {
         if (copiedRequests.isEmpty()) return;
@@ -567,7 +567,7 @@ public class RequestTreeCoordinator {
     }
 
     /**
-     * 确定粘贴的目标父节点
+     * Xác định nút cha mục tiêu để dán
      */
     private DefaultMutableTreeNode determineTargetParent() {
         DefaultMutableTreeNode targetNode = getSelectedNode();
@@ -590,7 +590,7 @@ public class RequestTreeCoordinator {
     }
 
     /**
-     * 创建粘贴的请求
+     * Tạo một yêu cầu dán
      */
     private void createPastedRequest(DefaultMutableTreeNode parent, HttpRequestItem copiedItem) {
         parent.add(CollectionTreeNodes.requestNodeWithExamples(copyWithSuffix(copiedItem)));
@@ -603,7 +603,7 @@ public class RequestTreeCoordinator {
     }
 
     /**
-     * 复制请求为cURL命令
+     * Yêu cầu sao chép làcURLĐặt hàng
      */
     public void copySelectedRequestAsCurl() {
         DefaultMutableTreeNode selectedNode = getSelectedNode();
@@ -630,7 +630,7 @@ public class RequestTreeCoordinator {
     }
 
     /**
-     * 复制选中的分组
+     * Sao chép nhóm đã chọn
      */
     public void duplicateSelectedGroup() {
         DefaultMutableTreeNode selectedNode = getSelectedNode();
@@ -659,7 +659,7 @@ public class RequestTreeCoordinator {
     }
 
     /**
-     * 导出分组为Postman Collection
+     * Xuất được nhóm thànhPostman Collection
      */
     public void exportGroupAsPostman(DefaultMutableTreeNode groupNode) {
         if (!isValidGroupNode(groupNode)) {
@@ -681,7 +681,7 @@ public class RequestTreeCoordinator {
     }
 
     /**
-     * 导出到文件
+     * Xuất sang tập tin
      */
     private void exportToFile(DefaultMutableTreeNode groupNode, String groupName, File file) {
         try {
@@ -698,7 +698,7 @@ public class RequestTreeCoordinator {
     }
 
     /**
-     * 转移集合到其他工作区
+     * Chuyển bộ sưu tập sang không gian làm việc khác
      */
     public void moveCollectionToWorkspace(DefaultMutableTreeNode selectedNode) {
         if (!isValidGroupNode(selectedNode)) return;
@@ -712,35 +712,35 @@ public class RequestTreeCoordinator {
     }
 
     /**
-     * 执行集合移动到目标工作区
-     * 将集合从当前工作区移动到目标工作区
+     * Bộ sưu tập thực thi được chuyển đến không gian làm việc đích
+     * Di chuyển một bộ sưu tập từ không gian làm việc hiện tại sang không gian làm việc đích
      *
-     * @param collectionNode  要移动的集合节点
-     * @param targetWorkspace 目标工作区
+     * @param collectionNode  Nút thu thập sẽ di chuyển
+     * @param targetWorkspace Mục tiêu không gian làm việc
      */
     private void performCollectionMove(DefaultMutableTreeNode collectionNode, Workspace targetWorkspace) {
-        // 1. 深拷贝集合节点（包含所有子节点）
+        // 1. Sao chép sâu nút thu thập (bao gồm tất cả các nút con)
         DefaultMutableTreeNode copiedNode = TreeNodeCloner.deepCopyGroupNode(collectionNode);
 
-        // 2. 获取目标工作区的集合文件路径
+        // 2. Lấy đường dẫn tệp bộ sưu tập của không gian làm việc đích
         String targetCollectionPath = SystemUtil.getCollectionPathForWorkspace(targetWorkspace);
 
-        // 3. 创建目标工作区的持久化工具
+        // 3. Tạo một công cụ kiên trì cho không gian làm việc mục tiêu
         DefaultMutableTreeNode targetRootNode = new DefaultMutableTreeNode(ROOT);
         DefaultTreeModel targetTreeModel = new DefaultTreeModel(targetRootNode);
         SwingCollectionTreePersistence targetPersistence = new SwingCollectionTreePersistence(
                 targetCollectionPath, targetRootNode, targetTreeModel);
 
-        // 4. 加载目标工作区的现有集合
+        // 4. Tải bộ sưu tập hiện có của không gian làm việc đích
         targetPersistence.loadIntoTree();
 
-        // 5. 将集合添加到目标工作区
+        // 5. Thêm bộ sưu tập vào không gian làm việc mục tiêu
         targetRootNode.add(copiedNode);
 
-        // 6. 保存到目标工作区
+        // 6. Lưu vào không gian làm việc mục tiêu
         targetPersistence.saveCurrentTree();
 
-        // 7. 从当前工作区删除原集合
+        // 7. Xóa bộ sưu tập gốc khỏi không gian làm việc hiện tại
         DefaultMutableTreeNode parent = (DefaultMutableTreeNode) collectionNode.getParent();
         if (parent != null) {
             parent.remove(collectionNode);
@@ -754,7 +754,7 @@ public class RequestTreeCoordinator {
     }
 
     /**
-     * 添加选中的请求到功能测试
+     * Thêm các yêu cầu đã chọn vào các bài kiểm tra chức năng
      */
     public void addSelectedRequestsToFunctionalTest() {
         TreePath[] selectedPaths = requestTree.getSelectionPaths();
@@ -772,16 +772,16 @@ public class RequestTreeCoordinator {
             FunctionalPanel functionalPanel = UiSingletonFactory.getInstance(FunctionalPanel.class);
             functionalPanel.loadRequests(requestsToAdd);
 
-            // 切换到功能测试Tab
+            // Chuyển sang thử nghiệm chức năngTab
             SidebarTabPanel sidebarPanel = UiSingletonFactory.getInstance(SidebarTabPanel.class);
             JTabbedPane tabbedPane = sidebarPanel.getTabbedPane();
-            tabbedPane.setSelectedIndex(3); // 功能测试Tab索引
+            tabbedPane.setSelectedIndex(3); // Kiểm tra chức năngTabchỉ số
         } catch (Exception e) {
-            log.error("添加请求到功能测试失败", e);
+            log.error("Thêm yêu cầu vào kiểm tra chức năng không thành công", e);
         }
     }
 
-    // ==================== 辅助方法 ====================
+    // ==================== Các phương pháp trợ giúp ====================
 
     private DefaultMutableTreeNode getSelectedNode() {
         return (DefaultMutableTreeNode) requestTree.getLastSelectedPathComponent();
@@ -825,10 +825,10 @@ public class RequestTreeCoordinator {
     }
 
     /**
-     * 从父请求中删除保存的响应
+     * Xóa phản hồi đã lưu khỏi yêu cầu gốc
      */
     private void deleteSavedResponseNode(DefaultMutableTreeNode savedResponseNode) {
-        // 获取父节点（应该是 REQUEST 节点）
+        // Lấy nút cha (phải là REQUEST nút)
         DefaultMutableTreeNode parentNode = (DefaultMutableTreeNode) savedResponseNode.getParent();
         if (parentNode == null) return;
 
@@ -836,7 +836,7 @@ public class RequestTreeCoordinator {
         SavedResponse toDelete = CollectionTreeNodes.savedResponse(savedResponseNode).orElse(null);
         if (parentRequest == null || toDelete == null) return;
 
-        // 从父请求的 response 列表中删除
+        // Được yêu cầu từ Chúa Cha response bị loại khỏi danh sách
         if (parentRequest.getResponse() != null) {
             parentRequest.getResponse().removeIf(resp ->
                     resp.getId() != null && resp.getId().equals(toDelete.getId())
@@ -845,7 +845,7 @@ public class RequestTreeCoordinator {
     }
 
     /**
-     * 请求复制信息内部类
+     * Yêu cầu sao chép thông tin lớp bên trong
      */
     private static class RequestCopyInfo {
         final HttpRequestItem item;

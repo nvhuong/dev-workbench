@@ -33,11 +33,11 @@ public class TimerPropertyPanel extends JPanel {
         JLabel label = new JLabel(I18nUtil.getMessage(MessageKeys.PERFORMANCE_TIMER_DELAY));
         add(label, gbc);
         gbc.gridx = 1;
-        gbc.insets = new Insets(6, 0, 6, 6); // 左间距为0，右间距为6
+        gbc.insets = new Insets(6, 0, 6, 6); // Khoảng cách bên trái là 0，Khoảng cách phù hợp là6
         delaySpinner = EasyJSpinner.intSpinner(1000, 0, 60000, 100);
         delaySpinner.setPreferredSize(new Dimension(100, 28));
         add(delaySpinner, gbc);
-        // 帮助说明
+        // Hướng dẫn trợ giúp
         gbc.gridx = 0;
         gbc.gridy = 1;
         gbc.gridwidth = 2;
@@ -48,7 +48,7 @@ public class TimerPropertyPanel extends JPanel {
         helpLabel.setFont(FontsUtil.getDefaultFontWithOffset(Font.PLAIN, -1));
         helpLabel.setForeground(ModernColors.getTextSecondary());
         add(helpLabel, gbc);
-        // 占位撑满高度
+        // Không gian được chiếm hết chiều cao
         gbc.gridy = 2;
         gbc.weighty = 1.0;
         gbc.fill = GridBagConstraints.BOTH;

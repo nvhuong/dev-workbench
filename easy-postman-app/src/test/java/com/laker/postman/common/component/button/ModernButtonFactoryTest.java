@@ -89,8 +89,8 @@ public class ModernButtonFactoryTest {
 
     @Test
     public void sharedPrimaryAndSecondaryButtonsShouldRemainToolbarCompact() {
-        JButton primaryButton = new PrimaryButton("发送", "icons/send.svg");
-        JButton secondaryButton = new SecondaryButton("保存", "icons/save.svg");
+        JButton primaryButton = new PrimaryButton("gửi", "icons/send.svg");
+        JButton secondaryButton = new SecondaryButton("cứu", "icons/save.svg");
 
         assertTrue(primaryButton.getPreferredSize().height <= 34,
                 "PrimaryButton should not inflate compact request/toolbox rows");
@@ -100,7 +100,7 @@ public class ModernButtonFactoryTest {
 
     @Test
     public void customColoredPrimaryButtonsShouldRemainToolbarCompact() {
-        JButton button = new PrimaryButton("取消", "icons/cancel.svg");
+        JButton button = new PrimaryButton("Hủy bỏ", "icons/cancel.svg");
         button.putClientProperty("baseColor", ModernColors.getWarning());
         button.putClientProperty("hoverColor", ModernColors.getWarningDark());
         button.putClientProperty("pressColor", ModernColors.getWarningDarker());

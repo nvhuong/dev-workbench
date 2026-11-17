@@ -33,20 +33,20 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 /**
- * Git 操作对话框
- * 场景1：提交 推送 拉取
- * 场景2：本地提交和远程提交不冲突
+ * Git Hộp thoại hành động
+ * bối cảnh1：nộp đẩy Sự lôi kéo
+ * bối cảnh2：Đệ trình cục bộ và đệ trình từ xa không xung đột
  */
 @Slf4j
 public class GitOperationDialog extends JDialog {
 
-    // 常量定义
-    private static final String OPTION_FORCE = "force"; // 强制操作
-    private static final String OPTION_CANCEL = "cancel"; // 取消操作
-    private static final String OPTION_COMMIT_FIRST = "commit_first"; // 先提交
-    private static final String OPTION_STASH = "stash"; // 暂存
-    private static final String OPTION_PULL_FIRST = "pull_first"; // 先拉取
-    private static final String OPTION_COMMIT_AND_PUSH = "commit_and_push"; // 提交并推送
+    // Định nghĩa hằng số
+    private static final String OPTION_FORCE = "force"; // Hoạt động cưỡng bức
+    private static final String OPTION_CANCEL = "cancel"; // Hủy thao tác
+    private static final String OPTION_COMMIT_FIRST = "commit_first"; // Gửi đầu tiên
+    private static final String OPTION_STASH = "stash"; // lưu trữ tạm thời
+    private static final String OPTION_PULL_FIRST = "pull_first"; // Kéo đầu tiên
+    private static final String OPTION_COMMIT_AND_PUSH = "commit_and_push"; // Gửi và đẩy
 
     private final transient Workspace workspace;
     private final GitOperation operation;
@@ -57,7 +57,7 @@ public class GitOperationDialog extends JDialog {
     @Getter
     private String commitMessage;
 
-    // 步骤指示器
+    // Chỉ báo bước
     private StepIndicator stepIndicator;
     private JEditorPane detailsArea;
     private JEditorPane fileChangesArea;
@@ -65,7 +65,7 @@ public class GitOperationDialog extends JDialog {
     private JLabel statusIcon;
     private JLabel statusMessage;
 
-    // 操作选择
+    // Lựa chọn hoạt động
     private JPanel optionsPanel;
     private ButtonGroup optionGroup;
     private JButton retryButton;
@@ -74,13 +74,13 @@ public class GitOperationDialog extends JDialog {
     private JPanel footerFeedbackPanel;
     private CardLayout footerFeedbackLayout;
 
-    // 进度和按钮
+    // Tiến trình và các nút
     private JProgressBar progressBar;
     private JButton executeButton;
     private boolean checkingStatus;
     private boolean operationRunning;
 
-    // 检测结果
+    // Kết quả kiểm tra
     private GitStatusCheck statusCheck;
 
     public GitOperationDialog(Window parent, Workspace workspace, GitOperation operation) {
@@ -95,49 +95,49 @@ public class GitOperationDialog extends JDialog {
     }
 
     /**
-     * 将 Color 转换为 HTML 颜色字符串（格式: #RRGGBB）
+     * Sẽ Color Chuyển đổi sang  HTML colorString(format: #RRGGBB）
      */
     private String toHtmlColor(Color color) {
         return String.format("#%02x%02x%02x", color.getRed(), color.getGreen(), color.getBlue());
     }
 
     /**
-     * 获取 HTML 中使用的成功色（绿色）
+     * Lấy HTML Màu thành công (màu xanh lá cây) được sử dụng trong
      */
     private String getHtmlSuccessColor() {
         return toHtmlColor(ModernColors.getSuccess());
     }
 
     /**
-     * 获取 HTML 中使用的警告色（橙色）
+     * Lấy HTML Màu cảnh báo (màu cam) được sử dụng trong
      */
     private String getHtmlWarningColor() {
         return toHtmlColor(ModernColors.getWarning());
     }
 
     /**
-     * 获取 HTML 中使用的错误色（红色）
+     * Lấy HTML Màu sai (màu đỏ) được sử dụng trong
      */
     private String getHtmlErrorColor() {
         return toHtmlColor(ModernColors.getError());
     }
 
     /**
-     * 获取 HTML 中使用的信息色（蓝色）
+     * Lấy HTML Màu thông tin (màu xanh) được sử dụng trong
      */
     private String getHtmlInfoColor() {
         return toHtmlColor(ModernColors.getPrimary());
     }
 
     /**
-     * 获取 HTML 中使用的次要文本色（灰色）
+     * Lấy HTML Màu văn bản phụ (màu xám) được sử dụng trong
      */
     private String getHtmlSecondaryColor() {
         return toHtmlColor(ModernColors.getTextSecondary());
     }
 
     /**
-     * 设置对话框基本属性
+     * Đặt các thuộc tính cơ bản của hộp thoại
      */
     private void setupDialog() {
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
@@ -149,20 +149,20 @@ public class GitOperationDialog extends JDialog {
     }
 
     /**
-     * 初始化UI组件
+     * khởi tạoUIthành phần
      */
     private void initializeUI() {
-        // 创建主面板
+        // Tạo bảng điều khiển chính
         JPanel mainPanel = new JPanel(new BorderLayout());
         ToolWindowSurfaceStyle.applyDialogSurface(mainPanel);
-        // 创建各个区域
+        // Tạo nhiều khu vực khác nhau
         JPanel headerPanel = createHeaderPanel();
         JPanel stepPanel = createStepPanel();
         JPanel summaryPanel = createSummaryPanel();
         JPanel actionPanel = createActionPanel();
         JPanel footerPanel = createFooterPanel();
 
-        // 布局主面板
+        // Bố trí bảng điều khiển chính
         mainPanel.add(headerPanel, BorderLayout.NORTH);
 
         JPanel centerPanel = new JPanel(new BorderLayout());
@@ -178,13 +178,13 @@ public class GitOperationDialog extends JDialog {
     }
 
     /**
-     * 创建头部面板 - 显示操作类型和基本信息
+     * Tạo bảng tiêu đề - Hiển thị loại hoạt động và thông tin cơ bản
      */
     private JPanel createHeaderPanel() {
         JPanel panel = new JPanel(new BorderLayout());
         ToolWindowSurfaceStyle.applyDialogHeader(panel, 8, 24, 8, 24);
 
-        // 左侧：操作图标和名称
+        // Bên trái: Biểu tượng và tên hành động
         JPanel leftPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
         leftPanel.setOpaque(false);
 
@@ -214,7 +214,7 @@ public class GitOperationDialog extends JDialog {
         leftPanel.add(operationIcon);
         leftPanel.add(textPanel);
 
-        // 右侧：分支信息
+        // Phải: thông tin chi nhánh
         JPanel rightPanel = createBranchInfoPanel();
 
         panel.add(leftPanel, BorderLayout.WEST);
@@ -224,7 +224,7 @@ public class GitOperationDialog extends JDialog {
     }
 
     /**
-     * 创建分支信息面板
+     * Tạo bảng thông tin chi nhánh
      */
     private JPanel createBranchInfoPanel() {
         JPanel panel = new JPanel(new GridLayout(2, 1, 0, 3));
@@ -250,7 +250,7 @@ public class GitOperationDialog extends JDialog {
     }
 
     /**
-     * 创建步骤指示器面板
+     * Tạo bảng chỉ báo bước
      */
     private JPanel createStepPanel() {
         JPanel panel = new JPanel(new FlowLayout(FlowLayout.CENTER));
@@ -264,17 +264,17 @@ public class GitOperationDialog extends JDialog {
     }
 
     /**
-     * 创建摘要信息面板
+     * Tạo bảng thông tin tóm tắt
      */
     private JPanel createSummaryPanel() {
         JPanel panel = new JPanel(new BorderLayout());
         ToolWindowSurfaceStyle.applyDialogSurface(panel);
         panel.setBorder(new EmptyBorder(0, 24, 8, 24));
 
-        // 状态显示区域
+        // Khu vực hiển thị trạng thái
         JPanel statusPanel = createStatusPanel();
 
-        // 文件变更区域
+        // Khu vực thay đổi tập tin
         JPanel filesPanel = createFilesPanel();
 
         JSplitPane sectionsSplitPane = AppToolWindowChrome.createHorizontalInnerSplitPane(
@@ -290,7 +290,7 @@ public class GitOperationDialog extends JDialog {
     }
 
     /**
-     * 创建状态显示面板
+     * Tạo bảng hiển thị trạng thái
      */
     private JPanel createStatusPanel() {
         JPanel panel = new JPanel(new BorderLayout(0, 6));
@@ -320,7 +320,7 @@ public class GitOperationDialog extends JDialog {
         detailsArea.setFont(FontsUtil.getDefaultFontWithOffset(Font.PLAIN, -2));
         detailsArea.putClientProperty(JEditorPane.HONOR_DISPLAY_PROPERTIES, Boolean.TRUE);
         detailsArea.setBorder(new EmptyBorder(2, 0, 8, 0));
-        detailsArea.setContentType("text/html"); // 支持HTML渲染
+        detailsArea.setContentType("text/html"); // Hỗ trợHTMLkết xuất
         ToolWindowSurfaceStyle.applyTextComponentDialogSurface(detailsArea);
 
         JScrollPane detailsScrollPane = new JScrollPane(detailsArea);
@@ -339,7 +339,7 @@ public class GitOperationDialog extends JDialog {
     }
 
     /**
-     * 创建文件变更面板
+     * Tạo bảng thay đổi tập tin
      */
     private JPanel createFilesPanel() {
         JPanel panel = new JPanel(new BorderLayout(0, 6));
@@ -354,7 +354,7 @@ public class GitOperationDialog extends JDialog {
         fileChangesArea.setFont(FontsUtil.getMonospacedFontWithOffset(Font.PLAIN, -2));
         fileChangesArea.putClientProperty(JEditorPane.HONOR_DISPLAY_PROPERTIES, Boolean.TRUE);
         fileChangesArea.setBorder(new EmptyBorder(2, 0, 10, 0));
-        fileChangesArea.setContentType("text/html"); // 支持HTML渲染
+        fileChangesArea.setContentType("text/html"); // Hỗ trợHTMLkết xuất
         fileChangesArea.setText(I18nUtil.getMessage(MessageKeys.GIT_DIALOG_LOADING_FILE_CHANGES));
         ToolWindowSurfaceStyle.applyTextComponentDialogSurface(fileChangesArea);
 
@@ -366,7 +366,7 @@ public class GitOperationDialog extends JDialog {
 
         fileChangesPanel.add(scrollPane, BorderLayout.CENTER);
 
-        // 如果是提交操作，添加提交信息输入区域
+        // Nếu đó là thao tác gửi, hãy thêm khu vực nhập thông tin gửi
         if (operation == GitOperation.COMMIT) {
             JPanel commitPanel = createCommitMessagePanel();
             fileChangesPanel.add(commitPanel, BorderLayout.SOUTH);
@@ -378,14 +378,14 @@ public class GitOperationDialog extends JDialog {
     }
 
     /**
-     * 创建提交信息输入面板
+     * Tạo một bảng nhập thông tin gửi
      */
     private JPanel createCommitMessagePanel() {
         JPanel panel = new JPanel(new BorderLayout(0, 4));
         panel.setOpaque(false);
         ToolWindowSurfaceStyle.applyDialogTopSeparator(panel, 8, 0, 0, 0);
         panel.add(createEditableSectionTitle(I18nUtil.getMessage(MessageKeys.GIT_DIALOG_COMMIT_MESSAGE)), BorderLayout.NORTH);
-        panel.setPreferredSize(new Dimension(0, 72)); // 设置固定高度
+        panel.setPreferredSize(new Dimension(0, 72)); // Đặt chiều cao cố định
 
         commitMessageArea = new JTextArea(1, 0);
         commitMessageArea.setFont(FontsUtil.getDefaultFontWithOffset(Font.PLAIN, -2));
@@ -409,7 +409,7 @@ public class GitOperationDialog extends JDialog {
     }
 
     /**
-     * 创建操作选择面板
+     * Tạo bảng lựa chọn hành động
      */
     private JPanel createActionPanel() {
         JPanel panel = new JPanel(new BorderLayout());
@@ -427,13 +427,13 @@ public class GitOperationDialog extends JDialog {
     }
 
     /**
-     * 创建底部面板
+     * Tạo bảng điều khiển phía dưới
      */
     private JPanel createFooterPanel() {
         JPanel panel = new JPanel(new BorderLayout(12, 0));
         ToolWindowSurfaceStyle.applyDialogFooter(panel);
 
-        // 状态提示与操作进度共用一块区域，避免禁用按钮看起来没有原因。
+        // Các lời nhắc trạng thái chia sẻ một khu vực với tiến trình thao tác để tránh việc vô hiệu hóa các nút dường như không có lý do.
         progressBar = new JProgressBar();
         progressBar.setStringPainted(true);
         progressBar.setString("");
@@ -448,7 +448,7 @@ public class GitOperationDialog extends JDialog {
         footerFeedbackPanel.add(progressBar, "progress");
         footerFeedbackLayout.show(footerFeedbackPanel, "hint");
 
-        // 按钮面板
+        // Bảng nút
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 0));
         buttonPanel.setOpaque(false);
 
@@ -556,7 +556,7 @@ public class GitOperationDialog extends JDialog {
     }
 
     /**
-     * 执行操作前检查
+     * Thực hiện kiểm tra trước khi vận hành
      */
     private void performPreOperationCheck() {
         checkingStatus = true;
@@ -576,10 +576,10 @@ public class GitOperationDialog extends JDialog {
         optionsPanel.revalidate();
         optionsPanel.repaint();
 
-        // 禁用执行按钮，防止在检查期间执行操作
+        // Tắt nút thực thi để ngăn các hành động được thực hiện trong quá trình kiểm tra
         executeButton.setEnabled(false);
 
-        // 使用 SwingWorker 在后台线程执行 Git 检查，避免阻塞 UI
+        // sử dụng SwingWorker Thực hiện trên một chủ đề nền Git Kiểm tra để tránh bị chặn UI
         SwingWorker<GitStatusCheck, Void> worker = new SwingWorker<>() {
             @Override
             protected GitStatusCheck doInBackground() {
@@ -636,7 +636,7 @@ public class GitOperationDialog extends JDialog {
     }
 
     /**
-     * 更新状态显示
+     * Hiển thị trạng thái cập nhật
      */
     private void updateStatus(String message, String iconPath, Color color) {
         // Create colored icon with theme-adapted color for better visibility
@@ -647,12 +647,12 @@ public class GitOperationDialog extends JDialog {
     }
 
     /**
-     * 显示状态检查结果
+     * Hiển thị kết quả kiểm tra trạng thái
      */
     private void displayStatusCheck(GitStatusCheck check) {
-        // 显示详细的状态检查信息
+        // Hiển thị thông tin kiểm tra trạng thái chi tiết
         displayStatusDetails(check);
-        // 显示操作选择（如果需要）
+        // Hiển thị các lựa chọn hành động (nếu cần)
         updateActionChoices(check);
         updateExecuteButtonStateByChoice();
     }
@@ -672,7 +672,7 @@ public class GitOperationDialog extends JDialog {
     }
 
     /**
-     * 显示详细的状态检查信息
+     * Hiển thị thông tin kiểm tra trạng thái chi tiết
      */
     private void displayStatusDetails(GitStatusCheck check) {
         StringBuilder html = new StringBuilder();
@@ -718,7 +718,7 @@ public class GitOperationDialog extends JDialog {
     }
 
     /**
-     * 根据状态检查结果更新操作选择
+     * Cập nhật các lựa chọn hành động dựa trên kết quả kiểm tra trạng thái
      */
     private void updateActionChoices(GitStatusCheck check) {
         optionsPanel.removeAll();
@@ -756,7 +756,7 @@ public class GitOperationDialog extends JDialog {
                         I18nUtil.getMessage(MessageKeys.GIT_DIALOG_OPTION_FORCE_PULL_DESC), false, ModernColors.getError());
             } else if (check.hasUncommittedChanges) {
                 showOptions = true;
-                // 如果可以自动合并，优先推荐提交后拉取
+                // Nếu có thể hợp nhất tự động, trước tiên bạn nên kéo sau khi gửi
                 if (check.canAutoMerge) {
                     addOptionTitle(I18nUtil.getMessage(MessageKeys.GIT_DIALOG_OPTION_PULL_UNCOMMITTED_AUTO_MERGE_TITLE));
                     addOption(OPTION_COMMIT_FIRST, I18nUtil.getMessage(MessageKeys.GIT_DIALOG_OPTION_COMMIT_FIRST_PULL), I18nUtil.getMessage(MessageKeys.GIT_DIALOG_OPTION_COMMIT_FIRST_PULL_AUTO_MERGE_DESC), false);
@@ -775,14 +775,14 @@ public class GitOperationDialog extends JDialog {
                 optionsPanel.repaint();
                 return;
             }
-            // 优先处理实际冲突
+            // Ưu tiên các xung đột thực tế
             if (check.hasActualConflicts) {
                 showOptions = true;
                 addOptionTitle(I18nUtil.getMessage(MessageKeys.GIT_DIALOG_OPTION_PUSH_CONFLICT_TITLE));
                 addOption(OPTION_CANCEL, I18nUtil.getMessage(MessageKeys.GIT_DIALOG_OPTION_CANCEL_EXTERNAL_TOOL), I18nUtil.getMessage(MessageKeys.GIT_DIALOG_OPTION_CANCEL_EXTERNAL_TOOL_DESC), true);
                 addOption(OPTION_FORCE, I18nUtil.getMessage(MessageKeys.GIT_DIALOG_OPTION_FORCE_PUSH_OVERWRITE), I18nUtil.getMessage(MessageKeys.GIT_DIALOG_OPTION_FORCE_PUSH_OVERWRITE_COMMITS_DESC, check.remoteCommitsBehind), false, ModernColors.getError());
             } else if (check.hasRemoteCommits) {
-                // 远程有新提交
+                // Có những cam kết mới trên điều khiển từ xa
                 showOptions = true;
                 if (check.canAutoMerge && check.localCommitsAhead > 0) {
                     addOptionTitle(I18nUtil.getMessage(MessageKeys.GIT_DIALOG_OPTION_PUSH_REMOTE_AUTO_MERGE_TITLE));
@@ -801,7 +801,7 @@ public class GitOperationDialog extends JDialog {
     }
 
     /**
-     * 添加选项标题
+     * Thêm tiêu đề tùy chọn
      */
     private void addOptionTitle(String title) {
         JLabel titleLabel = new JLabel(title);
@@ -813,7 +813,7 @@ public class GitOperationDialog extends JDialog {
     }
 
     /**
-     * 添加单个选项
+     * Thêm một lựa chọn duy nhất
      */
     private void addOption(String value, String text, String description, boolean selected) {
         addOption(value, text, description, selected, null);
@@ -835,7 +835,7 @@ public class GitOperationDialog extends JDialog {
         }
         optionGroup.add(radio);
 
-        // 监听选项变化，动态更新按钮状态
+        // Theo dõi các thay đổi tùy chọn và cập nhật động trạng thái nút
         radio.addActionListener(e -> updateExecuteButtonStateByChoice());
 
         JLabel descLabel = new JLabel(description);
@@ -850,22 +850,22 @@ public class GitOperationDialog extends JDialog {
         optionsPanel.add(optionPanel);
     }
 
-    // 根据当前选项动态判断按钮可用性
+    // Tự động xác định tính khả dụng của nút dựa trên các tùy chọn hiện tại
     private void updateExecuteButtonStateByChoice() {
         String choice = getUserChoice();
         boolean canExecute = false;
         switch (operation) {
             case PULL -> {
-                // 只要不是取消，选了强制拉取/暂存/先提交都允许
+                // Miễn là nó không bị hủy và kéo cưỡng bức được chọn/lưu trữ tạm thời/Gửi đầu tiên được cho phép
                 if (OPTION_FORCE.equals(choice) || OPTION_STASH.equals(choice) || OPTION_COMMIT_FIRST.equals(choice)) {
                     canExecute = true;
                 } else if (OPTION_CANCEL.equals(choice)) {
                     canExecute = false;
                 } else if (statusCheck != null && statusCheck.hasUncommittedChanges) {
-                    // 有未提交变更时，要求用户明确选择提交、暂存或丢弃策略。
+                    // Khi có những thay đổi không được cam kết, người dùng được yêu cầu chọn rõ ràng chiến lược cam kết, giai đoạn hoặc loại bỏ.
                     canExecute = false;
                 } else {
-                    // 默认按 canPull
+                    // Nhấn mặc định canPull
                     canExecute = statusCheck != null && (statusCheck.canPull || statusCheck.isRemoteRepositoryEmpty);
                 }
             }
@@ -875,14 +875,14 @@ public class GitOperationDialog extends JDialog {
                 } else if (OPTION_CANCEL.equals(choice)) {
                     canExecute = false;
                 } else if (statusCheck != null && statusCheck.hasRemoteCommits) {
-                    // 远程有新提交时，禁止在未明确选择策略的情况下直接推送。
+                    // Khi có nội dung gửi mới trên điều khiển từ xa, không được phép đẩy chúng trực tiếp mà không chọn chiến lược một cách rõ ràng.
                     canExecute = false;
                 } else {
                     canExecute = statusCheck != null && (statusCheck.canPush || statusCheck.isFirstPush);
                 }
             }
             case COMMIT -> {
-                // 提交和提交并推送都允许
+                // Cả cam kết và cam kết và đẩy đều được cho phép
                 if (OPTION_COMMIT_FIRST.equals(choice) || OPTION_COMMIT_AND_PUSH.equals(choice)) {
                     canExecute = true;
                 } else {
@@ -976,7 +976,7 @@ public class GitOperationDialog extends JDialog {
     }
 
     /**
-     * 展示文件变更信息，并在有冲突的文件下展示冲突详情
+     * Hiển thị thông tin thay đổi tệp và hiển thị chi tiết xung đột trong các tệp xung đột
      */
     private void displayFileChangesStatus() {
         if (statusCheck == null) {
@@ -990,7 +990,7 @@ public class GitOperationDialog extends JDialog {
         StringBuilder html = new StringBuilder();
         html.append(createHtmlStart(true));
 
-        // 本地变更
+        // Những thay đổi cục bộ
         openHtmlSection(html);
         appendHtmlSectionTitle(html, I18nUtil.getMessage(MessageKeys.GIT_DIALOG_LOCAL_CHANGES_TITLE));
         boolean hasLocalChanges = false;
@@ -1006,7 +1006,7 @@ public class GitOperationDialog extends JDialog {
         }
         closeHtmlSection(html);
 
-        // 远程变更分组展示
+        // Những thay đổi từ xa được hiển thị theo nhóm
         openHtmlSection(html);
         appendHtmlSectionTitle(html, I18nUtil.getMessage(MessageKeys.GIT_DIALOG_REMOTE_CHANGES_TITLE));
         boolean hasRemoteChanges = false;
@@ -1020,7 +1020,7 @@ public class GitOperationDialog extends JDialog {
         }
         closeHtmlSection(html);
 
-        // 冲突文件详情展示
+        // Chi tiết tập tin xung đột được hiển thị
         openHtmlSection(html);
         appendHtmlSectionTitle(html, I18nUtil.getMessage(MessageKeys.GIT_DIALOG_CONFLICT_DETAILS_TITLE));
 
@@ -1171,7 +1171,7 @@ public class GitOperationDialog extends JDialog {
     }
 
     /**
-     * HTML转义帮助方法，防止HTML注入
+     * HTMLPhương pháp trợ giúp thoát khỏi để ngăn chặnHTMLtiêm
      */
     private String escapeHtml(String text) {
         return HttpHtmlRenderer.escapeHtml(text);
@@ -1348,7 +1348,7 @@ public class GitOperationDialog extends JDialog {
     }
 
     /**
-     * 获取用户当前选择的操作选项
+     * Nhận tùy chọn hoạt động hiện được người dùng chọn
      */
     private String getUserChoice() {
         if (optionGroup == null) {

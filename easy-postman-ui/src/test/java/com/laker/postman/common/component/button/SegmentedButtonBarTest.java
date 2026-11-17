@@ -14,8 +14,8 @@ public class SegmentedButtonBarTest {
     @Test
     public void shouldManageExclusiveSelectionByValue() {
         SegmentedButtonBar<String> bar = new SegmentedButtonBar<>(FlowLayout.LEFT, SegmentedButtonBar.Size.COMPACT);
-        SegmentedToggleButton countButton = bar.addOption("count", "次数", true);
-        SegmentedToggleButton timeButton = bar.addOption("time", "时间", false);
+        SegmentedToggleButton countButton = bar.addOption("count", "lần", true);
+        SegmentedToggleButton timeButton = bar.addOption("time", "thời gian", false);
         AtomicReference<String> selected = new AtomicReference<>();
         bar.setSelectionListener(selected::set);
 
@@ -31,8 +31,8 @@ public class SegmentedButtonBarTest {
     @Test
     public void compactSizeShouldFitDenseForms() {
         SegmentedButtonBar<String> bar = new SegmentedButtonBar<>(FlowLayout.LEFT, SegmentedButtonBar.Size.COMPACT);
-        bar.addOption("count", "次数", true);
-        bar.addOption("time", "时间", false);
+        bar.addOption("count", "lần", true);
+        bar.addOption("time", "thời gian", false);
 
         assertTrue(bar.getPreferredSize().height <= 29,
                 "compact segmented button bar should align with dense 28px controls, preferred height: "
@@ -43,9 +43,9 @@ public class SegmentedButtonBarTest {
     @Test
     public void defaultSizeShouldStayToolbarCompact() {
         SegmentedButtonBar<String> bar = new SegmentedButtonBar<>(FlowLayout.LEFT);
-        bar.addOption("trend", "趋势", true);
-        bar.addOption("report", "报表", false);
-        bar.addOption("table", "结果表", false);
+        bar.addOption("trend", "xu hướng", true);
+        bar.addOption("report", "Báo cáo", false);
+        bar.addOption("table", "Bảng kết quả", false);
 
         assertTrue(bar.getPreferredSize().height <= 31,
                 "default segmented button bar should stay compact in toolbars, preferred height: "
@@ -66,8 +66,8 @@ public class SegmentedButtonBarTest {
     @Test
     public void compactSegmentsShouldUseConsistentWidthByDefault() {
         SegmentedButtonBar<String> bar = new SegmentedButtonBar<>(FlowLayout.LEFT, SegmentedButtonBar.Size.COMPACT);
-        SegmentedToggleButton countButton = bar.addOption("count", "次数", true);
-        SegmentedToggleButton timeButton = bar.addOption("time", "时间", false);
+        SegmentedToggleButton countButton = bar.addOption("count", "lần", true);
+        SegmentedToggleButton timeButton = bar.addOption("time", "thời gian", false);
 
         assertEquals(countButton.getPreferredSize().width, timeButton.getPreferredSize().width);
     }

@@ -15,18 +15,18 @@ import java.util.List;
 import java.util.function.BiConsumer;
 
 /**
- * 工作区转移 UI 协调器。
- * 提供通用的工作区选择、确认和错误提示流程，减少面板层重复代码。
+ * Chuyển giao không gian làm việc UI Điều phối viên.
+ * Cung cấp quy trình lựa chọn không gian làm việc chung, xác nhận và nhắc lỗi để giảm sự trùng lặp mã ở cấp bảng điều khiển.
  */
 @Slf4j
 @UtilityClass
 public class WorkspaceTransferCoordinator {
 
     /**
-     * 转移数据到其他工作区的通用流程（显示成功消息）
+     * Quy trình chung để truyền dữ liệu sang không gian làm việc khác (hiển thị thông báo thành công)
      *
-     * @param itemName       要转移的项目名称（用于日志和确认对话框）
-     * @param transferAction 实际执行转移的操作 (selectedWorkspace, itemName) -> void
+     * @param itemName       Tên của dự án sẽ được chuyển giao (được sử dụng cho nhật ký và hộp thoại xác nhận)
+     * @param transferAction Hoạt động thực tế của việc thực hiện chuyển giao (selectedWorkspace, itemName) -> void
      */
     public static void transferToWorkspace(String itemName, BiConsumer<Workspace, String> transferAction) {
         try {

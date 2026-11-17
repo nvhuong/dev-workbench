@@ -6,9 +6,9 @@ import lombok.experimental.UtilityClass;
 import java.awt.*;
 
 /**
- * 请求编辑器 Tab 资源清理工具。
+ * Request an editor Tab Công cụ dọn dẹp tài nguyên.
  * <p>
- * RequestEditSubPanel 持有网络连接、后台任务等运行资源，Tab 被替换或关闭时必须统一释放。
+ * RequestEditSubPanel Giữ các kết nối mạng, tác vụ nền và các tài nguyên đang chạy khác.Tab Chúng phải được giải phóng đồng đều khi thay thế hoặc đóng cửa.
  */
 @UtilityClass
 class RequestEditorTabResourceCleaner {

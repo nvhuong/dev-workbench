@@ -41,7 +41,7 @@ final class McpWorkspaceCatalog {
         this.workspacesById = Map.copyOf(indexed);
         this.workspaces = List.copyOf(indexed.values());
         if (this.workspaces.isEmpty()) {
-            throw new IllegalArgumentException("No EasyPostman workspaces are registered");
+            throw new IllegalArgumentException("No Dev Workbench workspaces are registered");
         }
     }
 

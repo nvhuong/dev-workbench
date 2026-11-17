@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 插件更新检查器。
+ * Trình kiểm tra cập nhật plugin.
  */
 @Component
 public final class PluginUpdateChecker {

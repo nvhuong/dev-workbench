@@ -8,9 +8,9 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
- * 迭代数据 API (pm.iterationData)。
+ * Lặp lại dữ liệu API (pm.iterationData)。
  * <p>
- * 用于只读访问当前执行上下文注入的数据驱动行，不参与持久化。
+ * Được sử dụng để truy cập chỉ đọc vào các hàng dựa trên dữ liệu được đưa vào ngữ cảnh thực thi hiện tại và không tham gia vào quá trình lưu giữ.
  */
 public class IterationDataApi {
 

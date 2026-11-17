@@ -24,7 +24,7 @@ import java.io.File;
 import java.net.URI;
 
 /**
- * 更新 UI 控制器，负责更新通知、对话框和下载进度界面。
+ * đổi mới UI Bộ điều khiển, chịu trách nhiệm cập nhật thông báo, hộp thoại và giao diện tiến trình tải xuống.
  */
 @Slf4j
 public class UpdateUiController {
@@ -42,7 +42,7 @@ public class UpdateUiController {
     }
 
     /**
-     * 显示后台更新通知（右下角弹窗）
+     * Hiển thị thông báo cập nhật nền (cửa sổ bật lên ở góc dưới bên phải)
      */
     public void showUpdateNotification(UpdateInfo updateInfo) {
         showUpdateNotification(updateInfo, () -> {
@@ -59,7 +59,7 @@ public class UpdateUiController {
     }
 
     /**
-     * 显示更新对话框（带更新日志）- 使用现代化对话框
+     * Hiển thị hộp thoại cập nhật (có nhật ký cập nhật)- Sử dụng hộp thoại hiện đại
      */
     public void showUpdateDialog(UpdateInfo updateInfo) {
         showUpdateDialog(updateInfo, () -> {
@@ -70,15 +70,15 @@ public class UpdateUiController {
         SwingUtilities.invokeLater(() -> {
             MainFrame mainFrame = UiSingletonFactory.getInstance(MainFrame.class);
 
-            // 使用现代化更新对话框
+            // Sử dụng hộp thoại cập nhật hiện đại
             int choice = ModernUpdateDialog.showUpdateDialog(mainFrame, updateInfo);
 
-            // 处理用户选择: 0=手动下载, 1=自动更新, 2=稍后提醒, 3=忽略此版本, -1=关闭对话框
+            // Xử lý các lựa chọn của người dùng: 0=Tải xuống theo cách thủ công, 1=Cập nhật tự động, 2=Nhắc lại sau, 3=Bỏ qua phiên bản này, -1=Đóng hộp thoại
             switch (choice) {
                 case 0 -> openManualDownloadPage();
                 case 1 -> showUpdateTypeSelectionAndStart(updateInfo);
                 case 3 -> runIgnoreVersion(onIgnoreVersion);
-                case 2, -1 -> { /* 用户稍后提醒或关闭对话框 */ }
+                case 2, -1 -> { /* Người dùng sẽ được nhắc nhở sau hoặc đóng hộp thoại */ }
                 default -> log.debug("Unknown dialog choice: {}", choice);
             }
         });
@@ -91,7 +91,7 @@ public class UpdateUiController {
     }
 
     /**
-     * 显示有新版本但无安装包的提示对话框（手动检查时直接弹出）
+     * Một hộp thoại nhắc nhở hiển thị cho biết có phiên bản mới nhưng chưa có gói cài đặt (bật lên trực tiếp khi kiểm tra thủ công)
      */
     public void showNoAssetDialog(UpdateInfo updateInfo) {
         SwingUtilities.invokeLater(() -> {
@@ -104,8 +104,8 @@ public class UpdateUiController {
     }
 
     /**
-     * 后台检查发现新版本但无安装包时，先显示右下角 toast；
-     * 用户点击「前往 GitHub」后再弹 NoAssetDialog
+     * Khi kiểm tra lý lịch tìm thấy phiên bản mới nhưng không có gói cài đặt thì góc dưới bên phải sẽ hiển thị đầu tiên toast；
+     * Người dùng bấm vào "Đi GitHub」Chơi lại sau NoAssetDialog
      */
     public void showNoAssetNotification(UpdateInfo updateInfo) {
         MainFrame mainFrame = UiSingletonFactory.getInstance(MainFrame.class);
@@ -113,7 +113,7 @@ public class UpdateUiController {
     }
 
     /**
-     * 打开 GitHub 发布页（指定版本）
+     * Mở GitHub Trang phát hành (phiên bản được chỉ định)
      */
     private void openGitHubReleasePage(String version) {
         try {
@@ -127,11 +127,11 @@ public class UpdateUiController {
     }
 
     /**
-     * 打开手动下载页面 - 动态选择最佳更新源
+     * Mở trang tải xuống thủ công - Tự động chọn nguồn cập nhật tốt nhất
      */
     private void openManualDownloadPage() {
         try {
-            // 选择最佳更新源
+            // Chọn nguồn cập nhật tốt nhất
             UpdateSource source = sourceSelector.selectBestSource();
             String releaseUrl = source.getWebUrl();
 
@@ -144,11 +144,11 @@ public class UpdateUiController {
     }
 
     /**
-     * 开始全量静默升级
+     * Bắt đầu nâng cấp hoàn toàn im lặng
      */
     private void showUpdateTypeSelectionAndStart(UpdateInfo updateInfo) {
 
-        // 检查可用的安装包
+        // Kiểm tra các gói cài đặt có sẵn
         JSONArray assets = updateInfo.getReleaseInfo() != null ?
                 updateInfo.getReleaseInfo().getJSONArray("assets") : null;
 
@@ -157,11 +157,11 @@ public class UpdateUiController {
             return;
         }
 
-        // 获取平台特定的安装包下载链接
+        // Nhận liên kết tải xuống gói cài đặt dành riêng cho nền tảng
         String installerUrl = downloadUrlResolver.resolveDownloadUrl(assets);
 
         if (installerUrl == null) {
-            // 安装包暂不可用，用现代化对话框引导用户去 GitHub 手动下载
+            // Gói cài đặt tạm thời không khả dụng và hộp thoại hiện đại được sử dụng để hướng dẫn người dùng GitHub Tải xuống theo cách thủ công
             log.warn("No installer URL found for current platform, showing NoAssetDialog");
             boolean goToGitHub = NoAssetDialog.show(
                     UiSingletonFactory.getInstance(MainFrame.class), updateInfo);
@@ -171,25 +171,25 @@ public class UpdateUiController {
             return;
         }
 
-        // 直接开始全量更新
+        // Bắt đầu cập nhật đầy đủ trực tiếp
         startAutomaticUpdate(updateInfo, installerUrl);
     }
 
     /**
-     * 启动自动更新 - 使用现代化进度对话框
+     * Bắt đầu cập nhật tự động - Sử dụng hộp thoại tiến trình hiện đại
      *
-     * <p>关键顺序：
+     * <p>Chuỗi khóa:
      * <ol>
-     *   <li>先在后台线程启动下载（downloader.downloadAsync），此时进度回调已就绪</li>
-     *   <li>注册 cancelListener（在 show() 阻塞 EDT 之前完成）</li>
-     *   <li>最后调用 progressDialog.show()，它会在 EDT 上 modal-block，
-     *       直到 hide() 被下载回调调用才解除</li>
+     *   <li>Trước tiên hãy bắt đầu tải xuống trong chuỗi nền (downloader.downloadAsync），Tại thời điểm này, cuộc gọi lại tiến trình đã sẵn sàng</li>
+     *   <li>Đăng ký cancelListener（Vào show() bị chặn EDT hoàn thành trước đó)</li>
+     *   <li>Cuộc gọi cuối cùng progressDialog.show()，Nó sẽ ở đó EDT thượng đẳng modal-block，
+     *       cho đến khi hide() Nó chỉ được phát hành sau khi được gọi bằng lệnh gọi lại tải xuống</li>
      * </ol>
-     * 这样进度回调的 invokeLater 就能正常排进 EDT 队列，进度条才会滚动。
+     * Bằng cách này, tiến trình được gọi trở lại invokeLater Nó sẽ chảy vào bình thường EDT Xếp hàng, thanh tiến trình sẽ cuộn.
      * </p>
      *
-     * @param updateInfo  更新发布信息
-     * @param downloadUrl 下载链接
+     * @param updateInfo  Cập nhật thông tin phát hành
+     * @param downloadUrl Liên kết tải xuống
      */
     private void startAutomaticUpdate(UpdateInfo updateInfo, String downloadUrl) {
         if (downloadUrl == null) {
@@ -200,10 +200,10 @@ public class UpdateUiController {
         ModernProgressDialog progressDialog = new ModernProgressDialog(
                 UiSingletonFactory.getInstance(MainFrame.class));
 
-        // 1. 先注册取消回调（在 show() 阻塞 EDT 之前）
+        // 1. Đầu tiên hãy đăng ký lệnh gọi lại hủy (in show() bị chặn EDT Trước)
         progressDialog.setOnCancelListener(downloader::cancel);
 
-        // 2. 先在后台线程启动下载
+        // 2. Trước tiên hãy bắt đầu tải xuống trong một chuỗi nền
         String primarySourceName = updateInfo.getReleaseInfo() == null ? null
                 : updateInfo.getReleaseInfo().getStr(UpdateSource.SOURCE_METADATA_KEY);
         try {
@@ -213,25 +213,25 @@ public class UpdateUiController {
                     new UpdateDownloader.DownloadProgressCallback() {
                         @Override
                         public void onProgress(int percentage, long downloaded, long total, double speed) {
-                            // show() 阻塞 EDT，invokeLater 排队后等 EDT 空出来就会执行
+                            // show() bị chặn EDT，invokeLater Xếp hàng đợi EDT Nó sẽ được thực thi khi nó trống
                             progressDialog.updateProgress(percentage, downloaded, total, speed);
                         }
 
                         @Override
                         public void onCompleted(File downloadedFile) {
-                            progressDialog.hide(); // 解除 modal 阻塞
+                            progressDialog.hide(); // Nâng lên modal bị chặn
                             SwingUtilities.invokeLater(() -> showInstallPrompt(downloadedFile));
                         }
 
                         @Override
                         public void onError(String errorMessage) {
-                            progressDialog.hide(); // 解除 modal 阻塞
+                            progressDialog.hide(); // Nâng lên modal bị chặn
                             SwingUtilities.invokeLater(() -> NotificationCenter.showError(errorMessage));
                         }
 
                         @Override
                         public void onCancelled() {
-                            // triggerCancel() 已经调了 hideNow()，这里只需通知
+                            // triggerCancel() Đã điều chỉnh rồi hideNow()，Chỉ cần một thông báo ở đây
                             SwingUtilities.invokeLater(() -> NotificationCenter.showInfo(
                                     I18nUtil.getMessage(MessageKeys.UPDATE_DOWNLOAD_CANCELLED)));
                         }
@@ -242,18 +242,18 @@ public class UpdateUiController {
             return;
         }
 
-        // 3. 最后 show() — modal 阻塞 EDT，直到 hide() 被调用才返回
-        //    此方法本身已经在 EDT 上（由 showUpdateTypeSelectionAndStart -> SwingUtilities.invokeLater 保证）
+        // 3. Cuối cùng show() — modal bị chặn EDT，cho đến khi hide() Chỉ trả về sau khi được gọi
+        //    Bản thân phương pháp này đã có sẵn EDT trên (bởi showUpdateTypeSelectionAndStart -> SwingUtilities.invokeLater đảm bảo)
         progressDialog.show();
     }
 
     /**
-     * 显示安装提示并静默安装
+     * Hiển thị lời nhắc cài đặt và cài đặt âm thầm
      *
-     * @param installerFile 下载的安装包文件
+     * @param installerFile Đã tải xuống tập tin gói cài đặt
      */
     private void showInstallPrompt(File installerFile) {
-        // 安装包全量更新：静默安装
+        // Cập nhật gói cài đặt đầy đủ: cài đặt im lặng
         String message = I18nUtil.getMessage(MessageKeys.UPDATE_INSTALLER_INSTALL_PROMPT);
 
         int choice = JOptionPane.showConfirmDialog(

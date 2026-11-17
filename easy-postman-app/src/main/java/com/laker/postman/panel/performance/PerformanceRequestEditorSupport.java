@@ -52,8 +52,8 @@ final class PerformanceRequestEditorSupport {
 
         if (item != null) {
             requestEditSubPanel.initPanelData(item);
-            // 压测页使用延迟初始化壳子降低首开成本，但用户选中请求节点后
-            // 必须立即升级为真实编辑器，否则会一直停留在骨架屏。
+            // Trang kiểm tra căng thẳng sử dụng trình bao khởi tạo bị trì hoãn để giảm chi phí mở ban đầu, nhưng sau khi người dùng chọn nút yêu cầu
+            // Bạn phải nâng cấp lên trình chỉnh sửa thực sự ngay lập tức, nếu không bạn sẽ ở lại màn hình khung xương.
             requestEditSubPanel.ensureEditorInitialized();
         }
     }

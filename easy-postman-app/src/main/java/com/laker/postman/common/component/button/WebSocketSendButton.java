@@ -7,7 +7,7 @@ import javax.swing.*;
 import java.awt.*;
 
 /**
- * WebSocket 发送按钮
+ * WebSocket Nút gửi
  */
 public class WebSocketSendButton extends JButton {
     public WebSocketSendButton() {

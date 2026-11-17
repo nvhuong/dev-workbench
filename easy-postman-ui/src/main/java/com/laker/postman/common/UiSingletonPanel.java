@@ -3,21 +3,21 @@ package com.laker.postman.common;
 import javax.swing.*;
 
 /**
- * 面板基础抽象类，统一UI初始化和监听注册结构
- * 提供了initUI和registerListeners两个抽象方法，
- * 子类需要实现这两个方法来完成具体的UI组件初始化和事件监听注册。
- * 所有子类必须通过UiSingletonFactory获取实例，禁止直接new创建实例。
+ * Bảng điều khiển lớp trừu tượng cơ bản, thống nhấtUIKhởi tạo và giám sát cấu trúc đăng ký
+ * cung cấpinitUIvàregisterListenersHai phương pháp trừu tượng,
+ * Các lớp con cần triển khai hai phương thức này để hoàn thành các nhiệm vụ cụ thểUIKhởi tạo thành phần và đăng ký trình xử lý sự kiện.
+ * Tất cả các lớp con phải vượt quaUiSingletonFactoryLấy ví dụ, trực tiếp bị cấmnewTạo một ví dụ.
  */
 public abstract class UiSingletonPanel extends JPanel {
-    // 使用静态线程局部变量直接控制创建状态
+    // Sử dụng các biến cục bộ luồng tĩnh để kiểm soát trực tiếp trạng thái tạo
     private static final ThreadLocal<Boolean> CREATING_ALLOWED = ThreadLocal.withInitial(() -> Boolean.FALSE);
 
-    // 构造函数设为protected，限制外部直接new
+    // Hàm tạo được đặt thành protected，Hạn chế trực tiếp từ bên ngoàinew
     protected UiSingletonPanel() {
-        // 验证是否允许创建实例
+        // Xác minh rằng việc tạo phiên bản được cho phép
         if (!CREATING_ALLOWED.get()) {
             throw new IllegalStateException(
-                    "UiSingletonPanel子类必须通过UiSingletonFactory.getInstance()获取实例，禁止直接new创建: " +
+                    "UiSingletonPanelCác lớp con phải vượt quaUiSingletonFactory.getInstance()Lấy ví dụ, trực tiếp bị cấmnewTạo: " +
                             this.getClass().getName());
         }
     }
@@ -28,17 +28,17 @@ public abstract class UiSingletonPanel extends JPanel {
     }
 
     /**
-     * 初始化UI组件
+     * khởi tạoUIthành phần
      */
     protected abstract void initUI();
 
     /**
-     * 注册事件监听
+     * Đăng ký người nghe sự kiện
      */
     protected abstract void registerListeners();
 
     /**
-     * 设置是否允许创建实例，供UiSingletonFactory使用
+     * Đặt xem có cho phép tạo phiên bản hay khôngUiSingletonFactorysử dụng
      */
     public static void setFactoryCreationAllowed(boolean allowed) {
         CREATING_ALLOWED.set(allowed);

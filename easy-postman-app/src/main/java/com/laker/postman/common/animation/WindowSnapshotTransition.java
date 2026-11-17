@@ -5,9 +5,9 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 
 /**
- * 窗口级快照淡出过渡。
- * 先对旧内容截图，再把截图挂到 layeredPane 上做短暂淡出。
- * 这里刻意不用 glassPane，避免覆盖层参与鼠标命中，影响底层组件的 hover / cursor / drag。
+ * Chuyển đổi mờ dần ảnh chụp nhanh ở cấp độ cửa sổ.
+ * Đầu tiên hãy chụp ảnh màn hình nội dung cũ rồi tải ảnh chụp màn hình lên layeredPane Thực hiện một đoạn fade-out ngắn ở phía trên.
+ * Cố tình không được sử dụng ở đây glassPane，Ngăn chặn lớp phủ dính vào các cú chạm chuột và ảnh hưởng đến các thành phần cơ bản hover / cursor / drag。
  */
 public final class WindowSnapshotTransition {
 
@@ -180,8 +180,8 @@ public final class WindowSnapshotTransition {
 
         @Override
         public boolean contains(int x, int y) {
-            // 过渡层只负责“画旧图”，不允许成为鼠标命中目标。
-            // 否则底层 JSplitPane、Tab 拖拽等交互会拿不到正常的 hover / cursor 事件。
+            // Lớp chuyển tiếp chỉ chịu trách nhiệm“Vẽ những bức tranh cũ”，Không được phép trở thành mục tiêu của các cú đánh chuột.
+            // Nếu không thì lớp dưới cùng JSplitPane、Tab Các tương tác như kéo và thả sẽ không hoạt động bình thường hover / cursor sự kiện.
             return false;
         }
 

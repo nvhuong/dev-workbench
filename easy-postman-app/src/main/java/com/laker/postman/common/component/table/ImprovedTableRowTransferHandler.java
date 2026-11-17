@@ -16,8 +16,8 @@ import java.util.List;
 import java.util.function.Consumer;
 
 /**
- * 改进的行拖动TransferHandler实现
- * 移除拖动阈值，使拖动更加灵敏
+ * Cải thiện tính năng kéo hàngTransferHandlerhoàn thành
+ * Đã xóa ngưỡng kéo để kéo phản ứng nhanh hơn
  */
 @Slf4j
 public class ImprovedTableRowTransferHandler extends TransferHandler {
@@ -36,7 +36,7 @@ public class ImprovedTableRowTransferHandler extends TransferHandler {
 
     @Override
     public void setDragImageOffset(Point p) {
-        // 设置拖拽图像偏移，使拖拽更自然
+        // Đặt độ lệch hình ảnh khi kéo để kéo tự nhiên hơn
         super.setDragImageOffset(p);
     }
 
@@ -49,7 +49,7 @@ public class ImprovedTableRowTransferHandler extends TransferHandler {
             return null;
         }
 
-        // 通知开始拖拽，禁用自动补空行
+        // Thông báo bắt đầu kéo, vô hiệu hóa tính năng tự động điền các dòng trống
         if (dragStateCallback != null) {
             SwingUtilities.invokeLater(() -> dragStateCallback.accept(true));
         }
@@ -63,40 +63,40 @@ public class ImprovedTableRowTransferHandler extends TransferHandler {
             transferredObjects.add(rowData);
         }
 
-        // 创建拖拽图像以提供视觉反馈
+        // Tạo hình ảnh kéo để cung cấp phản hồi trực quan
         createDragImage(table);
 
         return new ImprovedTableRowsTransferable(transferredObjects, localObjectFlavor);
     }
 
     /**
-     * 创建拖拽时的视觉反馈图像
+     * Tạo hình ảnh phản hồi trực quan khi kéo
      */
     private void createDragImage(JTable table) {
         try {
             if (rows != null && rows.length > 0) {
-                // 计算拖拽图像的大小
+                // Tính kích thước của hình ảnh được kéo
                 Rectangle rect = table.getCellRect(rows[0], 0, true);
                 int width = table.getWidth();
-                int height = rect.height * Math.min(rows.length, 3); // 最多显示3行
+                int height = rect.height * Math.min(rows.length, 3); // Hiển thị nhiều nhất3Được rồi
 
-                // 创建半透明的拖拽图像
+                // Tạo hình ảnh kéo bán trong suốt
                 BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
                 Graphics2D g2d = image.createGraphics();
 
-                // 设置半透明
+                // Đặt độ trong suốt
                 g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.7f));
 
-                // 绘制选中的行
+                // Vẽ các hàng đã chọn
                 for (int i = 0; i < Math.min(rows.length, 3); i++) {
                     Graphics rowGraphics = g2d.create(0, i * rect.height, width, rect.height);
                     table.getRowHeight(rows[i]);
 
-                    // 绘制行背景
+                    // Vẽ đường nền
                     rowGraphics.setColor(table.getSelectionBackground());
                     rowGraphics.fillRect(0, 0, width, rect.height);
 
-                    // 绘制边框
+                    // Vẽ đường viền
                     rowGraphics.setColor(ModernColors.withAlpha(ModernColors.getBorderMediumColor(), 150));
                     rowGraphics.drawRect(0, 0, width - 1, rect.height - 1);
 
@@ -110,7 +110,7 @@ public class ImprovedTableRowTransferHandler extends TransferHandler {
             }
         } catch (Exception e) {
             log.debug("Failed to create drag image: {}", e.getMessage());
-            // 不影响拖拽功能，只是没有视觉反馈
+            // Nó không ảnh hưởng đến chức năng kéo và thả, nhưng không có phản hồi trực quan
         }
     }
 
@@ -118,7 +118,7 @@ public class ImprovedTableRowTransferHandler extends TransferHandler {
     public boolean canImport(TransferSupport info) {
         boolean canImport = info.isDrop() && info.isDataFlavorSupported(localObjectFlavor);
 
-        // 设置更明显的拖放指示器
+        // Đặt các chỉ báo kéo và thả rõ ràng hơn
         if (canImport) {
             info.setShowDropLocation(true);
         }
@@ -139,7 +139,7 @@ public class ImprovedTableRowTransferHandler extends TransferHandler {
         DefaultTableModel targetModel = (DefaultTableModel) target.getModel();
         int index = ((JTable.DropLocation) info.getDropLocation()).getRow();
 
-        // 修正索引：确保索引在有效范围内
+        // Sửa chỉ mục: Đảm bảo chỉ mục nằm trong phạm vi hợp lệ
         int max = targetModel.getRowCount();
         if (index < 0) {
             index = max;
@@ -153,7 +153,7 @@ public class ImprovedTableRowTransferHandler extends TransferHandler {
             addIndex = index;
             addCount = values.size();
 
-            // 批量插入行，减少UI更新次数
+            // Chèn hàng theo đợt, giảm bớtUISố lượng cập nhật
             for (int i = 0; i < values.size(); i++) {
                 targetModel.insertRow(index + i, values.get(i));
             }
@@ -172,21 +172,21 @@ public class ImprovedTableRowTransferHandler extends TransferHandler {
                 log.debug("ExportDone - Original rows: {}, addIndex: {}, addCount: {}, total rows: {}",
                     java.util.Arrays.toString(rows), addIndex, addCount, model.getRowCount());
 
-                // 简化逻辑：从后往前删除源行，每次删除时重新计算正确的索引
+                // Logic đơn giản hóa: xóa các hàng nguồn từ sau ra trước, tính toán lại chỉ số chính xác cho mỗi lần xóa
                 for (int i = rows.length - 1; i >= 0; i--) {
                     int originalRow = rows[i];
                     int rowToDelete = originalRow;
 
-                    // 如果插入位置在源行之前，源行索引向后偏移了addCount
+                    // Nếu vị trí chèn ở trước hàng nguồn thì chỉ mục của hàng nguồn sẽ bị dịch ngược về phía sauaddCount
                     if (addIndex <= originalRow) {
                         rowToDelete = originalRow + addCount;
                     }
 
-                    // 对于后面的行，还需要考虑前面已经删除的行数
-                    // 计算当前行之前有多少行已经被删除了
+                    // Đối với các hàng tiếp theo, bạn cũng cần xem xét số lượng hàng đã xóa trước đó
+                    // Đếm số hàng đã bị xóa trước hàng hiện tại
                     int deletedBeforeCurrent = 0;
                     for (int j = i + 1; j < rows.length; j++) {
-                        // 如果前面删除的行在当前行之前，需要调整索引
+                        // Nếu hàng đã xóa trước đó nằm trước hàng hiện tại thì cần điều chỉnh chỉ mục
                         int prevDeletedRow = rows[j];
                         if (addIndex <= prevDeletedRow) {
                             prevDeletedRow = prevDeletedRow + addCount;
@@ -201,7 +201,7 @@ public class ImprovedTableRowTransferHandler extends TransferHandler {
                     log.debug("Removing row - original: {}, calculated: {}, model size: {}",
                         originalRow, rowToDelete, model.getRowCount());
 
-                    // 确保索引有效
+                    // Hãy chắc chắn rằng chỉ mục là hợp lệ
                     if (rowToDelete >= 0 && rowToDelete < model.getRowCount()) {
                         model.removeRow(rowToDelete);
                     } else {
@@ -218,13 +218,13 @@ public class ImprovedTableRowTransferHandler extends TransferHandler {
             addCount = 0;
             addIndex = -1;
 
-            // 拖拽完成，重新启用自动补空行并触发保存
+            // Sau khi kéo xong, tính năng tự động điền các dòng trống sẽ được bật lại và quá trình lưu được kích hoạt
             if (dragStateCallback != null) {
-                // 使用invokeLater确保在UI更新完成后执行，并传递拖动完成标志
+                // sử dụnginvokeLaterHãy chắc chắn rằng bạn có mặt ở đóUIĐược thực thi sau khi cập nhật hoàn tất, chuyển cờ hoàn thành kéo
                 SwingUtilities.invokeLater(() -> {
                     dragStateCallback.accept(false);
-                    // 再次延迟以确保拖动状态已完全重置后触发一次表格数据变更事件
-                    // 触发表格模型更新事件，让自动保存逻辑能够检测到变化
+                    // Trì hoãn lại để đảm bảo rằng sự kiện thay đổi dữ liệu bảng được kích hoạt sau khi trạng thái kéo được đặt lại hoàn toàn
+                    // Kích hoạt sự kiện cập nhật mô hình bảng để logic lưu tự động có thể phát hiện các thay đổi
                     SwingUtilities.invokeLater(model::fireTableDataChanged);
                 });
             }
@@ -232,7 +232,7 @@ public class ImprovedTableRowTransferHandler extends TransferHandler {
     }
 
     /**
-     * 自定义 Transferable 用于表格行拖动
+     * Tùy chỉnh Transferable Được sử dụng để kéo hàng của bảng
      */
     private record ImprovedTableRowsTransferable(List<Object[]> data, DataFlavor flavor) implements Transferable {
 

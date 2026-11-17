@@ -14,7 +14,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 
 /**
- * 编解码工具面板
+ * Bảng công cụ Codec
  */
 @Slf4j
 public class EncoderPanel extends JPanel {
@@ -31,7 +31,7 @@ public class EncoderPanel extends JPanel {
     private void initUI() {
         ToolboxWorkbench.applyRoot(this);
 
-        // 顶部工具栏
+        // Thanh công cụ trên cùng
         JLabel typeLabel = new JLabel(I18nUtil.getMessage(MessageKeys.TOOLBOX_ENCODER_TITLE) + ":");
 
         typeCombo = new JComboBox<>(new String[]{
@@ -47,8 +47,8 @@ public class EncoderPanel extends JPanel {
         JPanel rightActions = ToolboxWorkbench.rightToolbar(encodeBtn, decodeBtn, copyBtn, clearBtn);
         add(ToolboxWorkbench.toolbar(leftControls, rightActions), BorderLayout.NORTH);
 
-        // 中间分割面板
-        // 输入区域
+        // Bảng chia đôi ở giữa
+        // Khu vực đầu vào
         inputArea = new JTextArea();
         inputArea.setLineWrap(true);
         inputArea.setWrapStyleWord(true);
@@ -60,7 +60,7 @@ public class EncoderPanel extends JPanel {
                 inputScrollPane
         );
 
-        // 输出区域
+        // khu vực đầu ra
         outputArea = new JTextArea();
         outputArea.setLineWrap(true);
         outputArea.setWrapStyleWord(true);
@@ -77,7 +77,7 @@ public class EncoderPanel extends JPanel {
         splitPane.setResizeWeight(0.42);
         add(splitPane, BorderLayout.CENTER);
 
-        // 按钮事件
+        // Sự kiện nút
         encodeBtn.addActionListener(e -> encode());
         decodeBtn.addActionListener(e -> decode());
         typeCombo.addActionListener(e -> encodeBtn.setEnabled(typeCombo.getSelectedIndex() != 4));

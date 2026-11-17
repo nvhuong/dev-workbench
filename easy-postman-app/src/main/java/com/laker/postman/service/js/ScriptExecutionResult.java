@@ -8,40 +8,40 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * 脚本执行结果
- * 封装脚本执行的结果信息，包括成功状态、测试结果、错误信息等
+ * Kết quả thực thi script
+ * Đóng gói thông tin kết quả thực thi tập lệnh, bao gồm trạng thái thành công, kết quả kiểm tra, thông tin lỗi, v.v
  */
 @Getter
 @Builder
 public class ScriptExecutionResult {
     /**
-     * 是否执行成功
+     * Việc thực hiện có thành công hay không
      */
     private final boolean success;
 
     /**
-     * 测试结果列表（仅后置脚本）
+     * Danh sách kết quả kiểm tra (chỉ phần tái bút)
      */
     @Builder.Default
     private final List<TestResult> testResults = new ArrayList<>();
 
     /**
-     * 错误信息（如果执行失败）
+     * Thông báo lỗi nếu thực thi không thành công
      */
     private final String errorMessage;
 
     /**
-     * 异常对象（如果执行失败）
+     * Đối tượng ngoại lệ nếu thực thi thất bại
      */
     private final Exception exception;
 
     /**
-     * 前置类脚本是否显式修改了请求体。
+     * Tập lệnh tiền lớp có sửa đổi nội dung yêu cầu một cách rõ ràng hay không.
      */
     private final boolean requestBodyMutated;
 
     /**
-     * 创建成功的结果
+     * Tạo kết quả thành công
      */
     public static ScriptExecutionResult success() {
         return ScriptExecutionResult.builder()
@@ -50,7 +50,7 @@ public class ScriptExecutionResult {
     }
 
     /**
-     * 创建成功的结果（带测试结果）
+     * Tạo kết quả thành công (có kết quả kiểm tra)
      */
     public static ScriptExecutionResult success(List<TestResult> testResults) {
         return ScriptExecutionResult.builder()
@@ -60,7 +60,7 @@ public class ScriptExecutionResult {
     }
 
     /**
-     * 创建失败的结果
+     * Tạo kết quả thất bại
      */
     public static ScriptExecutionResult failure(String errorMessage, Exception exception) {
         return ScriptExecutionResult.builder()
@@ -71,7 +71,7 @@ public class ScriptExecutionResult {
     }
 
     /**
-     * 创建失败的结果（带测试结果）
+     * Tạo kết quả thất bại (có kết quả kiểm tra)
      */
     public static ScriptExecutionResult failure(String errorMessage, Exception exception, List<TestResult> testResults) {
         return ScriptExecutionResult.builder()
@@ -83,22 +83,22 @@ public class ScriptExecutionResult {
     }
 
     /**
-     * 是否有测试结果
+     * Có kết quả xét nghiệm nào không?
      */
     public boolean hasTestResults() {
         return !testResults.isEmpty();
     }
 
     /**
-     * 所有测试是否通过
-     * 注意：如果没有测试，返回true（没有失败的测试）
+     * Tất cả các bài kiểm tra đã vượt qua
+     * Lưu ý: Nếu không có bài kiểm tra, hãy trả lạitrue（Không có bài kiểm tra thất bại)
      */
     public boolean allTestsPassed() {
-        // 如果没有测试，视为通过
+        // Nếu không có bài kiểm tra nào thì coi như đã đậu
         if (!hasTestResults()) {
             return true;
         }
-        // 如果有测试，检查是否全部通过
+        // Nếu có bài kiểm tra, hãy kiểm tra xem tất cả chúng có vượt qua không
         return testResults.stream().allMatch(test -> test.passed);
     }
 }

@@ -5,7 +5,7 @@ import cn.hutool.json.JSONObject;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * 资源查找器 - 从发布信息中提取合适的下载链接
+ * Trình tìm tài nguyên - Trích xuất các liên kết tải xuống thích hợp từ thông tin phát hành
  */
 @Slf4j
 public class AssetFinder {
@@ -14,11 +14,11 @@ public class AssetFinder {
 
 
     /**
-     * 根据扩展名查找资源
+     * Tìm tài nguyên dựa trên phần mở rộng
      *
-     * @param assets    资源列表
-     * @param extension 文件扩展名（如 ".dmg", ".exe"）
-     * @return 下载 URL，未找到返回 null
+     * @param assets    Danh sách tài nguyên
+     * @param extension Phần mở rộng tệp (ví dụ:  ".dmg", ".exe"）
+     * @return tải về URL，Trả lại không tìm thấy null
      */
     public String findByExtension(JSONArray assets, String extension) {
         for (int i = 0; i < assets.size(); i++) {
@@ -34,11 +34,11 @@ public class AssetFinder {
     }
 
     /**
-     * 根据模式查找资源
+     * Tìm tài nguyên dựa trên các mẫu
      *
-     * @param assets  资源列表
-     * @param pattern 匹配模式（如 "-portable.zip"）
-     * @return 下载 URL，未找到返回 null
+     * @param assets  Danh sách tài nguyên
+     * @param pattern Mẫu khớp (ví dụ "-portable.zip"）
+     * @return tải về URL，Trả lại không tìm thấy null
      */
     public String findByPattern(JSONArray assets, String pattern) {
         for (int i = 0; i < assets.size(); i++) {
@@ -54,7 +54,7 @@ public class AssetFinder {
     }
 
     /**
-     * 按多个模式依次查找资源，返回首个命中的下载 URL
+     * Tìm kiếm tài nguyên theo trình tự theo nhiều mẫu và trả về lượt tải xuống đầu tiên URL
      */
     public String findFirstByPatterns(JSONArray assets, String... patterns) {
         if (patterns == null) {

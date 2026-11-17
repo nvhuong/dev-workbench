@@ -11,9 +11,9 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * HTTP Header Value 智能编辑器
- * 继承 EasySmartValueCellEditor，复用智能多行编辑能力
- * 同时支持根据对应的 Header Key 提供智能补全
+ * HTTP Header Value Trình chỉnh sửa thông minh
+ * kế thừa EasySmartValueCellEditor，Tái sử dụng khả năng soạn thảo nhiều dòng thông minh
+ * Đồng thời, nó được hỗ trợ theo tương ứng Header Key Cung cấp sự hoàn thiện thông minh
  */
 public class HttpHeaderValueEasyTextFieldCellEditor extends EasySmartValueCellEditor {
     private final int keyColumnIndex;
@@ -22,18 +22,18 @@ public class HttpHeaderValueEasyTextFieldCellEditor extends EasySmartValueCellEd
     private int editingRow;
 
     public HttpHeaderValueEasyTextFieldCellEditor(int keyColumnIndex) {
-        super(true); // 启用自动多行编辑
+        super(true); // Cho phép chỉnh sửa nhiều dòng tự động
         this.keyColumnIndex = keyColumnIndex;
 
-        // 将父类的单行 textField 替换为 AutoCompleteEasyTextField
+        // Thay đổi lớp cha thành một dòng duy nhất textField Thay thế bằng  AutoCompleteEasyTextField
         this.autoCompleteTextField = new AutoCompleteEasyTextField(1);
         this.autoCompleteTextField.setBorder(null);
 
-        // 优化：获得焦点时，如果文本为空则显示所有建议
+        // Tối ưu hóa: Khi tập trung, tất cả đề xuất sẽ được hiển thị nếu văn bản trống
         this.autoCompleteTextField.addFocusListener(new FocusAdapter() {
             @Override
             public void focusGained(FocusEvent e) {
-                // 只在文本为空时自动显示所有建议
+                // Tự động hiển thị tất cả các đề xuất chỉ khi văn bản trống
                 String text = autoCompleteTextField.getText();
                 if (text == null || text.trim().isEmpty()) {
                     SwingUtilities.invokeLater(autoCompleteTextField::showAllSuggestions);
@@ -41,7 +41,7 @@ public class HttpHeaderValueEasyTextFieldCellEditor extends EasySmartValueCellEd
             }
         });
 
-        // 通过父类方法替换单行组件，同步更新 CardLayout 卡片和 DocumentListener
+        // Thay thế các thành phần một hàng thông qua các phương thức của lớp cha và cập nhật đồng bộ CardLayout Thẻ và DocumentListener
         replaceTextField(autoCompleteTextField);
     }
 
@@ -51,11 +51,11 @@ public class HttpHeaderValueEasyTextFieldCellEditor extends EasySmartValueCellEd
         this.parentTable = table;
         this.editingRow = row; // view row index
 
-        // 调用父类方法（父类始终返回 containerPanel）
+        // Gọi phương thức của lớp cha (lớp cha luôn trả về containerPanel）
         Component editor = super.getTableCellEditorComponent(table, value, isSelected, row, column);
 
-        // 双重 invokeLater：第一次等待 stopCellEditing 写入 model，
-        // 第二次确保所有 TableModelEvent 监听器都已处理完，再读取 Key 值
+        // gấp đôi invokeLater：Lần đầu chờ đợi stopCellEditing Viết model，
+        // Lần thứ hai đảm bảo mọi thứ TableModelEvent Người nghe đều đã được xử lý trước khi đọc Key giá trị
         if (!isMultiLineMode()) {
             SwingUtilities.invokeLater(() ->
                 SwingUtilities.invokeLater(this::updateSuggestionsForCurrentKey)
@@ -71,13 +71,13 @@ public class HttpHeaderValueEasyTextFieldCellEditor extends EasySmartValueCellEd
             return;
         }
 
-        // 将视图行索引转换为模型行索引（RowSorter 可能重排了行顺序）
+        // Chuyển đổi chỉ mục hàng của chế độ xem thành chỉ mục hàng mô hình (RowSorter Thứ tự hàng có thể đã được sắp xếp lại)
         int modelRow = editingRow;
         if (parentTable.getRowSorter() != null) {
             try {
                 modelRow = parentTable.getRowSorter().convertRowIndexToModel(editingRow);
             } catch (IndexOutOfBoundsException e) {
-                // 视图行索引无效（可能被过滤掉了），放弃
+                // Chỉ mục hàng xem không hợp lệ (có thể đã bị lọc ra), hãy bỏ cuộc
                 disableAutoComplete();
                 return;
             }
@@ -88,17 +88,17 @@ public class HttpHeaderValueEasyTextFieldCellEditor extends EasySmartValueCellEd
             return;
         }
 
-        // 从模型中读取对应的 Key 值
+        // Đọc cái tương ứng từ mô hình Key giá trị
         Object keyValue = parentTable.getModel().getValueAt(modelRow, keyColumnIndex);
         String headerKey = (keyValue != null) ? keyValue.toString().trim() : "";
 
-        // 如果 Key 为空，禁用自动补全
+        // nếu Key Để trống để tắt tính năng tự động hoàn thành
         if (headerKey.isEmpty()) {
             disableAutoComplete();
             return;
         }
 
-        // 获取对应的推荐值列表
+        // Nhận danh sách giá trị được đề xuất tương ứng
         List<String> suggestions = HttpHeaderConstants.getCommonValuesForHeader(headerKey);
 
         if (suggestions == null || suggestions.isEmpty()) {
@@ -107,7 +107,7 @@ public class HttpHeaderValueEasyTextFieldCellEditor extends EasySmartValueCellEd
             autoCompleteTextField.setSuggestions(suggestions);
             autoCompleteTextField.setAutoCompleteEnabled(true);
 
-            // 如果文本为空，自动显示所有建议
+            // Nếu văn bản trống, tất cả các đề xuất sẽ tự động được hiển thị
             String currentText = autoCompleteTextField.getText();
             if (currentText == null || currentText.trim().isEmpty()) {
                 SwingUtilities.invokeLater(autoCompleteTextField::showAllSuggestions);
@@ -118,7 +118,7 @@ public class HttpHeaderValueEasyTextFieldCellEditor extends EasySmartValueCellEd
     private void disableAutoComplete() {
         if (autoCompleteTextField != null) {
             autoCompleteTextField.setAutoCompleteEnabled(false);
-            // 清除推荐列表，避免下次启用时显示旧的推荐
+            // Xóa danh sách đề xuất để tránh hiển thị các đề xuất cũ vào lần bật tiếp theo
             autoCompleteTextField.setSuggestions(Collections.emptyList());
         }
     }

@@ -9,7 +9,7 @@ import java.nio.file.Paths;
 import java.util.Locale;
 
 /**
- * 平台特定的下载 URL 解析器
+ * Tải xuống nền tảng cụ thể URL trình phân tích cú pháp
  */
 @Slf4j
 public class PlatformDownloadUrlResolver {
@@ -21,20 +21,20 @@ public class PlatformDownloadUrlResolver {
     }
 
     /**
-     * 根据当前平台获取安装包下载 URL
+     * Tải xuống gói cài đặt dựa trên nền tảng hiện tại URL
      *
-     * @param assets 资源列表
-     * @return 下载 URL，未找到返回 null
+     * @param assets Danh sách tài nguyên
+     * @return tải về URL，Trả lại không tìm thấy null
      */
     public String resolveDownloadUrl(JSONArray assets) {
         return resolvePlatformInstallerUrl(assets);
     }
 
     /**
-     * 解析平台特定的安装包 URL
+     * Phân tích các gói cài đặt dành riêng cho nền tảng URL
      */
     private String resolvePlatformInstallerUrl(JSONArray assets) {
-        // 根据操作系统查找对应的安装包
+        // Tìm gói cài đặt tương ứng theo hệ điều hành
         String osName = System.getProperty("os.name").toLowerCase();
         if (osName.contains("win")) {
             return resolveWindowsUrl(assets);
@@ -49,7 +49,7 @@ public class PlatformDownloadUrlResolver {
     }
 
     /**
-     * 解析 Windows 下载 URL
+     * phân tích Windows tải về URL
      */
     private String resolveWindowsUrl(JSONArray assets) {
         boolean isPortable = WindowsVersionDetector.isPortableVersion();
@@ -72,13 +72,13 @@ public class PlatformDownloadUrlResolver {
     }
 
     /**
-     * 解析 macOS 下载 URL
+     * phân tích macOS tải về URL
      */
     private String resolveMacUrl(JSONArray assets) {
         String arch = System.getProperty("os.arch", "").toLowerCase();
         boolean isAppleSilicon = arch.contains("aarch64") || arch.equals("arm64");
 
-        // 1. 优先查找新格式的架构特定 DMG
+        // 1. Ưu tiên tìm kiếm theo lược đồ cụ thể cho các định dạng mới DMG
         String archSpecificSuffix = getMacPackageSuffix(isAppleSilicon);
         String downloadUrl = assetFinder.findByExtension(assets, archSpecificSuffix);
 
@@ -92,7 +92,7 @@ public class PlatformDownloadUrlResolver {
     }
 
     /**
-     * 解析 Linux 下载 URL
+     * phân tích Linux tải về URL
      */
     private String resolveLinuxUrl(JSONArray assets) {
         String arch = System.getProperty("os.arch", "").toLowerCase(Locale.ROOT);
@@ -191,7 +191,7 @@ public class PlatformDownloadUrlResolver {
     }
 
     /**
-     * 获取 macOS 包后缀
+     * Lấy macOS hậu tố gói
      */
     private String getMacPackageSuffix(boolean isAppleSilicon) {
         if (isAppleSilicon) {

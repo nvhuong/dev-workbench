@@ -8,9 +8,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * HttpRequestItem 类表示一个HTTP请求的配置项
- * 包含请求的基本信息、头部、参数、认证等
- * 每个参数都要求有默认值，便于前端展示和编辑
+ * HttpRequestItem Lớp đại diện cho aHTTPMục cấu hình được yêu cầu
+ * Chứa thông tin cơ bản của yêu cầu, tiêu đề, tham số, xác thực, v.v
+ * Mỗi tham số yêu cầu một giá trị mặc định để hỗ trợ hiển thị và chỉnh sửa giao diện người dùng
  */
 @Setter
 @Getter
@@ -21,37 +21,37 @@ public class HttpRequestItem implements Serializable {
     public static final int DEFAULT_WEBSOCKET_PING_INTERVAL_MS = 30_000;
     public static final int DISABLED_WEBSOCKET_PING_INTERVAL_MS = 0;
 
-    private String id = ""; // 唯一标识符
-    private String name = ""; // 请求名称
-    private String description = ""; // 请求描述（支持Markdown）
-    private String url = ""; // 请求URL
-    private String method = "GET"; // 请求方法（GET, POST, PUT, DELETE等）
-    private RequestItemProtocolEnum protocol = RequestItemProtocolEnum.HTTP; // 协议类型，默认HTTP
+    private String id = ""; // Mã định danh duy nhất
+    private String name = ""; // Yêu cầu tên
+    private String description = ""; // Yêu cầu mô tả (supportMarkdown）
+    private String url = ""; // yêu cầuURL
+    private String method = "GET"; // Phương thức yêu cầu (GET, POST, PUT, DELETEChờ đợi)
+    private RequestItemProtocolEnum protocol = RequestItemProtocolEnum.HTTP; // Loại giao thức, mặc địnhHTTP
     private List<HttpHeader> headersList = new ArrayList<>();
-    private String bodyType = ""; // 请求体类型
-    private String body = ""; // 请求体内容（如JSON、表单数据等）
+    private String bodyType = ""; // Yêu cầu loại cơ thể
+    private String body = ""; // Request body content (egJSON、dữ liệu biểu mẫu, v.v.)
     private List<HttpParam> pathVariablesList = new ArrayList<>();
     private List<HttpParam> paramsList = new ArrayList<>();
     private List<HttpFormData> formDataList = new ArrayList<>();
     private List<HttpFormUrlencoded> urlencodedList = new ArrayList<>();
-    private String authType = AuthType.INHERIT.getConstant(); // 认证类型（inherit/none/apiKey/basic/bearer/digest），默认继承
-    private String authUsername = ""; // Basic/Digest用户名
-    private String authPassword = ""; // Basic/Digest密码
+    private String authType = AuthType.INHERIT.getConstant(); // Loại xác thực (inherit/none/apiKey/basic/bearer/digest），Được kế thừa theo mặc định
+    private String authUsername = ""; // Basic/DigestTên người dùng
+    private String authPassword = ""; // Basic/Digestmật khẩu
     private String authToken = "";    // Bearer Token
-    private String authApiKeyName = ""; // API Key 名称
-    private String authApiKeyValue = ""; // API Key 值
-    private String authApiKeyPlacement = AuthApiKeyPlacement.HEADER.getConstant(); // API Key 添加位置
-    private Boolean followRedirects; // 是否自动跟随重定向，null 表示跟随全局设置
-    private Boolean cookieJarEnabled; // 是否启用 Cookie Jar，null 表示使用默认值
-    private HttpRequestProxyPolicy proxyPolicy = HttpRequestProxyPolicy.DEFAULT; // 代理策略，默认跟随全局设置
-    private String httpVersion = HTTP_VERSION_AUTO; // HTTP 协议偏好
-    private Integer requestTimeoutMs; // 请求超时（毫秒），null 表示跟随全局设置
-    private Integer webSocketPingIntervalMs; // WebSocket 协议 ping 间隔（毫秒），null 表示默认 30 秒，0 表示关闭
-    // 前置脚本（请求前执行）
+    private String authApiKeyName = ""; // API Key tên
+    private String authApiKeyValue = ""; // API Key giá trị
+    private String authApiKeyPlacement = AuthApiKeyPlacement.HEADER.getConstant(); // API Key Thêm vị trí
+    private Boolean followRedirects; // Có tự động theo dõi các chuyển hướng hay không.null Cho biết các cài đặt chung sau đây
+    private Boolean cookieJarEnabled; // Có bật hay không Cookie Jar，null Cho biết sử dụng giá trị mặc định
+    private HttpRequestProxyPolicy proxyPolicy = HttpRequestProxyPolicy.DEFAULT; // Chính sách proxy, theo mặc định tuân theo cài đặt chung
+    private String httpVersion = HTTP_VERSION_AUTO; // HTTP Tùy chọn giao thức
+    private Integer requestTimeoutMs; // Yêu cầu thời gian chờ (mili giây).null Cho biết các cài đặt chung sau đây
+    private Integer webSocketPingIntervalMs; // WebSocket thỏa thuận ping Khoảng thời gian (mili giây),null Cho biết mặc định 30 Thứ hai,0 có nghĩa là đóng cửa
+    // Pre-script (thực thi trước khi có yêu cầu)
     private String prescript = "";
-    // 后置脚本（响应后执行）
+    // Postscript (được thực hiện sau khi phản hồi)
     private String postscript = "";
-    // 保存的响应列表（类似 Postman 的 Examples/Response）
+    // Danh sách các phản hồi đã lưu (tương tự như  Postman của Examples/Response）
     private List<SavedResponse> response = new ArrayList<>();
 
     public void setProtocol(RequestItemProtocolEnum protocol) {
@@ -59,7 +59,7 @@ public class HttpRequestItem implements Serializable {
     }
 
     /**
-     * 判断该请求是否为新建（未命名）请求
+     * Xác định xem yêu cầu có phải là yêu cầu mới (chưa được đặt tên) hay không
      */
     public boolean isNewRequest() {
         return name == null || name.trim().isEmpty();

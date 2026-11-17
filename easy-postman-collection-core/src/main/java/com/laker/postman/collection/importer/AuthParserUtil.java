@@ -18,14 +18,14 @@ import static com.laker.postman.request.model.RequestAuthTypes.AUTH_TYPE_BEARER;
 import static com.laker.postman.request.model.RequestAuthTypes.AUTH_TYPE_DIGEST;
 
 /**
- * 认证解析工具类
- * 提供统一的认证信息解析逻辑，供各个 Parser 复用
+ * Lớp công cụ phân tích xác thực
+ * Cung cấp logic phân tích thông tin xác thực thống nhất cho từng thông tin Parser Tái sử dụng
  */
 @Slf4j
 @UtilityClass
 public class AuthParserUtil {
 
-    // 常量定义
+    // Định nghĩa hằng số
     private static final String POSTMAN_AUTH_TYPE_BASIC = "basic";
     private static final String POSTMAN_AUTH_TYPE_BEARER = "bearer";
     private static final String POSTMAN_AUTH_TYPE_DIGEST = "digest";
@@ -33,7 +33,7 @@ public class AuthParserUtil {
     private static final String KEY_VALUE = "value";
 
     /**
-     * Basic认证凭据
+     * BasicThông tin xác thực
      */
     @Data
     public static class BasicAuthCredentials {
@@ -42,10 +42,10 @@ public class AuthParserUtil {
     }
 
     /**
-     * 从 Postman 格式的 auth 对象解析到 RequestGroup
+     * Từ Postman định dạng auth Đối tượng được giải quyết RequestGroup
      *
-     * @param auth Postman auth JSON 对象
-     * @param group 目标分组对象
+     * @param auth Postman auth JSON đối tượng
+     * @param group Đối tượng nhóm mục tiêu
      */
     public static void parsePostmanAuthToGroup(JSONObject auth, RequestGroup group) {
         String authType = auth.getStr("type", "");
@@ -120,11 +120,11 @@ public class AuthParserUtil {
     }
 
     /**
-     * 从 Basic Authorization 头部解析凭据
-     * 支持 Base64 编码和变量格式
+     * Từ Basic Authorization Thông tin xác thực phân tích cú pháp tiêu đề
+     * Hỗ trợ Base64 Mã hóa và định dạng biến đổi
      *
-     * @param authValue Authorization 头部值（例如："Basic dXNlcm5hbWU6cGFzc3dvcmQ="）
-     * @return Basic认证凭据，如果解析失败返回null
+     * @param authValue Authorization Giá trị tiêu đề (ví dụ: ."Basic dXNlcm5hbWU6cGFzc3dvcmQ="）
+     * @return BasicThông tin xác thực, được trả về nếu phân tích cú pháp không thành côngnull
      */
     public static BasicAuthCredentials parseBasicAuthHeader(String authValue) {
         if (authValue == null || !authValue.startsWith("Basic ")) {
@@ -133,15 +133,15 @@ public class AuthParserUtil {
 
         String credentials = authValue.substring(6).trim();
 
-        // 检查是否是变量占位符格式：Basic {{username}} {{password}}
+        // Kiểm tra xem đó có phải là định dạng giữ chỗ có thể thay đổi hay không: .Basic {{username}} {{password}}
         if (credentials.contains("{{") && credentials.contains("}}")) {
-            // 变量格式
+            // Định dạng biến đổi
             String[] parts = credentials.split("\\s+");
             if (parts.length >= 2) {
-                // 格式：Basic {{username}} {{password}}
+                // Định dạng:Basic {{username}} {{password}}
                 return new BasicAuthCredentials(parts[0], parts[1]);
             } else {
-                // 格式：Basic {{username}}:{{password}}
+                // Định dạng:Basic {{username}}:{{password}}
                 int colonIndex = credentials.indexOf(':');
                 if (colonIndex > 0) {
                     return new BasicAuthCredentials(
@@ -153,7 +153,7 @@ public class AuthParserUtil {
                 }
             }
         } else {
-            // Base64 编码格式
+            // Base64 Định dạng mã hóa
             try {
                 String decoded = new String(Base64.getDecoder().decode(credentials));
                 String[] parts = decoded.split(":", 2);
@@ -163,7 +163,7 @@ public class AuthParserUtil {
                     return new BasicAuthCredentials(decoded, "");
                 }
             } catch (Exception e) {
-                log.warn("解析 Basic 认证失败，可能是变量格式", e);
+                log.warn("phân tích Basic Xác thực không thành công, có thể do định dạng thay đổi", e);
                 return new BasicAuthCredentials(credentials, "");
             }
         }

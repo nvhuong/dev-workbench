@@ -13,7 +13,7 @@ import static org.testng.Assert.assertTrue;
 
 public class PerformanceProtocolStageValidatorTest {
 
-    @Test(description = "WebSocket 请求必须有启用的请求级 WS Connect 阶段")
+    @Test(description = "WebSocket Yêu cầu phải được kích hoạt ở cấp độ yêu cầu WS Connect sân khấu")
     public void shouldRequireEnabledDirectWebSocketConnectStage() {
         PerformanceTestPlanNode requestNode = requestNode();
         PerformanceTestPlanNode loopNode = new PerformanceTestPlanNode(new PerformanceTreeNode("Loop", NodeType.LOOP));
@@ -33,7 +33,7 @@ public class PerformanceProtocolStageValidatorTest {
         assertTrue(validateRequest(requestNode, PerformanceProtocol.WEBSOCKET).valid());
     }
 
-    @Test(description = "SSE 请求必须同时有启用的 Connect 和 Receive 阶段")
+    @Test(description = "SSE Yêu cầu cũng phải được kích hoạt Connect và Receive sân khấu")
     public void shouldRequireEnabledDirectSseStages() {
         PerformanceTestPlanNode requestNode = requestNode();
 
@@ -49,7 +49,7 @@ public class PerformanceProtocolStageValidatorTest {
         assertTrue(validateRequest(requestNode, PerformanceProtocol.SSE).valid());
     }
 
-    @Test(description = "HTTP 请求不需要协议阶段节点")
+    @Test(description = "HTTP The request does not require a protocol phase node")
     public void shouldNotRequireProtocolStagesForHttp() {
         assertTrue(validateRequest(requestNode(), PerformanceProtocol.HTTP).valid());
     }

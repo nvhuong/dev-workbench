@@ -7,7 +7,7 @@ import lombok.Getter;
 import java.util.Objects;
 
 /**
- * 环境项封装类，用于在下拉框中显示
+ * Lớp đóng gói mục môi trường, được sử dụng để hiển thị trong hộp thả xuống
  */
 @Getter
 public class EnvironmentItem {

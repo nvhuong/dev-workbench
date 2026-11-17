@@ -2,7 +2,7 @@ package com.laker.postman.service.render;
 
 import com.laker.postman.http.runtime.model.HttpEventInfo;
 
-// 时序计算辅助类
+// Lớp phụ trợ tính toán chuỗi thời gian
 public class TimingCalculator {
     private final HttpEventInfo info;
 
@@ -68,7 +68,7 @@ public class TimingCalculator {
             return -1;
         }
 
-        // 优先使用 RequestBodyEnd，如果没有则使用 RequestHeadersEnd
+        // Ưu tiên sử dụng RequestBodyEnd，Sử dụng nếu không có sẵn RequestHeadersEnd
         long requestEndTime = info.getRequestBodyEnd() > 0 ?
                 info.getRequestBodyEnd() : info.getRequestHeadersEnd();
 
@@ -84,12 +84,12 @@ public class TimingCalculator {
     }
 
     public boolean getConnectionReused() {
-        // 如果没有连接获取事件，无法判断
+        // Nếu không có mối liên hệ nào để có được sự kiện thì không thể phán xét được
         if (info.getConnectionAcquired() <= 0) {
             return false;
         }
 
-        // 如果连接获取时间早于连接开始时间，说明是复用的连接
+        // Nếu thời gian thu thập kết nối sớm hơn thời gian bắt đầu kết nối, điều đó có nghĩa là kết nối được sử dụng lại
         return info.getConnectStart() <= 0 || info.getConnectionAcquired() < info.getConnectStart();
     }
 
@@ -104,8 +104,8 @@ public class TimingCalculator {
 
         long duration = end - start;
 
-        // 防止异常大的时间差（超过1小时认为异常）
-        if (duration > 3600000) { // 3600000ms = 1小时
+        // Ngăn chặn chênh lệch thời gian lớn bất thường (vượt quá1giờ được coi là bất thường)
+        if (duration > 3600000) { // 3600000ms = 1giờ
             return -1;
         }
 

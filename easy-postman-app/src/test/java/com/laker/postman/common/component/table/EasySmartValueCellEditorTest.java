@@ -18,7 +18,7 @@ import static org.testng.Assert.assertTrue;
 
 public class EasySmartValueCellEditorTest extends AbstractSwingUiTest {
 
-    private static final String LONG_TEXT = "这是一段会明显超过当前单元格宽度并触发自动换行的中文输入内容";
+    private static final String LONG_TEXT = "Đây là nội dung đầu vào bằng tiếng Trung sẽ vượt quá đáng kể chiều rộng ô hiện tại và kích hoạt tính năng gói từ tự động";
 
     @Test
     public void shouldSwitchBetweenShortAndLongEditorsAfterInputSettles() throws Exception {
@@ -30,10 +30,10 @@ public class EasySmartValueCellEditorTest extends AbstractSwingUiTest {
         SwingUtilities.invokeAndWait(() -> {
             JTable table = createNarrowTable();
             EasySmartValueCellEditor editor = new EasySmartValueCellEditor();
-            editor.getTableCellEditorComponent(table, "短文本", false, 0, 1);
+            editor.getTableCellEditorComponent(table, "Văn bản ngắn", false, 0, 1);
             editor.containerPanel.setSize(80, table.getRowHeight());
 
-            assertTrue(editor.textField.isVisible(), "短内容应使用 JTextField");
+            assertTrue(editor.textField.isVisible(), "Nội dung ngắn nên được sử dụng JTextField");
             originalRowHeight[0] = table.getRowHeight(0);
             editor.textField.setText(LONG_TEXT);
 
@@ -49,23 +49,23 @@ public class EasySmartValueCellEditorTest extends AbstractSwingUiTest {
             JTextArea textArea = (JTextArea) scrollPane.getViewport().getView();
 
             assertFalse(editor.textField.isVisible());
-            assertTrue(scrollPane.isVisible(), "长内容应切换为 JTextArea");
+            assertTrue(scrollPane.isVisible(), "Nội dung dài nên chuyển sang  JTextArea");
             assertEquals(editor.getCellEditorValue(), LONG_TEXT);
-            assertTrue(table.getRowHeight(0) > originalRowHeight[0], "长内容应立即展开行高");
+            assertTrue(table.getRowHeight(0) > originalRowHeight[0], "Nội dung dài sẽ mở rộng ngay lập tức đến chiều cao dòng");
 
             textAreaRef.set(textArea);
-            textArea.setText("短文本");
+            textArea.setText("Văn bản ngắn");
         });
         flushEdt();
 
         SwingUtilities.invokeAndWait(() -> {
             EasySmartValueCellEditor editor = editorRef.get();
             JTable table = tableRef.get();
-            assertTrue(editor.textField.isVisible(), "内容重新变短后应切回 JTextField");
+            assertTrue(editor.textField.isVisible(), "Nó nên được chuyển trở lại khi nội dung trở nên ngắn hơn JTextField");
             assertFalse(findMultiLineScrollPane(editor).isVisible());
-            assertEquals(editor.getCellEditorValue(), "短文本");
+            assertEquals(editor.getCellEditorValue(), "Văn bản ngắn");
             assertEquals(table.getRowHeight(0), originalRowHeight[0]);
-            assertEquals(textAreaRef.get().getText(), "短文本");
+            assertEquals(textAreaRef.get().getText(), "Văn bản ngắn");
         });
     }
 
@@ -76,7 +76,7 @@ public class EasySmartValueCellEditorTest extends AbstractSwingUiTest {
         SwingUtilities.invokeAndWait(() -> {
             JTable table = createNarrowTable();
             EasySmartValueCellEditor editor = new EasySmartValueCellEditor();
-            editor.getTableCellEditorComponent(table, "短文本", false, 0, 1);
+            editor.getTableCellEditorComponent(table, "Văn bản ngắn", false, 0, 1);
             editor.containerPanel.setSize(80, table.getRowHeight());
 
             editor.updateInputMethodComposition(inputMethodEvent(editor, "zhong", 0));
@@ -87,12 +87,12 @@ public class EasySmartValueCellEditorTest extends AbstractSwingUiTest {
 
         SwingUtilities.invokeAndWait(() ->
                 assertTrue(editorRef.get().textField.isVisible(),
-                        "输入法仍在组合文字时不能切换焦点组件")
+                        "Phương thức nhập không thể chuyển đổi thành phần tiêu điểm trong khi vẫn kết hợp văn bản")
         );
 
         SwingUtilities.invokeAndWait(() -> {
             EasySmartValueCellEditor editor = editorRef.get();
-            editor.updateInputMethodComposition(inputMethodEvent(editor, "中", 1));
+            editor.updateInputMethodComposition(inputMethodEvent(editor, "ở giữa", 1));
         });
         flushEdt();
 
@@ -100,7 +100,7 @@ public class EasySmartValueCellEditorTest extends AbstractSwingUiTest {
             EasySmartValueCellEditor editor = editorRef.get();
             assertFalse(editor.textField.isVisible());
             assertTrue(findMultiLineScrollPane(editor).isVisible(),
-                    "输入法完成组合后应恢复自动多行切换");
+                    "Sau khi phương thức nhập được kết hợp, quá trình chuyển đổi nhiều dòng tự động sẽ tiếp tục");
         });
     }
 
@@ -130,7 +130,7 @@ public class EasySmartValueCellEditorTest extends AbstractSwingUiTest {
                 return scrollPane;
             }
         }
-        throw new AssertionError("应当存在多行编辑器滚动面板");
+        throw new AssertionError("Sẽ tồn tại một bảng cuộn trình soạn thảo nhiều dòng");
     }
 
     private void flushEdt() throws Exception {

@@ -22,9 +22,9 @@ import java.util.Map;
 import java.util.Objects;
 
 /**
- * 应用级全局变量服务。
+ * Dịch vụ biến toàn cầu cấp ứng dụng.
  * <p>
- * 与环境变量不同，全局变量不跟随工作区切换，始终持久化到应用级数据目录。
+ * Không giống như các biến môi trường, các biến toàn cục không tuân theo chuyển đổi không gian làm việc và luôn được lưu giữ trong thư mục dữ liệu cấp ứng dụng.
  */
 @Slf4j
 public class GlobalVariablesService implements VariableProvider {
@@ -57,7 +57,7 @@ public class GlobalVariablesService implements VariableProvider {
     }
 
     /**
-     * 仅用于测试隔离或特殊场景注入路径。
+     * Chỉ được sử dụng để thử nghiệm các đường dẫn cách ly hoặc đường dẫn chèn kịch bản đặc biệt.
      */
     public synchronized void setDataFilePath(String path) {
         if (path == null || path.isBlank()) {
@@ -86,9 +86,9 @@ public class GlobalVariablesService implements VariableProvider {
 
             ensureMetadata();
             FileUtil.writeString(JSONUtil.toJsonPrettyStr(globalVariables), file, StandardCharsets.UTF_8);
-            log.debug("全局变量已保存到: {}", file.getAbsolutePath());
+            log.debug("Các biến toàn cục đã được lưu vào: {}", file.getAbsolutePath());
         } catch (Exception e) {
-            log.error("保存全局变量失败", e);
+            log.error("Không lưu được các biến toàn cục", e);
         }
     }
 
@@ -171,7 +171,7 @@ public class GlobalVariablesService implements VariableProvider {
                 globalVariables.setVariableList(new ArrayList<>());
             }
         } catch (Exception e) {
-            log.error("加载全局变量失败: {}", file.getAbsolutePath(), e);
+            log.error("Không tải được các biến toàn cục: {}", file.getAbsolutePath(), e);
             globalVariables.setVariableList(new ArrayList<>());
         }
 

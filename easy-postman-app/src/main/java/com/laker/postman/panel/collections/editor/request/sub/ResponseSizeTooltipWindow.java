@@ -8,9 +8,9 @@ import javax.swing.border.EmptyBorder;
 import java.awt.*;
 
 /**
- * 响应大小悬浮提示窗口。
+ * Cửa sổ nhắc nổi có kích thước đáp ứng.
  * <p>
- * ResponsePanel 只需要决定何时显示提示，窗口定位、淡入淡出和自动关闭集中在这里。
+ * ResponsePanel Chỉ cần quyết định thời điểm hiển thị lời nhắc, định vị cửa sổ, làm mờ và tự động đóng đều tập trung ở đây.
  */
 final class ResponseSizeTooltipWindow extends JWindow {
     private static ResponseSizeTooltipWindow instance;

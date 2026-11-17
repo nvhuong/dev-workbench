@@ -8,36 +8,36 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * 变量上下文提供者
+ * Nhà cung cấp bối cảnh biến đổi
  * <p>
- * 负责管理当前执行上下文内的 pm.variables。
+ * Chịu trách nhiệm quản lý bối cảnh thực thi hiện tại pm.variables。
  * <ul>
- *   <li>优先级最高（优先级 = 1）</li>
- *   <li>作用域由调用方决定，可覆盖一次运行或一个虚拟用户线程</li>
- *   <li>使用 ThreadLocal 确保线程安全</li>
+ *   <li>Mức độ ưu tiên cao nhất (ưu tiên = 1）</li>
+ *   <li>Phạm vi được xác định bởi người gọi và có thể bao gồm một lần chạy hoặc một chuỗi người dùng ảo</li>
+ *   <li>sử dụng ThreadLocal Đảm bảo an toàn cho sợi</li>
  * </ul>
  */
 @Slf4j
 public class VariablesService implements VariableProvider {
 
     /**
-     * 单例实例
+     * Ví dụ Singleton
      */
     private static final VariablesService INSTANCE = new VariablesService();
 
     /**
-     * 执行上下文变量存储，使用 ThreadLocal 确保线程安全
+     * Lưu trữ biến bối cảnh thực thi, sử dụng ThreadLocal Đảm bảo an toàn cho sợi
      */
     private static final ThreadLocal<Map<String, String>> VARIABLES = new ThreadLocal<>();
 
     /**
-     * 私有构造函数，防止外部实例化
+     * Nhà xây dựng riêng để ngăn chặn việc khởi tạo bên ngoài
      */
     private VariablesService() {
     }
 
     /**
-     * 获取单例实例
+     * Nhận một ví dụ đơn lẻ
      */
     public static VariablesService getInstance() {
         return INSTANCE;
@@ -80,13 +80,13 @@ public class VariablesService implements VariableProvider {
         return VariableType.VARIABLE;
     }
 
-    // ==================== 执行上下文变量特有方法 ====================
+    // ==================== Thực hiện các phương pháp cụ thể cho biến ngữ cảnh ====================
 
     /**
-     * 设置执行上下文变量
+     * Đặt các biến bối cảnh thực thi
      *
-     * @param key   变量名
-     * @param value 变量值
+     * @param key   tên biến
+     * @param value giá trị thay đổi
      */
     public void set(String key, String value) {
         if (key != null && value != null) {
@@ -96,9 +96,9 @@ public class VariablesService implements VariableProvider {
     }
 
     /**
-     * 批量设置执行上下文变量
+     * Đặt các biến bối cảnh thực thi theo đợt
      *
-     * @param variables 变量 Map
+     * @param variables các biến Map
      */
     public void setAll(Map<String, String> variables) {
         if (variables != null && !variables.isEmpty()) {
@@ -108,9 +108,9 @@ public class VariablesService implements VariableProvider {
     }
 
     /**
-     * 删除执行上下文变量
+     * Xóa các biến bối cảnh thực thi
      *
-     * @param key 变量名
+     * @param key tên biến
      */
     public void remove(String key) {
         Map<String, String> variables = VARIABLES.get();
@@ -121,10 +121,10 @@ public class VariablesService implements VariableProvider {
     }
 
     /**
-     * 清空当前执行上下文中的变量值，但保留上下文本身。
+     * Xóa các giá trị biến trong ngữ cảnh thực thi hiện tại, nhưng vẫn giữ lại chính ngữ cảnh đó.
      * <p>
-     * 该方法对应脚本里的 pm.variables.clear() 语义：
-     * 后续脚本仍可继续在同一个执行上下文中重新 set 新值。
+     * This method corresponds to the one in the script pm.variables.clear() Semantics:
+     * Các tập lệnh tiếp theo vẫn có thể tiếp tục trong cùng bối cảnh thực thi set giá trị mới.
      */
     public void clearValues() {
         Map<String, String> variables = VARIABLES.get();
@@ -136,10 +136,10 @@ public class VariablesService implements VariableProvider {
     }
 
     /**
-     * 彻底解绑当前执行上下文。
+     * Hoàn toàn hủy liên kết bối cảnh thực thi hiện tại.
      * <p>
-     * 该方法只应在一次请求/一次运行结束时由框架层调用，
-     * 不应用于脚本内的变量清理。
+     * This method should only be requested once/Được gọi bởi lớp khung khi kết thúc quá trình chạy.
+     * Không nên sử dụng để dọn dẹp biến trong tập lệnh.
      */
     public void detachContext() {
         Map<String, String> variables = VARIABLES.get();
@@ -152,9 +152,9 @@ public class VariablesService implements VariableProvider {
     }
 
     /**
-     * 获取当前执行上下文变量数量
+     * Lấy số lượng biến bối cảnh thực thi hiện tại
      *
-     * @return 当前执行上下文变量数量
+     * @return Số lượng biến bối cảnh thực thi hiện tại
      */
     public int size() {
         Map<String, String> variables = VARIABLES.get();

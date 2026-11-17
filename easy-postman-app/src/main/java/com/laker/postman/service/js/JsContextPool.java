@@ -12,22 +12,22 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * JS Context 对象池
+ * JS Context Nhóm đối tượng
  * <p>
- * 通过复用 GraalVM Context 对象来提升性能，避免频繁创建和销毁 Context。
- * 使用 IIFE (Immediately Invoked Function Expression) 包装用户脚本，实现变量隔离，
- * 避免 let/const 变量污染全局作用域，使 Context 可以安全复用。
+ * thông qua việc tái sử dụng GraalVM Context Các đối tượng để cải thiện hiệu suất và tránh việc tạo và phá hủy thường xuyên Context。
+ * sử dụng IIFE (Immediately Invoked Function Expression) Gói các tập lệnh người dùng để đạt được sự cô lập có thể thay đổi.
+ * tránh let/const Các biến gây ô nhiễm phạm vi toàn cầu, tạo ra Context Có thể được tái sử dụng một cách an toàn.
  * </p>
  *
- * <h3>原理：</h3>
+ * <h3>Nguyên tắc:</h3>
  * <pre>
- * 用户脚本：
+ * Mô tả người dùng: .
  *   let env = "test";
  *   console.log(env);
  *
- * 自动包装为：
+ * Tự động đóng gói dưới dạng: .
  *   (function() {
- *     let env = "test";  // 局部变量，不污染全局作用域
+ *     let env = "test";  // Các biến cục bộ không gây ô nhiễm phạm vi toàn cầu
  *     console.log(env);
  *   })();
  * </pre>
@@ -51,7 +51,7 @@ public class JsContextPool {
     private volatile boolean closed = false;
 
     /**
-     * 包装的 Context 对象，带有统计信息
+     * Đóng gói Context Đối tượng, với số liệu thống kê
      */
     public static class PooledContext {
         final Context context;
@@ -78,9 +78,9 @@ public class JsContextPool {
     }
 
     /**
-     * 创建 Context 池
+     * Tạo Context hồ bơi
      *
-     * @param maxSize 最大池大小（建议设置为 CPU 核心数的 2-4 倍）
+     * @param maxSize Kích thước nhóm tối đa (cài đặt được đề xuất là  CPU Số lượng lõi 2-4 lần)
      */
     public JsContextPool(int maxSize) {
         this.maxSize = maxSize;
@@ -89,11 +89,11 @@ public class JsContextPool {
     }
 
     /**
-     * 获取 Context（带超时）
+     * Lấy Context（với thời gian chờ)
      *
-     * @param timeoutMs 超时时间（毫秒）
-     * @return Context 对象
-     * @throws InterruptedException 如果等待被中断
+     * @param timeoutMs Thời gian chờ (mili giây)
+     * @return Context đối tượng
+     * @throws InterruptedException Nếu việc chờ đợi bị gián đoạn
      */
     public PooledContext borrowContext(long timeoutMs) throws InterruptedException {
         if (closed) {
@@ -104,7 +104,7 @@ public class JsContextPool {
         long deadlineNanos = System.nanoTime() + TimeUnit.MILLISECONDS.toNanos(effectiveTimeoutMs);
 
         while (true) {
-            // 1. 尝试从池中快速获取（复用）
+            // 1. Cố gắng lấy (tái sử dụng) nhanh chóng từ hồ bơi
             PooledContext pooled = pool.poll();
             if (pooled != null) {
                 totalReused.incrementAndGet();
@@ -112,7 +112,7 @@ public class JsContextPool {
                 return pooled;
             }
 
-            // 2. 池为空，检查是否可以创建新的 Context。CAS 失败时重试，避免突发并发下低于 maxSize 就进入等待。
+            // 2. Nhóm trống, kiểm tra xem có thể tạo nhóm mới không Context。CAS Thử lại khi thất bại để tránh xảy ra đồng thời đột ngột maxSize Chỉ cần vào và chờ đợi.
             int current = currentSize.get();
             if (!retired && current < maxSize) {
                 if (currentSize.compareAndSet(current, current + 1)) {
@@ -130,7 +130,7 @@ public class JsContextPool {
                 continue;
             }
 
-            // 3. 达到最大数量限制，阻塞等待空闲 Context
+            // 3. Đã đạt đến giới hạn số lượng tối đa và chặn chờ thời gian nhàn rỗi Context
             long remainingNanos = deadlineNanos - System.nanoTime();
             if (remainingNanos <= 0) {
                 throw new IllegalStateException(
@@ -167,9 +167,9 @@ public class JsContextPool {
     }
 
     /**
-     * 归还 Context 到池中（复用）
+     * Trở về Context vào hồ bơi (tái sử dụng)
      *
-     * @param pooled Context 对象
+     * @param pooled Context đối tượng
      */
     public void returnContext(PooledContext pooled) {
         if (pooled == null) {
@@ -182,10 +182,10 @@ public class JsContextPool {
         }
 
         try {
-            // 清理脚本执行期间新增的全局状态，避免复用 Context 时污染下一次执行。
+            // Dọn dẹp trạng thái chung mới được thêm vào trong quá trình thực thi tập lệnh để tránh sử dụng lại Context khi gây ô nhiễm trong lần thực hiện tiếp theo.
             cleanupGlobalVariables(pooled.context);
 
-            // 归还到池中供复用。退役池只服务已经在旧池等待的借用者，之后逐步关闭。
+            // Quay trở lại hồ bơi để tái sử dụng. Pool ngừng hoạt động chỉ phục vụ những người vay đang chờ đợi ở pool cũ, sau đó sẽ dần đóng cửa.
             if (retired) {
                 if (waitingBorrowCount.get() > 0 && pool.offer(pooled, 100, TimeUnit.MILLISECONDS)) {
                     return;
@@ -194,14 +194,14 @@ public class JsContextPool {
                 decrementCurrentSize();
                 log.debug("Retired pool has no waiters, closed context. Pool size: {}/{}", currentSize.get(), maxSize);
             } else if (!pool.offer(pooled, 100, TimeUnit.MILLISECONDS)) {
-                // 池已满，关闭 Context
+                // Bể bơi đầy và đóng cửa Context
                 pooled.close();
                 decrementCurrentSize();
                 log.debug("Pool is full, closed context. Pool size: {}/{}", currentSize.get(), maxSize);
             }
         } catch (Exception e) {
             log.warn("Failed to return context to pool: {}", e.getMessage());
-            // 归还失败，关闭 Context
+            // Trả lại không thành công, đã đóng Context
             pooled.close();
             decrementCurrentSize();
         }
@@ -212,7 +212,7 @@ public class JsContextPool {
     }
 
     /**
-     * 退役池：不再作为新共享池使用，但允许已经在此池等待的线程拿到归还的 Context。
+     * Nhóm đã ngừng hoạt động: Nó không còn được sử dụng làm nhóm chia sẻ mới nữa, nhưng các chủ đề đã chờ trong nhóm này được phép trả lại Context。
      */
     void retire() {
         retired = true;
@@ -239,10 +239,10 @@ public class JsContextPool {
     }
 
     /**
-     * 清理脚本执行期间新增的全局变量。
+     * Dọn dẹp các biến toàn cục được thêm vào trong quá trình thực thi tập lệnh.
      * <p>
-     * 注意：由于用户脚本使用 IIFE 包装，let/const 变量都是局部变量，
-     * 这里主要处理显式写到 globalThis 的变量和我们注入的变量（pm）。
+     * LƯU Ý: Do việc sử dụng tập lệnh của người dùng IIFE Bưu kiện,let/const Các biến đều là biến cục bộ.
+     * Điều này chủ yếu liên quan đến văn bản rõ ràng globalThis Các biến và các biến chúng tôi đã chèn (pm）。
      * </p>
      */
     private void cleanupGlobalVariables(Context context) {
@@ -259,7 +259,7 @@ public class JsContextPool {
                                     try {
                                         delete globalThis[name];
                                     } catch (e) {
-                                        // 忽略删除失败
+                                        // Xóa thất bại được bỏ qua
                                     }
                                 }
                             });
@@ -270,7 +270,7 @@ public class JsContextPool {
                             try {
                                 delete globalThis[varName];
                             } catch (e) {
-                                // 忽略删除失败
+                                // Xóa thất bại được bỏ qua
                             }
                         });
 
@@ -289,7 +289,7 @@ public class JsContextPool {
     }
 
     /**
-     * 创建新的 Context 对象
+     * Tạo cái mới Context đối tượng
      */
     private PooledContext createNewContext() {
         try {
@@ -302,7 +302,7 @@ public class JsContextPool {
                     .engine(ENGINE)
                     .build();
 
-            // 预加载 polyfill 和内置库
+            // Đã tải trước polyfill và các thư viện tích hợp
             JsPolyfillInjector.injectAll(context);
             recordBaselineGlobals(context);
 
@@ -331,7 +331,7 @@ public class JsContextPool {
     }
 
     /**
-     * 关闭池，释放所有 Context
+     * Đóng hồ bơi và giải phóng mọi thứ Context
      */
     public void shutdown() {
         closed = true;
@@ -348,7 +348,7 @@ public class JsContextPool {
     }
 
     /**
-     * 获取统计信息
+     * Nhận số liệu thống kê
      */
     public String getStats() {
         return String.format("Pool[size=%d/%d, created=%d, reused=%d, ratio=%.2f%%]",

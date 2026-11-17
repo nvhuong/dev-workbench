@@ -33,11 +33,11 @@ public class SavedResponseSnapshotMapper {
             saved.setCode(response.code);
             saved.setHeaders(toSavedHeaders(response));
             if (ResponseFiles.isFileResponse(response)) {
-                // 示例只保存文件元信息：解码后的文本无法还原二进制内容，保存下来只会是乱码
+                // Ví dụ này chỉ lưu siêu thông tin tệp: văn bản được giải mã không thể khôi phục nội dung nhị phân và sẽ chỉ bị cắt xén khi lưu
                 saved.setFile(toFileInfo(response, false));
                 saved.setBody("");
             } else if (ResponseFiles.isTextAttachment(response)) {
-                // 文本附件（如 CSV）保留文本；只有能按声明字符集无损还原原始字节时才保存内容
+                // Tệp đính kèm văn bản (ví dụ: CSV）Bảo quản văn bản; chỉ lưu nội dung nếu byte gốc có thể được khôi phục không mất dữ liệu trong bộ ký tự được khai báo
                 boolean restorable = ResponseFiles.canRestoreBytesFromBody(response);
                 saved.setFile(toFileInfo(response, restorable));
                 saved.setBody(restorable ? response.body : "");
@@ -98,7 +98,7 @@ public class SavedResponseSnapshotMapper {
             response.fileAttachment = fileInfo.isAttachment();
             return;
         }
-        // 兼容旧版本保存的示例：文件内容被当作文本保存成了乱码，按文件头识别后改为展示文件概览
+        // Ví dụ về cách lưu tương thích với các phiên bản cũ hơn: Nội dung tệp được lưu dưới dạng văn bản và bị cắt xén. Sau khi xác định nó bằng tiêu đề tệp, thay vào đó, tổng quan về tệp sẽ được hiển thị
         String legacyExtension = ResponseFiles.detectFromLegacyText(savedResponse.getBody());
         if (legacyExtension != null) {
             ResponseFiles.markContentOmitted(response, legacyExtension, null);
@@ -112,8 +112,8 @@ public class SavedResponseSnapshotMapper {
     }
 
     /**
-     * 兼容旧版本保存的二进制示例：当时保存的是“已保存为临时文件”之类的提示文字，而不是文件内容。
-     * 依据是声明为二进制、记录了响应大小，但正文字节数与之不符；手写或编辑过的正文会同步更新大小，不受影响。
+     * Tương thích với các ví dụ nhị phân được lưu bởi các phiên bản cũ hơn: những phiên bản được lưu tại thời điểm đó là“Đã lưu dưới dạng tập tin tạm thời”Văn bản nhắc nhở như thế này, thay vì nội dung tập tin.
+     * Cơ sở được khai báo là nhị phân và kích thước phản hồi được ghi lại, nhưng số byte văn bản không khớp với nó; văn bản viết tay hoặc chỉnh sửa sẽ được cập nhật kích thước đồng thời và không bị ảnh hưởng.
      */
     public boolean isLegacyBinaryPlaceholder(SavedResponse savedResponse) {
         if (savedResponse == null || savedResponse.getFile() != null || savedResponse.getBodySize() <= 0) {
@@ -136,8 +136,8 @@ public class SavedResponseSnapshotMapper {
     }
 
     /**
-     * 兼容旧版本保存的文本附件（如 CSV）：当时没有文件信息，但响应头和正文都在，可恢复附件标记、文件名和原始字节。
-     * 正文含替换字符说明保存时已经有损，不再还原字节。
+     * Tương thích với các tệp đính kèm văn bản được lưu trong các phiên bản cũ hơn (ví dụ: CSV）：Không có thông tin tệp nhưng có tiêu đề và nội dung phản hồi, đồng thời có thể khôi phục thẻ đính kèm, tên tệp và byte thô.
+     * Nếu văn bản chứa các ký tự thay thế, điều đó có nghĩa là nó đã bị hỏng trong quá trình lưu và các byte sẽ không được khôi phục.
      */
     private void restoreLegacyTextAttachment(SavedResponse savedResponse, HttpResponse response) {
         String contentDisposition = ResponseFileNames.getContentDisposition(response.headers);

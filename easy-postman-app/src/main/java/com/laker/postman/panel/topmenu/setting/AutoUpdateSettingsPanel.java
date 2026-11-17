@@ -15,7 +15,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 /**
- * 自动更新设置面板
+ * Tự động cập nhật bảng cài đặt
  */
 public class AutoUpdateSettingsPanel extends ModernSettingsPanel {
     private static final int FIELD_SPACING = 8;
@@ -30,13 +30,13 @@ public class AutoUpdateSettingsPanel extends ModernSettingsPanel {
 
     @Override
     protected void buildContent(JPanel contentPanel) {
-        // 自动更新设置区域
+        // Tự động cập nhật khu vực cài đặt
         JPanel autoUpdateSection = createModernSection(
                 I18nUtil.getMessage(MessageKeys.SETTINGS_AUTO_UPDATE_TITLE),
                 I18nUtil.getMessage(MessageKeys.SETTINGS_AUTO_UPDATE_DESCRIPTION)
         );
 
-        // 主程序更新开关
+        // Công tắc cập nhật chương trình chính
         UpdatePolicy appPolicy = updateCenter.policy(UpdateTarget.APP);
         appUpdateCheckBox = new JCheckBox(
                 I18nUtil.getMessage(MessageKeys.SETTINGS_AUTO_UPDATE_ENABLED_CHECKBOX),
@@ -49,11 +49,11 @@ public class AutoUpdateSettingsPanel extends ModernSettingsPanel {
         autoUpdateSection.add(appUpdateRow);
         autoUpdateSection.add(createVerticalSpace(FIELD_SPACING));
 
-        // 检查频率
+        // Kiểm tra tần số
         String[] frequencyOptions = createFrequencyOptions();
         appUpdateFrequencyComboBox = new JComboBox<>(frequencyOptions);
 
-        // 根据当前设置选择对应的选项
+        // Chọn tùy chọn tương ứng dựa trên cài đặt hiện tại
         selectFrequency(appUpdateFrequencyComboBox, appPolicy.frequency().getCode());
 
         JPanel frequencyRow = createFieldRow(
@@ -64,7 +64,7 @@ public class AutoUpdateSettingsPanel extends ModernSettingsPanel {
         autoUpdateSection.add(frequencyRow);
         autoUpdateSection.add(createVerticalSpace(FIELD_SPACING));
 
-        // 上次检查时间
+        // Lần kiểm tra cuối cùng
         JLabel lastCheckTimeLabel = new JLabel(formatCheckTime(
                 updateCenter.state(UpdateTarget.APP).lastCheckTimeMillis()
         ));
@@ -76,7 +76,7 @@ public class AutoUpdateSettingsPanel extends ModernSettingsPanel {
         autoUpdateSection.add(lastCheckRow);
         autoUpdateSection.add(createVerticalSpace(FIELD_SPACING));
 
-        // 插件更新开关
+        // Công tắc cập nhật plug-in
         UpdatePolicy pluginPolicy = updateCenter.policy(UpdateTarget.PLUGIN);
         pluginUpdateCheckBox = new JCheckBox(
                 I18nUtil.getMessage(MessageKeys.SETTINGS_PLUGIN_UPDATE_ENABLED_CHECKBOX),
@@ -110,7 +110,7 @@ public class AutoUpdateSettingsPanel extends ModernSettingsPanel {
         autoUpdateSection.add(pluginLastCheckRow);
         autoUpdateSection.add(createVerticalSpace(FIELD_SPACING));
 
-        // 更新源选择
+        // Cập nhật lựa chọn nguồn
         String[] sourceOptions = {
                 I18nUtil.getMessage(MessageKeys.SETTINGS_UPDATE_SOURCE_AUTO),
                 I18nUtil.getMessage(MessageKeys.SETTINGS_UPDATE_SOURCE_GITHUB),
@@ -118,7 +118,7 @@ public class AutoUpdateSettingsPanel extends ModernSettingsPanel {
         };
         updateSourceComboBox = new JComboBox<>(sourceOptions);
 
-        // 根据当前设置选择对应的选项
+        // Chọn tùy chọn tương ứng dựa trên cài đặt hiện tại
         String currentPreference = SettingManager.getUpdateSourcePreference();
         switch (currentPreference) {
             case "github" -> updateSourceComboBox.setSelectedIndex(1);
@@ -136,7 +136,7 @@ public class AutoUpdateSettingsPanel extends ModernSettingsPanel {
         contentPanel.add(autoUpdateSection);
         contentPanel.add(createVerticalSpace(SECTION_SPACING));
 
-        // 跟踪所有组件的初始值
+        // Theo dõi các giá trị ban đầu cho tất cả các thành phần
         trackComponentValue(appUpdateCheckBox);
         trackComponentValue(appUpdateFrequencyComboBox);
         trackComponentValue(pluginUpdateCheckBox);
@@ -161,15 +161,15 @@ public class AutoUpdateSettingsPanel extends ModernSettingsPanel {
 
     private void saveSettings(boolean closeAfterSave) {
         try {
-            // 保存自动更新设置
+            // Lưu cài đặt cập nhật tự động
             SettingManager.setAutoUpdateCheckEnabled(appUpdateCheckBox.isSelected());
 
-            // 保存检查频率
+            // Lưu tần suất kiểm tra
             SettingManager.setAutoUpdateCheckFrequency(selectedFrequency(appUpdateFrequencyComboBox));
             SettingManager.setPluginUpdateCheckEnabled(pluginUpdateCheckBox.isSelected());
             SettingManager.setPluginUpdateCheckFrequency(selectedFrequency(pluginUpdateFrequencyComboBox));
 
-            // 保存更新源设置
+            // Lưu cài đặt nguồn cập nhật
             String selectedSource = switch (updateSourceComboBox.getSelectedIndex()) {
                 case 1 -> "github";
                 case 2 -> "gitee";
@@ -177,7 +177,7 @@ public class AutoUpdateSettingsPanel extends ModernSettingsPanel {
             };
             SettingManager.setUpdateSourcePreference(selectedSource);
 
-            // 重新跟踪当前值
+            // Truy xuất giá trị hiện tại
             originalValues.clear();
             trackComponentValue(appUpdateCheckBox);
             trackComponentValue(appUpdateFrequencyComboBox);
@@ -188,7 +188,7 @@ public class AutoUpdateSettingsPanel extends ModernSettingsPanel {
 
             NotificationCenter.showSuccess(I18nUtil.getMessage(MessageKeys.SETTINGS_SAVE_SUCCESS_MESSAGE));
 
-            // 根据参数决定是否关闭对话框
+            // Xác định có nên đóng hộp thoại hay không dựa trên các tham số
             if (closeAfterSave) {
                 Window window = SwingUtilities.getWindowAncestor(this);
                 if (window instanceof JDialog dialog) {

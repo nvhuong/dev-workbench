@@ -9,9 +9,9 @@ import javax.swing.*;
 import java.awt.*;
 
 /**
- * 请求编辑器延迟加载骨架屏。
- * 复用真实请求编辑区的结构关系：请求行、子标签、请求区/响应区分栏，
- * 让 deferred editor 出现时更接近真实界面，而不是一张泛化卡片。
+ * Yêu cầu người chỉnh sửa trì hoãn việc tải màn hình khung xương.
+ * Tái sử dụng mối quan hệ cấu trúc của khu vực chỉnh sửa yêu cầu thực: dòng yêu cầu, nhãn phụ và khu vực yêu cầu/Cột phân biệt phản hồi,
+ * cho phép deferred editor Xuất hiện gần với giao diện thực hơn là một thẻ tổng quát.
  */
 public class RequestEditorPlaceholderPanel extends AbstractPlaceholderPanel {
 

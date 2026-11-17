@@ -7,8 +7,8 @@ import javax.swing.*;
 import java.awt.*;
 
 /**
- * 自动滚动切换按钮
- * 用于切换控制台的自动滚动功能
+ * Nút chuyển đổi tự động cuộn
+ * Tính năng tự động cuộn để chuyển đổi bảng điều khiển
  */
 public class AutoScrollToggleButton extends JToggleButton {
 
@@ -21,17 +21,17 @@ public class AutoScrollToggleButton extends JToggleButton {
         setFocusable(false);
         setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         putClientProperty(FlatClientProperties.BUTTON_TYPE, FlatClientProperties.BUTTON_TYPE_TOOLBAR_BUTTON);
-        setSelected(true); // 默认启用自动滚动
+        setSelected(true); // Tính năng tự động cuộn được bật theo mặc định
         updateIcon(true);
 
-        // 添加状态改变监听器，动态更新图标颜色
+        // Thêm trình xử lý thay đổi trạng thái để tự động cập nhật màu biểu tượng
         addItemListener(e -> updateIcon(isSelected()));
     }
 
     /**
-     * 根据按钮选中状态更新图标颜色
+     * Cập nhật màu biểu tượng dựa trên trạng thái đã chọn của nút
      *
-     * @param selected 是否选中
+     * @param selected Đã kiểm tra hay chưa
      */
     private void updateIcon(boolean selected) {
         if (selected) {

@@ -21,7 +21,7 @@ import java.util.Comparator;
 import java.util.List;
 
 /**
- * 顶部插件菜单。
+ * Menu plugin hàng đầu.
  */
 @Slf4j
 @UtilityClass

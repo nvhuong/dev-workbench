@@ -7,14 +7,14 @@ import java.awt.datatransfer.StringSelection;
 import java.awt.datatransfer.Transferable;
 
 /**
- * 支持JTable行拖拽的TransferHandler
+ * Hỗ trợJTableKéo và thảTransferHandler
  */
 public class TableRowTransferHandler extends TransferHandler {
     private final JTable table;
     private int[] rows = null;
-    private int addIndex = -1; // 新插入的行索引
-    private int addCount = 0; // 插入的行数
-    /** 拖拽完成后的回调（用于持久化） */
+    private int addIndex = -1; // Chỉ mục của hàng mới được chèn
+    private int addCount = 0; // Số lượng hàng được chèn
+    /** Gọi lại sau khi kéo xong (để duy trì) */
     private transient Runnable onRowOrderChanged;
 
     public TableRowTransferHandler(JTable table) {
@@ -28,7 +28,7 @@ public class TableRowTransferHandler extends TransferHandler {
     @Override
     protected Transferable createTransferable(JComponent c) {
         rows = table.getSelectedRows();
-        return new StringSelection(""); // 内容无关紧要
+        return new StringSelection(""); // Nội dung không liên quan
     }
 
     @Override
@@ -49,16 +49,16 @@ public class TableRowTransferHandler extends TransferHandler {
         TableModel model = table.getModel();
         if (rows == null) return false;
         if (model instanceof FunctionalRunnerTableModel runnerModel) {
-            // 只支持单行拖拽（可扩展为多行）
+            // Chỉ hỗ trợ kéo một dòng (có thể mở rộng thành nhiều dòng)
             for (int from : rows) {
                 int to = index;
                 runnerModel.moveRow(from, to);
-                if (to > from) index--; // 移动后下标变化
+                if (to > from) index--; // Chỉ số dưới thay đổi sau khi di chuyển
             }
             table.getSelectionModel().setSelectionInterval(index, index + rows.length - 1);
             return true;
         }
-        // 复制行数据
+        // Sao chép dữ liệu hàng
         DefaultTableModel defModel = (DefaultTableModel) model;
         Object[][] rowData = new Object[rows.length][defModel.getColumnCount()];
         for (int i = 0; i < rows.length; i++) {
@@ -66,13 +66,13 @@ public class TableRowTransferHandler extends TransferHandler {
                 rowData[i][j] = defModel.getValueAt(rows[i], j);
             }
         }
-        // 插入到目标位置
+        // Chèn vào vị trí mục tiêu
         addIndex = index;
         addCount = rowData.length;
         for (Object[] rowDatum : rowData) {
             defModel.insertRow(index++, rowDatum);
         }
-        // 选中新插入的行
+        // Chọn hàng mới được chèn
         table.getSelectionModel().setSelectionInterval(addIndex, addIndex + addCount - 1);
         return true;
     }
@@ -82,10 +82,10 @@ public class TableRowTransferHandler extends TransferHandler {
         if (action == MOVE && rows != null) {
             TableModel model = table.getModel();
             if (model instanceof FunctionalRunnerTableModel) {
-                // 数据已在 moveRow 中同步，无需再删
+                // Dữ liệu đã có sẵn rồi moveRow Đã đồng bộ, không cần xóa lại
             } else {
                 DefaultTableModel defModel = (DefaultTableModel) model;
-                // 删除原有行（从后往前删）
+                // Xóa các hàng ban đầu (từ sau ra trước)
                 if (addIndex > rows[0]) {
                     for (int i = rows.length - 1; i >= 0; i--) {
                         defModel.removeRow(rows[i]);
@@ -96,7 +96,7 @@ public class TableRowTransferHandler extends TransferHandler {
                     }
                 }
             }
-            // 拖拽完成后触发持久化回调
+            // Một cuộc gọi lại liên tục được kích hoạt sau khi quá trình kéo hoàn tất
             if (onRowOrderChanged != null) {
                 SwingUtilities.invokeLater(onRowOrderChanged);
             }

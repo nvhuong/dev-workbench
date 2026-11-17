@@ -6,9 +6,9 @@ import lombok.RequiredArgsConstructor;
 import java.awt.Component;
 
 /**
- * 请求编辑区 Tab 可见性控制器。
+ * Request editing area Tab Bộ điều khiển khả năng hiển thị.
  * <p>
- * 用户可以在设置里隐藏 Docs/Params/Auth/Headers/Body/Scripts/Settings，重建和恢复选中项集中在这里。
+ * Người dùng có thể ẩn nó trong cài đặt Docs/Params/Auth/Headers/Body/Scripts/Settings，Các lựa chọn xây dựng lại và phục hồi đều tập trung ở đây.
  */
 @RequiredArgsConstructor
 final class RequestEditorTabsVisibilityController {

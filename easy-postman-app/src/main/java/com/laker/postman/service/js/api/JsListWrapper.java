@@ -12,8 +12,8 @@ import java.util.Map;
 import java.util.Objects;
 
 /**
- * JS 专用 List 包装类，支持 add 方法
- * 用于包装 List<HttpHeader>、List<HttpFormData>、List<HttpFormUrlencoded>
+ * JS Tận tâm List Lớp đóng gói, hỗ trợ add phương pháp
+ * Dùng để đóng gói List<HttpHeader>、List<HttpFormData>、List<HttpFormUrlencoded>
  */
 public class JsListWrapper<T> {
     private static final Runnable NOOP_MUTATION_CALLBACK = () -> {
@@ -21,7 +21,7 @@ public class JsListWrapper<T> {
 
     /**
      * -- GETTER --
-     * 获取底层 List
+     * Lấy lớp dưới cùng List
      */
     @Getter
     private final List<T> list;
@@ -45,7 +45,7 @@ public class JsListWrapper<T> {
 
     /**
      * Postman API: pm.request.params.all()
-     * 返回所有元素的列表，供 JavaScript 访问
+     * Trả về danh sách tất cả các phần tử được cung cấp JavaScript thăm
      */
     public List<ItemProxy> all() {
         reconcileProxies(false);
@@ -77,7 +77,7 @@ public class JsListWrapper<T> {
     }
 
     /**
-     * JS 脚本调用：pm.request.headers.add({key: 'X-Custom', value: 'Value'})
+     * JS Cuộc gọi kịch bản:pm.request.headers.add({key: 'X-Custom', value: 'Value'})
      */
     public void add(Map<String, Object> obj) {
         if (obj == null) return;
@@ -117,8 +117,8 @@ public class JsListWrapper<T> {
     }
 
     /**
-     * JS 脚本调用：pm.request.headers.add('Content-Type: application/json')
-     * 支持 "key: value" 格式的字符串
+     * JS Cuộc gọi kịch bản:pm.request.headers.add('Content-Type: application/json')
+     * Hỗ trợ "key: value" Định dạng chuỗi
      */
     public void add(String headerString) {
         if (headerString == null) return;
@@ -130,7 +130,7 @@ public class JsListWrapper<T> {
     }
 
     /**
-     * JS 脚本调用：pm.request.headers.add('X-Custom', 'Value')
+     * JS Cuộc gọi kịch bản:pm.request.headers.add('X-Custom', 'Value')
      */
     public void add(String key, String value) {
         if (key == null || value == null) return;
@@ -147,7 +147,7 @@ public class JsListWrapper<T> {
 
     /**
      * Postman API: pm.request.headers.upsert({key: 'X-Custom', value: 'Value'})
-     * 如果 key 已存在则更新，否则添加
+     * nếu key Nếu nó đã tồn tại thì cập nhật nó, nếu không thì thêm nó vào
      */
     public Boolean upsert(Map<String, Object> obj) {
         if (obj == null) return null;
@@ -181,7 +181,7 @@ public class JsListWrapper<T> {
 
     /**
      * Postman API: pm.request.headers.remove('X-Custom')
-     * 删除指定 key 的项
+     * Xóa đã chỉ định key mục
      */
     public void remove(String key) {
         if (key == null) return;
@@ -196,7 +196,7 @@ public class JsListWrapper<T> {
 
     /**
      * Postman API: pm.request.headers.has('X-Custom')
-     * 检查是否存在指定 key
+     * Kiểm tra xem nhiệm vụ có tồn tại không key
      */
     public boolean has(String key) {
         if (key == null) return false;
@@ -206,7 +206,7 @@ public class JsListWrapper<T> {
 
     /**
      * Postman API: pm.request.headers.has('X-Custom', 'Value')
-     * 检查是否存在同时匹配 key 和 value 的项
+     * Kiểm tra xem có sự trùng khớp đồng thời không key và value mục
      */
     public boolean has(String key, Object value) {
         if (key == null) return false;
@@ -218,7 +218,7 @@ public class JsListWrapper<T> {
 
     /**
      * Postman API: pm.request.headers.get('X-Custom')
-     * 获取指定 key 的值
+     * Nhận được chỉ định key giá trị
      */
     public String get(String key) {
         if (key == null) return null;
@@ -229,7 +229,7 @@ public class JsListWrapper<T> {
 
     /**
      * Postman API: pm.request.headers.count()
-     * 获取列表中元素的数量
+     * Lấy số phần tử trong danh sách
      */
     public int count() {
         return list.size();
@@ -237,7 +237,7 @@ public class JsListWrapper<T> {
 
     /**
      * Postman API: pm.request.headers.clear()
-     * 清空所有元素
+     * Xóa tất cả các yếu tố
      */
     public void clear() {
         sync();
@@ -251,7 +251,7 @@ public class JsListWrapper<T> {
 
     /**
      * Postman API: pm.request.headers.each(callback)
-     * 遍历所有元素，对每个元素执行回调函数
+     * Lặp lại qua tất cả các phần tử và thực hiện chức năng gọi lại cho từng phần tử
      */
     public void each(Value callback) {
         if (callback == null || !callback.canExecute()) {
@@ -266,7 +266,7 @@ public class JsListWrapper<T> {
 
     /**
      * Postman API: pm.request.headers.toObject()
-     * 将列表转换为 Map 对象（键值对形式）
+     * Chuyển đổi danh sách sang  Map Đối tượng (ở dạng cặp khóa-giá trị)
      */
     public Map<String, Object> toObject() {
         sync();

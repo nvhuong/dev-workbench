@@ -27,22 +27,22 @@ public class BoundedTextAccumulatorTest {
     public void shouldCountMultibyteCharactersWithoutAllocatingEncodedCopy() {
         BoundedTextAccumulator accumulator = new BoundedTextAccumulator(8);
 
-        accumulator.append("你好");
+        accumulator.append("Xin chào");
 
         assertEquals(accumulator.totalUtf8Bytes(), 6);
         assertFalse(accumulator.isTruncated());
-        assertEquals(accumulator.value(), "你好");
+        assertEquals(accumulator.value(), "Xin chào");
     }
 
     @Test
     public void shouldLimitRetainedPreviewByUtf8BytesInsteadOfCharacters() {
         BoundedTextAccumulator accumulator = new BoundedTextAccumulator(4);
 
-        accumulator.append("你好abc");
+        accumulator.append("Xin chàoabc");
 
         assertEquals(accumulator.totalUtf8Bytes(), 9);
         assertTrue(accumulator.isTruncated());
-        assertTrue(accumulator.value().startsWith("你"));
-        assertFalse(accumulator.value().startsWith("你好"));
+        assertTrue(accumulator.value().startsWith("Bạn"));
+        assertFalse(accumulator.value().startsWith("Xin chào"));
     }
 }

@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.Scanner;
 
 /**
- * 插件市场目录服务。
+ * Dịch vụ thư mục thị trường plug-in.
  */
 @Slf4j
 @UtilityClass

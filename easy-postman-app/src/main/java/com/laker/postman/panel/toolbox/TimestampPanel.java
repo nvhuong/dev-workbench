@@ -16,7 +16,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 /**
- * 时间戳转换工具面板
+ * Bảng công cụ chuyển đổi dấu thời gian
  */
 @Slf4j
 public class TimestampPanel extends JPanel {
@@ -56,12 +56,12 @@ public class TimestampPanel extends JPanel {
     }
 
     /**
-     * 创建当前时间戳面板
+     * Tạo bảng dấu thời gian hiện tại
      */
     private JPanel createCurrentTimestampPanel() {
         JPanel panel = createSectionPanel(I18nUtil.getMessage(MessageKeys.TOOLBOX_TIMESTAMP_CURRENT));
 
-        // 时间戳显示标签
+        // Nhãn hiển thị dấu thời gian
         currentLabel = new JLabel(String.valueOf(System.currentTimeMillis()));
         currentLabel.setFont(FontsUtil.getDefaultFontWithOffset(Font.BOLD, +2));
         currentLabel.setForeground(ModernColors.getTextPrimary());
@@ -81,23 +81,23 @@ public class TimestampPanel extends JPanel {
         panel.add(currentLabel, BorderLayout.CENTER);
         panel.add(btnPanel, BorderLayout.EAST);
 
-        // 自动刷新当前时间戳
+        // Tự động làm mới dấu thời gian hiện tại
         timer = new Timer(1000, e -> currentLabel.setText(String.valueOf(System.currentTimeMillis())));
 
         return panel;
     }
 
     /**
-     * 创建时间戳转日期面板
+     * Tạo bảng dấu thời gian cho đến ngày
      */
     private JPanel createTimestampToDatePanel() {
         JPanel panel = createSectionPanel(I18nUtil.getMessage(MessageKeys.TOOLBOX_TIMESTAMP_TO_DATE));
 
-        // 输入区域
+        // Khu vực đầu vào
         JPanel inputPanel = new JPanel(new BorderLayout(10, 5));
         inputPanel.setOpaque(false);
 
-        // 输入框和单位选择在同一行
+        // Hộp đầu vào và lựa chọn đơn vị nằm trên cùng một dòng
         JPanel fieldPanel = new JPanel(new BorderLayout(5, 0));
         fieldPanel.setOpaque(false);
         timestampField = new FlatTextField();
@@ -117,7 +117,7 @@ public class TimestampPanel extends JPanel {
         inputPanel.add(new JLabel(I18nUtil.getMessage(MessageKeys.TOOLBOX_TIMESTAMP_INPUT) + ":"), BorderLayout.WEST);
         inputPanel.add(fieldPanel, BorderLayout.CENTER);
 
-        // 转换按钮
+        // Nút chuyển đổi
         JButton convertBtn = new JButton(I18nUtil.getMessage(MessageKeys.TOOLBOX_TIMESTAMP_TO_DATE));
         convertBtn.addActionListener(e -> convertToDate());
         JPanel btnPanel = ToolboxWorkbench.leftToolbar(convertBtn);
@@ -129,12 +129,12 @@ public class TimestampPanel extends JPanel {
     }
 
     /**
-     * 创建日期转时间戳面板
+     * Tạo một bảng ngày để đánh dấu thời gian
      */
     private JPanel createDateToTimestampPanel() {
         JPanel panel = createSectionPanel(I18nUtil.getMessage(MessageKeys.TOOLBOX_TIMESTAMP_DATE_TO_TIMESTAMP));
 
-        // 输入区域
+        // Khu vực đầu vào
         JPanel inputPanel = new JPanel(new BorderLayout(10, 5));
         inputPanel.setOpaque(false);
 
@@ -147,7 +147,7 @@ public class TimestampPanel extends JPanel {
         inputPanel.add(new JLabel(I18nUtil.getMessage(MessageKeys.TOOLBOX_TIMESTAMP_DATE_INPUT) + ":"), BorderLayout.WEST);
         inputPanel.add(dateField, BorderLayout.CENTER);
 
-        // 快速填充按钮
+        // Nút điền nhanh
         JButton nowBtn = new JButton(I18nUtil.getMessage(MessageKeys.TOOLBOX_TIMESTAMP_NOW_BUTTON));
         nowBtn.setToolTipText(I18nUtil.getMessage(MessageKeys.TOOLBOX_TIMESTAMP_NOW_TOOLTIP));
         nowBtn.addActionListener(e -> {
@@ -158,7 +158,7 @@ public class TimestampPanel extends JPanel {
 
         inputPanel.add(quickBtnPanel, BorderLayout.EAST);
 
-        // 转换按钮
+        // Nút chuyển đổi
         JButton convertBtn = new JButton(I18nUtil.getMessage(MessageKeys.TOOLBOX_TIMESTAMP_DATE_TO_TIMESTAMP));
         convertBtn.addActionListener(e -> convertToTimestamp());
         JPanel btnPanel = ToolboxWorkbench.leftToolbar(convertBtn);
@@ -170,7 +170,7 @@ public class TimestampPanel extends JPanel {
     }
 
     /**
-     * 创建结果显示面板
+     * Tạo bảng hiển thị kết quả
      */
     private JPanel createResultPanel() {
         JPanel panel = createSectionPanel(I18nUtil.getMessage(MessageKeys.TOOLBOX_TIMESTAMP_OUTPUT));
@@ -220,7 +220,7 @@ public class TimestampPanel extends JPanel {
         try {
             long timestamp = Long.parseLong(input);
 
-            // 如果选择的是秒，转换为毫秒
+            // Nếu giây được chọn, hãy chuyển đổi thành mili giây
             if (unitCombo.getSelectedIndex() == 1) {
                 timestamp *= 1000;
             }

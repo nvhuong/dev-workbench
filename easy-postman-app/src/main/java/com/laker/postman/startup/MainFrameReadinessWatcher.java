@@ -8,7 +8,7 @@ import javax.swing.Timer;
 import java.util.function.Consumer;
 
 /**
- * 监听主窗口启动门闩：启动壳可见，以及可选的主内容加载完成。
+ * Lắng nghe chốt khởi chạy cửa sổ chính: vỏ khởi chạy hiển thị và nội dung chính tùy chọn được tải.
  */
 @RequiredArgsConstructor
 @Slf4j
@@ -52,7 +52,7 @@ class MainFrameReadinessWatcher {
     }
 
     private void startShellPaintFallbackTimer() {
-        // 个别平台不会稳定触发首帧回调，短兜底避免 Splash 卡住。
+        // Một số nền tảng sẽ không kích hoạt gọi lại khung đầu tiên một cách ổn định, vì vậy hãy tránh hiện tượng đoản mạch Splash mắc kẹt.
         shellPaintFallbackTimer = new Timer(STARTUP_SHELL_PAINT_FALLBACK_MS, e -> {
             if (!shellReady) {
                 log.warn("Main frame startup shell did not report a paint within {} ms; continuing via fallback",

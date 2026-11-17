@@ -35,12 +35,12 @@ import java.util.Objects;
 
 
 /**
- * 现代化统一设置对话框
- * 集成所有设置到一个标签页界面中
+ * Hộp thoại cài đặt thống nhất hiện đại
+ * Tích hợp tất cả các cài đặt vào giao diện theo thẻ
  */
 public class ModernSettingsDialog extends JDialog {
 
-    // UI 常量
+    // UI không thay đổi
     private static final int MIN_WIDTH = 600;
     private static final int MIN_HEIGHT = 300;
     private static final int PREFERRED_WIDTH = 820;
@@ -437,7 +437,7 @@ public class ModernSettingsDialog extends JDialog {
     }
 
     /**
-     * 处理窗口关闭事件
+     * Xử lý sự kiện đóng cửa sổ
      */
     private void handleWindowClosing() {
         if (checkCurrentPanelUnsavedChanges() && checkAllPanelsUnsavedChanges()) {
@@ -446,7 +446,7 @@ public class ModernSettingsDialog extends JDialog {
     }
 
     /**
-     * 检查当前选中面板的未保存更改
+     * Kiểm tra các thay đổi chưa được lưu đối với bảng hiện được chọn
      */
     private boolean checkCurrentPanelUnsavedChanges() {
         Component selectedComponent = selectedPage == null ? null : selectedPage.component();
@@ -457,7 +457,7 @@ public class ModernSettingsDialog extends JDialog {
     }
 
     /**
-     * 检查所有面板的未保存更改
+     * Kiểm tra tất cả các bảng để biết những thay đổi chưa được lưu
      */
     private boolean checkAllPanelsUnsavedChanges() {
         for (SettingsSearchSupport.SettingsSearchPage page : settingsPages) {
@@ -484,19 +484,19 @@ public class ModernSettingsDialog extends JDialog {
     }
 
     /**
-     * 显示设置对话框
+     * Hiển thị hộp thoại cài đặt
      *
-     * @param parent 父窗口
+     * @param parent cửa sổ cha mẹ
      */
     public static void showSettings(Window parent) {
         showSettings(parent, 0);
     }
 
     /**
-     * 显示设置对话框并打开指定的标签页
+     * Hiển thị hộp thoại cài đặt và mở tab đã chỉ định
      *
-     * @param parent   父窗口
-     * @param tabIndex 要打开的标签页索引
+     * @param parent   cửa sổ cha mẹ
+     * @param tabIndex Chỉ mục của tab sẽ mở
      */
     public static void showSettings(Window parent, int tabIndex) {
         ModernSettingsDialog dialog = new ModernSettingsDialog(parent);
@@ -505,9 +505,9 @@ public class ModernSettingsDialog extends JDialog {
     }
 
     /**
-     * 选择指定的标签页
+     * Chọn tab được chỉ định
      *
-     * @param tabIndex 标签页索引
+     * @param tabIndex Chỉ mục tab
      */
     private void selectTab(int tabIndex) {
         if (tabIndex >= 0 && tabIndex < settingsPages.size()) {

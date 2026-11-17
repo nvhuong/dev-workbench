@@ -19,10 +19,10 @@ public class TimelinePanel extends JPanel {
 
     private HttpEventInfo httpEventInfo;
 
-    // 交互状态
-    private int hoveredBarIndex = -1; // 当前鼠标悬停的瀑布条索引
+    // trạng thái tương tác
+    private int hoveredBarIndex = -1; // Chỉ số hiện tại của thanh thác nước mà chuột đang di chuột qua
 
-    // 瀑布图参数
+    // Các tham số của biểu đồ thác nước
     private static final int SECTION_RADIUS = 8;
     private static final int BAR_HEIGHT = 16;
     private static final int BAR_GAP = 6;
@@ -36,12 +36,12 @@ public class TimelinePanel extends JPanel {
     private static final int LABEL_LEFT_PAD = 22;
     private static final int LABEL_RIGHT_PAD = 16;
 
-    // 信息区参数
+    // Các thông số vùng thông tin
     private static final int INFO_BLOCK_H_GAP = 16;
     private static final int INFO_BLOCK_V_GAP = 10;
     private static final int INFO_TEXT_TOP_PAD = 10;
     private static final int INFO_TEXT_LINE_HEIGHT = 18;
-    private static final int INFO_TEXT_EXTRA_GAP = 4; // 信息区每项之间额外空白
+    private static final int INFO_TEXT_EXTRA_GAP = 4; // Khoảng trắng bổ sung giữa mỗi mục trong vùng thông tin
     private static final int INFO_TEXT_BOTTOM_PAD = 12;
     private static final int INFO_TEXT_LEFT_PAD = 18;
     private static final int INFO_COLUMN_GAP = 32;
@@ -49,16 +49,16 @@ public class TimelinePanel extends JPanel {
     static final int INFO_LABEL_VALUE_GAP = 8;
     static final int INFO_VALUE_MIN_WIDTH = 120;
 
-    // 区域间距
+    // Khoảng cách vùng
     private static final int AREA_GAP = 10;
 
     public TimelinePanel(List<Stage> stages, HttpEventInfo httpEventInfo) {
-        setLayout(new BorderLayout()); // 明确使用 BorderLayout
+        setLayout(new BorderLayout()); // Sử dụng rõ ràng BorderLayout
         ToolWindowSurfaceStyle.applyCard(this);
         this.httpEventInfo = httpEventInfo;
         setStages(stages);
         ToolTipManager.sharedInstance().registerComponent(this);
-        setupMouseListeners(); // 设置鼠标监听器
+        setupMouseListeners(); // Thiết lập trình nghe chuột
     }
 
     public void setStages(List<Stage> stages) {
@@ -75,7 +75,7 @@ public class TimelinePanel extends JPanel {
     }
 
     /**
-     * 设置鼠标监听器，实现交互效果
+     * Thiết lập trình nghe chuột để đạt được hiệu ứng tương tác
      */
     private void setupMouseListeners() {
         addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
@@ -84,7 +84,7 @@ public class TimelinePanel extends JPanel {
                 int oldHovered = hoveredBarIndex;
                 hoveredBarIndex = getStageRowIndexAtPoint(e.getPoint());
 
-                // 只在悬停状态改变时重绘
+                // Chỉ vẽ lại khi trạng thái di chuột thay đổi
                 if (oldHovered != hoveredBarIndex) {
                     setCursor(Cursor.getDefaultCursor());
                     repaint();
@@ -105,7 +105,7 @@ public class TimelinePanel extends JPanel {
     }
 
     /**
-     * 获取鼠标位置对应的瀑布条索引
+     * Lấy chỉ số thanh thác nước tương ứng với vị trí chuột
      */
     private int getBarIndexAtPoint(Point p) {
         return getStageIndexAtPoint(p, true);
@@ -184,7 +184,7 @@ public class TimelinePanel extends JPanel {
 
     @Override
     public Dimension getPreferredSize() {
-        // 统一计算 label 最大宽度；阶段说明只在 tooltip 中展示，不参与瀑布条宽度预算。
+        // Tính toán thống nhất label Chiều rộng tối đa; chỉ mô tả giai đoạn tooltip Được hiển thị trong , giới hạn chiều rộng của thanh thác nước không liên quan.
         int labelMaxWidth = 80;
         FontMetrics metrics = getFontMetrics(FontsUtil.getDefaultFont(Font.BOLD));
         if (metrics != null) {
@@ -196,13 +196,13 @@ public class TimelinePanel extends JPanel {
         int leftPad = LABEL_LEFT_PAD + labelMaxWidth + LABEL_RIGHT_PAD;
         int infoTextBlockHeight = getInfoBlockHeight();
         int w = leftPad + 480 + RIGHT_PAD;
-        // 总高度 = 顶部间距 + 信息区高度 + 底部间距 + 区域间距 + 顶部内边距 + 瀑布条总高度 + 底部内边距 + 底部间距
+        // Chiều cao tổng thể = Khoảng cách trên cùng + Chiều cao vùng thông tin + Khoảng cách đáy + Khoảng cách vùng + Phần đệm trên cùng + Tổng chiều cao của thanh thác + Đệm dưới cùng + Khoảng cách đáy
         int barsTotalHeight = stages.isEmpty() ? 0 : stages.size() * BAR_HEIGHT + (stages.size() - 1) * BAR_GAP;
         int h = INFO_BLOCK_V_GAP + infoTextBlockHeight + AREA_GAP + TOP_PAD + barsTotalHeight + BOTTOM_PAD + INFO_BLOCK_V_GAP;
         return new Dimension(w, Math.max(h, 150));
     }
 
-    // 信息区高度自适应（去除标题高度和分隔线高度）
+    // Chiều cao của vùng thông tin có tính thích ứng (loại bỏ chiều cao của tiêu đề và chiều cao của dải phân cách)
     private int getInfoBlockHeight() {
         int infoLines = getInfoRowsCount();
         return INFO_TEXT_TOP_PAD
@@ -217,11 +217,11 @@ public class TimelinePanel extends JPanel {
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 
-        // 0. 绘制面板背景
+        // 0. Vẽ nền bảng điều khiển
         g2.setColor(TimelineTheme.panelBackground());
         g2.fillRect(0, 0, getWidth(), getHeight());
 
-        // 1. 绘制信息区
+        // 1. Vẽ vùng thông tin
         int infoTextBlockHeight = getInfoBlockHeight();
         int sectionX = INFO_BLOCK_H_GAP;
         int sectionWidth = Math.max(0, getWidth() - 2 * INFO_BLOCK_H_GAP);
@@ -232,22 +232,22 @@ public class TimelinePanel extends JPanel {
         g2.drawRoundRect(sectionX, INFO_BLOCK_V_GAP, sectionWidth, infoTextBlockHeight, SECTION_RADIUS, SECTION_RADIUS);
         drawConnectionInfo(g2, sectionX, INFO_BLOCK_V_GAP, sectionWidth);
 
-        // 2. 绘制瀑布条区域背景和边框
+        // 2. Vẽ nền và viền khu vực quầy bar thác nước
         int n = stages.size();
         int barsTotalHeight = n > 0 ? n * BAR_HEIGHT + (n - 1) * BAR_GAP : 0;
         int barAreaTop = INFO_BLOCK_V_GAP + infoTextBlockHeight + AREA_GAP;
         int barAreaHeight = TOP_PAD + barsTotalHeight + BOTTOM_PAD;
 
-        // 绘制瀑布条区域背景
+        // Vẽ nền khu vực quán bar thác nước
         g2.setColor(TimelineTheme.barAreaBackground());
         g2.fillRoundRect(sectionX, barAreaTop, sectionWidth, barAreaHeight, SECTION_RADIUS, SECTION_RADIUS);
 
-        // 绘制瀑布条区域边框（与信息区边框一致）
+        // Vẽ đường viền vùng thanh thác nước (phù hợp với đường viền vùng thông tin)
         g2.setColor(TimelineTheme.infoBorder());
         g2.setStroke(new BasicStroke(1.0f));
         g2.drawRoundRect(sectionX, barAreaTop, sectionWidth, barAreaHeight, SECTION_RADIUS, SECTION_RADIUS);
 
-        // 3. 绘制瀑布条
+        // 3. Vẽ thanh thác nước
         int labelMaxWidth = 0;
         g2.setFont(FontsUtil.getDefaultFont(Font.BOLD));
         labelMaxWidth = getStageLabelMaxWidth(g2.getFontMetrics(), 0);
@@ -260,13 +260,13 @@ public class TimelinePanel extends JPanel {
         long displayTotalDuration = Math.max(0, total);
         int[] barWidths = resolveStageVisualWidths(stages, displayTotalDuration, trackWidth);
 
-        // 绘制
-        // 瀑布条Y坐标 = 信息区高度 + 信息区底部间距 + 区域间距 + 瀑布条区域顶部内边距
+        // vẽ
+        // Thanh thác nướcYđiều phối = Chiều cao vùng thông tin + Khoảng cách dưới cùng của vùng thông tin + Khoảng cách vùng + Phần đệm phía trên của khu vực quầy bar thác nước
         int barY = barAreaTop + TOP_PAD;
         int currentX = barStartX;
         drawScaleHeader(g2, stageLabelX, barStartX, trackWidth, barAreaTop, displayTotalDuration, hasSubMillisecondStage);
 
-        // 计算文字垂直居中的位置
+        // Tính toán vị trí trung tâm theo chiều dọc của văn bản
         g2.setFont(FontsUtil.getDefaultFont(Font.PLAIN));
         FontMetrics fm = g2.getFontMetrics();
         int textYOffset = (BAR_HEIGHT - fm.getHeight()) / 2 + fm.getAscent();
@@ -277,14 +277,14 @@ public class TimelinePanel extends JPanel {
             Color[] barColors = TimelineTheme.barColors();
             Color color = barColors[i % barColors.length];
 
-            // 绘制悬停背景高亮
+            // Vẽ một điểm nổi bật nền di chuột
             boolean isHovered = (i == hoveredBarIndex);
             if (isHovered) {
                 g2.setColor(TimelineTheme.hoveredBarBackground());
                 g2.fillRoundRect(sectionX + 8, barY - 4, Math.max(0, sectionWidth - 16), BAR_HEIGHT + 8, 6, 6);
             }
 
-            // label 区域
+            // label khu vực
             g2.setFont(FontsUtil.getDefaultFont(Font.BOLD));
             g2.setColor(isHovered ? TimelineTheme.hoveredLabelText() : TimelineTheme.labelText());
             String label = s.label;
@@ -300,7 +300,7 @@ public class TimelinePanel extends JPanel {
             }
             g2.drawString(label, stageLabelX, barY + textYOffset);
 
-            // 先绘制整行时间轨道，让瀑布条不再悬浮在大块背景上。
+            // Đầu tiên vẽ toàn bộ đường thời gian sao cho thanh thác nước không còn lơ lửng trên nền lớn.
             g2.setStroke(new BasicStroke(1.0f));
             g2.setColor(TimelineTheme.barTrackBackground());
             g2.fillRoundRect(barStartX, barY, trackWidth, BAR_HEIGHT, BAR_RADIUS, BAR_RADIUS);
@@ -312,7 +312,7 @@ public class TimelinePanel extends JPanel {
                 g2.drawLine(gridX, barY + 2, gridX, barY + BAR_HEIGHT - 2);
             }
 
-            // bar 区域：保持扁平语义色，避免把耗时阶段画成过重的状态卡片。
+            // bar Lĩnh vực: Giữ màu ngữ nghĩa phẳng và tránh vẽ các giai đoạn tốn thời gian vào các thẻ trạng thái quá nặng.
             long duration = durationMillis(s);
             String ms = formatStageDuration(s);
             int strW = g2.getFontMetrics(FontsUtil.getDefaultFont(Font.PLAIN)).stringWidth(ms);
@@ -323,7 +323,7 @@ public class TimelinePanel extends JPanel {
                 g2.setColor(TimelineTheme.barHighlight(isHovered));
                 g2.fillRoundRect(currentX, barY, barW, 1, BAR_RADIUS, BAR_RADIUS);
 
-                // 悬停时添加外边框高亮
+                // Thêm đánh dấu đường viền bên ngoài khi di chuột
                 if (isHovered) {
                     g2.setColor(TimelineTheme.hoveredBarOutline());
                     g2.setStroke(new BasicStroke(1.5f));
@@ -339,13 +339,13 @@ public class TimelinePanel extends JPanel {
                 g2.fillRoundRect(markerX, barY, SUB_MILLISECOND_MARKER_WIDTH, BAR_HEIGHT, BAR_RADIUS, BAR_RADIUS);
             }
 
-            // 耗时文字只放在柱子内部；窄柱和 <1ms> 标记通过 tooltip 展示完整耗时。
+            // Văn bản tốn thời gian chỉ được đặt bên trong các cột; cột hẹp và <1ms> Mark đã vượt qua tooltip Việc hiển thị hoàn chỉnh cần có thời gian.
             g2.setFont(FontsUtil.getDefaultFont(Font.PLAIN));
             if (duration > 0 && shouldDrawDurationTextInsideBar(barW, strW)) {
                 g2.setColor(TimelineTheme.barText());
                 g2.drawString(ms, currentX + barW - strW - 6, barY + textYOffset);
             }
-            // 已观测到的阶段都会占用视觉位置；未记录阶段只保留空轨道。
+            // Các pha được quan sát đều chiếm vị trí trực quan; các pha không được ghi lại chỉ giữ lại các rãnh trống.
             if (hasObservedTiming(s)) {
                 currentX += barW;
             }
@@ -508,7 +508,7 @@ public class TimelinePanel extends JPanel {
         g2.drawString(ellipsis(g2, item.value, valueWidth), valueX, baseline);
     }
 
-    // 根据当前语言的 key 宽度动态分配 label 区，避免英文信息项被固定宽度截断。
+    // dựa trên ngôn ngữ hiện tại key Chiều rộng được phân bổ động label để ngăn các mục thông tin tiếng Anh bị cắt ngắn theo chiều rộng cố định.
     static int resolveInfoLabelWidth(FontMetrics metrics, List<String> labels, int itemWidth) {
         int preferredWidth = INFO_LABEL_MIN_WIDTH;
         if (metrics != null && labels != null) {
@@ -613,7 +613,7 @@ public class TimelinePanel extends JPanel {
                 .replace("'", "&#39;");
     }
 
-    // 计算两列摘要区实际行数（用于动态布局）
+    // Tính số hàng thực tế trong vùng tóm tắt hai cột (đối với bố cục động)
     private int getInfoRowsCount() {
         int rows = (buildConnectionInfoItems().size() + 1) / 2;
         if (httpEventInfo != null && httpEventInfo.getSslCertWarning() != null && !httpEventInfo.getSslCertWarning().isEmpty()) {
@@ -729,7 +729,7 @@ public class TimelinePanel extends JPanel {
         return widths;
     }
 
-    // 工具方法：根据 HttpEventInfo 生成六大阶段（即使为0也显示）
+    // Phương pháp công cụ: Dựa trên HttpEventInfo Tạo ra sáu giai đoạn chính (ngay cả khi có0cũng được hiển thị)
     public static List<Stage> buildStandardStages(HttpEventInfo info) {
         String[] labels = {
                 I18nUtil.getMessage(MessageKeys.WATERFALL_STAGE_DNS),

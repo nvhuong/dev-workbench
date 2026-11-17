@@ -5,19 +5,19 @@ import javax.swing.table.TableCellRenderer;
 import java.awt.*;
 
 /**
- * 文本或文件组合单元格渲染器
- * 增强版：支持类型动态配置、自定义文本渲染
+ * Trình kết xuất ô kết hợp văn bản hoặc tập tin
+ * Phiên bản nâng cao: Hỗ trợ cấu hình kiểu động và hiển thị văn bản tùy chỉnh
  */
 public class TextOrFileTableCellRenderer implements TableCellRenderer {
 
     private final FileCellRenderer fileRenderer = new FileCellRenderer();
     private final EasyTextFieldCellRenderer textRenderer;
 
-    // 可配置的类型列索引，默认为2（Form-Data表格中Type列的索引）
+    // Chỉ mục cột loại có thể định cấu hình, mặc định là 2（Form-Datatrong bảngTypechỉ mục cột)
     private final int typeColumnIndex = 2;
 
     /**
-     * 创建默认的文本或文件组合渲染器
+     * Tạo trình kết xuất thành phần văn bản hoặc tệp mặc định
      */
     public TextOrFileTableCellRenderer() {
         textRenderer = new EasyTextFieldCellRenderer();
@@ -25,7 +25,7 @@ public class TextOrFileTableCellRenderer implements TableCellRenderer {
 
     @Override
     public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-        // 从类型列获取单元格类型
+        // Lấy loại ô từ cột loại
         Object type = table.getValueAt(row, typeColumnIndex);
         boolean isFileType = TableUIConstants.FILE_TYPE.equalsIgnoreCase(String.valueOf(type));
         Component c;
@@ -46,7 +46,7 @@ public class TextOrFileTableCellRenderer implements TableCellRenderer {
 
         c.setBackground(TableUIConstants.getCellBackground(isSelected, isHovered, isFileType && isEmpty, table, row));
 
-        // 为文本单元格添加内边距
+        // Thêm phần đệm vào ô văn bản
         if (!isFileType) {
             if (c instanceof JLabel) {
                 ((JLabel) c).setBorder(TableUIConstants.createLabelBorder());

@@ -9,16 +9,16 @@ import java.util.List;
 import static org.testng.Assert.*;
 
 /**
- * PostmanEnvironmentParser 单元测试
+ * PostmanEnvironmentParser Kiểm tra đơn vị
  */
 public class PostmanEnvironmentParserTest {
 
     @Test
     public void testParsePostmanEnvironments_SingleObject() {
-        // 准备测试数据 - 单个环境对象
+        // Chuẩn bị dữ liệu thử nghiệm - Một đối tượng môi trường duy nhất
         String json = """
                 {
-                    "name": "测试环境",
+                    "name": "Môi trường thử nghiệm",
                     "values": [
                         {"key": "baseUrl", "value": "https://api.example.com", "enabled": true},
                         {"key": "token", "value": "abc123", "enabled": true},
@@ -27,19 +27,19 @@ public class PostmanEnvironmentParserTest {
                 }
                 """;
 
-        // 执行解析
+        // Thực hiện phân tích cú pháp
         List<Environment> envs = PostmanEnvironmentParser.parsePostmanEnvironments(json);
 
-        // 验证结果
+        // Xác minh kết quả
         assertNotNull(envs);
         assertEquals(envs.size(), 1);
 
         Environment env = envs.get(0);
-        assertEquals(env.getName(), "测试环境");
+        assertEquals(env.getName(), "Môi trường thử nghiệm");
         assertNotNull(env.getId());
 
-        // 验证变量
-        assertEquals(env.getVariables().size(), 2); // disabled_var 应该被忽略
+        // Xác thực các biến
+        assertEquals(env.getVariables().size(), 2); // disabled_var nên được bỏ qua
         assertEquals(env.getVariables().get("baseUrl"), "https://api.example.com");
         assertEquals(env.getVariables().get("token"), "abc123");
         assertNull(env.getVariables().get("disabled_var"));
@@ -47,17 +47,17 @@ public class PostmanEnvironmentParserTest {
 
     @Test
     public void testParsePostmanEnvironments_Array() {
-        // 准备测试数据 - 环境数组
+        // Chuẩn bị dữ liệu thử nghiệm - mảng môi trường
         String json = """
                 [
                     {
-                        "name": "开发环境",
+                        "name": "môi trường phát triển",
                         "values": [
                             {"key": "url", "value": "http://dev.example.com", "enabled": true}
                         ]
                     },
                     {
-                        "name": "生产环境",
+                        "name": "môi trường sản xuất",
                         "values": [
                             {"key": "url", "value": "https://prod.example.com", "enabled": true}
                         ]
@@ -65,43 +65,43 @@ public class PostmanEnvironmentParserTest {
                 ]
                 """;
 
-        // 执行解析
+        // Thực hiện phân tích cú pháp
         List<Environment> envs = PostmanEnvironmentParser.parsePostmanEnvironments(json);
 
-        // 验证结果
+        // Xác minh kết quả
         assertNotNull(envs);
         assertEquals(envs.size(), 2);
 
-        assertEquals(envs.get(0).getName(), "开发环境");
+        assertEquals(envs.get(0).getName(), "môi trường phát triển");
         assertEquals(envs.get(0).getVariables().get("url"), "http://dev.example.com");
 
-        assertEquals(envs.get(1).getName(), "生产环境");
+        assertEquals(envs.get(1).getName(), "môi trường sản xuất");
         assertEquals(envs.get(1).getVariables().get("url"), "https://prod.example.com");
     }
 
     @Test
     public void testParsePostmanEnvironments_EmptyValues() {
-        // 准备测试数据 - 空变量列表
+        // Chuẩn bị dữ liệu thử nghiệm - Danh sách biến trống
         String json = """
                 {
-                    "name": "空环境",
+                    "name": "Môi trường trống rỗng",
                     "values": []
                 }
                 """;
 
-        // 执行解析
+        // Thực hiện phân tích cú pháp
         List<Environment> envs = PostmanEnvironmentParser.parsePostmanEnvironments(json);
 
-        // 验证结果
+        // Xác minh kết quả
         assertNotNull(envs);
         assertEquals(envs.size(), 1);
-        assertEquals(envs.get(0).getName(), "空环境");
+        assertEquals(envs.get(0).getName(), "Môi trường trống rỗng");
         assertTrue(envs.get(0).getVariables().isEmpty());
     }
 
     @Test
     public void testParsePostmanEnvironments_NoName() {
-        // 准备测试数据 - 无名称
+        // Chuẩn bị dữ liệu thử nghiệm - Không có tên
         String json = """
                 {
                     "values": [
@@ -110,39 +110,39 @@ public class PostmanEnvironmentParserTest {
                 }
                 """;
 
-        // 执行解析
+        // Thực hiện phân tích cú pháp
         List<Environment> envs = PostmanEnvironmentParser.parsePostmanEnvironments(json);
 
-        // 验证结果
+        // Xác minh kết quả
         assertNotNull(envs);
         assertEquals(envs.size(), 1);
-        assertEquals(envs.get(0).getName(), "未命名环境");
+        assertEquals(envs.get(0).getName(), "Môi trường không tên");
     }
 
     @Test
     public void testToPostmanEnvironmentJson() {
-        // 准备测试数据
-        Environment env = new Environment("测试环境");
+        // Chuẩn bị dữ liệu thử nghiệm
+        Environment env = new Environment("Môi trường thử nghiệm");
         env.setId("test-id");
         env.addVariable("apiUrl", "https://api.example.com");
         env.addVariable("apiKey", "secret-key");
 
-        // 执行导出
+        // Thực hiện xuất khẩu
         String json = PostmanEnvironmentParser.toPostmanEnvironmentJson(env);
 
-        // 验证结果
+        // Xác minh kết quả
         assertNotNull(json);
         assertTrue(JSONUtil.isTypeJSON(json));
 
-        // 解析JSON验证内容
+        // phân tíchJSONXác minh nội dung
         cn.hutool.json.JSONObject obj = JSONUtil.parseObj(json);
         assertNotNull(obj.getStr("id"));
-        assertEquals(obj.getStr("name"), "测试环境");
+        assertEquals(obj.getStr("name"), "Môi trường thử nghiệm");
         assertEquals(obj.getStr("_postman_variable_scope"), "environment");
         assertEquals(obj.getStr("_postman_exported_using"), "EasyPostman");
         assertNotNull(obj.getStr("_postman_exported_at"));
 
-        // 验证变量
+        // Xác thực các biến
         cn.hutool.json.JSONArray values = obj.getJSONArray("values");
         assertNotNull(values);
         assertEquals(values.size(), 2);
@@ -166,14 +166,14 @@ public class PostmanEnvironmentParserTest {
 
     @Test
     public void testToPostmanEnvironmentJson_EmptyVariables() {
-        // 准备测试数据 - 空变量
-        Environment env = new Environment("空环境");
+        // Chuẩn bị dữ liệu thử nghiệm - Biến trống
+        Environment env = new Environment("Môi trường trống rỗng");
         env.setId("empty-id");
 
-        // 执行导出
+        // Thực hiện xuất khẩu
         String json = PostmanEnvironmentParser.toPostmanEnvironmentJson(env);
 
-        // 验证结果
+        // Xác minh kết quả
         assertNotNull(json);
         cn.hutool.json.JSONObject obj = JSONUtil.parseObj(json);
         cn.hutool.json.JSONArray values = obj.getJSONArray("values");
@@ -183,18 +183,18 @@ public class PostmanEnvironmentParserTest {
 
     @Test
     public void testRoundTrip() {
-        // 测试导出后再导入，数据应该保持一致
-        Environment original = new Environment("往返测试");
+        // Sau khi thử nghiệm xuất và sau đó nhập, dữ liệu sẽ vẫn nhất quán
+        Environment original = new Environment("Thử nghiệm chuyến đi khứ hồi");
         original.addVariable("var1", "value1");
         original.addVariable("var2", "value2");
 
-        // 导出
+        // Xuất khẩu
         String json = PostmanEnvironmentParser.toPostmanEnvironmentJson(original);
 
-        // 导入
+        // Nhập khẩu
         List<Environment> imported = PostmanEnvironmentParser.parsePostmanEnvironments(json);
 
-        // 验证
+        // Xác minh
         assertNotNull(imported);
         assertEquals(imported.size(), 1);
         Environment restored = imported.get(0);

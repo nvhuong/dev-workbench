@@ -29,7 +29,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
- * WebSocket响应体面板，展示消息类型、时间、内容和断言结果，支持搜索、清除、类型过滤。
+ * WebSocketBảng nội dung phản hồi hiển thị loại thông báo, thời gian, nội dung và kết quả xác nhận, đồng thời hỗ trợ tìm kiếm, xóa và lọc loại.
  */
 public class WebSocketResponsePanel extends JPanel {
     private final JTable table;
@@ -82,8 +82,8 @@ public class WebSocketResponsePanel extends JPanel {
         setLayout(new BorderLayout());
         ToolWindowSurfaceStyle.applyCard(this);
         setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
-        // 顶部工具栏
-        JPanel toolBar = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 2)); // 左对齐，水平间距5，垂直间距2
+        // Thanh công cụ trên cùng
+        JPanel toolBar = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 2)); // Căn trái, giãn cách theo chiều ngang5，khoảng cách dọc2
         ToolWindowSurfaceStyle.applyCard(toolBar);
         typeFilterBox = new JComboBox<>(TYPE_FILTERS);
         searchField = new SearchTextField();
@@ -98,7 +98,7 @@ public class WebSocketResponsePanel extends JPanel {
         toolBar.add(retentionLabel);
         add(toolBar, BorderLayout.NORTH);
 
-        // 表格
+        // cái bàn
         tableModel = new StreamMessageTableModel<>(COLUMN_NAMES, this::messageValueAt);
         table = new JTable(tableModel);
         StreamMessageTableSupport.configureBaseTable(table, viewRow -> {
@@ -116,7 +116,7 @@ public class WebSocketResponsePanel extends JPanel {
         });
         StreamMessageTableSupport.configureContentColumn(table, COLUMN_CONTENT, 680);
         StreamMessageTableSupport.configureAssertionColumn(table, COLUMN_ASSERTION);
-        // 鼠标监听：内容列右键菜单，断言列单击查看结果，内容列双击查看详情。
+        // Giám sát chuột: cột nội dung nhấp chuột phải vào menu, cột xác nhận nhấp chuột để xem kết quả, cột nội dung nhấp đúp để xem chi tiết.
         table.addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
@@ -176,7 +176,7 @@ public class WebSocketResponsePanel extends JPanel {
                         JMenuItem copyItem = new JMenuItem(I18nUtil.getMessage(MessageKeys.BUTTON_COPY));
                         JMenuItem detailItem = new JMenuItem(I18nUtil.getMessage(MessageKeys.BUTTON_DETAIL));
                         copyItem.addActionListener(ev -> {
-                            // 复制内容到剪贴板
+                            // Sao chép nội dung vào clipboard
                             StringSelection selection = new StringSelection(buildDetailContent(messageRow));
                             Toolkit.getDefaultToolkit().getSystemClipboard().setContents(selection, null);
                         });
@@ -204,7 +204,7 @@ public class WebSocketResponsePanel extends JPanel {
         assertionSplitPane.setDividerSize(0);
         add(assertionSplitPane, BorderLayout.CENTER);
 
-        // 事件
+        // sự kiện
         clearButton.addActionListener(e -> clearMessages());
         searchField.getDocument().addDocumentListener(new DocumentListener() {
             public void insertUpdate(DocumentEvent e) {
@@ -292,7 +292,7 @@ public class WebSocketResponsePanel extends JPanel {
     }
 
     private void filterAndShow() {
-        // 确保在 EDT 内执行
+        // Hãy chắc chắn rằng bạn có mặt ở đó EDT được thực hiện bên trong
         if (!SwingUtilities.isEventDispatchThread()) {
             SwingUtilities.invokeLater(this::filterAndShow);
             return;
@@ -429,7 +429,7 @@ public class WebSocketResponsePanel extends JPanel {
         return tableScrollPane;
     }
 
-    // 行数据
+    // dữ liệu hàng
     public static class MessageRow {
         public final MessageType type;
         public final String time;
@@ -533,7 +533,7 @@ public class WebSocketResponsePanel extends JPanel {
     }
 
 
-    // 简单格式化JSON
+    // Định dạng đơn giảnJSON
     private String formatJson(String str) {
         if (JSONUtil.isTypeJSON(str)) {
             return JsonUtil.toJsonPrettyStr(str);

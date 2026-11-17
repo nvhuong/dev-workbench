@@ -1,7 +1,7 @@
 package com.laker.postman.model;
 
 /**
- * 远程状态信息封装
+ * Đóng gói thông tin trạng thái từ xa
  */
 public class RemoteStatus {
     public boolean hasRemote = false;

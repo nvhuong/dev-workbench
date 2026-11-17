@@ -10,9 +10,9 @@ import java.nio.file.Paths;
 import java.util.Properties;
 
 /**
- * 运行时版本解析器。
+ * Trình phân tích cú pháp phiên bản thời gian chạy.
  * <p>
- * 负责解析当前 app 版本和插件平台版本，并在开发态提供 pom 回退读取能力。
+ * Chịu trách nhiệm phân tích hiện tại app phiên bản và phiên bản nền tảng plug-in và được cung cấp ở trạng thái phát triển pom Khả năng đọc dự phòng.
  * </p>
  */
 @UtilityClass

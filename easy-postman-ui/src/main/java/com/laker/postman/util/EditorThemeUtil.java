@@ -19,10 +19,10 @@ import java.io.InputStream;
 import java.util.function.Consumer;
 
 /**
- * RSyntaxTextArea 的统一外观入口。
- * 应用亮暗主题、标准 token painter，并在主题之后调用宿主提供的编辑器字体配置器。
- * 项目内编辑器使用 {@link com.laker.postman.common.component.FallbackAwareRSyntaxTextArea}，
- * 由文本组件本身统一缺字字体与布局度量。
+ * RSyntaxTextArea Một diện mạo thống nhất cho lối vào.
+ * Áp dụng các chủ đề, tiêu chuẩn sáng và tối token painter，Và gọi trình cấu hình phông chữ soạn thảo do máy chủ cung cấp sau chủ đề.
+ * Sử dụng trình soạn thảo trong dự án {@link com.laker.postman.common.component.FallbackAwareRSyntaxTextArea}，
+ * Các số liệu về phông chữ và bố cục bị thiếu sẽ được thống nhất bởi chính thành phần văn bản.
  */
 @Slf4j
 @UtilityClass
@@ -47,10 +47,10 @@ public class EditorThemeUtil {
     private static volatile Consumer<RSyntaxTextArea> configuredEditorFontApplier;
 
     /**
-     * 加载并应用统一编辑器外观。长 token 编辑器可额外安装视口裁剪 painter；
-     * 缺字字体回退由 {@code FallbackAwareRSyntaxTextArea} 提供。
+     * Tải và áp dụng giao diện của trình chỉnh sửa hợp nhất. dài token Trình chỉnh sửa có thể cài đặt thêm tính năng cắt xén khung nhìn painter；
+     * Thiếu phông chữ dự phòng bằng {@code FallbackAwareRSyntaxTextArea} cung cấp.
      *
-     * @param area RSyntaxTextArea 编辑器实例
+     * @param area RSyntaxTextArea Ví dụ về trình soạn thảo
      */
     public static void loadTheme(RSyntaxTextArea area) {
         String themeFile = themeResourcePath();

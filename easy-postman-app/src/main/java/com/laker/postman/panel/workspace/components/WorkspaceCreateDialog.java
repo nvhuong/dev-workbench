@@ -24,8 +24,8 @@ import java.awt.event.ActionListener;
 import java.io.File;
 
 /**
- * 创建工作区对话框
- * 支持创建本地工作区和Git工作区
+ * Tạo hộp thoại không gian làm việc
+ * Hỗ trợ tạo không gian làm việc cục bộ vàGitkhu vực làm việc
  */
 @Slf4j
 public class WorkspaceCreateDialog extends ProgressDialog {
@@ -37,7 +37,7 @@ public class WorkspaceCreateDialog extends ProgressDialog {
     @Getter
     private transient Workspace workspace;
 
-    // UI组件
+    // UIthành phần
     private JTextField nameField;
     private JTextArea descriptionArea;
     private JRadioButton localTypeRadio;
@@ -47,14 +47,14 @@ public class WorkspaceCreateDialog extends ProgressDialog {
     private JCheckBox autoGeneratePathCheckBox;
     private JScrollPane descriptionScrollPane;
 
-    // Git相关组件
+    // GitCác thành phần liên quan
     private JPanel gitPanel;
     private JRadioButton cloneRadio;
     private JRadioButton initRadio;
     private JTextField gitUrlField;
     private GitAuthPanel gitAuthPanel;
 
-    // 新增分支相关组件
+    // Đã thêm các thành phần liên quan đến chi nhánh
     private JTextField branchField;
     private JLabel branchLabel;
     private boolean adjustingWorkspaceType;
@@ -66,7 +66,7 @@ public class WorkspaceCreateDialog extends ProgressDialog {
     }
 
     private void initComponents() {
-        // 基本信息
+        // Thông tin cơ bản
         nameField = new JTextField(10);
         SettingsInputStyle.apply(nameField);
         descriptionArea = new JTextArea(2, 10);
@@ -76,26 +76,26 @@ public class WorkspaceCreateDialog extends ProgressDialog {
         descriptionScrollPane = new JScrollPane(descriptionArea);
         ToolWindowSurfaceStyle.applyFramedScrollPaneCard(descriptionScrollPane);
 
-        // 工作区类型
+        // Loại không gian làm việc
         localTypeRadio = new JRadioButton(I18nUtil.getMessage(MessageKeys.WORKSPACE_TYPE_LOCAL), true);
         gitTypeRadio = new JRadioButton(I18nUtil.getMessage(MessageKeys.WORKSPACE_TYPE_GIT));
         ButtonGroup typeGroup = new ButtonGroup();
         typeGroup.add(localTypeRadio);
         typeGroup.add(gitTypeRadio);
 
-        // 路径选择 - 设置默认工作区目录
+        // Lựa chọn đường đi - Đặt thư mục không gian làm việc mặc định
         pathField = new JTextField(15);
         SettingsInputStyle.apply(pathField);
-        setDefaultWorkspacePath(); // 设置默认路径
+        setDefaultWorkspacePath(); // Đặt đường dẫn mặc định
 
         browseButton = new JButton(I18nUtil.getMessage(MessageKeys.WORKSPACE_SELECT_PATH));
         browseButton.setIcon(IconUtil.createThemed("icons/file.svg", 16, 16));
 
-        // 自动生成路径选项
+        // Tự động tạo các tùy chọn đường dẫn
         autoGeneratePathCheckBox = new JCheckBox(I18nUtil.getMessage(MessageKeys.WORKSPACE_AUTO_GENERATE_PATH), true);
         autoGeneratePathCheckBox.setFont(FontsUtil.getDefaultFontWithOffset(Font.PLAIN, -1));
 
-        // Git相关组件
+        // GitCác thành phần liên quan
         cloneRadio = new JRadioButton(I18nUtil.getMessage(MessageKeys.WORKSPACE_CLONE_FROM_REMOTE), true);
         initRadio = new JRadioButton(I18nUtil.getMessage(MessageKeys.WORKSPACE_INIT_LOCAL));
         ButtonGroup gitModeGroup = new ButtonGroup();
@@ -106,16 +106,16 @@ public class WorkspaceCreateDialog extends ProgressDialog {
         SettingsInputStyle.apply(gitUrlField);
         gitAuthPanel = new GitAuthPanel();
 
-        // 初始化分支字段
+        // Khởi tạo các trường nhánh
         branchField = new JTextField(15);
         branchField.setText(DEFAULT_BRANCH);
         SettingsInputStyle.apply(branchField);
 
-        // 进度相关组件
+        // Các thành phần liên quan đến tiến độ
         progressPanel = new ProgressPanel("Progress");
         progressPanel.setVisible(false);
 
-        // 设置默认字体
+        // Đặt phông chữ mặc định
         Font defaultFont = FontsUtil.getDefaultFont(Font.PLAIN);
         nameField.setFont(defaultFont);
         descriptionArea.setFont(defaultFont);
@@ -125,7 +125,7 @@ public class WorkspaceCreateDialog extends ProgressDialog {
     }
 
     /**
-     * 设置默认的工作区路径
+     * Đặt đường dẫn không gian làm việc mặc định
      */
     private void setDefaultWorkspacePath() {
         String defaultWorkspaceDir = SystemUtil.getEasyPostmanPath() + WORKSPACES;
@@ -133,22 +133,22 @@ public class WorkspaceCreateDialog extends ProgressDialog {
     }
 
     /**
-     * 根据工作区名称生成符合路径规则的目录名
+     * Tạo tên thư mục phù hợp với quy tắc đường dẫn dựa trên tên không gian làm việc
      */
     private String generatePathFromName(String name) {
         if (name == null || name.trim().isEmpty()) {
             return "";
         }
 
-        // 清理名称，生成合法的目录名
+        // Dọn dẹp tên và tạo tên thư mục hợp pháp
         String cleanName = name.trim()
-                .replaceAll("[\\\\/:*?\"<>|]", "_") // 替换非法字符
-                .replaceAll("\\s+", "_") // 空格替换为下划线
-                .replaceAll("_{2,}", "_") // 多个下划线合并为一个
-                .replaceAll("^_|_$", ""); // 去除首尾下划线
+                .replaceAll("[\\\\/:*?\"<>|]", "_") // Thay thế các ký tự không hợp lệ
+                .replaceAll("\\s+", "_") // Dấu cách được thay thế bằng dấu gạch dưới
+                .replaceAll("_{2,}", "_") // Nhiều dấu gạch dưới được kết hợp thành một
+                .replaceAll("^_|_$", ""); // Loại bỏ dấu gạch dưới ở đầu và cuối
 
         if (cleanName.isEmpty()) {
-            cleanName = RandomUtil.randomString(10); // 如果清理后为空，使用随机字符串
+            cleanName = RandomUtil.randomString(10); // Nếu trống sau khi làm sạch, một chuỗi ngẫu nhiên sẽ được sử dụng
         }
 
         return ConfigPathConstants.WORKSPACES_DIR + cleanName;
@@ -158,12 +158,12 @@ public class WorkspaceCreateDialog extends ProgressDialog {
     protected void setupLayout() {
         setLayout(new BorderLayout());
 
-        // 创建主容器面板
+        // Tạo bảng điều khiển vùng chứa chính
         JPanel containerPanel = new JPanel(new BorderLayout());
         ToolWindowSurfaceStyle.applyDialogSurface(containerPanel);
         containerPanel.setBorder(BorderFactory.createEmptyBorder(16, 18, 0, 18));
 
-        // 创建内容面板 - 使用滚动面板以适应不同屏幕大小
+        // Tạo bảng nội dung - Sử dụng bảng cuộn để thích ứng với các kích thước màn hình khác nhau
         JPanel contentPanel = new JPanel(new GridBagLayout());
         ToolWindowSurfaceStyle.applyDialogSurface(contentPanel);
         GridBagConstraints contentGbc = new GridBagConstraints();
@@ -172,13 +172,13 @@ public class WorkspaceCreateDialog extends ProgressDialog {
         contentGbc.fill = GridBagConstraints.HORIZONTAL;
         contentGbc.anchor = GridBagConstraints.NORTHWEST;
 
-        // 基本信息面板
+        // Bảng thông tin cơ bản
         JPanel basicPanel = createBasicInfoPanel();
         contentGbc.gridy = 0;
         contentGbc.weighty = 0;
         contentPanel.add(basicPanel, contentGbc);
 
-        // Git配置面板
+        // GitBảng cấu hình
         gitPanel = createGitPanel();
         gitPanel.setVisible(false);
         contentGbc.gridy = 1;
@@ -191,7 +191,7 @@ public class WorkspaceCreateDialog extends ProgressDialog {
         contentGbc.insets = new Insets(0, 0, 0, 0);
         contentPanel.add(Box.createVerticalGlue(), contentGbc);
 
-        // 为内容面板添加滚动支持
+        // Thêm hỗ trợ cuộn cho bảng nội dung
         JScrollPane scrollPane = new JScrollPane(contentPanel);
         ToolWindowSurfaceStyle.applyDialogScrollPane(scrollPane);
         scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
@@ -199,14 +199,14 @@ public class WorkspaceCreateDialog extends ProgressDialog {
 
         containerPanel.add(scrollPane, BorderLayout.CENTER);
 
-        // 底部面板：进度条 + 按钮
+        // Bảng dưới cùng: thanh tiến trình + nút
         JPanel bottomPanel = new JPanel(new BorderLayout());
         ToolWindowSurfaceStyle.applyDialogSurface(bottomPanel);
 
-        // 进度面板
+        // Bảng tiến độ
         bottomPanel.add(progressPanel, BorderLayout.NORTH);
 
-        // 按钮面板
+        // Bảng nút
         JPanel buttonPanel = createStandardButtonPanel(I18nUtil.getMessage(MessageKeys.WORKSPACE_CREATE));
         bottomPanel.add(buttonPanel, BorderLayout.SOUTH);
 
@@ -214,27 +214,27 @@ public class WorkspaceCreateDialog extends ProgressDialog {
 
         add(containerPanel, BorderLayout.CENTER);
 
-        // 保持一个稳定的最小宽度，高度由当前可见内容决定
+        // Duy trì chiều rộng và chiều cao tối thiểu ổn định được xác định bởi nội dung hiện có
         setPreferredSize(new Dimension(DIALOG_MIN_WIDTH, getPreferredSize().height));
         setMinimumSize(new Dimension(DIALOG_MIN_WIDTH, 0));
     }
 
     @Override
     protected void setupEventHandlers() {
-        // 工作区类型切换
+        // Chuyển đổi loại không gian làm việc
         ActionListener typeChangeListener = e -> handleWorkspaceTypeChanged();
         localTypeRadio.addActionListener(typeChangeListener);
         gitTypeRadio.addActionListener(typeChangeListener);
 
-        // Git模式切换
+        // GitChuyển đổi chế độ
         ActionListener gitModeListener = e -> updateGitUrlFieldState();
         cloneRadio.addActionListener(gitModeListener);
         initRadio.addActionListener(gitModeListener);
 
-        // 路径浏览
+        // Duyệt đường dẫn
         browseButton.addActionListener(this::browseForPath);
 
-        // 名称字段变化监听器 - 自动生成路径
+        // Người nghe thay đổi trường tên - Tự động tạo đường dẫn
         nameField.getDocument().addDocumentListener(new DocumentListener() {
             @Override
             public void insertUpdate(DocumentEvent e) {
@@ -258,7 +258,7 @@ public class WorkspaceCreateDialog extends ProgressDialog {
             }
         });
 
-        // 自动生成路径复选框
+        // Hộp kiểm tự động tạo đường dẫn
         autoGeneratePathCheckBox.addActionListener(e -> {
             boolean autoGen = autoGeneratePathCheckBox.isSelected();
             pathField.setEditable(!autoGen);
@@ -268,17 +268,17 @@ public class WorkspaceCreateDialog extends ProgressDialog {
             }
         });
 
-        // 初始状态
+        // trạng thái ban đầu
         updateGitPanelVisibility();
         updateGitUrlFieldState();
 
-        // 设置初始状态
+        // Đặt trạng thái ban đầu
         pathField.setEditable(false);
         browseButton.setEnabled(false);
     }
 
     /**
-     * 根据名称更新路径
+     * Cập nhật đường dẫn dựa trên tên
      */
     private void updatePathFromName() {
         String name = nameField.getText();
@@ -311,7 +311,7 @@ public class WorkspaceCreateDialog extends ProgressDialog {
         gbc.weightx = 1.0;
         panel.add(titleLabel, gbc);
 
-        // 工作区名称
+        // Tên không gian làm việc
         gbc.gridx = 0;
         gbc.gridy = 1;
         gbc.gridwidth = 1;
@@ -324,7 +324,7 @@ public class WorkspaceCreateDialog extends ProgressDialog {
         gbc.weightx = 1.0;
         panel.add(nameField, gbc);
 
-        // 描述
+        // Mô tả
         gbc.gridx = 0;
         gbc.gridy = 2;
         gbc.gridwidth = 1;
@@ -337,7 +337,7 @@ public class WorkspaceCreateDialog extends ProgressDialog {
         gbc.weightx = 1.0;
         panel.add(descriptionScrollPane, gbc);
 
-        // 工作区类型
+        // Loại không gian làm việc
         gbc.gridx = 0;
         gbc.gridy = 3;
         gbc.gridwidth = 1;
@@ -349,14 +349,14 @@ public class WorkspaceCreateDialog extends ProgressDialog {
         gbc.gridx = 2;
         panel.add(gitTypeRadio, gbc);
 
-        // 自动生成路径选项
+        // Tự động tạo các tùy chọn đường dẫn
         gbc.gridx = 0;
         gbc.gridy = 4;
         gbc.gridwidth = 3;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         panel.add(autoGeneratePathCheckBox, gbc);
 
-        // 本地路径
+        // đường đi cục bộ
         gbc.gridx = 0;
         gbc.gridy = 5;
         gbc.gridwidth = 1;
@@ -390,7 +390,7 @@ public class WorkspaceCreateDialog extends ProgressDialog {
         rootGbc.insets = new Insets(6, 8, 2, 8);
         panel.add(titleLabel, rootGbc);
 
-        // Git模式选择
+        // GitLựa chọn chế độ
         JPanel modePanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
         modePanel.setOpaque(false);
         modePanel.add(cloneRadio);
@@ -400,7 +400,7 @@ public class WorkspaceCreateDialog extends ProgressDialog {
         rootGbc.insets = new Insets(6, 8, 2, 8);
         panel.add(modePanel, rootGbc);
 
-        // Git URL、分支配置
+        // Git URL、Cấu hình chi nhánh
         JPanel gitConfigPanel = new JPanel(new GridBagLayout());
         gitConfigPanel.setOpaque(false);
         GridBagConstraints gbc = new GridBagConstraints();
@@ -416,7 +416,7 @@ public class WorkspaceCreateDialog extends ProgressDialog {
         gbc.weightx = 1.0;
         gitConfigPanel.add(gitUrlField, gbc);
 
-        // 分支配置
+        // Cấu hình chi nhánh
         gbc.gridx = 0;
         gbc.gridy = 1;
         gbc.fill = GridBagConstraints.NONE;
@@ -432,12 +432,12 @@ public class WorkspaceCreateDialog extends ProgressDialog {
         rootGbc.insets = new Insets(0, 8, 2, 8);
         panel.add(gitConfigPanel, rootGbc);
 
-        // Git认证面板
+        // GitBảng xác thực
         rootGbc.gridy = 3;
         rootGbc.insets = new Insets(0, 8, 6, 8);
         panel.add(gitAuthPanel, rootGbc);
 
-        // 占位空行，确保内容始终贴顶显示，而不是拉伸中间表单区域
+        // Đặt các hàng trống để đảm bảo nội dung luôn hiển thị ở trên cùng thay vì kéo giãn vùng giữa biểu mẫu
         rootGbc.gridy = 4;
         rootGbc.weighty = 1.0;
         rootGbc.fill = GridBagConstraints.BOTH;
@@ -464,7 +464,7 @@ public class WorkspaceCreateDialog extends ProgressDialog {
         gitUrlField.setEnabled(enableUrl);
         gitAuthPanel.setComponentsEnabled(enableUrl);
 
-        // 根据模式控制分支字段的标签和状态
+        // Kiểm soát nhãn và trạng thái của các trường nhánh dựa trên chế độ
         if (cloneRadio.isSelected()) {
             branchLabel.setText(I18nUtil.getMessage(MessageKeys.WORKSPACE_DETAIL_REMOTE_BRANCH) + ":");
             branchField.setEnabled(true);
@@ -490,7 +490,7 @@ public class WorkspaceCreateDialog extends ProgressDialog {
             currentPath = ConfigPathConstants.WORKSPACES_DIR;
         }
 
-        // 确保父目录存在
+        // Hãy chắc chắn rằng thư mục mẹ tồn tại
         File parentDir = new File(currentPath).getParentFile();
         if (parentDir != null && parentDir.exists()) {
             chooser.setCurrentDirectory(parentDir);
@@ -502,7 +502,7 @@ public class WorkspaceCreateDialog extends ProgressDialog {
         if (result == SystemFileChooser.APPROVE_OPTION) {
             File selectedDir = chooser.getSelectedFile();
             pathField.setText(selectedDir.getAbsolutePath());
-            // 取消自动生成，因为用户手动选择了路径
+            // Ngăn chặn việc tạo tự động vì người dùng đã chọn đường dẫn theo cách thủ công
             autoGeneratePathCheckBox.setSelected(false);
             pathField.setEditable(true);
             browseButton.setEnabled(true);
@@ -511,20 +511,20 @@ public class WorkspaceCreateDialog extends ProgressDialog {
 
     @Override
     protected void validateInput() throws IllegalArgumentException {
-        // 验证工作区名称
+        // Xác minh tên không gian làm việc
         String name = nameField.getText().trim();
         if (name.isEmpty()) {
             throw new IllegalArgumentException(I18nUtil.getMessage(MessageKeys.WORKSPACE_VALIDATION_NAME_REQUIRED));
         }
 
-        // 验证路径
+        // Xác minh đường dẫn
         String path = pathField.getText().trim();
         if (path.isEmpty()) {
             throw new IllegalArgumentException(I18nUtil.getMessage(MessageKeys.WORKSPACE_VALIDATION_PATH_REQUIRED));
         }
 
-        // Git工作区特殊验证
-        // 克隆模式下必须提供Git URL 和认证信息 和分支信息
+        // GitXác thực đặc biệt của không gian làm việc
+        // Cần thiết trong chế độ nhân bảnGit URL và thông tin chứng nhận và thông tin chi nhánh
         if (gitTypeRadio.isSelected() && cloneRadio.isSelected()) {
             String gitUrl = gitUrlField.getText().trim();
             if (gitUrl.isEmpty()) {
@@ -535,10 +535,10 @@ public class WorkspaceCreateDialog extends ProgressDialog {
                 throw new IllegalArgumentException(I18nUtil.getMessage(MessageKeys.WORKSPACE_VALIDATION_GIT_BRANCH_INVALID));
             }
 
-            // 验证认证信息
+            // Xác minh thông tin xác thực
             gitAuthPanel.validateAuth();
         }
-        // 初始化模式下只需要验证分支信息
+        // Trong chế độ khởi tạo, chỉ cần xác minh thông tin nhánh
         if (gitTypeRadio.isSelected() && initRadio.isSelected()) {
             String branch = branchField.getText().trim();
             if (branch.isEmpty()) {
@@ -546,7 +546,7 @@ public class WorkspaceCreateDialog extends ProgressDialog {
             }
         }
 
-        // 构建workspace对象供后续使用
+        // Xây dựngworkspaceĐối tượng để sử dụng tiếp theo
         workspace = buildWorkspace();
     }
 
@@ -558,12 +558,12 @@ public class WorkspaceCreateDialog extends ProgressDialog {
                 publish(I18nUtil.getMessage(MessageKeys.WORKSPACE_CREATE_DIALOG_CREATING));
                 setProgress(10);
                 try {
-                    // 使用 WorkspaceService 创建工作区，它会处理所有的 Git 操作
+                    // sử dụng WorkspaceService Tạo một không gian làm việc và nó sẽ đảm nhiệm tất cả Git hoạt động
                     WorkspaceService.getInstance().createWorkspace(workspace);
                     publish(I18nUtil.getMessage(MessageKeys.WORKSPACE_CREATE_DIALOG_CREATION_COMPLETED));
                     setProgress(100);
                 } catch (Exception e) {
-                    // 重新抛出异常，让 SwingWorker 的错误处理机制处理
+                    // Hãy thử lại ngoại lệ và để cho SwingWorker cơ chế xử lý lỗi
                     log.error(I18nUtil.getMessage(MessageKeys.WORKSPACE_CREATE_DIALOG_CREATION_FAILED), e);
                     throw new WorkspaceCreateException(I18nUtil.getMessage(MessageKeys.WORKSPACE_CREATE_DIALOG_CREATION_FAILED_WITH_MESSAGE, e.getMessage()), e);
                 }
@@ -594,7 +594,7 @@ public class WorkspaceCreateDialog extends ProgressDialog {
         gitTypeRadio.setEnabled(enabled);
         autoGeneratePathCheckBox.setEnabled(enabled);
 
-        // 路径相关控件的启用状态取决于是否自动生成
+        // Trạng thái kích hoạt của các điều khiển liên quan đến đường dẫn phụ thuộc vào việc chúng có được tạo tự động hay không
         if (enabled) {
             boolean autoGen = autoGeneratePathCheckBox.isSelected();
             pathField.setEditable(!autoGen);
@@ -624,7 +624,7 @@ public class WorkspaceCreateDialog extends ProgressDialog {
         } else {
             ws.setType(WorkspaceType.GIT);
 
-            // 设置本地分支信息
+            // Đặt thông tin chi nhánh địa phương
             String localBranch = branchField.getText().trim();
             if (!localBranch.isEmpty()) {
                 ws.setCurrentBranch(localBranch);

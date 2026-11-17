@@ -30,7 +30,7 @@ import java.util.Optional;
 import static com.formdev.flatlaf.FlatClientProperties.*;
 
 /**
- * 请求编辑面板，支持多标签页，每个标签页为独立的请求编辑子面板
+ * Bảng chỉnh sửa yêu cầu hỗ trợ nhiều trang tab và mỗi trang tab là một bảng phụ chỉnh sửa yêu cầu độc lập
  */
 public class RequestEditorPanel extends UiSingletonPanel {
     private static final String REQUEST_STRING = I18nUtil.getMessage(MessageKeys.NEW_REQUEST);
@@ -40,15 +40,15 @@ public class RequestEditorPanel extends UiSingletonPanel {
     static final Insets REQUEST_TAB_AREA_INSETS = new Insets(0, 0, 0, 5);
     static final String PLUS_TAB = "+";
     @Getter
-    private JTabbedPane tabbedPane; // 使用 JTabbedPane 管理多个请求编辑子面板
+    private JTabbedPane tabbedPane; // sử dụng JTabbedPane Quản lý nhiều bảng con chỉnh sửa yêu cầu
 
     @Getter
-    private TabbedPaneDragHandler dragHandler; // Tab 拖拽排序支持
+    private TabbedPaneDragHandler dragHandler; // Tab Hỗ trợ sắp xếp kéo và thả
 
-    // 普通交互下，新增/选中 tab 后会在下一轮 EDT 初始化当前编辑器。
+    // Đã thêm dưới sự tương tác bình thường/Đã chọn tab sẽ vào vòng tiếp theo EDT Khởi tạo trình soạn thảo hiện tại.
     @Setter
     private boolean autoInitializeSelectedTabOnTabAdd = true;
-    // 启动恢复多个请求时，仅最后一个 tab 自动成为选中 tab。
+    // Khi bắt đầu khôi phục nhiều yêu cầu, chỉ yêu cầu cuối cùng tab Tự động được chọn tab。
     @Getter
     @Setter
     private boolean startupRestoreSelectingLastTab;
@@ -66,55 +66,55 @@ public class RequestEditorPanel extends UiSingletonPanel {
     private final CollectionTreeEditorGateway collectionTreeGateway = new CollectionTreeEditorGateway();
 
 
-    // 新建Tab，可指定标题
+    // MớiTab，Một tiêu đề có thể được chỉ định
     public RequestEditSubPanel addNewTab(String title, RequestItemProtocolEnum protocol) {
         cancelStartupRestoreAutoSelectionIfNeeded();
         return tabLifecycleController.addNewRequestTab(title, protocol);
     }
 
-    // 新建Tab，可指定标题
+    // MớiTab，Một tiêu đề có thể được chỉ định
     public void addNewTab(String title) {
         addNewTab(title, RequestItemProtocolEnum.HTTP);
     }
 
-    // 添加"+"Tab
+    // Thêm vào"+"Tab
     public void addPlusTab() {
         tabLifecycleController.addPlusTab();
     }
 
-    // 判断是否为“+”Tab
+    // Xác định xem có phải như vậy không“+”Tab
     private boolean isPlusTab(int idx) {
         return tabLifecycleController.isPlusTab(idx);
     }
 
     /**
-     * 单击树节点时显示或复用临时 Tab。
+     * Hiển thị hoặc sử dụng lại tạm thời khi nhấp vào nút cây Tab。
      */
     public void showOrCreateTransientTab(HttpRequestItem item) {
         tabOpenController.showOrCreateTransientRequest(item);
     }
 
     /**
-     * 将当前临时 Tab 固定为普通 Tab。
+     * Hiện tại sẽ là tạm thời Tab Đã sửa thành bình thường Tab。
      */
     public void pinTransientTab() {
         transientTabManager.pin();
     }
 
     /**
-     * 单击 Group 时显示或复用临时 Tab。
+     * Bấm vào Group Hiển thị hoặc tái sử dụng tạm thời Tab。
      */
     public void showOrCreateTransientTabForGroup(DefaultMutableTreeNode groupNode, RequestGroup group) {
         tabOpenController.showOrCreateTransientGroup(groupNode, group);
     }
 
-    // showOrCreateTab 需适配 "+" Tab（双击时调用，创建固定 tab）
+    // showOrCreateTab Yêu cầu thích ứng "+" Tab（Được gọi khi nhấp đúp để tạo mã pin tab）
     public void showOrCreateTab(HttpRequestItem item) {
         tabOpenController.showOrCreateRequestTab(item);
     }
 
     /**
-     * 重新加载快捷键（快捷键设置修改后调用）
+     * Tải lại các phím tắt (được gọi sau khi sửa đổi cài đặt phím tắt)
      */
     public void reloadShortcuts() {
         shortcutInstaller.install();
@@ -126,7 +126,7 @@ public class RequestEditorPanel extends UiSingletonPanel {
     }
 
     /**
-     * 保存当前请求
+     * Lưu yêu cầu hiện tại
      */
     public boolean saveCurrentRequest() {
         return saveController.saveCurrentRequest();
@@ -139,7 +139,7 @@ public class RequestEditorPanel extends UiSingletonPanel {
         return CollectionGroupSelectionDialog.chooseGroupAndRequestName(groupTreeModel, defaultName);
     }
 
-    // 用于动态更新tab红点
+    // để cập nhật độngtabchấm đỏ
     public void updateTabDirty(RequestEditSubPanel panel, boolean dirty) {
         tabStateController.updateRequestDirty(panel, dirty);
     }
@@ -149,7 +149,7 @@ public class RequestEditorPanel extends UiSingletonPanel {
     }
 
     /**
-     * 更新 GroupEditPanel 的 Tab 标题
+     * đổi mới GroupEditPanel của Tab tiêu đề
      */
     void updateGroupTabTitle(GroupEditPanel panel, String newTitle) {
         tabStateController.updateGroupTitle(panel, newTitle);
@@ -269,7 +269,7 @@ public class RequestEditorPanel extends UiSingletonPanel {
     }
 
     /**
-     * 在下一轮 EDT 初始化当前选中的请求编辑器，保持切换直接且不额外引入定时器。
+     * ở vòng tiếp theo EDT Khởi tạo trình chỉnh sửa yêu cầu hiện được chọn, tiếp tục chuyển đổi trực tiếp và không giới thiệu thêm bộ tính giờ.
      */
     void initializeSelectedTabSoon() {
         tabInitializationScheduler.initializeSelectedTabSoon();
@@ -321,43 +321,43 @@ public class RequestEditorPanel extends UiSingletonPanel {
     }
 
     /**
-     * 显示分组编辑面板（参考 Postman，不使用弹窗）
-     * 双击时调用，创建固定 tab
+     * Hiển thị bảng chỉnh sửa nhóm (reference Postman，Không sử dụng cửa sổ bật lên)
+     * Được gọi khi nhấp đúp để tạo mã pin tab
      */
     public void showGroupEditPanel(DefaultMutableTreeNode groupNode, RequestGroup group) {
         tabOpenController.showOrCreateGroupTab(groupNode, group);
     }
 
     /**
-     * 关闭当前标签页
+     * Đóng tab hiện tại
      */
     public void closeCurrentTab() {
         tabCloseController.closeCurrentTab();
     }
 
     /**
-     * 关闭其他标签页
+     * Đóng các tab khác
      */
     public void closeOtherTabs() {
         tabCloseController.closeOtherTabs();
     }
 
     /**
-     * 关闭所有标签页
+     * Đóng tất cả các tab
      */
     public void closeAllTabs() {
         tabCloseController.closeAllTabs();
     }
 
     /**
-     * 单击保存的响应：在临时 Tab 中显示
+     * Nhấp vào Phản hồi đã lưu: Tạm thời Tab hiển thị trong
      */
     public void showOrCreateTransientTabForSavedResponse(SavedResponse savedResponse) {
         tabOpenController.showOrCreateTransientSavedResponse(savedResponse);
     }
 
     /**
-     * 双击保存的响应：在固定 Tab 中显示
+     * Bấm đúp vào câu trả lời đã lưu: trong Đã ghim Tab hiển thị trong
      */
     public void showOrCreateTabForSavedResponse(SavedResponse savedResponse) {
         tabOpenController.showOrCreateSavedResponseTab(savedResponse);
@@ -370,9 +370,9 @@ public class RequestEditorPanel extends UiSingletonPanel {
     }
 
     /**
-     * 更新所有打开标签页的布局方向
+     * Cập nhật hướng bố cục của tất cả các tab đang mở
      *
-     * @param isVertical true=垂直布局，false=水平布局
+     * @param isVertical true=bố cục dọc,false=Bố cục ngang
      */
     public void updateAllTabsLayout(boolean isVertical) {
         tabStateController.updateAllRequestLayouts(isVertical);

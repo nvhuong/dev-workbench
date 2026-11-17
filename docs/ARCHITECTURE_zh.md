@@ -1,288 +1,288 @@
-# 🏗️ 系统架构
+# 🏗️ Kiến trúc hệ thống
 
-## 架构概览
+## Tổng quan về kiến ​​trúc
 
 ```
 EasyPostman
-├── 🎨 用户界面层 (UI Layer)
-│   ├── Workspace 工作区管理
-│   ├── Collections 接口集合管理
-│   ├── Environments 环境变量配置
-│   ├── History 请求历史记录
-│   ├── Performance 性能测试模块
-│   └── NetworkLog 网络请求监控
-├── 🔧 业务逻辑层 (Business Layer)
-│   ├── HTTP 请求处理引擎
-│   ├── 工作区切换与隔离引擎
-│   ├── Git 版本控制引擎
-│   ├── 环境变量解析器
-│   ├── 脚本执行引擎
-│   ├── 数据导入导出模块
-│   └── 性能测试执行器
-├── 💾 数据访问层 (Data Layer)
-│   ├── 工作区存储管理
-│   ├── 本地文件存储
-│   ├── Git 仓库管理
-│   ├── 配置管理
-│   └── 历史记录管理
-└── 🌐 网络通信层 (Network Layer)
-    ├── HTTP/HTTPS 客户端
-    ├── WebSocket 客户端
-    ├── SSE 客户端
-    └── Git 远程仓库通信
+├── 🎨 Lớp giao diện người dùng (UI Layer)
+│   ├── Workspace Quản lý không gian làm việc
+│   ├── Collections Quản lý bộ sưu tập giao diện
+│   ├── Environments Cấu hình biến môi trường
+│   ├── History Yêu cầu lịch sử
+│   ├── Performance Mô-đun kiểm tra hiệu suất
+│   └── NetworkLog Giám sát yêu cầu mạng
+├── 🔧 Lớp logic nghiệp vụ (Business Layer)
+│   ├── HTTP Yêu cầu công cụ xử lý
+│   ├── Công cụ chuyển mạch và cách ly không gian làm việc
+│   ├── Git Công cụ kiểm soát phiên bản
+│   ├── Trình phân tích cú pháp biến môi trường
+│   ├── Công cụ thực thi tập lệnh
+│   ├── Mô-đun nhập và xuất dữ liệu
+│   └── Người thực hiện kiểm tra hiệu suất
+├── 💾 Lớp truy cập dữ liệu (Data Layer)
+│   ├── Quản lý lưu trữ không gian làm việc
+│   ├── Lưu trữ tập tin cục bộ
+│   ├── Git Quản lý kho hàng
+│   ├── Quản lý cấu hình
+│   └── Quản lý lịch sử
+└── 🌐 Lớp truyền thông mạng (Network Layer)
+    ├── HTTP/HTTPS khách hàng
+    ├── WebSocket khách hàng
+    ├── SSE khách hàng
+    └── Git Giao tiếp kho từ xa
 ```
 
 ---
 
-## 🛠️ 技术选型说明
+## 🛠️ Hướng dẫn lựa chọn kỹ thuật
 
-### 核心技术栈
+### Ngăn xếp công nghệ cốt lõi
 
-- **Java 21**: 使用 Java 21 LTS，享受现代 Java 特性
+- **Java 21**: sử dụng Java 21 LTS，Tận hưởng sự hiện đại Java Đặc điểm
   - Records、Sealed Classes、Pattern Matching
-  - 增强的 NullPointerException 消息
-  - Text Blocks 更好的字符串处理
-  
-- **JavaSwing**: 原生桌面 GUI 框架
-  - 跨平台兼容性（Windows、macOS、Linux）
-  - 原生外观和感觉
-  - 无浏览器开销
-  
-- **jlink & jpackage**: 官方打包工具
-  - 创建自定义运行时镜像
-  - 生成原生安装包（DMG、EXE、DEB）
-  - 减少分发大小
+  - Tăng cường NullPointerException tin nhắn
+  - Text Blocks Xử lý chuỗi tốt hơn
 
-### UI 组件库
+- **JavaSwing**: Máy tính để bàn gốc GUI khung
+  - Khả năng tương thích đa nền tảng (Windows、macOS、Linux）
+  - Cái nhìn và cảm nhận bản địa
+  - Không có chi phí trình duyệt
 
-- **[FlatLaf](https://github.com/JFormDesigner/FlatLaf)**: 现代化 UI 主题
-  - 支持暗色和亮色模式
-  - 支持 HiDPI/Retina 显示
-  - 原生 macOS 样式
-  - 可自定义配色方案
-  
-- **[RSyntaxTextArea](https://github.com/bobbylight/RSyntaxTextArea)**: 语法高亮文本编辑器
-  - 支持 JSON、XML、JavaScript、HTML 等
-  - 代码折叠
-  - 自动完成
-  - 搜索和替换
-  
-- **SwingX**: 扩展 Swing 组件库
-  - 增强的表格和树
-  - 日期选择器
-  - 搜索面板
-  
-- **MigLayout**: 强大的布局管理器
-  - 灵活直观
-  - 支持响应式设计
-  - 跨平台一致性
+- **jlink & jpackage**: Công cụ đóng gói chính thức
+  - Tạo một hình ảnh thời gian chạy tùy chỉnh
+  - Tạo gói cài đặt gốc (DMG、EXE、DEB）
+  - Giảm kích thước phân phối
 
-### 网络与通信
+### UI Thư viện thành phần
 
-- **[OkHttp](https://github.com/square/okhttp)**: 高性能 HTTP 客户端
-  - HTTP/2 支持
-  - 连接池
-  - 透明 GZIP 压缩
-  - 响应缓存
-  - 拦截器支持
-  
-- **WebSocket 支持**: 实时通信
-  - 全双工通信
-  - 消息分帧
-  - Ping/Pong 心跳
-  
-- **SSE (Server-Sent Events)**: 服务器推送支持
-  - 事件流解析
-  - 自动重连
-  - 事件 ID 跟踪
+- **[FlatLaf](https://github.com/JFormDesigner/FlatLaf)**: hiện đại hóa UI chủ đề
+  - Hỗ trợ chế độ tối và sáng
+  - Hỗ trợ HiDPI/Retina trình diễn
+  - bản địa macOS phong cách
+  - Phối màu tùy chỉnh
 
-### 脚本引擎
+- **[RSyntaxTextArea](https://github.com/bobbylight/RSyntaxTextArea)**: Syntax highlighting text editor
+  - Hỗ trợ JSON、XML、JavaScript、HTML Đợi đã
+  - Gấp mã
+  - Hoàn thành tự động
+  - Tìm kiếm và thay thế
 
-- **GraalVM JavaScript**：用于前置/后置脚本的嵌入式脚本运行时
-  - ECMAScript 5.1 支持
-  - Java 互操作性
-  
-- **GraalVM JavaScript** (Java 21+): 现代 JavaScript 引擎
-  - ECMAScript 2021+ 支持
-  - 更好的性能
-  - 多语言支持
+- **SwingX**: Sự mở rộng Swing Thư viện thành phần
+  - Bảng và cây nâng cao
+  - Bộ chọn ngày
+  - Bảng tìm kiếm
 
-### 数据与存储
+- **MigLayout**: Trình quản lý bố cục mạnh mẽ
+  - Linh hoạt và trực quan
+  - Hỗ trợ thiết kế đáp ứng
+  - Tính nhất quán đa nền tảng
 
-- **JSON 处理**:
-  - Gson: JSON 序列化/反序列化
-  - Jackson: 备选 JSON 处理器
-  
-- **XML 处理**:
-  - 内置 Java XML API
-  - XPath 支持
-  
-- **文件存储**:
-  - 接口集合的本地 JSON 文件
-  - 环境变量文件
-  - Git 仓库集成
+### Mạng và Truyền thông
 
-### 版本控制
+- **[OkHttp](https://github.com/square/okhttp)**: Hiệu suất cao HTTP khách hàng
+  - HTTP/2 Hỗ trợ
+  - Bể kết nối
+  - Minh bạch GZIP Nén
+  - Bộ nhớ đệm phản hồi
+  - Hỗ trợ đánh chặn
 
-- **JGit**: 纯 Java Git 实现
-  - Clone、commit、push、pull 操作
-  - 分支管理
-  - 冲突检测
-  - SSH 和 HTTPS 认证
+- **WebSocket Hỗ trợ**: Giao tiếp thời gian thực
+  - Giao tiếp song công hoàn toàn
+  - Đóng khung tin nhắn
+  - Ping/Pong Nhịp tim
 
-### 日志记录
+- **SSE (Server-Sent Events)**: Hỗ trợ đẩy máy chủ
+  - Phân tích luồng sự kiện
+  - Tự động kết nối lại
+  - sự kiện ID theo dõi
 
-- **SLF4J + Logback**: 日志框架
-  - 灵活配置
-  - 多种输出方式（控制台、文件、滚动）
-  - 性能优化
-  - 异步日志支持
+### Công cụ kịch bản
+
+- **GraalVM JavaScript**：Được sử dụng ở phía trước/Thời gian chạy tập lệnh nhúng cho tập lệnh phía sau
+  - ECMAScript 5.1 Hỗ trợ
+  - Java khả năng tương tác
+
+- **GraalVM JavaScript** (Java 21+): Hiện đại JavaScript động cơ
+  - ECMAScript 2021+ Hỗ trợ
+  - Hiệu suất tốt hơn
+  - Hỗ trợ đa ngôn ngữ
+
+### Dữ liệu và lưu trữ
+
+- **JSON xử lý**:
+  - Gson: JSON tuần tự hóa/Giải tuần tự hóa
+  - Jackson: Thay thế JSON bộ xử lý
+
+- **XML xử lý**:
+  - Tích hợp sẵn Java XML API
+  - XPath Hỗ trợ
+
+- **Lưu trữ tập tin**:
+  - Địa phương cho bộ sưu tập giao diện JSON tập tin
+  - Tệp biến môi trường
+  - Git Tích hợp kho hàng
+
+### Kiểm soát phiên bản
+
+- **JGit**: Tinh khiết Java Git hoàn thành
+  - Clone、commit、push、pull hoạt động
+  - Quản lý chi nhánh
+  - Phát hiện xung đột
+  - SSH và HTTPS Chứng nhận
+
+### Ghi nhật ký
+
+- **SLF4J + Logback**: Khung ghi nhật ký
+  - Cấu hình linh hoạt
+  - Nhiều phương thức đầu ra (bảng điều khiển, tệp, cuộn)
+  - Tối ưu hóa hiệu suất
+  - Hỗ trợ ghi nhật ký không đồng bộ
 
 ---
 
-## 📦 构建与打包
+## 📦 Xây dựng và đóng gói
 
-### 构建工具
+### Xây dựng công cụ
 
-- **Maven**: 项目管理和构建自动化
-  - 依赖管理
-  - 插件生态系统
-  - 多模块支持
+- **Maven**: Quản lý dự án và tự động hóa tòa nhà
+  - Quản lý sự phụ thuộc
+  - Hệ sinh thái plugin
+  - Hỗ trợ đa mô-đun
 
-### 打包策略
+### Chiến lược đóng gói
 
-1. **跨平台 JAR**:
+1. **Đa nền tảng JAR**:
    ```
    mvn clean package
    ```
-   - 生成 `easy-postman-{版本号}.jar`
-   - 需要 Java 21+ 运行时
-   - 最小的分发大小
+   - phát ra `easy-postman-{Số phiên bản}.jar`
+   - Cần thiết Java 21+ thời gian chạy
+   - Kích thước phân phối tối thiểu
 
-2. **原生安装包**:
-   - **macOS DMG**: 使用 `jpackage` 自定义图标和背景
-   - **Windows EXE**: Inno Setup 安装程序带快捷方式
-   - **Windows 便携版 ZIP**: 解压即用，无需安装
-   - **Linux DEB**: Debian 软件包带桌面集成
+2. **Gói cài đặt gốc**:
+   - **macOS DMG**: sử dụng `jpackage` Tùy chỉnh biểu tượng và hình nền
+   - **Windows EXE**: Inno Setup Trình cài đặt đi kèm với các phím tắt
+   - **Windows Phiên bản di động ZIP**: Sẵn sàng giải nén, không cần cài đặt
+   - **Linux DEB**: Debian Gói phần mềm đi kèm với tích hợp máy tính để bàn
 
-3. **自定义运行时**:
-   - 使用 `jlink` 创建最小化 JRE
-   - 仅包含所需模块
-   - 减少约 50% 的分发大小
+3. **Thời gian chạy tùy chỉnh**:
+   - sử dụng `jlink` Tạo sự tối thiểu hóa JRE
+   - Chỉ có các mô-đun cần thiết được bao gồm
+   - Giảm khoảng 50% kích thước phân phối
 
-### 推荐的开发 JDK
+### Khuyến nghị phát triển JDK
 
-> 💡 **推荐使用 JetBrains Runtime (JBR)** 获得最佳 Swing 性能：
-> 
-> - 所有平台上更好的字体渲染
-> - 改进的 HiDPI 支持
-> - Swing 特定的 bug 修复
-> - 为桌面应用优化的垃圾回收
-> 
-> **下载地址**: [JetBrains Runtime Releases](https://github.com/JetBrains/JetBrainsRuntime/releases)
+> 💡 **Khuyến khích JetBrains Runtime (JBR)** Nhận được điều tốt nhất Swing hiệu suất:
+>
+> - Hiển thị phông chữ tốt hơn trên tất cả các nền tảng
+> - Được cải thiện HiDPI Hỗ trợ
+> - Swing cụ thể bug Sửa chữa
+> - Bộ sưu tập rác được tối ưu hóa cho các ứng dụng máy tính để bàn
+>
+> **Địa chỉ tải về**: [JetBrains Runtime Releases](https://github.com/JetBrains/JetBrainsRuntime/releases)
 
 ---
 
-## 🔧 开发工作流
+## 🔧 Quy trình phát triển
 
-### 项目结构
+### Cấu trúc dự án
 
 ```
 easy-postman/
-├── src/main/java/          # Java 源代码
+├── src/main/java/          # Java mã nguồn
 │   └── com/laker/postman/
-│       ├── ui/             # UI 组件
-│       ├── service/        # 业务逻辑
-│       ├── model/          # 数据模型
-│       ├── network/        # 网络层
-│       └── utils/          # 工具类
-├── src/main/resources/     # 资源文件
-│   ├── icons/              # 应用图标
-│   ├── themes/             # FlatLaf 主题
-│   ├── js-libs/            # JavaScript 库
-│   └── messages*.properties # 国际化文件
-├── build/                  # 构建脚本
-│   ├── mac.sh             # macOS 打包
-│   ├── win-exe.bat        # Windows 安装程序
-│   └── linux-deb.sh       # Linux DEB 打包
-└── docs/                   # 文档
+│       ├── ui/             # UI thành phần
+│       ├── service/        # logic kinh doanh
+│       ├── model/          # Mô hình dữ liệu
+│       ├── network/        # lớp mạng
+│       └── utils/          # Công cụ
+├── src/main/resources/     # Các tập tin tài nguyên
+│   ├── icons/              # Biểu tượng ứng dụng
+│   ├── themes/             # FlatLaf chủ đề
+│   ├── js-libs/            # JavaScript thư viện
+│   └── messages*.properties # Các tập tin quốc tế hóa
+├── build/                  # Xây dựng kịch bản
+│   ├── mac.sh             # macOS Đóng gói
+│   ├── win-exe.bat        # Windows Trình cài đặt
+│   └── linux-deb.sh       # Linux DEB Đóng gói
+└── docs/                   # Tài liệu
 ```
 
-### 测试
+### Bài kiểm tra
 
-- **单元测试**: JUnit 5
-- **集成测试**: TestNG
-- **UI 测试**: 不同主题和分辨率的手动测试
-
----
-
-## 🚀 性能优化
-
-### UI 渲染
-- 大型集合的延迟加载
-- 历史记录的虚拟滚动
-- 防抖搜索和过滤
-- 复杂组件的离屏渲染
-
-### 网络
-- 使用 OkHttp 的连接池
-- 请求取消支持
-- 流式响应处理
-- Gzip 压缩
-
-### 内存管理
-- 缓存使用弱引用
-- 限制历史记录保留
-- 响应大小限制
-- 垃圾回收调优
-
-### 启动时间
-- 组件的延迟初始化
-- 并行资源加载
-- 优化的依赖图
-- GraalVM AOT 编译（未来）
+- **Kiểm tra đơn vị**: JUnit 5
+- **Kiểm tra tích hợp**: TestNG
+- **UI Bài kiểm tra**: Kiểm tra thủ công trên các chủ đề và độ phân giải khác nhau
 
 ---
 
-## 🔒 安全考虑
+## 🚀 Tối ưu hóa hiệu suất
 
-- **本地存储**: 所有数据本地存储，无云同步
-- **无遥测**: 无跟踪或分析
-- **证书验证**: 正确的 SSL/TLS 验证
-- **凭证存储**: Git 凭证的安全存储
-- **脚本沙箱**: JavaScript 在沙箱环境中执行
-- **输入验证**: 防止注入攻击
+### UI kết xuất
+- Tải các bộ sưu tập lớn một cách lười biếng
+- Cuộn ảo của lịch sử
+- Tìm kiếm và lọc chống rung
+- Hiển thị ngoài màn hình của các thành phần phức tạp
+
+### mạng
+- sử dụng OkHttp hồ kết nối
+- Yêu cầu loại bỏ hỗ trợ
+- Xử lý phản hồi trực tuyến
+- Gzip Nén
+
+### Quản lý bộ nhớ
+- Bộ nhớ đệm sử dụng các tham chiếu yếu
+- Hạn chế lưu giữ lịch sử
+- Giới hạn kích thước phản hồi
+- Điều chỉnh thu gom rác
+
+### Thời gian bắt đầu
+- Khởi tạo lười biếng các thành phần
+- Tải tài nguyên song song
+- Biểu đồ phụ thuộc được tối ưu hóa
+- GraalVM AOT Biên dịch (tương lai)
 
 ---
 
-## 🌐 跨平台兼容性
+## 🔒 Cân nhắc về an toàn
+
+- **lưu trữ cục bộ**: Tất cả dữ liệu được lưu trữ cục bộ, không đồng bộ hóa trên đám mây
+- **Không có đo từ xa**: Không theo dõi hoặc phân tích
+- **Certificate verification**: Đúng SSL/TLS Xác minh
+- **Lưu trữ thông tin xác thực**: Git Lưu trữ an toàn thông tin xác thực
+- **Hộp cát tập lệnh**: JavaScript Thực hiện trong môi trường hộp cát
+- **Nhập xác nhận**: Ngăn chặn các cuộc tấn công tiêm
+
+---
+
+## 🌐 Khả năng tương thích đa nền tảng
 
 ### Windows
-- 原生外观和感觉
-- 文件关联
-- 注册表集成
-- 自动更新支持
+- Cái nhìn và cảm nhận bản địa
+- Liên kết tập tin
+- Tích hợp đăng ký
+- Hỗ trợ cập nhật tự động
 
 ### macOS
-- 原生菜单栏集成
-- Touch Bar 支持（未来）
-- 沙箱兼容
-- 公证以确保安全
+- Tích hợp thanh menu gốc
+- Touch Bar Hỗ trợ (tương lai)
+- Tương thích với hộp cát
+- Được công chứng để bảo mật
 
 ### Linux
-- 桌面文件集成
-- 系统托盘支持
-- 多种桌面环境（GNOME、KDE、XFCE）
-- AppImage 支持（未来）
+- Tích hợp tập tin máy tính để bàn
+- Hỗ trợ khay hệ thống
+- Nhiều môi trường máy tính để bàn (GNOME、KDE、XFCE）
+- AppImage Hỗ trợ (tương lai)
 
 ---
 
-## 📈 未来增强
+## 📈 Những cải tiến trong tương lai
 
-- 🚧 插件系统以实现可扩展性
-- 🚧 GraphQL 支持
-- 🚧 gRPC 协议支持
-- ✅ 自托管 Mock Server（集合 Example、动态脚本、局域网/CLI、访问密钥、会话状态、调用日志）
-- 🚧 API 文档生成
-- 🚧 云工作区同步（可选）
-- 🚧 移动端配套应用
+- 🚧 Hệ thống plug-in cho khả năng mở rộng
+- 🚧 GraphQL Hỗ trợ
+- 🚧 gRPC Hỗ trợ giao thức
+- ✅ Tự lưu trữ Mock Server（tập trung Example、Kịch bản động, LAN/CLI、khóa truy cập, trạng thái phiên, nhật ký cuộc gọi)
+- 🚧 API Tạo tài liệu
+- 🚧 Đồng bộ hóa không gian làm việc trên đám mây (tùy chọn)
+- 🚧 Ứng dụng đồng hành trên thiết bị di động

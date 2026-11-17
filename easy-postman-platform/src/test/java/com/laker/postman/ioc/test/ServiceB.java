@@ -7,12 +7,12 @@ import lombok.Setter;
 import lombok.ToString;
 
 /**
- * 测试循环依赖 - ServiceB
+ * Kiểm tra sự phụ thuộc vòng tròn - ServiceB
  */
 @Component
 @Getter
 @Setter
-@ToString(exclude = "serviceA") // 排除循环引用字段，避免 toString 栈溢出
+@ToString(exclude = "serviceA") // Loại trừ các trường tham chiếu vòng tròn để tránh toString Tràn ngăn xếp
 public class ServiceB {
 
     @Autowired

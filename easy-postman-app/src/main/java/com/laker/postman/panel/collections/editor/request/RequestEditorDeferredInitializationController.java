@@ -13,9 +13,9 @@ import java.awt.event.MouseEvent;
 import java.util.function.BooleanSupplier;
 
 /**
- * 请求编辑器延迟初始化控制器。
+ * Yêu cầu trình soạn thảo khởi tạo bộ điều khiển một cách lười biếng.
  * <p>
- * 启动恢复大量 Tab 时先显示轻量占位页，用户激活后再创建真实编辑器，避免主面板承担监听和过渡细节。
+ * Khởi động phục hồi rất nhiều Tab Trang giữ chỗ nhẹ được hiển thị đầu tiên và trình chỉnh sửa thực được tạo sau khi người dùng kích hoạt nó để tránh bảng điều khiển chính chịu trách nhiệm theo dõi và chuyển đổi chi tiết.
  */
 @RequiredArgsConstructor
 final class RequestEditorDeferredInitializationController {

@@ -8,17 +8,17 @@ import com.laker.postman.model.Environment;
 import java.util.*;
 
 /**
- * Postman环境变量解析器
- * 负责解析和导出Postman环境变量（v2.1格式）
+ * PostmanTrình phân tích cú pháp biến môi trường
+ * Chịu trách nhiệm phân tích và xuất khẩuPostmanCác biến môi trường (v2.1định dạng)
  */
 public class PostmanEnvironmentParser {
 
     /**
-     * 解析Postman环境变量JSON，转换为Environment列表
+     * phân tíchPostmancác biến môi trườngJSON，Chuyển đổi sang Environmentdanh sách
      */
     public static List<Environment> parsePostmanEnvironments(String json) {
         List<Environment> result = new ArrayList<>();
-        // 支持单个对象或数组
+        // Hỗ trợ một đối tượng hoặc mảng
         if (JSONUtil.isTypeJSONArray(json)) {
             JSONArray arr = JSONUtil.parseArray(json);
             for (Object obj : arr) {
@@ -32,10 +32,10 @@ public class PostmanEnvironmentParser {
     }
 
     /**
-     * 解析单个环境变量对象
+     * Giải quyết một đối tượng biến môi trường duy nhất
      */
     private static void parseSingleEnvObj(JSONObject envObj, List<Environment> result) {
-        String name = envObj.getStr("name", "未命名环境");
+        String name = envObj.getStr("name", "Môi trường không tên");
         Environment env = new Environment(name);
         env.setId(UUID.randomUUID().toString());
         JSONArray values = envObj.getJSONArray("values");
@@ -54,7 +54,7 @@ public class PostmanEnvironmentParser {
     }
 
     /**
-     * 导出单个环境为Postman环境变量JSON字符串
+     * Xuất một môi trường duy nhất dưới dạng Postmancác biến môi trườngJSONchuỗi
      */
     public static String toPostmanEnvironmentJson(Environment env) {
         JSONObject obj = new JSONObject();
@@ -73,7 +73,7 @@ public class PostmanEnvironmentParser {
         obj.put("values", values);
         obj.put("_postman_variable_scope", "environment");
         obj.put("_postman_exported_at", java.time.ZonedDateTime.now().toString());
-        obj.put("_postman_exported_using", "EasyPostman");
+        obj.put("_postman_exported_using", "Dev Workbench");
         return obj.toStringPretty();
     }
 }

@@ -10,9 +10,9 @@ import java.awt.event.ActionEvent;
 import java.util.function.Supplier;
 
 /**
- * 请求编辑器快捷键安装器。
+ * Yêu cầu trình cài đặt lối tắt soạn thảo.
  * <p>
- * 快捷键属于 Swing 控制逻辑，统一放在面板外部，避免 RequestEditorPanel 同时承担布局和动作绑定职责。
+ * Phím tắt thuộc về Swing Logic điều khiển được đặt bên ngoài bảng điều khiển để tránh điều đó RequestEditorPanel Cũng chịu trách nhiệm về bố cục và ràng buộc hành động.
  */
 @RequiredArgsConstructor
 final class RequestEditorShortcutInstaller {
@@ -87,7 +87,7 @@ final class RequestEditorShortcutInstaller {
         if (button == null || !button.isEnabled()) {
             return;
         }
-        // 焦点先落到按钮，触发表格 cell editor 的 terminateEditOnFocusLost，再执行真实动作。
+        // Tiêu điểm rơi vào nút trước tiên, kích hoạt biểu mẫu cell editor của terminateEditOnFocusLost，Sau đó thực hiện các hành động thực tế.
         button.requestFocusInWindow();
         SwingUtilities.invokeLater(button::doClick);
     }

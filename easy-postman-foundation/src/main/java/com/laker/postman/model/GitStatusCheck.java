@@ -6,65 +6,65 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Git状态检查结果
+ * GitKết quả kiểm tra trạng thái
  */
 public class GitStatusCheck {
-    // 基本状态
-    public boolean hasUncommittedChanges = false; // 是否有未提交的更改
-    public boolean hasLocalCommits = false; // 是否有本地提交
-    public boolean hasRemoteCommits = false; // 是否有远程提交
+    // Trạng thái cơ bản
+    public boolean hasUncommittedChanges = false; // Có bất kỳ thay đổi không được cam kết?
+    public boolean hasLocalCommits = false; // Có một cam kết địa phương
+    public boolean hasRemoteCommits = false; // Cho dù có gửi từ xa
 
-    // 本地提交数量信息
+    // Thông tin số lượng nộp tại địa phương
     public int localCommitsAhead = 0;
-    // 远程提交数量信息
+    // Gửi thông tin số lượng từ xa
     public int remoteCommitsBehind = 0;
 
-    // 操作能力
-    public boolean canCommit = false; // 是否可以提交
-    public boolean canPush = false; // 是否可以推送
-    public boolean canPull = false; // 是否可以拉取
+    // khả năng hoạt động
+    public boolean canCommit = false; // Cho dù nó có thể được gửi
+    public boolean canPush = false; // Liệu nó có thể được đẩy
+    public boolean canPull = false; // Liệu nó có thể được kéo
 
-    // 远程仓库状态
-    public boolean hasRemoteRepository = false; // 是否存在远程仓库
-    public boolean hasUpstreamBranch = false; // 是否有上游分支
-    public boolean isRemoteRepositoryEmpty = false; // 远程仓库是否为空
-    public boolean isFirstPush = false; // 是否是第一次推送
+    // Tình trạng kho từ xa
+    public boolean hasRemoteRepository = false; // Liệu một nhà kho ở xa có tồn tại hay không
+    public boolean hasUpstreamBranch = false; // Có chi nhánh thượng nguồn không?
+    public boolean isRemoteRepositoryEmpty = false; // Kho từ xa có trống không
+    public boolean isFirstPush = false; // Cho dù đó là lần đẩy đầu tiên
 
-    // 冲突和问题检测
-    public boolean hasFileConflicts = false; // 是否有文件冲突
-    public boolean needsForcePush = false; // 是否需要强制推送
-    public boolean needsForcePull = false; // 是否需要强制拉取
+    // Xung đột và phát hiện vấn đề
+    public boolean hasFileConflicts = false; // Có bất kỳ xung đột tập tin?
+    public boolean needsForcePush = false; // Có cần đẩy lực hay không
+    public boolean needsForcePull = false; // Có cần phải kéo cưỡng bức hay không
 
-    // 冲突检测
-    public boolean hasActualConflicts = false; // 是否存在实际内容冲突
-    public boolean canAutoMerge = false; // 是否可以自动合并
-    public boolean hasOnlyNewFiles = false; // 是否只是新文件（无冲突）
-    public boolean hasNonOverlappingChanges = false; // 是否为非重叠变更
+    // Phát hiện xung đột
+    public boolean hasActualConflicts = false; // Liệu có xung đột nội dung thực tế hay không
+    public boolean canAutoMerge = false; // Liệu nó có thể được hợp nhất tự động hay không
+    public boolean hasOnlyNewFiles = false; // Đây chỉ là một tập tin mới (không có xung đột)
+    public boolean hasNonOverlappingChanges = false; // Cho dù đó là một thay đổi không chồng chéo
 
-    // 网络和认证状态
-    public boolean canConnectToRemote = false; // 是否能连接到远程仓库
-    public boolean hasAuthenticationIssue = false; // 是否存在认证问题
+    // Trạng thái mạng và xác thực
+    public boolean canConnectToRemote = false; // Liệu nó có thể kết nối với kho từ xa hay không
+    public boolean hasAuthenticationIssue = false; // Có bất kỳ vấn đề xác thực?
 
-    // 操作类型判断
-    public boolean isInitTypeWorkspace = false; // 是否是初始化类型的工作区
-    public boolean isEmptyLocalRepository = false; // 本地仓库是否为空
+    // Phán quyết loại hoạt động
+    public boolean isInitTypeWorkspace = false; // Cho dù đó là không gian làm việc thuộc loại khởi tạo
+    public boolean isEmptyLocalRepository = false; // Liệu kho địa phương có trống không
 
-    // 消息列表（保留用于详细说明）
+    // Danh sách tin nhắn (dành riêng cho việc xây dựng)
     public final List<String> warnings = new ArrayList<>();
     public final List<String> suggestions = new ArrayList<>();
 
-    // 当前分支信息
+    // Thông tin chi nhánh hiện tại
     public String currentBranch;
     public String remoteBranch;
     public String remoteUrl;
 
-    // 文件列表
+    // Danh sách tập tin
     public final List<String> conflictingFiles = new ArrayList<>();
 
-    // 冲突详情（文件名 -> 冲突块列表）
+    // Xung độtChi tiết (tên tệp -> danh sách các khối xung đột)
     public Map<String, List<ConflictBlock>> conflictDetails = new HashMap<>();
 
-    // 本地变更文件列表
+    // Danh sách các tập tin thay đổi cục bộ
     public final List<String> added = new ArrayList<>();
     public final List<String> changed = new ArrayList<>();
     public final List<String> removed = new ArrayList<>();
@@ -73,7 +73,7 @@ public class GitStatusCheck {
     public final List<String> untracked = new ArrayList<>();
     public final List<String> conflicting = new ArrayList<>();
 
-    // 远程变更文件列表
+    // Danh sách tập tin được thay đổi từ xa
     public List<String> remoteAdded = new ArrayList<>();
     public List<String> remoteModified = new ArrayList<>();
     public List<String> remoteRemoved = new ArrayList<>();

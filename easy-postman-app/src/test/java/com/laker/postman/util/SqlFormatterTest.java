@@ -6,7 +6,7 @@ import static org.testng.Assert.*;
 
 public class SqlFormatterTest {
 
-    @Test(description = "通用方言应格式化简单 SELECT")
+    @Test(description = "Các phương ngữ phổ biến nên được định dạng đơn giản SELECT")
     public void shouldFormatBasicSelectExactly() {
         assertFormattedEquals("""
                         SELECT id,
@@ -18,7 +18,7 @@ public class SqlFormatterTest {
                 "select id,name from users where status=1 and age>18 order by created_at desc");
     }
 
-    @Test(description = "通用方言应格式化 JOIN 查询")
+    @Test(description = "Phương ngữ phổ biến nên được định dạng JOIN Truy vấn")
     public void shouldFormatJoinQueryExactly() {
         assertFormattedEquals("""
                         SELECT u.id,
@@ -31,7 +31,7 @@ public class SqlFormatterTest {
                 "select u.id,u.name,o.total from users u left join orders o on u.id=o.user_id where o.total>100 order by o.total desc");
     }
 
-    @Test(description = "通用方言应按级联缩进格式化复杂 SELECT")
+    @Test(description = "Các phương ngữ phổ biến phải được định dạng phức tạp bằng cách thụt dòng theo tầng SELECT")
     public void shouldFormatComplexSelectWithCascadeIndentExactly() {
         assertFormattedEquals("""
                         SELECT u.id,
@@ -54,18 +54,18 @@ public class SqlFormatterTest {
                 "select u.id,u.name,u.email,u.created_at,o.order_id,o.total,o.status from users u left join orders o on u.id=o.user_id where u.status=1 and u.created_at>='2024-01-01' and (o.total>100 or o.status='paid') group by u.id having count(o.order_id)>0 order by u.created_at desc,o.total desc limit 100");
     }
 
-    @Test(description = "应支持多语句格式化")
+    @Test(description = "Định dạng nhiều câu lệnh nên được hỗ trợ")
     public void shouldFormatMultipleStatementsExactly() {
         assertFormattedEquals("""
                         SELECT 1;
-                        
+
                         UPDATE users
                         SET name = 'alice'
                         WHERE id = 1;""",
                 "select 1; update users set name='alice' where id=1");
     }
 
-    @Test(description = "通用方言应格式化带子查询的复杂 SELECT")
+    @Test(description = "Phương ngữ phổ quát phải được định dạng với các truy vấn con phức tạp SELECT")
     public void shouldFormatNestedSelectExactly() {
         assertFormattedEquals("""
                         SELECT u.id,
@@ -79,7 +79,7 @@ public class SqlFormatterTest {
                 "select u.id,(select count(*) from orders o where o.user_id=u.id) as order_count from users u where u.status='ACTIVE'");
     }
 
-    @Test(description = "通用方言应格式化 CTE 和 CASE 表达式")
+    @Test(description = "Phương ngữ phổ biến nên được định dạng CTE và CASE biểu hiện")
     public void shouldFormatCteAndCaseExactly() {
         assertFormattedEquals("""
                         WITH active_users AS (
@@ -98,7 +98,7 @@ public class SqlFormatterTest {
                 "with active_users as (select id,name,status from users where status='ACTIVE') select id,case when status='ACTIVE' then 'Y' else 'N' end as enabled_flag from active_users");
     }
 
-    @Test(description = "自定义选项应支持小写关键字和去掉结尾分号")
+    @Test(description = "Các tùy chọn tùy chỉnh sẽ hỗ trợ các từ khóa viết thường và loại bỏ dấu chấm phẩy ở cuối")
     public void shouldRespectLowercaseAndNoSemicolonOption() {
         String formatted = SqlFormatter.format("SELECT id,name FROM users WHERE status=1",
                 new SqlFormatter.FormatOption()
@@ -112,7 +112,7 @@ public class SqlFormatterTest {
                     where status = 1""");
     }
 
-    @Test(description = "压缩应移除注释并压成单行")
+    @Test(description = "Việc thu nhỏ sẽ loại bỏ nhận xét và nén thành một dòng")
     public void shouldCompressSqlWithoutComments() {
         String input = """
                 SELECT id, -- user id
@@ -127,13 +127,13 @@ public class SqlFormatterTest {
         assertFalse(compressed.contains("\n"));
     }
 
-    @Test(description = "压缩应保留多语句分号")
+    @Test(description = "Nén nên bảo toàn dấu chấm phẩy nhiều câu lệnh")
     public void shouldCompressMultipleStatements() {
         String compressed = SqlFormatter.compress("select 1;\nupdate users set name='a' where id=1;");
         assertEquals(compressed, "select 1; update users set name = 'a' where id = 1;");
     }
 
-    @Test(description = "校验应识别缺少表达式的 WHERE 子句")
+    @Test(description = "Việc xác thực sẽ xác định các biểu thức bị thiếu WHERE khoản")
     public void shouldDetectIncompleteWhereClause() {
         SqlFormatter.ValidationResult result = SqlFormatter.validate("select * from users where");
 
@@ -142,7 +142,7 @@ public class SqlFormatterTest {
                 I18nUtil.getMessage(MessageKeys.TOOLBOX_SQL_VALIDATION_EXPECTED_AFTER, "WHERE")));
     }
 
-    @Test(description = "校验应识别缺少 SET 的 UPDATE")
+    @Test(description = "Việc xác minh sẽ xác định được sự thiếu sót SET của UPDATE")
     public void shouldDetectUpdateWithoutSet() {
         SqlFormatter.ValidationResult result = SqlFormatter.validate("update users where id=1");
 
@@ -151,7 +151,7 @@ public class SqlFormatterTest {
                 I18nUtil.getMessage(MessageKeys.TOOLBOX_SQL_VALIDATION_MISSING_KEYWORD, "SET")));
     }
 
-    @Test(description = "校验应识别缺少 FROM 的 DELETE")
+    @Test(description = "Việc xác minh sẽ xác định được sự thiếu sót FROM của DELETE")
     public void shouldDetectDeleteWithoutFrom() {
         SqlFormatter.ValidationResult result = SqlFormatter.validate("delete users where id=1");
 
@@ -160,7 +160,7 @@ public class SqlFormatterTest {
                 I18nUtil.getMessage(MessageKeys.TOOLBOX_SQL_VALIDATION_EXPECTED_KEYWORD_AFTER, "FROM", "DELETE")));
     }
 
-    @Test(description = "校验应识别 GROUP 后缺少 BY")
+    @Test(description = "Việc xác minh phải được công nhận GROUP mất tích sau đó BY")
     public void shouldDetectMissingByAfterGroup() {
         SqlFormatter.ValidationResult result = SqlFormatter.validate("select id from users group id");
 
@@ -169,7 +169,7 @@ public class SqlFormatterTest {
                 I18nUtil.getMessage(MessageKeys.TOOLBOX_SQL_VALIDATION_EXPECTED_KEYWORD_AFTER, "BY", "GROUP")));
     }
 
-    @Test(description = "校验应识别 SELECT 后缺少表达式")
+    @Test(description = "Việc xác minh phải được công nhận SELECT Biểu thức bị thiếu sau")
     public void shouldDetectSelectWithoutProjection() {
         SqlFormatter.ValidationResult result = SqlFormatter.validate("select from users");
 
@@ -178,7 +178,7 @@ public class SqlFormatterTest {
                 I18nUtil.getMessage(MessageKeys.TOOLBOX_SQL_VALIDATION_EXPECTED_AFTER, "SELECT")));
     }
 
-    @Test(description = "校验应识别 INSERT 后缺少 VALUES 或 SELECT")
+    @Test(description = "Việc xác minh phải được công nhận INSERT mất tích sau đó VALUES hoặc SELECT")
     public void shouldDetectInsertWithoutValuesOrSelect() {
         SqlFormatter.ValidationResult result = SqlFormatter.validate("insert into users(id,name)");
 
@@ -187,7 +187,7 @@ public class SqlFormatterTest {
                 I18nUtil.getMessage(MessageKeys.TOOLBOX_SQL_VALIDATION_MISSING_KEYWORD, "VALUES/SELECT")));
     }
 
-    @Test(description = "校验应识别未闭合字符串")
+    @Test(description = "Việc xác thực sẽ xác định các chuỗi không được tiết lộ")
     public void shouldDetectUnterminatedString() {
         SqlFormatter.ValidationResult result = SqlFormatter.validate("select * from users where name='alice");
 
@@ -196,7 +196,7 @@ public class SqlFormatterTest {
                 I18nUtil.getMessage(MessageKeys.TOOLBOX_SQL_VALIDATION_UNTERMINATED_STRING));
     }
 
-    @Test(description = "校验应识别未闭合块注释")
+    @Test(description = "Việc xác thực sẽ xác định các nhận xét khối không được tiết lộ")
     public void shouldDetectUnterminatedComment() {
         SqlFormatter.ValidationResult result = SqlFormatter.validate("select /* test");
 
@@ -205,7 +205,7 @@ public class SqlFormatterTest {
                 I18nUtil.getMessage(MessageKeys.TOOLBOX_SQL_VALIDATION_UNTERMINATED_COMMENT));
     }
 
-    @Test(description = "校验应统计多语句数量")
+    @Test(description = "Việc xác minh nên đếm số lượng nhiều câu lệnh")
     public void shouldCountStatementsDuringValidation() {
         SqlFormatter.ValidationResult result = SqlFormatter.validate(
                 "select 1; update users set name='alice' where id=1;");
@@ -214,7 +214,7 @@ public class SqlFormatterTest {
         assertEquals(result.statementCount(), 2);
     }
 
-    @Test(description = "校验应允许 INSERT SELECT 语句")
+    @Test(description = "Việc xác minh phải được cho phép INSERT SELECT tuyên bố")
     public void shouldValidateInsertSelect() {
         SqlFormatter.ValidationResult result = SqlFormatter.validate(
                 "insert into archive_users(id,name) select id,name from users where status=1");
@@ -222,7 +222,7 @@ public class SqlFormatterTest {
         assertTrue(result.valid(), result.firstIssue());
     }
 
-    @Test(description = "MySQL 方言应支持反引号和井号注释")
+    @Test(description = "MySQL Các phương ngữ nên hỗ trợ các bình luận đánh dấu ngược và đánh dấu")
     public void shouldFormatMysqlDialectSql() {
         String formatted = SqlFormatter.format("select `id`,`name` # comment\nfrom `users` limit 10",
                 SqlFormatter.SqlDialect.MYSQL);
@@ -235,7 +235,7 @@ public class SqlFormatterTest {
                   LIMIT 10;""");
     }
 
-    @Test(description = "MySQL 方言应格式化 ON DUPLICATE KEY UPDATE")
+    @Test(description = "MySQL Các phương ngữ nên được định dạng ON DUPLICATE KEY UPDATE")
     public void shouldFormatMysqlOnDuplicateKeyUpdate() {
         String formatted = SqlFormatter.format(
                 "insert into users(id,name,status) values(1,'alice',1) on duplicate key update name='alice2',status=2",
@@ -248,7 +248,7 @@ public class SqlFormatterTest {
                   status = 2;""");
     }
 
-    @Test(description = "MySQL 方言应格式化 INSERT IGNORE")
+    @Test(description = "MySQL Các phương ngữ nên được định dạng INSERT IGNORE")
     public void shouldFormatMysqlInsertIgnore() {
         String formatted = SqlFormatter.format(
                 "insert ignore into users(id,name,status) values(1,'alice',1)",
@@ -259,7 +259,7 @@ public class SqlFormatterTest {
                 VALUES (1, 'alice', 1);""");
     }
 
-    @Test(description = "MySQL 方言应格式化 REPLACE INTO")
+    @Test(description = "MySQL Các phương ngữ nên được định dạng REPLACE INTO")
     public void shouldFormatMysqlReplaceInto() {
         String formatted = SqlFormatter.format(
                 "replace into users(id,name,status) values(1,'alice',1)",
@@ -270,7 +270,7 @@ public class SqlFormatterTest {
                 VALUES (1, 'alice', 1);""");
     }
 
-    @Test(description = "MySQL 方言应格式化 STRAIGHT_JOIN")
+    @Test(description = "MySQL Các phương ngữ nên được định dạng STRAIGHT_JOIN")
     public void shouldFormatMysqlStraightJoin() {
         String formatted = SqlFormatter.format(
                 "select u.id,u.name from users u straight_join orders o on u.id=o.user_id where o.status='paid'",
@@ -284,7 +284,7 @@ public class SqlFormatterTest {
                     WHERE o.status = 'paid';""");
     }
 
-    @Test(description = "MySQL 方言应格式化 USE INDEX 和 FOR UPDATE")
+    @Test(description = "MySQL Các phương ngữ nên được định dạng USE INDEX và FOR UPDATE")
     public void shouldFormatMysqlUseIndexAndForUpdate() {
         String formatted = SqlFormatter.format(
                 "select u.id,u.name from users u use index(idx_users_status) where u.status=1 for update",
@@ -298,7 +298,7 @@ public class SqlFormatterTest {
                     FOR UPDATE;""");
     }
 
-    @Test(description = "MySQL 方言应格式化 FORCE INDEX 和 LOCK IN SHARE MODE")
+    @Test(description = "MySQL Các phương ngữ nên được định dạng FORCE INDEX và LOCK IN SHARE MODE")
     public void shouldFormatMysqlForceIndexAndLockShareMode() {
         String formatted = SqlFormatter.format(
                 "select u.id,u.name from users u force index(idx_users_status) where u.status=1 lock in share mode",
@@ -312,7 +312,7 @@ public class SqlFormatterTest {
                     LOCK IN SHARE MODE;""");
     }
 
-    @Test(description = "PostgreSQL 方言应支持双引号标识符和 RETURNING")
+    @Test(description = "PostgreSQL Các phương ngữ phải hỗ trợ các mã định danh được trích dẫn kép và  RETURNING")
     public void shouldFormatPostgresqlDialectSql() {
         String formatted = SqlFormatter.format("select \"id\",\"name\" from \"users\" returning \"id\"",
                 SqlFormatter.SqlDialect.POSTGRESQL);
@@ -324,7 +324,7 @@ public class SqlFormatterTest {
                   RETURNING "id";""");
     }
 
-    @Test(description = "PostgreSQL 方言应格式化 WITH RECURSIVE 和 ILIKE")
+    @Test(description = "PostgreSQL Các phương ngữ nên được định dạng WITH RECURSIVE và ILIKE")
     public void shouldFormatPostgresqlRecursiveCteAndIlike() {
         String formatted = SqlFormatter.format(
                 "with recursive dept_tree as (select id,parent_id,name from departments where parent_id is null union all select d.id,d.parent_id,d.name from departments d join dept_tree t on d.parent_id=t.id) select * from dept_tree where name ilike 'ops%'",
@@ -348,7 +348,7 @@ public class SqlFormatterTest {
                     WHERE name ILIKE 'ops%';""");
     }
 
-    @Test(description = "PostgreSQL 方言应保留 :: cast 语法")
+    @Test(description = "PostgreSQL Các phương ngữ cần được bảo tồn :: cast ngữ pháp")
     public void shouldFormatPostgresqlTypeCast() {
         String formatted = SqlFormatter.format(
                 "select id::bigint,name::text from users where created_at::date >= '2024-01-01'::date",
@@ -361,7 +361,7 @@ public class SqlFormatterTest {
                     WHERE created_at::date >= '2024-01-01'::date;""");
     }
 
-    @Test(description = "PostgreSQL 方言应格式化 DISTINCT ON 和 NULLS LAST")
+    @Test(description = "PostgreSQL Các phương ngữ nên được định dạng DISTINCT ON và NULLS LAST")
     public void shouldFormatPostgresqlDistinctOnAndNullsLast() {
         String formatted = SqlFormatter.format(
                 "select distinct on (u.status) u.id,u.name,u.status from users u order by u.status,u.created_at desc nulls last",
@@ -376,7 +376,7 @@ public class SqlFormatterTest {
                     u.created_at DESC NULLS LAST;""");
     }
 
-    @Test(description = "PostgreSQL 方言应格式化 FILTER 子句")
+    @Test(description = "PostgreSQL Các phương ngữ nên được định dạng FILTER khoản")
     public void shouldFormatPostgresqlFilterClause() {
         String formatted = SqlFormatter.format(
                 "select count(*) filter (where status='paid') as paid_count,sum(total) filter (where total>100) as high_total from orders",
@@ -392,7 +392,7 @@ public class SqlFormatterTest {
                   FROM orders;""");
     }
 
-    @Test(description = "PostgreSQL 方言应格式化窗口函数子句")
+    @Test(description = "PostgreSQL Các phương ngữ nên định dạng mệnh đề chức năng cửa sổ")
     public void shouldFormatPostgresqlWindowClause() {
         String formatted = SqlFormatter.format(
                 "select user_id,sum(total) over (partition by user_id order by created_at rows between unbounded preceding and current row) as running_total from orders",
@@ -408,7 +408,7 @@ public class SqlFormatterTest {
                   FROM orders;""");
     }
 
-    @Test(description = "PostgreSQL 方言应格式化 RANGE 窗口 frame")
+    @Test(description = "PostgreSQL Các phương ngữ nên được định dạng RANGE cửa sổ frame")
     public void shouldFormatPostgresqlWindowRangeClause() {
         String formatted = SqlFormatter.format(
                 "select user_id,sum(total) over (partition by user_id order by created_at range between unbounded preceding and current row) as running_total from orders",
@@ -424,7 +424,7 @@ public class SqlFormatterTest {
                   FROM orders;""");
     }
 
-    @Test(description = "PostgreSQL 方言应格式化 GROUPS 窗口 frame")
+    @Test(description = "PostgreSQL Các phương ngữ nên được định dạng GROUPS cửa sổ frame")
     public void shouldFormatPostgresqlWindowGroupsClause() {
         String formatted = SqlFormatter.format(
                 "select user_id,sum(total) over (partition by user_id order by created_at groups between unbounded preceding and current row) as running_total from orders",
@@ -440,7 +440,7 @@ public class SqlFormatterTest {
                   FROM orders;""");
     }
 
-    @Test(description = "PostgreSQL 方言应格式化 FILTER 和 OVER 组合")
+    @Test(description = "PostgreSQL Các phương ngữ nên được định dạng FILTER và OVER sự kết hợp")
     public void shouldFormatPostgresqlFilterOverWindowClause() {
         String formatted = SqlFormatter.format(
                 "select count(*) filter (where status='paid') over (partition by team_id order by created_at rows between unbounded preceding and current row) as paid_running_total from orders",
@@ -457,7 +457,7 @@ public class SqlFormatterTest {
                   FROM orders;""");
     }
 
-    @Test(description = "PostgreSQL 方言应格式化 FOLLOWING 窗口 frame")
+    @Test(description = "PostgreSQL Các phương ngữ nên được định dạng FOLLOWING cửa sổ frame")
     public void shouldFormatPostgresqlWindowFollowingClause() {
         String formatted = SqlFormatter.format(
                 "select user_id,sum(total) over (partition by user_id order by created_at rows between current row and unbounded following) as forward_total from orders",
@@ -473,7 +473,7 @@ public class SqlFormatterTest {
                   FROM orders;""");
     }
 
-    @Test(description = "PostgreSQL 方言应格式化 RANGE FOLLOWING 窗口 frame")
+    @Test(description = "PostgreSQL Các phương ngữ nên được định dạng RANGE FOLLOWING cửa sổ frame")
     public void shouldFormatPostgresqlWindowRangeFollowingClause() {
         String formatted = SqlFormatter.format(
                 "select user_id,sum(total) over (partition by user_id order by created_at range between current row and 1 following) as rolling_total from orders",
@@ -489,7 +489,7 @@ public class SqlFormatterTest {
                   FROM orders;""");
     }
 
-    @Test(description = "PostgreSQL 方言应格式化 NULLS FIRST 窗口排序")
+    @Test(description = "PostgreSQL Các phương ngữ nên được định dạng NULLS FIRST Sắp xếp cửa sổ")
     public void shouldFormatPostgresqlWindowNullsFirstClause() {
         String formatted = SqlFormatter.format(
                 "select user_id,sum(total) over (partition by user_id order by created_at desc nulls first rows between current row and unbounded following) as forward_total from orders",
@@ -505,7 +505,7 @@ public class SqlFormatterTest {
                   FROM orders;""");
     }
 
-    @Test(description = "PostgreSQL 方言应格式化 EXCLUDE CURRENT ROW 窗口 frame")
+    @Test(description = "PostgreSQL Các phương ngữ nên được định dạng EXCLUDE CURRENT ROW cửa sổ frame")
     public void shouldFormatPostgresqlWindowExcludeCurrentRow() {
         String formatted = SqlFormatter.format(
                 "select user_id,sum(total) over (partition by user_id order by created_at rows between unbounded preceding and current row exclude current row) as running_total from orders",
@@ -522,7 +522,7 @@ public class SqlFormatterTest {
                   FROM orders;""");
     }
 
-    @Test(description = "PostgreSQL 方言应格式化 EXCLUDE TIES 窗口 frame")
+    @Test(description = "PostgreSQL Các phương ngữ nên được định dạng EXCLUDE TIES cửa sổ frame")
     public void shouldFormatPostgresqlWindowExcludeTies() {
         String formatted = SqlFormatter.format(
                 "select user_id,sum(total) over (partition by user_id order by created_at desc nulls last,id asc rows between 1 preceding and 1 following exclude ties) as rolling_total from orders",
@@ -540,7 +540,7 @@ public class SqlFormatterTest {
                   FROM orders;""");
     }
 
-    @Test(description = "PostgreSQL 方言应格式化 EXCLUDE GROUP 窗口 frame")
+    @Test(description = "PostgreSQL Các phương ngữ nên được định dạng EXCLUDE GROUP cửa sổ frame")
     public void shouldFormatPostgresqlWindowExcludeGroup() {
         String formatted = SqlFormatter.format(
                 "select user_id,sum(total) over (partition by user_id order by created_at groups between 1 preceding and current row exclude group) as grouped_total from orders",
@@ -557,7 +557,7 @@ public class SqlFormatterTest {
                   FROM orders;""");
     }
 
-    @Test(description = "PostgreSQL 方言应格式化 EXCLUDE NO OTHERS 窗口 frame")
+    @Test(description = "PostgreSQL Các phương ngữ nên được định dạng EXCLUDE NO OTHERS cửa sổ frame")
     public void shouldFormatPostgresqlWindowExcludeNoOthers() {
         String formatted = SqlFormatter.format(
                 "select user_id,sum(total) over (partition by user_id order by created_at desc,id asc rows between 2 preceding and current row exclude no others) as rolling_total from orders",
@@ -575,7 +575,7 @@ public class SqlFormatterTest {
                   FROM orders;""");
     }
 
-    @Test(description = "PostgreSQL 方言应格式化多排序列 RANGE 窗口 frame")
+    @Test(description = "PostgreSQL Các phương ngữ nên định dạng các cột được sắp xếp nhiều thứ RANGE cửa sổ frame")
     public void shouldFormatPostgresqlWindowMultiOrderRangeClause() {
         String formatted = SqlFormatter.format(
                 "select user_id,sum(total) over (partition by user_id order by created_at desc nulls first,id asc range between current row and unbounded following) as forward_total from orders",
@@ -592,7 +592,7 @@ public class SqlFormatterTest {
                   FROM orders;""");
     }
 
-    @Test(description = "PostgreSQL 方言应格式化多列 PARTITION 的 EXCLUDE CURRENT ROW")
+    @Test(description = "PostgreSQL Các phương ngữ nên định dạng nhiều cột PARTITION của EXCLUDE CURRENT ROW")
     public void shouldFormatPostgresqlWindowMultiPartitionExcludeCurrentRow() {
         String formatted = SqlFormatter.format(
                 "select team_id,user_id,sum(total) over (partition by team_id,user_id order by created_at desc,id asc rows between unbounded preceding and current row exclude current row) as rolling_total from orders",
@@ -612,7 +612,7 @@ public class SqlFormatterTest {
                   FROM orders;""");
     }
 
-    @Test(description = "PostgreSQL 方言应格式化 FILTER + 多列 PARTITION + RANGE")
+    @Test(description = "PostgreSQL Các phương ngữ nên được định dạng FILTER + Nhiều cột PARTITION + RANGE")
     public void shouldFormatPostgresqlFilterWithMultiPartitionRangeWindow() {
         String formatted = SqlFormatter.format(
                 "select count(*) filter (where status='paid' and total>100) over (partition by team_id,user_id order by created_at desc nulls first,id asc range between current row and unbounded following exclude no others) as rolling_total from orders",
@@ -633,7 +633,7 @@ public class SqlFormatterTest {
                   FROM orders;""");
     }
 
-    @Test(description = "SQL Server 方言应格式化 UPDATE OUTPUT")
+    @Test(description = "SQL Server Các phương ngữ nên được định dạng UPDATE OUTPUT")
     public void shouldFormatSqlServerUpdateOutput() {
         String formatted = SqlFormatter.format(
                 "update [users] set [status]=2 output inserted.[id],inserted.[status] where [status]=1",
@@ -647,7 +647,7 @@ public class SqlFormatterTest {
                 WHERE [status] = 1;""");
     }
 
-    @Test(description = "SQL Server 方言应格式化 UPDATE OUTPUT INTO")
+    @Test(description = "SQL Server Các phương ngữ nên được định dạng UPDATE OUTPUT INTO")
     public void shouldFormatSqlServerUpdateOutputInto() {
         String formatted = SqlFormatter.format(
                 "update [users] set [status]=2 output inserted.[id],inserted.[status] into [user_log] where [status]=1",
@@ -662,7 +662,7 @@ public class SqlFormatterTest {
                 WHERE [status] = 1;""");
     }
 
-    @Test(description = "SQL Server 方言应支持 TOP 和方括号标识符")
+    @Test(description = "SQL Server Các phương ngữ cần được hỗ trợ TOP và định danh dấu ngoặc vuông")
     public void shouldFormatSqlServerDialectSql() {
         String formatted = SqlFormatter.format("select top 10 [id],[name] from [users] order by [id] desc",
                 SqlFormatter.SqlDialect.SQLSERVER);
@@ -674,7 +674,7 @@ public class SqlFormatterTest {
                     ORDER BY [id] DESC;""");
     }
 
-    @Test(description = "SQL Server 方言应格式化 WITH (NOLOCK)")
+    @Test(description = "SQL Server Các phương ngữ nên được định dạng WITH (NOLOCK)")
     public void shouldFormatSqlServerWithNolock() {
         String formatted = SqlFormatter.format(
                 "select u.id,u.name from [users] u with (nolock) where u.status=1",
@@ -687,7 +687,7 @@ public class SqlFormatterTest {
                     WHERE u.status = 1;""");
     }
 
-    @Test(description = "SQL Server 方言应格式化 OFFSET FETCH")
+    @Test(description = "SQL Server Các phương ngữ nên được định dạng OFFSET FETCH")
     public void shouldFormatSqlServerOffsetFetch() {
         String formatted = SqlFormatter.format(
                 "select [id],[name] from [users] order by [id] offset 10 rows fetch next 5 rows only",
@@ -702,7 +702,7 @@ public class SqlFormatterTest {
                     FETCH NEXT 5 ROWS ONLY;""");
     }
 
-    @Test(description = "SQL Server 方言应格式化 CTE 查询")
+    @Test(description = "SQL Server Các phương ngữ nên được định dạng CTE Truy vấn")
     public void shouldFormatSqlServerCteQuery() {
         String formatted = SqlFormatter.format(
                 "with recent_users as (select top 10 [id],[name],[created_at] from [users] order by [created_at] desc) select [id],[name] from recent_users",
@@ -721,7 +721,7 @@ public class SqlFormatterTest {
                   FROM recent_users;""");
     }
 
-    @Test(description = "Oracle 方言应支持双引号标识符和 FETCH")
+    @Test(description = "Oracle Các phương ngữ phải hỗ trợ các mã định danh được trích dẫn kép và  FETCH")
     public void shouldFormatOracleDialectSql() {
         String formatted = SqlFormatter.format("select \"ID\",\"NAME\" from \"USERS\" fetch next 5 rows only",
                 SqlFormatter.SqlDialect.ORACLE);
@@ -733,7 +733,7 @@ public class SqlFormatterTest {
                     FETCH NEXT 5 ROWS ONLY;""");
     }
 
-    @Test(description = "Oracle 方言应格式化 MERGE 语句")
+    @Test(description = "Oracle Các phương ngữ nên được định dạng MERGE tuyên bố")
     public void shouldFormatOracleMergeStatement() {
         String formatted = SqlFormatter.format(
                 "merge into users u using temp_users t on (u.id=t.id) when matched then update set u.name=t.name,u.status=t.status when not matched then insert (id,name,status) values (t.id,t.name,t.status)",
@@ -750,7 +750,7 @@ public class SqlFormatterTest {
                 VALUES (t.id, t.name, t.status);""");
     }
 
-    @Test(description = "Oracle 方言应保留 MERGE 条件匹配子句")
+    @Test(description = "Oracle Các phương ngữ cần được bảo tồn MERGE Điều khoản khớp có điều kiện")
     public void shouldFormatOracleMergeMatchedCondition() {
         String formatted = SqlFormatter.format(
                 "merge into users u using temp_users t on (u.id=t.id) when matched and t.deleted=1 then delete when matched then update set u.name=t.name,u.status=t.status when not matched then insert (id,name,status) values (t.id,t.name,t.status)",
@@ -768,7 +768,7 @@ public class SqlFormatterTest {
                 VALUES (t.id, t.name, t.status);""");
     }
 
-    @Test(description = "Oracle 方言应保留 MERGE 条件插入子句")
+    @Test(description = "Oracle Các phương ngữ cần được bảo tồn MERGE Mệnh đề chèn có điều kiện")
     public void shouldFormatOracleMergeNotMatchedCondition() {
         String formatted = SqlFormatter.format(
                 "merge into users u using temp_users t on (u.id=t.id) when matched then update set u.name=t.name when not matched and t.enabled=1 then insert (id,name,status) values (t.id,t.name,t.status)",
@@ -784,7 +784,7 @@ public class SqlFormatterTest {
                 VALUES (t.id, t.name, t.status);""");
     }
 
-    @Test(description = "Oracle 方言应格式化 MERGE 复杂 INSERT VALUES")
+    @Test(description = "Oracle Các phương ngữ nên được định dạng MERGE Phức tạp INSERT VALUES")
     public void shouldFormatOracleMergeComplexInsertValues() {
         String formatted = SqlFormatter.format(
                 "merge into users u using temp_users t on (u.id=t.id) when matched then update set u.name=t.name,u.status=t.status when not matched and t.enabled=1 then insert (id,name,status,created_at) values (t.id,t.name,t.status,current_timestamp)",
@@ -801,7 +801,7 @@ public class SqlFormatterTest {
                 VALUES (t.id, t.name, t.status, current_timestamp);""");
     }
 
-    @Test(description = "Oracle 方言应格式化多个 WHEN MATCHED 分支")
+    @Test(description = "Oracle Các phương ngữ nên được định dạng nhiều lần WHEN MATCHED chi nhánh")
     public void shouldFormatOracleMergeMultipleMatchedBranches() {
         String formatted = SqlFormatter.format(
                 "merge into users u using temp_users t on (u.id=t.id) when matched and t.deleted=1 then delete when matched and t.status='inactive' then update set u.status=t.status when not matched and t.enabled=1 then insert (id,name,status,created_at) values (t.id,t.name,t.status,current_timestamp)",
@@ -818,7 +818,7 @@ public class SqlFormatterTest {
                 VALUES (t.id, t.name, t.status, current_timestamp);""");
     }
 
-    @Test(description = "Oracle 方言应格式化 MERGE 复杂 UPDATE SET 和 INSERT VALUES")
+    @Test(description = "Oracle Các phương ngữ nên được định dạng MERGE Phức tạp UPDATE SET và INSERT VALUES")
     public void shouldFormatOracleMergeComplexUpdateSetAndInsertValues() {
         String formatted = SqlFormatter.format(
                 "merge into users u using temp_users t on (u.id=t.id) when matched and t.status='inactive' then update set u.status=t.status,u.updated_at=current_timestamp,u.note='archived' when not matched and t.enabled=1 then insert (id,name,status,created_at,updated_at) values (t.id,t.name,t.status,current_timestamp,current_timestamp)",
@@ -836,7 +836,7 @@ public class SqlFormatterTest {
                 VALUES (t.id, t.name, t.status, current_timestamp, current_timestamp);""");
     }
 
-    @Test(description = "Oracle 方言应格式化 MERGE DELETE WHERE 子句")
+    @Test(description = "Oracle Các phương ngữ nên được định dạng MERGE DELETE WHERE khoản")
     public void shouldFormatOracleMergeDeleteWhereClause() {
         String formatted = SqlFormatter.format(
                 "merge into users u using temp_users t on (u.id=t.id) when matched then update set u.status=t.status delete where u.status='DELETED' when not matched then insert (id,name,status) values (t.id,t.name,t.status)",
@@ -853,7 +853,7 @@ public class SqlFormatterTest {
                 VALUES (t.id, t.name, t.status);""");
     }
 
-    @Test(description = "Oracle 方言应格式化 MERGE UPDATE WHERE DELETE WHERE 组合")
+    @Test(description = "Oracle Các phương ngữ nên được định dạng MERGE UPDATE WHERE DELETE WHERE sự kết hợp")
     public void shouldFormatOracleMergeUpdateWhereDeleteWhereClause() {
         String formatted = SqlFormatter.format(
                 "merge into users u using temp_users t on (u.id=t.id) when matched then update set u.status=t.status,u.updated_at=current_timestamp where t.enabled=1 delete where u.status='DELETED' when not matched then insert (id,name,status) values (t.id,t.name,t.status)",
@@ -872,7 +872,7 @@ public class SqlFormatterTest {
                 VALUES (t.id, t.name, t.status);""");
     }
 
-    @Test(description = "Oracle 方言应格式化 MERGE INSERT WHERE 组合")
+    @Test(description = "Oracle Các phương ngữ nên được định dạng MERGE INSERT WHERE sự kết hợp")
     public void shouldFormatOracleMergeInsertWhereClause() {
         String formatted = SqlFormatter.format(
                 "merge into users u using temp_users t on (u.id=t.id) when not matched then insert (id,name,status,created_at) values (t.id,t.name,t.status,current_timestamp) where t.enabled=1 and t.status<>'DELETED'",
@@ -888,7 +888,7 @@ public class SqlFormatterTest {
                   AND t.status <> 'DELETED';""");
     }
 
-    @Test(description = "Oracle 方言应格式化 FETCH FIRST")
+    @Test(description = "Oracle Các phương ngữ nên được định dạng FETCH FIRST")
     public void shouldFormatOracleFetchFirst() {
         String formatted = SqlFormatter.format(
                 "select \"ID\",\"NAME\" from \"USERS\" order by \"ID\" fetch first 5 rows only",
@@ -902,7 +902,7 @@ public class SqlFormatterTest {
                     FETCH FIRST 5 ROWS ONLY;""");
     }
 
-    @Test(description = "Oracle 方言应格式化 START WITH 和 CONNECT BY")
+    @Test(description = "Oracle Các phương ngữ nên được định dạng START WITH và CONNECT BY")
     public void shouldFormatOracleHierarchyQuery() {
         String formatted = SqlFormatter.format(
                 "select id,parent_id,name from departments start with parent_id is null connect by prior id = parent_id order siblings by name",
@@ -918,7 +918,7 @@ public class SqlFormatterTest {
                       ORDER SIBLINGS BY name;""");
     }
 
-    @Test(description = "Oracle 方言应格式化 CONNECT BY NOCYCLE")
+    @Test(description = "Oracle Các phương ngữ nên được định dạng CONNECT BY NOCYCLE")
     public void shouldFormatOracleConnectByNocycle() {
         String formatted = SqlFormatter.format(
                 "select id,parent_id,name from departments start with parent_id is null connect by nocycle prior id = parent_id order siblings by name",
@@ -934,7 +934,7 @@ public class SqlFormatterTest {
                       ORDER SIBLINGS BY name;""");
     }
 
-    @Test(description = "Oracle 方言应保留 CONNECT_BY_ROOT")
+    @Test(description = "Oracle Các phương ngữ cần được bảo tồn CONNECT_BY_ROOT")
     public void shouldFormatOracleConnectByRoot() {
         String formatted = SqlFormatter.format(
                 "select connect_by_root id as root_id,id,parent_id from departments start with parent_id is null connect by prior id = parent_id",
@@ -949,7 +949,7 @@ public class SqlFormatterTest {
                       CONNECT BY PRIOR id = parent_id;""");
     }
 
-    @Test(description = "Oracle 方言应在 MINUS 后换行下一条 SELECT")
+    @Test(description = "Oracle Phương ngữ nên có ở đó MINUS Sau đó bọc sang dòng tiếp theo SELECT")
     public void shouldFormatOracleMinusQuery() {
         String formatted = SqlFormatter.format(
                 "select id,name from active_users minus select id,name from blocked_users",
@@ -965,7 +965,7 @@ public class SqlFormatterTest {
                   FROM blocked_users;""");
     }
 
-    @Test(description = "MySQL 方言应格式化 IGNORE INDEX 和 LOCK IN SHARE MODE")
+    @Test(description = "MySQL Các phương ngữ nên được định dạng IGNORE INDEX và LOCK IN SHARE MODE")
     public void shouldFormatMysqlIgnoreIndexAndShareLock() {
         String formatted = SqlFormatter.format(
                 "select u.id,u.name from users u ignore index(idx_users_status) where u.status=1 lock in share mode",
@@ -979,7 +979,7 @@ public class SqlFormatterTest {
                     LOCK IN SHARE MODE;""");
     }
 
-    @Test(description = "Oracle 方言应格式化多层 MINUS")
+    @Test(description = "Oracle Các phương ngữ nên được định dạng thành nhiều lớp MINUS")
     public void shouldFormatOracleMinusChain() {
         String formatted = SqlFormatter.format(
                 "select id,name from active_users minus select id,name from blocked_users minus select id,name from archived_users",
@@ -999,7 +999,7 @@ public class SqlFormatterTest {
                   FROM archived_users;""");
     }
 
-    @Test(description = "Oracle 方言校验应允许 FETCH NEXT")
+    @Test(description = "Oracle Việc xác minh phương ngữ nên được cho phép FETCH NEXT")
     public void shouldValidateOracleFetchNext() {
         SqlFormatter.ValidationResult result = SqlFormatter.validate(
                 "select \"ID\" from \"USERS\" fetch next 5 rows only",
@@ -1008,7 +1008,7 @@ public class SqlFormatterTest {
         assertTrue(result.valid(), result.firstIssue());
     }
 
-    @Test(description = "方言校验应允许 PostgreSQL RETURNING")
+    @Test(description = "Việc xác minh phương ngữ nên được cho phép PostgreSQL RETURNING")
     public void shouldValidatePostgresqlReturning() {
         SqlFormatter.ValidationResult result = SqlFormatter.validate(
                 "insert into users(id,name) values(1,'alice') returning id",
@@ -1017,7 +1017,7 @@ public class SqlFormatterTest {
         assertTrue(result.valid(), result.firstIssue());
     }
 
-    @Test(description = "方言校验应允许 SQL Server TOP")
+    @Test(description = "Việc xác minh phương ngữ nên được cho phép SQL Server TOP")
     public void shouldValidateSqlServerTop() {
         SqlFormatter.ValidationResult result = SqlFormatter.validate(
                 "select top 5 [id] from [users] order by [id] desc",
@@ -1026,7 +1026,7 @@ public class SqlFormatterTest {
         assertTrue(result.valid(), result.firstIssue());
     }
 
-    @Test(description = "SQL Server 方言应支持括号形式的 TOP")
+    @Test(description = "SQL Server Các phương ngữ nên hỗ trợ các hình thức trong ngoặc TOP")
     public void shouldValidateSqlServerTopWithParentheses() {
         SqlFormatter.ValidationResult result = SqlFormatter.validate(
                 "select top (5) [id] from [users]",

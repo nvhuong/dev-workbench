@@ -9,8 +9,8 @@ import javax.swing.*;
 import java.awt.*;
 
 /**
- * 格式化按钮
- * 用于格式化代码或文本内容
+ * Nút định dạng
+ * Được sử dụng để định dạng mã hoặc nội dung văn bản
  */
 public class FormatButton extends JButton {
     public FormatButton() {

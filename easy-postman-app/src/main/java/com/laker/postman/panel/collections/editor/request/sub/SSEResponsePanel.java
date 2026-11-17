@@ -29,7 +29,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
- * SSE响应体面板，展示事件时间线以及 event/id/retry 等元信息。
+ * SSEBảng nội dung phản hồi, hiển thị dòng thời gian sự kiện và event/id/retry Thông tin tương đương.
  */
 public class SSEResponsePanel extends JPanel {
     private final JTable table;

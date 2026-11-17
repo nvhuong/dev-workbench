@@ -24,7 +24,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 
 /**
- * JSON工具面板 - 使用RSyntaxTextArea提供语法高亮和更好的编辑体验
+ * JSONBảng công cụ - sử dụngRSyntaxTextAreaCung cấp đánh dấu cú pháp và trải nghiệm chỉnh sửa tốt hơn
  */
 @Slf4j
 public class JsonToolPanel extends JPanel {
@@ -40,7 +40,7 @@ public class JsonToolPanel extends JPanel {
     private void initUI() {
         ToolboxWorkbench.applyRoot(this);
 
-        // 顶部工具栏
+        // Thanh công cụ trên cùng
         JButton formatBtn = new JButton(I18nUtil.getMessage(MessageKeys.TOOLBOX_JSON_FORMAT));
         JButton compressBtn = new JButton(I18nUtil.getMessage(MessageKeys.TOOLBOX_JSON_COMPRESS));
         JButton validateBtn = new JButton(I18nUtil.getMessage(MessageKeys.TOOLBOX_JSON_VALIDATE));
@@ -79,8 +79,8 @@ public class JsonToolPanel extends JPanel {
         JPanel rightBtnPanel = ToolboxWorkbench.rightToolbar(copyBtn, pasteBtn, clearBtn, swapBtn);
         add(ToolboxWorkbench.toolbar(leftBtnPanel, rightBtnPanel), BorderLayout.NORTH);
 
-        // 中间分割面板
-        // 输入区域 - 使用RSyntaxTextArea
+        // Bảng chia đôi ở giữa
+        // Khu vực đầu vào - sử dụngRSyntaxTextArea
         inputArea = createJsonTextArea();
         inputArea.setEditable(true);
         SearchableTextArea searchableInputArea = new SearchableTextArea(inputArea);
@@ -90,7 +90,7 @@ public class JsonToolPanel extends JPanel {
                 searchableInputArea
         );
 
-        // 输出区域 - 使用RSyntaxTextArea
+        // khu vực đầu ra - sử dụngRSyntaxTextArea
         outputArea = createJsonTextArea();
         outputArea.setEditable(false);
         SearchableTextArea searchableOutputArea = new SearchableTextArea(outputArea, false);
@@ -101,12 +101,12 @@ public class JsonToolPanel extends JPanel {
         );
         add(ToolboxWorkbench.editorSplit(inputPanel, outputPanel, 300), BorderLayout.CENTER);
 
-        // 底部状态栏
+        // Thanh trạng thái phía dưới
         statusLabel = new JLabel(" ");
         statusLabel.setFont(FontsUtil.getDefaultFontWithOffset(Font.PLAIN, -2));
         add(ToolboxWorkbench.statusBar(statusLabel), BorderLayout.SOUTH);
 
-        // 按钮事件
+        // Sự kiện nút
         formatBtn.addActionListener(e -> formatJson());
         compressBtn.addActionListener(e -> compressJson());
         validateBtn.addActionListener(e -> validateJson());
@@ -118,30 +118,30 @@ public class JsonToolPanel extends JPanel {
         clearBtn.addActionListener(e -> clearAll());
         swapBtn.addActionListener(e -> swapInputOutput());
 
-        // 添加快捷键
+        // Thêm phím tắt
         setupKeyBindings();
     }
 
     /**
-     * 创建配置好的JSON文本编辑区域
+     * Tạo cấu hìnhJSONKhu vực soạn thảo văn bản
      */
     private RSyntaxTextArea createJsonTextArea() {
         RSyntaxTextArea textArea = new FallbackAwareRSyntaxTextArea(10, 40);
         textArea.setSyntaxEditingStyle(SyntaxConstants.SYNTAX_STYLE_JSON);
-        textArea.setCodeFoldingEnabled(true); // 启用代码折叠
-        textArea.setAntiAliasingEnabled(true); // 抗锯齿
-        textArea.setAutoIndentEnabled(true); // 自动缩进
-        textArea.setTabSize(2); // Tab大小为2个空格
-        textArea.setTabsEmulated(true); // 用空格模拟Tab
-        textArea.setMarkOccurrences(true); // 标记相同内容
-        textArea.setAnimateBracketMatching(true); // 括号匹配动画
+        textArea.setCodeFoldingEnabled(true); // Kích hoạt tính năng gấp mã
+        textArea.setAntiAliasingEnabled(true); // Khử răng cưa
+        textArea.setAutoIndentEnabled(true); // Tự động thụt lề
+        textArea.setTabSize(2); // TabKích thước là2không gian
+        textArea.setTabsEmulated(true); // Mô phỏng với không gianTab
+        textArea.setMarkOccurrences(true); // Gắn thẻ cùng một nội dung
+        textArea.setAnimateBracketMatching(true); // Hoạt ảnh phù hợp với khung
         EditorThemeUtil.loadTheme(textArea);
         EditorThemeUtil.installViewportClippedTokenPainter(textArea);
         return textArea;
     }
 
     /**
-     * 设置快捷键
+     * Đặt phím tắt
      */
     private void setupKeyBindings() {
         // Ctrl+Shift+F - Format
@@ -172,7 +172,7 @@ public class JsonToolPanel extends JPanel {
     }
 
     /**
-     * 格式化JSON
+     * Định dạngJSON
      */
     private void formatJson() {
         String input = inputArea.getText().trim();
@@ -197,7 +197,7 @@ public class JsonToolPanel extends JPanel {
     }
 
     /**
-     * 压缩JSON
+     * NénJSON
      */
     private void compressJson() {
         String input = inputArea.getText().trim();
@@ -223,7 +223,7 @@ public class JsonToolPanel extends JPanel {
     }
 
     /**
-     * 验证JSON
+     * Xác minhJSON
      */
     private void validateJson() {
         String input = inputArea.getText().trim();
@@ -239,14 +239,14 @@ public class JsonToolPanel extends JPanel {
             int lines = input.split("\n").length;
             int chars = input.length();
 
-            // 统计JSON结构信息
+            // số liệu thống kêJSONthông tin cấu trúc
             StringBuilder info = new StringBuilder();
             info.append(I18nUtil.getMessage(MessageKeys.TOOLBOX_JSON_VALIDATION_VALID)).append("\n\n");
             info.append(I18nUtil.getMessage(MessageKeys.TOOLBOX_JSON_VALIDATION_TYPE)).append(": ").append(type).append("\n");
             info.append(I18nUtil.getMessage(MessageKeys.TOOLBOX_JSON_VALIDATION_CHARACTERS)).append(": ").append(chars).append("\n");
             info.append(I18nUtil.getMessage(MessageKeys.TOOLBOX_JSON_VALIDATION_LINES)).append(": ").append(lines).append("\n");
 
-            // 尝试统计键值对数量
+            // Hãy thử đếm số cặp khóa-giá trị
             if (parsed instanceof cn.hutool.json.JSONObject obj) {
                 info.append(I18nUtil.getMessage(MessageKeys.TOOLBOX_JSON_VALIDATION_KEYS)).append(": ").append(obj.size()).append("\n");
             } else if (parsed instanceof cn.hutool.json.JSONArray arr) {
@@ -265,7 +265,7 @@ public class JsonToolPanel extends JPanel {
     }
 
     /**
-     * Escape JSON字符串（转义特殊字符）
+     * Escape JSONChuỗi (thoát ký tự đặc biệt)
      */
     private void escapeJson() {
         String input = inputArea.getText();
@@ -286,7 +286,7 @@ public class JsonToolPanel extends JPanel {
     }
 
     /**
-     * Unescape JSON字符串（反转义）
+     * Unescape JSONChuỗi (đã thoát)
      */
     private void unescapeJson() {
         String input = inputArea.getText();
@@ -306,7 +306,7 @@ public class JsonToolPanel extends JPanel {
     }
 
     /**
-     * 排序JSON的键
+     * LoạiJSONchìa khóa
      */
     private void sortJsonKeys() {
         String input = inputArea.getText().trim();
@@ -318,7 +318,7 @@ public class JsonToolPanel extends JPanel {
 
         try {
             Object parsed = JSONUtil.parse(input);
-            // 使用有序的JSONObject来保持键的排序
+            // Sử dụng có trật tựJSONObjectđể giữ các phím được sắp xếp
             if (parsed instanceof cn.hutool.json.JSONObject obj) {
                 String sorted = JsonUtil.toJsonPrettyStr(sortJsonObject(obj));
                 outputArea.setText(sorted);
@@ -336,10 +336,10 @@ public class JsonToolPanel extends JPanel {
     }
 
     /**
-     * 递归排序JSON对象的键
+     * Sắp xếp đệ quyJSONChìa khóa của đối tượng
      */
     private cn.hutool.json.JSONObject sortJsonObject(cn.hutool.json.JSONObject obj) {
-        cn.hutool.json.JSONObject sorted = new cn.hutool.json.JSONObject(true); // true表示使用LinkedHashMap保持顺序
+        cn.hutool.json.JSONObject sorted = new cn.hutool.json.JSONObject(true); // trueCho biết sử dụngLinkedHashMapGiữ trật tự
         obj.keySet().stream().sorted().forEach(key -> {
             Object value = obj.get(key);
             if (value instanceof cn.hutool.json.JSONObject) {
@@ -354,7 +354,7 @@ public class JsonToolPanel extends JPanel {
     }
 
     /**
-     * 递归处理JSON数组中的对象
+     * Xử lý đệ quyJSONcác đối tượng trong mảng
      */
     private cn.hutool.json.JSONArray sortJsonArray(cn.hutool.json.JSONArray arr) {
         cn.hutool.json.JSONArray sorted = new cn.hutool.json.JSONArray();
@@ -371,7 +371,7 @@ public class JsonToolPanel extends JPanel {
     }
 
     /**
-     * 交换输入和输出区域的内容
+     * Hoán đổi nội dung của vùng đầu vào và đầu ra
      */
     private void swapInputOutput() {
         String inputText = inputArea.getText();
@@ -382,7 +382,7 @@ public class JsonToolPanel extends JPanel {
     }
 
     /**
-     * 从剪贴板粘贴
+     * Dán từ clipboard
      */
     private void pasteFromClipboard() {
         try {
@@ -400,7 +400,7 @@ public class JsonToolPanel extends JPanel {
     }
 
     /**
-     * 复制到剪贴板
+     * Sao chép vào clipboard
      */
     private void copyToClipboard() {
         String text = outputArea.getText();
@@ -414,7 +414,7 @@ public class JsonToolPanel extends JPanel {
     }
 
     /**
-     * 清空所有区域
+     * Xóa tất cả các khu vực
      */
     private void clearAll() {
         inputArea.setText("");
@@ -423,10 +423,10 @@ public class JsonToolPanel extends JPanel {
     }
 
     /**
-     * 智能反转义：
-     * 1. 如果输入本身是 JSON，对其中嵌套的 JSON 字符串递归展开
-     * 2. 如果输入是被转义的 JSON 字符串，优先还原成 JSON
-     * 3. 兜底再按普通文本反转义
+     * Chống thoát hiểm thông minh: .
+     * 1. Nếu chính đầu vào là JSON，lồng trong đó JSON Mở rộng chuỗi đệ quy
+     * 2. Nếu đầu vào bị thoát JSON Chuỗi được khôi phục đầu tiên JSON
+     * 3. Quay lại và nhấn văn bản bình thường để thoát ngược
      */
     private String unescapeJsonContent(String input) {
         JsonNode root = tryReadJson(input);
@@ -503,13 +503,13 @@ public class JsonToolPanel extends JPanel {
     }
 
     /**
-     * 更新状态栏
+     * Cập nhật thanh trạng thái
      */
     private void updateStatus(String message, boolean success) {
         statusLabel.setText(message);
         statusLabel.setForeground(success ? ModernColors.getSuccess() : ModernColors.getError());
 
-        // 3秒后清除状态
+        // 3Xóa trạng thái sau vài giây
         Timer timer = new Timer(3000, e -> statusLabel.setText(" "));
         timer.setRepeats(false);
         timer.start();

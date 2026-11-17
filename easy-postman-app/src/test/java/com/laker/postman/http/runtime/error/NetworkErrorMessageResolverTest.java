@@ -39,12 +39,12 @@ public class NetworkErrorMessageResolverTest {
 
     @Test
     public void shouldReplaceGarbledUnknownHostMessageWithLocalizedHostHint() {
-        UnknownHostException ex = new UnknownHostException("涓嶇煡閬撹繖鏍风殑涓绘満銆� (oktadomainq)");
+        UnknownHostException ex = new UnknownHostException("Gió thổi, ô sáng, gió thổi, gió thổi� (oktadomainq)");
 
         String message = NetworkErrorMessageResolver.toUserFriendlyMessage(ex);
 
         assertTrue(message.contains("oktadomainq"));
         assertTrue(message.contains("baseUrl"));
-        assertFalse(message.contains("涓嶇煡"));
+        assertFalse(message.contains("Nó gồ ghề và nóng bỏng"));
     }
 }

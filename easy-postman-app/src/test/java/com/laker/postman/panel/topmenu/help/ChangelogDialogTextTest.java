@@ -18,7 +18,7 @@ public class ChangelogDialogTextTest {
     @Test
     public void changelogSourceButtonsShouldUseCompactEnglishAndChineseLabels() {
         ResourceBundle en = ResourceBundle.getBundle("messages", Locale.ENGLISH);
-        ResourceBundle zh = ResourceBundle.getBundle("messages", Locale.CHINESE);
+        ResourceBundle zh = ResourceBundle.getBundle("messages", Locale.forLanguageTag("vi"));
 
         assertEquals(en.getString(MessageKeys.CHANGELOG_VIEW_ON_GITHUB), "GitHub");
         assertEquals(en.getString(MessageKeys.CHANGELOG_VIEW_ON_GITEE), "Gitee");

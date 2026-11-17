@@ -51,8 +51,8 @@ public class PerformanceResultTableVisualizerTest extends AbstractSwingUiTest {
                     0L
             ), false);
 
-            assertEquals(statsCollector.snapshot().totalRequests(), 0L, "取消的采样不计入统计");
-            assertEquals(tablePanel.recordedRows, 1, "取消的采样仍显示在结果表");
+            assertEquals(statsCollector.snapshot().totalRequests(), 0L, "Việc lấy mẫu bị hủy không được đưa vào số liệu thống kê");
+            assertEquals(tablePanel.recordedRows, 1, "Các mẫu bị hủy vẫn được hiển thị trong bảng kết quả");
             assertTrue(tablePanel.lastResult.cancelled);
             assertFalse(tablePanel.lastResult.isActuallySuccessful());
         } finally {

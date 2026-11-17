@@ -21,8 +21,8 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
 /**
- * 性能测试配置持久化服务
- * 用于保存和加载性能测试面板中的测试计划配置
+ * Kiểm tra hiệu suất sẽ định cấu hình dịch vụ lưu trữ lâu dài
+ * Được sử dụng để lưu và tải các cấu hình kế hoạch kiểm tra trong bảng kiểm tra hiệu suất
  */
 @Slf4j
 @Component
@@ -78,7 +78,7 @@ public class PerformancePersistenceService {
     }
 
     /**
-     * 清空配置
+     * Cấu hình rõ ràng
      */
     public void clear() {
         Path configPath = getConfigFilePath();
@@ -86,7 +86,7 @@ public class PerformancePersistenceService {
     }
 
     private void writeAndWait(Runnable writeAction) {
-        // 所有写入共用同一个队列，退出时的最终保存必须排在旧的自动保存之后。
+        // Tất cả các thao tác ghi đều có chung một hàng đợi và lần lưu cuối cùng khi thoát phải được xếp hàng sau lần lưu tự động cũ.
         Future<?> write = saveExecutor.submit(writeAction);
         try {
             write.get();

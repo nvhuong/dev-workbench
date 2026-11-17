@@ -12,7 +12,7 @@ import okhttp3.sse.EventSourceListener;
 import java.util.function.BooleanSupplier;
 
 /**
- * SSE 网络日志装饰器：只记录握手响应和生命周期，不改变业务回调语义。
+ * SSE Trình trang trí nhật ký mạng: chỉ ghi lại phản hồi bắt tay và vòng đời, đồng thời không thay đổi ngữ nghĩa cuộc gọi lại kinh doanh.
  */
 final class SseNetworkLogEventSourceListener extends EventSourceListener {
     private final EventSourceListener delegate;

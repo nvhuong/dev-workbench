@@ -3,22 +3,22 @@ package com.laker.postman.ioc;
 import lombok.Data;
 
 /**
- * Bean定义，描述一个Bean的元数据
+ * BeanĐịnh nghĩa, mô tả aBeansiêu dữ liệu
  */
 @Data
 public class BeanDefinition {
     /**
-     * Bean名称
+     * Beantên
      */
     private String name;
 
     /**
-     * Bean的Class类型
+     * BeancủaClassloại
      */
     private Class<?> beanClass;
 
     /**
-     * 是否单例（默认为单例）
+     * Có phải là singleton hay không (mặc định là singleton)
      */
     private boolean singleton = true;
 

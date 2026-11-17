@@ -11,7 +11,7 @@ import javax.swing.JMenu;
 import javax.swing.JRadioButtonMenuItem;
 
 /**
- * 顶部主题菜单。
+ * Menu chủ đề hàng đầu.
  */
 @UtilityClass
 class TopMenuThemeMenu {

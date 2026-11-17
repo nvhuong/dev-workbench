@@ -11,8 +11,8 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 /**
- * 内存占用显示标签组件，显示当前JVM内存使用情况。
- * 支持自动刷新和双击手动GC功能。
+ * Thành phần nhãn hiển thị mức sử dụng bộ nhớ, dòng điện hiển thịJVMSử dụng bộ nhớ.
+ * Hỗ trợ làm mới tự động và nhấp đúp thủ côngGCChức năng.
  */
 public class MemoryLabel extends JLabel {
     private static final double BYTES_PER_MB = 1024.0 * 1024.0;
@@ -26,16 +26,16 @@ public class MemoryLabel extends JLabel {
     private boolean autoRefresh = true;
 
     /**
-     * 创建内存标签，默认1秒刷新一次
+     * Tạo thẻ nhớ, mặc định1Làm mới mỗi giây một lần
      */
     public MemoryLabel() {
         this(1000, false);
     }
 
     /**
-     * 创建内存标签，指定刷新间隔
+     * Tạo thẻ nhớ và chỉ định khoảng thời gian làm mới
      *
-     * @param refreshIntervalMs 刷新间隔(毫秒)
+     * @param refreshIntervalMs Làm mới khoảng thời gian(mili giây)
      */
     public MemoryLabel(int refreshIntervalMs) {
         this(refreshIntervalMs, false);
@@ -46,15 +46,15 @@ public class MemoryLabel extends JLabel {
         this.refreshInterval = refreshIntervalMs;
         this.compactSeparator = compactSeparator;
 
-        // 设置图标和字体
+        // Đặt biểu tượng và phông chữ
         setIcon(new FlatSVGIcon("icons/computer.svg", 20, 20));
         setFont(getFont().deriveFont(Font.BOLD));
-        setToolTipText("当前JVM内存使用情况，双击GC");
+        setToolTipText("hiện tạiJVMSử dụng bộ nhớ, nhấp đúp chuộtGC");
 
-        // 初始刷新
+        // Làm mới ban đầu
         updateMemoryInfo();
 
-        // 添加双击GC功能
+        // Đã thêm nhấp đúp chuộtGCChức năng
         addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
@@ -65,12 +65,12 @@ public class MemoryLabel extends JLabel {
             }
         });
 
-        // 启动定时刷新
+        // Bắt đầu làm mới theo lịch trình
         startAutoRefresh();
     }
 
     /**
-     * 更新内存信息显示
+     * Cập nhật hiển thị thông tin bộ nhớ
      */
     public void updateMemoryInfo() {
         Runtime rt = Runtime.getRuntime();
@@ -81,7 +81,7 @@ public class MemoryLabel extends JLabel {
     }
 
     /**
-     * 格式化内存大小，自动显示为 MB 或 GB
+     * Kích thước bộ nhớ được định dạng, tự động hiển thị dưới dạng MB hoặc GB
      */
     private String formatSize(long bytes) {
         double mb = bytes / BYTES_PER_MB;
@@ -98,7 +98,7 @@ public class MemoryLabel extends JLabel {
     }
 
     /**
-     * 启动自动刷新
+     * Bắt đầu làm mới tự động
      */
     public void startAutoRefresh() {
         if (refreshTimer != null) {
@@ -116,7 +116,7 @@ public class MemoryLabel extends JLabel {
     }
 
     /**
-     * 停止自动刷新
+     * Dừng làm mới tự động
      */
     public void stopAutoRefresh() {
         autoRefresh = false;
@@ -127,7 +127,7 @@ public class MemoryLabel extends JLabel {
     }
 
     /**
-     * 组件被移除时停止定时器
+     * Dừng bộ đếm thời gian khi thành phần được gỡ bỏ
      */
     @Override
     public void removeNotify() {
@@ -136,9 +136,9 @@ public class MemoryLabel extends JLabel {
     }
 
     /**
-     * 设置是否自动刷新
+     * Đặt xem có tự động làm mới hay không
      *
-     * @param autoRefresh 是否自动刷新
+     * @param autoRefresh Có tự động làm mới hay không
      */
     public void setAutoRefresh(boolean autoRefresh) {
         if (this.autoRefresh == autoRefresh) return;

@@ -9,7 +9,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 /**
- * 统一解析应用运行形态和关键路径。
+ * Phân tích thống nhất về trạng thái chạy ứng dụng và các đường dẫn quan trọng.
  */
 @Slf4j
 public final class AppRuntimeLayout {

@@ -24,7 +24,7 @@ public final class PerformanceVirtualUserCoordinator {
     }
 
     /**
-     * 趋势图采样按窗口峰值展示并重置窗口，避免短请求在采样瞬间结束后被误画成 0 用户。
+     * Lấy mẫu biểu đồ xu hướng được hiển thị theo giá trị đỉnh của cửa sổ và cửa sổ được đặt lại để tránh các yêu cầu ngắn bị rút nhầm sau khi thời điểm lấy mẫu kết thúc 0 Người dùng.
      */
     public int sampleWindowPeakActiveThreads() {
         int current = activeThreads.get();
@@ -52,7 +52,7 @@ public final class PerformanceVirtualUserCoordinator {
     }
 
     /**
-     * 持续时间只限制下一个 sample 的启动，已经发出的 sample 继续等待响应。
+     * Thời lượng chỉ được giới hạn ở lần tiếp theo sample Việc khởi động đã được phát hành sample Tiếp tục chờ phản hồi.
      */
     public boolean canStartNextSample() {
         return acceptingSamples.get() && System.currentTimeMillis() < threadLoadEndTimeMs.get();

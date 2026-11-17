@@ -16,43 +16,43 @@ import java.util.Map;
 import java.util.Objects;
 
 /**
- * 脚本请求访问器 (pm.request)
+ * Trình truy cập yêu cầu tập lệnh (pm.request)
  * <p>
- * 该类为 JavaScript 脚本提供对 HTTP 请求的访问接口，模拟 Postman 的 pm.request 对象。
- * 主要用于在前置脚本中读取或修改即将发送的请求。
+ * This category is JavaScript Kịch bản cung cấp các cặp HTTP Giao diện truy cập được yêu cầu, được mô phỏng Postman của pm.request đối tượng.
+ * Chủ yếu được sử dụng để đọc hoặc sửa đổi các yêu cầu sắp tới trong các tập lệnh trước.
  * </p>
  *
- * <h3>主要功能：</h3>
+ * <h3>Chức năng chính:</h3>
  * <ul>
- *   <li>访问和修改请求 URL、方法、头部、Body 等信息</li>
- *   <li>在前置脚本中动态修改请求参数</li>
- *   <li>支持操作 headers、formData、urlencoded 等集合</li>
- *   <li>提供 JavaScript 友好的访问接口</li>
+ *   <li>Yêu cầu truy cập và sửa đổi URL、phương thức, tiêu đề,Body và các thông tin khác</li>
+ *   <li>Tự động sửa đổi các tham số yêu cầu trong tập lệnh trước</li>
+ *   <li>Hỗ trợ các hoạt động headers、formData、urlencoded Chờ thu thập</li>
+ *   <li>cung cấp JavaScript Giao diện truy cập thân thiện</li>
  * </ul>
  *
- * <h3>使用示例：</h3>
+ * <h3>Ví dụ sử dụng:</h3>
  * <pre>{@code
- * // 在 PreRequest Script 中
+ * // Vào PreRequest Script ở giữa
  * console.log("Request URL:", pm.request.url);
  * console.log("Request Method:", pm.request.method);
  *
- * // 添加请求头
+ * // Thêm tiêu đề yêu cầu
  * pm.request.headers.add({
  *     key: "Authorization",
  *     value: "Bearer " + pm.environment.get("token")
  * });
  *
- * // 修改 raw 请求体（Collection SDK 形态的 EasyPostman 迁移扩展）
+ * // Ôn lại raw Nội dung yêu cầu (Collection SDK hình thái EasyPostman phần mở rộng di chuyển)
  * pm.request.body.update(JSON.stringify({userId: 123}));
  *
- * // 添加表单数据
+ * // Thêm dữ liệu biểu mẫu
  * pm.request.body.formdata.add({
  *     key: "username",
  *     value: "john",
  *     type: "text"
  * });
  *
- * // 添加 URL 查询参数
+ * // Thêm vào URL Tham số truy vấn
  * pm.request.url.query.add({
  *     key: "timestamp",
  *     value: Date.now()
@@ -65,58 +65,58 @@ import java.util.Objects;
 public class ScriptRequestAccessor {
 
     /**
-     * 原始请求对象，包含所有请求信息
+     * Đối tượng yêu cầu ban đầu, chứa tất cả thông tin yêu cầu
      */
     public final PreparedRequest raw;
 
     /**
-     * 请求头集合包装器，支持 JavaScript 操作
+     * Yêu cầu trình bao bọc bộ sưu tập tiêu đề, được hỗ trợ JavaScript hoạt động
      */
     public JsListWrapper<HttpHeader> headers;
 
     /**
-     * 表单数据（multipart/form-data）集合包装器
+     * Dữ liệu biểu mẫu (multipart/form-data）Trình bao bọc bộ sưu tập
      */
     public JsListWrapper<HttpFormData> formData;
 
     /**
-     * URL 编码表单数据（application/x-www-form-urlencoded）集合包装器
+     * URL Mã hóa dữ liệu biểu mẫu (application/x-www-form-urlencoded）Trình bao bọc bộ sưu tập
      */
     public JsListWrapper<HttpFormUrlencoded> urlencoded;
 
     /**
-     * URL 查询参数集合包装器
+     * URL Trình bao bọc bộ sưu tập tham số truy vấn
      */
     public JsListWrapper<HttpParam> params;
 
     /**
-     * 请求唯一标识
+     * Yêu cầu một mã định danh duy nhất
      */
     public String id;
 
     /**
-     * 请求 URL 对象（支持 pm.request.url.query.all() 访问）
+     * yêu cầu URL đối tượng (hỗ trợ pm.request.url.query.all() thăm)
      */
     public UrlWrapper url;
 
     /**
-     * 请求方法 (GET, POST, PUT, DELETE 等)
+     * Phương pháp yêu cầu (GET, POST, PUT, DELETE Đợi đã)
      */
     public String method;
 
     /**
-     * Postman RequestBody 对象。声明为 Object 是为了保留 Collection SDK body definition
-     * 形态，并支持 EasyPostman 的迁移扩展：整个 body definition 或字符串赋值。
+     * Postman RequestBody đối tượng. được khai báo là Object Đó là để lưu giữ Collection SDK body definition
+     * hình thức và hỗ trợ EasyPostman Tiện ích mở rộng di chuyển: Toàn bộ body definition hoặc gán chuỗi.
      */
     public Object body;
 
     /**
-     * 是否为 multipart 请求
+     * Cho dù đó là multipart yêu cầu
      */
     public boolean isMultipart;
 
     /**
-     * 是否跟随重定向
+     * Có nên theo chuyển hướng hay không
      */
     public boolean followRedirects;
 
@@ -125,13 +125,13 @@ public class ScriptRequestAccessor {
     private ScriptRequestBodyAccessor bodyAccessor;
 
     /**
-     * 构造脚本请求访问器
+     * Xây dựng một trình truy cập yêu cầu tập lệnh
      * <p>
-     * 会确保所有集合字段非空，并创建可在 JavaScript 中操作的包装器。
-     * 前置脚本对这些包装器的修改会直接反映到原始请求对象中。
+     * Sẽ đảm bảo rằng tất cả các trường bộ sưu tập đều không có giá trị và có sẵn JavaScript Một trình bao bọc cho các hoạt động.
+     * Các sửa đổi đối với các trình bao bọc này bằng các tập lệnh trước sẽ được phản ánh trực tiếp trong đối tượng yêu cầu ban đầu.
      * </p>
      *
-     * @param req 准备好的请求对象
+     * @param req Đối tượng yêu cầu đã chuẩn bị
      */
     public ScriptRequestAccessor(PreparedRequest req) {
         this.raw = req;
@@ -203,11 +203,11 @@ public class ScriptRequestAccessor {
     }
 
     /**
-     * 将 JavaScript 对公共字段的修改同步回真正用于发送的请求。
+     * Sẽ JavaScript Các sửa đổi đối với các trường công khai được đồng bộ hóa trở lại yêu cầu thực tế được gửi.
      * <p>
-     * 集合方法直接操作底层 List，集合元素代理、标量字段和 URL 查询参数代理
-     * 则在前置脚本结束后写回。同步时只覆盖脚本确实修改过的字段，
-     * 避免覆盖通过 {@code pm.request.raw} 或 {@code request} 直接完成的修改。
+     * Phương pháp thu thập hoạt động trực tiếp trên lớp bên dưới List，Proxy phần tử bộ sưu tập, trường vô hướng và  URL Proxy tham số truy vấn
+     * Nó sẽ được viết lại sau khi kịch bản trước kết thúc. Trong quá trình đồng bộ hóa, chỉ những trường đã được tập lệnh sửa đổi mới bị ghi đè.
+     * Tránh ghi đè thẻ {@code pm.request.raw} hoặc {@code request} Sửa đổi hoàn thành trực tiếp.
      * </p>
      */
     public boolean syncToRaw() {

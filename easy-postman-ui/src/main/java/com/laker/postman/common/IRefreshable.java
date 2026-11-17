@@ -1,13 +1,13 @@
 package com.laker.postman.common;
 
 /**
- * 可刷新组件接口
+ * Giao diện thành phần có thể làm mới
  * <p>
- * 实现此接口的组件将在以下场景自动刷新：
+ * Các thành phần triển khai giao diện này sẽ tự động làm mới trong các trường hợp sau:
  * <ul>
- *   <li>语言切换时 - 更新所有文本内容</li>
- *   <li>主题切换时 - 更新组件外观</li>
- *   <li>字体切换时 - 更新字体样式</li>
+ *   <li>When switching languages - Cập nhật tất cả nội dung văn bản</li>
+ *   <li>Khi chuyển đổi chủ đề - Cập nhật giao diện thành phần</li>
+ *   <li>Khi chuyển đổi phông chữ - Cập nhật kiểu phông chữ</li>
  * </ul>
  *
  * @author laker
@@ -15,14 +15,14 @@ package com.laker.postman.common;
 public interface IRefreshable {
 
     /**
-     * 刷新组件
+     * Làm mới thành phần
      * <p>
-     * 此方法会在语言、主题、字体改变时被调用。
-     * 实现类应该：
+     * Phương thức này sẽ được gọi khi ngôn ngữ, chủ đề hoặc phông chữ thay đổi.
+     * Lớp thực hiện nên:
      * <ul>
-     *   <li>更新所有国际化文本（使用 I18nUtil.getMessage）</li>
-     *   <li>重新布局组件（调用 revalidate）</li>
-     *   <li>重绘组件（调用 repaint）</li>
+     *   <li>Cập nhật tất cả văn bản được quốc tế hóa (sử dụng  I18nUtil.getMessage）</li>
+     *   <li>Thành phần chuyển tiếp (call revalidate）</li>
+     *   <li>RedrawComponent(call repaint）</li>
      * </ul>
      */
     void refresh();

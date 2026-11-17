@@ -9,30 +9,30 @@ import java.util.Collections;
 import java.util.Map;
 
 /**
- * 环境变量提供者
+ * Nhà cung cấp biến môi trường
  * <p>
- * 负责从当前激活的环境中获取环境变量
+ * Chịu trách nhiệm lấy các biến môi trường từ môi trường hiện được kích hoạt
  * <ul>
- *   <li>优先级中等（位于执行变量、迭代数据、分组变量之后）</li>
- *   <li>高于全局变量与内置函数</li>
+ *   <li>Mức độ ưu tiên trung bình (sau các biến thực thi, dữ liệu lặp, các biến nhóm)</li>
+ *   <li>Cao hơn các biến toàn cục và các hàm dựng sẵn</li>
  * </ul>
  */
 @Slf4j
 public class EnvironmentVariableService implements VariableProvider {
 
     /**
-     * 单例实例
+     * Ví dụ Singleton
      */
     private static final EnvironmentVariableService INSTANCE = new EnvironmentVariableService();
 
     /**
-     * 私有构造函数，防止外部实例化
+     * Nhà xây dựng riêng để ngăn chặn việc khởi tạo bên ngoài
      */
     private EnvironmentVariableService() {
     }
 
     /**
-     * 获取单例实例
+     * Nhận một ví dụ đơn lẻ
      */
     public static EnvironmentVariableService getInstance() {
         return INSTANCE;

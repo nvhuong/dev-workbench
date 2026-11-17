@@ -19,7 +19,7 @@ public class I18nGovernanceTest {
         assertEquals(I18nUtil.fallbackLocale(), Locale.ENGLISH);
         assertEquals(I18nUtil.supportedLocales(), List.of(Locale.ENGLISH, Locale.forLanguageTag("vi")));
         assertEquals(I18nUtil.normalizeSupportedLocale(Locale.forLanguageTag("vi-VN")), Locale.forLanguageTag("vi"));
-        assertEquals(I18nUtil.normalizeSupportedLocale(Locale.SIMPLIFIED_CHINESE), Locale.ENGLISH);
+        assertEquals(I18nUtil.normalizeSupportedLocale(Locale.forLanguageTag("zh")), Locale.ENGLISH);
         assertEquals(I18nUtil.normalizeSupportedLocale(Locale.FRENCH), Locale.ENGLISH);
     }
 
@@ -39,7 +39,7 @@ public class I18nGovernanceTest {
 
     @Test
     public void bundleLookupShouldFallbackToEnglishLocaleBundle() throws Exception {
-        Locale originalLocale = forceCurrentLocale(Locale.CHINESE);
+        Locale originalLocale = forceCurrentLocale(Locale.forLanguageTag("vi"));
         try {
             assertEquals(
                     I18nUtil.getMessage(
@@ -66,7 +66,7 @@ public class I18nGovernanceTest {
                 """);
         Files.writeString(resourcesRoot.resolve("demo-messages_vi.properties"),
                 """
-                hello=你好
+                hello=Xin chào
                 """);
 
         I18nDiagnosticsReport report = I18nBundleDiagnostics.scanResourceDirectory(
@@ -95,8 +95,8 @@ public class I18nGovernanceTest {
                 """);
         Files.writeString(resourcesRoot.resolve("clean-messages_vi.properties"),
                 """
-                hello=你好
-                goodbye=再见
+                hello=Xin chào
+                goodbye=tạm biệt
                 """);
 
         I18nDiagnosticsReport report = I18nBundleDiagnostics.scanResourceDirectory(

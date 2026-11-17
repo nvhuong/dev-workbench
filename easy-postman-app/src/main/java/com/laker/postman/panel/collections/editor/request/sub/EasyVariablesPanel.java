@@ -18,7 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Variables 面板包装器，提供批量编辑功能
+ * Variables Trình bao bọc bảng điều khiển cung cấp chức năng chỉnh sửa hàng loạt
  */
 public class EasyVariablesPanel extends JPanel {
     private EasyVariableTablePanel tablePanel;
@@ -31,7 +31,7 @@ public class EasyVariablesPanel extends JPanel {
     private void initializeComponents() {
         setLayout(new BorderLayout());
         ToolWindowSurfaceStyle.applyCard(this);
-        // 设置边距
+        // Đặt lề
         setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 
         // Create header panel
@@ -45,7 +45,7 @@ public class EasyVariablesPanel extends JPanel {
         bulkEditButton.addActionListener(e -> showBulkEditDialog());
 
         headerPanel.add(label);
-        headerPanel.add(Box.createHorizontalStrut(5)); // 添加间距
+        headerPanel.add(Box.createHorizontalStrut(5)); // Thêm khoảng cách
         headerPanel.add(bulkEditButton);
 
         add(headerPanel, BorderLayout.NORTH);
@@ -58,11 +58,11 @@ public class EasyVariablesPanel extends JPanel {
     }
 
     /**
-     * 显示批量编辑对话框
-     * 支持以 "Key: Value" 格式批量粘贴和编辑变量
+     * Hiển thị hộp thoại chỉnh sửa hàng loạt
+     * Được hỗ trợ bởi "Key: Value" Định dạng dán hàng loạt và chỉnh sửa các biến
      */
     private void showBulkEditDialog() {
-        // 1. 将当前表格数据转换为文本格式（Key: Value\n）
+        // 1. Chuyển đổi dữ liệu bảng hiện tại sang định dạng văn bản (Key: Value\n）
         StringBuilder text = new StringBuilder();
         List<Variable> currentVariables = tablePanel.getVariableList();
         for (Variable variable : currentVariables) {
@@ -71,14 +71,14 @@ public class EasyVariablesPanel extends JPanel {
             }
         }
 
-        // 2. 创建文本编辑区域
+        // 2. Tạo vùng soạn thảo văn bản
         JTextArea textArea = new JTextArea(text.toString());
         textArea.setLineWrap(false);
         textArea.setTabSize(4);
         ToolWindowSurfaceStyle.applyTextComponentInput(textArea);
         textArea.setCaretColor(ModernColors.getPrimary());
 
-        // 将光标定位到文本末尾
+        // Đặt con trỏ ở cuối văn bản
         textArea.setCaretPosition(textArea.getDocument().getLength());
 
         JScrollPane scrollPane = new JScrollPane(textArea);
@@ -86,35 +86,35 @@ public class EasyVariablesPanel extends JPanel {
         ToolWindowSurfaceStyle.applyDialogInputBorder(scrollPane, false);
         scrollPane.setPreferredSize(new Dimension(600, 400));
 
-        // 3. 创建提示标签 - 使用国际化，垂直排列
+        // 3. Tạo nhãn nhắc nhở - Sử dụng quốc tế hóa, sắp xếp theo chiều dọc
         JPanel hintPanel = new JPanel();
         hintPanel.setLayout(new BoxLayout(hintPanel, BoxLayout.Y_AXIS));
         hintPanel.setOpaque(false);
 
-        // 主提示文本
+        // Văn bản nhắc nhở chính
         JLabel hintLabel = new JLabel(I18nUtil.getMessage(MessageKeys.BULK_EDIT_HINT));
         hintLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
         hintLabel.setForeground(ModernColors.getTextPrimary());
 
-        // 支持格式说明
+        // Hỗ trợ mô tả định dạng
         JLabel formatLabel = new JLabel(I18nUtil.getMessage(MessageKeys.BULK_EDIT_SUPPORTED_FORMATS));
         formatLabel.setForeground(ModernColors.getTextSecondary());
         formatLabel.setFont(FontsUtil.getDefaultFontWithOffset(Font.PLAIN, -2));
         formatLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         hintPanel.add(hintLabel);
-        hintPanel.add(Box.createVerticalStrut(6)); // 添加间距
+        hintPanel.add(Box.createVerticalStrut(6)); // Thêm khoảng cách
         hintPanel.add(formatLabel);
         hintPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 
-        // 4. 组装内容面板
+        // 4. Lắp ráp bảng nội dung
         JPanel contentPanel = new JPanel(new BorderLayout(0, 5));
         ToolWindowSurfaceStyle.applyDialogSurface(contentPanel);
         contentPanel.add(hintPanel, BorderLayout.NORTH);
         contentPanel.add(scrollPane, BorderLayout.CENTER);
         contentPanel.setBorder(BorderFactory.createEmptyBorder(14, 16, 14, 16));
 
-        // 5. 创建按钮面板
+        // 5. Tạo một bảng nút
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 0));
         ToolWindowSurfaceStyle.applyDialogFooter(buttonPanel);
         JButton cancelButton = ModernButtonFactory.createButton(I18nUtil.getMessage(MessageKeys.BUTTON_CANCEL), false);
@@ -123,7 +123,7 @@ public class EasyVariablesPanel extends JPanel {
         buttonPanel.add(cancelButton);
         buttonPanel.add(okButton);
 
-        // 6. 创建自定义对话框
+        // 6. Tạo hộp thoại tùy chỉnh
         Window window = SwingUtilities.getWindowAncestor(this);
         JDialog dialog = new JDialog(window, I18nUtil.getMessage(MessageKeys.BULK_EDIT_VARIABLES), Dialog.ModalityType.APPLICATION_MODAL);
         ToolWindowSurfaceStyle.applyDialogWindowChrome(dialog);
@@ -131,13 +131,13 @@ public class EasyVariablesPanel extends JPanel {
         dialog.add(contentPanel, BorderLayout.CENTER);
         dialog.add(buttonPanel, BorderLayout.SOUTH);
 
-        // 设置对话框属性
+        // Đặt thuộc tính hộp thoại
         dialog.setSize(650, 400);
         dialog.setMinimumSize(new Dimension(500, 300));
         dialog.setResizable(true);
         dialog.setLocationRelativeTo(this);
 
-        // 7. 按钮事件处理
+        // 7. Xử lý sự kiện nút
         okButton.addActionListener(e -> {
             parseBulkText(textArea.getText());
             dialog.dispose();
@@ -145,32 +145,32 @@ public class EasyVariablesPanel extends JPanel {
 
         cancelButton.addActionListener(e -> dialog.dispose());
 
-        // 8. 支持 ESC 键关闭对话框
+        // 8. Hỗ trợ ESC phím để đóng hộp thoại
         dialog.getRootPane().registerKeyboardAction(
                 e -> dialog.dispose(),
                 KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
                 JComponent.WHEN_IN_FOCUSED_WINDOW
         );
 
-        // 9. 设置默认按钮
+        // 9. Đặt nút mặc định
         dialog.getRootPane().setDefaultButton(okButton);
 
-        // 10. 显示对话框
+        // 10. Hiển thị hộp thoại
         dialog.setVisible(true);
     }
 
     /**
-     * 解析批量编辑的文本内容
-     * 支持格式：
+     * Phân tích nội dung văn bản chỉnh sửa hàng loạt
+     * Các định dạng được hỗ trợ: .
      * - Key: Value
      * - Key:Value
      * - Key = Value
      * - Key=Value
-     * 空行和注释会被忽略
+     * Các dòng trống và nhận xét sẽ bị bỏ qua
      */
     private void parseBulkText(String text) {
         if (text == null || text.trim().isEmpty()) {
-            // 如果文本为空，清空所有变量
+            // Nếu văn bản trống, hãy xóa tất cả các biến
             tablePanel.setVariableList(new ArrayList<>());
             return;
         }
@@ -181,10 +181,10 @@ public class EasyVariablesPanel extends JPanel {
         for (String line : lines) {
             line = line.trim();
             if (line.isEmpty() || line.startsWith("#") || line.startsWith("//")) {
-                continue; // 忽略空行和注释
+                continue; // Các dòng trống và nhận xét sẽ bị bỏ qua
             }
 
-            // 支持 ":" 和 "=" 两种分隔符
+            // Hỗ trợ ":" và "=" Hai dấu phân cách
             String[] parts = null;
             if (line.contains(":")) {
                 parts = line.split(":", 2);
@@ -199,7 +199,7 @@ public class EasyVariablesPanel extends JPanel {
                     variables.add(new Variable(true, key, value));
                 }
             } else if (line.contains(":") || line.contains("=")) {
-                // 如果包含分隔符但解析失败，可能是值为空的情况
+                // Nếu có dấu phân cách nhưng phân tích cú pháp không thành công thì có thể giá trị đó trống
                 String key = line.replaceAll("[=:].*", "").trim();
                 if (!key.isEmpty()) {
                     variables.add(new Variable(true, key, ""));
@@ -207,11 +207,11 @@ public class EasyVariablesPanel extends JPanel {
             }
         }
 
-        // 更新表格数据
+        // Cập nhật dữ liệu bảng
         tablePanel.setVariableList(variables);
     }
 
-    // ========== 代理方法，暴露给外部使用 ==========
+    // ========== Phương thức proxy, được sử dụng bên ngoài ==========
 
     public void addTableModelListener(TableModelListener listener) {
         tablePanel.addTableModelListener(listener);
@@ -222,8 +222,8 @@ public class EasyVariablesPanel extends JPanel {
     }
 
     /**
-     * 从 model 直接读取，不停止单元格编辑。
-     * 用于自动保存 / tab 指示器等后台场景，避免打断用户正在进行的输入。
+     * Từ model Đọc trực tiếp mà không dừng chỉnh sửa ô.
+     * để lưu tự động / tab Các cảnh nền như chỉ báo để tránh làm gián đoạn quá trình nhập liệu đang diễn ra của người dùng.
      */
     public List<Variable> getVariableListFromModel() {
         return tablePanel.getVariableListFromModel();

@@ -1,7 +1,7 @@
 package com.laker.postman.platform.update.source;
 
 /**
- * GitHub 更新源实现
+ * GitHub Cập nhật triển khai nguồn
  */
 public class GitHubUpdateSource extends AbstractUpdateSource {
 

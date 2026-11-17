@@ -14,16 +14,16 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 
 /**
- * EasyPostman 密码输入框组件
+ * EasyPostman Thành phần hộp nhập mật khẩu
  * <p>
- * 功能特性：
- * 1. 集成 FlatLaf 显示/隐藏密码按钮（眼睛图标）
- * 2. 支持撤回/重做操作
- * - Windows: Ctrl+Z 撤回，Ctrl+Y 重做
- * - macOS: Cmd+Z 撤回，Cmd+Shift+Z 重做
- * 3. 支持占位符文本
- * 4. 统一的字体样式
- * 5. 支持自定义样式（通过 FlatLaf 的 STYLE 属性）
+ * Đặc trưng:
+ * 1. tích hợp FlatLaf trình diễn/Nút ẩn mật khẩu (biểu tượng con mắt)
+ * 2. Hỗ trợ rút tiền/Làm lại thao tác
+ * - Windows: Ctrl+Z Rút tiền,Ctrl+Y làm lại
+ * - macOS: Cmd+Z Rút tiền,Cmd+Shift+Z làm lại
+ * 3. Văn bản giữ chỗ được hỗ trợ
+ * 4. Kiểu phông chữ thống nhất
+ * 5. Hỗ trợ các kiểu tùy chỉnh (thông qua  FlatLaf của STYLE thuộc tính)
  *
  */
 @Slf4j
@@ -35,16 +35,16 @@ public class EasyPasswordField extends FlatPasswordField {
     private boolean showRevealButton = true;
 
     /**
-     * 创建默认的密码输入框
+     * Tạo hộp nhập mật khẩu mặc định
      */
     public EasyPasswordField() {
         this(20);
     }
 
     /**
-     * 创建指定列数的密码输入框
+     * Tạo hộp nhập mật khẩu với số cột được chỉ định
      *
-     * @param columns 显示列数
+     * @param columns Hiển thị số lượng cột
      */
     public EasyPasswordField(int columns) {
         super();
@@ -53,10 +53,10 @@ public class EasyPasswordField extends FlatPasswordField {
     }
 
     /**
-     * 创建带初始文本和列数的密码输入框
+     * Tạo hộp nhập mật khẩu với văn bản và số cột ban đầu
      *
-     * @param text    初始文本
-     * @param columns 显示列数
+     * @param text    Văn bản ban đầu
+     * @param columns Hiển thị số lượng cột
      */
     public EasyPasswordField(String text, int columns) {
         super();
@@ -66,10 +66,10 @@ public class EasyPasswordField extends FlatPasswordField {
     }
 
     /**
-     * 创建带占位符的密码输入框
+     * Tạo hộp nhập mật khẩu có phần giữ chỗ
      *
-     * @param columns         显示列数
-     * @param placeholderText 占位符文本
+     * @param columns         Hiển thị số lượng cột
+     * @param placeholderText Văn bản giữ chỗ
      */
     public EasyPasswordField(int columns, String placeholderText) {
         super();
@@ -79,11 +79,11 @@ public class EasyPasswordField extends FlatPasswordField {
     }
 
     /**
-     * 创建带初始文本、列数和占位符的密码输入框
+     * Tạo hộp nhập mật khẩu với văn bản ban đầu, số cột và phần giữ chỗ
      *
-     * @param text            初始文本
-     * @param columns         显示列数
-     * @param placeholderText 占位符文本
+     * @param text            Văn bản ban đầu
+     * @param columns         Hiển thị số lượng cột
+     * @param placeholderText Văn bản giữ chỗ
      */
     public EasyPasswordField(String text, int columns, String placeholderText) {
         super();
@@ -94,21 +94,21 @@ public class EasyPasswordField extends FlatPasswordField {
     }
 
     /**
-     * 初始化组件
+     * Khởi tạo thành phần
      */
     private void init() {
-        // 设置默认字体
+        // Đặt phông chữ mặc định
         setFont(FontsUtil.getDefaultFont(Font.PLAIN));
 
-        // 启用密码显示/隐藏按钮
+        // Kích hoạt hiển thị mật khẩu/Nút ẩn
         updateRevealButtonStyle();
 
-        // 初始化撤回/重做功能
+        // Đã rút lại quá trình khởi tạo/Làm lại chức năng
         initUndoRedo();
     }
 
     /**
-     * 更新显示/隐藏按钮样式
+     * Cập nhật hiển thị/Ẩn kiểu nút
      */
     private void updateRevealButtonStyle() {
         if (showRevealButton) {
@@ -119,9 +119,9 @@ public class EasyPasswordField extends FlatPasswordField {
     }
 
     /**
-     * 设置是否显示密码显示/隐藏按钮
+     * Đặt xem có hiển thị hiển thị mật khẩu hay không/Nút ẩn
      *
-     * @param show true 显示按钮，false 隐藏按钮
+     * @param show true Nút hiển thị,false Nút ẩn
      */
     public void setShowRevealButton(boolean show) {
         if (this.showRevealButton != show) {
@@ -131,21 +131,21 @@ public class EasyPasswordField extends FlatPasswordField {
     }
 
     /**
-     * 获取是否显示密码显示/隐藏按钮
+     * Nhận xem có hiển thị hiển thị mật khẩu hay không/Nút ẩn
      *
-     * @return true 显示按钮，false 隐藏按钮
+     * @return true Nút hiển thị,false Nút ẩn
      */
     public boolean isShowRevealButton() {
         return showRevealButton;
     }
 
     /**
-     * 初始化撤回/重做功能
+     * Đã rút lại quá trình khởi tạo/Làm lại chức năng
      */
     private void initUndoRedo() {
         getDocument().addUndoableEditListener(undoManager);
 
-        // Undo - 撤回
+        // Undo - Rút tiền
         getInputMap().put(KeyStroke.getKeyStroke("control Z"), "Undo");
         getInputMap().put(KeyStroke.getKeyStroke("meta Z"), "Undo"); // macOS Cmd+Z
         getActionMap().put("Undo", new AbstractAction() {
@@ -161,7 +161,7 @@ public class EasyPasswordField extends FlatPasswordField {
             }
         });
 
-        // Redo - 重做
+        // Redo - làm lại
         getInputMap().put(KeyStroke.getKeyStroke("control Y"), "Redo");
         getInputMap().put(KeyStroke.getKeyStroke("meta shift Z"), "Redo"); // macOS Cmd+Shift+Z
         getActionMap().put("Redo", new AbstractAction() {
@@ -179,65 +179,65 @@ public class EasyPasswordField extends FlatPasswordField {
     }
 
     /**
-     * 获取密码文本（便捷方法）
+     * Lấy văn bản mật khẩu (phương pháp thuận tiện)
      *
-     * @return 密码字符串
+     * @return Chuỗi mật khẩu
      */
     public String getPasswordText() {
         return new String(getPassword());
     }
 
     /**
-     * 设置密码文本（便捷方法）
+     * Đặt văn bản mật khẩu (phương pháp thuận tiện)
      *
-     * @param password 密码字符串
+     * @param password Chuỗi mật khẩu
      */
     public void setPasswordText(String password) {
         setText(password);
     }
 
     /**
-     * 清空密码
+     * Xóa mật khẩu
      */
     public void clearPassword() {
         setText("");
     }
 
     /**
-     * 添加文档监听器（便捷方法）
+     * Thêm trình nghe tài liệu (phương pháp tiện lợi)
      *
-     * @param listener 文档监听器
+     * @param listener Người nghe tài liệu
      */
     public void addDocumentListener(DocumentListener listener) {
         getDocument().addDocumentListener(listener);
     }
 
     /**
-     * 移除文档监听器（便捷方法）
+     * Xóa trình nghe tài liệu (phương pháp tiện lợi)
      *
-     * @param listener 文档监听器
+     * @param listener Người nghe tài liệu
      */
     public void removeDocumentListener(DocumentListener listener) {
         getDocument().removeDocumentListener(listener);
     }
 
     /**
-     * 重置撤回管理器
-     * 当需要清除撤回历史时调用此方法
+     * Đặt lại trình quản lý thu hồi
+     * Phương thức này được gọi khi lịch sử thu hồi cần được xóa
      */
     public void resetUndoManager() {
         undoManager.discardAllEdits();
     }
 
     /**
-     * 设置自定义样式
-     * 注意：如果要保留显示/隐藏按钮，请在样式字符串中包含 "showRevealButton: true"
+     * Đặt kiểu tùy chỉnh
+     * LƯU Ý: Nếu bạn muốn giữ màn hình/Để ẩn nút, hãy đưa nó vào chuỗi kiểu "showRevealButton: true"
      *
-     * @param style FlatLaf 样式字符串
+     * @param style FlatLaf Chuỗi phong cách
      */
     public void setCustomStyle(String style) {
         if (showRevealButton && (style == null || !style.contains("showRevealButton"))) {
-            // 如果开启了显示按钮但样式中没有，则追加
+            // Nếu nút hiển thị được bật nhưng không đúng kiểu, nó sẽ được thêm vào
             String newStyle = style == null ? SHOW_REVEAL_BUTTON_STYLE :
                     style + "; " + SHOW_REVEAL_BUTTON_STYLE;
             putClientProperty(FlatClientProperties.STYLE, newStyle);

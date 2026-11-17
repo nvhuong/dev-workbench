@@ -3,19 +3,19 @@ package com.laker.postman.common.constants;
 import lombok.experimental.UtilityClass;
 
 /**
- * 应用程序常量
- * 定义应用级别的全局常量
+ * Các hằng số ứng dụng
+ * Xác định các hằng số toàn cục ở cấp độ ứng dụng
  */
 @UtilityClass
 public class AppConstants {
 
     /**
-     * 应用程序名称
+     * Tên ứng dụng
      */
-    public static final String APP_NAME = "EasyPostman";
+    public static final String APP_NAME = "Dev Workbench";
 
     /**
-     * 应用程序基础包名
+     * Tên gói cơ sở ứng dụng
      */
     public static final String BASE_PACKAGE = "com.laker.postman";
 

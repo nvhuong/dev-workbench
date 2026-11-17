@@ -69,7 +69,7 @@ public class SidebarBottomBarTest extends AbstractSwingUiTest {
     public void bottomBarShouldRenderPluginStatusBarActions() {
         StatusBarActionContribution contribution = new StatusBarActionContribution(
                 "capture-shortcut",
-                "抓包",
+                "Chụp các gói tin",
                 "icons/global-variables.svg",
                 StatusBarActionContribution.TARGET_TOOLBOX,
                 "capture",
@@ -80,12 +80,12 @@ public class SidebarBottomBarTest extends AbstractSwingUiTest {
 
         List<JLabel> labels = collectIconLabels(bottomBar.leftPanel(), bottomBar.rightPanel());
         JLabel actionLabel = labels.stream()
-                .filter(label -> "抓包".equals(label.getToolTipText()))
+                .filter(label -> "Chụp các gói tin".equals(label.getToolTipText()))
                 .findFirst()
                 .orElseThrow();
 
         assertEquals(labels.size(), 6);
-        assertEquals(actionLabel.getAccessibleContext().getAccessibleName(), "抓包");
+        assertEquals(actionLabel.getAccessibleContext().getAccessibleName(), "Chụp các gói tin");
         click(actionLabel);
         assertSame(invoked.get(), contribution);
     }

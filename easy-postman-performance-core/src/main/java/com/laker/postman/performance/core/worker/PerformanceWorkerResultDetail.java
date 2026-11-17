@@ -16,13 +16,13 @@ public class PerformanceWorkerResultDetail {
     int costMs;
     boolean executionFailed;
     boolean cancelled;
-    /** 请求开始时间（epoch ms），未知为 -1。 */
+    /** Yêu cầu thời gian bắt đầu (epoch ms），Không rõ cho -1。 */
     @Builder.Default
     long startTimeMs = -1L;
-    /** 首字节耗时（ms），未知为 -1。 */
+    /** Byte đầu tiên cần có thời gian (ms），Không rõ cho -1。 */
     @Builder.Default
     long latencyMs = -1L;
-    /** 连接耗时（含排队/DNS/TCP/TLS，ms），未知为 -1。 */
+    /** Thời gian kết nối (bao gồm cả hàng đợi)/DNS/TCP/TLS，ms），Không rõ cho -1。 */
     @Builder.Default
     long connectMs = -1L;
     DetailRequest request;
@@ -49,11 +49,11 @@ public class PerformanceWorkerResultDetail {
         long endTimeMs;
         long bodySize;
         long headersSize;
-        /** 响应文件名，仅文件响应有值。 */
+        /** Tên tệp phản hồi, chỉ phản hồi tệp mới có giá trị. */
         String fileName;
-        /** 文件头识别出、与 Content-Type 不符的扩展名。 */
+        /** Tiêu đề tệp xác định và  Content-Type Phần mở rộng chưa từng có. */
         String detectedFileExtension;
-        /** 文件正文未随详情传输，只展示文件信息。 */
+        /** Văn bản của tệp không được truyền kèm theo chi tiết, chỉ có thông tin tệp được hiển thị. */
         boolean fileContentOmitted;
     }
 

@@ -50,7 +50,7 @@ public class WorkspaceRunExecutor {
         }
         WorkspaceRunObserver completionObserver = observer == null ? WorkspaceRunObserver.NO_OP : observer;
         WorkspaceRunWorkspace workspace = WorkspaceRunWorkspaceResolver.resolve(options.getWorkspace());
-        Path collectionPath = requireFile(workspace.collectionsFile(), "EasyPostman collections file");
+        Path collectionPath = requireFile(workspace.collectionsFile(), "Dev Workbench collections file");
         Path workingDirectory = resolveWorkingDirectory(options, workspace.directory());
         CollectionDocument document = parseCollections(collectionPath);
         WorkspaceRunPlan plan = planner.plan(workspace, document);
@@ -187,14 +187,14 @@ public class WorkspaceRunExecutor {
         try {
             CollectionDocument document = CollectionDocumentJsonCodec.read(collectionPath.toFile());
             if (document.getRoots().isEmpty()) {
-                throw new IllegalArgumentException("No EasyPostman collections found: " + collectionPath);
+                throw new IllegalArgumentException("No Dev Workbench collections found: " + collectionPath);
             }
             return document;
         } catch (IllegalArgumentException ex) {
             throw ex;
         } catch (Exception ex) {
             throw new IllegalArgumentException(
-                    "Unable to read EasyPostman collections: " + collectionPath + ": " + describe(ex),
+                    "Unable to read Dev Workbench collections: " + collectionPath + ": " + describe(ex),
                     ex
             );
         }
@@ -203,7 +203,7 @@ public class WorkspaceRunExecutor {
     private static Environment loadEnvironment(Path path, String selector) {
         if (!Files.isRegularFile(path) || !Files.isReadable(path)) {
             if (selector != null && !selector.isBlank()) {
-                throw new IllegalArgumentException("EasyPostman environments file does not exist: " + path);
+                throw new IllegalArgumentException("Dev Workbench environments file does not exist: " + path);
             }
             return new Environment("<none>");
         }
@@ -217,7 +217,7 @@ public class WorkspaceRunExecutor {
             environments = cn.hutool.json.JSONUtil.toList(array, Environment.class);
         } catch (Exception ex) {
             throw new IllegalArgumentException(
-                    "Unable to read EasyPostman environments: " + path + ": " + describe(ex),
+                    "Unable to read Dev Workbench environments: " + path + ": " + describe(ex),
                     ex
             );
         }
@@ -264,7 +264,7 @@ public class WorkspaceRunExecutor {
             return empty;
         } catch (Exception ex) {
             throw new IllegalArgumentException(
-                    "Unable to read EasyPostman globals: " + path + ": " + describe(ex),
+                    "Unable to read Dev Workbench globals: " + path + ": " + describe(ex),
                     ex
             );
         }

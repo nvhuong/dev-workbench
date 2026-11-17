@@ -9,7 +9,7 @@ import javax.swing.SwingWorker;
 import java.util.List;
 
 /**
- * Splash 模式的主窗口后台启动任务。
+ * Splash Cửa sổ chính của phương thức bắt đầu tác vụ ở chế độ nền.
  */
 @Slf4j
 @RequiredArgsConstructor

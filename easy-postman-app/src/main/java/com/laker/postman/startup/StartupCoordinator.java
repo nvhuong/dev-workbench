@@ -11,7 +11,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 
 /**
- * 协调应用启动过程中与主窗口相关的初始化步骤。
+ * Điều phối các bước khởi tạo liên quan đến cửa sổ chính trong quá trình khởi động ứng dụng.
  */
 @Slf4j
 public class StartupCoordinator {
@@ -23,7 +23,7 @@ public class StartupCoordinator {
     }
 
     /**
-     * IOC 扫描只注册 Bean 定义，与 Swing 主题安装互不依赖，可以同时进行。
+     * IOC Chỉ quét để đăng ký Bean Định nghĩa, và Swing Việc cài đặt chủ đề không phụ thuộc vào nhau và có thể được thực hiện cùng một lúc.
      */
     public synchronized void startHostIocInitialization() {
         if (hostIocInitialization != null) {
@@ -164,7 +164,7 @@ public class StartupCoordinator {
     private void showMainFrameAndLoadContentOnEdt(MainFrame mainFrame) {
         showMainFrameOnEdt(mainFrame);
         log.info("Scheduling main content loading");
-        // 先让轻量启动壳完成首帧显示，再切换到完整主内容，减少首屏阻塞。
+        // Để shell khởi động nhẹ hoàn tất việc hiển thị khung hình đầu tiên trước, sau đó chuyển sang nội dung chính hoàn chỉnh để giảm tình trạng chặn màn hình đầu tiên.
         SwingUtilities.invokeLater(mainFrame::loadMainContentAsync);
     }
 

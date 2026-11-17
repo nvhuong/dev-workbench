@@ -8,127 +8,127 @@ import lombok.experimental.UtilityClass;
 import java.io.File;
 
 /**
- * 配置文件路径常量统一管理
- * 所有配置文件路径都在这里定义，便于维护
+ * Các hằng số đường dẫn tệp cấu hình được quản lý thống nhất
+ * Tất cả các đường dẫn tệp cấu hình được xác định ở đây để dễ dàng bảo trì
  */
 @UtilityClass
 public class ConfigPathConstants {
 
     /**
-     * 获取数据根目录
-     * Portable 模式：程序所在目录/data/
-     * 普通模式：用户主目录/EasyPostman/
+     * Lấy thư mục gốc dữ liệu
+     * Portable Mode: Thư mục chứa chương trình/data/
+     * Chế độ bình thường: thư mục chính của người dùng/EasyPostman/
      */
     private static String getDataRootPath() {
         return SystemUtil.getEasyPostmanPath();
     }
 
-    // ==================== 配置文件路径常量 ====================
+    // ==================== Đường dẫn tệp cấu hình không đổi ====================
 
     /**
-     * 客户端证书配置文件
+     * Tệp cấu hình chứng chỉ ứng dụng khách
      */
     public static final String CLIENT_CERTIFICATES = getDataRootPath() + "client_certificates.json";
 
     /**
-     * 默认工作区目录（与其他工作区平级，根目录不参与 git）
+     * Thư mục không gian làm việc mặc định (ngang hàng với các không gian làm việc khác, thư mục gốc không tham gia git）
      */
     public static final String DEFAULT_WORKSPACE_DIR = getDataRootPath() + "workspaces" + File.separator + "default" + File.separator;
 
     /**
-     * 集合配置文件（默认工作区）
+     * Tệp cấu hình bộ sưu tập (không gian làm việc mặc định)
      */
     public static final String COLLECTIONS = DEFAULT_WORKSPACE_DIR + "collections.json";
 
     /**
-     * 应用设置文件
+     * Tệp cài đặt ứng dụng
      */
     public static final String EASY_POSTMAN_SETTINGS = getDataRootPath() + "easy_postman_settings.properties";
 
     /**
-     * 环境变量配置文件（默认工作区）
+     * Tệp cấu hình biến môi trường (không gian làm việc mặc định)
      */
     public static final String ENVIRONMENTS = DEFAULT_WORKSPACE_DIR + "environments.json";
 
     /**
-     * 全局变量配置文件（应用级，不跟随工作区切换）
+     * Tệp cấu hình biến toàn cục (cấp ứng dụng, không tuân theo chuyển đổi không gian làm việc)
      */
     public static final String GLOBAL_VARIABLES = getDataRootPath() + "global_variables.json";
 
     /**
-     * 功能测试配置文件
+     * Tệp cấu hình kiểm tra chức năng
      */
     public static final String FUNCTIONAL_CONFIG = getDataRootPath() + "functional_config.json";
 
     /**
-     * 性能测试配置文件
+     * Tệp cấu hình kiểm tra hiệu suất
      */
     public static final String PERFORMANCE_CONFIG = getDataRootPath() + "performance_config.json";
 
     /**
-     * Mock Server 配置文件（默认工作区）。
+     * Mock Server Tệp cấu hình (không gian làm việc mặc định).
      */
     public static final String MOCK_SERVERS = DEFAULT_WORKSPACE_DIR + "mock_servers.json";
 
     /**
-     * Elasticsearch 连接配置文件
+     * Elasticsearch Hồ sơ kết nối
      */
     public static final String ELASTICSEARCH_CONNECTION_PROFILES = getDataRootPath() + "elasticsearch_connection_profiles.json";
 
     /**
-     * InfluxDB 连接配置文件
+     * InfluxDB Hồ sơ kết nối
      */
     public static final String INFLUXDB_CONNECTION_PROFILES = getDataRootPath() + "influxdb_connection_profiles.json";
 
     /**
-     * 请求历史记录文件
+     * Yêu cầu tập tin lịch sử
      */
     public static final String REQUEST_HISTORY = getDataRootPath() + "request_history.json";
 
     /**
-     * 快捷键配置文件
+     * Tệp cấu hình phím tắt
      */
     public static final String SHORTCUTS = getDataRootPath() + "shortcuts.properties";
 
     /**
-     * 用户设置文件
+     * Tệp cài đặt người dùng
      */
     public static final String USER_SETTINGS = getDataRootPath() + "user_settings.json";
 
     /**
-     * 工作区配置文件
+     * Tệp cấu hình không gian làm việc
      */
     public static final String WORKSPACES = getDataRootPath() + "workspaces.json";
 
     /**
-     * 工作区设置文件
+     * Tệp cài đặt không gian làm việc
      */
     public static final String WORKSPACE_SETTINGS = getDataRootPath() + "workspace_settings.json";
 
     /**
-     * 工作区目录
+     * Thư mục không gian làm việc
      */
     public static final String WORKSPACES_DIR = getDataRootPath() + "workspaces" + File.separator;
 
     /**
-     * 已打开的请求文件
+     * Mở tập tin yêu cầu
      */
     public static final String OPENED_REQUESTS = getDataRootPath() + "opened_requests.json";
 
     /**
-     * 日志目录
-     * Portable 模式：程序所在目录/logs/
-     * 普通模式：用户主目录/EasyPostman/logs/
+     * Thư mục nhật ký
+     * Portable Mode: Thư mục chứa chương trình/logs/
+     * Chế độ bình thường: thư mục chính của người dùng/EasyPostman/logs/
      */
     public static final String LOG_DIR = AppRuntimeLayout.logRootDirectory(ConfigPathConstants.class).toString()
             + File.separator;
 
-    // ==================== 工作区相关路径方法 ====================
+    // ==================== Phương pháp đường dẫn liên quan đến không gian làm việc ====================
 
     /**
-     * 获取指定工作区的集合文件路径。
-     * {@link com.laker.postman.model.Workspace#getPath()} 保证末尾始终带 {@link java.io.File#separator}，
-     * 直接拼接文件名即可。
+     * Lấy đường dẫn tệp bộ sưu tập của không gian làm việc được chỉ định.
+     * {@link com.laker.postman.model.Workspace#getPath()} Hãy đảm bảo luôn mang nó đến cuối cùng {@link java.io.File#separator}，
+     * Chỉ cần nối trực tiếp tên tệp.
      */
     public static String getCollectionsPath(Workspace workspace) {
         if (workspace == null) {
@@ -138,9 +138,9 @@ public class ConfigPathConstants {
     }
 
     /**
-     * 获取指定工作区的环境变量文件路径。
-     * {@link com.laker.postman.model.Workspace#getPath()} 保证末尾始终带 {@link java.io.File#separator}，
-     * 直接拼接文件名即可。
+     * Lấy đường dẫn tệp biến môi trường của không gian làm việc được chỉ định.
+     * {@link com.laker.postman.model.Workspace#getPath()} Hãy đảm bảo luôn mang nó đến cuối cùng {@link java.io.File#separator}，
+     * Chỉ cần nối trực tiếp tên tệp.
      */
     public static String getEnvironmentsPath(Workspace workspace) {
         if (workspace == null) {
@@ -150,7 +150,7 @@ public class ConfigPathConstants {
     }
 
     /**
-     * 获取指定工作区的功能测试配置文件路径。
+     * Lấy đường dẫn tệp cấu hình kiểm tra chức năng cho không gian làm việc được chỉ định.
      */
     public static String getFunctionalConfigPath(Workspace workspace) {
         if (workspace == null || workspace.getPath() == null || workspace.getPath().isBlank()) {
@@ -160,7 +160,7 @@ public class ConfigPathConstants {
     }
 
     /**
-     * 获取指定工作区的性能测试配置文件路径。
+     * Nhận đường dẫn tệp cấu hình kiểm tra hiệu suất của không gian làm việc được chỉ định.
      */
     public static String getPerformanceConfigPath(Workspace workspace) {
         if (workspace == null || workspace.getPath() == null || workspace.getPath().isBlank()) {
@@ -170,7 +170,7 @@ public class ConfigPathConstants {
     }
 
     /**
-     * 获取指定工作区的 Mock Server 配置文件路径。
+     * Nhận không gian làm việc được chỉ định Mock Server Đường dẫn tập tin cấu hình.
      */
     public static String getMockServersPath(Workspace workspace) {
         if (workspace == null || workspace.getPath() == null || workspace.getPath().isBlank()) {

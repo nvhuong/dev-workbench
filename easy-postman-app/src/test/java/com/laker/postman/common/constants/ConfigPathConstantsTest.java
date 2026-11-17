@@ -9,7 +9,7 @@ import static org.testng.Assert.assertEquals;
 
 public class ConfigPathConstantsTest {
 
-    @Test(description = "性能测试配置路径应位于指定工作区目录内")
+    @Test(description = "Đường dẫn cấu hình kiểm tra hiệu năng phải nằm trong thư mục không gian làm việc được chỉ định")
     public void shouldResolvePerformanceConfigPathForWorkspace() {
         Workspace workspace = new Workspace();
         workspace.setPath("/tmp/easy-postman-workspace" + File.separator);
@@ -20,7 +20,7 @@ public class ConfigPathConstantsTest {
         );
     }
 
-    @Test(description = "工作区为空时性能测试配置路径应回退到旧应用级路径")
+    @Test(description = "Đường dẫn cấu hình kiểm tra hiệu năng sẽ quay trở lại đường dẫn cấp ứng dụng cũ khi không gian làm việc trống")
     public void shouldFallbackToDefaultWorkspacePerformanceConfigPathWhenWorkspaceMissing() {
         assertEquals(
                 ConfigPathConstants.getPerformanceConfigPath(null),
@@ -36,7 +36,7 @@ public class ConfigPathConstantsTest {
         );
     }
 
-    @Test(description = "功能测试配置路径应位于指定工作区目录内")
+    @Test(description = "Đường dẫn cấu hình kiểm tra chức năng phải nằm trong thư mục không gian làm việc được chỉ định")
     public void shouldResolveFunctionalConfigPathForWorkspace() {
         Workspace workspace = new Workspace();
         workspace.setPath("/tmp/easy-postman-workspace" + File.separator);
@@ -47,7 +47,7 @@ public class ConfigPathConstantsTest {
         );
     }
 
-    @Test(description = "工作区为空时功能测试配置路径应回退到旧应用级路径")
+    @Test(description = "Đường dẫn cấu hình kiểm tra chức năng sẽ quay trở lại đường dẫn cấp ứng dụng cũ khi không gian làm việc trống")
     public void shouldFallbackToDefaultWorkspaceFunctionalConfigPathWhenWorkspaceMissing() {
         assertEquals(
                 ConfigPathConstants.getFunctionalConfigPath(null),
@@ -63,7 +63,7 @@ public class ConfigPathConstantsTest {
         );
     }
 
-    @Test(description = "Mock Server 配置路径应位于指定工作区目录内")
+    @Test(description = "Mock Server Đường dẫn cấu hình phải nằm trong thư mục không gian làm việc được chỉ định")
     public void shouldResolveMockServersPathForWorkspace() {
         Workspace workspace = new Workspace();
         workspace.setPath("/tmp/easy-postman-workspace" + File.separator);

@@ -67,7 +67,7 @@ final class McpWorkspaceToolService implements EasyPostmanMcpBackend {
                 failures.add(workspace.name() + ": " + describe(exception));
             }
         }
-        throw new IllegalArgumentException("No runnable EasyPostman workspace found. " + String.join("; ", failures));
+        throw new IllegalArgumentException("No runnable Dev Workbench workspace found. " + String.join("; ", failures));
     }
 
     @Override
@@ -303,14 +303,14 @@ final class McpWorkspaceToolService implements EasyPostmanMcpBackend {
         try {
             CollectionDocument document = CollectionDocumentJsonCodec.read(workspace.collectionsFile().toFile());
             if (document.getRoots().isEmpty()) {
-                throw new IllegalArgumentException("No EasyPostman collections found");
+                throw new IllegalArgumentException("No Dev Workbench collections found");
             }
             return document;
         } catch (IllegalArgumentException exception) {
             throw exception;
         } catch (Exception exception) {
             throw new IllegalArgumentException(
-                    "Unable to read EasyPostman collections: " + describe(exception),
+                    "Unable to read Dev Workbench collections: " + describe(exception),
                     exception
             );
         }
@@ -327,7 +327,7 @@ final class McpWorkspaceToolService implements EasyPostmanMcpBackend {
             ));
         } catch (Exception exception) {
             throw new IllegalArgumentException(
-                    "Unable to read EasyPostman environments: " + describe(exception),
+                    "Unable to read Dev Workbench environments: " + describe(exception),
                     exception
             );
         }

@@ -18,7 +18,7 @@ import java.awt.Frame;
 import java.awt.Window;
 
 /**
- * 顶部帮助菜单。
+ * Trình đơn trợ giúp hàng đầu.
  */
 @Slf4j
 @UtilityClass

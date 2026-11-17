@@ -1,31 +1,31 @@
-# 工作流名称：同步标签
+# Tên quy trình làm việc: Đồng bộ hóa thẻ
 name: Sync Labels
 
-# 触发条件
+# Điều kiện kích hoạt
 on:
-  # 当推送到 master 分支，且 .github/labels.json 文件发生变化时触发
+  # Khi bị đẩy tới master chi nhánh, và .github/labels.json Được kích hoạt khi tập tin thay đổi
   push:
     branches:
       - master
     paths:
       - '.github/labels.json'
-  # 允许手动触发工作流
+  # Cho phép kích hoạt quy trình công việc theo cách thủ công
   workflow_dispatch:
 
 jobs:
   sync-labels:
-    # 运行环境：使用最新版本的 Ubuntu
+    # Môi trường chạy: Sử dụng phiên bản mới nhất Ubuntu
     runs-on: ubuntu-latest
-    # 权限设置：允许写入 issues（包括标签管理）
+    # Cài đặt quyền: Cho phép viết issues（bao gồm quản lý thẻ)
     permissions:
       issues: write
 
     steps:
-      # 第一步：检出代码仓库
+      # Bước một: Kiểm tra kho lưu trữ mã
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
-      # 第二步：同步标签配置到 GitHub 仓库
+      # Bước 2: Đồng bộ cấu hình nhãn thành GitHub nhà kho
       - name: Sync labels
         uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
         with:

@@ -38,7 +38,7 @@ public class PerformanceWorkerResultDetailDisplayMapper {
         );
     }
 
-    // 旧 worker 不传开始时间，用结束时间减耗时推算。
+    // cũ worker Thời gian bắt đầu không được thông qua và thời gian được tính bằng cách trừ đi thời gian kết thúc.
     private long resolveStartTimeMs(PerformanceWorkerResultDetail detail, HttpResponse response) {
         if (detail.getStartTimeMs() > 0) {
             return detail.getStartTimeMs();

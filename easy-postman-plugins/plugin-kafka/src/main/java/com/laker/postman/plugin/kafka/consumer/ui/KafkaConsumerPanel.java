@@ -415,7 +415,7 @@ public class KafkaConsumerPanel extends JPanel {
     }
 
     /**
-     * 主题切换时重新取语义强调色，避免亮/暗模式下仍沿用旧主题的 chip 底色。
+     * Khi chuyển chủ đề nên chọn lại màu nhấn ngữ nghĩa để tránh bị chói/Theme cũ vẫn được sử dụng ở chế độ tối chip màu nền.
      */
     private static final class ThemedChipLabel extends ChipLabel {
         private final transient Supplier<Color> accentSupplier;

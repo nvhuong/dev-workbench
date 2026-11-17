@@ -9,7 +9,7 @@ import static org.testng.Assert.assertEquals;
 
 public class SidebarTabTest {
 
-    @Test(description = "默认侧边栏应按配置、Mock、测试、工具的顺序排列")
+    @Test(description = "Thanh bên mặc định phải được định cấu hình như đã định cấu hình.Mock、Trình tự kiểm tra và dụng cụ")
     public void testDefaultOrder_ShouldPlaceMockServerAfterWorkspaces() {
         assertEquals(List.of(SidebarTab.values()), List.of(
                 SidebarTab.COLLECTIONS,
@@ -23,7 +23,7 @@ public class SidebarTabTest {
         ));
     }
 
-    @Test(description = "侧边栏排序配置应忽略未知和重复项，并补齐遗漏项")
+    @Test(description = "Cấu hình sắp xếp thanh bên sẽ bỏ qua các mục không xác định và trùng lặp và điền vào các mục còn thiếu")
     public void testResolveOrderedTabs_ShouldNormalizeConfiguredOrder() {
         List<SidebarTab> tabs = SidebarTab.resolveOrderedTabs(List.of(
                 "TOOLBOX",
@@ -37,7 +37,7 @@ public class SidebarTabTest {
         assertEquals(tabs.size(), SidebarTab.values().length);
     }
 
-    @Test(description = "当隐藏配置把所有菜单都隐藏时，应回退到默认可见列表")
+    @Test(description = "Khi cấu hình ẩn ẩn tất cả các menu, nó sẽ quay trở lại danh sách hiển thị mặc định")
     public void testResolveVisibleTabs_ShouldFallbackWhenAllTabsHidden() {
         Set<String> hiddenTabs = Set.of(
                 "COLLECTIONS",

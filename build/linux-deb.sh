@@ -1,75 +1,75 @@
 #!/bin/bash
 
-# Ubuntu/Debian 系统 DEB 包打包脚本
+# Ubuntu/Debian hệ thống DEB Kịch bản đóng gói gói
 
-# 检查 java 是否可用
+# nghiên cứu java có sẵn
 if ! command -v java &> /dev/null; then
-    echo "❌ 未检测到 java，请先安装 JDK 21+ 并配置环境变量。"
+    echo "❌ Không được phát hiện java，Vui lòng cài đặt nó trước JDK 21+ và cấu hình các biến môi trường."
     exit 1
 fi
-# 检查 mvn 是否可用
+# nghiên cứu mvn có sẵn
 if ! command -v mvn &> /dev/null; then
-    echo "❌ 未检测到 mvn，请先安装 Maven 并配置环境变量。"
+    echo "❌ Không được phát hiện mvn，Vui lòng cài đặt nó trước Maven và cấu hình các biến môi trường."
     exit 1
 fi
-# 检查 jlink 是否可用
+# nghiên cứu jlink có sẵn
 if ! command -v jlink &> /dev/null; then
-    echo "❌ 未检测到 jlink，请确认 JDK 21+ 已正确安装。"
+    echo "❌ Không được phát hiện jlink，Vui lòng xác nhận JDK 21+ Đã cài đặt chính xác."
     exit 1
 fi
-# 检查 jpackage 是否可用
+# nghiên cứu jpackage có sẵn
 if ! command -v jpackage &> /dev/null; then
-    echo "❌ 未检测到 jpackage，请确认 JDK 21+ 已正确安装。"
+    echo "❌ Không được phát hiện jpackage，Vui lòng xác nhận JDK 21+ Đã cài đặt chính xác."
     exit 1
 fi
-# 检查 objcopy 是否可用（jlink 需要）
+# nghiên cứu objcopy Nó có sẵn không (jlink bắt buộc)
 if ! command -v objcopy &> /dev/null; then
-    echo "❌ 未检测到 objcopy，请先安装 binutils："
+    echo "❌ Không được phát hiện objcopy，Vui lòng cài đặt nó trước binutils："
     echo "   sudo apt-get install binutils"
     exit 1
 fi
-# 获取项目根目录路径（包含 pom.xml）
+# Lấy đường dẫn thư mục gốc của dự án (bao gồm pom.xml）
 PROJECT_ROOT=$(cd "$(dirname "$0")/.."; pwd)
 
-# 切换到项目根目录并读取版本号
+# Chuyển sang thư mục gốc của dự án và đọc số phiên bản
 cd "$PROJECT_ROOT" || exit 1
-# 直接从 pom.xml 解析 revision
+# Trực tiếp từ pom.xml phân tích revision
 VERSION=$(grep -m 1 '<revision>' pom.xml | sed 's/.*<revision>\(.*\)<\/revision>.*/\1/')
-echo "🔧 开始打包 EasyPostman DEB 包，版本: $VERSION"
+echo "🔧 Bắt đầu đóng gói EasyPostman DEB Gói, phiên bản: $VERSION"
 APP_NAME="EasyPostman"
 JAR_NAME_WITH_VERSION="easy-postman-$VERSION.jar"
-JAR_NAME="easy-postman.jar"  # 固定名称，不带版本号
+JAR_NAME="easy-postman.jar"  # Đã sửa tên không có số phiên bản
 MAIN_CLASS="com.laker.postman.App"
 ICON_DIR="assets/linux/EasyPostman.png"
 OUTPUT_DIR="dist"
 APP_TARGET_DIR="easy-postman-app/target"
 
-# 检查 JDK 版本是否 >= 21
+# nghiên cứu JDK phiên bản hay không >= 21
 JAVA_VERSION=$(java -version 2>&1 | grep version | awk '{print substr($3, 2, 3)}' | tr -d '"')
 if (( $(echo "$JAVA_VERSION < 21" | bc -l) )); then
-    echo "❌ 需要 JDK 21 或更高版本。当前版本: $JAVA_VERSION"
+    echo "❌ Cần thiết JDK 21 hoặc cao hơn. Phiên bản hiện tại: $JAVA_VERSION"
     exit 1
 fi
 
-# Step 1: 清理 & 构建项目
-echo "🚀 开始构建项目..."
+# Step 1: Dọn dẹp & Xây dựng dự án
+echo "🚀 Bắt đầu xây dựng dự án..."
 mvn clean package -DskipTests=false
 if [ $? -ne 0 ]; then
-    echo "❌ Maven 构建失败，请检查错误日志"
+    echo "❌ Maven Xây dựng không thành công, vui lòng kiểm tra nhật ký lỗi"
     exit 1
 fi
-# 检查 jar 包是否生成成功
+# nghiên cứu jar Liệu gói có được tạo thành công hay không
 if [ ! -f "${APP_TARGET_DIR}/$JAR_NAME_WITH_VERSION" ]; then
-    echo "❌ 构建未生成 jar 包: ${APP_TARGET_DIR}/$JAR_NAME_WITH_VERSION"
+    echo "❌ Bản dựng không được tạo jar gói: ${APP_TARGET_DIR}/$JAR_NAME_WITH_VERSION"
     exit 1
 fi
 
-# 重命名 JAR 为固定名称（方便 jpackage 配置和后续更新）
-echo "📝 重命名 JAR: $JAR_NAME_WITH_VERSION -> $JAR_NAME"
+# Đổi tên JAR như một tên cố định (convenience jpackage cấu hình và các bản cập nhật tiếp theo)
+echo "📝 Đổi tên JAR: $JAR_NAME_WITH_VERSION -> $JAR_NAME"
 cp "${APP_TARGET_DIR}/$JAR_NAME_WITH_VERSION" "${APP_TARGET_DIR}/$JAR_NAME"
 
-# Step 2: 创建最小运行时 jlink
-echo "⚙️ 使用 jlink 创建最小化运行时..."
+# Step 2: Tạo thời gian chạy tối thiểu jlink
+echo "⚙️ sử dụng jlink Tạo thời gian chạy tối thiểu..."
 rm -rf target/runtime
 jlink \
     --add-modules java.base,java.desktop,java.logging,jdk.unsupported,java.naming,java.net.http,jdk.httpserver,java.prefs,java.sql,java.security.sasl,java.security.jgss,jdk.crypto.ec,java.management,java.management.rmi,jdk.crypto.cryptoki \
@@ -80,21 +80,21 @@ jlink \
     --output target/runtime
 
 if [ $? -ne 0 ]; then
-    echo "❌ jlink 创建失败"
+    echo "❌ jlink Tạo không thành công"
     exit 1
 fi
 
-# Step 3: 准备输出目录
+# Step 3: Chuẩn bị thư mục đầu ra
 mkdir -p ${OUTPUT_DIR}
 
-# Step 4: 创建仅包含主 jar 的临时目录
+# Step 4: Tạo chỉ chứa chủ jar thư mục tạm thời
 DIST_INPUT_DIR="target/dist-input"
 rm -rf ${DIST_INPUT_DIR}
 mkdir -p ${DIST_INPUT_DIR}
 cp "${APP_TARGET_DIR}/${JAR_NAME}" ${DIST_INPUT_DIR}/
 
-# Step 5: 使用 jpackage 打包 DEB
-echo "📦 使用 jpackage 打包 DEB 包..."
+# Step 5: sử dụng jpackage Đóng gói DEB
+echo "📦 sử dụng jpackage Đóng gói DEB gói..."
 jpackage \
     --input ${DIST_INPUT_DIR} \
     --main-jar ${JAR_NAME} \
@@ -129,25 +129,25 @@ jpackage \
     --java-options "--add-opens=java.desktop/sun.awt.X11=ALL-UNNAMED"
 
 if [ $? -ne 0 ]; then
-    echo "❌ jpackage 打包失败"
+    echo "❌ jpackage Đóng gói không thành công"
     exit 1
 fi
 
-# 自动识别 jpackage 产出的 DEB 文件名，避免架构提示写死为 amd64
+# Tự động nhận dạng jpackage được sản xuất DEB Tên tệp để tránh mã hóa cứng lời nhắc kiến ​​trúc amd64
 DEB_FILE=$(find "${OUTPUT_DIR}" -maxdepth 1 -type f -name "*.deb" | sort | tail -n 1)
 
 if [ -n "${DEB_FILE}" ]; then
-    echo "📦 生成 DEB: ${DEB_FILE}"
+    echo "📦 phát ra DEB: ${DEB_FILE}"
 fi
 
-# 完成提示
-echo "🎉 DEB 包打包完成！输出路径：$(pwd)/${OUTPUT_DIR}"
+# Hoàn thành lời nhắc
+echo "🎉 DEB Gói hàng đã được đóng gói! Đường dẫn đầu ra: .$(pwd)/${OUTPUT_DIR}"
 if [ -n "${DEB_FILE}" ]; then
     DEB_BASENAME=$(basename "${DEB_FILE}")
-    echo "📝 安装命令: sudo dpkg -i ${OUTPUT_DIR}/${DEB_BASENAME}"
-    echo "📝 或使用: sudo apt install ${OUTPUT_DIR}/${DEB_BASENAME}"
+    echo "📝 Lệnh cài đặt: sudo dpkg -i ${OUTPUT_DIR}/${DEB_BASENAME}"
+    echo "📝 hoặc sử dụng: sudo apt install ${OUTPUT_DIR}/${DEB_BASENAME}"
 else
-    echo "📝 安装命令: sudo dpkg -i ${OUTPUT_DIR}/<generated-package>.deb"
-    echo "📝 或使用: sudo apt install ${OUTPUT_DIR}/<generated-package>.deb"
+    echo "📝 Lệnh cài đặt: sudo dpkg -i ${OUTPUT_DIR}/<generated-package>.deb"
+    echo "📝 hoặc sử dụng: sudo apt install ${OUTPUT_DIR}/<generated-package>.deb"
 fi
-echo "📝 卸载命令: sudo dpkg -r easypostman"
+echo "📝 Lệnh gỡ cài đặt: sudo dpkg -r easypostman"

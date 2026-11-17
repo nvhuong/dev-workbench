@@ -49,7 +49,7 @@ public class SearchableTextAreaTest {
 
     @Test
     public void shouldLocalizeDefaultEditorPopupMenu() throws Exception {
-        Locale originalLocale = forceCurrentLocale(Locale.CHINESE);
+        Locale originalLocale = forceCurrentLocale(Locale.forLanguageTag("vi"));
         try {
             SwingUtilities.invokeAndWait(() -> {
                 RSyntaxTextArea textArea = new RSyntaxTextArea();
@@ -57,8 +57,8 @@ public class SearchableTextAreaTest {
                 new SearchableTextArea(textArea);
 
                 JPopupMenu popupMenu = textArea.getPopupMenu();
-                assertTrue(hasMenuTextContaining(popupMenu, "全选"));
-                assertTrue(hasMenuTextContaining(popupMenu, "折叠"));
+                assertTrue(hasMenuTextContaining(popupMenu, "Chọn tất cả"));
+                assertTrue(hasMenuTextContaining(popupMenu, "nếp gấp"));
                 assertFalse(hasMenuTextContaining(popupMenu, "Select All"));
                 assertFalse(hasMenuTextContaining(popupMenu, "Folding"));
             });
@@ -69,7 +69,7 @@ public class SearchableTextAreaTest {
 
     @Test
     public void shouldExposeCompactCurrentPlatformShortcutHintInEditorPopupMenu() throws Exception {
-        Locale originalLocale = forceCurrentLocale(Locale.CHINESE);
+        Locale originalLocale = forceCurrentLocale(Locale.forLanguageTag("vi"));
         try {
             SwingUtilities.invokeAndWait(() -> {
                 RSyntaxTextArea textArea = new RSyntaxTextArea();
@@ -77,7 +77,7 @@ public class SearchableTextAreaTest {
                 new SearchableTextArea(textArea);
 
                 JPopupMenu popupMenu = textArea.getPopupMenu();
-                assertEquals(countMenuTextContaining(popupMenu, "选中到行首/尾"), 1);
+                assertEquals(countMenuTextContaining(popupMenu, "Chọn về đầu dòng/đuôi"), 1);
                 assertFalse(hasMenuTextContaining(popupMenu, "Windows/Linux"));
                 assertFalse(hasMenuTextContaining(popupMenu, "macOS"));
                 if (isMac()) {
@@ -93,7 +93,7 @@ public class SearchableTextAreaTest {
 
     @Test
     public void shouldExposeJsonCopyActionsInSharedEditorPopupMenu() throws Exception {
-        Locale originalLocale = forceCurrentLocale(Locale.CHINESE);
+        Locale originalLocale = forceCurrentLocale(Locale.forLanguageTag("vi"));
         try {
             SwingUtilities.invokeAndWait(() -> {
                 RSyntaxTextArea textArea = new RSyntaxTextArea();
@@ -101,10 +101,10 @@ public class SearchableTextAreaTest {
                 new SearchableTextArea(textArea);
 
                 JPopupMenu popupMenu = textArea.getPopupMenu();
-                assertTrue(hasMenuTextContaining(popupMenu, "复制键"));
-                assertTrue(hasMenuTextContaining(popupMenu, "复制值"));
-                assertTrue(hasMenuTextContaining(popupMenu, "复制选中"));
-                assertTrue(hasMenuTextContaining(popupMenu, "复制全部"));
+                assertTrue(hasMenuTextContaining(popupMenu, "Sao chép chìa khóa"));
+                assertTrue(hasMenuTextContaining(popupMenu, "Sao chép giá trị"));
+                assertTrue(hasMenuTextContaining(popupMenu, "Sao chép lựa chọn"));
+                assertTrue(hasMenuTextContaining(popupMenu, "Sao chép tất cả"));
             });
         } finally {
             forceCurrentLocale(originalLocale);
@@ -113,7 +113,7 @@ public class SearchableTextAreaTest {
 
     @Test
     public void shouldEnableJsonCopyActionsForJsonPropertyAtCaret() throws Exception {
-        Locale originalLocale = forceCurrentLocale(Locale.CHINESE);
+        Locale originalLocale = forceCurrentLocale(Locale.forLanguageTag("vi"));
         try {
             SwingUtilities.invokeAndWait(() -> {
                 RSyntaxTextArea textArea = new RSyntaxTextArea();
@@ -123,8 +123,8 @@ public class SearchableTextAreaTest {
 
                 firePopupWillBecomeVisible(textArea.getPopupMenu());
 
-                assertTrue(findMenuItem(textArea.getPopupMenu(), "复制键").isEnabled());
-                assertTrue(findMenuItem(textArea.getPopupMenu(), "复制值").isEnabled());
+                assertTrue(findMenuItem(textArea.getPopupMenu(), "Sao chép chìa khóa").isEnabled());
+                assertTrue(findMenuItem(textArea.getPopupMenu(), "Sao chép giá trị").isEnabled());
             });
         } finally {
             forceCurrentLocale(originalLocale);

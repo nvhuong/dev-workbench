@@ -107,11 +107,11 @@ public class AppLauncherShutdownTest {
     public static class SlowFileAppender extends FileAppender<ILoggingEvent> {
         @Override
         protected void append(ILoggingEvent event) {
-            // 模拟慢磁盘，确保退出时异步队列尚未清空。
+            // Mô phỏng đĩa chậm và đảm bảo rằng hàng đợi không đồng bộ chưa bị xóa khi thoát.
             try {
                 Thread.sleep(25);
             } catch (InterruptedException ignored) {
-                // AsyncAppender.stop 会中断worker；剩余队列仍应被刷新。
+                // AsyncAppender.stop sẽ bị gián đoạnworker；Hàng đợi còn lại vẫn phải được xóa.
             }
             super.append(event);
         }

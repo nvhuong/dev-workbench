@@ -42,7 +42,7 @@ public class SettingsHintLabelTest {
     @Test
     public void mixedChineseEnglishHintShouldWrapInsteadOfUsingHtmlLabelRenderer() {
         SettingsHintLabel label = new SettingsHintLabel(
-                "客户端证书能力已拆分为可选插件。安装官方 Client Certificate 插件后，即可继续配置 mTLS 证书并自动应用到请求。",
+                "Khả năng chứng chỉ ứng dụng khách đã được chia thành các plugin tùy chọn. Cài đặt chính thức Client Certificate Sau khi plug-in, bạn có thể tiếp tục cấu hình mTLS certificate and automatically applied to the request.",
                 360
         );
 
@@ -55,7 +55,7 @@ public class SettingsHintLabelTest {
     }
 
     private static String sidebarHint() {
-        return "拖动列表项可调整顺序；点击左侧复选框或按空格键可隐藏或显示菜单。至少保留一个菜单。";
+        return "Kéo các mục trong danh sách để điều chỉnh thứ tự; nhấp vào hộp kiểm ở bên trái hoặc nhấn thanh dấu cách để ẩn hoặc hiển thị menu. Giữ ít nhất một menu.";
     }
 
     private static String textWiderThanTwoLines(SettingsHintLabel label, String sample) {

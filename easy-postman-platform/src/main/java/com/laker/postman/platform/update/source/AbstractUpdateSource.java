@@ -13,26 +13,26 @@ import java.nio.charset.StandardCharsets;
 import java.util.Scanner;
 
 /**
- * 抽象更新源基类 - 提供通用的 HTTP 连接和响应处理逻辑
+ * Lớp cơ sở nguồn cập nhật trừu tượng - Được cung cấp phổ biến HTTP Logic xử lý kết nối và phản hồi
  *
- * <p>子类只需实现 getApiUrl()、getAllReleasesApiUrl()、getWebUrl() 和 getName() 方法即可。</p>
+ * <p>Các lớp con chỉ cần thực hiện nó getApiUrl()、getAllReleasesApiUrl()、getWebUrl() và getName() Chỉ cần sử dụng phương pháp.</p>
  */
 @Slf4j
 public abstract class AbstractUpdateSource implements UpdateSource {
 
-    /** 防止插件发布挤占首页，同时限制异常更新源带来的额外请求和等待时间。 */
+    /** Ngăn chặn việc phát hành plug-in chiếm trang chủ, đồng thời hạn chế các yêu cầu bổ sung và thời gian chờ đợi do các nguồn cập nhật bất thường gây ra. */
     private static final int MAX_RELEASE_PAGES = 2;
 
-    /** 连接超时时间（毫秒） */
+    /** Thời gian chờ kết nối (mili giây) */
     protected static final int CONNECTION_TIMEOUT = 2500;
 
-    /** 读取超时时间（毫秒） */
+    /** Thời gian chờ đọc (mili giây) */
     protected static final int READ_TIMEOUT = 2500;
 
-    /** 获取发布信息时的连接超时时间（毫秒） */
+    /** Thời gian chờ kết nối (mili giây) khi nhận được thông tin được công bố */
     protected static final int FETCH_CONNECTION_TIMEOUT = 10000;
 
-    /** 获取发布信息时的读取超时时间（毫秒） */
+    /** Thời gian chờ đọc (tính bằng mili giây) khi nhận được thông tin được công bố */
     protected static final int FETCH_READ_TIMEOUT = 10000;
 
     @Override
@@ -195,8 +195,8 @@ public abstract class AbstractUpdateSource implements UpdateSource {
     }
 
     /**
-     * 构造按标签查询单个发布的 API 地址。GitHub 与 Gitee 均采用
-     * {@code /releases/tags/{tag}} 路径；查询参数不属于基础路径，需要先移除。
+     * Xây dựng truy vấn cho một ấn phẩm theo thẻ API địa chỉ.GitHub Và Gitee Tất cả đều được thông qua
+     * {@code /releases/tags/{tag}} Con đường; các tham số truy vấn không thuộc đường dẫn cơ bản và cần được loại bỏ trước.
      */
     protected String buildReleaseByTagApiUrl(String tagName) {
         String releasesUrl = getAllReleasesApiUrl();
@@ -218,13 +218,13 @@ public abstract class AbstractUpdateSource implements UpdateSource {
         conn.setRequestMethod("GET");
         conn.setRequestProperty("Accept", "application/json");
         conn.setRequestProperty("User-Agent", buildUserAgent());
-        conn.setRequestProperty("Accept-Language", "zh-CN,zh;q=0.9,en;q=0.8");
+        conn.setRequestProperty("Accept-Language", "vi,en;q=0.8");
         conn.setRequestProperty("Cache-Control", "no-cache");
         return conn;
     }
 
     /**
-     * 读取成功响应
+     * Đọc phản hồi thành công
      */
     protected String readResponse(HttpURLConnection conn) throws Exception {
         try (InputStream is = conn.getInputStream();
@@ -234,7 +234,7 @@ public abstract class AbstractUpdateSource implements UpdateSource {
     }
 
     /**
-     * 读取错误响应
+     * Đọc phản hồi lỗi
      */
     protected String readErrorResponse(HttpURLConnection conn) {
         try (InputStream errorStream = conn.getErrorStream()) {
@@ -246,27 +246,27 @@ public abstract class AbstractUpdateSource implements UpdateSource {
                 }
             }
         } catch (Exception ignored) {
-            // 忽略读取错误响应的异常
+            // Bỏ qua các ngoại lệ đối với phản hồi lỗi đọc
         }
         return "";
     }
 
     /**
-     * 构建 User-Agent 字符串
+     * Xây dựng User-Agent chuỗi
      */
     protected String buildUserAgent() {
-        return "Mozilla/5.0 (compatible; EasyPostman/" + SystemUtil.getCurrentVersion() + ")";
+        return "Mozilla/5.0 (compatible; DevWorkbench/" + SystemUtil.getCurrentVersion() + ")";
     }
 
     /**
-     * 关闭连接
+     * Đóng kết nối
      */
     protected void closeConnection(HttpURLConnection conn) {
         if (conn != null) {
             try {
                 conn.disconnect();
             } catch (Exception ignored) {
-                // 忽略断开连接时的异常
+                // Bỏ qua các trường hợp ngoại lệ khi ngắt kết nối
             }
         }
     }

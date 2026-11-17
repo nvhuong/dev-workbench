@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 环境变量模型，用于管理一组相关的变量
+ * Mô hình biến môi trường, được sử dụng để quản lý một tập hợp các biến liên quan
  */
 @Setter
 @Getter
@@ -36,7 +36,7 @@ public class Environment {
 
     public void set(String key, String value) {
         if (key != null && !key.isEmpty()) {
-            // 查找是否存在该key的变量
+            // Tìm nếu điều này tồn tạikeybiến
             boolean found = false;
             if (variableList != null) {
                 for (Variable envVar : variableList) {
@@ -48,7 +48,7 @@ public class Environment {
                     }
                 }
             }
-            // 如果不存在，则添加新变量
+            // Nếu nó không tồn tại, biến mới sẽ được thêm vào
             if (!found) {
                 if (variableList == null) {
                     variableList = new ArrayList<>();
@@ -71,7 +71,7 @@ public class Environment {
     }
 
     public String get(String key) {
-        // 从 variableList 获取已启用的变量
+        // Từ variableList Nhận các biến được kích hoạt
         if (variableList != null && !variableList.isEmpty()) {
             for (Variable envVar : variableList) {
                 if (envVar.isEnabled() && key.equals(envVar.getKey())) {
@@ -87,7 +87,7 @@ public class Environment {
     }
 
     public boolean hasVariable(String key) {
-        // 从 variableList 查找已启用的变量
+        // Từ variableList Tìm các biến được kích hoạt
         if (variableList != null && !variableList.isEmpty()) {
             for (Variable envVar : variableList) {
                 if (envVar.isEnabled() && key.equals(envVar.getKey())) {
@@ -99,8 +99,8 @@ public class Environment {
     }
 
     /**
-     * 获取所有变量的 Map 表示
-     * 从 variableList 构建 Map，只包含已启用的变量
+     * Nhận tất cả các biến Map bày tỏ
+     * Từ variableList Xây dựng Map，Chỉ các biến được kích hoạt mới được bao gồm
      */
     public Map<String, String> getVariables() {
         Map<String, String> result = new LinkedHashMap<>();

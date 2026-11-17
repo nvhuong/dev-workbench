@@ -37,9 +37,9 @@ public class RequestGroupGenerator {
             group.set("children", children);
             jsonArray.add(group);
         }
-        // 写入文件
+        // Viết vào tập tin
         FileUtil.writeUtf8String(jsonArray.toStringPretty(), new File(SystemUtil.getEasyPostmanPath() + "collections.json"));
-        System.out.println("✅ 已生成 " + INT + " 个请求，分为 " + groupCount + " 个分组，保存为 collections.json");
+        System.out.println("✅ Đã tạo " + INT + " yêu cầu, chia thành " + groupCount + " nhóm, lưu dưới dạng collections.json");
     }
 
     private static JSONObject generateRequest(int i) {

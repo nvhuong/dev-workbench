@@ -64,7 +64,7 @@ public class PerformanceResultDisplayMapperTest {
         assertNull(request.bodyType);
         assertNull(request.headersList);
         assertNull(response.filePath);
-        assertEquals(response.fileName, "result.bin", "文件名用于详情页展示文件信息");
+        assertEquals(response.fileName, "result.bin", "Tên tệp được sử dụng để hiển thị thông tin tệp trên trang chi tiết");
         assertNull(response.httpEventInfo);
         assertEquals(resultNodeInfo.costMs, 123);
     }
@@ -326,8 +326,8 @@ public class PerformanceResultDisplayMapperTest {
         );
 
         assertTrue(resultNodeInfo.cancelled);
-        assertFalse(resultNodeInfo.executionFailed, "取消与执行失败分开展示");
-        assertFalse(resultNodeInfo.isActuallySuccessful(), "已握手 101 的取消采样也不算成功");
+        assertFalse(resultNodeInfo.executionFailed, "Lỗi hủy và thực hiện được hiển thị riêng biệt");
+        assertFalse(resultNodeInfo.isActuallySuccessful(), "Bắt tay 101 Việc lấy mẫu cũng không được coi là thành công");
         assertEquals(resultNodeInfo.errorMsg, "Execution interrupted");
         assertTrue(resultNodeInfo.resp.body.contains("Error: Execution interrupted"));
         assertTrue(resultNodeInfo.resp.body.contains("Sent: 120"));

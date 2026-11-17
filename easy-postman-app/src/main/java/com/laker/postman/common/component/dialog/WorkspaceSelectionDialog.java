@@ -24,8 +24,8 @@ import java.awt.event.*;
 import java.util.List;
 
 /**
- * 工作区选择对话框 - 可复用组件
- * 用于在多个场景中选择目标工作区（如转移环境、转移集合等）
+ * Hộp thoại lựa chọn không gian làm việc - Các thành phần có thể tái sử dụng
+ * Được sử dụng để chọn không gian làm việc mục tiêu trong nhiều tình huống (chẳng hạn như chuyển môi trường, chuyển bộ sưu tập, v.v.)
  */
 public class WorkspaceSelectionDialog extends JDialog {
     private final JList<Workspace> workspaceList;
@@ -41,12 +41,12 @@ public class WorkspaceSelectionDialog extends JDialog {
         ToolWindowSurfaceStyle.applyDialogWindowChrome(this);
         ToolWindowSurfaceStyle.applyDialogSurface((JComponent) getContentPane());
 
-        // 主面板
+        // Bảng điều khiển chính
         JPanel mainPanel = new JPanel(new BorderLayout(5, 5));
         ToolWindowSurfaceStyle.applyDialogSurface(mainPanel);
         mainPanel.setBorder(new EmptyBorder(15, 15, 15, 15));
 
-        // 顶部搜索框
+        // Hộp tìm kiếm hàng đầu
         JPanel searchPanel = new JPanel(new BorderLayout(5, 0));
         searchPanel.setOpaque(false);
         JLabel searchLabel = new JLabel(I18nUtil.getMessage(MessageKeys.GENERAL_SEARCH) + ":");
@@ -57,7 +57,7 @@ public class WorkspaceSelectionDialog extends JDialog {
         searchPanel.add(searchField, BorderLayout.CENTER);
         mainPanel.add(searchPanel, BorderLayout.NORTH);
 
-        // 创建工作区列表
+        // Tạo danh sách không gian làm việc
         listModel = new DefaultListModel<>();
         for (Workspace workspace : workspaces) {
             listModel.addElement(workspace);
@@ -72,7 +72,7 @@ public class WorkspaceSelectionDialog extends JDialog {
         ToolWindowSurfaceStyle.applyDialogListScrollPane(scrollPane, workspaceList);
         mainPanel.add(scrollPane, BorderLayout.CENTER);
 
-        // 说明文字
+        // Văn bản mô tả
         JLabel hintLabel = new JLabel(I18nUtil.getMessage(MessageKeys.WORKSPACE_SELECT_HINT));
         hintLabel.setFont(FontsUtil.getDefaultFontWithOffset(Font.ITALIC, -2));
         hintLabel.setForeground(ModernColors.getTextSecondary());
@@ -81,7 +81,7 @@ public class WorkspaceSelectionDialog extends JDialog {
 
         add(mainPanel, BorderLayout.CENTER);
 
-        // 按钮面板
+        // Bảng nút
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 10));
         ToolWindowSurfaceStyle.applyDialogFooter(buttonPanel);
 
@@ -98,20 +98,20 @@ public class WorkspaceSelectionDialog extends JDialog {
         buttonPanel.add(okButton);
         add(buttonPanel, BorderLayout.SOUTH);
 
-        // 注册事件监听器
+        // Đăng ký một người nghe sự kiện
         registerListeners(workspaces);
 
-        // 自动选中第一个
+        // Cái đầu tiên được chọn tự động
         if (!listModel.isEmpty()) {
             workspaceList.setSelectedIndex(0);
         }
 
-        // 设置默认按钮
+        // Đặt nút mặc định
         getRootPane().setDefaultButton(okButton);
     }
 
     private void registerListeners(List<Workspace> allWorkspaces) {
-        // 搜索框监听
+        // Hộp tìm kiếm nghe
         searchField.getDocument().addDocumentListener(new DocumentListener() {
             @Override
             public void insertUpdate(DocumentEvent e) {
@@ -138,14 +138,14 @@ public class WorkspaceSelectionDialog extends JDialog {
                         listModel.addElement(workspace);
                     }
                 }
-                // 自动选中第一个搜索结果
+                // Kết quả tìm kiếm đầu tiên được chọn tự động
                 if (!listModel.isEmpty()) {
                     workspaceList.setSelectedIndex(0);
                 }
             }
         });
 
-        // 双击确认
+        // Nhấp đúp chuột để xác nhận
         workspaceList.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
@@ -159,7 +159,7 @@ public class WorkspaceSelectionDialog extends JDialog {
             }
         });
 
-        // Enter键确认
+        // Enterchìa khóa để xác nhận
         workspaceList.addKeyListener(new KeyAdapter() {
             @Override
             public void keyPressed(KeyEvent e) {
@@ -169,7 +169,7 @@ public class WorkspaceSelectionDialog extends JDialog {
             }
         });
 
-        // ESC键取消
+        // ESCphím để hủy bỏ
         KeyStroke escapeKeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0);
         getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(escapeKeyStroke, "ESCAPE");
         getRootPane().getActionMap().put("ESCAPE", new AbstractAction() {
@@ -199,9 +199,9 @@ public class WorkspaceSelectionDialog extends JDialog {
     }
 
     /**
-     * 显示对话框并返回选择的工作区
+     * Hiển thị hộp thoại và quay lại không gian làm việc đã chọn
      *
-     * @return 选择的工作区，如果取消则返回null
+     * @return Không gian làm việc đã chọn, được trả về nếu bị hủynull
      */
     public Workspace showDialog() {
         setVisible(true);
@@ -209,7 +209,7 @@ public class WorkspaceSelectionDialog extends JDialog {
     }
 
     /**
-     * 工作区列表单元格渲染器
+     * Trình kết xuất ô danh sách không gian làm việc
      */
     private static class WorkspaceListCellRenderer extends DefaultListCellRenderer {
         private static final String HTML_START = "<html>";
@@ -226,7 +226,7 @@ public class WorkspaceSelectionDialog extends JDialog {
                         : createGitIcon(workspace);
                 setIcon(icon);
 
-                // 构建显示文本：名称 + 类型 + 描述
+                // Xây dựng văn bản hiển thị: tên + loại + Mô tả
                 StringBuilder text = new StringBuilder();
                 text.append(HTML_START);
                 text.append("<b>").append(workspace.getName()).append("</b>");
@@ -235,12 +235,12 @@ public class WorkspaceSelectionDialog extends JDialog {
                         .append(ModernColors.toHtmlColor(ModernColors.getTextHint()))
                         .append(";'>");
 
-                // 显示工作区类型
+                // Hiển thị loại không gian làm việc
                 text.append(workspace.getType() == WorkspaceType.LOCAL
                         ? I18nUtil.getMessage(MessageKeys.WORKSPACE_TYPE_LOCAL)
                         : I18nUtil.getMessage(MessageKeys.WORKSPACE_TYPE_GIT));
 
-                // 如果有描述，追加显示
+                // Nếu có mô tả, hãy thêm nó vào màn hình
                 if (workspace.getDescription() != null && !workspace.getDescription().trim().isEmpty()) {
                     text.append(" - ").append(workspace.getDescription());
                 }

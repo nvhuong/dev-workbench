@@ -13,7 +13,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * 响应“是否为文件”的统一判定，供响应面板、示例保存、历史记录、渲染等共用，避免各处规则不一致。
+ * phản hồi“Cho dù đó là một tập tin”Phán quyết thống nhất có thể được chia sẻ bởi bảng phản hồi, lưu mẫu, bản ghi lịch sử, kết xuất, v.v. để tránh sự mâu thuẫn trong các quy tắc ở mọi nơi.
  */
 @UtilityClass
 public class ResponseFiles {
@@ -21,7 +21,7 @@ public class ResponseFiles {
     public static final String CONTENT_TYPE_HEADER = "Content-Type";
 
     /**
-     * 大小写不敏感地读取第一个响应头值，不存在时返回 {@code null}。
+     * Đọc giá trị tiêu đề phản hồi đầu tiên không phân biệt chữ hoa chữ thường, trả về nếu nó không tồn tại {@code null}。
      */
     public static String firstHeader(Map<String, List<String>> headers, String name) {
         if (headers == null || name == null) {
@@ -39,7 +39,7 @@ public class ResponseFiles {
     }
 
     /**
-     * 响应的 Content-Type，不存在时返回空字符串。
+     * Đáp ứng Content-Type，Trả về một chuỗi trống nếu nó không tồn tại.
      */
     public static String contentType(HttpResponse response) {
         String contentType = response == null ? null : firstHeader(response.headers, CONTENT_TYPE_HEADER);
@@ -47,9 +47,9 @@ public class ResponseFiles {
     }
 
     /**
-     * 响应体按文件处理（而不是文本）：已识别出文件格式、文件内容已省略，或 Content-Type 声明为二进制且确实收到了内容。
-     * 这类响应的 {@link HttpResponse#body} 不是可读文本，持久化时只应保留文件元信息。
-     * 二进制下载失败（超限、连接中断、无响应体）时 body 是错误提示，按文本保留，便于在历史中排查。
+     * Nội dung phản hồi được xử lý dưới dạng tệp (thay vì văn bản): định dạng tệp được nhận dạng, nội dung tệp bị bỏ qua hoặc Content-Type Được khai báo là nhị phân và đã nhận được nội dung.
+     * Loại phản ứng này {@link HttpResponse#body} Văn bản không thể đọc được, chỉ nên giữ lại thông tin meta của tệp khi vẫn tồn tại.
+     * Khi tải xuống nhị phân không thành công (vượt quá giới hạn, kết nối bị gián đoạn, không có nội dung phản hồi) body Đó là một thông báo lỗi và được giữ lại dưới dạng văn bản để hỗ trợ khắc phục sự cố trong lịch sử.
      */
     public static boolean isFileResponse(HttpResponse response) {
         return response != null
@@ -64,7 +64,7 @@ public class ResponseFiles {
     }
 
     /**
-     * 只表示“某种二进制数据”、不指明具体格式的 Content-Type。
+     * Chỉ có nghĩa là“Một số loại dữ liệu nhị phân”、Định dạng cụ thể không được chỉ định Content-Type。
      */
     public static boolean isGenericBinaryContentType(String contentType) {
         String mediaType = contentType == null ? "" : contentType.split(";", 2)[0].trim().toLowerCase(Locale.ROOT);
@@ -76,7 +76,7 @@ public class ResponseFiles {
             "application/download", "application/force-download", "application/x-download");
 
     /**
-     * 文本附件（如 CSV、GBK 编码的 TXT）：响应体是可读文本，但服务端希望以文件方式下载。
+     * Tệp đính kèm văn bản (ví dụ: CSV、GBK Đã mã hóa TXT）：Nội dung phản hồi là văn bản có thể đọc được nhưng máy chủ muốn tải xuống dưới dạng tệp.
      */
     public static boolean isTextAttachment(HttpResponse response) {
         return response != null && response.fileAttachment && !response.isRecognizedFile()
@@ -84,14 +84,14 @@ public class ResponseFiles {
     }
 
     /**
-     * Content-Type 声明的字符集，未声明或无法识别时为 UTF-8（与解码响应体时的默认值一致）。
+     * Content-Type Bộ ký tự được khai báo hoặc nếu không được khai báo hoặc không được nhận dạng UTF-8（Phù hợp với giá trị mặc định khi giải mã nội dung phản hồi).
      */
     public static Charset declaredCharset(HttpResponse response) {
         return charsetOf(contentType(response));
     }
 
     /**
-     * Content-Type 字符串声明的字符集，未声明或无法识别时为 UTF-8。
+     * Content-Type Bộ ký tự được khai báo bằng chuỗi hoặc nếu không được khai báo hoặc không được nhận dạng UTF-8。
      */
     public static Charset charsetOf(String contentType) {
         if (contentType == null) {
@@ -112,7 +112,7 @@ public class ResponseFiles {
     }
 
     /**
-     * 按声明的字符集把响应体文本还原为字节。
+     * Khôi phục văn bản nội dung phản hồi thành byte trong bộ ký tự được khai báo.
      */
     public static byte[] encodeBody(HttpResponse response) {
         String body = response == null || response.body == null ? "" : response.body;
@@ -120,22 +120,22 @@ public class ResponseFiles {
     }
 
     /**
-     * 响应体文本能否按声明的字符集无损还原出原始字节，用于判断只保存文本的示例能否恢复出完整文件。
-     * 内容落在临时文件里时 {@link HttpResponse#body} 只是提示文字，不能用来还原。
+     * Liệu văn bản nội dung phản hồi có thể được khôi phục dễ dàng về byte gốc theo bộ ký tự đã khai báo hay không được sử dụng để xác định xem ví dụ chỉ lưu văn bản có thể khôi phục tệp hoàn chỉnh hay không.
+     * Khi nội dung rơi vào một tập tin tạm thời {@link HttpResponse#body} Nó chỉ là một văn bản nhắc nhở và không thể được sử dụng để khôi phục.
      */
     public static boolean canRestoreBytesFromBody(HttpResponse response) {
         if (response == null || response.body == null
                 || (response.filePath != null && !response.filePath.isBlank())) {
             return false;
         }
-        // 没有保留原始字节说明正文是无损解码的 UTF-8 文本
+        // Việc không giữ lại các byte gốc cho biết văn bản đã được giải mã một cách dễ dàng UTF-8 văn bản
         return response.rawBodyBytes == null || Arrays.equals(encodeBody(response), response.rawBodyBytes);
     }
 
     /**
-     * 兼容旧数据：二进制文件曾被按 UTF-8 解码成文本保存，ASCII 部分（ZIP 条目名、%PDF- 头等）仍可识别。
+     * Khả năng tương thích với dữ liệu cũ: các tệp nhị phân đã được nhấn UTF-8 Giải mã và lưu dưới dạng văn bản.ASCII phần (ZIP Tên mục, .%PDF- hạng nhất) vẫn có thể nhận dạng được.
      *
-     * @return 识别出的扩展名（含点），无法识别时返回 {@code null}
+     * @return Recognized extension (including dot), returned if unrecognized {@code null}
      */
     public static String detectFromLegacyText(String body) {
         if (body == null || body.isEmpty()) {
@@ -145,7 +145,7 @@ public class ResponseFiles {
     }
 
     /**
-     * 将响应标记为“只有文件信息、没有文件内容”，用于从示例或历史恢复。
+     * Đánh dấu câu trả lời là “Chỉ có thông tin tập tin và không có nội dung tập tin”，Để khôi phục từ các ví dụ hoặc lịch sử.
      */
     public static void markContentOmitted(HttpResponse response, String extension, String fileName) {
         response.body = "";

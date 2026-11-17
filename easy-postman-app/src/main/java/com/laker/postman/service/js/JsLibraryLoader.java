@@ -28,45 +28,45 @@ import com.laker.postman.service.setting.SettingManager;
 import com.laker.postman.util.SystemUtil;
 
 /**
- * JS 外部库加载器
+ * JS Trình tải thư viện bên ngoài
  * <p>
- * 支持加载内置 JS 库和用户自定义的外部 JS 库，模拟 Node.js 的 require() 机制。
- * 与 Postman 风格，提供 Postman 风格的内置库支持。
+ * Hỗ trợ tải tích hợp JS thư viện và các phần bên ngoài do người dùng định nghĩa JS thư viện, mô phỏng Node.js của require() cơ chế.
+ * Và Postman Phong cách, giao hàng Postman Hỗ trợ thư viện tích hợp cho các kiểu.
  * </p>
  *
- * <h3>支持的内置库：</h3>
+ * <h3>Các thư viện tích hợp được hỗ trợ: .</h3>
  * <ul>
- *   <li><b>crypto-js</b>: 加密库，支持 AES、DES、MD5、SHA 等算法</li>
- *   <li><b>lodash</b>: JavaScript 实用工具库，提供丰富的函数式编程辅助方法</li>
- *   <li><b>moment</b>: 日期时间处理库，格式化、解析和操作日期</li>
+ *   <li><b>crypto-js</b>: Thư viện tiền điện tử, được hỗ trợ AES、DES、MD5、SHA và các thuật toán khác</li>
+ *   <li><b>lodash</b>: JavaScript Một thư viện công cụ thực tế cung cấp nhiều phương pháp phụ trợ lập trình chức năng</li>
+ *   <li><b>moment</b>: Thư viện xử lý ngày và giờ, định dạng, phân tích và thao tác ngày tháng</li>
  * </ul>
  *
- * <h3>Java 实现的全局函数（由 JsPolyfillInjector 提供）：</h3>
+ * <h3>Java Các chức năng toàn cầu được triển khai (bởi  JsPolyfillInjector cung cấp):</h3>
  * <ul>
- *   <li><b>uuid()</b>: UUID 生成器</li>
- *   <li><b>atob/btoa</b>: Base64 编码解码</li>
- *   <li><b>MD5/SHA1/SHA256/SHA512</b>: 哈希函数</li>
- *   <li><b>timestamp()</b>: 时间戳函数</li>
- *   <li><b>encodeURIComponent/decodeURIComponent</b>: URL 编解码</li>
+ *   <li><b>uuid()</b>: UUID máy phát điện</li>
+ *   <li><b>atob/btoa</b>: Base64 Mã hóa và giải mã</li>
+ *   <li><b>MD5/SHA1/SHA256/SHA512</b>: Hàm băm</li>
+ *   <li><b>timestamp()</b>: chức năng dấu thời gian</li>
+ *   <li><b>encodeURIComponent/decodeURIComponent</b>: URL Codec</li>
  * </ul>
  *
- * <h3>使用方式：</h3>
+ * <h3>Cách sử dụng:</h3>
  * <pre>{@code
- * // 方式1: 直接使用内置库（自动加载到全局）
+ * // cách1: Sử dụng trực tiếp các thư viện tích hợp (được tải tự động trên toàn cầu)
  * var encrypted = CryptoJS.AES.encrypt('message', 'secret');
  * var id = uuid.v4();
  * var now = moment().format('YYYY-MM-DD');
  * var result = _.filter([1, 2, 3], n => n > 1);
  *
- * // 方式2: 使用 require() 加载
+ * // cách2: sử dụng require() trọng tải
  * var CryptoJS = require('crypto-js');
  * var _ = require('lodash');
  * var moment = require('moment');
  *
- * // 方式3: 加载自定义外部库（从文件路径）
+ * // cách3: Tải thư viện bên ngoài tùy chỉnh (từ đường dẫn tệp)
  * var myLib = require('/path/to/my-library.js');
  *
- * // 方式4: 加载自定义外部库（从 URL）
+ * // cách4: Tải các thư viện bên ngoài tùy chỉnh (từ  URL）
  * var myLib = require('https://cdn.example.com/library.js');
  * }</pre>
  *
@@ -77,22 +77,22 @@ import com.laker.postman.util.SystemUtil;
 public class JsLibraryLoader {
 
     /**
-     * 内置库缓存 - 避免重复加载
+     * Bộ đệm thư viện tích hợp - Tránh tải lặp đi lặp lại
      */
     private static final Map<String, String> BUILTIN_LIBRARY_CACHE = new ConcurrentHashMap<>();
 
     /**
-     * 内置库别名 -> 规范名称
+     * Bí danh thư viện tích hợp -> Tên kinh điển
      */
     private static final Map<String, String> BUILTIN_LIBRARY_IDS = new HashMap<>();
 
     /**
-     * 内置库映射表 - 规范名称 -> 资源路径
+     * Bảng ánh xạ thư viện tích hợp - Tên kinh điển -> Đường dẫn tài nguyên
      */
     private static final Map<String, String> BUILTIN_LIBRARY_PATHS = new HashMap<>();
 
     /**
-     * 库路径常量 - 统一存放在 js-libs 目录
+     * Đường dẫn thư viện không đổi - Được lưu trữ thống nhất js-libs Thư mục
      */
     private static final String JS_LIBS_DIR = "/js-libs/";
     private static final String CRYPTO_JS_PATH = JS_LIBS_DIR + "crypto-js.min.js";
@@ -100,13 +100,13 @@ public class JsLibraryLoader {
     private static final String MOMENT_PATH = JS_LIBS_DIR + "moment.min.js";
 
     static {
-        // 注册内置库 - CryptoJS
+        // Đăng ký thư viện tích hợp - CryptoJS
         registerBuiltInLibrary("crypto-js", CRYPTO_JS_PATH, "crypto-js", "cryptojs", "CryptoJS");
 
-        // 注册内置库 - Lodash
+        // Đăng ký thư viện tích hợp - Lodash
         registerBuiltInLibrary("lodash", LODASH_PATH, "lodash", "_");
 
-        // 注册内置库 - Moment
+        // Đăng ký thư viện tích hợp - Moment
         registerBuiltInLibrary("moment", MOMENT_PATH, "moment", "Moment");
 
 
@@ -114,19 +114,19 @@ public class JsLibraryLoader {
     }
 
     /**
-     * 注入内置库访问入口到 JS 上下文。
+     * Đưa mục truy cập thư viện tích hợp vào JS bối cảnh.
      * <p>
-     * 大型内置库通过全局懒加载属性暴露，用户直接访问 CryptoJS、_、moment 或 require()
-     * 时才会真正加载并执行对应库代码。压测脚本如果只使用 pm.variables、Math.random 等基础能力，
-     * 就不会为每个 Context 额外加载 lodash / crypto-js / moment。
+     * Các thư viện tích hợp lớn được hiển thị thông qua các thuộc tính tải chậm toàn cầu và người dùng có thể truy cập trực tiếp CryptoJS、_、moment hoặc require()
+     * Chỉ khi đó mã thư viện tương ứng mới thực sự được tải và thực thi. Kịch bản kiểm tra căng thẳng nếu chỉ được sử dụng pm.variables、Math.random và các khả năng cơ bản khác.
+     * Không dành cho tất cả mọi người Context Tải bổ sung lodash / crypto-js / moment。
      * </p>
      *
-     * @param context GraalVM JS 上下文
+     * @param context GraalVM JS bối cảnh
      */
     public static void injectBuiltinLibraries(Context context) {
         log.debug("Registering lazy built-in JavaScript libraries...");
 
-        // 注入 crypto polyfill（为 CryptoJS 提供随机数生成）
+        // tiêm crypto polyfill（vì CryptoJS Cung cấp khả năng tạo số ngẫu nhiên)
         injectCryptoPolyfill(context);
 
         injectRequireFunction(context);
@@ -167,7 +167,7 @@ public class JsLibraryLoader {
     }
 
     /**
-     * 注入 crypto polyfill，为 CryptoJS 提供随机数生成
+     * tiêm crypto polyfill，vì CryptoJS Cung cấp khả năng tạo số ngẫu nhiên
      */
     private static void injectCryptoPolyfill(Context context) {
         String cryptoPolyfill = """
@@ -191,16 +191,16 @@ public class JsLibraryLoader {
     }
 
     /**
-     * 注入 require() 函数，支持动态加载外部 JS 库
+     * tiêm require() Chức năng, hỗ trợ tải động bên ngoài JS thư viện
      * <p>
-     * 用户可以在脚本中使用 require('library-name') 或 require('/path/to/file.js')
-     * 来加载内置库或自定义库。
+     * Người dùng có thể sử dụng nó trong các tập lệnh require('library-name') hoặc require('/path/to/file.js')
+     * để tải các thư viện tích hợp hoặc thư viện tùy chỉnh.
      * </p>
      *
-     * @param context GraalVM JS 上下文
+     * @param context GraalVM JS bối cảnh
      */
     public static void injectRequireFunction(Context context) {
-        // 创建 require() 函数的实现
+        // Tạo require() Thực hiện chức năng
         String requireFunction = """
                 if (!globalThis.__epRequireCache) {
                     globalThis.__epRequireCache = Object.create(null);
@@ -245,7 +245,7 @@ public class JsLibraryLoader {
                 };
                 """;
 
-        // 注入 __loadLibrary 辅助函数（Java 端实现）
+        // tiêm __loadLibrary Chức năng phụ trợ (Java kết thúc thực hiện)
         ProxyExecutable loadLibraryFunc = args -> {
             String moduleName = args[0].asString();
             String parentModuleId = args.length > 1 ? args[1].asString() : null;
@@ -259,17 +259,17 @@ public class JsLibraryLoader {
         };
         context.getBindings("js").putMember("__loadLibrary", loadLibraryFunc);
 
-        // 注入 require() 函数
+        // tiêm require() chức năng
         context.eval("js", requireFunction);
         log.debug("Injected require() function");
     }
 
     /**
-     * 加载 JS 库（内置或外部）
+     * trọng tải JS Thư viện (tích hợp hoặc bên ngoài)
      *
-     * @param moduleName 库名、文件路径或 URL
-     * @param parentModuleId 父模块标识，用于解析相对路径
-     * @return 库的 JavaScript 代码与规范 ID
+     * @param moduleName Tên thư viện, đường dẫn tệp hoặc  URL
+     * @param parentModuleId Mã định danh mô-đun chính, được sử dụng để giải quyết các đường dẫn tương đối
+     * @return thư viện JavaScript Mã và thông số kỹ thuật ID
      */
     private static LoadedLibrary loadLibrary(String moduleName, String parentModuleId) throws IOException {
         String builtInId = resolveBuiltinLibraryId(moduleName);
@@ -287,13 +287,13 @@ public class JsLibraryLoader {
     }
 
     /**
-     * 加载内置库
+     * Tải các thư viện tích hợp
      *
-     * @param libraryName 库名
-     * @return 库的 JavaScript 代码
+     * @param libraryName Tên thư viện
+     * @return thư viện JavaScript mã
      */
     private static String loadBuiltinLibrary(String libraryName) throws IOException {
-        // 检查缓存
+        // Kiểm tra bộ đệm
         String cached = BUILTIN_LIBRARY_CACHE.get(libraryName);
         if (cached != null) {
             return cached;
@@ -304,7 +304,7 @@ public class JsLibraryLoader {
             throw new IOException("Unknown built-in library: " + libraryName);
         }
 
-        // 从 resources 加载
+        // Từ resources trọng tải
         try (InputStream is = JsLibraryLoader.class.getResourceAsStream(resourcePath)) {
             if (is == null) {
                 throw new IOException("Built-in library not found: " + resourcePath);
@@ -317,10 +317,10 @@ public class JsLibraryLoader {
     }
 
     /**
-     * 从文件路径加载 JS 库
+     * Tải từ đường dẫn tập tin JS thư viện
      *
-     * @param filePath 文件路径
-     * @return 文件内容
+     * @param filePath Đường dẫn tập tin
+     * @return Nội dung tập tin
      */
     private static LoadedLibrary loadFromFile(Path path) throws IOException {
         if (!Files.exists(path)) {
@@ -333,10 +333,10 @@ public class JsLibraryLoader {
     }
 
     /**
-     * 从 URL 加载 JS 库
+     * Từ URL trọng tải JS thư viện
      *
-     * @param urlString URL 地址
-     * @return URL 内容
+     * @param urlString URL địa chỉ
+     * @return URL nội dung
      */
     private static LoadedLibrary loadFromUrl(String urlString) throws IOException {
         validateRemoteUrl(urlString);
@@ -352,7 +352,7 @@ public class JsLibraryLoader {
     }
 
     /**
-     * 清空库缓存（测试用）
+     * Xóa bộ đệm thư viện (để kiểm tra)
      */
     public static void clearCache() {
         BUILTIN_LIBRARY_CACHE.clear();
@@ -364,9 +364,9 @@ public class JsLibraryLoader {
     }
 
     /**
-     * 获取已注册的内置库列表
+     * Lấy danh sách các thư viện tích hợp đã đăng ký
      *
-     * @return 内置库名称列表
+     * @return Danh sách tên thư viện tích hợp
      */
     public static String[] getBuiltinLibraries() {
         return BUILTIN_LIBRARY_PATHS.keySet().toArray(new String[0]);

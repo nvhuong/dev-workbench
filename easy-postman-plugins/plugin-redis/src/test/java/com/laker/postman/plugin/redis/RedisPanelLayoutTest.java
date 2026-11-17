@@ -106,7 +106,7 @@ public class RedisPanelLayoutTest {
     public void connectionActionsShouldUseLabeledButtons() {
         Locale originalLocale = I18nUtil.currentLocale();
         try {
-            assertConnectionActionsUseLabeledButtons(Locale.CHINESE);
+            assertConnectionActionsUseLabeledButtons(Locale.forLanguageTag("vi"));
             assertConnectionActionsUseLabeledButtons(Locale.ENGLISH);
         } finally {
             I18nUtil.setLocale(originalLocale);
@@ -117,7 +117,7 @@ public class RedisPanelLayoutTest {
     public void disconnectedStateShouldDisableServerActionsAndExplainEmptyKeys() throws Exception {
         Locale originalLocale = I18nUtil.currentLocale();
         try {
-            I18nUtil.setLocale(Locale.CHINESE);
+            I18nUtil.setLocale(Locale.forLanguageTag("vi"));
             RedisPanel panel = layoutPanel(1320);
 
             assertFalse(fieldValue(panel, "executeBtn", JButton.class).isEnabled(),
@@ -139,7 +139,7 @@ public class RedisPanelLayoutTest {
     public void hostFieldShouldStayCompactAcrossLocales() throws Exception {
         Locale originalLocale = I18nUtil.currentLocale();
         try {
-            assertHostFieldUsesCompactWidth(Locale.CHINESE);
+            assertHostFieldUsesCompactWidth(Locale.forLanguageTag("vi"));
             assertHostFieldUsesCompactWidth(Locale.ENGLISH);
         } finally {
             I18nUtil.setLocale(originalLocale);
@@ -150,7 +150,7 @@ public class RedisPanelLayoutTest {
     public void actionBarShouldUseCompactActionsAcrossLocales() throws Exception {
         Locale originalLocale = I18nUtil.currentLocale();
         try {
-            assertActionBarUsesCompactActions(Locale.CHINESE);
+            assertActionBarUsesCompactActions(Locale.forLanguageTag("vi"));
             assertActionBarUsesCompactActions(Locale.ENGLISH);
         } finally {
             I18nUtil.setLocale(originalLocale);
@@ -161,7 +161,7 @@ public class RedisPanelLayoutTest {
     public void leftSidebarTabsShouldUseCompactLocalizedTitlesAcrossLocales() {
         Locale originalLocale = I18nUtil.currentLocale();
         try {
-            assertLeftSidebarTabsUseCompactTitle(Locale.CHINESE);
+            assertLeftSidebarTabsUseCompactTitle(Locale.forLanguageTag("vi"));
             assertLeftSidebarTabsUseCompactTitle(Locale.ENGLISH);
         } finally {
             I18nUtil.setLocale(originalLocale);

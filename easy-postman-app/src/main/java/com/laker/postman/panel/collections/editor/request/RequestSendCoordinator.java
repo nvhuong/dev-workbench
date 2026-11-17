@@ -30,7 +30,7 @@ final class RequestSendCoordinator {
         }
 
         requestPreparationFeedbackPresenter.clearUrlValidationFeedback(urlField);
-        // 点击发送后立即切到“请求中”态，保持和实际网络请求一致的即时反馈。
+        // Cắt ngay sau khi nhấn gửi“Yêu cầu”trạng thái để duy trì phản hồi tức thì phù hợp với yêu cầu mạng thực tế.
         updateUiForRequestingAction.run();
 
         SwingWorker<Void, Void> preparationWorker = new SwingWorker<>() {
@@ -38,7 +38,7 @@ final class RequestSendCoordinator {
 
             @Override
             protected Void doInBackground() {
-                // 预处理阶段只负责准备请求数据，不直接触碰协议执行，便于后续独立演进校验逻辑。
+                // Giai đoạn tiền xử lý chỉ chịu trách nhiệm chuẩn bị dữ liệu yêu cầu và không liên quan trực tiếp đến việc thực thi giao thức, điều này tạo điều kiện thuận lợi cho sự phát triển logic xác minh độc lập tiếp theo.
                 preparationResult = preparationSupplier.get();
                 return null;
             }
@@ -50,7 +50,7 @@ final class RequestSendCoordinator {
                     return;
                 }
 
-                // 预处理 worker 只负责准备数据；进入结果分发前，先把当前 worker 归还给主状态机。
+                // tiền xử lý worker Nó chỉ chịu trách nhiệm chuẩn bị dữ liệu; trước khi vào phân phối kết quả, trước tiên hãy đặt dòng điện worker Trở về máy trạng thái chính.
                 executionState.clearCurrentWorkerIf(this);
 
                 if (requestPreparationFeedbackPresenter.handlePreparationFailure(

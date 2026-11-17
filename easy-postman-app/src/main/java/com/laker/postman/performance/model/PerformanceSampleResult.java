@@ -36,9 +36,9 @@ public class PerformanceSampleResult {
     int sentMessages;
     int receivedMessages;
     int matchedMessages;
-    // 发送字节数：请求头 + 请求体，统计 Sent KB/s 时使用
+    // Số byte được gửi: tiêu đề yêu cầu + Yêu cầu nội dung, thống kê Sent KB/s khi sử dụng
     long sentBytes;
-    // 接收字节数：响应头 + 响应体，统计 Received KB/s 和 Avg. Bytes 时使用
+    // Số byte nhận được: tiêu đề phản hồi + Cơ quan phản hồi, thống kê Received KB/s và Avg. Bytes khi sử dụng
     long receivedBytes;
     long firstMessageLatencyMs;
     boolean successful;

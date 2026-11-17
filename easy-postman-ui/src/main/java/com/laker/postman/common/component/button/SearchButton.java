@@ -9,7 +9,7 @@ import javax.swing.*;
 import java.awt.*;
 
 /**
- * 通用搜索按钮，带图标和统一样式。
+ * Nút tìm kiếm phổ quát với biểu tượng và phong cách thống nhất.
  */
 public class SearchButton extends JButton {
     public SearchButton() {

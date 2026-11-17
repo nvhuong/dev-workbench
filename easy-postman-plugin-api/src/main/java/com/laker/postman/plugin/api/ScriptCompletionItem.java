@@ -1,7 +1,7 @@
 package com.laker.postman.plugin.api;
 
 /**
- * 不绑定具体编辑器实现的脚本补全项。
+ * Các mục hoàn thành tập lệnh không bị ràng buộc với việc triển khai trình chỉnh sửa cụ thể.
  */
 public record ScriptCompletionItem(
         ScriptCompletionKind kind,

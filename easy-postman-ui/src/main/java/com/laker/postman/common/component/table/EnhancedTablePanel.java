@@ -28,39 +28,39 @@ import java.util.function.BiFunction;
 import java.util.function.Consumer;
 
 /**
- * 增强型通用表格组件
+ * Thành phần bảng phổ quát nâng cao
  * <ul>
- *   <li>自动铺满视口宽度（内容窄时拉伸，超宽时出横向滚动条）</li>
- *   <li>顶部工具栏：实时搜索过滤 + 列多选过滤 + 总行数显示</li>
- *   <li>分页：每页条数下拉 20/50/100/All、翻页、页码跳转</li>
- *   <li>列标题单击排序（升/降，带箭头指示）</li>
- *   <li>行悬停高亮 + 斑马纹</li>
- *   <li>右键菜单：复制单元格、复制整行</li>
- *   <li>支持运行时动态重置列结构（{@link #resetAndSetData}）</li>
+ *   <li>Tự động lấp đầy chiều rộng khung nhìn (kéo dài khi nội dung bị thu hẹp và hiển thị thanh cuộn ngang khi nội dung siêu rộng)</li>
+ *   <li>Thanh công cụ trên cùng: Lọc tìm kiếm trực tiếp + Lọc nhiều lựa chọn cột + Tổng số hàng được hiển thị</li>
+ *   <li>Phân trang: thả xuống số lượng mục trên mỗi trang 20/50/100/All、Lật trang, nhảy số trang</li>
+ *   <li>Nhấp vào tiêu đề cột để sắp xếp (l/xuống, được biểu thị bằng một mũi tên)</li>
+ *   <li>Làm nổi bật hàng di chuột + In ngựa vằn</li>
+ *   <li>Menu chuột phải: Sao chép ô, sao chép toàn bộ hàng</li>
+ *   <li>Hỗ trợ đặt lại động cấu trúc cột khi chạy ({@link #resetAndSetData}）</li>
  * </ul>
  */
 @Slf4j
 public class EnhancedTablePanel extends JPanel {
 
-    // ── 列名（可变，支持动态重置）───────────────────────────────────────────
+    // ── Tên cột (có thể thay đổi, hỗ trợ thiết lập lại động)───────────────────────────────────────────
     private String[] currentColumns;
 
-    // ── 数据 ──────────────────────────────────────────────────────────────
+    // ── dữ liệu ──────────────────────────────────────────────────────────────
     private final List<Object[]> allRows = new ArrayList<>();
     private final List<Object[]> filteredRows = new ArrayList<>();
 
-    // ── 分页 ──────────────────────────────────────────────────────────────
+    // ── Phân trang ──────────────────────────────────────────────────────────────
     private int pageSize = 20;
     private int currentPage = 0;
 
-    // ── 排序 ──────────────────────────────────────────────────────────────
+    // ── Loại ──────────────────────────────────────────────────────────────
     private int sortCol = -1;
     private boolean sortAsc = true;
 
-    // ── 过滤 ─────────────────────────────────────────────────────────────
+    // ── lọc ─────────────────────────────────────────────────────────────
     private String filterText = "";
     /**
-     * null = 搜索全列；否则只在这些列索引中搜索
+     * null = Tìm kiếm tất cả các cột; nếu không thì chỉ tìm kiếm trong các chỉ mục cột này
      */
     private Set<Integer> filterCols = null;
 
@@ -74,7 +74,7 @@ public class EnhancedTablePanel extends JPanel {
     @Setter
     private Consumer<JPopupMenu> contextMenuCustomizer;
     /**
-     * 当前可见页数据发生变化后调用。适合详情面板按当前选中行重新同步内容。
+     * Được gọi sau khi thay đổi dữ liệu trang hiện có. Điều chỉnh bảng chi tiết để đồng bộ hóa lại nội dung dựa trên hàng hiện được chọn.
      */
     @Setter
     private Runnable viewDataChangedListener;
@@ -82,19 +82,19 @@ public class EnhancedTablePanel extends JPanel {
     private BiFunction<Integer, Integer, String> rowCountFormatter;
 
     /**
-     * 超过此字符数时，单元格显示截断文字 + 省略号，并启用 tooltip
+     * Khi vượt quá số lượng ký tự này, ô sẽ hiển thị văn bản bị cắt bớt + dấu chấm lửng và kích hoạt tooltip
      */
     private static final int LARGE_CELL_THRESHOLD = 100;
     /**
-     * Tooltip 最多显示的字符数
+     * Tooltip Số ký tự tối đa cần hiển thị
      */
     private static final int TOOLTIP_MAX_LEN = 300;
 
-    // ── 分页大小选项 ───────────────────────────────────────────────────────
+    // ── Tùy chọn kích thước trang ───────────────────────────────────────────────────────
     private static final int[] PAGE_SIZES = {20, 50, 100, 0};
     private static final String[] SIZE_LABELS = {"20", "50", "100", UiI18n.get(UiMessageKeys.TABLE_PAGE_SIZE_ALL)};
 
-    // ── Swing 组件 ────────────────────────────────────────────────────────
+    // ── Swing thành phần ────────────────────────────────────────────────────────
     @Getter
     private JTable table;
     private DefaultTableModel tableModel;
@@ -105,11 +105,11 @@ public class EnhancedTablePanel extends JPanel {
     private JButton btnPrev;
     private JButton btnNext;
 
-    // ── 搜索选项（与 SearchTextField 联动）────────────────────────────────
+    // ── Tùy chọn tìm kiếm (với  SearchTextField liên kết)────────────────────────────────
     private boolean caseSensitive = false;
     private boolean wholeWord = false;
 
-    // ── 空状态覆盖层 ─────────────────────────────────────────────────────
+    // ── Lớp phủ trạng thái trống ─────────────────────────────────────────────────────
     private JLabel emptyLabel;
 
     // ─────────────────────────────────────────────────────────────────────
@@ -122,7 +122,7 @@ public class EnhancedTablePanel extends JPanel {
     // ═══════════════════ Public API ══════════════════════════════════════
 
     /**
-     * 动态重置列结构并替换全量数据。
+     * Tự động đặt lại cấu trúc cột và thay thế tất cả dữ liệu.
      */
     public void resetAndSetData(String[] newColumns, List<Object[]> rows) {
         boolean colsChanged = !Arrays.equals(currentColumns, newColumns);
@@ -133,7 +133,7 @@ public class EnhancedTablePanel extends JPanel {
         searchField.setText("");
 
         if (colsChanged) {
-            // 列结构变化：清除超出新列数的无效索引；若清后覆盖全部列则置 null（全选）
+            // Thay đổi cấu trúc cột: Xóa các chỉ mục không hợp lệ vượt quá số lượng cột mới; đặt nếu tất cả các cột được che phủ sau khi xóa null（Chọn tất cả)
             if (filterCols != null && !filterCols.isEmpty()) {
                 filterCols.removeIf(ci -> ci >= newColumns.length);
                 if (filterCols.size() >= newColumns.length) filterCols = null;
@@ -141,7 +141,7 @@ public class EnhancedTablePanel extends JPanel {
             updateColFilterBtnLabel();
         }
 
-        // 重置 tableModel 列
+        // Đặt lại tableModel cột
         tableModel.setRowCount(0);
         tableModel.setColumnCount(0);
         for (String col : currentColumns) tableModel.addColumn(col);
@@ -155,7 +155,7 @@ public class EnhancedTablePanel extends JPanel {
     }
 
     /**
-     * 保持列不变，仅替换数据
+     * Giữ nguyên các cột, chỉ thay thế dữ liệu
      */
     public void setData(List<Object[]> rows) {
         allRows.clear();
@@ -168,7 +168,7 @@ public class EnhancedTablePanel extends JPanel {
     }
 
     /**
-     * 保持当前排序、过滤、分页，仅替换数据。
+     * Giữ việc sắp xếp, lọc, phân trang hiện tại, chỉ thay thế dữ liệu.
      */
     public void setDataPreserveView(List<Object[]> rows) {
         allRows.clear();
@@ -178,8 +178,8 @@ public class EnhancedTablePanel extends JPanel {
     }
 
     /**
-     * 获取当前视图页中的行数据。EnhancedTablePanel 使用自有分页/过滤/排序，
-     * JTable 的 convertRowIndexToModel 无法映射回 allRows。
+     * Lấy dữ liệu hàng trong trang xem hiện tại.EnhancedTablePanel Sử dụng phân trang riêng/lọc/Loại,
+     * JTable của convertRowIndexToModel Không thể ánh xạ lại allRows。
      */
     public Object[] getVisibleRowData(int viewRow) {
         if (viewRow < 0 || table == null || viewRow >= table.getRowCount()) {
@@ -222,7 +222,7 @@ public class EnhancedTablePanel extends JPanel {
     }
 
     /**
-     * 清空数据（保持列结构）
+     * Xóa dữ liệu (giữ cấu trúc cột)
      */
     public void clearData() {
         allRows.clear();
@@ -238,27 +238,27 @@ public class EnhancedTablePanel extends JPanel {
     }
 
     /**
-     * 返回全量数据行数（不受分页/过滤影响）
+     * Trả về tổng số hàng dữ liệu (không được phân trang)/hiệu ứng lọc)
      */
     public int getTotalRowCount() {
         return allRows.size();
     }
 
     /**
-     * 增量追加单行数据（无需重排序/重过滤，性能优于全量 setData）。
-     * 若当前有过滤或排序条件则回退到全量刷新以保证视图正确性。
+     * Tăng dần thêm một hàng dữ liệu (không cần sắp xếp lại/Được lọc lại, hiệu suất tốt hơn âm lượng đầy đủ setData）。
+     * Nếu hiện có các điều kiện lọc hoặc sắp xếp, hãy quay lại làm mới hoàn toàn để đảm bảo chế độ xem chính xác.
      */
     public void addRow(Object[] row) {
         if (row == null) return;
         allRows.add(row);
         updateHintLabel();
         if ((filterText != null && !filterText.isBlank()) || hasActiveSort()) {
-            // 有过滤/排序条件时全量刷新保证新增行进入正确位置
+            // Có lọc/Khi sắp xếp các điều kiện, hãy làm mới toàn bộ để đảm bảo các hàng mới vào đúng vị trí
             applyFilterAndSort();
             return;
         }
         filteredRows.add(row);
-        // 若当前在最后一页（或 All），直接追加到 tableModel
+        // Nếu bạn hiện đang ở trang cuối cùng (hoặc All），Nối trực tiếp vào tableModel
         boolean isAll = (pageSize == 0);
         int totalFiltered = filteredRows.size();
         int totalPages = isAll ? 1 : (int) Math.ceil((double) totalFiltered / pageSize);
@@ -282,7 +282,7 @@ public class EnhancedTablePanel extends JPanel {
         add(buildPagination(), BorderLayout.SOUTH);
     }
 
-    // ── 工具栏：搜索框 + 列筛选按钮 + 行数提示 ────────────────────────────
+    // ── Thanh công cụ: Hộp tìm kiếm + Nút lọc cột + Gợi ý số dòng ────────────────────────────
     private JPanel buildToolBar() {
         JPanel bar = new JPanel(new BorderLayout(4, 0));
         ToolWindowSurfaceStyle.applyCard(bar);
@@ -292,7 +292,7 @@ public class EnhancedTablePanel extends JPanel {
                 BorderFactory.createEmptyBorder(4, 6, 4, 6)));
 
         searchField = new SearchTextField();
-        // 保留 SearchTextField 内置的大小写/整词匹配按钮（不覆盖 trailing component）
+        // Đã đặt trước SearchTextField Vỏ tích hợp/Nút khớp toàn bộ từ (không ghi đè trailing component）
         searchField.putClientProperty(FlatClientProperties.PLACEHOLDER_TEXT,
                 UiI18n.get(UiMessageKeys.TABLE_SEARCH_PLACEHOLDER_ALL));
         searchField.setPreferredSize(new Dimension(220, 28));
@@ -310,7 +310,7 @@ public class EnhancedTablePanel extends JPanel {
             }
         });
 
-        // 监听大小写 / 整词切换 → 重新过滤
+        // Trường hợp giám sát / Chuyển đổi toàn bộ từ → Lọc lại
         searchField.addPropertyChangeListener("caseSensitive", e -> {
             caseSensitive = searchField.isCaseSensitive();
             if (!filterText.isEmpty()) {
@@ -326,7 +326,7 @@ public class EnhancedTablePanel extends JPanel {
             }
         });
 
-        // Escape 清空搜索框
+        // Escape Xóa hộp tìm kiếm
         searchField.getInputMap(WHEN_FOCUSED).put(
                 KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), "clearSearch");
         searchField.getActionMap().put("clearSearch", new AbstractAction() {
@@ -357,7 +357,7 @@ public class EnhancedTablePanel extends JPanel {
         return bar;
     }
 
-    // ── 列筛选 popup（持久化，避免每次重建导致状态丢失）──────────────────────
+    // ── Bộ lọc cột popup（Kiên trì để tránh mất trạng thái do mỗi lần xây dựng lại)──────────────────────
     private JPopupMenu colFilterPopup = null;
     private JCheckBox[] colFilterBoxes = null;
     private String[] colFilterPopupColumns = null;
@@ -380,7 +380,7 @@ public class EnhancedTablePanel extends JPanel {
         ToolWindowSurfaceStyle.applyPopupMenuCard(popup);
         popup.setLayout(new BorderLayout(0, 0));
 
-        // ── 标题栏 ──────────────────────────────────────────────────────
+        // ── thanh tiêu đề ──────────────────────────────────────────────────────
         JLabel titleLabel = new JLabel(UiI18n.get(UiMessageKeys.TABLE_COL_FILTER_TITLE));
         titleLabel.setFont(FontsUtil.getDefaultFontWithOffset(Font.BOLD, -1));
         titleLabel.setForeground(ModernColors.getTextPrimary());
@@ -389,7 +389,7 @@ public class EnhancedTablePanel extends JPanel {
                 BorderFactory.createEmptyBorder(6, 10, 6, 10)));
         popup.add(titleLabel, BorderLayout.NORTH);
 
-        // ── 复选框列表 ───────────────────────────────────────────────────
+        // ── Danh sách hộp kiểm ───────────────────────────────────────────────────
         JPanel checkPanel = new JPanel(new GridLayout(0, 1, 0, 0));
         checkPanel.setBorder(BorderFactory.createEmptyBorder(4, 10, 4, 10));
         checkPanel.setOpaque(false);
@@ -409,7 +409,7 @@ public class EnhancedTablePanel extends JPanel {
         checkScroll.setPreferredSize(new Dimension(200, Math.min(currentColumns.length * 28 + 8, 250)));
         popup.add(checkScroll, BorderLayout.CENTER);
 
-        // ── 底部操作栏 ───────────────────────────────────────────────────
+        // ── Thanh hành động phía dưới ───────────────────────────────────────────────────
         JPanel footer = new JPanel(new BorderLayout(0, 0));
         ToolWindowSurfaceStyle.applyCard(footer);
         footer.setBorder(BorderFactory.createCompoundBorder(
@@ -447,7 +447,7 @@ public class EnhancedTablePanel extends JPanel {
     }
 
     /**
-     * 链接风格的小按钮（无边框、无背景、使用紧凑字体）
+     * Các nút bấm kiểu liên kết nhỏ (không viền, không nền, sử dụng font chữ gọn)
      */
     private static JButton makeLinkBtn(String text) {
         JButton b = new JButton(text);
@@ -484,23 +484,23 @@ public class EnhancedTablePanel extends JPanel {
     }
 
     /**
-     * 更新列筛选按钮文字 + 搜索框 placeholder
+     * Cập nhật văn bản nút lọc cột + Hộp tìm kiếm placeholder
      */
     private void updateColFilterBtnLabel() {
         if (filterCols == null) {
-            // 默认：搜索全部列
+            // Mặc định: Tìm kiếm tất cả các cột
             colFilterBtn.setText(UiI18n.get(UiMessageKeys.TABLE_COL_FILTER_BTN));
             colFilterBtn.setForeground(null);
             searchField.putClientProperty(FlatClientProperties.PLACEHOLDER_TEXT,
                     UiI18n.get(UiMessageKeys.TABLE_SEARCH_PLACEHOLDER_ALL));
         } else if (filterCols.isEmpty()) {
-            // 全不选：置灰提示用户未指定范围
+            // Bỏ chọn tất cả: chuyển sang màu xám để nhắc người dùng rằng không có phạm vi nào được chỉ định
             colFilterBtn.setText(UiI18n.get(UiMessageKeys.TABLE_COL_FILTER_BTN_N, "0"));
             colFilterBtn.setForeground(ModernColors.getTextSecondary());
             searchField.putClientProperty(FlatClientProperties.PLACEHOLDER_TEXT,
                     UiI18n.get(UiMessageKeys.TABLE_SEARCH_PLACEHOLDER_NONE));
         } else {
-            // 已选部分列：高亮显示数量，placeholder 显示列名
+            // Các cột đã chọn: Đánh dấu số lượng.placeholder Hiển thị tên cột
             colFilterBtn.setText(UiI18n.get(UiMessageKeys.TABLE_COL_FILTER_BTN_N,
                     String.valueOf(filterCols.size())));
             colFilterBtn.setForeground(accentColor());
@@ -523,7 +523,7 @@ public class EnhancedTablePanel extends JPanel {
         return (names.size() >= 3 && filterCols.size() > 3) ? joined + "..." : joined;
     }
 
-    // ── 表格 ─────────────────────────────────────────────────────────────
+    // ── cái bàn ─────────────────────────────────────────────────────────────
     private JComponent buildTableArea() {
         initTableModel();
         initTableWidget();
@@ -563,7 +563,7 @@ public class EnhancedTablePanel extends JPanel {
         table.getTableHeader().addMouseListener(buildHeaderMouseListener());
         table.addMouseMotionListener(buildTableMotionListener());
         table.addMouseListener(buildTableMouseListener());
-        // 双击单元格 → 大内容弹出详情对话框
+        // Bấm đúp vào ô → Nội dung lớn hiện lên hộp thoại chi tiết
         table.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
@@ -673,7 +673,7 @@ public class EnhancedTablePanel extends JPanel {
         };
     }
 
-    // ── 分页栏 ────────────────────────────────────────────────────────────
+    // ── Thanh phân trang ────────────────────────────────────────────────────────────
     private JPanel buildPagination() {
         JPanel bar = new JPanel(new FlowLayout(FlowLayout.CENTER, 6, 3));
         ToolWindowSurfaceStyle.applyCard(bar);
@@ -738,7 +738,7 @@ public class EnhancedTablePanel extends JPanel {
         return bar;
     }
 
-    // ═══════════════════ 核心逻辑 ════════════════════════════════════════
+    // ═══════════════════ logic cốt lõi ════════════════════════════════════════
 
     private void onSearch() {
         filterText = searchField.getText().trim();
@@ -813,7 +813,7 @@ public class EnhancedTablePanel extends JPanel {
     }
 
     /**
-     * 更新顶部行数提示（过滤时显示过滤比例）
+     * Cập nhật lời nhắc số hàng trên cùng (hiển thị tỷ lệ bộ lọc khi lọc)
      */
     private void updateHintLabel() {
         int total = allRows.size();
@@ -835,7 +835,7 @@ public class EnhancedTablePanel extends JPanel {
     }
 
     /**
-     * 更新空状态覆盖层文字和可见性
+     * Cập nhật văn bản và khả năng hiển thị của lớp phủ trạng thái trống
      */
     private void updateEmptyState() {
         boolean hasData = !filteredRows.isEmpty();
@@ -861,7 +861,7 @@ public class EnhancedTablePanel extends JPanel {
         int r = table.getSelectedRow();
         int c = table.getSelectedColumn();
 
-        // "查看单元格内容" 仅在单元格内容超过阈值时显示
+        // "Xem nội dung ô" Chỉ hiển thị nếu nội dung ô vượt quá ngưỡng
         if (r >= 0 && c >= 0) {
             Object val = table.getValueAt(r, c);
             String text = val == null ? "" : val.toString();
@@ -912,7 +912,7 @@ public class EnhancedTablePanel extends JPanel {
         clip(sb.toString());
     }
 
-    // ═══════════════════ 工具方法 ════════════════════════════════════════
+    // ═══════════════════ Phương pháp công cụ ════════════════════════════════════════
 
     private int totalPages() {
         if (pageSize == 0) return 1;
@@ -960,7 +960,7 @@ public class EnhancedTablePanel extends JPanel {
     }
 
     /**
-     * 在列头上追加排序箭头指示
+     * Thêm mũi tên sắp xếp vào tiêu đề cột
      */
     private void updateSortHeaders() {
         TableColumnModel cm = table.getColumnModel();
@@ -977,7 +977,7 @@ public class EnhancedTablePanel extends JPanel {
     }
 
     /**
-     * 自动适配所有列宽
+     * Tự động vừa với tất cả độ rộng của cột
      */
     private void autoResizeColumns() {
         if (table.getColumnModel().getColumnCount() == 0) return;
@@ -987,7 +987,7 @@ public class EnhancedTablePanel extends JPanel {
     }
 
     /**
-     * 计算单列合适宽度（扫描最多 100 行，上限 320px）
+     * Tính chiều rộng thích hợp của một cột (quét tối đa 100 Được rồi, giới hạn trên 320px）
      */
     private int calcColWidth(int col) {
         TableCellRenderer hr = table.getTableHeader().getDefaultRenderer();
@@ -1003,7 +1003,7 @@ public class EnhancedTablePanel extends JPanel {
     }
 
     /**
-     * 双击列分隔线时自适应该列宽
+     * Điều chỉnh độ rộng cột khi bạn bấm đúp vào dấu phân cách cột
      */
     private void autoResizeSingleColumn(int col) {
         int count = table.getColumnModel().getColumnCount();
@@ -1013,7 +1013,7 @@ public class EnhancedTablePanel extends JPanel {
     }
 
     /**
-     * 判断鼠标是否在列分隔线上（距分隔线 3px 内）
+     * Xác định xem chuột có nằm trên vạch phân cách cột hay không (khoảng cách từ vạch phân cách 3px bên trong)
      */
     private boolean isOnColumnResizeBorder(MouseEvent e) {
         int x = e.getX();
@@ -1066,10 +1066,10 @@ public class EnhancedTablePanel extends JPanel {
         return l;
     }
 
-    // ═══════════════════ 单元格详情对话框 ═════════════════════════════════
+    // ═══════════════════ Hộp thoại chi tiết ô ═════════════════════════════════
 
     /**
-     * 弹出单元格详情对话框（支持语法高亮、JSON 格式化、Cmd/Ctrl+F 搜索、复制）
+     * Xuất hiện hộp thoại chi tiết ô (hỗ trợ tô sáng cú pháp,JSON Định dạng,Cmd/Ctrl+F tìm kiếm, sao chép)
      */
     private void showCellDetailDialog(String colName, String text) {
         Window owner = SwingUtilities.getWindowAncestor(this);
@@ -1090,23 +1090,23 @@ public class EnhancedTablePanel extends JPanel {
         textArea.setHighlightCurrentLine(false);
         EditorThemeUtil.loadTheme(textArea);
 
-        // 判断是否是 JSON
+        // Xác định nếu có JSON
         boolean isJson = JsonUtil.isTypeJSON(text);
         textArea.setSyntaxEditingStyle(isJson
                 ? SyntaxConstants.SYNTAX_STYLE_JSON
                 : SyntaxConstants.SYNTAX_STYLE_NONE);
 
-        // ── SearchableTextArea 包装（仅搜索，禁用替换）──────────────────
+        // ── SearchableTextArea Gói (chỉ tìm kiếm, thay thế bị vô hiệu hóa)──────────────────
         SearchableTextArea searchableTextArea = new SearchableTextArea(textArea, false);
 
-        // ── 顶部信息栏 ──────────────────────────────────────────────────
+        // ── Thanh thông tin hàng đầu ──────────────────────────────────────────────────
         JLabel lenLabel = new JLabel(UiI18n.get(UiMessageKeys.TABLE_CELL_DETAIL_LENGTH,
                 String.valueOf(text.length())));
         lenLabel.setForeground(ModernColors.getTextSecondary());
         lenLabel.setFont(FontsUtil.getDefaultFontWithOffset(Font.PLAIN, -2));
         ToolWindowSurfaceStyle.applyDialogHeader(lenLabel, 4, 8, 4, 8);
 
-        // ── 底部按钮栏 ──────────────────────────────────────────────────
+        // ── Thanh nút dưới cùng ──────────────────────────────────────────────────
         JButton btnFormatJson = ModernButtonFactory.createButton(UiI18n.get(UiMessageKeys.TABLE_CELL_DETAIL_FORMAT_JSON), false);
         JButton btnCopy = ModernButtonFactory.createButton(CommonI18n.get(CommonMessageKeys.BUTTON_COPY), false);
         JButton btnClose = ModernButtonFactory.createButton(CommonI18n.get(CommonMessageKeys.BUTTON_CLOSE), true);
@@ -1114,7 +1114,7 @@ public class EnhancedTablePanel extends JPanel {
         btnFormatJson.setEnabled(isJson);
         if (!isJson) btnFormatJson.setToolTipText(UiI18n.get(UiMessageKeys.TABLE_INVALID_JSON));
 
-        // 格式化 / 还原 JSON 切换
+        // Định dạng / Khôi phục JSON chuyển đổi
         final boolean[] formatted = {false};
         btnFormatJson.addActionListener(ev -> {
             if (!formatted[0]) {
@@ -1142,7 +1142,7 @@ public class EnhancedTablePanel extends JPanel {
         });
         btnClose.addActionListener(ev -> dialog.dispose());
 
-        // JSON 自动格式化展示
+        // JSON Tự động định dạng màn hình
         if (isJson) {
             try {
                 String pretty = JsonUtil.toJsonPrettyStr(text);
@@ -1170,7 +1170,7 @@ public class EnhancedTablePanel extends JPanel {
         dialog.add(searchableTextArea, BorderLayout.CENTER);
         dialog.add(footer, BorderLayout.SOUTH);
 
-        // Escape 关闭
+        // Escape Đóng lại
         dialog.getRootPane().registerKeyboardAction(
                 ev -> dialog.dispose(),
                 KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
@@ -1211,7 +1211,7 @@ public class EnhancedTablePanel extends JPanel {
         @Override
         public Component getTableCellRendererComponent(
                 JTable t, Object value, boolean sel, boolean focus, int row, int col) {
-            // 对大内容进行截断展示
+            // Cắt bớt nội dung lớn để hiển thị
             String display = value == null ? "" : value.toString();
             String tooltip = null;
             if (display.length() > LARGE_CELL_THRESHOLD) {
@@ -1238,7 +1238,7 @@ public class EnhancedTablePanel extends JPanel {
     }
 
     /**
-     * 转义 HTML 特殊字符，用于 tooltip
+     * bỏ trốn HTML Ký tự đặc biệt, được sử dụng cho tooltip
      */
     private static String escapeHtml(String text) {
         return text.replace("&", "&amp;")

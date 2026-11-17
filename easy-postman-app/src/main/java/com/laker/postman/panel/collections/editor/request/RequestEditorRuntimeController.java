@@ -19,10 +19,10 @@ import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 /**
- * 请求编辑器运行时控制器集合。
+ * Yêu cầu một bộ sưu tập các bộ điều khiển thời gian chạy của trình soạn thảo.
  * <p>
- * 核心点：发送、取消、协议分发、流式连接、响应回填和布局联动都属于运行态编排，
- * 不放在 RequestEditSubPanel 的视图初始化代码里。
+ * Điểm cốt lõi: Gửi, hủy, phân phối giao thức, kết nối phát trực tuyến, chèn lấp phản hồi và liên kết bố cục đều thuộc về điều phối thời gian chạy.
+ * Đừng đặt nó RequestEditSubPanel trong mã khởi tạo chế độ xem.
  */
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 final class RequestEditorRuntimeController {

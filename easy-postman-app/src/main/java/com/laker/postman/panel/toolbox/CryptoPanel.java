@@ -19,7 +19,7 @@ import java.text.MessageFormat;
 import java.util.Base64;
 
 /**
- * 加解密工具面板 - 专注于双向加密解密
+ * Bảng công cụ mã hóa và giải mã - Tập trung vào mã hóa và giải mã hai chiều
  */
 @Slf4j
 public class CryptoPanel extends JPanel {
@@ -41,21 +41,21 @@ public class CryptoPanel extends JPanel {
     private void initUI() {
         ToolboxWorkbench.applyRoot(this);
 
-        // 顶部工具栏
+        // Thanh công cụ trên cùng
         add(createToolbar(), BorderLayout.NORTH);
 
-        // 中间分割面板
+        // Bảng chia đôi ở giữa
         add(createMainPanel(), BorderLayout.CENTER);
     }
 
     private JPanel createToolbar() {
-        // 配置面板
+        // Bảng cấu hình
         JPanel configPanel = new JPanel();
         configPanel.setOpaque(false);
         configPanel.setLayout(new BoxLayout(configPanel, BoxLayout.Y_AXIS));
         configPanel.setBorder(BorderFactory.createEmptyBorder());
 
-        // 第一行：算法和模式选择
+        // Hàng đầu tiên: Thuật toán và lựa chọn mẫu
         JPanel row1 = ToolboxWorkbench.optionsRow();
         row1.add(new JLabel(I18nUtil.getMessage(MessageKeys.TOOLBOX_CRYPTO_ALGORITHM) + ":"));
         algorithmCombo = new JComboBox<>(new String[]{"AES-128", "AES-256", "DES"});
@@ -70,7 +70,7 @@ public class CryptoPanel extends JPanel {
 
         configPanel.add(row1);
 
-        // 第二行：密钥输入和生成
+        // Dòng thứ hai: Đầu vào và tạo khóa
         JPanel row2 = ToolboxWorkbench.optionsRow();
         row2.add(new JLabel(I18nUtil.getMessage(MessageKeys.TOOLBOX_CRYPTO_KEY) + ":"));
         keyField = new FlatTextField();
@@ -85,7 +85,7 @@ public class CryptoPanel extends JPanel {
 
         configPanel.add(row2);
 
-        // 第三行：IV输入和生成（仅CBC模式显示）
+        // Dòng thứ ba:IVĐầu vào và tạo (chỉCBChiển thị chế độ)
         ivPanel = ToolboxWorkbench.optionsRow();
         ivPanel.add(new JLabel(I18nUtil.getMessage(MessageKeys.TOOLBOX_CRYPTO_IV) + ":"));
         ivField = new FlatTextField();
@@ -128,7 +128,7 @@ public class CryptoPanel extends JPanel {
                 copyBtn,
                 clearBtn);
 
-        // 初始化状态
+        // Trạng thái khởi tạo
         updatePlaceholders();
         updateIvVisibility();
 
@@ -139,7 +139,7 @@ public class CryptoPanel extends JPanel {
     }
 
     private JSplitPane createMainPanel() {
-        // 输入区域
+        // Khu vực đầu vào
         inputArea = new JTextArea();
         inputArea.setLineWrap(true);
         inputArea.setWrapStyleWord(true);
@@ -151,7 +151,7 @@ public class CryptoPanel extends JPanel {
                 inputScrollPane
         );
 
-        // 输出区域
+        // khu vực đầu ra
         outputArea = new JTextArea();
         outputArea.setLineWrap(true);
         outputArea.setWrapStyleWord(true);
@@ -168,7 +168,7 @@ public class CryptoPanel extends JPanel {
     }
 
     private void setupKeyBindings() {
-        // Ctrl+E / Cmd+E - 加密
+        // Ctrl+E / Cmd+E - Mã hóa
         getInputMap(WHEN_IN_FOCUSED_WINDOW).put(
                 KeyStroke.getKeyStroke(KeyEvent.VK_E, Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx()),
                 "encrypt"
@@ -180,7 +180,7 @@ public class CryptoPanel extends JPanel {
             }
         });
 
-        // Ctrl+D / Cmd+D - 解密
+        // Ctrl+D / Cmd+D - Giải mã
         getInputMap(WHEN_IN_FOCUSED_WINDOW).put(
                 KeyStroke.getKeyStroke(KeyEvent.VK_D, Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx()),
                 "decrypt"
@@ -192,7 +192,7 @@ public class CryptoPanel extends JPanel {
             }
         });
 
-        // Ctrl+L / Cmd+L - 清空
+        // Ctrl+L / Cmd+L - Trống
         getInputMap(WHEN_IN_FOCUSED_WINDOW).put(
                 KeyStroke.getKeyStroke(KeyEvent.VK_L, Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx()),
                 "clear"
@@ -422,7 +422,7 @@ public class CryptoPanel extends JPanel {
     private void copyToClipboard() {
         String text = outputArea.getText();
         if (!text.isEmpty()) {
-            // 移除前面的成功标识行
+            // Xóa dòng thành công trước đó
             String[] lines = text.split("\n", 3);
             String contentToCopy = lines.length > 2 ? lines[2] : text;
 

@@ -9,7 +9,7 @@ import javax.swing.*;
 import java.awt.*;
 
 /**
- * 下载按钮
+ * Nút tải xuống
  */
 public class DownloadButton extends JButton {
 

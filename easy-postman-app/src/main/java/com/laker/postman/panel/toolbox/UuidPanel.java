@@ -31,7 +31,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * UUID生成工具面板 - 增强版
+ * UUIDTạo bảng công cụ - Phiên bản nâng cao
  */
 @Slf4j
 public class UuidPanel extends JPanel {
@@ -47,7 +47,7 @@ public class UuidPanel extends JPanel {
     private JTextField namespaceField;
     private JTextField nameField;
 
-    // UUID 正则表达式
+    // UUID Biểu thức chính quy
     private static final Pattern UUID_NO_HYPHEN_PATTERN = Pattern.compile("^[0-9a-fA-F]{32}$");
     private static final Pattern UUID_FLEXIBLE_PATTERN = Pattern.compile("(?i)[0-9a-f]{8}-?[0-9a-f]{4}-?[0-9a-f]{4}-?[0-9a-f]{4}-?[0-9a-f]{12}");
     private static final long UUID_EPOCH_OFFSET_100NS = 0x01b21dd213814000L;
@@ -59,7 +59,7 @@ public class UuidPanel extends JPanel {
             .ofPattern("yyyy-MM-dd HH:mm:ss.SSS 'UTC'")
             .withZone(ZoneId.of("UTC"));
 
-    // 预定义命名空间
+    // Không gian tên được xác định trước
     private static final UUID NAMESPACE_DNS = UUID.fromString("6ba7b810-9dad-11d1-80b4-00c04fd430c8");
     private static final UUID NAMESPACE_URL = UUID.fromString("6ba7b811-9dad-11d1-80b4-00c04fd430c8");
     private static final UUID NAMESPACE_OID = UUID.fromString("6ba7b812-9dad-11d1-80b4-00c04fd430c8");
@@ -72,7 +72,7 @@ public class UuidPanel extends JPanel {
     private void initUI() {
         ToolboxWorkbench.applyRoot(this);
 
-        // 主分割面板
+        // Bảng chia chính
         JSplitPane splitPane = ToolboxWorkbench.horizontalSplit(
                 createGeneratorPanel(),
                 createParsePanel(),
@@ -85,23 +85,23 @@ public class UuidPanel extends JPanel {
     }
 
     /**
-     * 创建生成器面板
+     * Tạo một bảng điều khiển máy phát điện
      */
     private JPanel createGeneratorPanel() {
         JPanel panel = new JPanel(new BorderLayout(10, 10));
         panel.setOpaque(false);
 
-        // 顶部配置面板
+        // Bảng cấu hình hàng đầu
         JPanel topPanel = new JPanel(new BorderLayout(10, 10));
         topPanel.setOpaque(false);
 
-        // 生成配置面板
+        // Tạo bảng cấu hình
         JPanel configPanel = new JPanel();
         configPanel.setLayout(new BoxLayout(configPanel, BoxLayout.Y_AXIS));
         configPanel.setOpaque(false);
         configPanel.add(createSectionTitle(I18nUtil.getMessage(MessageKeys.TOOLBOX_UUID_BATCH_GENERATE)));
 
-        // 第一行：版本和数量
+        // Dòng đầu tiên: phiên bản và số lượng
         JPanel row1 = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 5));
         row1.setOpaque(false);
         row1.add(new JLabel(I18nUtil.getMessage(MessageKeys.TOOLBOX_UUID_VERSION) + ":"));
@@ -126,7 +126,7 @@ public class UuidPanel extends JPanel {
         row1.add(countSpinner);
         configPanel.add(row1);
 
-        // 第二行：格式配置
+        // Dòng thứ hai: cấu hình định dạng
         JPanel row2 = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 5));
         row2.setOpaque(false);
         row2.add(new JLabel(I18nUtil.getMessage(MessageKeys.TOOLBOX_UUID_FORMAT) + ":"));
@@ -151,7 +151,7 @@ public class UuidPanel extends JPanel {
         row2.add(separatorComboBox);
         configPanel.add(row2);
 
-        // 第三行：命名空间和名称（用于 v3 和 v5）
+        // Dòng thứ ba: không gian tên và tên (đối với  v3 và v5）
         JPanel row3 = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 5));
         row3.setOpaque(false);
         row3.add(new JLabel(I18nUtil.getMessage(MessageKeys.TOOLBOX_UUID_NAMESPACE) + ":"));
@@ -173,12 +173,12 @@ public class UuidPanel extends JPanel {
         nameField.setPreferredSize(new Dimension(150, 28));
         ToolWindowSurfaceStyle.applyTextComponentInput(nameField);
         row3.add(nameField);
-        row3.setVisible(false); // 默认隐藏，只在选择 v3/v5 时显示
+        row3.setVisible(false); // Ẩn theo mặc định, chỉ khi được chọn v3/v5 được hiển thị
         configPanel.add(row3);
 
         topPanel.add(configPanel, BorderLayout.CENTER);
 
-        // 操作按钮面板
+        // Bảng nút thao tác
         JButton generateBtn = new JButton(I18nUtil.getMessage(MessageKeys.TOOLBOX_UUID_GENERATE));
         generateBtn.setPreferredSize(new Dimension(120, 32));
         generateBtn.setFocusPainted(false);
@@ -210,7 +210,7 @@ public class UuidPanel extends JPanel {
         topPanel.add(buttonPanel, BorderLayout.SOUTH);
         panel.add(topPanel, BorderLayout.NORTH);
 
-        // 中间UUID显示区域
+        // giữaUUIDKhu vực trưng bày
         uuidArea = new JTextArea();
         uuidArea.setEditable(false);
         uuidArea.setLineWrap(true);
@@ -228,7 +228,7 @@ public class UuidPanel extends JPanel {
 
         panel.add(centerPanel, BorderLayout.CENTER);
 
-        // 底部信息面板
+        // Bảng thông tin phía dưới
         JPanel bottomPanel = new JPanel(new BorderLayout(10, 5));
         bottomPanel.setBorder(BorderFactory.createEmptyBorder(5, 0, 0, 0));
         bottomPanel.setOpaque(false);
@@ -251,7 +251,7 @@ public class UuidPanel extends JPanel {
         bottomPanel.add(statusPanel, BorderLayout.EAST);
         panel.add(bottomPanel, BorderLayout.SOUTH);
 
-        // 按钮事件
+        // Sự kiện nút
         generateBtn.addActionListener(e -> {
             int count = (Integer) countSpinner.getValue();
             generateUuid(count);
@@ -268,22 +268,22 @@ public class UuidPanel extends JPanel {
             statusLabel.setText("");
         });
 
-        // 复选框变更时自动重新生成
+        // Tự động tạo lại khi hộp kiểm thay đổi
         uppercaseCheckBox.addActionListener(e -> refreshIfNotEmpty());
         withHyphensCheckBox.addActionListener(e -> refreshIfNotEmpty());
         separatorComboBox.addActionListener(e -> refreshIfNotEmpty());
 
-        // 版本选择变更事件
+        // Sự kiện thay đổi lựa chọn phiên bản
         versionComboBox.addActionListener(e -> {
             int selectedIndex = versionComboBox.getSelectedIndex();
-            // v3 和 v5 需要显示命名空间和名称输入框
+            // v3 và v5 Không gian tên và hộp nhập tên cần được hiển thị
             row3.setVisible(selectedIndex == 2 || selectedIndex == 3);
             refreshIfNotEmpty();
             configPanel.revalidate();
             configPanel.repaint();
         });
 
-        // 命名空间选择变更事件
+        // Sự kiện thay đổi lựa chọn không gian tên
         namespaceCombo.addActionListener(e -> {
             int selected = namespaceCombo.getSelectedIndex();
             if (selected == 4) { // Custom
@@ -307,17 +307,17 @@ public class UuidPanel extends JPanel {
         bindAutoGenerateListener(namespaceField, true);
         bindAutoGenerateListener(nameField, true);
 
-        // 初始化命名空间字段
+        // Khởi tạo các trường không gian tên
         namespaceField.setText(NAMESPACE_DNS.toString());
 
-        // 初始生成 UUID（默认数量）
+        // Thế hệ ban đầu UUID（số lượng mặc định)
         generateUuid((Integer) countSpinner.getValue());
 
         return panel;
     }
 
     /**
-     * 创建解析面板
+     * Tạo một bảng phân tích cú pháp
      */
     private JPanel createParsePanel() {
         JPanel panel = new JPanel(new BorderLayout(10, 10));
@@ -327,7 +327,7 @@ public class UuidPanel extends JPanel {
         topPanel.setOpaque(false);
         topPanel.add(createSectionTitle(I18nUtil.getMessage(MessageKeys.TOOLBOX_UUID_PARSE)), BorderLayout.NORTH);
 
-        // 顶部输入区域
+        // Khu vực đầu vào hàng đầu
         JPanel inputPanel = new JPanel(new BorderLayout(5, 5));
         inputPanel.setOpaque(false);
         inputPanel.add(new JLabel(I18nUtil.getMessage(MessageKeys.TOOLBOX_UUID_INPUT) + ":"), BorderLayout.NORTH);
@@ -346,7 +346,7 @@ public class UuidPanel extends JPanel {
         topPanel.add(inputPanel, BorderLayout.CENTER);
         panel.add(topPanel, BorderLayout.NORTH);
 
-        // 解析结果显示区域
+        // Khu vực hiển thị kết quả phân tích
         parseArea = new JTextArea();
         parseArea.setEditable(false);
         parseArea.setFont(FontsUtil.getDefaultFont(Font.PLAIN));
@@ -362,10 +362,10 @@ public class UuidPanel extends JPanel {
                 scrollPane
         ), BorderLayout.CENTER);
 
-        // 解析按钮事件
+        // Sự kiện nút phân tích cú pháp
         parseBtn.addActionListener(e -> parseUuid(inputField.getText().trim()));
 
-        // 输入框回车事件
+        // Nhập sự kiện của hộp đầu vào
         inputField.addActionListener(e -> parseUuid(inputField.getText().trim()));
 
         return panel;
@@ -380,7 +380,7 @@ public class UuidPanel extends JPanel {
     }
 
     /**
-     * 生成UUID
+     * phát raUUID
      */
     private void generateUuid(int count) {
         StringBuilder sb = new StringBuilder();
@@ -415,14 +415,14 @@ public class UuidPanel extends JPanel {
         uuidArea.setText(sb.toString());
         uuidArea.setCaretPosition(0);
 
-        // 更新状态信息
+        // Cập nhật thông tin trạng thái
         String statusText = String.format("%s: %d",
                 I18nUtil.getMessage(MessageKeys.TOOLBOX_UUID_COUNT), count);
         statusLabel.setText(statusText);
     }
 
     /**
-     * 生成 UUID v1 (基于时间)
+     * phát ra UUID v1 (Dựa trên thời gian)
      */
     private String generateUuidV1() {
         long timestamp = System.currentTimeMillis();
@@ -440,21 +440,21 @@ public class UuidPanel extends JPanel {
     }
 
     /**
-     * 生成 UUID v3 (基于名称的 MD5)
+     * phát ra UUID v3 (Dựa trên tên MD5)
      */
     private String generateUuidV3() {
         return generateNameBasedUuid("MD5", 3);
     }
 
     /**
-     * 生成 UUID v5 (基于名称的 SHA-1)
+     * phát ra UUID v5 (Dựa trên tên SHA-1)
      */
     private String generateUuidV5() {
         return generateNameBasedUuid("SHA-1", 5);
     }
 
     /**
-     * 生成基于名称的 UUID（v3 或 v5）
+     * Tạo dựa trên tên UUID（v3 hoặc v5）
      */
     private String generateNameBasedUuid(String algorithm, int version) {
         try {
@@ -462,10 +462,10 @@ public class UuidPanel extends JPanel {
             String name = nameField.getText().trim();
 
             if (name.isEmpty()) {
-                name = "example.com"; // 默认名称
+                name = "example.com"; // Tên mặc định
             }
 
-            // 解析命名空间 UUID
+            // Giải quyết các không gian tên UUID
             UUID namespace;
             try {
                 namespaceStr = namespaceStr.replace("-", "");
@@ -479,21 +479,21 @@ public class UuidPanel extends JPanel {
                 }
                 namespace = UUID.fromString(namespaceStr);
             } catch (Exception e) {
-                namespace = NAMESPACE_DNS; // 默认使用 DNS 命名空间
+                namespace = NAMESPACE_DNS; // Được sử dụng theo mặc định DNS không gian tên
             }
 
-            // 将命名空间 UUID 和名称组合
+            // không gian tên UUID và sự kết hợp tên
             byte[] namespaceBytes = toBytes(namespace);
             byte[] nameBytes = name.getBytes(StandardCharsets.UTF_8);
             byte[] combined = new byte[namespaceBytes.length + nameBytes.length];
             System.arraycopy(namespaceBytes, 0, combined, 0, namespaceBytes.length);
             System.arraycopy(nameBytes, 0, combined, namespaceBytes.length, nameBytes.length);
 
-            // 计算哈希
+            // Tính hàm băm
             MessageDigest digest = MessageDigest.getInstance(algorithm);
             byte[] hash = digest.digest(combined);
 
-            // 构造 UUID
+            // kết cấu UUID
             long msb = 0;
             long lsb = 0;
 
@@ -504,21 +504,21 @@ public class UuidPanel extends JPanel {
                 lsb = (lsb << 8) | (hash[i] & 0xff);
             }
 
-            // 设置版本和变体
-            msb &= ~0x0000f000L; // 清除版本位
-            msb |= ((long) version) << 12; // 设置版本
-            lsb &= ~0xc000000000000000L; // 清除变体位
-            lsb |= 0x8000000000000000L; // 设置变体（RFC 4122）
+            // Đặt phiên bản và biến thể
+            msb &= ~0x0000f000L; // Xóa bit phiên bản
+            msb |= ((long) version) << 12; // Đặt phiên bản
+            lsb &= ~0xc000000000000000L; // Xóa các bit biến thể
+            lsb |= 0x8000000000000000L; // Đặt biến thể (RFC 4122）
 
             return formatUuid(msb, lsb);
         } catch (Exception e) {
             log.error("Failed to generate name-based UUID", e);
-            return UUID.randomUUID().toString(); // 失败时返回随机 UUID
+            return UUID.randomUUID().toString(); // Trả về ngẫu nhiên khi thất bại UUID
         }
     }
 
     /**
-     * 将 UUID 转换为字节数组
+     * Sẽ UUID Chuyển đổi sang mảng byte
      */
     private byte[] toBytes(UUID uuid) {
         long msb = uuid.getMostSignificantBits();
@@ -536,7 +536,7 @@ public class UuidPanel extends JPanel {
     }
 
     /**
-     * 格式化 UUID
+     * Định dạng UUID
      */
     private String formatUuid(long msb, long lsb) {
         return String.format("%08x-%04x-%04x-%04x-%012x",
@@ -548,7 +548,7 @@ public class UuidPanel extends JPanel {
     }
 
     /**
-     * 获取节点ID (MAC地址或随机数)
+     * Nhận nútID (MACđịa chỉ hoặc số ngẫu nhiên)
      */
     private long getNodeId() {
         try {
@@ -564,12 +564,12 @@ public class UuidPanel extends JPanel {
         } catch (Exception e) {
             // Ignore
         }
-        // 使用随机数作为节点ID
+        // Sử dụng số ngẫu nhiên làm nútID
         return new SecureRandom().nextLong() & 0xFFFFFFFFFFFFL;
     }
 
     /**
-     * 获取分隔符
+     * Lấy dấu phân cách
      */
     private String getSeparator() {
         int index = separatorComboBox.getSelectedIndex();
@@ -582,7 +582,7 @@ public class UuidPanel extends JPanel {
     }
 
     /**
-     * 解析UUID
+     * phân tíchUUID
      */
     private void parseUuid(String input) {
         if (input.isEmpty()) {
@@ -590,7 +590,7 @@ public class UuidPanel extends JPanel {
             return;
         }
 
-        // 允许粘贴多种格式（带/不带连字符，包含前后缀，甚至一段文本中的 UUID）
+        // Cho phép dán ở nhiều định dạng (có /Không có dấu gạch nối, kể cả hậu tố và hậu tố, ngay cả trong một khối văn bản UUID）
         String uuid = extractFirstUuidHex(input);
 
         if (uuid == null || !UUID_NO_HYPHEN_PATTERN.matcher(uuid).matches()) {
@@ -598,7 +598,7 @@ public class UuidPanel extends JPanel {
             return;
         }
 
-        // 添加连字符
+        // Thêm dấu gạch nối
         String formattedUuid = String.format("%s-%s-%s-%s-%s",
                 uuid.substring(0, 8),
                 uuid.substring(8, 12),
@@ -619,7 +619,7 @@ public class UuidPanel extends JPanel {
         result.append(I18nUtil.getMessage(MessageKeys.TOOLBOX_UUID_WITHOUT_HYPHENS)).append(":\n");
         result.append("   ").append(uuid).append("\n\n");
 
-        // 解析版本和变体
+        // Phân tích các phiên bản và biến thể
         int version = Integer.parseInt(uuid.substring(12, 13), 16);
         int variantNibble = Integer.parseInt(uuid.substring(16, 17), 16);
 
@@ -645,7 +645,7 @@ public class UuidPanel extends JPanel {
 
         appendTimeInfoIfAvailable(result, uuid, version);
 
-        // 如果是 v3 或 v5，提示这是基于名称的 UUID
+        // trong trường hợp v3 hoặc v5，Mẹo Đây là tên dựa UUID
         if (version == 3 || version == 5) {
             result.append("\n");
             result.append(I18nUtil.getMessage(MessageKeys.TOOLBOX_UUID_NAME_BASED)).append("\n");
@@ -665,7 +665,7 @@ public class UuidPanel extends JPanel {
             return matcher.group().replace("-", "").toLowerCase(Locale.ROOT);
         }
 
-        // 兜底：支持 urn:uuid:{...} 这类场景
+        // Tóm lại: hỗ trợ urn:uuid:{...} Loại cảnh này
         normalized = normalized.replace("urn:uuid:", "")
                 .replace("URN:UUID:", "")
                 .replace("{", "")
@@ -708,7 +708,7 @@ public class UuidPanel extends JPanel {
                     appendDecodedTime(result, unixTimeMs, "v7");
                 }
                 default -> {
-                    // 非时间型 UUID 无时间信息
+                    // Vô thời gian UUID Không có thông tin thời gian
                 }
             }
         } catch (Exception e) {
@@ -730,7 +730,7 @@ public class UuidPanel extends JPanel {
     }
 
     /**
-     * 复制到剪贴板
+     * Sao chép vào clipboard
      */
     private void copyToClipboard() {
         String text = uuidArea.getText().trim();
@@ -750,7 +750,7 @@ public class UuidPanel extends JPanel {
     }
 
     /**
-     * 复制第一个UUID
+     * Sao chép cái đầu tiênUUID
      */
     private void copyFirstUuid() {
         String text = uuidArea.getText().trim();
@@ -773,7 +773,7 @@ public class UuidPanel extends JPanel {
     }
 
     /**
-     * 导出到文件
+     * Xuất sang tập tin
      */
     private void exportToFile() {
         String text = uuidArea.getText().trim();
@@ -808,7 +808,7 @@ public class UuidPanel extends JPanel {
     }
 
     /**
-     * 如果有内容则刷新
+     * Làm mới nếu có nội dung
      */
     private void refreshIfNotEmpty() {
         String text = uuidArea.getText().trim();
@@ -853,7 +853,7 @@ public class UuidPanel extends JPanel {
     }
 
     /**
-     * 更新状态显示数量
+     * Cập nhật số lượng hiển thị trạng thái
      */
     private void updateStatusWithCount() {
         String currentText = uuidArea.getText().trim();
@@ -877,7 +877,7 @@ public class UuidPanel extends JPanel {
     }
 
     /**
-     * 显示信息消息
+     * Hiển thị thông báo thông tin
      */
     private void showInfoMessage(String message) {
         JOptionPane.showMessageDialog(this,

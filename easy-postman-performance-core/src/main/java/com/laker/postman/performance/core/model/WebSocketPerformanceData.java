@@ -1,7 +1,7 @@
 package com.laker.postman.performance.core.model;
 
 /**
- * WebSocket 压测配置，挂载在 REQUEST 节点上。
+ * WebSocket Cấu hình kiểm tra sức chịu đựng, được gắn vào REQUEST trên nút.
  */
 public class WebSocketPerformanceData {
 

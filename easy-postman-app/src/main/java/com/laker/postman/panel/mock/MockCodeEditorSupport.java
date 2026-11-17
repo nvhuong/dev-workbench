@@ -18,7 +18,7 @@ import javax.swing.text.JTextComponent;
 import java.awt.Font;
 
 final class MockCodeEditorSupport {
-    private static final String COMPLETION_INSTALLED = "EasyPostman.mockCodeCompletionInstalled";
+    private static final String COMPLETION_INSTALLED = "Dev Workbench.mockCodeCompletionInstalled";
 
     private MockCodeEditorSupport() {
     }

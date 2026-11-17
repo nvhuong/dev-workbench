@@ -92,17 +92,17 @@ public class UISettingsPanelLayoutTest {
 
     @Test
     public void editorFontLabelsShouldUsePrimaryAndFallbackTerminology() throws Exception {
-        Properties zh = loadProperties("src/main/resources/messages_zh.properties");
+        Properties zh = loadProperties("src/main/resources/messages_vi.properties");
         Properties en = loadProperties("src/main/resources/messages_en.properties");
         String messageKeysSource = Files.readString(Path.of(
                 "../easy-postman-foundation/src/main/java/com/laker/postman/util/MessageKeys.java"
         ));
 
-        assertEquals(zh.getProperty("settings.editor.title"), "编辑器字体");
-        assertEquals(zh.getProperty("settings.editor.font_name"), "编辑器主字体:");
-        assertEquals(zh.getProperty("settings.editor.font_fallback_name"), "缺字回退字体:");
-        assertTrue(zh.getProperty("settings.editor.description").contains("主字体缺字"));
-        assertTrue(zh.getProperty("settings.editor.font_fallback_name.tooltip").contains("符号或 emoji"));
+        assertEquals(zh.getProperty("settings.editor.title"), "Phông chữ soạn thảo");
+        assertEquals(zh.getProperty("settings.editor.font_name"), "Phông chữ chính của trình soạn thảo:");
+        assertEquals(zh.getProperty("settings.editor.font_fallback_name"), "Phông chữ dự phòng cho các ký tự bị thiếu:");
+        assertTrue(zh.getProperty("settings.editor.description").contains("Phông chữ chính bị thiếu ký tự"));
+        assertTrue(zh.getProperty("settings.editor.font_fallback_name.tooltip").contains("Biểu tượng hoặc emoji"));
         assertFalse(zh.containsKey("settings.editor.font.default"));
         assertFalse(zh.containsKey("settings.editor.font.fallback_auto"));
         assertFalse(zh.containsKey("settings.editor.font.fallback_none"));
@@ -125,14 +125,14 @@ public class UISettingsPanelLayoutTest {
         String source = Files.readString(Path.of(
                 "src/main/java/com/laker/postman/panel/topmenu/setting/UISettingsPanelModern.java"
         ));
-        Properties zh = loadProperties("src/main/resources/messages_zh.properties");
+        Properties zh = loadProperties("src/main/resources/messages_vi.properties");
         Properties en = loadProperties("src/main/resources/messages_en.properties");
         String messageKeysSource = Files.readString(Path.of(
                 "../easy-postman-foundation/src/main/java/com/laker/postman/util/MessageKeys.java"
         ));
 
-        assertEquals(zh.getProperty("settings.editor.font.default_resolved"), "自动选择（{0}）");
-        assertEquals(zh.getProperty("settings.editor.font.fallback_auto_resolved"), "自动选择（{0}，推荐）");
+        assertEquals(zh.getProperty("settings.editor.font.default_resolved"), "Tự động chọn ({0}）");
+        assertEquals(zh.getProperty("settings.editor.font.fallback_auto_resolved"), "Tự động chọn ({0}，gợi ý)");
         assertEquals(en.getProperty("settings.editor.font.default_resolved"), "Auto ({0})");
         assertEquals(en.getProperty("settings.editor.font.fallback_auto_resolved"), "Auto ({0}, Recommended)");
         assertTrue(messageKeysSource.contains("SETTINGS_EDITOR_FONT_DEFAULT_RESOLVED"));

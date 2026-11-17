@@ -20,9 +20,9 @@ import java.util.function.IntPredicate;
 import java.util.function.Predicate;
 
 /**
- * 请求编辑器 Tab 打开控制器。
+ * Request an editor Tab Bật bộ điều khiển.
  * <p>
- * 临时打开、固定打开、同 ID 查重、临时 Tab 固定和插入到 +Tab 前都是 Tab 行为规则，不放在面板布局类里。
+ * Mở tạm thời, mở cố định, giống nhau ID Kiểm tra đạo văn và tạm thời Tab Buộc chặt và chèn vào +Tab Tất cả trước đây Tab Quy tắc hành vi không được đặt trong lớp bố trí bảng điều khiển.
  */
 @Slf4j
 @RequiredArgsConstructor
@@ -189,7 +189,7 @@ final class RequestEditorTabOpenController {
     }
 
     /**
-     * 查找已固定（非临时）的 Tab，跳过临时 Tab 和最后的 "+" Tab。
+     * Tìm những cái được ghim (không tạm thời) Tab，Bỏ qua tạm thời Tab và cuối cùng "+" Tab。
      */
     private int findFixedTab(Predicate<Component> matcher) {
         for (int i = 0; i < tabbedPane.getTabCount() - 1; i++) {
@@ -209,14 +209,14 @@ final class RequestEditorTabOpenController {
     }
 
     /**
-     * 已打开 Tab 与被点击的 Example 只是 ID 相同、并非同一个 Example 时记录日志，便于排查 ID 重复导致无法切换的问题。
+     * Đã mở Tab với nhấp chuột Example chỉ một ID Giống nhau, không giống nhau Example Ghi lại nhật ký thường xuyên để tạo điều kiện khắc phục sự cố ID Các vấn đề lặp đi lặp lại dẫn đến không thể chuyển đổi.
      */
     private void logIfDifferentExampleShared(int index, SavedResponse clicked) {
         if (!(tabbedPane.getComponentAt(index) instanceof RequestEditSubPanel subPanel)) {
             return;
         }
         SavedResponse opened = subPanel.getSavedResponse();
-        // 集合重新加载后 Tab 仍持有旧对象，内容相同则视为同一个 Example
+        // Sau khi bộ sưu tập được tải lại Tab Đối tượng cũ vẫn được giữ và nội dung giống nhau được coi là giống nhau Example
         if (Objects.equals(opened, clicked)) {
             return;
         }

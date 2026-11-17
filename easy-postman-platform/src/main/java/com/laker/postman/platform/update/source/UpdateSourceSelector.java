@@ -7,13 +7,13 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
 /**
- * 更新源选择器 - 负责根据配置或自动检测选择最佳更新源
+ * Cập nhật bộ chọn nguồn - Chịu trách nhiệm lựa chọn nguồn cập nhật tốt nhất dựa trên cấu hình hoặc phát hiện tự động
  *
- * <p>支持三种模式：</p>
+ * <p>Ba chế độ được hỗ trợ:</p>
  * <ul>
- *   <li>github - 固定使用 GitHub</li>
- *   <li>gitee - 固定使用 Gitee</li>
- *   <li>auto - 自动选择最快的源</li>
+ *   <li>github - Sử dụng cố định GitHub</li>
+ *   <li>gitee - Sử dụng cố định Gitee</li>
+ *   <li>auto - Tự động chọn nguồn nhanh nhất</li>
  * </ul>
  */
 @Slf4j
@@ -21,19 +21,19 @@ public class UpdateSourceSelector {
 
     private final UpdateSettingsProvider settingsProvider;
 
-    /** GitHub 更新源 */
+    /** GitHub Cập nhật nguồn */
     private final UpdateSource githubSource;
 
-    /** Gitee 更新源 */
+    /** Gitee Cập nhật nguồn */
     private final UpdateSource giteeSource;
 
-    /** 缓存的最佳源 */
+    /** Nguồn tốt nhất cho bộ nhớ đệm */
     private volatile UpdateSource cachedBestSource = null;
 
-    /** 自动检测超时时间（秒） */
+    /** Thời gian chờ tự động phát hiện (giây) */
     private static final int AUTO_DETECT_TIMEOUT_SECONDS = 6;
 
-    /** 快速响应阈值（毫秒） */
+    /** Ngưỡng phản hồi nhanh (mili giây) */
     private static final long FAST_RESPONSE_THRESHOLD_MS = 3000;
 
     public UpdateSourceSelector() {
@@ -47,36 +47,36 @@ public class UpdateSourceSelector {
     }
 
     /**
-     * 选择最佳更新源
+     * Chọn nguồn cập nhật tốt nhất
      *
-     * @return 选中的更新源
+     * @return Nguồn cập nhật đã chọn
      */
     public UpdateSource selectBestSource() {
         String preference = settingsProvider.getUpdateSourcePreference();
 
-        // 用户指定 GitHub
+        // Người dùng chỉ định GitHub
         if ("github".equalsIgnoreCase(preference)) {
             log.info("Using user-preferred source: GitHub");
             cachedBestSource = githubSource;
             return githubSource;
         }
 
-        // 用户指定 Gitee
+        // Người dùng chỉ định Gitee
         if ("gitee".equalsIgnoreCase(preference)) {
             log.info("Using user-preferred source: Gitee");
             cachedBestSource = giteeSource;
             return giteeSource;
         }
 
-        // auto 模式：自动选择
+        // auto Chế độ: Chọn tự động
         return selectSourceAutomatically();
     }
 
     /**
-     * 自动选择最快的更新源
+     * Tự động chọn nguồn cập nhật nhanh nhất
      */
     private UpdateSource selectSourceAutomatically() {
-        // 如果有缓存，直接使用
+        // Nếu có bộ đệm, hãy sử dụng nó trực tiếp
         if (cachedBestSource != null) {
             log.info("Using cached best source: {}", cachedBestSource.getName());
             return cachedBestSource;
@@ -84,18 +84,18 @@ public class UpdateSourceSelector {
 
         log.info("Auto-detecting best update source...");
 
-        // 并行测试两个源
+        // Kiểm tra song song cả hai nguồn
         CompletableFuture<Long> githubTest = CompletableFuture.supplyAsync(githubSource::testConnectionSpeed);
         CompletableFuture<Long> giteeTest = CompletableFuture.supplyAsync(giteeSource::testConnectionSpeed);
 
         try {
-            // 等待测试完成
+            // Chờ cho quá trình kiểm tra hoàn tất
             CompletableFuture.allOf(githubTest, giteeTest).get(AUTO_DETECT_TIMEOUT_SECONDS, TimeUnit.SECONDS);
 
             long githubTime = githubTest.getNow(Long.MAX_VALUE);
             long giteeTime = giteeTest.getNow(Long.MAX_VALUE);
 
-            // 选择更快的源
+            // Chọn một nguồn nhanh hơn
             if (githubTime < giteeTime && githubTime < FAST_RESPONSE_THRESHOLD_MS) {
                 log.info("GitHub is faster ({} ms vs {} ms), using GitHub", githubTime, giteeTime);
                 cachedBestSource = githubSource;
@@ -112,17 +112,17 @@ public class UpdateSourceSelector {
             }
         }
 
-        // 默认使用 Gitee（国内用户居多）
+        // Được sử dụng theo mặc định Gitee（Hầu hết người dùng trong nước)
         log.info("Using default source: Gitee");
         cachedBestSource = giteeSource;
         return giteeSource;
     }
 
     /**
-     * 获取备用源（当主源失败时使用）
+     * Nhận nguồn dự phòng (dùng khi nguồn chính bị lỗi)
      *
-     * @param primarySource 主源
-     * @return 备用源
+     * @param primarySource nguồn chính
+     * @return Nguồn thay thế
      */
     public UpdateSource getFallbackSource(UpdateSource primarySource) {
         if (primarySource == githubSource) {
@@ -132,8 +132,8 @@ public class UpdateSourceSelector {
     }
 
     /**
-     * 根据发布信息中的来源名称获取备用源。
-     * 未知来源不做猜测，避免把下载请求发往错误的镜像。
+     * Nhận nguồn thay thế dựa trên tên nguồn trong thông tin phát hành.
+     * Không cần phỏng đoán đối với các nguồn không xác định để tránh gửi yêu cầu tải xuống tới máy nhân bản sai.
      */
     public UpdateSource getFallbackSource(String primarySourceName) {
         if (primarySourceName == null) {
@@ -149,7 +149,7 @@ public class UpdateSourceSelector {
     }
 
     /**
-     * 清除缓存的最佳源
+     * Nguồn tốt nhất để xóa bộ nhớ cache
      */
     public void clearCache() {
         cachedBestSource = null;

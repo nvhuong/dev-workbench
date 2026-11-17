@@ -193,7 +193,7 @@ public class PerformanceWorkerProtocolJsonStorageTest {
         PerformanceWorkerResultDetail.DetailResponse legacy = storage.detailsResponseFromJson(
                 "{\"details\":[{\"response\":{\"code\":200,\"body\":\"ok\"}}]}").getDetails().get(0).getResponse();
         assertEquals(legacy.getFileName(), null);
-        assertFalse(legacy.isFileContentOmitted(), "旧 worker 不带文件字段时按普通响应处理");
+        assertFalse(legacy.isFileContentOmitted(), "cũ worker Nếu không có trường tệp, nó sẽ được xử lý như một phản hồi bình thường");
     }
 
     @Test

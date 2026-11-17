@@ -46,7 +46,7 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
- * 事件监听器，既记录详细连接事件和耗时，也统计连接信息
+ * Trình nghe sự kiện không chỉ ghi lại các sự kiện kết nối chi tiết và mức tiêu thụ thời gian mà còn đếm thông tin kết nối
  */
 @Slf4j
 public class OkHttpExchangeEventListener extends EventListener {
@@ -62,10 +62,10 @@ public class OkHttpExchangeEventListener extends EventListener {
     private final PreparedRequest preparedRequest;
     private final HttpExchangeKind exchangeKind;
 
-    // 精细化控制开关
-    private final boolean collectMetricsInfo; // 是否收集轻量统计指标（时间戳、发送/接收字节）
-    private final boolean collectEventInfo; // 是否收集完整事件信息（DNS、连接等）
-    private final boolean enableNetworkLog; // 是否启用网络日志面板输出
+    // Công tắc điều khiển tinh tế
+    private final boolean collectMetricsInfo; // Có thu thập các chỉ số thống kê nhẹ (dấu thời gian, đã gửi hay không)/nhận byte)
+    private final boolean collectEventInfo; // Có thu thập thông tin sự kiện đầy đủ hay không (tệp DNS、kết nối, v.v.)
+    private final boolean enableNetworkLog; // Có bật đầu ra bảng nhật ký mạng hay không
     private final Object routeAttemptLock = new Object();
     private final AtomicBoolean socksProtocolMismatchLogged = new AtomicBoolean();
     private final Set<String> hiddenDiagnosticHosts;
@@ -93,14 +93,14 @@ public class OkHttpExchangeEventListener extends EventListener {
     }
 
     /**
-     * 发布网络日志事件（仅在 enableNetworkLog=true 时使用）。
+     * Xuất bản các sự kiện nhật ký web (chỉ trong  enableNetworkLog=true khi sử dụng).
      */
     private void log(NetworkLogEventStage stage, String msg) {
         log(stage, msg, null);
     }
 
     private void log(NetworkLogEventStage stage, String msg, Long durationMs) {
-        // 只有启用了网络日志才向外发布事件，具体展示由调用方注入的 sink 负责。
+        // Chỉ khi tính năng ghi nhật ký mạng được bật thì các sự kiện mới được xuất bản ra thế giới bên ngoài, đặc biệt hiển thị các sự kiện được người gọi đưa vào sink Chịu trách nhiệm.
         if (!enableNetworkLog) {
             return;
         }
@@ -349,14 +349,14 @@ public class OkHttpExchangeEventListener extends EventListener {
                 info.setTlsVersion(handshake.tlsVersion().javaName());
                 info.setCipherName(handshake.cipherSuite().toString());
 
-                // 首先尝试从 Handshake 获取证书
+                // Đầu tiên hãy thử từ Handshake Nhận một chứng chỉ
                 List<Certificate> peerCerts = handshake.peerCertificates();
                 log.debug("=== SSL Handshake Debug ===");
                 log.debug("TLS Version: {}", handshake.tlsVersion());
                 log.debug("Cipher Suite: {}", handshake.cipherSuite());
                 log.debug("Peer Certificates from Handshake: {}", peerCerts.size());
 
-                // 如果 Handshake 中的证书为空，尝试从同线程的 SSLSession 捕获缓存获取
+                // nếu Handshake Chứng chỉ trong trống, hãy thử từ cùng một chuỗi SSLSession Ghi lại việc thu thập bộ đệm
                 if (peerCerts.isEmpty()) {
                     log.warn("⚠️  Handshake.peerCertificates() is empty, trying to get from SSLSession...");
 
@@ -385,12 +385,12 @@ public class OkHttpExchangeEventListener extends EventListener {
                 info.setPeerCertificates(peerCerts);
                 info.setLocalCertificates(handshake.localCertificates());
 
-                // 验证证书并记录警告信息
+                // Xác minh chứng chỉ và ghi thông báo cảnh báo
                 StringBuilder allWarnings = new StringBuilder();
                 try {
                     String hostname = call.request().url().host();
 
-                    // 1. 检查在握手阶段捕获的SSL验证错误（如untrusted root, hostname mismatch）
+                    // 1. Kiểm tra được ghi lại trong giai đoạn bắt taySSLLỗi xác thực (ví dụuntrusted root, hostname mismatch）
                     SSLValidationResult validationResult = SSLConfigurationUtil.getLastValidationResult();
                     if (validationResult != null && validationResult.hasErrors()) {
                         String sslValidationError = validationResult.getSummary();
@@ -398,7 +398,7 @@ public class OkHttpExchangeEventListener extends EventListener {
                         log.warn("SSL Validation Error: {}", sslValidationError);
                     }
 
-                    // 2. 对证书本身进行检查（如expired, self-signed等）
+                    // 2. Việc kiểm tra được thực hiện trên chính chứng chỉ (ví dụ:expired, self-signedChờ đợi)
                     SSLValidationResult certValidationResult = SSLCertificateValidator.validateCertificates(
                             peerCerts,
                             hostname
@@ -413,7 +413,7 @@ public class OkHttpExchangeEventListener extends EventListener {
                         }
                     }
 
-                    // 合并所有警告
+                    // Hợp nhất tất cả các cảnh báo
                     if (!allWarnings.isEmpty()) {
                         info.setSslCertWarning(allWarnings.toString());
                     }
@@ -422,7 +422,7 @@ public class OkHttpExchangeEventListener extends EventListener {
                     log.debug("Error validating certificate: {}", e.getMessage());
                 }
             }
-            // 记录handshake信息
+            // Ghihandshakethông tin
             if (handshake != null) {
                 StringBuilder handshakeInfo = new StringBuilder();
                 handshakeInfo.append("TLS connection: ")
@@ -467,7 +467,7 @@ public class OkHttpExchangeEventListener extends EventListener {
                     }
                 }
 
-                // 如果有证书警告，添加到日志中
+                // Nếu có cảnh báo chứng chỉ, hãy thêm vào nhật ký
                 if (hasWarning) {
                     handshakeInfo.append("⚠️  Certificate Warning: ").append(info.getSslCertWarning()).append("\n");
                 }
@@ -743,8 +743,8 @@ public class OkHttpExchangeEventListener extends EventListener {
                 info.setProtocol(connection.protocol().toString());
             }
         } catch (Exception e) {
-            info.setLocalAddress("无法获取");
-            info.setRemoteAddress("无法获取");
+            info.setLocalAddress("Không thể có được");
+            info.setRemoteAddress("Không thể có được");
         }
         boolean reused = info.getConnectStart() <= 0;
         String label = reused ? "Connection reused" : "Connection acquired";
@@ -916,18 +916,18 @@ public class OkHttpExchangeEventListener extends EventListener {
             sb.append(" ").append(response.message());
         }
         sb.append("\n");
-        // 处理响应头
+        // Xử lý các tiêu đề phản hồi
         Headers headers = response.headers();
         for (int i = 0; i < headers.size(); i++) {
             String name = headers.name(i);
             String value = headers.value(i);
             if (name.equalsIgnoreCase("set-cookie")) {
-                // 只保留可见字符，避免乱码
+                // Chỉ các ký tự hiển thị mới được giữ lại để tránh các ký tự bị cắt xén
                 value = value.replaceAll("[^\\x20-\\x7E]", "");
             }
             sb.append(name).append(": ").append(value).append("\n");
         }
-        // 如果是重定向，使用橙色高亮
+        // Nếu đó là chuyển hướng, hãy sử dụng đánh dấu màu cam
         if (isRedirect) {
             log(NetworkLogEventStage.RESPONSE_HEADERS_END_REDIRECT, sb.toString(),
                     duration(info.getResponseHeadersStart(), info.getResponseHeadersEnd()));
@@ -1014,7 +1014,7 @@ public class OkHttpExchangeEventListener extends EventListener {
     @Override
     public void retryDecision(Call call, IOException ioe, boolean retry) {
         if (collectMetricsInfo && retry && info.getErrorMessage() != null) {
-            // 失败的尝试会被重试：先降级为“已恢复”，若重试仍失败，callFailed 会重新写入错误
+            // Những lần thử không thành công sẽ được thử lại: bị hạ cấp xuống lần đầu tiên“Đã khôi phục”，Nếu thử lại vẫn không thành công,callFailed Lỗi sẽ được viết lại
             info.setRecoveredErrorMessage(info.getErrorMessage());
             info.setErrorMessage(null);
             info.setError(null);

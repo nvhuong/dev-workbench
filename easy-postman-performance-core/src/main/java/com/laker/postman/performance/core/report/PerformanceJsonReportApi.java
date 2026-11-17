@@ -12,14 +12,14 @@ public class PerformanceJsonReportApi {
     long success;
     long failed;
     double successRate;
-    // QPS：请求数 /（最后一个样本结束时间 - 第一个样本开始时间）
+    // QPS：Số lượng yêu cầu /（Thời gian kết thúc mẫu cuối cùng - thời gian bắt đầu mẫu đầu tiên)
     double samplesPerSecond;
-    // 第一个样本开始时间，master 合并多 worker 时用它确定全局开始边界
+    // Thời gian bắt đầu mẫu đầu tiên,master Hợp nhất nhiều hơn worker Sử dụng nó để xác định ranh giới bắt đầu toàn cầu
     long firstSampleStartTimeMs;
-    // 最后一个样本结束时间，master 合并多 worker 时用它确定全局结束边界
+    // Thời gian kết thúc mẫu cuối cùng,master Hợp nhất nhiều hơn worker Sử dụng nó để xác định ranh giới cuối cùng toàn cầu
     long lastSampleEndTimeMs;
     PerformanceJsonReportDuration durationMs;
-    // HTTP 字节指标：发送/接收总字节、字节速率、平均接收字节
+    // HTTP Số liệu byte: Đã gửi/Tổng số byte nhận được, tốc độ byte, số byte trung bình nhận được
     PerformanceJsonReportBytes bytes;
     PerformanceJsonReportStream stream;
     PerformanceJsonReportDuration firstMessageLatencyMs;

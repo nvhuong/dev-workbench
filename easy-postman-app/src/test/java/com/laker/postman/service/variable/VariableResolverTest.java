@@ -17,7 +17,7 @@ import java.nio.file.Path;
 import static org.testng.Assert.*;
 
 /**
- * 变量解析器测试类 - 测试嵌套变量解析功能
+ * Lớp kiểm tra trình phân tích cú pháp biến - Kiểm tra chức năng phân tích cú pháp biến lồng nhau
  */
 public class VariableResolverTest {
 
@@ -29,7 +29,7 @@ public class VariableResolverTest {
 
     @BeforeMethod
     public void setUp() {
-        // 隔离测试数据：切换到临时环境文件，避免污染本机真实环境变量
+        // Cô lập dữ liệu thử nghiệm: Chuyển sang tệp môi trường tạm thời để tránh làm ô nhiễm các biến môi trường thực của máy
         originalDataFilePath = EnvironmentService.getDataFilePath();
         try {
             tempEnvFile = Files.createTempFile("easy-postman-env-test-", ".json");
@@ -43,20 +43,20 @@ public class VariableResolverTest {
         originalGlobalDataFilePath = GlobalVariablesService.getInstance().getDataFilePath();
         GlobalVariablesService.getInstance().setDataFilePath(tempGlobalFile.toString());
 
-        // 清空执行上下文，避免测试之间共享 pm.variables / pm.iterationData
+        // Xóa bối cảnh thực thi để tránh chia sẻ nó giữa các lần kiểm tra pm.variables / pm.iterationData
         clearExecutionContext();
 
-        // 创建测试环境
+        // Tạo môi trường thử nghiệm
         testEnv = new Environment();
         testEnv.setId("test-env-id");
         testEnv.setName("Test Environment");
 
-        // 设置嵌套变量
+        // Đặt các biến lồng nhau
         testEnv.set("baseUrl", "https://api.example.com");
         testEnv.set("apiPath", "{{baseUrl}}/api");
         testEnv.set("userModule", "{{apiPath}}/user");
 
-        // 将环境添加到 EnvironmentService 并设置为活动环境
+        // Thêm môi trường vào EnvironmentService và thiết lập làm môi trường hoạt động
         EnvironmentService.saveEnvironment(testEnv);
         EnvironmentService.setActiveEnvironment(testEnv.getId());
     }
@@ -64,14 +64,14 @@ public class VariableResolverTest {
     @AfterMethod
     public void tearDown() {
         try {
-            // 清理测试环境
+            // Dọn dẹp môi trường thử nghiệm
             if (testEnv != null && testEnv.getId() != null) {
                 EnvironmentService.deleteEnvironment(testEnv.getId());
             }
             clearExecutionContext();
             RequestExecutionContext.clearCurrentScope();
         } finally {
-            // 恢复原始环境文件路径
+            // Khôi phục đường dẫn tệp môi trường ban đầu
             if (originalDataFilePath != null && !originalDataFilePath.isBlank()) {
                 EnvironmentService.setDataFilePath(originalDataFilePath);
             }
@@ -96,21 +96,21 @@ public class VariableResolverTest {
     }
 
     /**
-     * 测试嵌套变量解析 - 核心功能
+     * Kiểm tra độ phân giải biến lồng nhau - chức năng cốt lõi
      */
     @Test
     public void testNestedVariableResolution() {
-        // 测试一级嵌套
+        // Kiểm tra một cấp độ lồng nhau
         String result1 = VariableResolver.resolve("{{apiPath}}");
         assertEquals("https://api.example.com/api", result1,
                 "apiPath should resolve to https://api.example.com/api");
 
-        // 测试二级嵌套
+        // Kiểm tra lồng cấp độ thứ hai
         String result2 = VariableResolver.resolve("{{userModule}}");
         assertEquals("https://api.example.com/api/user", result2,
                 "userModule should resolve to https://api.example.com/api/user");
 
-        // 测试完整的接口 URL
+        // Kiểm tra giao diện hoàn chỉnh URL
         String result3 = VariableResolver.resolve("{{userModule}}/list");
         assertEquals("https://api.example.com/api/user/list", result3,
                 "{{userModule}}/list should resolve to https://api.example.com/api/user/list");
@@ -136,7 +136,7 @@ public class VariableResolverTest {
     }
 
     /**
-     * 测试多个嵌套变量在同一字符串中
+     * Kiểm tra nhiều biến lồng nhau trong cùng một chuỗi
      */
     @Test
     public void testMultipleNestedVariables() {
@@ -146,7 +146,7 @@ public class VariableResolverTest {
     }
 
     /**
-     * 测试深层嵌套（3层以上）
+     * Kiểm tra khả năng lồng sâu (3lớp trở lên)
      */
     @Test
     public void testDeepNesting() {
@@ -158,16 +158,16 @@ public class VariableResolverTest {
     }
 
     /**
-     * 测试执行上下文变量优先级
+     * Mức độ ưu tiên của biến bối cảnh thực hiện thử nghiệm
      */
     @Test
     public void testExecutionScopedVariablePriority() {
-        // 设置执行上下文变量，覆盖环境变量
+        // Đặt các biến bối cảnh thực thi, ghi đè các biến môi trường
         Map<String, String> tempVars = new HashMap<>();
         tempVars.put("baseUrl", "https://temp.example.com");
         VariablesService.getInstance().setAll(tempVars);
 
-        // 执行上下文变量优先级更高，应该使用它的值
+        // Biến bối cảnh thực thi có mức độ ưu tiên cao hơn và nên sử dụng giá trị của nó
         String result = VariableResolver.resolve("{{userModule}}/list");
         assertEquals("https://temp.example.com/api/user/list", result);
     }
@@ -233,7 +233,7 @@ public class VariableResolverTest {
     }
 
     /**
-     * 测试全局变量在环境变量未命中时可被解析
+     * Kiểm tra các biến toàn cục có thể được giải quyết khi các biến môi trường không bị ảnh hưởng
      */
     @Test
     public void testGlobalVariableResolution() {
@@ -245,7 +245,7 @@ public class VariableResolverTest {
     }
 
     /**
-     * 测试内置函数与嵌套变量混合
+     * Kiểm tra các hàm dựng sẵn kết hợp với các biến lồng nhau
      */
     @Test
     public void testBuiltInFunctionWithNesting() {
@@ -259,7 +259,7 @@ public class VariableResolverTest {
     }
 
     /**
-     * 测试未定义变量保持原样
+     * Kiểm tra các biến không xác định vẫn như cũ
      */
     @Test
     public void testUndefinedVariableStaysUnchanged() {
@@ -270,7 +270,7 @@ public class VariableResolverTest {
     }
 
     /**
-     * 测试空字符串和 null
+     * Kiểm tra chuỗi trống và  null
      */
     @Test
     public void testNullAndEmptyString() {
@@ -279,7 +279,7 @@ public class VariableResolverTest {
     }
 
     /**
-     * 测试循环引用检测
+     * Kiểm tra phát hiện tham chiếu vòng tròn
      */
     @Test
     public void testCircularReferenceDetection() {
@@ -287,15 +287,15 @@ public class VariableResolverTest {
         vars.put("var1", "{{var2}}");
         vars.put("var2", "{{var1}}");
 
-        // 应该在达到最大迭代次数后停止，不会无限循环
+        // Nó sẽ dừng lại sau khi đạt đến số lần lặp tối đa và không lặp vô hạn
         String result = VariableResolver.resolve("{{var1}}");
         assertNotNull(result);
-        // 由于循环引用，结果仍然会包含变量占位符
+        // Do tham chiếu vòng tròn, kết quả sẽ vẫn chứa các phần giữ chỗ có thể thay đổi
         assertTrue(result.contains("{{"), "Circular reference should stop after max iterations");
     }
 
     /**
-     * 测试特殊字符处理
+     * Kiểm tra việc xử lý ký tự đặc biệt
      */
     @Test
     public void testSpecialCharacters() {
@@ -308,7 +308,7 @@ public class VariableResolverTest {
     }
 
     /**
-     * 测试变量查询功能
+     * Kiểm tra hàm truy vấn biến
      */
     @Test
     public void testIsVariableDefined() {

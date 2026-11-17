@@ -46,7 +46,7 @@ public class InfluxDbPanelLayoutTest extends AbstractSwingUiTest {
     public void localizedConnectionActionsShouldStayInsideCompactPanelWidth() {
         Locale originalLocale = I18nUtil.currentLocale();
         try {
-            assertConnectionActionsStayInsidePanel(Locale.CHINESE);
+            assertConnectionActionsStayInsidePanel(Locale.forLanguageTag("vi"));
             assertConnectionActionsStayInsidePanel(Locale.ENGLISH);
         } finally {
             I18nUtil.setLocale(originalLocale);
@@ -57,7 +57,7 @@ public class InfluxDbPanelLayoutTest extends AbstractSwingUiTest {
     public void connectionActionsShouldUseLabeledButtonsAndIconMetadataReload() {
         Locale originalLocale = I18nUtil.currentLocale();
         try {
-            I18nUtil.setLocale(Locale.CHINESE);
+            I18nUtil.setLocale(Locale.forLanguageTag("vi"));
             InfluxDbPanel panel = layoutPanel(1320);
 
             JButton connect = findButtonByTooltip(panel, I18nUtil.getMessage(MessageKeys.TOOLBOX_INFLUX_CONNECT_TOOLTIP));
@@ -76,7 +76,7 @@ public class InfluxDbPanelLayoutTest extends AbstractSwingUiTest {
     public void queryToolbarIconActionsShouldUseSharedSvgButtonsWithTooltips() {
         Locale originalLocale = I18nUtil.currentLocale();
         try {
-            I18nUtil.setLocale(Locale.CHINESE);
+            I18nUtil.setLocale(Locale.forLanguageTag("vi"));
             InfluxDbPanel panel = layoutPanel(1320);
 
             assertIconOnlyToolbarButton(panel, I18nUtil.getMessage(MessageKeys.TOOLBOX_INFLUX_LOAD_TEMPLATE));
@@ -91,7 +91,7 @@ public class InfluxDbPanelLayoutTest extends AbstractSwingUiTest {
     public void executeActionShouldUseShortTextWithModeTooltipAcrossLocales() throws Exception {
         Locale originalLocale = I18nUtil.currentLocale();
         try {
-            assertExecuteActionUsesShortText(Locale.CHINESE);
+            assertExecuteActionUsesShortText(Locale.forLanguageTag("vi"));
             assertExecuteActionUsesShortText(Locale.ENGLISH);
         } finally {
             I18nUtil.setLocale(originalLocale);
@@ -102,7 +102,7 @@ public class InfluxDbPanelLayoutTest extends AbstractSwingUiTest {
     public void leftSidebarTabsShouldUseCompactLocalizedTitlesAcrossLocales() {
         Locale originalLocale = I18nUtil.currentLocale();
         try {
-            assertLeftSidebarTabsUseCompactTitle(Locale.CHINESE);
+            assertLeftSidebarTabsUseCompactTitle(Locale.forLanguageTag("vi"));
             assertLeftSidebarTabsUseCompactTitle(Locale.ENGLISH);
         } finally {
             I18nUtil.setLocale(originalLocale);
@@ -113,7 +113,7 @@ public class InfluxDbPanelLayoutTest extends AbstractSwingUiTest {
     public void v1ConnectionFieldPairsShouldAlignAcrossLocales() throws Exception {
         Locale originalLocale = I18nUtil.currentLocale();
         try {
-            assertV1FieldPairsAlign(Locale.CHINESE);
+            assertV1FieldPairsAlign(Locale.forLanguageTag("vi"));
             assertV1FieldPairsAlign(Locale.ENGLISH);
         } finally {
             I18nUtil.setLocale(originalLocale);
@@ -124,7 +124,7 @@ public class InfluxDbPanelLayoutTest extends AbstractSwingUiTest {
     public void v2ConnectionFieldPairsShouldAlignAcrossLocales() throws Exception {
         Locale originalLocale = I18nUtil.currentLocale();
         try {
-            assertV2FieldPairsAlign(Locale.CHINESE);
+            assertV2FieldPairsAlign(Locale.forLanguageTag("vi"));
             assertV2FieldPairsAlign(Locale.ENGLISH);
         } finally {
             I18nUtil.setLocale(originalLocale);
@@ -135,7 +135,7 @@ public class InfluxDbPanelLayoutTest extends AbstractSwingUiTest {
     public void v2LocalizedPlaceholdersShouldFitAcrossLocales() throws Exception {
         Locale originalLocale = I18nUtil.currentLocale();
         try {
-            assertV2PlaceholdersFit(Locale.CHINESE);
+            assertV2PlaceholdersFit(Locale.forLanguageTag("vi"));
             assertV2PlaceholdersFit(Locale.ENGLISH);
         } finally {
             I18nUtil.setLocale(originalLocale);
@@ -146,7 +146,7 @@ public class InfluxDbPanelLayoutTest extends AbstractSwingUiTest {
     public void localizedConnectionLabelsShouldNotBeClipped() {
         Locale originalLocale = I18nUtil.currentLocale();
         try {
-            assertLocalizedLabelsFit(Locale.CHINESE);
+            assertLocalizedLabelsFit(Locale.forLanguageTag("vi"));
             assertLocalizedLabelsFit(Locale.ENGLISH);
         } finally {
             I18nUtil.setLocale(originalLocale);
@@ -157,7 +157,7 @@ public class InfluxDbPanelLayoutTest extends AbstractSwingUiTest {
     public void v1QueryBuilderLabelsShouldBeLocalizedAcrossLocales() {
         Locale originalLocale = I18nUtil.currentLocale();
         try {
-            assertV1QueryBuilderLabelsLocalized(Locale.CHINESE);
+            assertV1QueryBuilderLabelsLocalized(Locale.forLanguageTag("vi"));
             assertV1QueryBuilderLabelsLocalized(Locale.ENGLISH);
         } finally {
             I18nUtil.setLocale(originalLocale);
@@ -168,7 +168,7 @@ public class InfluxDbPanelLayoutTest extends AbstractSwingUiTest {
     public void queryTemplatesShouldUseLocalizedDisplayNamesAcrossLocales() throws Exception {
         Locale originalLocale = I18nUtil.currentLocale();
         try {
-            assertQueryTemplatesLocalized(Locale.CHINESE);
+            assertQueryTemplatesLocalized(Locale.forLanguageTag("vi"));
             assertQueryTemplatesLocalized(Locale.ENGLISH);
         } finally {
             I18nUtil.setLocale(originalLocale);

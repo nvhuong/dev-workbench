@@ -22,7 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * SQL 工具面板。
+ * SQL Bảng công cụ.
  */
 @Slf4j
 public class SqlToolPanel extends JPanel {

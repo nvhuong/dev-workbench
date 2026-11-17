@@ -204,7 +204,7 @@ public class PerformanceWorkerServer implements AutoCloseable {
             return;
         }
 
-        // worker 只接收控制面 JSON；plan.assets 中的本地文件路径必须由用户提前放到本机同一路径。
+        // worker Chỉ có mặt phẳng điều khiển được nhận JSON；plan.assets Người dùng phải đặt trước đường dẫn tệp cục bộ vào cùng một đường dẫn trên máy cục bộ.
         String runId;
         WorkerRunState state;
         boolean busy;
@@ -325,7 +325,7 @@ public class PerformanceWorkerServer implements AutoCloseable {
             write(exchange, 404, error("Run not found: " + runId));
             return;
         }
-        // 失败/慢请求明细在 worker 本地有界保留；master 收尾时按需拉取，避免实时推送拖慢压测主路径。
+        // thất bại/Chi tiết yêu cầu chậm có tại đây worker Đặt phòng giới hạn địa phương;master Kéo theo yêu cầu ở cuối để tránh việc đẩy thời gian thực làm chậm quá trình kiểm tra sức chịu đựng chính.
         write(exchange, 200, jsonStorage.toJson(PerformanceWorkerRunDetailsResponse.builder()
                 .runId(runId)
                 .workerId(state.workerId)
@@ -569,7 +569,7 @@ public class PerformanceWorkerServer implements AutoCloseable {
         if (control == null) {
             return false;
         }
-        // stop 后 WebSocket/SSE 可能还在 finally 中生成中断样本；这里等控制面归零再冻结最终 report。
+        // stop mặt sau WebSocket/SSE Có lẽ vẫn còn đó finally Các mẫu ngắt được tạo ra trong; ở đây, đợi bề mặt điều khiển trở về 0 rồi cuối cùng đóng băng report。
         return control.getActiveUsers() > 0
                 || control.getActiveWebSocketConnections() > 0
                 || control.getActiveSseStreams() > 0;
@@ -631,7 +631,7 @@ public class PerformanceWorkerServer implements AutoCloseable {
         try {
             listener.onRunAccepted(runId, workerId, assignment);
         } catch (RuntimeException ignored) {
-            // listener 只负责控制台提示，不能影响 worker 控制面响应。
+            // listener Nó chỉ chịu trách nhiệm về lời nhắc của bảng điều khiển và không thể bị ảnh hưởng worker Kiểm soát phản ứng bề mặt.
         }
     }
 
@@ -639,7 +639,7 @@ public class PerformanceWorkerServer implements AutoCloseable {
         try {
             listener.onRunStarted(runId, workerId);
         } catch (RuntimeException ignored) {
-            // listener 只负责控制台提示，不能影响压测执行。
+            // listener Nó chỉ chịu trách nhiệm về lời nhắc của bảng điều khiển và không thể ảnh hưởng đến việc thực hiện các bài kiểm tra căng thẳng.
         }
     }
 
@@ -657,7 +657,7 @@ public class PerformanceWorkerServer implements AutoCloseable {
                     status.getQps()
             );
         } catch (RuntimeException ignored) {
-            // listener 只负责控制台提示，不能影响 worker 执行。
+            // listener Nó chỉ chịu trách nhiệm về lời nhắc của bảng điều khiển và không thể bị ảnh hưởng worker thực hiện.
         }
     }
 
@@ -673,7 +673,7 @@ public class PerformanceWorkerServer implements AutoCloseable {
                     state.error
             );
         } catch (RuntimeException ignored) {
-            // listener 只负责控制台提示，不能影响结果查询。
+            // listener Nó chỉ chịu trách nhiệm về lời nhắc của bảng điều khiển và không thể ảnh hưởng đến truy vấn kết quả.
         }
     }
 

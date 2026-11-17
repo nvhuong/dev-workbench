@@ -7,51 +7,51 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * HTTP 响应类
+ * HTTP Lớp phản hồi
  */
 public class HttpResponse {
     public Map<String, List<String>> headers;
     public String body;
     /**
-     * 原始响应体字节，仅在完整读取、未落临时文件，且识别为文件/附件或文本无法无损还原原始字节时保留。
-     * 普通 UTF-8 文本响应不保留，{@link #body} 按 UTF-8 编码即可还原原始字节。
-     * 下载响应时必须优先使用该字段，避免预览文本的字符集转换破坏原始内容。
+     * Các byte nội dung phản hồi thô, chỉ khi được đọc hoàn toàn, không có tệp tạm thời và được nhận dạng dưới dạng tệp/Các tệp đính kèm hoặc văn bản không thể được khôi phục một cách dễ dàng khi các byte gốc được giữ lại.
+     * bình thường UTF-8 Phản hồi văn bản không được bảo tồn.{@link #body} Nhấn UTF-8 Mã hóa khôi phục các byte gốc.
+     * Trường này phải được sử dụng trước tiên khi tải xuống phản hồi để tránh việc chuyển đổi bộ ký tự của văn bản xem trước làm phá hủy nội dung gốc.
      */
     public transient byte[] rawBodyBytes;
     /**
-     * 根据响应体特征高置信识别出的文件扩展名（包含点），未识别时为 null。
+     * Các phần mở rộng tệp (chứa dấu chấm) được xác định với độ tin cậy cao dựa trên các đặc điểm của nội dung phản hồi khi không được xác định null。
      */
     public transient String detectedFileExtension;
     /**
-     * Content-Disposition 声明为 attachment，说明服务端希望以文件方式下载（inline 不算）。
+     * Content-Disposition được khai báo là attachment，Cho biết rằng máy chủ muốn tải xuống dưới dạng tệp (inline Không tính).
      */
     public transient boolean fileAttachment;
     /**
-     * 文件响应的内容未被保留（如从只保存元信息的示例中恢复），此时只能展示文件信息，无法下载。
+     * Nội dung của phản hồi tệp không được giữ nguyên (chẳng hạn như khôi phục từ một ví dụ chỉ lưu thông tin meta). Tại thời điểm này, chỉ có thể hiển thị thông tin tệp và không thể tải xuống.
      */
     public transient boolean fileContentOmitted;
     /**
-     * 响应头已收到，但读取响应体时连接中断，{@link #body} 只是错误提示而非真实内容。
+     * Đã nhận được tiêu đề phản hồi nhưng kết nối bị gián đoạn khi đọc nội dung phản hồi.{@link #body} Chỉ là một thông báo lỗi chứ không phải nội dung thực sự.
      */
     public transient boolean bodyIncomplete;
     /**
-     * PREVIEW 模式下响应体超过读取上限，{@link #body} 只保留了前缀（未追加任何提示文本）。
+     * PREVIEW Nội dung phản hồi vượt quá giới hạn đọc trong chế độ.{@link #body} Chỉ có tiền tố được giữ lại (không có văn bản nhắc nhở nào được thêm vào).
      */
     public transient boolean bodyPreviewTruncated;
-    public int code; // 添加响应状态码字段
-    public String threadName; // 添加线程名称字段
-    public String filePath; // 临时文件下载路径字段
-    public String fileName; // 如果是文件下载，从响应头中获取的文件名字段
-    public long costMs; // 请求耗时，单位毫秒
-    public long endTime; // 响应结束时间，单位毫秒
-    public String protocol; // 协议类型字段，例如 HTTP/1.1 或 HTTP/2
-    public int idleConnectionCount; // 空闲连接数
-    public int connectionCount; // 连接总数
+    public int code; // Thêm trường mã trạng thái phản hồi
+    public String threadName; // Thêm trường tên chủ đề
+    public String filePath; // Trường đường dẫn tải xuống tệp tạm thời
+    public String fileName; // Nếu đó là tệp tải xuống, trường tên tệp được lấy từ tiêu đề phản hồi
+    public long costMs; // Yêu cầu mất thời gian tính bằng mili giây
+    public long endTime; // Thời gian kết thúc phản hồi, tính bằng mili giây
+    public String protocol; // Trường loại giao thức, ví dụ HTTP/1.1 hoặc HTTP/2
+    public int idleConnectionCount; // Số lượng kết nối nhàn rỗi
+    public int connectionCount; // Tổng số kết nối
     public HttpEventInfo httpEventInfo;
-    public long bodySize; // 响应体字节数
-    public long headersSize; // 响应头字节数
-    public boolean isSse = false; // 是否为SSE响应
-    public boolean isImage = false; // 是否为图片响应（用于预览）
+    public long bodySize; // Số byte nội dung phản hồi
+    public long headersSize; // Số byte tiêu đề phản hồi
+    public boolean isSse = false; // Cho dù đó làSSEphản hồi
+    public boolean isImage = false; // Có phản hồi hình ảnh hay không (để xem trước)
 
     public void addHeader(String name, List<String> value) {
         if (headers == null) {
@@ -69,29 +69,29 @@ public class HttpResponse {
     }
 
     /**
-     * 响应体被识别为二进制文件（或文件内容已被省略），其 {@link #body} 文本不适合直接展示。
+     * Nội dung phản hồi được nhận dạng dưới dạng tệp nhị phân (hoặc nội dung tệp đã bị bỏ qua) {@link #body} Văn bản không phù hợp để hiển thị trực tiếp.
      */
     public boolean isRecognizedFile() {
         return detectedFileExtension != null || fileContentOmitted;
     }
 
     /**
-     * 简化对象，将渲染时不需要的字段置为 null，减少内存占用。
-     * 保留的字段：code, protocol, threadName, httpEventInfo, headers, body, costMs, endTime, bodySize, headersSize,
+     * Đơn giản hóa đối tượng và đặt các trường không cần thiết trong quá trình kết xuất thành  null，Giảm mức sử dụng bộ nhớ.
+     * Các trường dành riêng:code, protocol, threadName, httpEventInfo, headers, body, costMs, endTime, bodySize, headersSize,
      * idleConnectionCount, connectionCount, detectedFileExtension, fileAttachment；
-     * 置为 null 的字段：filePath, rawBodyBytes；fileName 保留用于展示文件信息。
-     * 文件响应（见 {@link ResponseFiles#isFileResponse}）不保留按文本解码出的乱码或临时文件提示，
-     * 并标记内容已省略，渲染时只展示文件信息。
+     * Đặt thành null Các trường: .filePath, rawBodyBytes；fileName Dành riêng để hiển thị thông tin tập tin.
+     * Phản hồi của tệp (xem {@link ResponseFiles#isFileResponse}）Các ký tự bị cắt xén hoặc lời nhắc tệp tạm thời được giải mã bằng văn bản sẽ không được giữ lại.
+     * Và đánh dấu nội dung là bị lược bỏ, khi kết xuất chỉ hiển thị thông tin file.
      */
     public void simplify() {
-        // 正确声明 MIME 的二进制文件（PDF/PNG 等）不会设置 detectedFileExtension，同样按文件处理
+        // Tuyên bố đúng đắn MIME tệp nhị phân (PDF/PNG v.v.) sẽ không được thiết lập detectedFileExtension，Điều tương tự được thực hiện bằng tập tin
         boolean file = ResponseFiles.isFileResponse(this);
-        this.filePath = null;    // 文件下载路径，渲染时不需要
-        this.rawBodyBytes = null; // 原始响应体字节，渲染时不需要
+        this.filePath = null;    // Đường dẫn tải file, không cần thiết khi kết xuất
+        this.rawBodyBytes = null; // Byte nội dung phản hồi thô, không bắt buộc khi kết xuất
         if (file) {
             this.body = "";
             this.fileContentOmitted = true;
         }
-        // isSse, idleConnectionCount, connectionCount 保留（Timing标签页可能需要）
+        // isSse, idleConnectionCount, connectionCount Dự trữ(Timingcác tab có thể được yêu cầu)
     }
 }

@@ -43,7 +43,7 @@ public class McpCliCommand {
             printUsage(err);
             return 2;
         } catch (Exception exception) {
-            err.println("EasyPostman MCP command failed: "
+            err.println("Dev Workbench MCP command failed: "
                     + McpSensitiveDataRedactor.message(describe(exception)));
             return 1;
         }
@@ -78,7 +78,7 @@ public class McpCliCommand {
         out.println("Options:");
         out.println("      --max-response-bytes <n>    Total response-body bytes per tool call (default 65536)");
         out.println("  -h, --help                      Show this help");
-        out.println("Without a directory, all workspaces registered in EasyPostman are authorized.");
+        out.println("Without a directory, all workspaces registered in Dev Workbench are authorized.");
         out.println("Only newline-delimited MCP JSON-RPC is written to stdout; diagnostics use stderr.");
     }
 

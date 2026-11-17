@@ -130,7 +130,7 @@ public class PerformanceWorkerCommand {
         return "groupIndex=" + assignment.getThreadGroupIndex()
                 + ",first=" + first
                 + ",count=" + count
-                // CSV 不做物理切片，按全局虚拟用户编号取行；这里把绑定范围直接打到日志里，方便验收分片是否重复。
+                // CSV Không có quá trình cắt vật lý nào được thực hiện và các hàng được tìm nạp theo số người dùng ảo toàn cầu; ở đây, phạm vi liên kết được nhập trực tiếp vào nhật ký để tạo điều kiện thuận lợi cho việc chấp nhận xem các phân đoạn có bị trùng lặp hay không.
                 + ",csvGlobalUsers=" + csvGlobalUserRange(first, count);
     }
 

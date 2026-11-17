@@ -27,7 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * 请求级 Settings 面板，参考 Postman 的列表式布局。
+ * mức độ yêu cầu Settings Bảng điều khiển, ref Postman bố cục danh sách.
  */
 public class RequestSettingsPanel extends JScrollPane {
     private static final int CONTROL_WIDTH = 176;

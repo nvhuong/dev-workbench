@@ -1,7 +1,7 @@
 package com.laker.postman.plugin.manager.market;
 
 /**
- * 插件安装进度快照。
+ * Ảnh chụp tiến trình cài đặt plugin.
  */
 public record PluginInstallProgress(
         Stage stage,

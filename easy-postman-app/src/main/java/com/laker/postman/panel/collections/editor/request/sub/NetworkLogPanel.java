@@ -24,7 +24,7 @@ import java.awt.*;
 import java.awt.datatransfer.StringSelection;
 
 /**
- * 网络日志面板，包含网络日志、请求详情和响应详情三个子Tab
+ * Bảng nhật ký mạng, bao gồm nhật ký mạng, chi tiết yêu cầu và chi tiết phản hồiTab
  */
 public class NetworkLogPanel extends JPanel {
     private final NetworkLogTextPane logArea;
@@ -37,22 +37,22 @@ public class NetworkLogPanel extends JPanel {
     private PreparedRequest currentRequest;
     private boolean hasResponseDetails;
 
-    // 性能优化配置 - 降低限制防止卡顿
-    private static final int MAX_LINE_LENGTH = 500; // 单行最大长度
-    private static final int MAX_LINES_PER_MESSAGE = 30; // 单条消息最大行数
-    private static final int MAX_TOTAL_LENGTH = 50000; // 日志总长度限制（字符数）
+    // Cấu hình tối ưu hóa hiệu suất - Giảm giới hạn để tránh bị trễ
+    private static final int MAX_LINE_LENGTH = 500; // Độ dài tối đa của một dòng
+    private static final int MAX_LINES_PER_MESSAGE = 30; // Số dòng tối đa trong một tin nhắn
+    private static final int MAX_TOTAL_LENGTH = 50000; // Tổng giới hạn độ dài nhật ký (số ký tự)
 
     public NetworkLogPanel() {
         setLayout(new BorderLayout());
         ToolWindowSurfaceStyle.applyCard(this);
-        // 设置边距
+        // Đặt lề
         setBorder(BorderFactory.createEmptyBorder(5, 0, 5, 5));
 
         copyCurrentTabButton = createCopyCurrentTabButton();
         copyActualCurlButton = createCopyActualCurlButton();
         add(createToolbar(), BorderLayout.NORTH);
 
-        // 创建 TabbedPane
+        // Tạo TabbedPane
         tabbedPane = new JTabbedPane(SwingConstants.LEFT);
         ToolWindowSurfaceStyle.applyTabbedPaneCard(tabbedPane);
         tabbedPane.addChangeListener(e -> updateCopyCurrentTabButtonState());
@@ -126,7 +126,7 @@ public class NetworkLogPanel extends JPanel {
     }
 
     /**
-     * 创建详情面板
+     * Tạo bảng chi tiết
      */
     private JTextPane createDetailPane() {
         JTextPane pane = new JTextPane();
@@ -138,19 +138,19 @@ public class NetworkLogPanel extends JPanel {
     }
 
     /**
-     * 添加日志
+     * Thêm nhật ký
      *
-     * @param stage 日志阶段枚举
-     * @param msg   消息内容
+     * @param stage Bảng liệt kê giai đoạn nhật ký
+     * @param msg   Nội dung tin nhắn
      */
     public void appendLog(NetworkLogStage stage, String msg) {
         appendLog(stage, msg, null);
     }
 
     /**
-     * 渲染 HTTP 执行层发布的日志事件。
+     * kết xuất HTTP Ghi lại các sự kiện được xuất bản bởi lớp thực thi.
      * <p>
-     * 执行层只提供阶段和内容，颜色/图标等展示细节仍由 Swing 面板本地的 NetworkLogStage 决定。
+     * Lớp thực thi chỉ cung cấp các giai đoạn và nội dung, màu sắc/Các chi tiết hiển thị như biểu tượng vẫn được giữ nguyên Swing Bảng điều khiển cục bộ NetworkLogStage quyết định.
      */
     public void appendLog(NetworkLogEvent event) {
         if (event == null) {
@@ -163,11 +163,11 @@ public class NetworkLogPanel extends JPanel {
     }
 
     /**
-     * 添加日志（支持时间偏移）
+     * Đã thêm nhật ký (hỗ trợ bù thời gian)
      *
-     * @param stage     日志阶段枚举
-     * @param msg       消息内容
-     * @param elapsedMs 已用时间（毫秒），可为 null
+     * @param stage     Bảng liệt kê giai đoạn nhật ký
+     * @param msg       Nội dung tin nhắn
+     * @param elapsedMs Thời gian đã trôi qua (mili giây), có thể null
      */
     public void appendLog(NetworkLogStage stage, String msg, Long elapsedMs) {
         appendLog(stage, msg, elapsedMs, null);
@@ -181,9 +181,9 @@ public class NetworkLogPanel extends JPanel {
         SwingUtilities.invokeLater(() -> {
             try {
                 NetworkLogStage resolvedStage = NetworkLogPresentation.resolveStage(stage, rawMessage);
-                // 检查并限制总日志长度，防止内存溢出
+                // Kiểm tra và giới hạn tổng chiều dài nhật ký để tránh tràn bộ nhớ
                 if (doc.getLength() > MAX_TOTAL_LENGTH) {
-                    // 删除前1/3的内容，保持日志可读性
+                    // trước khi xóa1/3nội dung để giữ cho nhật ký có thể đọc được
                     int removeLength = Math.min(doc.getLength(),
                             doc.getParagraphElement(MAX_TOTAL_LENGTH / 3).getEndOffset());
                     AttributeSet retainedParagraphStyle = doc.getParagraphElement(removeLength)
@@ -193,7 +193,7 @@ public class NetworkLogPanel extends JPanel {
                     doc.setParagraphAttributes(0, 0, retainedParagraphStyle, true);
                 }
 
-                // 内容截断优化：如果内容过长，进行截断
+                // Tối ưu hóa việc cắt ngắn nội dung: Nếu nội dung quá dài, hãy cắt bớt nội dung đó
                 String content = resolvedStage == NetworkLogStage.CANCELED && stage != resolvedStage
                         ? I18nUtil.getMessage(MessageKeys.NETWORK_LOG_MESSAGE_CALL_CANCELED)
                         : msg != null ? msg : "";
@@ -224,7 +224,7 @@ public class NetworkLogPanel extends JPanel {
                 appendContent(resolvedStage, content, rawMessage, fontSize);
                 logArea.styleEntry(entryStart, presentation, fontSize);
 
-                // 自动滚动到底部
+                // Tự động cuộn xuống phía dưới
                 logArea.setCaretPosition(doc.getLength());
                 updateCopyCurrentTabButtonState();
             } catch (BadLocationException e) {
@@ -234,7 +234,7 @@ public class NetworkLogPanel extends JPanel {
     }
 
     /**
-     * 获取主题适配的默认文本颜色
+     * Lấy màu văn bản mặc định để điều chỉnh chủ đề
      */
     private Color getDefaultTextColor() {
         return NetworkLogStage.DEFAULT.getColor();
@@ -297,7 +297,7 @@ public class NetworkLogPanel extends JPanel {
     }
 
     /**
-     * 更新请求详情
+     * Cập nhật chi tiết yêu cầu
      */
     public void setRequestDetails(PreparedRequest request) {
         if (requestDetailsPane == null) return;
@@ -315,7 +315,7 @@ public class NetworkLogPanel extends JPanel {
     }
 
     /**
-     * 更新响应详情
+     * Cập nhật chi tiết phản hồi
      */
     public void setResponseDetails(HttpResponse response) {
         if (responseDetailsPane == null) return;
@@ -332,7 +332,7 @@ public class NetworkLogPanel extends JPanel {
     }
 
     /**
-     * 清空所有详情面板
+     * Xóa tất cả các bảng chi tiết
      */
     public void clearAllDetails() {
         currentRequest = null;

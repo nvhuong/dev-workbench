@@ -46,7 +46,7 @@ import static org.testng.Assert.*;
 
 public class PerformancePersistenceServiceTest {
 
-    @Test(description = "退出同步保存必须等待旧的异步保存，最终文件保留最新工作区")
+    @Test(description = "Việc thoát khỏi quá trình lưu đồng bộ phải đợi quá trình lưu không đồng bộ cũ và tệp cuối cùng vẫn giữ nguyên không gian làm việc mới nhất")
     public void synchronousWorkspaceSaveShouldFollowQueuedAsyncSave() throws Exception {
         Path configPath = Files.createTempDirectory("performance-final-save").resolve("performance_config.json");
         TestablePerformancePersistenceService service = new TestablePerformancePersistenceService(configPath);
@@ -56,7 +56,7 @@ public class PerformancePersistenceServiceTest {
         assertEquals(service.loadWorkspace().getActivePlan().getName(), "latest");
     }
 
-    @Test(description = "同步更新配置必须基于前一个异步保存完成后的工作区")
+    @Test(description = "Cấu hình cập nhật đồng bộ phải dựa trên không gian làm việc sau khi quá trình lưu không đồng bộ trước đó hoàn tất")
     public void configurationSaveShouldFollowQueuedAsyncSave() throws Exception {
         Path configPath = Files.createTempDirectory("performance-final-configuration").resolve("performance_config.json");
         TestablePerformancePersistenceService service = new TestablePerformancePersistenceService(configPath);
@@ -69,7 +69,7 @@ public class PerformancePersistenceServiceTest {
         assertTrue(service.loadConfiguration().isEfficientMode());
     }
 
-    @Test(description = "清空配置必须排在已经调度的自动保存之后，不能被旧保存重建")
+    @Test(description = "Việc xóa cấu hình phải được lên lịch sau khi tự động lưu theo lịch trình và không thể được xây dựng lại bằng cách lưu cũ")
     public void clearShouldFollowQueuedAsyncSave() throws Exception {
         Path configPath = Files.createTempDirectory("performance-final-clear").resolve("performance_config.json");
         TestablePerformancePersistenceService service = new TestablePerformancePersistenceService(configPath);
@@ -112,7 +112,7 @@ public class PerformancePersistenceServiceTest {
                 latestWrite.get(100, TimeUnit.MILLISECONDS);
                 fail("Synchronous write returned before the queued older save completed");
             } catch (TimeoutException expected) {
-                // 必须等旧保存完成，不能绕过保存队列。
+                // Phải đợi quá trình lưu cũ hoàn tất, không thể bỏ qua hàng đợi lưu.
             }
             releaseOldSave.countDown();
             latestWrite.get(2, TimeUnit.SECONDS);
@@ -123,7 +123,7 @@ public class PerformancePersistenceServiceTest {
         }
     }
 
-    @Test(description = "默认配置路径应跟随当前工作区，便于 Git 工作区同步性能测试方案")
+    @Test(description = "Đường dẫn cấu hình mặc định phải tuân theo không gian làm việc hiện tại để thuận tiện Git Kịch bản thử nghiệm hiệu suất đồng bộ hóa không gian làm việc")
     public void shouldResolveConfigPathFromCurrentWorkspace() throws IOException {
         Path workspaceDir = Files.createTempDirectory("performance-workspace-path");
         Workspace workspace = new Workspace();
@@ -134,7 +134,7 @@ public class PerformancePersistenceServiceTest {
         assertEquals(service.getConfigFilePath(), workspaceDir.resolve("performance_config.json"));
     }
 
-    @Test(description = "保存性能测试配置时应真实写入当前工作区，便于 Git 同步")
+    @Test(description = "Khi lưu cấu hình kiểm tra hiệu năng, không gian làm việc hiện tại phải được ghi thực sự để thuận tiện Git đồng bộ")
     public void shouldSaveConfigFileIntoCurrentWorkspace() throws IOException {
         Path workspaceDir = Files.createTempDirectory("performance-workspace-save");
         Workspace workspace = new Workspace();
@@ -156,7 +156,7 @@ public class PerformancePersistenceServiceTest {
         assertFalse(Files.readString(configPath).contains("\"csvState\""));
     }
 
-    @Test(description = "异步保存应固定调度时的工作区，避免切换工作区后写错位置")
+    @Test(description = "Việc lưu không đồng bộ sẽ khắc phục vùng làm việc trong quá trình lên lịch để tránh ghi sai vị trí sau khi chuyển đổi vùng làm việc")
     public void shouldSaveAsyncToWorkspaceActiveWhenScheduled() throws Exception {
         Path workspaceA = Files.createTempDirectory("performance-workspace-async-a");
         Path workspaceB = Files.createTempDirectory("performance-workspace-async-b");
@@ -180,7 +180,7 @@ public class PerformancePersistenceServiceTest {
         assertTrue(Files.readString(configInA).contains("Plan"));
     }
 
-    @Test(description = "应保存并恢复 Thread Group 下的 CSV Data Set 节点")
+    @Test(description = "nên được lưu và khôi phục Thread Group Xuống CSV Data Set nút")
     public void shouldPersistCsvDataSetNodeUnderThreadGroup() throws IOException {
         Path tempDir = Files.createTempDirectory("performance-csv-data-set-node");
         Path configPath = tempDir.resolve("performance_config.json");
@@ -216,7 +216,7 @@ public class PerformancePersistenceServiceTest {
         assertEquals(loadedCsvData.csvDataSetData.getRows().get(0).get("roomId"), "1728");
     }
 
-    @Test(description = "应保存并恢复趋势采样开关")
+    @Test(description = "Công tắc lấy mẫu xu hướng phải được lưu và khôi phục")
     public void shouldPersistAndLoadTrendEnabled() throws IOException {
         Path tempDir = Files.createTempDirectory("performance-trend-enabled");
         Path configPath = tempDir.resolve("performance_config.json");
@@ -230,7 +230,7 @@ public class PerformancePersistenceServiceTest {
         assertTrue(Files.readString(configPath, StandardCharsets.UTF_8).contains("\"trendEnabled\": false"));
     }
 
-    @Test(description = "应保存并恢复报表实时刷新开关，默认结束后生成")
+    @Test(description = "Công tắc làm mới thời gian thực của báo cáo phải được lưu và khôi phục và nó sẽ được tạo sau khi mặc định")
     public void shouldPersistAndLoadRealtimeReportRefresh() throws IOException {
         Path tempDir = Files.createTempDirectory("performance-report-refresh");
         Path configPath = tempDir.resolve("performance_config.json");
@@ -244,7 +244,7 @@ public class PerformancePersistenceServiceTest {
         assertTrue(Files.readString(configPath, StandardCharsets.UTF_8).contains("\"reportRealtimeEnabled\": true"));
     }
 
-    @Test(description = "应支持通过纯计划文档保存请求快照，便于无集合树的压测运行器恢复配置")
+    @Test(description = "Nó sẽ hỗ trợ lưu ảnh chụp nhanh yêu cầu thông qua các tài liệu kế hoạch thuần túy để tạo điều kiện khôi phục cấu hình của các trình chạy thử nghiệm căng thẳng mà không cần cây thu thập")
     public void shouldSaveAndLoadPlanDocumentWithRequestSnapshotWithoutCollectionTree() throws IOException {
         Path tempDir = Files.createTempDirectory("performance-persistence-document");
         Path configPath = tempDir.resolve("performance_config.json");
@@ -305,7 +305,7 @@ public class PerformancePersistenceServiceTest {
         assertTrue(json.contains("wss://example.test/ws"));
     }
 
-    @Test(description = "应支持一次性保存并加载无界面压测运行所需的完整配置包")
+    @Test(description = "Nó sẽ hỗ trợ lưu và tải một lần gói cấu hình hoàn chỉnh cần thiết cho hoạt động kiểm tra sức chịu đựng không có giao diện")
     public void shouldSaveAndLoadPerformanceConfigurationBundle() throws IOException {
         Path tempDir = Files.createTempDirectory("performance-persistence-bundle");
         Path configPath = tempDir.resolve("performance_config.json");
@@ -373,7 +373,7 @@ public class PerformancePersistenceServiceTest {
         assertEquals(((PerformanceTreeNode) loadedTree.getUserObject()).name, "Loaded Bundle");
     }
 
-    @Test(description = "应保存并恢复 GUI 远程 worker 配置，便于像 JMeter 一样远程启动全部 worker")
+    @Test(description = "nên được lưu và khôi phục GUI Điều khiển từ xa worker Có thể cấu hình để tạo điều kiện thích JMeter Cùng một điều khiển từ xa bắt đầu tất cả worker")
     public void shouldSaveAndLoadRemoteWorkerSettings() throws IOException {
         Path tempDir = Files.createTempDirectory("performance-persistence-remote-workers");
         Path configPath = tempDir.resolve("performance_config.json");
@@ -404,7 +404,7 @@ public class PerformancePersistenceServiceTest {
         assertTrue(json.contains("\"remoteWorkers\": \"127.0.0.1:19090,127.0.0.1:19091\""));
     }
 
-    @Test(description = "应保存并恢复请求执行作用域，确保无界面运行器不依赖集合树也能解析分组变量")
+    @Test(description = "Phạm vi thực hiện yêu cầu phải được lưu và khôi phục để đảm bảo rằng trình chạy không đầu có thể giải quyết các biến nhóm mà không cần dựa vào cây tập hợp")
     public void shouldSaveAndLoadRequestExecutionScopeInPlanDocument() throws IOException {
         Path tempDir = Files.createTempDirectory("performance-persistence-scope");
         Path configPath = tempDir.resolve("performance_config.json");
@@ -454,7 +454,7 @@ public class PerformancePersistenceServiceTest {
         assertEquals(loadedRequest.getRequestExecutionScope().getGroupVariable("tenantId"), "persisted-tenant");
     }
 
-    @Test(description = "旧版单计划配置不再兼容加载")
+    @Test(description = "Các cấu hình gói đơn cũ hơn không còn tương thích với việc tải")
     public void shouldRejectLegacySinglePlanConfiguration() throws IOException {
         Path tempDir = Files.createTempDirectory("performance-persistence-no-csv");
         Path configPath = tempDir.resolve("performance_config.json");
@@ -477,7 +477,7 @@ public class PerformancePersistenceServiceTest {
         assertFalse(Files.exists(configPath));
     }
 
-    @Test(description = "空 CSV 状态不应写出脏数据")
+    @Test(description = "vô giá trị CSV Trạng thái không nên ghi dữ liệu bẩn")
     public void shouldKeepCsvStateEmptyWhenNotProvided() throws IOException {
         Path tempDir = Files.createTempDirectory("performance-persistence-empty");
         Path configPath = tempDir.resolve("performance_config.json");
@@ -491,7 +491,7 @@ public class PerformancePersistenceServiceTest {
         assertFalse(json.contains("\"csvState\""));
     }
 
-    @Test(description = "应保存并恢复 WebSocket 发送和等待步骤的独立配置")
+    @Test(description = "nên được lưu và khôi phục WebSocket Cấu hình độc lập các bước gửi và chờ")
     public void shouldPersistWebSocketStepConfigs() throws IOException {
         Path tempDir = Files.createTempDirectory("performance-persistence-ws-step");
         Path configPath = tempDir.resolve("performance_config.json");
@@ -536,7 +536,7 @@ public class PerformancePersistenceServiceTest {
         assertEquals(loadedReadNode.webSocketPerformanceData.messageFilter, "a");
     }
 
-    @Test(description = "应保存并恢复 SSE 阶段节点的独立配置")
+    @Test(description = "nên được lưu và khôi phục SSE Cấu hình độc lập của các nút giai đoạn")
     public void shouldPersistSseStageConfigs() throws IOException {
         Path tempDir = Files.createTempDirectory("performance-persistence-sse-stage");
         Path configPath = tempDir.resolve("performance_config.json");
@@ -574,7 +574,7 @@ public class PerformancePersistenceServiceTest {
         assertEquals(loadedReadNode.ssePerformanceData.holdConnectionMs, 30000);
     }
 
-    @Test(description = "WebSocket 配置遇到未知枚举值时不再兼容回退")
+    @Test(description = "WebSocket Cấu hình không còn tương thích với dự phòng khi gặp các giá trị liệt kê không xác định")
     public void shouldRejectUnknownWebSocketEnumsWhenLoading() throws IOException {
         Path tempDir = Files.createTempDirectory("performance-persistence-ws-defaults");
         Path configPath = tempDir.resolve("performance_config.json");
@@ -621,7 +621,7 @@ public class PerformancePersistenceServiceTest {
         assertFalse(Files.exists(configPath));
     }
 
-    @Test(description = "SSE Read 阶段配置遇到未知枚举值时不再兼容回退")
+    @Test(description = "SSE Read Cấu hình giai đoạn không còn tương thích với dự phòng khi gặp các giá trị liệt kê không xác định")
     public void shouldRejectUnknownSseReadEnumsWhenLoading() throws IOException {
         Path tempDir = Files.createTempDirectory("performance-persistence-sse-defaults");
         Path configPath = tempDir.resolve("performance_config.json");
@@ -674,7 +674,7 @@ public class PerformancePersistenceServiceTest {
         assertFalse(Files.exists(configPath));
     }
 
-    @Test(description = "应保存并恢复 WebSocket Connect 步骤的独立配置")
+    @Test(description = "nên được lưu và khôi phục WebSocket Connect Cấu hình độc lập của các bước")
     public void shouldPersistWebSocketConnectStepConfig() throws IOException {
         Path tempDir = Files.createTempDirectory("performance-persistence-ws-connect-step");
         Path configPath = tempDir.resolve("performance_config.json");
@@ -700,7 +700,7 @@ public class PerformancePersistenceServiceTest {
         assertEquals(loadedConnectNode.webSocketPerformanceData.connectTimeoutMs, 12345);
     }
 
-    @Test(description = "应保存并恢复通用 Loop 控制器配置")
+    @Test(description = "Phổ quát nên được lưu và khôi phục Loop Cấu hình bộ điều khiển")
     public void shouldPersistLoopControllerConfig() throws IOException {
         Path tempDir = Files.createTempDirectory("performance-persistence-loop");
         Path configPath = tempDir.resolve("performance_config.json");
@@ -726,7 +726,7 @@ public class PerformancePersistenceServiceTest {
         assertEquals(loadedLoop.loopData.iterations, 4);
     }
 
-    @Test(description = "应保存并恢复所有性能节点配置对象")
+    @Test(description = "Tất cả các đối tượng cấu hình nút hiệu suất phải được lưu và khôi phục")
     public void shouldPersistAllPerformanceNodeConfigs() throws IOException {
         Path tempDir = Files.createTempDirectory("performance-persistence-all-nodes");
         Path configPath = tempDir.resolve("performance_config.json");

@@ -15,13 +15,13 @@ import java.awt.*;
 import java.util.function.Consumer;
 
 /**
- * UI 刷新管理器
+ * UI Làm mới người quản lý
  * <p>
- * 统一管理所有 UI 组件的刷新逻辑，支持以下场景：
+ * Quản lý mọi thứ ở một nơi UI Logic làm mới của thành phần hỗ trợ các tình huống sau:
  * <ul>
- *   <li>主题切换 - 更新所有组件的外观样式</li>
- *   <li>字体切换 - 更新所有组件的字体</li>
- *   <li>语言切换 - 更新所有文本内容</li>
+ *   <li>Chuyển đổi chủ đề - Cập nhật phong cách xuất hiện của tất cả các thành phần</li>
+ *   <li>Chuyển đổi phông chữ - Phông chữ được cập nhật cho tất cả các thành phần</li>
+ *   <li>Chuyển đổi ngôn ngữ - Cập nhật tất cả nội dung văn bản</li>
  * </ul>
  *
  * @author laker
@@ -31,16 +31,16 @@ import java.util.function.Consumer;
 public class UIRefreshManager {
 
     /**
-     * 刷新所有窗口（主题或字体切换时调用）
+     * Làm mới tất cả các cửa sổ (được gọi khi chủ đề hoặc phông chữ được chuyển đổi)
      * <p>
-     * 此方法会：
+     * Phương pháp này sẽ:
      * <ul>
-     *   <li>递归更新所有组件的 UI（应用新的 Look and Feel）</li>
-     *   <li>重新验证布局</li>
-     *   <li>重绘所有组件</li>
+     *   <li>Cập nhật tất cả các thành phần theo cách đệ quy UI（Áp dụng mới Look and Feel）</li>
+     *   <li>Xác nhận lại bố cục</li>
+     *   <li>Vẽ lại tất cả các thành phần</li>
      * </ul>
      * <p>
-     * 适用场景：主题切换、字体切换
+     * Các tình huống áp dụng: chuyển đổi chủ đề, chuyển đổi phông chữ
      */
     public static void refreshAllWindows() {
         try {
@@ -56,10 +56,10 @@ public class UIRefreshManager {
                         ToolWindowSurfaceStyle.applyDialogWindowChrome(dialog);
                     }
 
-                    // 重新验证布局
+                    // Xác nhận lại bố cục
                     window.validate();
 
-                    // 重绘窗口
+                    // Vẽ lại cửa sổ
                     window.repaint();
                     log.debug("Refreshed window: {}", window.getClass().getSimpleName());
                 }
@@ -70,10 +70,10 @@ public class UIRefreshManager {
     }
 
     /**
-     * 只刷新编辑器字体设置。
+     * Chỉ làm mới cài đặt phông chữ của trình soạn thảo.
      * <p>
-     * 编辑器字体变化不需要重装 Look and Feel。避免调用 {@link FlatLaf#updateUI()}，
-     * 防止请求页签、响应页签、工具栏等非编辑器组件在运行时被重新安装 UI delegate 后丢失自定义状态颜色。
+     * Thay đổi phông chữ của trình soạn thảo không yêu cầu cài đặt lại Look and Feel。Tránh gọi điện {@link FlatLaf#updateUI()}，
+     * Ngăn không cho cài đặt lại các thành phần không phải trình chỉnh sửa như tab yêu cầu, tab phản hồi và thanh công cụ trong thời gian chạy UI delegate Màu trạng thái tùy chỉnh bị mất.
      */
     public static void refreshEditorFonts() {
         try {
@@ -162,15 +162,15 @@ public class UIRefreshManager {
     }
 
     /**
-     * 刷新语言（语言切换时调用）
+     * Làm mới ngôn ngữ (được gọi khi chuyển đổi ngôn ngữ)
      * <p>
-     * 此方法会：
+     * Phương pháp này sẽ:
      * <ul>
-     *   <li>递归刷新实现了 IRefreshable 接口的组件（包括窗口标题更新）</li>
-     *   <li>重新验证布局和重绘</li>
+     *   <li>Làm mới đệ quy được thực hiện IRefreshable Các thành phần của giao diện (bao gồm cập nhật tiêu đề cửa sổ)</li>
+     *   <li>Xác nhận lại bố cục và vẽ lại</li>
      * </ul>
      * <p>
-     * 适用场景：语言切换
+     * Các tình huống áp dụng: chuyển đổi ngôn ngữ
      */
     public static void refreshLanguage() {
         log.info("Refreshing UI for language change...");
@@ -181,13 +181,13 @@ public class UIRefreshManager {
 
             for (Window window : windows) {
                 if (window.isDisplayable()) {
-                    // 1. 递归刷新所有实现了 IRefreshable 的组件
+                    // 1. Làm mới đệ quy tất cả các triển khai IRefreshable thành phần
                     refreshComponentRecursively(window);
 
-                    // 2. 重新验证布局
+                    // 2. Xác nhận lại bố cục
                     window.validate();
 
-                    // 3. 重绘窗口
+                    // 3. Vẽ lại cửa sổ
                     window.repaint();
 
                     refreshedCount++;
@@ -203,18 +203,18 @@ public class UIRefreshManager {
 
 
     /**
-     * 递归刷新组件
+     * Làm mới các thành phần theo cách đệ quy
      * <p>
-     * 遍历组件树，对实现了 IRefreshable 接口的组件调用 refresh() 方法
+     * Duyệt qua cây thành phần và triển khai nó IRefreshable Cuộc gọi thành phần giao diện refresh() phương pháp
      *
-     * @param component 要刷新的组件
+     * @param component Thành phần cần làm mới
      */
     private static void refreshComponentRecursively(Component component) {
         if (component == null) {
             return;
         }
 
-        // 如果组件实现了 IRefreshable 接口，调用其 refresh 方法
+        // Nếu thành phần này được triển khai IRefreshable giao diện, gọi nó refresh phương pháp
         if (component instanceof IRefreshable refreshable) {
             try {
                 refreshable.refresh();
@@ -224,14 +224,14 @@ public class UIRefreshManager {
             }
         }
 
-        // 递归处理子组件
+        // Xử lý các thành phần con một cách đệ quy
         if (component instanceof Container container) {
             for (Component child : container.getComponents()) {
                 refreshComponentRecursively(child);
             }
         }
 
-        // 处理菜单栏（JFrame 的菜单栏不在 contentPane 中）
+        // Xử lý thanh menu (JFrame Thanh menu không có ở đó contentPane giữa)
         if (component instanceof JFrame frame) {
             JMenuBar menuBar = frame.getJMenuBar();
             if (menuBar != null) {

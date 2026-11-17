@@ -7,33 +7,33 @@ import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * Swagger/OpenAPI 格式解析器入口
- * 支持 Swagger 2.0、OpenAPI 3.0.x 和 OpenAPI 3.1.x 格式
+ * Swagger/OpenAPI Định dạng mục nhập của trình phân tích cú pháp
+ * Hỗ trợ Swagger 2.0、OpenAPI 3.0.x và OpenAPI 3.1.x định dạng
  */
 @Slf4j
 @UtilityClass
 public class SwaggerParser {
 
     /**
-     * 解析 Swagger/OpenAPI JSON 文件，返回解析结果
+     * phân tích Swagger/OpenAPI JSON tập tin và trả về kết quả phân tích cú pháp
      *
-     * @param json Swagger/OpenAPI JSON 字符串
-     * @return 解析结果，如果解析失败返回 null
+     * @param json Swagger/OpenAPI JSON chuỗi
+     * @return Kết quả phân tích cú pháp, được trả về nếu phân tích cú pháp thất bại null
      */
     public static CollectionParseResult parseSwagger(String json) {
         try {
             JSONObject root = JSONUtil.parseObj(json);
 
-            // 检测版本
+            // Kiểm tra phiên bản
             String version = detectVersion(root);
             if (version == null) {
-                log.error("无法识别的Swagger/OpenAPI格式");
+                log.error("Không thể nhận raSwagger/OpenAPIđịnh dạng");
                 return null;
             }
 
-            log.info("检测到 {} 格式", version);
+            log.info("được phát hiện {} định dạng", version);
 
-            // 根据版本分发到对应的解析器
+            // Phân phối tới trình phân tích cú pháp tương ứng theo phiên bản
             if (version.startsWith("Swagger 2.0")) {
                 return Swagger2Parser.parse(root);
             } else if (version.startsWith("OpenAPI 3.0") || version.startsWith("OpenAPI 3.1")) {
@@ -42,13 +42,13 @@ public class SwaggerParser {
 
             return null;
         } catch (Exception e) {
-            log.error("解析Swagger文件失败", e);
+            log.error("phân tíchSwaggerTệp không thành công", e);
             return null;
         }
     }
 
     /**
-     * 检测 Swagger/OpenAPI 版本
+     * phát hiện Swagger/OpenAPI Phiên bản
      */
     private static String detectVersion(JSONObject root) {
         if (root.containsKey("swagger")) {

@@ -15,7 +15,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 /**
- * 国际化工具类
+ * Công cụ quốc tế
  */
 @Slf4j
 @UtilityClass
@@ -41,7 +41,7 @@ public class I18nUtil {
     private static final ConcurrentMap<BundleCacheKey, ResourceBundle> BUNDLE_CACHE = new ConcurrentHashMap<>();
 
     static {
-        // 从用户设置中读取语言设置，默认使用系统语言
+        // Đọc cài đặt ngôn ngữ từ cài đặt người dùng và sử dụng ngôn ngữ hệ thống theo mặc định
         String savedLocale = UserPreferencesStore.getLanguage();
         if (savedLocale != null && !savedLocale.isEmpty()) {
             try {
@@ -60,7 +60,7 @@ public class I18nUtil {
     }
 
     /**
-     * 获取系统默认语言环境
+     * Lấy ngôn ngữ mặc định của hệ thống
      */
     private static Locale getSystemDefaultLocale() {
         Locale systemLocale = Locale.getDefault();
@@ -89,7 +89,7 @@ public class I18nUtil {
     }
 
     /**
-     * 加载资源包
+     * Tải gói tài nguyên
      */
     private static void loadResourceBundle() {
         try {
@@ -97,7 +97,7 @@ public class I18nUtil {
             log.info("Loaded resource bundle for locale: {}", currentLocale);
         } catch (MissingResourceException e) {
             log.error("Failed to load resource bundle for locale: {}", currentLocale, e);
-            // 如果加载失败，尝试加载默认的英文资源包
+            // Nếu tải không thành công, hãy thử tải gói tài nguyên tiếng Anh mặc định
             try {
                 resourceBundle = ResourceBundle.getBundle(BUNDLE_NAME, FALLBACK_LOCALE);
                 log.info("Fallback to English resource bundle");
@@ -116,21 +116,21 @@ public class I18nUtil {
     }
 
     /**
-     * 获取国际化消息
+     * Nhận tin tức quốc tế
      *
-     * @param key 消息键
-     * @return 国际化消息
+     * @param key Phím tin nhắn
+     * @return Tin quốc tế
      */
     public static String getMessage(String key) {
         return getMessagePattern(key);
     }
 
     /**
-     * 获取带参数的国际化消息
+     * Nhận tin nhắn quốc tế hóa với các thông số
      *
-     * @param key  消息键
-     * @param args 参数
-     * @return 格式化后的国际化消息
+     * @param key  Phím tin nhắn
+     * @param args các thông số
+     * @return Tin nhắn được quốc tế hóa được định dạng
      */
     public static String getMessage(String key, Object... args) {
         String pattern = getMessagePattern(key);
@@ -200,9 +200,9 @@ public class I18nUtil {
     }
 
     /**
-     * 设置语言环境
+     * Đặt ngôn ngữ
      *
-     * @param locale 语言环境
+     * @param locale miền địa phương
      */
     public static void setLocale(Locale locale) {
         Locale normalizedLocale = normalizeSupportedLocale(locale);
@@ -211,7 +211,7 @@ public class I18nUtil {
             BUNDLE_CACHE.clear();
             loadResourceBundle();
 
-            // 保存到用户设置
+            // Lưu vào cài đặt người dùng
             String localeCode = normalizedLocale.getLanguage();
             UserPreferencesStore.saveLanguage(localeCode);
 
@@ -220,9 +220,9 @@ public class I18nUtil {
     }
 
     /**
-     * 设置语言环境（通过语言代码）
+     * Đặt ngôn ngữ (thông qua mã ngôn ngữ)
      *
-     * @param languageCode 语言代码 (en, vi)
+     * @param languageCode Mã ngôn ngữ (en, vi)
      */
     public static void setLocale(String languageCode) {
         Locale locale = switch (languageCode == null ? "" : languageCode.toLowerCase(Locale.ROOT)) {
@@ -237,13 +237,10 @@ public class I18nUtil {
     }
 
     /**
-     * 是否为中文环境
-     *
-     * @return true if current locale is Chinese
+     * Kiểm tra giao diện hiện tại có đang dùng tiếng Việt hay không.
      */
-    public static boolean isChinese() {
-        return Locale.CHINESE.equals(currentLocale) ||
-                "zh".equals(currentLocale.getLanguage());
+    public static boolean isVietnamese() {
+        return VIETNAMESE.getLanguage().equals(currentLocale.getLanguage());
     }
 
     private record BundleCacheKey(String bundleName, Locale locale, ClassLoader classLoader) {

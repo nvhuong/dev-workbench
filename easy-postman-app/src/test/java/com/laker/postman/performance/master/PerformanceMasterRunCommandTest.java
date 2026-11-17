@@ -329,7 +329,7 @@ public class PerformanceMasterRunCommandTest {
         calls.incrementAndGet();
         PerformanceJsonReportApi api = PerformanceJsonReportApi.builder()
                 .apiId("http")
-                .name("普通 HTTP")
+                .name("bình thường HTTP")
                 .protocol(PerformanceProtocol.HTTP.name())
                 .total(2L)
                 .success(2L)

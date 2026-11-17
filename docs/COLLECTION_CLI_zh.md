@@ -1,61 +1,61 @@
 # EasyPostman Collection CLI
 
-`collection run` 用于在开发机、CI Runner 或独立服务器上，按集合和文件夹无界面运行 EasyPostman 原生 workspace。
+`collection run` Được sử dụng trên các máy phát triển.CI Runner Hoặc trên một máy chủ độc lập, chạy không có giao diện theo bộ sưu tập và thư mục EasyPostman bản địa workspace。
 
-它从 workspace 的 `collections.json` 读取请求，并支持按集合和文件夹选择运行范围。
+Nó bắt đầu từ workspace của `collections.json` Đọc yêu cầu và hỗ trợ lựa chọn phạm vi chạy theo bộ sưu tập và thư mục.
 
-CLI 以完整 workspace 目录为运行单位。普通 workspace 应把整个目录复制到 CI；Git workspace 应在 CI checkout 后直接运行仓库目录，不要只复制其中某一个 JSON 文件。
+CLI để hoàn thành workspace Thư mục là đơn vị đang chạy. Bình thường workspace Toàn bộ thư mục phải được sao chép vào  CI；Git workspace Đáng lẽ phải ở đó CI checkout Sau đó chạy trực tiếp thư mục kho, không sao chép chỉ một trong số chúng JSON tập tin.
 
 ```bash
 java -jar easy-postman.jar collection run <workspace-directory> [options]
 ```
 
-`<workspace-directory>` 直接指定 workspace 所在目录，例如：
+`<workspace-directory>` Chỉ định trực tiếp workspace thư mục, ví dụ: .
 
 ```bash
 java -jar easy-postman.jar collection run /srv/api-workspace
 ```
 
-## 下载最新 JAR
+## Tải về mới nhất JAR
 
-打开任一发布页，在最新 `v*` 版本的 Assets 中下载 `easy-postman-{版本号}.jar`：
+Mở bất kỳ trang phát hành nào, mới nhất `v*` phiên bản Assets Tải về `easy-postman-{Số phiên bản}.jar`：
 
-- [GitHub 最新 Release](https://github.com/lakernote/easy-postman/releases/latest)
-- [Gitee Releases（国内镜像）](https://gitee.com/lakernote/easy-postman/releases)
+- [GitHub cập nhật Release](https://github.com/lakernote/easy-postman/releases/latest)
+- [Gitee Releases（Phản ánh trong nước)](https://gitee.com/lakernote/easy-postman/releases)
 
-Gitee 附件同步可能稍晚；如果最新版本中暂时没有主 JAR，请使用 GitHub 下载地址。运行 CLI 需要 Java 21 或更高版本。
+Gitee Đồng bộ hóa tệp đính kèm có thể bị trì hoãn; nếu bản gốc tạm thời không có sẵn trong phiên bản mới nhất JAR，Hãy sử dụng GitHub Địa chỉ tải về. chạy CLI Cần thiết Java 21 hoặc cao hơn.
 
-## 1. Workspace 文件
+## 1. Workspace tập tin
 
-标准 workspace 目录包含 4 个 JSON 文件：
+tiêu chuẩn workspace Thư mục chứa 4 cá nhân JSON Tập tin:
 
 ```text
 api-workspace/
-├── collections.json          # 必需：集合、文件夹、请求、脚本和断言
-├── environments.json         # 环境列表和活动环境
-├── functional_config.json    # 功能测试配置，collection run 不读取
-└── performance_config.json   # 性能测试配置，collection run 不读取
+├── collections.json          # Bắt buộc: Bộ sưu tập, Thư mục, Yêu cầu, Tập lệnh và Xác nhận
+├── environments.json         # Danh sách môi trường và môi trường hoạt động
+├── functional_config.json    # Cấu hình kiểm tra chức năng,collection run Không đọc
+└── performance_config.json   # Cấu hình kiểm tra hiệu năng,collection run Không đọc
 ```
 
-CLI 行为：
+CLI Hành vi:
 
-- 请求配置只来自 workspace 根目录的 `collections.json`。
-- 自动读取同目录的 `environments.json`。
-- `functional_config.json` 和 `performance_config.json` 属于标准 workspace，但不参与 `collection run`。
-- 应用级 `global_variables.json` 从 EasyPostman 数据目录读取。
-- `-d` 指定 CSV / JSON 多轮数据，相对路径从 workspace 根目录解析。
-- 相对上传路径默认从 workspace 根目录解析。
-- CLI 只读 workspace 配置，不会写回集合和环境。
+- Chỉ yêu cầu cấu hình từ workspace của thư mục gốc `collections.json`。
+- Tự động đọc cùng một thư mục `environments.json`。
+- `functional_config.json` và `performance_config.json` Thuộc tiêu chuẩn workspace，Nhưng đừng tham gia `collection run`。
+- Cấp độ ứng dụng `global_variables.json` Từ EasyPostman Đọc thư mục dữ liệu.
+- `-d` được chỉ định CSV / JSON Nhiều vòng dữ liệu, đường dẫn tương đối từ workspace Độ phân giải thư mục gốc .
+- Đường dẫn tải lên tương đối mặc định từ  workspace Độ phân giải thư mục gốc .
+- CLI Chỉ đọc workspace Cấu hình, bộ sưu tập và môi trường không được ghi lại.
 
-## 2. 最短用法
+## 2. Thời gian sử dụng ngắn nhất
 
-运行 workspace 中全部集合：
+chạy workspace Tất cả các bộ sưu tập trong:
 
 ```bash
 java -jar easy-postman.jar collection run /srv/api-workspace
 ```
 
-选择集合、文件夹和环境：
+Chọn Bộ sưu tập, Thư mục và Môi trường:
 
 ```bash
 java -jar easy-postman.jar collection run /srv/api-workspace \
@@ -64,21 +64,21 @@ java -jar easy-postman.jar collection run /srv/api-workspace \
   -e "CI"
 ```
 
-在 Git workspace 根目录：
+Vào Git workspace Thư mục gốc: .
 
 ```bash
 java -jar /opt/easy-postman/easy-postman.jar collection run .
 ```
 
-## 3. 集合与文件夹选择
+## 3. Lựa chọn bộ sưu tập và thư mục
 
-不传 `-c` 时运行全部根集合：
+Không được truyền lại `-c` Khi chạy tất cả các bộ sưu tập gốc:
 
 ```bash
 java -jar easy-postman.jar collection run "$WORKSPACE_DIR"
 ```
 
-`-c` 可按集合名称或 ID 选择，并可重复：
+`-c` Có sẵn theo tên bộ sưu tập hoặc ID Chọn và lặp lại:
 
 ```bash
 java -jar easy-postman.jar collection run "$WORKSPACE_DIR" \
@@ -86,7 +86,7 @@ java -jar easy-postman.jar collection run "$WORKSPACE_DIR" \
   -c "Order API"
 ```
 
-`--folder` 按文件夹名称选择该文件夹及其子文件夹，可重复：
+`--folder` Chọn thư mục và các thư mục con của nó theo tên thư mục, có thể lặp lại:
 
 ```bash
 java -jar easy-postman.jar collection run "$WORKSPACE_DIR" \
@@ -95,13 +95,13 @@ java -jar easy-postman.jar collection run "$WORKSPACE_DIR" \
   --folder "Regression"
 ```
 
-集合或文件夹不存在时退出码为 `2`，并列出可用集合或未匹配的文件夹。
+Mã thoát là khi bộ sưu tập hoặc thư mục không tồn tại `2`，và liệt kê các bộ sưu tập có sẵn hoặc các thư mục chưa từng có.
 
-## 4. CSV / JSON 多轮驱动
+## 4. CSV / JSON Dẫn động nhiều bánh
 
 ### 4.1 CSV
 
-例如 CI 机器上的 `/opt/easy-postman-data/users.csv`：
+Ví dụ CI trên máy `/opt/easy-postman-data/users.csv`：
 
 ```csv
 user,role
@@ -109,14 +109,14 @@ alice,admin
 bob,user
 ```
 
-运行：
+chạy:
 
 ```bash
 java -jar easy-postman.jar collection run "$WORKSPACE_DIR" \
   -d /opt/easy-postman-data/users.csv
 ```
 
-默认执行两轮。请求中使用 `{{user}}`，脚本中使用：
+Theo mặc định, hai vòng được thực hiện. được sử dụng trong các yêu cầu `{{user}}`，Được sử dụng trong tập lệnh:
 
 ```javascript
 pm.iterationData.get('user');
@@ -127,7 +127,7 @@ pm.info.iterationCount;
 
 ### 4.2 JSON
 
-JSON 必须是对象数组：
+JSON Phải là một mảng các đối tượng: .
 
 ```json
 [
@@ -141,21 +141,21 @@ java -jar easy-postman.jar collection run "$WORKSPACE_DIR" \
   -d /opt/easy-postman-data/users.json
 ```
 
-### 4.3 `-n` 规则
+### 4.3 `-n` luật lệ
 
-| 数据 | 参数 | 实际行为 |
+| dữ liệu | các thông số | hành vi thực tế |
 |---|---|---|
-| 无数据 | 不传 `-n` | 1 轮 |
-| 2 行 | 不传 `-n` | 2 轮 |
-| 2 行 | `-n 1` | 只使用第 1 行 |
-| 2 行 | `-n 5` | 依次使用第 1、2、1、2、1 行 |
-| 无数据 | `-n 3` | 3 轮空迭代数据 |
+| Không có dữ liệu | Không được truyền lại `-n` | 1 bánh xe |
+| 2 Được rồi | Không được truyền lại `-n` | 2 bánh xe |
+| 2 Được rồi | `-n 1` | Chỉ sử dụng  1 Được rồi |
+| 2 Được rồi | `-n 5` | Sử dụng  1、2、1、2、1 Được rồi |
+| Không có dữ liệu | `-n 3` | 3 Tạm biệt dữ liệu lặp lại |
 
-## 5. 普通 workspace 复制到 CI
+## 5. bình thường workspace Sao chép vào CI
 
-普通 workspace 不要求是 Git 仓库。GUI 机器保存后，应传递完整目录，而不是只复制 `collections.json`。
+bình thường workspace Không bắt buộc phải có Git nhà kho.GUI Sau khi máy được lưu, toàn bộ thư mục sẽ được chuyển thay vì chỉ sao chép `collections.json`。
 
-开发机打包：
+Phát triển máy đóng gói:
 
 ```bash
 tar -C /Users/me/EasyPostman/workspaces \
@@ -163,7 +163,7 @@ tar -C /Users/me/EasyPostman/workspaces \
   order-api
 ```
 
-CI 解压并运行：
+CI Giải nén và chạy: .
 
 ```bash
 mkdir -p "$CI_PROJECT_DIR/api-workspace"
@@ -180,20 +180,20 @@ java -jar "$CI_PROJECT_DIR/tools/easy-postman.jar" \
   --out "$CI_PROJECT_DIR/target/collection-result.json"
 ```
 
-也可以通过 CI Artifact、SCP、rsync、Docker volume 或 Kubernetes volume 交付 workspace。
+Nó cũng có thể được thông qua CI Artifact、SCP、rsync、Docker volume hoặc Kubernetes volume giao workspace。
 
-## 6. Git workspace 在 CI 中运行
+## 6. Git workspace Vào CI đang hoạt động
 
-推荐让 GUI workspace 目录本身就是 Git 仓库：
+Đề nghị cho phép GUI workspace Bản thân danh mục là như vậy Git Kho:
 
-1. 开发机 clone API workspace 仓库。
-2. EasyPostman 中把 Git workspace 路径指向该目录。
-3. 使用 GUI 维护 workspace。
-4. 审查并提交 workspace 的 4 个 JSON 文件。
-5. push 后由 CI 使用干净 checkout。
-6. CI 在仓库根目录执行 `collection run .`。
+1. Máy phát triển clone API workspace nhà kho.
+2. EasyPostman Tay cầm giữa Git workspace Đường dẫn trỏ đến thư mục này.
+3. sử dụng GUI duy trì workspace。
+4. Xem xét và gửi workspace của 4 cá nhân JSON tập tin.
+5. push Sau đó bởi CI Sử dụng sạch sẽ checkout。
+6. CI Thực thi tại thư mục gốc của kho `collection run .`。
 
-不要提交真实 Token、Cookie、私钥、生产数据或运行报告。
+Đừng gửi sự thật Token、Cookie、Khóa riêng, dữ liệu sản xuất hoặc báo cáo chạy.
 
 ### GitHub Actions
 
@@ -233,7 +233,7 @@ jobs:
           path: target/collection-result.json
 ```
 
-业务代码和 workspace 分仓时，checkout 到一个目录后直接传该目录：
+mã doanh nghiệp và workspace Khi chia kho,checkout Sau khi đến thư mục, chuyển trực tiếp thư mục:
 
 ```bash
 git clone "$API_WORKSPACE_REPOSITORY" "$CI_PROJECT_DIR/api-workspace"
@@ -242,13 +242,13 @@ java -jar "$CI_PROJECT_DIR/tools/easy-postman.jar" \
   collection run "$CI_PROJECT_DIR/api-workspace"
 ```
 
-CI 不需要登记 workspace，也不需要 GUI 机器保持在线。
+CI Không cần đăng ký workspace，Không cần GUI Máy vẫn trực tuyến.
 
-## 7. 环境、全局变量和 Secret
+## 7. Môi trường, các biến toàn cục và Secret
 
-未传 `-e` 时优先使用 `active: true` 的环境；否则使用第一个环境。CI 建议固定 `-e "CI"`。
+Không được truyền lại `-e` ưu tiên khi sử dụng `active: true` môi trường; nếu không thì môi trường đầu tiên sẽ được sử dụng.CI Đề nghị khắc phục `-e "CI"`。
 
-`global_variables.json` 是应用级文件。CI 可指定隔离数据目录：
+`global_variables.json` Nó là một tập tin cấp độ ứng dụng.CI Bạn có thể chỉ định thư mục dữ liệu cách ly:
 
 ```bash
 java -DeasyPostman.data.dir="$RUNNER_TEMP/easy-postman-data" \
@@ -257,7 +257,7 @@ java -DeasyPostman.data.dir="$RUNNER_TEMP/easy-postman-data" \
   -e "CI"
 ```
 
-Secret 不应提交到 workspace。可以在 CI 临时 checkout 中用 `jq` 注入环境副本：
+Secret Không nên nộp cho workspace。Có thể vào CI tạm thời checkout Được sử dụng ở Trung Quốc `jq` Tiêm một bản sao của môi trường: .
 
 ```bash
 jq --arg token "$API_TOKEN" '
@@ -273,48 +273,48 @@ jq --arg token "$API_TOKEN" '
 mv environments.json.tmp environments.json
 ```
 
-CLI 不会自动把任意 shell 环境变量映射为 EasyPostman 变量。
+CLI Sẽ không tự động đặt tùy ý shell Các biến môi trường được ánh xạ tới  EasyPostman các biến.
 
-## 8. 文件上传
+## 8. Tải lên tập tin
 
-上传附件不属于标准 workspace 文件。请求需要上传时，可以使用绝对路径：
+Tải lên tệp đính kèm không chuẩn workspace tập tin. Khi yêu cầu cần được tải lên, bạn có thể sử dụng đường dẫn tuyệt đối:
 
 ```text
 /opt/easy-postman-test-data/avatar.png
 ```
 
-默认以 workspace 根目录解析。附件位于其他挂载目录时：
+Mặc định là  workspace Độ phân giải thư mục gốc Khi tệp đính kèm nằm trong thư mục gắn kết khác:
 
 ```bash
 java -jar easy-postman.jar collection run "$WORKSPACE_DIR" \
   --working-dir "$CI_PROJECT_DIR/test-assets"
 ```
 
-路径为空、仍含 `{{...}}`、文件不存在或不可读时会在发送前失败。
+Đường dẫn trống và vẫn chứa `{{...}}`、Lỗi trước khi gửi nếu tệp không tồn tại hoặc không thể đọc được.
 
-## 9. 参数与退出码
+## 9. Các thông số và mã thoát
 
-| 参数 | 说明 |
+| các thông số | Mô tả |
 |---|---|
-| `[workspace-directory]` | workspace 所在目录；Git workspace 根目录可写 `.` |
-| `-w, --workspace` | workspace 目录的显式写法，不能与位置参数同时使用 |
-| `-c, --collection` | 选择集合，可重复 |
-| `--folder` | 选择文件夹，可重复 |
-| `-e, --environment` | 环境名称或 ID |
-| `-d, --iteration-data` | workspace 相对或绝对 CSV / JSON 路径 |
-| `-n, --iteration-count` | 正整数总轮数 |
-| `--working-dir` | 上传文件根目录 |
-| `--out` | JSON 报告路径 |
-| `--bail` | 首次请求、脚本或断言失败后停止 |
-| `-h, --help` | 帮助 |
+| `[workspace-directory]` | workspace thư mục;Git workspace Thư mục gốc có thể ghi được `.` |
+| `-w, --workspace` | workspace Việc viết thư mục rõ ràng không thể được sử dụng cùng lúc với các tham số vị trí |
+| `-c, --collection` | Chọn một bộ sưu tập, có thể lặp lại |
+| `--folder` | Chọn một thư mục, có thể lặp lại |
+| `-e, --environment` | tên môi trường hoặc  ID |
+| `-d, --iteration-data` | workspace Tương đối hoặc tuyệt đối CSV / JSON con đường |
+| `-n, --iteration-count` | Tổng số vòng là số nguyên dương |
+| `--working-dir` | Tải lên thư mục gốc của tập tin |
+| `--out` | JSON Đường dẫn báo cáo |
+| `--bail` | Dừng sau khi yêu cầu, tập lệnh hoặc xác nhận đầu tiên không thành công |
+| `-h, --help` | giúp đỡ |
 
-退出码：`0` 全部成功；`1` 请求、脚本或断言失败；`2` 参数或 workspace 数据无效。
+Mã thoát: .`0` Tất cả đều thành công;`1` Request, script, or assertion failed;`2` Tham số hoặc workspace Dữ liệu không hợp lệ.
 
-报告 schema 为 `2.1`，`selectionMode` 固定为 `COLLECTIONS`。
+Báo cáo schema vì `2.1`，`selectionMode` Đã sửa như `COLLECTIONS`。
 
-## 10. 仓库示例
+## 10. Ví dụ về kho
 
-示例 workspace：[`docs/examples/collection-cli`](examples/collection-cli/)
+Ví dụ workspace：[`docs/examples/collection-cli`](examples/collection-cli/)
 
 ```bash
 java -jar easy-postman-app/target/easy-postman-*.jar \
@@ -325,6 +325,6 @@ java -jar easy-postman-app/target/easy-postman-*.jar \
   --out target/collection-run-result.json
 ```
 
-该命令发送一个请求并完成两个断言。
+This command sends a request and completes two assertions.
 
-功能测试 CLI 请参阅 [`FUNCTIONAL_CLI_zh.md`](FUNCTIONAL_CLI_zh.md)。
+Kiểm tra chức năng CLI Xem [`FUNCTIONAL_CLI_zh.md`](FUNCTIONAL_CLI_zh.md)。

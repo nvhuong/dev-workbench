@@ -12,9 +12,9 @@
     </parent>
 
     <!--
-        插件 API 层：
-        只放稳定的扩展接口 / 数据结构，尽量不依赖宿主实现细节。
-        插件模块应该优先依赖这里，而不是直接依赖 easy-postman-app 内部代码。
+        plugin API lớp:
+        Chỉ đặt giao diện mở rộng ổn định / Cấu trúc dữ liệu, cố gắng không dựa vào chi tiết triển khai máy chủ.
+        Các mô-đun plug-in nên dựa vào điều này trước tiên thay vì trực tiếp easy-postman-app mã nội bộ.
      -->
     <artifactId>easy-postman-plugin-api</artifactId>
     <packaging>jar</packaging>

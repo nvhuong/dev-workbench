@@ -70,14 +70,14 @@ public class SettingManager {
     }
 
     /**
-     * 初始化通知位置设置
+     * Khởi tạo cài đặt vị trí thông báo
      */
     private static void initializeNotificationPosition() {
         try {
             NotificationPosition position = getNotificationPosition();
             NotificationCenter.setDefaultPosition(position);
         } catch (Exception e) {
-            // 如果解析失败，使用默认值
+            // Nếu phân tích cú pháp không thành công, giá trị mặc định sẽ được sử dụng
             log.error("Error initializing notification position", e);
         }
     }
@@ -317,8 +317,8 @@ public class SettingManager {
     }
 
     /**
-     * 是否禁用 SSL 证书验证（通用请求设置）
-     * 此设置应用于所有 HTTPS 请求，用于开发测试环境
+     * Có nên vô hiệu hóa hay không SSL Certificate verification (common request settings)
+     * Cài đặt này áp dụng cho tất cả HTTPS Yêu cầu, cho môi trường thử nghiệm phát triển
      */
     public static boolean isRequestSslVerificationDisabled() {
         return !get(AppSettingKeys.REQUEST_SSL_VERIFICATION_ENABLED);
@@ -326,13 +326,13 @@ public class SettingManager {
 
     public static void setRequestSslVerificationDisabled(boolean disabled) {
         put(AppSettingKeys.REQUEST_SSL_VERIFICATION_ENABLED, !disabled);
-        // 清除客户端缓存以应用新的 SSL 设置
+        // Xóa bộ nhớ đệm của máy khách để áp dụng bộ đệm mới SSL cài đặt
         OkHttpClientManager.clearClientCache();
     }
 
     /**
-     * 获取默认协议（当URL没有协议时自动补全）
-     * 支持的值：http, https
+     * Nhận giao thức mặc định (khiURLTự động hoàn thiện khi không có sự thống nhất)
+     * Các giá trị được hỗ trợ: .http, https
      */
     public static String getDefaultProtocol() {
         return get(AppSettingKeys.DEFAULT_PROTOCOL);
@@ -430,7 +430,7 @@ public class SettingManager {
     }
 
     /**
-     * 是否启用自定义受信任证书或 truststore。
+     * Có bật chứng chỉ tin cậy tùy chỉnh hay không truststore。
      */
     public static boolean isCustomTrustMaterialEnabled() {
         return get(AppSettingKeys.CUSTOM_TRUST_MATERIAL_ENABLED);
@@ -472,7 +472,7 @@ public class SettingManager {
     }
 
     /**
-     * 是否根据响应类型自动格式化响应体
+     * Có tự động định dạng nội dung phản hồi dựa trên loại phản hồi hay không
      */
     public static boolean isAutoFormatResponse() {
         return get(AppSettingKeys.AUTO_FORMAT_RESPONSE);
@@ -483,7 +483,7 @@ public class SettingManager {
     }
 
     /**
-     * 是否在启动时显示欢迎画面
+     * Có hiển thị màn hình chào mừng khi khởi động hay không
      */
     public static boolean isStartupSplashEnabled() {
         return get(AppSettingKeys.STARTUP_SPLASH_ENABLED);
@@ -494,7 +494,7 @@ public class SettingManager {
     }
 
     /**
-     * 是否默认展开侧边栏
+     * Có mở rộng thanh bên theo mặc định hay không
      */
     public static boolean isSidebarExpanded() {
         return get(AppSettingKeys.SIDEBAR_EXPANDED);
@@ -525,7 +525,7 @@ public class SettingManager {
     }
 
     /**
-     * 获取布局方向（true=垂直，false=水平）
+     * Nhận hướng bố cục (true=thẳng đứng,false=mức độ)
      */
     public static boolean isLayoutVertical() {
         return get(AppSettingKeys.LAYOUT_VERTICAL);
@@ -536,7 +536,7 @@ public class SettingManager {
     }
 
     /**
-     * 获取通知位置
+     * Nhận vị trí thông báo
      */
     public static NotificationPosition getNotificationPosition() {
         return get(AppSettingKeys.NOTIFICATION_POSITION);
@@ -546,10 +546,10 @@ public class SettingManager {
         put(AppSettingKeys.NOTIFICATION_POSITION, Objects.requireNonNull(position, "position"));
     }
 
-    // ===== 自动更新设置 =====
+    // ===== Tự động cập nhật cài đặt =====
 
     /**
-     * 是否启用自动检查更新
+     * Có bật tính năng tự động kiểm tra các bản cập nhật hay không
      */
     public static boolean isAutoUpdateCheckEnabled() {
         return get(AppSettingKeys.AUTO_UPDATE_CHECK_ENABLED);
@@ -560,8 +560,8 @@ public class SettingManager {
     }
 
     /**
-     * 获取更新检查频率
-     * 支持的值：startup（每次启动）、daily（每日）、weekly（每周）、monthly（每月）
+     * Nhận tần suất kiểm tra cập nhật
+     * Các giá trị được hỗ trợ: .startup（Mỗi lần nó được bắt đầu).daily（hằng ngày),weekly（hàng tuần),monthly（mỗi tháng)
      */
     public static String getAutoUpdateCheckFrequency() {
         return get(AppSettingKeys.AUTO_UPDATE_CHECK_FREQUENCY);
@@ -608,14 +608,14 @@ public class SettingManager {
     }
 
     /**
-     * 获取上次检查更新的时间戳（毫秒）
+     * Nhận dấu thời gian (tính bằng mili giây) của lần cập nhật cuối cùng được kiểm tra
      */
     public static long getLastUpdateCheckTime() {
         return get(AppSettingKeys.LAST_UPDATE_CHECK_TIME);
     }
 
     /**
-     * 设置上次检查更新的时间戳（毫秒）
+     * Đặt dấu thời gian tính bằng mili giây khi cập nhật được kiểm tra lần cuối
      */
     public static void setLastUpdateCheckTime(long timestamp) {
         put(AppSettingKeys.LAST_UPDATE_CHECK_TIME, timestamp);
@@ -638,11 +638,11 @@ public class SettingManager {
     }
 
     /**
-     * 更新源偏好设置
-     * 支持的值：
-     * - "auto": 自动选择最快的源（默认）
-     * - "github": 始终使用 GitHub
-     * - "gitee": 始终使用 Gitee
+     * Cập nhật tùy chọn nguồn
+     * Các giá trị được hỗ trợ: .
+     * - "auto": Tự động chọn nguồn nhanh nhất (mặc định)
+     * - "github": Luôn luôn sử dụng GitHub
+     * - "gitee": Luôn luôn sử dụng Gitee
      */
     public static String getUpdateSourcePreference() {
         return get(AppSettingKeys.UPDATE_SOURCE_PREFERENCE);
@@ -656,10 +656,10 @@ public class SettingManager {
         }
     }
 
-    // ===== 网络代理设置 =====
+    // ===== Cài đặt proxy mạng =====
 
     /**
-     * 是否启用网络代理
+     * Có bật proxy mạng hay không
      */
     public static boolean isProxyEnabled() {
         return get(AppSettingKeys.PROXY_ENABLED);
@@ -670,7 +670,7 @@ public class SettingManager {
     }
 
     /**
-     * 代理模式：MANUAL 或 SYSTEM
+     * Chế độ đại lý:MANUAL hoặc SYSTEM
      */
     public static String getProxyMode() {
         return get(AppSettingKeys.PROXY_MODE);
@@ -693,7 +693,7 @@ public class SettingManager {
     }
 
     /**
-     * 代理类型：HTTP 或 SOCKS
+     * Loại đại lý: .HTTP hoặc SOCKS
      */
     public static String getProxyType() {
         return get(AppSettingKeys.PROXY_TYPE);
@@ -708,7 +708,7 @@ public class SettingManager {
     }
 
     /**
-     * 代理服务器地址
+     * Địa chỉ máy chủ proxy
      */
     public static String getProxyHost() {
         return get(AppSettingKeys.PROXY_HOST);
@@ -719,7 +719,7 @@ public class SettingManager {
     }
 
     /**
-     * 代理服务器端口
+     * Cổng máy chủ proxy
      */
     public static int getProxyPort() {
         return get(AppSettingKeys.PROXY_PORT);
@@ -734,7 +734,7 @@ public class SettingManager {
     }
 
     /**
-     * 代理用户名
+     * Tên người dùng đại lý
      */
     public static String getProxyUsername() {
         return get(AppSettingKeys.PROXY_USERNAME);
@@ -745,7 +745,7 @@ public class SettingManager {
     }
 
     /**
-     * 代理密码
+     * Mật khẩu đại lý
      */
     public static String getProxyPassword() {
         return get(AppSettingKeys.PROXY_PASSWORD);
@@ -757,8 +757,8 @@ public class SettingManager {
 
 
     /**
-     * 是否禁用 SSL 证书验证（代理环境专用设置）
-     * 此设置专门用于解决代理环境下的 SSL 证书验证问题
+     * Có nên vô hiệu hóa hay không SSL Certificate verification (a proxy environment-specific setting)
+     * Cài đặt này được thiết kế đặc biệt để giải quyết các môi trường proxy SSL Certificate verification issues
      */
     public static boolean isProxySslVerificationDisabled() {
         return get(AppSettingKeys.PROXY_SSL_VERIFICATION_DISABLED);
@@ -766,11 +766,11 @@ public class SettingManager {
 
     public static void setProxySslVerificationDisabled(boolean disabled) {
         put(AppSettingKeys.PROXY_SSL_VERIFICATION_DISABLED, disabled);
-        // 清除客户端缓存以应用新的 SSL 设置
+        // Xóa bộ nhớ đệm của máy khách để áp dụng bộ đệm mới SSL cài đặt
         OkHttpClientManager.clearClientCache();
     }
 
-    // ===== WebDAV 同步设置 =====
+    // ===== WebDAV Đồng bộ hóa cài đặt =====
 
     public static WebDavSyncSettings getWebDavSyncSettings() {
         return new WebDavSyncSettings(
@@ -810,10 +810,10 @@ public class SettingManager {
         put(AppSettingKeys.WEBDAV_SYNC_LAST_SYNC_TIME, timestamp);
     }
 
-    // ===== UI 字体设置 =====
+    // ===== UI Cài đặt phông chữ =====
 
     /**
-     * 获取UI字体名称
+     * LấyUITên phông chữ
      */
     public static String getUiFontName() {
         return get(AppSettingKeys.UI_FONT_NAME);
@@ -824,7 +824,7 @@ public class SettingManager {
     }
 
     /**
-     * 获取UI字体大小
+     * LấyUICỡ chữ
      */
     public static int getUiFontSize() {
         return get(AppSettingKeys.UI_FONT_SIZE);
@@ -834,7 +834,7 @@ public class SettingManager {
         put(AppSettingKeys.UI_FONT_SIZE, size);
     }
 
-    // ===== 编辑器字体设置 =====
+    // ===== Cài đặt phông chữ của trình soạn thảo =====
 
     public static String getEditorFontName() {
         return get(AppSettingKeys.EDITOR_FONT_NAME);

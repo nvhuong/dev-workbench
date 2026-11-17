@@ -35,7 +35,7 @@ final class RequestDirtyStateTracker {
             return false;
         }
 
-        // 脏检查始终基于“原始快照 vs 当前表单快照”，这样 UI 不需要了解比较细节。
+        // Kiểm tra bẩn luôn dựa trên “Ảnh chụp gốc vs Ảnh chụp nhanh của biểu mẫu hiện tại”，Vì thế UI Không cần biết chi tiết so sánh.
         HttpRequestItem current = currentRequestFromModelSupplier.get();
         return HttpRequestDirtyComparator.isDirty(
                 originalRequestItem,

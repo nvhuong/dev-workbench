@@ -26,7 +26,7 @@ public class ScriptSnippetManagerTest {
         PluginRuntime.getRegistry().clear();
     }
 
-    @Test(description = "在已有脚本中间编辑时，自动补全应基于光标前字符触发")
+    @Test(description = "Khi chỉnh sửa ở giữa tập lệnh hiện có, tính năng tự động hoàn thành sẽ được kích hoạt dựa trên ký tự trước con trỏ")
     public void testAutoActivateUsesCaretPositionInsideExistingScript() {
         DefaultCompletionProvider provider =
                 (DefaultCompletionProvider) ScriptSnippetManager.createCompletionProvider();
@@ -38,7 +38,7 @@ public class ScriptSnippetManagerTest {
         assertTrue(provider.isAutoActivateOkay(textArea));
     }
 
-    @Test(description = "光标在开头时不应触发自动补全")
+    @Test(description = "Tự động hoàn thành không được kích hoạt khi con trỏ ở đầu")
     public void testAutoActivateReturnsFalseAtDocumentStart() {
         DefaultCompletionProvider provider =
                 (DefaultCompletionProvider) ScriptSnippetManager.createCompletionProvider();
@@ -49,7 +49,7 @@ public class ScriptSnippetManagerTest {
         assertFalse(provider.isAutoActivateOkay(textArea));
     }
 
-    @Test(description = "插件中立补全贡献最终应适配成 RSyntax basic/shorthand completion")
+    @Test(description = "Đóng góp hoàn thành trung lập với plugin cuối cùng sẽ được điều chỉnh cho phù hợp RSyntax basic/shorthand completion")
     public void shouldAdaptNeutralPluginCompletionsToEditorProvider() {
         PluginRuntime.getRegistry().registerScriptCompletionContributor(sink -> {
             sink.basic("pm.neutral.basic", "Neutral basic completion");
@@ -70,7 +70,7 @@ public class ScriptSnippetManagerTest {
         assertTrue("pm.neutral.run();".equals(shorthand.getReplacementText()));
     }
 
-    @Test(description = "BASIC 中立补全应使用 inputText 作为 provider 输入")
+    @Test(description = "BASIC Nên sử dụng hoàn thiện trung lập inputText như provider Nhập")
     public void shouldUseInputTextForDirectBasicCompletionItems() {
         PluginRuntime.getRegistry().registerScriptCompletionContributor(sink ->
                 sink.add(new ScriptCompletionItem(
@@ -87,7 +87,7 @@ public class ScriptSnippetManagerTest {
         assertNull(findCompletion(provider, "pm.direct.replacement"));
     }
 
-    @Test(description = "单个插件补全贡献异常不应阻断后续插件补全")
+    @Test(description = "Ngoại lệ trong một lần đóng góp hoàn thành trình cắm thêm sẽ không cản trở việc hoàn thành trình cắm thêm tiếp theo")
     public void shouldContinueAfterPluginCompletionContributorThrows() {
         PluginRuntime.getRegistry().registerScriptCompletionContributor(sink -> {
             throw new IllegalStateException("broken contributor");
@@ -101,7 +101,7 @@ public class ScriptSnippetManagerTest {
         assertNotNull(findCompletion(provider, "pm.after.failure"));
     }
 
-    @Test(description = "内置代码片段应优先使用 Postman 官方 pm.environment，而不是历史 pm.env 简写")
+    @Test(description = "Các đoạn mã tích hợp nên được sử dụng trước tiên Postman chính thức pm.environment，hơn là lịch sử pm.env Viết tắt")
     public void builtInSnippetsShouldUseCanonicalEnvironmentApi() {
         for (SnippetType snippetType : SnippetType.values()) {
             assertFalse(snippetType.code.contains("pm.env."),
@@ -109,7 +109,7 @@ public class ScriptSnippetManagerTest {
         }
     }
 
-    @Test(description = "补全不应提示当前运行时无法可靠支持的 Chai 关键字方法")
+    @Test(description = "Việc hoàn thành không có nghĩa là thời gian chạy hiện tại không thể hỗ trợ nó một cách đáng tin cậy Chai Phương pháp từ khóa")
     public void shouldNotAdvertiseUnsupportedChaiKeywordMethods() {
         DefaultCompletionProvider provider =
                 (DefaultCompletionProvider) ScriptSnippetManager.createCompletionProvider();

@@ -12,9 +12,9 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * 支持自动补全的增强版 EasyTextField
- * 继承自 EasyTextField，保留所有原有功能（变量高亮、撤销重做等）
- * 新增：支持普通文本的自动补全功能
+ * Phiên bản nâng cao hỗ trợ tự động hoàn thành EasyTextField
+ * Kế thừa từ EasyTextField，Tất cả chức năng ban đầu được giữ lại (đánh dấu biến, hoàn tác và làm lại, v.v.)
+ * Mới: Hỗ trợ tự động hoàn thành văn bản thông thường
  */
 public class AutoCompleteEasyTextField extends EasyTextField {
     private static final int MAX_VISIBLE_ROWS = 8;
@@ -45,7 +45,7 @@ public class AutoCompleteEasyTextField extends EasyTextField {
     }
 
     /**
-     * 设置自动补全建议列表
+     * Thiết lập danh sách đề xuất tự động hoàn thành
      */
     public void setSuggestions(List<String> suggestions) {
         if (suggestions == null || suggestions.isEmpty()) {
@@ -53,7 +53,7 @@ public class AutoCompleteEasyTextField extends EasyTextField {
             this.autoCompleteEnabled = false;
             hidePopup();
         } else {
-            // 只有当列表真正改变时才更新
+            // Chỉ cập nhật khi danh sách thực sự thay đổi
             if (!suggestions.equals(this.suggestions)) {
                 this.suggestions = new ArrayList<>(suggestions);
             }
@@ -61,7 +61,7 @@ public class AutoCompleteEasyTextField extends EasyTextField {
     }
 
     /**
-     * 启用或禁用自动补全
+     * Bật hoặc tắt tính năng tự động hoàn thành
      */
     public void setAutoCompleteEnabled(boolean enabled) {
         this.autoCompleteEnabled = enabled;
@@ -95,7 +95,7 @@ public class AutoCompleteEasyTextField extends EasyTextField {
         });
 
         JScrollPane scrollPane = new JScrollPane(suggestionList);
-        // 使用主题感知的边框颜色，深色/浅色主题下均清晰可见
+        // Sử dụng màu đường viền nhận biết chủ đề, màu tối/Tất cả đều được thể hiện rõ ràng dưới các chủ đề nhẹ nhàng
         scrollPane.setBorder(new LineBorder(UIManager.getColor("Component.borderColor") != null
                 ? UIManager.getColor("Component.borderColor")
                 : ModernColors.getDividerBorderColor(), 1));
@@ -105,7 +105,7 @@ public class AutoCompleteEasyTextField extends EasyTextField {
     }
 
     private void setupAutoCompleteListeners() {
-        // 监听文本变化 - 优化：减少不必要的更新
+        // Theo dõi thay đổi văn bản - Tối ưu hóa: Giảm các cập nhật không cần thiết
         getDocument().addDocumentListener(new javax.swing.event.DocumentListener() {
             private void scheduleUpdate() {
                 if (autoCompleteEnabled && !isUpdatingSuggestions) {
@@ -129,7 +129,7 @@ public class AutoCompleteEasyTextField extends EasyTextField {
             }
         });
 
-        // 键盘事件处理
+        // Xử lý sự kiện bàn phím
         addKeyListener(new KeyAdapter() {
             @Override
             public void keyPressed(KeyEvent e) {
@@ -140,7 +140,7 @@ public class AutoCompleteEasyTextField extends EasyTextField {
             }
         });
 
-        // 鼠标点击选择
+        // Click chuột để chọn
         suggestionList.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
@@ -150,7 +150,7 @@ public class AutoCompleteEasyTextField extends EasyTextField {
             }
         });
 
-        // 失去焦点时隐藏
+        // Ẩn khi mất tiêu điểm
         addFocusListener(new FocusAdapter() {
             @Override
             public void focusLost(FocusEvent e) {
@@ -174,15 +174,15 @@ public class AutoCompleteEasyTextField extends EasyTextField {
                 moveSelection(-1);
                 break;
             case KeyEvent.VK_ENTER:
-                // Enter 接受当前选中的建议
+                // Enter Chấp nhận đề xuất hiện được chọn
                 if (suggestionList.getSelectedIndex() >= 0) {
                     e.consume();
                     acceptSelectedSuggestion();
                 }
                 break;
             case KeyEvent.VK_TAB:
-                // Tab 关闭弹窗，让表格的 Tab 导航处理焦点移动
-                // 不消费事件，让事件继续向上传递给表格的 InputMap
+                // Tab Đóng cửa sổ bật lên và để biểu mẫu Tab Điều hướng xử lý chuyển động lấy nét
+                // Đừng tiêu thụ sự kiện và để sự kiện tiếp tục được chuyển lên bàn InputMap
                 hidePopup();
                 break;
             case KeyEvent.VK_ESCAPE:
@@ -237,12 +237,12 @@ public class AutoCompleteEasyTextField extends EasyTextField {
     }
 
     private void filterAndAddSuggestions(String text) {
-        // 检查是否完全匹配
+        // Kiểm tra sự trùng khớp chính xác
         if (hasExactMatch(text)) {
-            return; // 完全匹配时不显示建议列表
+            return; // Không hiển thị danh sách gợi ý cho các kết quả khớp chính xác
         }
 
-        // 三级匹配策略：精确前缀 > 忽略大小写前缀 > 包含匹配
+        // Chiến lược kết hợp ba cấp độ: tiền tố chính xác > Tiền tố trường hợp bị bỏ qua > Chứa các trận đấu
         if (tryAddPrefixMatches(text, true)) {
             return;
         }
@@ -310,7 +310,7 @@ public class AutoCompleteEasyTextField extends EasyTextField {
             int x = location.x;
             int y = location.y + getHeight();
 
-            // 检查右边界
+            // Kiểm tra đường viền bên phải
             if (x + popupWidth > screenBounds.x + screenBounds.width) {
                 x = screenBounds.x + screenBounds.width - popupWidth - 10;
             }
@@ -318,10 +318,10 @@ public class AutoCompleteEasyTextField extends EasyTextField {
                 x = screenBounds.x;
             }
 
-            // 检查下边界，如果空间不够则显示在上方
+            // Kiểm tra viền dưới và hiển thị nó ở trên nếu không đủ chỗ
             if (y + popupHeight > screenBounds.y + screenBounds.height) {
                 y = location.y - popupHeight;
-                // 如果上方也不够，则尽可能显示在下方
+                // Nếu phần trên không đủ, hãy hiển thị càng nhiều càng tốt ở phần dưới
                 if (y < screenBounds.y) {
                     y = location.y + getHeight();
                     popupHeight = Math.min(popupHeight, screenBounds.y + screenBounds.height - y - 10);
@@ -335,7 +335,7 @@ public class AutoCompleteEasyTextField extends EasyTextField {
                 popup.setVisible(true);
             }
         } catch (IllegalComponentStateException e) {
-            // 组件不可见时忽略
+            // Bỏ qua nếu thành phần không hiển thị
             hidePopup();
         }
     }
@@ -370,7 +370,7 @@ public class AutoCompleteEasyTextField extends EasyTextField {
     }
 
     /**
-     * 显示所有建议（通常在获得焦点或点击时调用）
+     * Hiển thị tất cả các đề xuất (thường được gọi là tiêu điểm hoặc nhấp chuột)
      */
     public void showAllSuggestions() {
         if (autoCompleteEnabled && !suggestions.isEmpty()) {
@@ -379,14 +379,14 @@ public class AutoCompleteEasyTextField extends EasyTextField {
     }
 
     /**
-     * 返回自动补全弹窗是否当前可见
+     * Trả về xem cửa sổ bật lên tự động hoàn thành hiện có hiển thị hay không
      */
     public boolean isAutoCompletePopupVisible() {
         return popup != null && popup.isVisible();
     }
 
     /**
-     * 接受当前高亮的建议（供外部调用，等同于用户按 Enter）
+     * Chấp nhận đề xuất hiện được đánh dấu (đối với các cuộc gọi bên ngoài, tương đương với việc người dùng nhấn Enter）
      */
     public void acceptCurrentSuggestion() {
         if (popup != null && popup.isVisible() && suggestionList.getSelectedIndex() >= 0) {

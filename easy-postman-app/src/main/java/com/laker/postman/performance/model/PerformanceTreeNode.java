@@ -22,21 +22,21 @@ import com.laker.postman.service.variable.RequestExecutionScope;
 public class PerformanceTreeNode {
     public String name;
     public NodeType type;
-    public HttpRequestItem httpRequestItem; // 仅REQUEST节点用
-    public PerformanceRequestSnapshot requestSnapshot; // REQUEST节点的无GUI请求快照
-    public ThreadGroupData threadGroupData; // 线程组数据
-    public CsvDataSetData csvDataSetData;   // CSV Data Set 配置
-    public LoopData loopData;             // Loop 控制器数据
-    public ConditionData conditionData;   // 条件控制器数据
-    public WhileData whileData;   // While 控制器数据
-    public AssertionData assertionData;   // 断言数据
-    public ExtractorData extractorData;   // 提取器数据
-    public TimerData timerData;           // 定时器数据
-    public SsePerformanceData ssePerformanceData; // SSE 压测配置，仅 SSE 阶段节点使用
-    public boolean ssePerformanceEnabled; // REQUEST 节点显式选择的 SSE 压测场景
-    public WebSocketPerformanceData webSocketPerformanceData; // WebSocket 压测配置，REQUEST/WS 节点共用
-    public boolean enabled = true;        // 是否启用，默认启用
-    public RequestExecutionScope requestExecutionScope; // REQUEST 节点执行所需分组变量快照
+    public HttpRequestItem httpRequestItem; // ChỉREQUESTĐối với các nút
+    public PerformanceRequestSnapshot requestSnapshot; // REQUESTNút là Không cóGUIYêu cầu ảnh chụp nhanh
+    public ThreadGroupData threadGroupData; // Dữ liệu nhóm chủ đề
+    public CsvDataSetData csvDataSetData;   // CSV Data Set cấu hình
+    public LoopData loopData;             // Loop Dữ liệu điều khiển
+    public ConditionData conditionData;   // Dữ liệu bộ điều khiển có điều kiện
+    public WhileData whileData;   // While Dữ liệu điều khiển
+    public AssertionData assertionData;   // Khẳng định dữ liệu
+    public ExtractorData extractorData;   // Dữ liệu trích xuất
+    public TimerData timerData;           // dữ liệu hẹn giờ
+    public SsePerformanceData ssePerformanceData; // SSE Chỉ cấu hình kiểm tra căng thẳng SSE Các nút giai đoạn được sử dụng
+    public boolean ssePerformanceEnabled; // REQUEST Các nút được chọn rõ ràng SSE Kịch bản kiểm tra căng thẳng
+    public WebSocketPerformanceData webSocketPerformanceData; // WebSocket Cấu hình kiểm tra căng thẳng,REQUEST/WS Các nút được chia sẻ
+    public boolean enabled = true;        // Có bật hay không thì bật theo mặc định
+    public RequestExecutionScope requestExecutionScope; // REQUEST Ảnh chụp nhanh các biến nhóm cần thiết để thực thi nút
 
     public PerformanceTreeNode(String name, NodeType type) {
         this.name = name;

@@ -20,9 +20,9 @@ import java.util.jar.JarFile;
 import java.util.stream.Stream;
 
 /**
- * 插件扫描器。
+ * Máy quét plug-in.
  * <p>
- * 负责目录遍历、descriptor 读取，以及把磁盘上的 jar 转成可供运行时决策的候选信息。
+ * Chịu trách nhiệm duyệt thư mục.descriptor Đọc và đưa vào đĩa jar Được chuyển đổi thành thông tin ứng viên để ra quyết định trong thời gian chạy.
  * </p>
  */
 @Slf4j

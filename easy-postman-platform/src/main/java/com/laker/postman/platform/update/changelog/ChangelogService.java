@@ -8,14 +8,14 @@ import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * 更新日志服务 - 负责获取和格式化更新日志
+ * Thay đổi dịch vụ nhật ký - Chịu trách nhiệm thu thập và định dạng nhật ký thay đổi
  */
 @Slf4j
 public class ChangelogService {
 
     /**
      * -- GETTER --
-     *  获取更新源选择器（用于获取 Web URL）
+     *  Nhận bộ chọn nguồn cập nhật (để nhận Web URL）
      */
     @Getter
     private final UpdateSourceSelector sourceSelector;
@@ -32,27 +32,27 @@ public class ChangelogService {
     }
 
     /**
-     * 获取格式化的更新日志
+     * Nhận nhật ký thay đổi được định dạng
      *
-     * @return 格式化后的更新日志文本，失败返回 null
+     * @return Văn bản nhật ký cập nhật được định dạng, được trả về khi không thành công null
      */
     public String getChangelog() {
         return getChangelog(DEFAULT_LIMIT);
     }
 
     /**
-     * 获取格式化的更新日志
+     * Nhận nhật ký thay đổi được định dạng
      *
-     * @param limit 限制返回的版本数量
-     * @return 格式化后的更新日志文本，失败返回 null
+     * @param limit Giới hạn số lượng phiên bản được trả về
+     * @return Văn bản nhật ký cập nhật được định dạng, được trả về khi không thành công null
      */
     public String getChangelog(int limit) {
-        // 选择最佳更新源
+        // Chọn nguồn cập nhật tốt nhất
         UpdateSource primarySource = sourceSelector.selectBestSource();
         JSONArray releases = primarySource.fetchAllReleases(limit);
 
         if (releases == null) {
-            // 尝试备用源
+            // Hãy thử một nguồn thay thế
             UpdateSource fallbackSource = sourceSelector.getFallbackSource(primarySource);
             log.info("Primary source failed, trying fallback source: {}", fallbackSource.getName());
             releases = fallbackSource.fetchAllReleases(limit);

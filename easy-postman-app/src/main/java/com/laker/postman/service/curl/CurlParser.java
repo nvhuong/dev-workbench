@@ -13,10 +13,10 @@ import java.util.List;
 public class CurlParser {
 
     /**
-     * 解析 cURL 命令字符串为 CurlRequest 对象。
+     * phân tích cURL Chuỗi lệnh là  CurlRequest đối tượng.
      *
-     * @param curl cURL 命令字符串
-     * @return 解析后的 CurlRequest 对象
+     * @param curl cURL chuỗi lệnh
+     * @return Sau khi phân tích CurlRequest đối tượng
      */
     public static CurlRequest parse(String curl) {
         if (curl == null || curl.trim().isEmpty()) {
@@ -34,10 +34,10 @@ public class CurlParser {
     }
 
     /**
-     * 解析包含一条或多条 cURL 命令的文本。
+     * Việc phân tích cú pháp có chứa một hoặc nhiều mục cURL Văn bản của lệnh.
      *
-     * @param curlText cURL 命令文本
-     * @return 逐条解析后的请求列表
+     * @param curlText cURL Văn bản lệnh
+     * @return Danh sách các yêu cầu được phân tích từng cái một
      */
     public static List<CurlRequest> parseMany(String curlText) {
         List<CurlRequest> requests = new ArrayList<>();
@@ -48,31 +48,31 @@ public class CurlParser {
     }
 
     /**
-     * 将批量粘贴的 Bash cURL 文本拆成独立命令。
+     * Sẽ được dán theo đợt Bash cURL Văn bản được chia thành các lệnh độc lập.
      *
-     * @param curlText cURL 命令文本
-     * @return 独立 cURL 命令列表
+     * @param curlText cURL Văn bản lệnh
+     * @return độc lập cURL Danh sách lệnh
      */
     public static List<String> splitCommands(String curlText) {
         return CurlCommandSplitter.split(curlText);
     }
 
     /**
-     * 将 PreparedRequest 转换为 cURL 命令字符串。
+     * Sẽ PreparedRequest Chuyển đổi sang  cURL chuỗi lệnh.
      */
     public static String toCurl(PreparedRequest preparedRequest) {
         return CurlRequestExporter.toCurl(preparedRequest);
     }
 
     /**
-     * 将网络层实际发送的 PreparedRequest 快照转换为 cURL 命令字符串。
+     * Sẽ thực sự được gửi bởi lớp mạng PreparedRequest Ảnh chụp nhanh được chuyển đổi thành cURL chuỗi lệnh.
      */
     public static String toActualCurl(PreparedRequest preparedRequest) {
         return CurlRequestExporter.toActualCurl(preparedRequest);
     }
 
     /**
-     * 判断 PreparedRequest 是否已有网络层实际发送快照。
+     * phán xét PreparedRequest Liệu có lớp mạng nào thực sự gửi ảnh chụp nhanh hay không.
      */
     public static boolean canExportActualCurl(PreparedRequest preparedRequest) {
         return CurlRequestExporter.hasSentSnapshot(preparedRequest);

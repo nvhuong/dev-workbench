@@ -34,7 +34,7 @@ import static org.testng.Assert.assertTrue;
 
 public class PerformanceTreeSupportTest {
 
-    @Test(description = "SSE 请求应自动补齐固定节点，并把断言归并到 Read 节点下")
+    @Test(description = "SSE Các yêu cầu sẽ tự động hoàn thành các nút cố định và hợp nhất các xác nhận vào chúng Read dưới nút")
     public void shouldCreateSseStructureAndMoveAssertionsUnderReadNode() {
         TestContext context = newSseTestContext();
         DefaultMutableTreeNode assertionNode = newNode("Assertion", NodeType.ASSERTION);
@@ -51,7 +51,7 @@ public class PerformanceTreeSupportTest {
         assertNotNull(((PerformanceTreeNode) readNode.getUserObject()).ssePerformanceData);
     }
 
-    @Test(description = "SSE 阶段节点应使用独立默认配置，不从父请求读取旧配置")
+    @Test(description = "SSE Các nút giai đoạn nên sử dụng cấu hình mặc định độc lập và không đọc cấu hình cũ từ yêu cầu chính")
     public void shouldInitializeSseStageNodesWithIndependentDefaultData() {
         TestContext context = newSseTestContext();
         context.requestData.ssePerformanceData = new SsePerformanceData();
@@ -73,7 +73,7 @@ public class PerformanceTreeSupportTest {
         assertFalse(readData.name.contains("30s"), readData.name);
     }
 
-    @Test(description = "SSE Read 标题应跟随 Read 节点配置，而不是父请求上的旧配置")
+    @Test(description = "SSE Read Tiêu đề nên theo sau Read cấu hình nút thay vì cấu hình cũ theo yêu cầu gốc")
     public void shouldRefreshSseReadTitleFromReadStageData() {
         TestContext context = newSseTestContext();
         context.treeSupport.ensureRequestStructure(context.requestNode, context.requestData);
@@ -89,7 +89,7 @@ public class PerformanceTreeSupportTest {
         assertFalse(readData.name.contains("10s"), readData.name);
     }
 
-    @Test(description = "SSE 匹配消息模式应在 Receive 节点标题展示消息过滤条件")
+    @Test(description = "SSE Mẫu tin nhắn phù hợp phải có Receive Tiêu đề nút hiển thị các điều kiện lọc tin nhắn")
     public void shouldShowSseMatchedMessageFilterInReadNodeTitle() {
         TestContext context = newSseTestContext();
         context.treeSupport.ensureRequestStructure(context.requestNode, context.requestData);
@@ -107,7 +107,7 @@ public class PerformanceTreeSupportTest {
         assertTrue(readData.name.contains("contains=done"), readData.name);
     }
 
-    @Test(description = "SSE 固定时长模式不应在 Receive 节点标题展示事件过滤条件")
+    @Test(description = "SSE Không nên bật chế độ thời lượng cố định Receive Tiêu đề nút hiển thị các điều kiện lọc sự kiện")
     public void shouldHideSseEventFilterInFixedDurationReadNodeTitle() {
         TestContext context = newSseTestContext();
         context.treeSupport.ensureRequestStructure(context.requestNode, context.requestData);
@@ -125,7 +125,7 @@ public class PerformanceTreeSupportTest {
         assertFalse(readData.name.contains("event=done"), readData.name);
     }
 
-    @Test(description = "WebSocket 固定时长等待不应在 Read 节点标题展示消息过滤条件")
+    @Test(description = "WebSocket Không nên sử dụng thời gian chờ cố định Read Tiêu đề nút hiển thị các điều kiện lọc tin nhắn")
     public void shouldHideWebSocketMessageFilterInFixedDurationReadNodeTitle() {
         TestContext context = newTestContext(RequestItemProtocolEnum.WEBSOCKET);
         context.treeSupport.ensureRequestStructure(context.requestNode, context.requestData);
@@ -143,7 +143,7 @@ public class PerformanceTreeSupportTest {
         assertFalse(readData.name.contains("contains=done"), readData.name);
     }
 
-    @Test(description = "SSE 请求切回 HTTP 后应移除 SSE 固定节点，并把断言恢复到请求节点下")
+    @Test(description = "SSE Yêu cầu chuyển lại HTTP nên được loại bỏ sau này SSE Ghim nút và khôi phục xác nhận vào nút yêu cầu")
     public void shouldRemoveSseNodesAndRestoreAssertionsWhenSwitchingBackToHttp() {
         TestContext context = newTestContext(RequestItemProtocolEnum.HTTP);
         DefaultMutableTreeNode assertionNode = newNode("Assertion", NodeType.ASSERTION);
@@ -167,7 +167,7 @@ public class PerformanceTreeSupportTest {
         assertNull(findChild(context.requestNode, NodeType.SSE_READ));
     }
 
-    @Test(description = "WebSocket 请求应创建连接节点并初始化默认压测数据")
+    @Test(description = "WebSocket Yêu cầu sẽ tạo một nút kết nối và khởi tạo dữ liệu stress test mặc định")
     public void shouldCreateWebSocketConnectNodeAndDefaults() {
         TestContext context = newTestContext(RequestItemProtocolEnum.WEBSOCKET);
 
@@ -178,7 +178,7 @@ public class PerformanceTreeSupportTest {
         assertNotNull(findChild(context.requestNode, NodeType.WS_CONNECT));
     }
 
-    @Test(description = "WebSocket 同步结构时不应把 Read 节点下的断言搬回请求节点")
+    @Test(description = "WebSocket Nó không nên được sử dụng khi đồng bộ hóa cấu trúc Read Các xác nhận dưới nút được chuyển trở lại nút yêu cầu")
     public void shouldKeepWebSocketReadAssertionsWhenSyncingStructure() {
         TestContext context = newTestContext(RequestItemProtocolEnum.WEBSOCKET);
         context.treeSupport.ensureRequestStructure(context.requestNode, context.requestData);
@@ -193,7 +193,7 @@ public class PerformanceTreeSupportTest {
         assertEquals(childTypesOf(readNode), List.of(NodeType.ASSERTION));
     }
 
-    @Test(description = "WebSocket 请求切回 HTTP 后应清理步骤节点，并把 Read 下的断言恢复出来")
+    @Test(description = "WebSocket Yêu cầu chuyển lại HTTP Sau đó, nút bước sẽ được dọn sạch và đặt Read Khẳng định thấp hơn được khôi phục")
     public void shouldRemoveWebSocketNodesAndRestoreAssertionsWhenSwitchingBackToHttp() {
         TestContext context = newTestContext(RequestItemProtocolEnum.WEBSOCKET);
         context.treeSupport.ensureRequestStructure(context.requestNode, context.requestData);
@@ -215,7 +215,7 @@ public class PerformanceTreeSupportTest {
         assertNull(findChild(context.requestNode, NodeType.WS_CLOSE));
     }
 
-    @Test(description = "WebSocket 切回 HTTP 时应清理 Loop 中的步骤，并恢复嵌套 Read 断言")
+    @Test(description = "WebSocket Cắt lại HTTP nên được làm sạch theo thời gian Loop bước vào và khôi phục lồng nhau Read khẳng định")
     public void shouldRemoveWebSocketLoopAndRestoreNestedReadAssertionsWhenSwitchingBackToHttp() {
         TestContext context = newTestContext(RequestItemProtocolEnum.WEBSOCKET);
         context.treeSupport.ensureRequestStructure(context.requestNode, context.requestData);
@@ -236,7 +236,7 @@ public class PerformanceTreeSupportTest {
         assertNull(findChild(context.requestNode, NodeType.LOOP));
     }
 
-    @Test(description = "WebSocket Loop 应作为步骤容器，便于在其中继续添加 Send/Read/Timer")
+    @Test(description = "WebSocket Loop Nên được sử dụng làm nơi chứa bước để tiếp tục thêm vào nó Send/Read/Timer")
     public void shouldResolveWebSocketLoopAsStepParent() {
         TestContext context = newTestContext(RequestItemProtocolEnum.WEBSOCKET);
         context.treeSupport.ensureRequestStructure(context.requestNode, context.requestData);
@@ -251,7 +251,7 @@ public class PerformanceTreeSupportTest {
         assertFalse(context.treeSupport.isRequestContainerLoop(loopNode));
     }
 
-    @Test(description = "WebSocket Send 重复次数应标注为每轮次数，避免和外层 Loop 总次数混淆")
+    @Test(description = "WebSocket Send Số lần lặp lại cần được ghi nhận là số hiệp trong mỗi hiệp, tránh và các lớp bên ngoài Loop Tổng số lần bị nhầm lẫn")
     public void shouldShowWebSocketSendRepeatCountAsPerLoopCount() {
         TestContext context = newTestContext(RequestItemProtocolEnum.WEBSOCKET);
         context.treeSupport.ensureRequestStructure(context.requestNode, context.requestData);
@@ -265,11 +265,11 @@ public class PerformanceTreeSupportTest {
 
         context.treeSupport.ensureRequestStructure(context.requestNode, context.requestData);
 
-        assertTrue(sendData.name.contains("每轮 3 次") || sendData.name.contains("Per loop 3x"), sendData.name);
+        assertTrue(sendData.name.contains("mỗi vòng 3 lần") || sendData.name.contains("Per loop 3x"), sendData.name);
         assertFalse(sendData.name.contains(" | 3x | "), sendData.name);
     }
 
-    @Test(description = "线程组下的 Loop 应作为请求容器，供 HTTP/SSE/WS 请求复用")
+    @Test(description = "dưới nhóm chủ đề Loop Nên được sử dụng như một thùng chứa yêu cầu HTTP/SSE/WS Yêu cầu sử dụng lại")
     public void shouldIdentifyLoopUnderThreadGroupAsRequestContainer() {
         DefaultMutableTreeNode root = newNode("Plan", NodeType.ROOT);
         DefaultMutableTreeNode groupNode = newNode("Group", NodeType.THREAD_GROUP);
@@ -281,7 +281,7 @@ public class PerformanceTreeSupportTest {
         assertTrue(treeSupport.isRequestContainerLoop(loopNode));
     }
 
-    @Test(description = "复制请求节点应复制完整子树并生成新的请求 id")
+    @Test(description = "Nút yêu cầu sao chép sẽ sao chép toàn bộ cây con và tạo ra một yêu cầu mới id")
     public void shouldCopyRequestSubtreeWithIndependentRequestId() {
         TestContext context = newTestContext(RequestItemProtocolEnum.WEBSOCKET);
         context.requestData.httpRequestItem.setId("original-request");
@@ -306,7 +306,7 @@ public class PerformanceTreeSupportTest {
         assertEquals(copiedSendData.webSocketPerformanceData.customSendBody, "hello");
     }
 
-    @Test(description = "多选复制时应过滤已包含在父节点子树中的重复子节点")
+    @Test(description = "Khi sao chép nhiều lựa chọn, các nút con trùng lặp đã có trong cây con của nút cha phải được lọc")
     public void shouldCopyOnlyTopLevelNodesFromMultiSelection() {
         DefaultMutableTreeNode root = newNode("Plan", NodeType.ROOT);
         DefaultMutableTreeNode groupNode = newNode("Group", NodeType.THREAD_GROUP);
@@ -327,7 +327,7 @@ public class PerformanceTreeSupportTest {
         assertEquals(childTypesOf(copied.get(0)), List.of(NodeType.REQUEST));
     }
 
-    @Test(description = "粘贴请求到另一个请求上时应作为同级插入到目标之后")
+    @Test(description = "Việc dán một yêu cầu vào một yêu cầu khác phải được chèn dưới dạng anh chị em sau mục tiêu")
     public void shouldPasteRequestAfterSelectedSiblingWhenTargetCannotContainRequest() {
         DefaultMutableTreeNode root = newNode("Plan", NodeType.ROOT);
         DefaultMutableTreeNode groupNode = newNode("Group", NodeType.THREAD_GROUP);
@@ -349,7 +349,7 @@ public class PerformanceTreeSupportTest {
         assertNotEquals(pastedData.httpRequestItem.getId(), ((PerformanceTreeNode) copied.get(0).getUserObject()).httpRequestItem.getId());
     }
 
-    @Test(description = "粘贴 WebSocket 步骤到 WebSocket 请求上时应插入步骤并保留步骤配置")
+    @Test(description = "Dán WebSocket Các bước tới WebSocket Steps should be inserted on request and the step configuration preserved")
     public void shouldPasteWebSocketStepIntoWebSocketRequest() {
         TestContext context = newTestContext(RequestItemProtocolEnum.WEBSOCKET);
         context.treeSupport.ensureRequestStructure(context.requestNode, context.requestData);
@@ -369,7 +369,7 @@ public class PerformanceTreeSupportTest {
         assertEquals(pastedData.webSocketPerformanceData.customSendBody, "payload");
     }
 
-    @Test(description = "SSE 固定阶段节点也应支持单独复制")
+    @Test(description = "SSE Các nút giai đoạn cố định cũng phải hỗ trợ sao chép riêng biệt")
     public void shouldCopySseStageNodesIndividually() {
         TestContext context = newSseTestContext();
         context.treeSupport.ensureRequestStructure(context.requestNode, context.requestData);
@@ -381,7 +381,7 @@ public class PerformanceTreeSupportTest {
         assertEquals(context.treeSupport.copyNodes(paths(connectNode, readNode)).size(), 2);
     }
 
-    @Test(description = "粘贴 SSE 阶段节点到 SSE 请求上时应插入阶段节点")
+    @Test(description = "Dán SSE Nút giai đoạn đến SSE The stage node should be inserted when the request is made")
     public void shouldPasteSseStageNodeIntoSseRequest() {
         TestContext context = newSseTestContext();
         context.treeSupport.ensureRequestStructure(context.requestNode, context.requestData);
@@ -400,7 +400,7 @@ public class PerformanceTreeSupportTest {
         assertEquals(pastedData.ssePerformanceData.messageFilter, "ready");
     }
 
-    @Test(description = "WebSocket Connect 节点应支持单独复制")
+    @Test(description = "WebSocket Connect Các nút nên hỗ trợ sao chép cá nhân")
     public void shouldCopyWebSocketConnectNodeIndividually() {
         TestContext context = newTestContext(RequestItemProtocolEnum.WEBSOCKET);
         context.treeSupport.ensureRequestStructure(context.requestNode, context.requestData);
@@ -410,7 +410,7 @@ public class PerformanceTreeSupportTest {
         assertEquals(context.treeSupport.copyNodes(paths(connectNode)).size(), 1);
     }
 
-    @Test(description = "粘贴 WebSocket Connect 到 WebSocket 请求上时应插入连接节点")
+    @Test(description = "Dán WebSocket Connect Đến WebSocket The connection node should be inserted when the request is made")
     public void shouldPasteWebSocketConnectIntoWebSocketRequest() {
         TestContext context = newTestContext(RequestItemProtocolEnum.WEBSOCKET);
         context.treeSupport.ensureRequestStructure(context.requestNode, context.requestData);
@@ -429,7 +429,7 @@ public class PerformanceTreeSupportTest {
         assertEquals(pastedData.webSocketPerformanceData.connectTimeoutMs, 15000);
     }
 
-    @Test(description = "WebSocket Connect 粘到场景 Loop 上时应回落为请求级阶段节点")
+    @Test(description = "WebSocket Connect Bám sát hiện trường Loop Khi đi lên, nó sẽ quay trở lại nút giai đoạn cấp yêu cầu")
     public void shouldPasteWebSocketConnectAtRequestLevelWhenTargetingScenarioLoop() {
         TestContext context = newTestContext(RequestItemProtocolEnum.WEBSOCKET);
         context.treeSupport.ensureRequestStructure(context.requestNode, context.requestData);
@@ -446,7 +446,7 @@ public class PerformanceTreeSupportTest {
         assertEquals(childTypesOf(context.requestNode), List.of(NodeType.WS_CONNECT, NodeType.WS_CONNECT, NodeType.LOOP));
     }
 
-    @Test(description = "从 WebSocket Loop 内显式添加 Connect 时应补到请求根节点")
+    @Test(description = "Từ WebSocket Loop Được thêm vào một cách rõ ràng bên trong Connect nên được bổ sung vào nút gốc yêu cầu")
     public void shouldAddWebSocketConnectAtRequestLevelWhenSelectionIsScenarioLoop() {
         TestContext context = newTestContext(RequestItemProtocolEnum.WEBSOCKET);
         DefaultMutableTreeNode loopNode = newLoopNode(2);
@@ -461,7 +461,7 @@ public class PerformanceTreeSupportTest {
         assertEquals(childTypesOf(context.requestNode), List.of(NodeType.WS_CONNECT, NodeType.LOOP));
     }
 
-    @Test(description = "SSE Connect、SSE Read、WebSocket Connect 阶段节点应支持删除")
+    @Test(description = "SSE Connect、SSE Read、WebSocket Connect Các nút giai đoạn nên hỗ trợ xóa")
     public void shouldDeleteProtocolStageNodes() {
         TestContext sseContext = newSseTestContext();
         sseContext.treeSupport.ensureRequestStructure(sseContext.requestNode, sseContext.requestData);
@@ -485,7 +485,7 @@ public class PerformanceTreeSupportTest {
         assertEquals(childTypesOf(wsContext.requestNode), List.of());
     }
 
-    @Test(description = "删除多选节点时应过滤父节点子树内的重复子节点")
+    @Test(description = "Khi xóa một nút có nhiều lựa chọn, các nút con trùng lặp trong cây con của nút cha sẽ được lọc")
     public void shouldDeleteOnlyTopLevelNodesFromMultiSelection() {
         DefaultMutableTreeNode root = newNode("Plan", NodeType.ROOT);
         DefaultMutableTreeNode groupNode = newNode("Group", NodeType.THREAD_GROUP);
@@ -504,7 +504,7 @@ public class PerformanceTreeSupportTest {
         assertFalse(treeSupport.hasDeletableNodes(paths(root)));
     }
 
-    @Test(description = "删除协议阶段节点后，普通同步不应自动补回")
+    @Test(description = "Sau khi xóa nút giai đoạn giao thức, việc đồng bộ hóa thông thường sẽ không tự động bù đắp cho nó")
     public void shouldNotRecreateDeletedProtocolStagesDuringSync() {
         TestContext sseContext = newSseTestContext();
         sseContext.treeSupport.ensureRequestStructure(sseContext.requestNode, sseContext.requestData);
@@ -526,7 +526,7 @@ public class PerformanceTreeSupportTest {
         assertEquals(childTypesOf(wsContext.requestNode), List.of());
     }
 
-    @Test(description = "协议阶段节点应能通过显式添加补回")
+    @Test(description = "Các nút pha giao thức sẽ có thể được bổ sung bằng cách bổ sung rõ ràng")
     public void shouldAddProtocolStageNodesExplicitly() {
         TestContext sseContext = newSseTestContext();
         JTree sseTree = new JTree(sseContext.treeModel);
@@ -549,7 +549,7 @@ public class PerformanceTreeSupportTest {
         assertEquals(childTypesOf(wsContext.requestNode), List.of(NodeType.WS_CONNECT));
     }
 
-    @Test(description = "Accept 头不应隐式更改压测场景，SSE 模式由用户明确选择")
+    @Test(description = "Accept Tiêu đề không được ngầm thay đổi kịch bản kiểm tra căng thẳng.SSE Chế độ được người dùng lựa chọn rõ ràng")
     public void shouldNotInferSsePerformanceModeFromAcceptHeader() {
         TestContext context = newTestContext(RequestItemProtocolEnum.HTTP);
         context.requestData.httpRequestItem.setHeadersList(List.of(

@@ -8,16 +8,16 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
 /**
- * 现代化的Tab按钮组件
- * 支持：
- * 1. 底部高亮指示器
- * 2. 悬停效果
- * 3. 平滑动画
- * 4. 主题自适应（使用TabbedPane主题颜色）
+ * hiện đạiTabThành phần nút
+ * Hỗ trợ:
+ * 1. Chỉ báo đánh dấu phía dưới
+ * 2. Hiệu ứng di chuột
+ * 3. Hoạt hình mượt mà
+ * 4. Chủ đề thích ứng (sử dụngTabbedPanemàu chủ đề)
  */
 public class ModernTabButton extends JButton {
 
-    // 常量定义
+    // Định nghĩa hằng số
     private static final int INDICATOR_HEIGHT = 3;
     private static final int MIN_HEIGHT = 34;
     private static final int HOVER_ANIMATION_DELAY = 10;
@@ -26,7 +26,7 @@ public class ModernTabButton extends JButton {
     private final int tabIndex;
     private int selectedTabIndex = -1;
 
-    // 悬停效果
+    // Hiệu ứng di chuột
     private float hoverAlpha = 0.0f;
     private Timer hoverAnimationTimer;
 
@@ -38,7 +38,7 @@ public class ModernTabButton extends JButton {
     }
 
     /**
-     * 初始化按钮样式
+     * Khởi tạo kiểu nút
      */
     private void initializeStyle() {
         setFocusPainted(false);
@@ -48,15 +48,15 @@ public class ModernTabButton extends JButton {
         setFont(FontsUtil.getDefaultFont(Font.PLAIN));
         setForeground(ModernTabButtonTheme.foreground(true));
 
-        // 设置内边距
+        // Đặt phần đệm
         setBorder(BorderFactory.createEmptyBorder(6, 12, 6, 12));
 
-        // 设置光标
+        // Đặt con trỏ
         setCursor(new Cursor(Cursor.HAND_CURSOR));
     }
 
     /**
-     * 设置悬停效果
+     * Đặt hiệu ứng di chuột
      */
     private void setupHoverEffect() {
         addMouseListener(new MouseAdapter() {
@@ -75,9 +75,9 @@ public class ModernTabButton extends JButton {
     }
 
     /**
-     * 启动悬停动画
+     * Bắt đầu hoạt ảnh di chuột
      *
-     * @param fadeIn true为淡入，false为淡出
+     * @param fadeIn trueĐể mờ dần trong,falsemờ đi
      */
     private void startHoverAnimation(boolean fadeIn) {
         if (hoverAnimationTimer != null && hoverAnimationTimer.isRunning()) {
@@ -102,7 +102,7 @@ public class ModernTabButton extends JButton {
     }
 
     /**
-     * 更新选中的tab索引
+     * Đã chọn cập nhậttabchỉ số
      */
     public void updateSelectedIndex(int selectedIndex) {
         this.selectedTabIndex = selectedIndex;
@@ -110,7 +110,7 @@ public class ModernTabButton extends JButton {
     }
 
     /**
-     * 判断是否被选中（匹配 JToggleButton 接口）
+     * Xác định xem nó có được chọn hay không (matching JToggleButton giao diện)
      */
     @Override
     public boolean isSelected() {
@@ -123,14 +123,14 @@ public class ModernTabButton extends JButton {
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 
-        // 绘制悬停背景
+        // Vẽ nền di chuột
         if (hoverAlpha > 0 && !isSelected()) {
             Color hoverBg = ModernTabButtonTheme.hoverBackground(hoverAlpha);
             g2d.setColor(hoverBg);
             g2d.fillRoundRect(0, 0, getWidth(), getHeight() - INDICATOR_HEIGHT, 4, 4);
         }
 
-        // 绘制选中背景
+        // Vẽ nền đã chọn
         if (isSelected()) {
             Color selectedBg = ModernTabButtonTheme.selectedBackground();
             g2d.setColor(selectedBg);
@@ -139,10 +139,10 @@ public class ModernTabButton extends JButton {
 
         g2d.dispose();
 
-        // 绘制文本
+        // Vẽ văn bản
         super.paintComponent(g);
 
-        // 绘制底部指示器（使用TabbedPane主题颜色）
+        // Vẽ chỉ báo phía dưới (sử dụng TabbedPanemàu chủ đề)
         if (isSelected()) {
             Graphics2D g2 = (Graphics2D) g.create();
             g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
@@ -168,8 +168,8 @@ public class ModernTabButton extends JButton {
     }
 
     /**
-     * 清理资源，防止内存泄漏
-     * 当按钮从容器中移除时应该调用此方法
+     * Dọn dẹp tài nguyên và ngăn chặn rò rỉ bộ nhớ
+     * Phương thức này sẽ được gọi khi nút được lấy ra khỏi vùng chứa
      */
     public void cleanup() {
         if (hoverAnimationTimer != null && hoverAnimationTimer.isRunning()) {
@@ -180,7 +180,7 @@ public class ModernTabButton extends JButton {
 
     @Override
     public void removeNotify() {
-        // 组件从容器中移除时自动清理资源
+        // Tự động dọn sạch tài nguyên khi thành phần bị xóa khỏi vùng chứa
         cleanup();
         super.removeNotify();
     }
@@ -188,7 +188,7 @@ public class ModernTabButton extends JButton {
     @Override
     public Dimension getPreferredSize() {
         Dimension size = super.getPreferredSize();
-        // 确保有足够的高度
+        // Hãy chắc chắn rằng có đủ chiều cao
         size.height = Math.max(size.height, MIN_HEIGHT);
         return size;
     }

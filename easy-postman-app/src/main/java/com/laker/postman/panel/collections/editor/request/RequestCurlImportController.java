@@ -14,9 +14,9 @@ import javax.swing.*;
 import java.util.function.Consumer;
 
 /**
- * cURL 输入导入控制器。
+ * cURL Nhập bộ điều khiển nhập.
  * <p>
- * URL 输入框只负责承载文本，识别 cURL、解析请求和清理剪贴板都集中在这里。
+ * URL Ô nhập liệu chỉ có nhiệm vụ mang văn bản và nhận dạng nó cURL、Các yêu cầu phân tích cú pháp và dọn dẹp clipboard tập trung ở đây.
  */
 @RequiredArgsConstructor
 final class RequestCurlImportController {
@@ -50,7 +50,7 @@ final class RequestCurlImportController {
             AsyncClipboardUtil.clearStringAsync();
             NotificationCenter.showSuccess(I18nUtil.getMessage(MessageKeys.PARSE_CURL_SUCCESS));
         } catch (Exception ignored) {
-            // 用户可能还在输入半截 cURL，保持静默，避免输入过程中频繁弹错。
+            // Người dùng có thể vẫn đang gõ giữa chừng cURL，Giữ im lặng để tránh thường xuyên mắc lỗi trong quá trình nhập liệu.
         }
     }
 }

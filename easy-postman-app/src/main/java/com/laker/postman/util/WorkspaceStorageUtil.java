@@ -20,8 +20,8 @@ import java.util.Locale;
 import java.util.Map;
 
 /**
- * 工作区数据存储工具类
- * 负责工作区数据的 JSON 文件持久化
+ * Lớp công cụ lưu trữ dữ liệu không gian làm việc
+ * Chịu trách nhiệm về dữ liệu không gian làm việc JSON Sự kiên trì của tập tin
  */
 @Slf4j
 @UtilityClass
@@ -43,18 +43,18 @@ public class WorkspaceStorageUtil {
     private static final String DEFAULT_WORKSPACE_DESCRIPTION = I18nUtil.getMessage(MessageKeys.WORKSPACE_DEFAULT_DESCRIPTION);
 
     /**
-     * 判断是否为默认工作区
+     * Xác định xem đó có phải là không gian làm việc mặc định hay không
      */
     public static boolean isDefaultWorkspace(Workspace workspace) {
         return workspace != null && DEFAULT_WORKSPACE_ID.equals(workspace.getId());
     }
 
     /**
-     * 获取默认工作区对象
+     * Lấy đối tượng không gian làm việc mặc định
      * <p>
-     * 默认工作区路径为当前数据根下的 {@code workspaces/default/}，
-     * 与其他子工作区平级，使根目录完全不参与 git 管理，
-     * 从根本上避免嵌套 git 仓库问题。
+     * Đường dẫn không gian làm việc mặc định nằm dưới gốc dữ liệu hiện tại {@code workspaces/default/}，
+     * Cân bằng với các không gian làm việc phụ khác để thư mục gốc hoàn toàn không tham gia git quản lý,
+     * Tránh làm tổ chút nào git Các vấn đề về kho hàng.
      * </p>
      */
     public static Workspace getDefaultWorkspace() {
@@ -70,23 +70,23 @@ public class WorkspaceStorageUtil {
     }
 
     /**
-     * 保存工作区列表
+     * Lưu danh sách không gian làm việc
      * <p>
-     * 注意：内部操作副本，不会修改传入的原始列表。
+     * Lưu ý: Hoạt động nội bộ trên một bản sao và không sửa đổi danh sách gốc được truyền vào.
      * </p>
      */
     public static void saveWorkspaces(List<Workspace> workspaces) {
         synchronized (lock) {
             try {
-                // 操作副本，避免修改调用方持有的列表引用（如 WorkspaceService.workspaces 字段）
+                // Thao tác các bản sao để tránh sửa đổi các tham chiếu danh sách do người gọi nắm giữ (ví dụ: WorkspaceService.workspaces trường)
                 List<Workspace> toSave = new ArrayList<>();
                 for (Workspace workspace : workspaces) {
                     toSave.add(toPersistedWorkspace(workspace));
                 }
-                // 确保目录存在
+                // Hãy chắc chắn rằng thư mục tồn tại
                 File file = workspacesFile();
                 FileUtil.mkParentDirs(file);
-                // 保证默认工作区始终存在
+                // Không gian làm việc mặc định được đảm bảo luôn tồn tại
                 boolean hasDefault = toSave.stream().anyMatch(WorkspaceStorageUtil::isDefaultWorkspace);
                 if (!hasDefault) {
                     toSave.add(0, toPersistedWorkspace(getDefaultWorkspace()));
@@ -102,7 +102,7 @@ public class WorkspaceStorageUtil {
     }
 
     /**
-     * 加载工作区列表
+     * Tải danh sách không gian làm việc
      */
     public static List<Workspace> loadWorkspaces() {
         synchronized (lock) {
@@ -122,7 +122,7 @@ public class WorkspaceStorageUtil {
                     }
                 }
                 normalizeLoadedWorkspacePaths(workspaces);
-                // 运行时视图保证默认工作区可用；持久化只在 saveWorkspaces 中发生。
+                // Chế độ xem thời gian chạy được đảm bảo có sẵn trong không gian làm việc mặc định; chỉ có sự kiên trì saveWorkspaces xảy ra ở.
                 boolean hasDefault = workspaces.stream().anyMatch(WorkspaceStorageUtil::isDefaultWorkspace);
                 if (!hasDefault) {
                     workspaces.add(0, getDefaultWorkspace());
@@ -131,7 +131,7 @@ public class WorkspaceStorageUtil {
                 return workspaces;
             } catch (Exception e) {
                 log.error("Failed to load workspaces", e);
-                // 加载失败也返回默认工作区
+                // Nếu tải không thành công, không gian làm việc mặc định cũng sẽ được trả về
                 List<Workspace> ws = new ArrayList<>();
                 ws.add(getDefaultWorkspace());
                 return ws;
@@ -140,7 +140,7 @@ public class WorkspaceStorageUtil {
     }
 
     /**
-     * 保存当前工作区ID
+     * Lưu không gian làm việc hiện tạiID
      */
     public static void saveCurrentWorkspace(String workspaceId) {
         synchronized (lock) {
@@ -161,7 +161,7 @@ public class WorkspaceStorageUtil {
     }
 
     /**
-     * 获取当前工作区ID
+     * Nhận không gian làm việc hiện tạiID
      */
     public static String getCurrentWorkspace() {
         synchronized (lock) {
@@ -177,7 +177,7 @@ public class WorkspaceStorageUtil {
     }
 
     /**
-     * 加载工作区设置
+     * Tải cài đặt không gian làm việc
      */
     private static Map<String, Object> loadWorkspaceSettings() {
         try {

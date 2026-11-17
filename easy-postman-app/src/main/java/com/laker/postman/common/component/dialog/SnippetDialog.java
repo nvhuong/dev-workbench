@@ -36,7 +36,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
- * 代码片段弹窗，基于 ListModel
+ * Cửa sổ bật lên đoạn mã, dựa trên ListModel
  */
 public class SnippetDialog extends JDialog {
     private final JList<Snippet> snippetList;
@@ -67,26 +67,26 @@ public class SnippetDialog extends JDialog {
         ToolWindowSurfaceStyle.applyDialogSurface(contentPanel);
         contentPanel.setBorder(new EmptyBorder(12, 12, 8, 12));
 
-        // 初始化片段数据
+        // Khởi tạo dữ liệu phân đoạn
         snippets = getI18nSnippets();
-        // 初始化分类
+        // Khởi tạo phân loại
         initCategories();
 
-        // 创建北部面板：搜索框和分类选择器
+        // Tạo bảng điều khiển phía bắc: hộp tìm kiếm và bộ chọn danh mục
         JPanel northPanel = new JPanel(new BorderLayout(12, 0));
         ToolWindowSurfaceStyle.applyDialogSurface(northPanel);
         northPanel.setBorder(new EmptyBorder(0, 0, 12, 0));
 
-        // 搜索框带图标和提示
+        // Hộp tìm kiếm có biểu tượng và mẹo
         JPanel searchPanel = new JPanel(new BorderLayout());
         searchPanel.setOpaque(false);
         searchField = new SearchTextField();
         searchField.installUserActivatedFocus();
 
-        // 添加搜索图标
+        // Đã thêm biểu tượng tìm kiếm
         searchPanel.add(searchField, BorderLayout.CENTER);
 
-        // 下拉分类选择器
+        // Bộ chọn danh mục thả xuống
         String[] categories = snippetCategories.keySet().toArray(new String[0]);
         categoryCombo = new JComboBox<>(categories);
         categoryCombo.setPreferredSize(new Dimension(160, 32));
@@ -96,7 +96,7 @@ public class SnippetDialog extends JDialog {
         northPanel.add(searchPanel, BorderLayout.CENTER);
         northPanel.add(categoryCombo, BorderLayout.EAST);
 
-        // 创建中部面板：片段列表
+        // Tạo bảng ở giữa: danh sách đoạn trích
         listModel = new DefaultListModel<>();
         loadSnippets(snippets);
 
@@ -104,7 +104,7 @@ public class SnippetDialog extends JDialog {
         snippetList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         snippetList.setVisibleRowCount(8);
 
-        // 自定义渲染器，让列表项更美观
+        // Tùy chỉnh trình kết xuất để làm cho các mục trong danh sách đẹp hơn
         snippetList.setCellRenderer(new DefaultListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
@@ -112,11 +112,11 @@ public class SnippetDialog extends JDialog {
                 if (value instanceof Snippet snippet) {
                     label.setText(snippet.title);
                     label.setBorder(new EmptyBorder(5, 10, 5, 10));
-                    // 根据类型设置图标
-                    // 注意：http.svg 和 cookie.svg 保持彩色，使用 create()
-                    // 其他图标使用 createThemed() 以支持主题适配
+                    // Đặt biểu tượng dựa trên loại
+                    // Lưu ý:http.svg và cookie.svg Giữ nó đầy màu sắc và sử dụng nó create()
+                    // Các biểu tượng khác được sử dụng createThemed() Để hỗ trợ việc thích ứng chủ đề
                     switch (snippet.category) {
-                        // 基础分类
+                        // Phân loại cơ bản
                         case PRE_SCRIPT ->
                                 label.setIcon(IconUtil.createThemed("icons/arrow-up.svg", IconUtil.SIZE_SMALL, IconUtil.SIZE_SMALL));
                         case ASSERT ->
@@ -128,17 +128,17 @@ public class SnippetDialog extends JDialog {
                         case ENV_VAR ->
                                 label.setIcon(IconUtil.createThemed("icons/environments.svg", IconUtil.SIZE_SMALL, IconUtil.SIZE_SMALL));
 
-                        // 编码和加密
+                        // Mã hóa và mã hóa
                         case ENCODE ->
                                 label.setIcon(IconUtil.createThemed("icons/format.svg", IconUtil.SIZE_SMALL, IconUtil.SIZE_SMALL));
                         case ENCRYPT ->
                                 label.setIcon(IconUtil.createThemed("icons/security.svg", IconUtil.SIZE_SMALL, IconUtil.SIZE_SMALL));
 
-                        // 数据类型
+                        // Kiểu dữ liệu
                         case ARRAY ->
                                 label.setIcon(IconUtil.createThemed("icons/functional.svg", IconUtil.SIZE_SMALL, IconUtil.SIZE_SMALL));
                         case JSON ->
-                                label.setIcon(IconUtil.create("icons/http.svg", IconUtil.SIZE_SMALL, IconUtil.SIZE_SMALL)); // 彩色图标
+                                label.setIcon(IconUtil.create("icons/http.svg", IconUtil.SIZE_SMALL, IconUtil.SIZE_SMALL)); // Biểu tượng màu sắc
                         case STRING ->
                                 label.setIcon(IconUtil.createThemed("icons/code.svg", IconUtil.SIZE_SMALL, IconUtil.SIZE_SMALL));
                         case DATE ->
@@ -146,7 +146,7 @@ public class SnippetDialog extends JDialog {
                         case REGEX ->
                                 label.setIcon(IconUtil.createThemed("icons/search.svg", IconUtil.SIZE_SMALL, IconUtil.SIZE_SMALL));
 
-                        // 其他基础
+                        // Những điều cơ bản khác
                         case LOG ->
                                 label.setIcon(IconUtil.createThemed("icons/console.svg", IconUtil.SIZE_SMALL, IconUtil.SIZE_SMALL));
                         case CONTROL ->
@@ -156,7 +156,7 @@ public class SnippetDialog extends JDialog {
                         case COOKIES ->
                                 label.setIcon(IconUtil.createThemed("icons/cookie.svg", IconUtil.SIZE_SMALL, IconUtil.SIZE_SMALL));
 
-                        // 内置库分类
+                        // Phân loại thư viện tích hợp
                         case CRYPTOJS ->
                                 label.setIcon(IconUtil.createThemed("icons/security.svg", IconUtil.SIZE_SMALL, IconUtil.SIZE_SMALL));
                         case LODASH ->
@@ -164,7 +164,7 @@ public class SnippetDialog extends JDialog {
                         case MOMENT ->
                                 label.setIcon(IconUtil.createThemed("icons/time.svg", IconUtil.SIZE_SMALL, IconUtil.SIZE_SMALL));
 
-                        // 高级场景分类
+                        // Phân loại cảnh nâng cao
                         case AUTHENTICATION ->
                                 label.setIcon(IconUtil.createThemed("icons/security.svg", IconUtil.SIZE_SMALL, IconUtil.SIZE_SMALL));
                         case PERFORMANCE ->
@@ -178,7 +178,7 @@ public class SnippetDialog extends JDialog {
                         case EXAMPLES ->
                                 label.setIcon(IconUtil.createThemed("icons/collections.svg", IconUtil.SIZE_SMALL, IconUtil.SIZE_SMALL));
 
-                        // 其他
+                        // khác
                         case OTHER ->
                                 label.setIcon(IconUtil.createThemed("icons/code.svg", IconUtil.SIZE_SMALL, IconUtil.SIZE_SMALL));
                         default ->
@@ -192,7 +192,7 @@ public class SnippetDialog extends JDialog {
         JScrollPane listScrollPane = new JScrollPane(snippetList);
         ToolWindowSurfaceStyle.applyDialogListScrollPane(listScrollPane, snippetList);
 
-        // 预览区域
+        // khu vực xem trước
         JPanel previewPanel = new JPanel(new BorderLayout(0, 8));
         ToolWindowSurfaceStyle.applyDialogSurface(previewPanel);
         JLabel previewTitleLabel = new JLabel(I18nUtil.getMessage(MessageKeys.SNIPPET_DIALOG_PREVIEW_TITLE));
@@ -207,7 +207,7 @@ public class SnippetDialog extends JDialog {
         previewScrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         previewPanel.add(previewScrollPane, BorderLayout.CENTER);
 
-        // 按钮面板
+        // Bảng nút
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 0));
         buttonPanel.setOpaque(false);
         JButton closeBtn = ModernButtonFactory.createButton(I18nUtil.getMessage(MessageKeys.SNIPPET_DIALOG_CLOSE), false);
@@ -216,7 +216,7 @@ public class SnippetDialog extends JDialog {
         buttonPanel.add(closeBtn);
         buttonPanel.add(insertBtn);
 
-        // 描述标签
+        // Thẻ mô tả
         descriptionLabel = new JLabel(" ");
         descriptionLabel.setForeground(ModernColors.getTextSecondary());
 
@@ -225,9 +225,9 @@ public class SnippetDialog extends JDialog {
         footerPanel.add(descriptionLabel, BorderLayout.CENTER);
         footerPanel.add(buttonPanel, BorderLayout.EAST);
 
-        // 代码片段弹窗整体只保留一个外层圆角卡片，列表和预览之间用内部 split 分割。
+        // Cửa sổ bật lên đoạn mã chỉ giữ lại một thẻ tròn bên ngoài và thẻ bên trong được sử dụng giữa danh sách và bản xem trước split sự phân đoạn.
         JSplitPane splitPane = AppToolWindowChrome.createHorizontalInnerSplitPane(listScrollPane, previewPanel, 260);
-        splitPane.setResizeWeight(0.28); // 设置左右比例
+        splitPane.setResizeWeight(0.28); // Đặt tỷ lệ trái và phải
 
         contentPanel.add(northPanel, BorderLayout.NORTH);
         contentPanel.add(AppToolWindowChrome.wrapToolWindow(splitPane, new Insets(0, 0, 0, 0)), BorderLayout.CENTER);
@@ -235,9 +235,9 @@ public class SnippetDialog extends JDialog {
         setContentPane(contentPanel);
         getRootPane().setDefaultButton(insertBtn);
 
-        // 绑定事件监听器
+        // Liên kết người nghe sự kiện
 
-        // 搜索框事件
+        // Sự kiện hộp tìm kiếm
         searchField.getDocument().addDocumentListener(new DocumentListener() {
             public void insertUpdate(DocumentEvent e) {
                 filterSnippets();
@@ -252,7 +252,7 @@ public class SnippetDialog extends JDialog {
             }
         });
 
-        // 分类选择器事件
+        // Sự kiện chọn danh mục
         categoryCombo.addActionListener(e -> {
             String category = (String) categoryCombo.getSelectedItem();
             if (category != null) {
@@ -262,11 +262,11 @@ public class SnippetDialog extends JDialog {
                     loadSnippets(snippetCategories.get(category));
                 }
 
-                // 如果有搜索关键词，则还需要过滤
+                // Nếu có từ khóa tìm kiếm, việc lọc cũng được yêu cầu
                 if (!searchField.getText().trim().isEmpty()) {
                     filterSnippets();
                 } else {
-                    // 如果列表不为空，自动选择第一个并显示预览
+                    // Nếu danh sách không trống, hãy tự động chọn danh sách đầu tiên và hiển thị bản xem trước
                     if (listModel.getSize() > 0) {
                         snippetList.setSelectedIndex(0);
                         selectedSnippet = snippetList.getSelectedValue();
@@ -276,7 +276,7 @@ public class SnippetDialog extends JDialog {
                             descriptionLabel.setText(selectedSnippet.desc);
                         }
                     } else {
-                        // 如果列表为空，清空预览区域
+                        // Nếu danh sách trống, hãy xóa vùng xem trước
                         previewArea.setText("");
                         descriptionLabel.setText("");
                     }
@@ -284,7 +284,7 @@ public class SnippetDialog extends JDialog {
             }
         });
 
-        // 列表选择事件
+        // Liệt kê các sự kiện chọn lọc
         snippetList.addListSelectionListener(e -> {
             if (!e.getValueIsAdjusting()) {
                 selectedSnippet = snippetList.getSelectedValue();
@@ -296,11 +296,11 @@ public class SnippetDialog extends JDialog {
             }
         });
 
-        // 列表双击事件
+        // Liệt kê sự kiện nhấp đúp chuột
         snippetList.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent evt) {
-                if (evt.getClickCount() == 2) { // 双击事件
+                if (evt.getClickCount() == 2) { // Sự kiện nhấp đúp
                     selectedSnippet = snippetList.getSelectedValue();
                     if (selectedSnippet != null) {
                         dispose();
@@ -309,17 +309,17 @@ public class SnippetDialog extends JDialog {
             }
         });
 
-        // 键盘事件
+        // Sự kiện bàn phím
         searchField.addKeyListener(new KeyAdapter() {
             @Override
             public void keyPressed(KeyEvent e) {
                 if (e.getKeyCode() == KeyEvent.VK_DOWN || e.getKeyCode() == KeyEvent.VK_UP) {
-                    // 按下方向键时，转移焦点到列表并选择第一项
+                    // Trong khi nhấn các phím mũi tên, hãy chuyển tiêu điểm sang danh sách và chọn mục đầu tiên
                     snippetList.requestFocusInWindow();
                     if (listModel.getSize() > 0 && snippetList.getSelectedIndex() == -1) {
                         snippetList.setSelectedIndex(0);
                     }
-                    e.consume();  // 消费事件，防止其他组件处理
+                    e.consume();  // Tiêu thụ các sự kiện để ngăn các thành phần khác xử lý chúng
                 }
             }
         });
@@ -328,20 +328,20 @@ public class SnippetDialog extends JDialog {
             @Override
             public void keyPressed(KeyEvent e) {
                 if (e.getKeyCode() == KeyEvent.VK_ENTER) {
-                    // 按下回车键时，如果有选中项，则选择并关闭对话框
+                    // Khi nhấn phím Enter, nếu một mục được chọn, hộp thoại sẽ được chọn và đóng lại
                     selectedSnippet = snippetList.getSelectedValue();
                     if (selectedSnippet != null) {
                         dispose();
                     }
                 } else if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
-                    // ESC 键取消并关闭对话框
+                    // ESC để hủy và đóng hộp thoại
                     selectedSnippet = null;
                     dispose();
                 }
             }
         });
 
-        // 按钮事件
+        // Sự kiện nút
         insertBtn.addActionListener(e -> {
             selectedSnippet = snippetList.getSelectedValue();
             if (selectedSnippet != null) {
@@ -356,10 +356,10 @@ public class SnippetDialog extends JDialog {
             dispose();
         });
 
-        // 初始化状态
+        // Trạng thái khởi tạo
         if (listModel.getSize() > 0) {
             snippetList.setSelectedIndex(0);
-            // 显示第一项的预览
+            // Hiển thị bản xem trước của mục đầu tiên
             selectedSnippet = snippetList.getSelectedValue();
             if (selectedSnippet != null) {
                 previewArea.setText(selectedSnippet.code);
@@ -368,7 +368,7 @@ public class SnippetDialog extends JDialog {
             }
         }
 
-        // 添加窗口关闭监听器，处理点击 X 按钮的情况
+        // Thêm trình nghe đóng cửa sổ để xử lý các lượt nhấp chuột X Vỏ nút
         addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
@@ -376,7 +376,7 @@ public class SnippetDialog extends JDialog {
             }
         });
 
-        // 设置对话框属性
+        // Đặt thuộc tính hộp thoại
         setSize(800, 600);
         setLocationRelativeTo(owner);
         setMinimumSize(new Dimension(600, 400));
@@ -396,19 +396,19 @@ public class SnippetDialog extends JDialog {
         return editor;
     }
 
-    // 初始化代码片段分类
+    // Khởi tạo phân loại đoạn mã
     private void initCategories() {
         snippetCategories.put(I18nUtil.getMessage(MessageKeys.SNIPPET_DIALOG_CATEGORY_ALL), this.snippets);
         Map<String, List<Snippet>> categorized = this.snippets.stream()
                 .collect(Collectors.groupingBy(snippet -> switch (snippet.category) {
-                    // 基础分类
+                    // Phân loại cơ bản
                     case PRE_SCRIPT -> I18nUtil.getMessage(MessageKeys.SNIPPET_DIALOG_CATEGORY_PRE_SCRIPT);
                     case ASSERT -> I18nUtil.getMessage(MessageKeys.SNIPPET_DIALOG_CATEGORY_ASSERT);
                     case EXTRACT -> I18nUtil.getMessage(MessageKeys.SNIPPET_DIALOG_CATEGORY_EXTRACT);
                     case LOCAL_VAR -> I18nUtil.getMessage(MessageKeys.SNIPPET_DIALOG_CATEGORY_LOCAL_VAR);
                     case ENV_VAR -> I18nUtil.getMessage(MessageKeys.SNIPPET_DIALOG_CATEGORY_ENV_VAR);
 
-                    // 高级场景分类
+                    // Phân loại cảnh nâng cao
                     case AUTHENTICATION -> I18nUtil.getMessage(MessageKeys.SNIPPET_DIALOG_CATEGORY_AUTHENTICATION);
                     case PERFORMANCE -> I18nUtil.getMessage(MessageKeys.SNIPPET_DIALOG_CATEGORY_PERFORMANCE);
                     case VALIDATION -> I18nUtil.getMessage(MessageKeys.SNIPPET_DIALOG_CATEGORY_VALIDATION);
@@ -416,29 +416,29 @@ public class SnippetDialog extends JDialog {
                     case REQUEST_MODIFICATION ->
                             I18nUtil.getMessage(MessageKeys.SNIPPET_DIALOG_CATEGORY_REQUEST_MODIFICATION);
 
-                    // Cookie 操作
+                    // Cookie hoạt động
                     case COOKIES -> I18nUtil.getMessage(MessageKeys.SNIPPET_DIALOG_CATEGORY_COOKIES);
 
-                    // 编码和加密
+                    // Mã hóa và mã hóa
                     case ENCRYPT -> I18nUtil.getMessage(MessageKeys.SNIPPET_DIALOG_CATEGORY_ENCRYPT);
                     case ENCODE -> I18nUtil.getMessage(MessageKeys.SNIPPET_DIALOG_CATEGORY_ENCODE);
 
-                    // 数据类型
+                    // Kiểu dữ liệu
                     case STRING -> I18nUtil.getMessage(MessageKeys.SNIPPET_DIALOG_CATEGORY_STRING);
                     case ARRAY -> I18nUtil.getMessage(MessageKeys.SNIPPET_DIALOG_CATEGORY_ARRAY);
                     case JSON -> I18nUtil.getMessage(MessageKeys.SNIPPET_DIALOG_CATEGORY_JSON);
                     case DATE -> I18nUtil.getMessage(MessageKeys.SNIPPET_DIALOG_CATEGORY_DATE);
                     case REGEX -> I18nUtil.getMessage(MessageKeys.SNIPPET_DIALOG_CATEGORY_REGEX);
 
-                    // 内置库分类
+                    // Phân loại thư viện tích hợp
                     case CRYPTOJS -> I18nUtil.getMessage(MessageKeys.SNIPPET_DIALOG_CATEGORY_CRYPTOJS);
                     case LODASH -> I18nUtil.getMessage(MessageKeys.SNIPPET_DIALOG_CATEGORY_LODASH);
                     case MOMENT -> I18nUtil.getMessage(MessageKeys.SNIPPET_DIALOG_CATEGORY_MOMENT);
 
-                    // 完整示例
+                    // Ví dụ đầy đủ
                     case EXAMPLES -> I18nUtil.getMessage(MessageKeys.SNIPPET_DIALOG_CATEGORY_EXAMPLES);
 
-                    // 其他
+                    // khác
                     case LOG -> I18nUtil.getMessage(MessageKeys.SNIPPET_DIALOG_CATEGORY_LOG);
                     case CONTROL -> I18nUtil.getMessage(MessageKeys.SNIPPET_DIALOG_CATEGORY_CONTROL);
                     case TOKEN -> I18nUtil.getMessage(MessageKeys.SNIPPET_DIALOG_CATEGORY_TOKEN);
@@ -446,44 +446,44 @@ public class SnippetDialog extends JDialog {
                     default -> I18nUtil.getMessage(MessageKeys.SNIPPET_DIALOG_CATEGORY_OTHER);
                 }));
 
-        // 按照使用频率和重要性排序的分类列表
+        // Danh sách phân loại được sắp xếp theo tần suất sử dụng và tầm quan trọng
         String[] orderedCategories = {
-                // 常用基础
+                // Cơ bản thường dùng
                 I18nUtil.getMessage(MessageKeys.SNIPPET_DIALOG_CATEGORY_PRE_SCRIPT),
                 I18nUtil.getMessage(MessageKeys.SNIPPET_DIALOG_CATEGORY_ASSERT),
                 I18nUtil.getMessage(MessageKeys.SNIPPET_DIALOG_CATEGORY_EXTRACT),
 
-                // 高级场景（新增，放在前面）
+                // Kịch bản nâng cao (mới, được đặt ở phía trước)
                 I18nUtil.getMessage(MessageKeys.SNIPPET_DIALOG_CATEGORY_AUTHENTICATION),
                 I18nUtil.getMessage(MessageKeys.SNIPPET_DIALOG_CATEGORY_PERFORMANCE),
                 I18nUtil.getMessage(MessageKeys.SNIPPET_DIALOG_CATEGORY_VALIDATION),
                 I18nUtil.getMessage(MessageKeys.SNIPPET_DIALOG_CATEGORY_DATA_PROCESSING),
                 I18nUtil.getMessage(MessageKeys.SNIPPET_DIALOG_CATEGORY_REQUEST_MODIFICATION),
 
-                // 变量和Cookie
+                // các biến vàCookie
                 I18nUtil.getMessage(MessageKeys.SNIPPET_DIALOG_CATEGORY_LOCAL_VAR),
                 I18nUtil.getMessage(MessageKeys.SNIPPET_DIALOG_CATEGORY_ENV_VAR),
                 I18nUtil.getMessage(MessageKeys.SNIPPET_DIALOG_CATEGORY_COOKIES),
 
-                // 数据类型
+                // Kiểu dữ liệu
                 I18nUtil.getMessage(MessageKeys.SNIPPET_DIALOG_CATEGORY_STRING),
                 I18nUtil.getMessage(MessageKeys.SNIPPET_DIALOG_CATEGORY_ARRAY),
                 I18nUtil.getMessage(MessageKeys.SNIPPET_DIALOG_CATEGORY_JSON),
                 I18nUtil.getMessage(MessageKeys.SNIPPET_DIALOG_CATEGORY_DATE),
 
-                // 内置库
+                // Thư viện tích hợp
                 I18nUtil.getMessage(MessageKeys.SNIPPET_DIALOG_CATEGORY_CRYPTOJS),
                 I18nUtil.getMessage(MessageKeys.SNIPPET_DIALOG_CATEGORY_LODASH),
                 I18nUtil.getMessage(MessageKeys.SNIPPET_DIALOG_CATEGORY_MOMENT),
 
-                // 编码加密
+                // Mã hóa mã hóa
                 I18nUtil.getMessage(MessageKeys.SNIPPET_DIALOG_CATEGORY_ENCRYPT),
                 I18nUtil.getMessage(MessageKeys.SNIPPET_DIALOG_CATEGORY_ENCODE),
 
-                // 完整示例
+                // Ví dụ đầy đủ
                 I18nUtil.getMessage(MessageKeys.SNIPPET_DIALOG_CATEGORY_EXAMPLES),
 
-                // 其他辅助
+                // Hỗ trợ khác
                 I18nUtil.getMessage(MessageKeys.SNIPPET_DIALOG_CATEGORY_REGEX),
                 I18nUtil.getMessage(MessageKeys.SNIPPET_DIALOG_CATEGORY_CONTROL),
                 I18nUtil.getMessage(MessageKeys.SNIPPET_DIALOG_CATEGORY_LOG),
@@ -499,7 +499,7 @@ public class SnippetDialog extends JDialog {
         }
     }
 
-    // 加载片段到列表
+    // Tải các đoạn vào một danh sách
     private void loadSnippets(List<Snippet> snippetsToLoad) {
         listModel.clear();
         for (Snippet s : snippetsToLoad) {
@@ -507,7 +507,7 @@ public class SnippetDialog extends JDialog {
         }
     }
 
-    // 根据搜索词过滤片段
+    // Lọc đoạn trích dựa trên cụm từ tìm kiếm
     private void filterSnippets() {
         String query = searchField.getText().trim().toLowerCase();
         String currentCategory = (String) categoryCombo.getSelectedItem();
@@ -518,13 +518,13 @@ public class SnippetDialog extends JDialog {
             searchSource = this.snippets;
         }
 
-        // 搜索框为空时，显示当前分类的所有片段
+        // Khi hộp tìm kiếm trống, tất cả các đoạn của danh mục hiện tại sẽ được hiển thị
         if (query.isEmpty()) {
             loadSnippets(searchSource);
             return;
         }
 
-        // 在当前选中分类中搜索
+        // Tìm kiếm trong danh mục hiện được chọn
         DefaultListModel<Snippet> filteredModel = new DefaultListModel<>();
         for (Snippet s : searchSource) {
             if (s.title.toLowerCase().contains(query) ||
@@ -534,22 +534,22 @@ public class SnippetDialog extends JDialog {
             }
         }
 
-        // 更新列表模型
+        // Cập nhật mô hình danh sách
         listModel.clear();
         for (int i = 0; i < filteredModel.getSize(); i++) {
             listModel.addElement(filteredModel.getElementAt(i));
         }
 
-        // 如果有结果，选择第一个
+        // Nếu có kết quả thì chọn kết quả đầu tiên
         if (listModel.getSize() > 0) {
             snippetList.setSelectedIndex(0);
-            // 显示预览
+            // Hiển thị bản xem trước
             selectedSnippet = snippetList.getSelectedValue();
             previewArea.setText(selectedSnippet.code);
             previewArea.setCaretPosition(0);
             descriptionLabel.setText(selectedSnippet.desc);
         } else {
-            // 没有结果时清空预览
+            // Xóa bản xem trước khi không có kết quả
             previewArea.setText("");
             descriptionLabel.setText(I18nUtil.getMessage(MessageKeys.SNIPPET_DIALOG_NOT_FOUND));
         }

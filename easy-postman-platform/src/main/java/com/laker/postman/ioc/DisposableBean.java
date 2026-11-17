@@ -1,17 +1,17 @@
 package com.laker.postman.ioc;
 
 /**
- * Bean销毁接口
- * 实现此接口的Bean会在容器关闭时自动调用destroy方法
- * 这是@PreDestroy注解的接口方式替代
+ * BeanPhá hủy giao diện
+ * Thực hiện giao diện nàyBeanSẽ được gọi tự động khi container được đóng lạidestroyphương pháp
+ * Đây là@PreDestroyPhương thức giao diện thay thế cho chú thích
  */
 public interface DisposableBean {
 
     /**
-     * Bean销毁前调用
-     * 可以用于释放资源、关闭连接等清理工作
+     * BeanĐược kêu gọi trước khi hủy diệt
+     * Có thể được sử dụng để giải phóng tài nguyên, đóng kết nối và các tác vụ dọn dẹp khác
      *
-     * @throws Exception 如果销毁过程中出现错误
+     * @throws Exception Nếu xảy ra lỗi trong quá trình hủy
      */
     void destroy() throws Exception;
 }

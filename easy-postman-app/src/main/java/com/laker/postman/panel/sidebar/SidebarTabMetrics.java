@@ -3,7 +3,7 @@ package com.laker.postman.panel.sidebar;
 import lombok.experimental.UtilityClass;
 
 /**
- * 侧边栏 Tab 尺寸策略，避免绘制组件里散落 magic number。
+ * Thanh bên Tab Chiến lược kích thước để tránh sự phân tán trong các thành phần được vẽ magic number。
  */
 @UtilityClass
 class SidebarTabMetrics {
@@ -12,16 +12,16 @@ class SidebarTabMetrics {
     static final int TAB_AREA_INSET_BOTTOM = 4;
     static final int TAB_AREA_INSET_RIGHT = 2;
 
-    // 展开态右侧紧邻内容卡片，卡片自身还有 gutter；右侧少留一点，整体看起来才左右均衡。
+    // Phía bên phải của trạng thái mở rộng nằm cạnh thẻ nội dung và cũng có chính thẻ đó gutter；Để lại ít hơn một chút ở phía bên phải để cái nhìn tổng thể được cân bằng giữa bên trái và bên phải.
     static final int EXPANDED_SELECTED_BACKGROUND_INSET_LEFT = 10;
     static final int EXPANDED_SELECTED_BACKGROUND_INSET_RIGHT = 2;
     static final int EXPANDED_SELECTED_BACKGROUND_INSET_VERTICAL = 5;
     static final int COLLAPSED_SELECTED_BACKGROUND_WIDTH = 32;
     static final int COLLAPSED_SELECTED_BACKGROUND_HEIGHT = 32;
-    // 折叠态菜单左侧紧贴窗口边缘，右侧又临近内容卡片 gap，需要轻微右移抵消视觉偏左。
+    // Cạnh trái của menu thu gọn sát mép cửa sổ, cạnh phải sát với thẻ nội dung gap，Cần phải dịch chuyển sang phải một chút để bù đắp cho độ lệch thị giác bên trái.
     static final int COLLAPSED_VISUAL_CENTER_OFFSET_X = 2;
-    // BasicTabbedPaneUI 会给未选中 tab label 一个 +1px 位移，选中态默认则是 -1px。
-    // 统一 label 位移后，状态背景也向内容卡片 gutter 补偿 1px，才能和图标共享视觉中心。
+    // BasicTabbedPaneUI Sẽ cung cấp cho không được kiểm tra tab label một +1px Dịch chuyển, trạng thái được chọn là mặc định -1px。
+    // thống nhất label Sau khi dịch chuyển, nền trạng thái cũng chuyển sang thẻ nội dung gutter đền bù 1px，Tài năng và biểu tượng chia sẻ một trung tâm hình ảnh.
     static final int COLLAPSED_TAB_LABEL_SHIFT_X = 1;
     static final int COLLAPSED_STATE_BACKGROUND_GUTTER_OFFSET_X = 1;
     static final int SELECTED_BACKGROUND_ARC = 10;
@@ -33,7 +33,7 @@ class SidebarTabMetrics {
     static final int EXPANDED_TAB_SPACING_BOTTOM = 4;
 
     static final int COLLAPSED_TAB_PADDING_VERTICAL = 8;
-    // 选中背景做了视觉右移补偿，图标 padding 同步，保证图标中心跟随选中背景。
+    // Nền được chọn đã được dịch chuyển trực quan sang bên phải để bù đắp cho biểu tượng padding Đồng bộ hóa để đảm bảo rằng tâm của biểu tượng tuân theo nền đã chọn.
     static final int COLLAPSED_TAB_PADDING_HORIZONTAL = 6;
 
     static int expandedWidth(int maxTextWidth) {

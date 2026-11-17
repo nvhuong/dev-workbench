@@ -215,7 +215,7 @@ public final class PerformanceExecutionEngine {
     }
 
     void prepareRun(PerformanceTestPlan plan) {
-        // 纯 HTTP/CSV 压测不需要启动 GraalJS 池，避免首秒被无用初始化拉低。
+        // Tinh khiết HTTP/CSV Kiểm tra căng thẳng không cần phải bắt đầu GraalJS Pool để tránh bị kéo xuống do khởi tạo vô ích trong giây đầu tiên.
         preparedPlanUsesScripts = PerformancePlanScriptUsageDetector.usesScripts(plan);
     }
 

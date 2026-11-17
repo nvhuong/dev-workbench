@@ -3,7 +3,7 @@ package com.laker.postman.request.model;
 import java.util.List;
 import java.util.Map;
 
-// 重定向信息结构体
+// Chuyển hướng cấu trúc thông tin
 public class RedirectInfo {
     public String url;
     public int statusCode;

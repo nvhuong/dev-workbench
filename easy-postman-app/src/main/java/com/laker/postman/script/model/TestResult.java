@@ -2,7 +2,7 @@ package com.laker.postman.script.model;
 
 public class TestResult {
     /**
-     * 测试唯一标识
+     * Kiểm tra mã định danh duy nhất
      */
     public String id;
     public final String name;

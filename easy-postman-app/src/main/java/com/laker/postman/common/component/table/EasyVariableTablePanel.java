@@ -14,15 +14,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Postman 环境变量表格面板
- * 专门用于处理 Postman 环境变量数据
- * 支持 Drag+Enable、Key、Value 和 Delete 列结构
+ * Postman Bảng bảng biến môi trường
+ * Được thiết kế đặc biệt để xử lý Postman Dữ liệu biến môi trường
+ * Hỗ trợ Drag+Enable、Key、Value và Delete cấu trúc cột
  */
 @Slf4j
 public class EasyVariableTablePanel extends AbstractTablePanel<Variable> {
 
-    // Column indices - 此表格有特殊的 Drag+Enable 合并列
-    private static final int COL_DRAG_ENABLE = 0;  // 合并拖动手柄和启用复选框
+    // Column indices - Hình thức này là đặc biệt Drag+Enable Hợp nhất các cột
+    private static final int COL_DRAG_ENABLE = 0;  // Kết hợp tay cầm kéo và hộp kiểm được bật
     private static final int COL_KEY = 1;
     private static final int COL_VALUE = 2;
     private static final int COL_DELETE = 3;
@@ -32,19 +32,19 @@ public class EasyVariableTablePanel extends AbstractTablePanel<Variable> {
 
 
     /**
-     * 构造函数，创建默认的环境变量表格面板
+     * Trình xây dựng, tạo bảng bảng biến môi trường mặc định
      */
     public EasyVariableTablePanel() {
         this("Name", "Value", true, true);
     }
 
     /**
-     * 构造函数，支持自定义配置
+     * Trình xây dựng, hỗ trợ cấu hình tùy chỉnh
      *
-     * @param nameCol              Key列名称
-     * @param valueCol             Value列名称
-     * @param popupMenuEnabled     是否启用右键菜单
-     * @param autoAppendRowEnabled 是否启用自动补空行
+     * @param nameCol              KeyTên cột
+     * @param valueCol             ValueTên cột
+     * @param popupMenuEnabled     Có bật menu chuột phải hay không
+     * @param autoAppendRowEnabled Có bật tự động điền dòng trống hay không
      */
     public EasyVariableTablePanel(String nameCol, String valueCol, boolean popupMenuEnabled, boolean autoAppendRowEnabled) {
         super(new String[]{"", nameCol, valueCol, ""});
@@ -64,11 +64,11 @@ public class EasyVariableTablePanel extends AbstractTablePanel<Variable> {
         addRow();
     }
 
-    // ========== 实现抽象方法 ==========
+    // ========== Thực hiện các phương pháp trừu tượng ==========
 
     @Override
     protected int getEnabledColumnIndex() {
-        return COL_DRAG_ENABLE;  // Drag+Enable 合并列
+        return COL_DRAG_ENABLE;  // Drag+Enable Hợp nhất các cột
     }
 
     @Override
@@ -98,20 +98,20 @@ public class EasyVariableTablePanel extends AbstractTablePanel<Variable> {
         return !key.isEmpty() || !value.isEmpty();
     }
 
-    // ========== 拖拽功能 ==========
+    // ========== Chức năng kéo và thả ==========
 
     /**
-     * 启用JTable行拖动排序
-     * 注意：不使用 setDragEnabled(true)，而是只在拖拽手柄区域手动触发拖拽，
-     * 避免全局 dragEnabled 干扰单击编辑行为。
+     * Kích hoạtJTableSắp xếp kéo hàng
+     * Lưu ý: Không được sử dụng setDragEnabled(true)，Thay vào đó, thao tác kéo chỉ được kích hoạt thủ công trong khu vực tay cầm kéo.
+     * Tránh bức tranh lớn dragEnabled Can thiệp vào hành vi nhấp để chỉnh sửa.
      */
     private void enableRowDragAndDrop() {
-        // 不调用 table.setDragEnabled(true)，防止 Swing 的 DragGestureRecognizer
-        // 拦截 mousePressed 事件，导致单击编辑失效。
-        // 拖拽由 addDragHandleMouseListener() 中的 exportAsDrag 手动触发。
+        // Không được gọi table.setDragEnabled(true)，ngăn chặn Swing của DragGestureRecognizer
+        // Đánh chặn mousePressed sự kiện, khiến nhấp chuột để chỉnh sửa không thành công.
+        // Kéo và thả qua addDragHandleMouseListener() trong exportAsDrag Kích hoạt thủ công.
         table.setDropMode(DropMode.INSERT_ROWS);
 
-        // 传递回调函数，在拖拽期间控制自动补空行和编辑状态
+        // Truyền chức năng gọi lại để kiểm soát trạng thái chỉnh sửa và điền dòng trống tự động trong khi kéo
         table.setTransferHandler(new ImprovedTableRowTransferHandler(tableModel, dragging -> {
             isDragging = dragging;
             log.debug("Drag state changed: {}", dragging);
@@ -120,7 +120,7 @@ public class EasyVariableTablePanel extends AbstractTablePanel<Variable> {
 
     @Override
     protected boolean isCellEditable(int row, int column) {
-        // 拖拽时禁止编辑
+        // Chỉnh sửa bị vô hiệu hóa trong khi kéo
         if (isDragging) {
             return false;
         }
@@ -129,10 +129,10 @@ public class EasyVariableTablePanel extends AbstractTablePanel<Variable> {
 
     @Override
     protected void initializeTableUI() {
-        // 调用父类的通用UI配置
+        // Gọi hàm chung của lớp chaUIcấu hình
         super.initializeTableUI();
 
-        // 设置 Drag+Enable 合并列的宽度（增加宽度以提供更好的视觉效果）
+        // cài đặt Drag+Enable Kết hợp độ rộng của các cột (tăng chiều rộng để mang lại hiệu ứng hình ảnh tốt hơn)
         setEnabledColumnWidth(50);
         setDeleteColumnWidth();
 
@@ -147,7 +147,7 @@ public class EasyVariableTablePanel extends AbstractTablePanel<Variable> {
 
         // Set editors for Key and Value columns
         setColumnEditor(COL_KEY, new EasyPostmanTextFieldCellEditor());
-        // 为 Value 列使用智能编辑器，自动根据内容长度选择单行/多行编辑
+        // vì Value Các cột sử dụng trình chỉnh sửa thông minh tự động chọn các hàng riêng lẻ dựa trên độ dài nội dung/Chỉnh sửa nhiều dòng
         setColumnEditor(COL_VALUE, new EasySmartValueCellEditor());
         setColumnRenderer(COL_KEY, new EasyTextFieldCellRenderer());
         setColumnRenderer(COL_VALUE, new EasyTextFieldCellRenderer());
@@ -164,14 +164,14 @@ public class EasyVariableTablePanel extends AbstractTablePanel<Variable> {
         private final JCheckBox checkBox;
 
         public DragEnableRenderer() {
-            // 使用 FlowLayout 让拖动手柄和复选框更紧凑
-            setLayout(new FlowLayout(FlowLayout.CENTER, 2, 0)); // 水平间距设为 2，垂直间距为 0
+            // sử dụng FlowLayout Làm cho thanh điều khiển kéo và hộp kiểm nhỏ gọn hơn
+            setLayout(new FlowLayout(FlowLayout.CENTER, 2, 0)); // Khoảng cách ngang được đặt thành  2，Khoảng cách dọc là  0
             setOpaque(true);
 
-            // Drag handle label - 加粗的拖拽图标
+            // Drag handle label - Biểu tượng kéo đậm
             dragLabel = new JLabel("⋮⋮");
             dragLabel.setHorizontalAlignment(SwingConstants.CENTER);
-            dragLabel.setPreferredSize(new Dimension(16, 28)); // 宽度从 20 减到 16，更紧凑
+            dragLabel.setPreferredSize(new Dimension(16, 28)); // Chiều rộng từ 20 giảm xuống 16，Nhỏ gọn hơn
             dragLabel.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 
             // Checkbox
@@ -206,15 +206,15 @@ public class EasyVariableTablePanel extends AbstractTablePanel<Variable> {
         public DragEnableEditor() {
             super(new JCheckBox());
 
-            // 使用 FlowLayout 让拖动手柄和复选框更紧凑
-            panel = new JPanel(new FlowLayout(FlowLayout.CENTER, 2, 0)); // 水平间距设为 2，垂直间距为 0
+            // sử dụng FlowLayout Làm cho thanh điều khiển kéo và hộp kiểm nhỏ gọn hơn
+            panel = new JPanel(new FlowLayout(FlowLayout.CENTER, 2, 0)); // Khoảng cách ngang được đặt thành  2，Khoảng cách dọc là  0
             panel.setOpaque(true);
 
-            // Drag handle label - 加粗的拖拽图标
+            // Drag handle label - Biểu tượng kéo đậm
             dragLabel = new JLabel("⋮⋮");
-            dragLabel.setFont(FontsUtil.getDefaultFontWithOffset(Font.BOLD, 4)); // 比标准字体大4号并加粗
+            dragLabel.setFont(FontsUtil.getDefaultFontWithOffset(Font.BOLD, 4)); // Lớn hơn kích thước phông chữ tiêu chuẩn4Số và in đậm
             dragLabel.setHorizontalAlignment(SwingConstants.CENTER);
-            dragLabel.setPreferredSize(new Dimension(16, 28)); // 宽度从 20 减到 16，更紧凑
+            dragLabel.setPreferredSize(new Dimension(16, 28)); // Chiều rộng từ 20 giảm xuống 16，Nhỏ gọn hơn
             dragLabel.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 
             // Checkbox
@@ -304,7 +304,7 @@ public class EasyVariableTablePanel extends AbstractTablePanel<Variable> {
      * Add mouse listener to show hand cursor when hovering over drag handle area
      */
     private void addDragHandleMouseListener() {
-        // 使用简单的鼠标监听器来显示光标
+        // Sử dụng trình nghe chuột đơn giản để hiển thị con trỏ
         table.addMouseMotionListener(new MouseAdapter() {
             @Override
             public void mouseMoved(MouseEvent e) {
@@ -330,25 +330,25 @@ public class EasyVariableTablePanel extends AbstractTablePanel<Variable> {
                 int column = table.columnAtPoint(e.getPoint());
                 int row = table.rowAtPoint(e.getPoint());
 
-                // 在第一列的拖拽手柄区域按下时，选中行并立即启动拖拽
+                // Khi nhấn vào vùng tay cầm kéo của cột đầu tiên, hàng sẽ được chọn và quá trình kéo được bắt đầu ngay lập tức
                 if (column == COL_DRAG_ENABLE && row >= 0) {
                     Rectangle cellRect = table.getCellRect(row, column, false);
                     int relativeX = e.getX() - cellRect.x;
 
-                    // 左侧25px是拖拽区域
+                    // bên trái25pxLà vùng kéo
                     if (relativeX < 25) {
-                        // 选中该行
+                        // Chọn hàng
                         table.setRowSelectionInterval(row, row);
 
-                        // 停止编辑
+                        // Dừng chỉnh sửa
                         if (table.isEditing()) {
                             table.getCellEditor().stopCellEditing();
                         }
 
-                        // 标记为拖拽状态，防止意外编辑
+                        // Được đánh dấu để kéo để tránh vô tình chỉnh sửa
                         isDragging = true;
 
-                        // 立即触发拖拽操作
+                        // Kích hoạt thao tác kéo ngay lập tức
                         TransferHandler handler = table.getTransferHandler();
                         if (handler != null) {
                             handler.exportAsDrag(table, e, TransferHandler.MOVE);
@@ -359,7 +359,7 @@ public class EasyVariableTablePanel extends AbstractTablePanel<Variable> {
 
             @Override
             public void mouseReleased(MouseEvent e) {
-                // 释放鼠标后重置拖拽状态
+                // Đặt lại trạng thái kéo sau khi thả chuột
                 SwingUtilities.invokeLater(() -> isDragging = false);
             }
         });
@@ -381,7 +381,7 @@ public class EasyVariableTablePanel extends AbstractTablePanel<Variable> {
     }
 
     /**
-     * 获取环境变量列表（新格式）
+     * Nhận danh sách các biến môi trường (định dạng mới)
      */
     public List<Variable> getVariableList() {
         // Stop cell editing to ensure any in-progress edits are committed
@@ -402,9 +402,9 @@ public class EasyVariableTablePanel extends AbstractTablePanel<Variable> {
     }
 
     /**
-     * 从 tableModel 直接读取变量列表，不停止当前单元格编辑。
-     * 用于自动保存 / tab 指示器等后台场景，避免打断用户正在进行的输入。
-     * 正在编辑的单元格值尚未提交到 model，因此读取的是上一次已提交的值。
+     * Từ tableModel Đọc danh sách biến trực tiếp mà không dừng việc chỉnh sửa ô hiện tại.
+     * để lưu tự động / tab Các cảnh nền như chỉ báo để tránh làm gián đoạn quá trình nhập liệu đang diễn ra của người dùng.
+     * Giá trị ô đang được chỉnh sửa vẫn chưa được cam kết model，Do đó, giá trị gửi cuối cùng được đọc.
      */
     public List<Variable> getVariableListFromModel() {
         List<Variable> dataList = new ArrayList<>();
@@ -421,7 +421,7 @@ public class EasyVariableTablePanel extends AbstractTablePanel<Variable> {
     }
 
     /**
-     * 设置环境变量列表（新格式）
+     * Đặt danh sách biến môi trường (định dạng mới)
      */
     public void setVariableList(List<Variable> dataList) {
         stopCellEditing();

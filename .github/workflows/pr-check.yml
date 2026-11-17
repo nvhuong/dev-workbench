@@ -1,30 +1,30 @@
-# 工作流名称：Pull Request 检查
+# Tên quy trình làm việc: .Pull Request nghiên cứu
 #
-# 作用：在 PR 合并前进行自动化质量检查，确保代码质量
-# 包括：构建测试、代码质量检查、PR 规范验证、跨平台打包和功能测试
+# Chức năng: trong PR Tiến hành kiểm tra chất lượng tự động trước khi hợp nhất để đảm bảo chất lượng mã
+# Bao gồm: build testing, kiểm tra chất lượng code,PR Xác minh thông số kỹ thuật, đóng gói đa nền tảng và kiểm tra chức năng
 name: PR Check
 
-# 触发条件：当创建或更新 Pull Request 时
+# Điều kiện kích hoạt: khi được tạo hoặc cập nhật Pull Request thời gian
 on:
   pull_request:
-    # 目标分支：main、master、develop、feature开头的分支
+    # Nhánh mục tiêu: .main、master、develop、featureNhánh đầu
     branches:
       - main
       - master
       - develop
       - 'feature/**'
-    # 触发类型：
-    # - opened: PR 首次创建时
-    # - synchronize: PR 有新提交推送时
-    # - reopened: 关闭的 PR 重新打开时
+    # Loại kích hoạt:
+    # - opened: PR Khi lần đầu tiên được tạo ra
+    # - synchronize: PR Khi một cam kết mới được đẩy
+    # - reopened: đóng cửa PR Khi mở cửa trở lại
     types: [ opened, synchronize, reopened ]
 
-# 权限配置：允许工作流访问 GitHub API
+# Cấu hình quyền: Cho phép truy cập quy trình làm việc GitHub API
 permissions:
   contents: read
   pull-requests: read
 
-# 环境变量：定义跨平台打包所需的配置
+# Biến môi trường: Xác định cấu hình cần thiết cho việc đóng gói đa nền tảng
 env:
   JAVA_VERSION: '21'
   JAVA_DISTRIBUTION: 'jetbrains'
@@ -33,7 +33,7 @@ env:
   JAVA_OPTIONS_MACOS: '-Dsun.java2d.metal=false'
 
 jobs:
-  # Job 0: 获取版本号（供所有 Job 使用）
+  # Job 0: Nhận số phiên bản (cho tất cả Job sử dụng)
   get-version:
     name: Get Version
     runs-on: ubuntu-latest
@@ -60,7 +60,7 @@ jobs:
           echo "Version: $VERSION"
           echo "version=$VERSION" >> $GITHUB_OUTPUT
 
-  # Job 1: 构建 JAR（一次构建，多次复用）
+  # Job 1: Xây dựng JAR（Xây dựng một lần, tái sử dụng nhiều lần)
   build:
     name: Build JAR
     runs-on: ubuntu-latest
@@ -79,7 +79,7 @@ jobs:
           distribution: ${{ env.JAVA_DISTRIBUTION }}
           cache: 'maven'
 
-      # package 阶段已包含 test，一次构建完成编译、测试和打包
+      # package Đã bao gồm sân khấu test，Biên dịch, kiểm tra và đóng gói trong một bản dựng
       - name: Build and test with Maven
         run: mvn -B clean package
 
@@ -91,7 +91,7 @@ jobs:
           path: easy-postman-app/target/easy-postman-${{ needs.get-version.outputs.version }}.jar
           retention-days: 1
 
-  # Job 2: Windows 打包和验证
+  # Job 2: Windows Đóng gói và xác minh
   test-windows-package:
     name: Test Windows Package
     runs-on: windows-latest
@@ -120,11 +120,11 @@ jobs:
         run: |
           Write-Host "📦 Installing Inno Setup..."
           choco install innosetup -y --no-progress
-          
-          # 刷新环境变量
+
+          # Làm mới các biến môi trường
           $env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User")
-          
-          # 验证安装
+
+          # Xác minh cài đặt
           $iscc = Get-Command iscc -ErrorAction SilentlyContinue
           if ($iscc) {
             Write-Host "✅ Inno Setup installed: $($iscc.Source)"
@@ -139,7 +139,7 @@ jobs:
           Write-Host "🔧 Creating Windows runtime..."
           $runtimeDir = "target\runtime"
           if (Test-Path $runtimeDir) { Remove-Item -Recurse -Force $runtimeDir }
-          
+
           jlink `
             --add-modules "$env:JLINK_MODULES,jdk.crypto.mscapi" `
             --strip-debug `
@@ -155,12 +155,12 @@ jobs:
           $version = "${{ needs.get-version.outputs.version }}"
           $jarNameWithVersion = "easy-postman-$version.jar"
           $jarName = "easy-postman.jar"
-          
+
           $distInputDir = "target\dist-input"
           if (Test-Path $distInputDir) { Remove-Item -Recurse -Force $distInputDir }
           New-Item -ItemType Directory -Path $distInputDir | Out-Null
-          
-          # 重命名 JAR 为固定名称（去除版本号）
+
+          # Đổi tên JAR là tên cố định (bỏ số phiên bản)
           Copy-Item "target\$jarNameWithVersion" -Destination "$distInputDir\$jarName"
           Write-Host "✅ Prepared dist-input with fixed JAR name: $jarName"
 
@@ -170,11 +170,11 @@ jobs:
           Write-Host "📦 Creating app-image for Inno Setup..."
           $version = "${{ needs.get-version.outputs.version }}"
           $jarName = "easy-postman.jar"
-          
-          # 解析 Java 选项
+
+          # phân tích Java tùy chọn
           $javaOpts = $env:JAVA_OPTIONS -split '\|'
-          
-          # 创建应用镜像（供 Inno Setup 使用）
+
+          # Tạo hình ảnh ứng dụng (for Inno Setup sử dụng)
           jpackage `
             --type app-image `
             --input target\dist-input `
@@ -192,7 +192,7 @@ jobs:
             --java-options $javaOpts[1] `
             --java-options $javaOpts[2] `
             --java-options "-Djavax.accessibility.assistive_technologies="
-          
+
           Write-Host "✅ App image created at: target\EasyPostman"
 
       - name: Create EXE with Inno Setup
@@ -202,31 +202,31 @@ jobs:
           $version = "${{ needs.get-version.outputs.version }}"
           $issScript = "build\easy-postman.iss"
           $arch = "x64"
-          
-          # 确保输出目录存在
-          if (-not (Test-Path "dist")) { 
-            New-Item -ItemType Directory -Path "dist" | Out-Null 
+
+          # Hãy chắc chắn rằng thư mục đầu ra tồn tại
+          if (-not (Test-Path "dist")) {
+            New-Item -ItemType Directory -Path "dist" | Out-Null
           }
-          
-          # 验证源目录存在
+
+          # Xác minh rằng thư mục nguồn tồn tại
           if (-not (Test-Path "target\EasyPostman")) {
             Write-Error "❌ Source directory not found: target\EasyPostMan"
             exit 1
           }
-          
-          # 运行 Inno Setup 编译器
+
+          # chạy Inno Setup trình biên dịch
           & iscc `
             "/DMyAppVersion=$version" `
             "/DMyAppSourceDir=..\target\EasyPostman" `
             "/DMyOutputDir=..\dist" `
             "/DMyArch=$arch" `
             $issScript
-          
+
           if ($LASTEXITCODE -ne 0) {
             Write-Error "❌ Inno Setup compilation failed with exit code: $LASTEXITCODE"
             exit 1
           }
-          
+
           Write-Host "✅ EXE installer created successfully"
 
       - name: Verify EXE installer
@@ -235,14 +235,14 @@ jobs:
           Write-Host "🔍 Verifying EXE installer..."
           $version = "${{ needs.get-version.outputs.version }}"
           $exeFile = "dist\EasyPostman-$version-windows-x64.exe"
-          
+
           if (-not (Test-Path $exeFile)) {
             Write-Host "❌ EXE file not found: $exeFile"
             Write-Host "Files in dist folder:"
             Get-ChildItem "dist" -ErrorAction SilentlyContinue | ForEach-Object { Write-Host "  - $($_.Name)" }
             exit 1
           }
-          
+
           $fileSize = (Get-Item $exeFile).Length / 1MB
           Write-Host "✅ EXE installer exists: $exeFile ($([math]::Round($fileSize, 2)) MB)"
           Write-Host "✅ EXE installer verification passed"
@@ -253,8 +253,8 @@ jobs:
         run: |
           Write-Host "📦 Marking as portable version..."
           $appDir = "target\EasyPostman"
-          
-          # 创建 .portable 标识文件（app-image 已在 Inno Setup 步骤中创建）
+
+          # Tạo .portable Tệp nhận dạng (app-image Đã ở đây rồi Inno Setup được tạo ở bước)
           "This is a portable version" | Out-File -FilePath "$appDir\.portable" -Encoding UTF8
           Write-Host "✅ Portable version marker created"
 
@@ -265,12 +265,12 @@ jobs:
           $appDir = "target\EasyPostman"
           $exeFile = "$appDir\EasyPostman.exe"
           $mcpExeFile = "$appDir\EasyPostmanMCP.exe"
-          
+
           if (-not (Test-Path $exeFile)) {
             Write-Host "❌ Executable not found: $exeFile"
             exit 1
           }
-          
+
           $fileSize = (Get-Item $exeFile).Length / 1KB
           Write-Host "✅ Executable exists: $exeFile ($([math]::Round($fileSize, 2)) KB)"
 
@@ -284,8 +284,8 @@ jobs:
             exit 1
           }
           Write-Host "✅ MCP executable exists and accepts --help"
-          
-          # 检查运行时目录
+
+          # Kiểm tra thư mục thời gian chạy
           $runtimeDir = "$appDir\runtime"
           if (Test-Path $runtimeDir) {
             Write-Host "✅ Runtime directory exists"
@@ -302,7 +302,7 @@ jobs:
           .\build\verify-windows-single-instance.ps1 `
             -AppExe "target\EasyPostman\EasyPostman.exe"
 
-  # Job 3: macOS 打包和验证
+  # Job 3: macOS Đóng gói và xác minh
   test-macos-package:
     name: Test macOS Package
     runs-on: macos-latest
@@ -330,7 +330,7 @@ jobs:
         run: |
           echo "🔧 Creating macOS runtime..."
           rm -rf target/runtime
-          
+
           jlink \
             --add-modules ${{ env.JLINK_MODULES }} \
             --strip-debug \
@@ -345,11 +345,11 @@ jobs:
           VERSION="${{ needs.get-version.outputs.version }}"
           JAR_NAME_WITH_VERSION="easy-postman-${VERSION}.jar"
           JAR_NAME="easy-postman.jar"
-          
+
           rm -rf target/dist-input
           mkdir -p target/dist-input
-          
-          # 重命名 JAR 为固定名称（去除版本号）
+
+          # Đổi tên JAR là tên cố định (bỏ số phiên bản)
           cp "target/${JAR_NAME_WITH_VERSION}" "target/dist-input/${JAR_NAME}"
           echo "✅ Prepared dist-input with fixed JAR name: ${JAR_NAME}"
 
@@ -358,9 +358,9 @@ jobs:
           echo "📦 Creating macOS app bundle..."
           VERSION="${{ needs.get-version.outputs.version }}"
           JAR_NAME="easy-postman.jar"
-          
+
           IFS='|' read -ra JAVA_OPTS <<< "${{ env.JAVA_OPTIONS }}"
-          
+
           jpackage \
             --type app-image \
             --input target/dist-input \
@@ -378,22 +378,22 @@ jobs:
             --java-options "${JAVA_OPTS[1]}" \
             --java-options "${JAVA_OPTS[2]}" \
             --java-options "${{ env.JAVA_OPTIONS_MACOS }}"
-          
+
           echo "✅ App bundle created"
 
       - name: Verify macOS package
         run: |
           echo "🔍 Verifying macOS package..."
           APP_PATH="target/EasyPostman.app"
-          
+
           if [ ! -d "$APP_PATH" ]; then
             echo "❌ App bundle not found: $APP_PATH"
             exit 1
           fi
-          
+
           echo "✅ App bundle exists: $APP_PATH"
-          
-          # 检查可执行文件
+
+          # Kiểm tra tập tin thực thi
           EXE_PATH="$APP_PATH/Contents/MacOS/EasyPostman"
           if [ -f "$EXE_PATH" ]; then
             echo "✅ Executable exists: $EXE_PATH"
@@ -410,15 +410,15 @@ jobs:
           fi
           "$MCP_EXE_PATH" --help
           echo "✅ MCP executable exists and accepts --help"
-          
-          # 检查 Info.plist
+
+          # nghiên cứu Info.plist
           PLIST_PATH="$APP_PATH/Contents/Info.plist"
           if [ -f "$PLIST_PATH" ]; then
             echo "✅ Info.plist exists"
             plutil -p "$PLIST_PATH" | head -20
           fi
-          
-          # 检查运行时
+
+          # Kiểm tra thời gian chạy
           RUNTIME_PATH="$APP_PATH/Contents/runtime"
           if [ -d "$RUNTIME_PATH" ]; then
             echo "✅ Runtime directory exists"
@@ -431,30 +431,30 @@ jobs:
           echo "🧪 Running macOS smoke test..."
           APP_PATH="target/EasyPostman.app"
           EXE_PATH="$APP_PATH/Contents/MacOS/EasyPostman"
-          
-          # 启动应用（后台运行）
+
+          # Khởi động ứng dụng (chạy ở chế độ nền)
           "$EXE_PATH" > stdout.log 2> stderr.log &
           APP_PID=$!
-          
+
           echo "✅ Application started (PID: $APP_PID)"
-          
-          # 等待应用启动
+
+          # Đợi ứng dụng khởi động
           sleep 8
-          
-          # 检查进程是否还在运行
+
+          # Kiểm tra xem tiến trình vẫn đang chạy
           if ps -p $APP_PID > /dev/null; then
             echo "✅ Application is running successfully"
             ps -p $APP_PID -o pid,comm,rss
-          
-            # 停止应用
+
+            # Dừng ứng dụng
             kill -TERM $APP_PID 2>/dev/null || true
             sleep 2
-          
-            # 强制终止（如果还在运行）
+
+            # Buộc chấm dứt nếu vẫn chạy
             if ps -p $APP_PID > /dev/null 2>&1; then
               kill -9 $APP_PID 2>/dev/null || true
             fi
-          
+
             echo "✅ Application stopped"
           else
             echo "❌ Application crashed or exited immediately"
@@ -464,19 +464,19 @@ jobs:
           fi
 
 
-  # Job 4: 代码质量检查
+  # Job 4: Kiểm tra chất lượng mã
   code-quality:
     name: Code Quality Check
     runs-on: ubuntu-latest
 
     steps:
-      # 第一步：检出代码
+      # Bước một: Kiểm tra mã
       - name: Checkout code
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          fetch-depth: 0  # 获取完整历史，用于 SonarCloud 等工具分析增量代码
+          fetch-depth: 0  # Nhận toàn bộ lịch sử cho SonarCloud và các công cụ khác để phân tích mã gia tăng
 
-      # 第二步：设置 Java 21 环境
+      # Bước 2: Thiết lập Java 21 môi trường
       - name: Set up JDK 21
         uses: actions/setup-java@de7274f081f381c8f8158605e0321c36c376e2e6 # v6.0.1
         with:
@@ -484,107 +484,107 @@ jobs:
           distribution: 'temurin'
           cache: 'maven'
 
-      # 第三步：验证代码编译是否通过
+      # Bước 3: Xác minh xem quá trình biên dịch mã có thành công hay không
       - name: Verify compilation
         run: mvn clean compile -B
 
-      # 第四步：代码格式和规范检查
+      # Bước 4: Kiểm tra định dạng mã và thông số kỹ thuật
       - name: Run code style checks
         run: |
           echo "✅ Code formatting check passed"
-          # 可以添加以下工具：
-          # mvn spotless:check          # 代码格式检查
-          # mvn checkstyle:check        # Java 代码规范检查
-          # mvn pmd:check               # PMD 静态分析
-        continue-on-error: true  # 代码规范问题不阻断流程，只提示
+          # Có thể thêm các công cụ sau:
+          # mvn spotless:check          # Kiểm tra định dạng mã
+          # mvn checkstyle:check        # Java Kiểm tra tuân thủ mã
+          # mvn pmd:check               # PMD Phân tích tĩnh
+        continue-on-error: true  # Các vấn đề về đặc tả mã không cản trở quá trình mà chỉ nhắc nhở
 
-  # Job 3: PR 规范验证
+  # Job 3: PR Xác minh thông số kỹ thuật
   pr-validation:
     name: PR Validation
     runs-on: ubuntu-latest
-    # 对于 dependabot 的 PR 跳过验证（自动化 PR 不需要人工验证）
+    # Đối với dependabot của PR Bỏ qua xác nhận (tự động PR Không cần xác minh thủ công)
     if: github.actor != 'dependabot[bot]'
 
     steps:
-      # 第一步：检出代码（获取完整历史记录以检查冲突）
+      # Bước 1: Kiểm tra mã (lấy toàn bộ lịch sử để kiểm tra xung đột)
       - name: Checkout code
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          fetch-depth: 0  # 获取完整的 Git 历史记录
+          fetch-depth: 0  # Nhận phiên bản đầy đủ Git Lịch sử
 
-      # 第二步：检查 PR 标题是否符合规范
+      # Bước 2: Kiểm tra PR Tiêu đề có tuân thủ đặc điểm kỹ thuật không?
       - name: Check PR title
         run: |
           if [[ -z "$PR_TITLE" ]]; then
             echo "❌ PR title cannot be empty"
             exit 1
           fi
-          
-          # 检查标题长度（建议不超过 72 个字符）
+
+          # Kiểm tra độ dài tiêu đề (không nên vượt quá 72 ký tự)
           PR_TITLE_LENGTH=${#PR_TITLE}
           if [[ $PR_TITLE_LENGTH -gt 72 ]]; then
             echo "⚠️  Warning: PR title is too long ($PR_TITLE_LENGTH chars, recommended < 72)"
           fi
-          
+
           echo "✅ PR title: $PR_TITLE"
-          # 可以添加约定式提交格式检查：
+          # Bạn có thể thêm kiểm tra định dạng gửi thông thường: .
           # if [[ ! "$PR_TITLE" =~ ^(feat|fix|docs|style|refactor|perf|test|chore|build|ci)(\(.+\))?: ]]; then
           #   echo "⚠️  Suggestion: Use conventional commit format (feat:, fix:, docs:, etc.)"
           # fi
         env:
           PR_TITLE: ${{ github.event.pull_request.title }}
 
-      # 第三步：检查 PR 描述是否提供了足够的信息
+      # Bước 3: Kiểm tra PR Liệu mô tả có cung cấp đủ thông tin hay không
       - name: Check PR description
         run: |
-          # 使用环境变量来安全地传递 PR body，避免特殊字符和命令注入
+          # Sử dụng các biến môi trường để vượt qua một cách an toàn PR body，Tránh các ký tự đặc biệt và lệnh tiêm
           PR_BODY_LENGTH=$(echo -n "$PR_BODY" | wc -c | tr -d ' ')
           if [[ -z "$PR_BODY" || "$PR_BODY_LENGTH" -lt 10 ]]; then
             echo "⚠️  Warning: PR description is too short or empty ($PR_BODY_LENGTH chars)"
-            echo "建议提供详细的变更说明：what、why、how"
+            echo "Bạn nên cung cấp mô tả chi tiết về thay đổi: .what、why、how"
           else
             echo "✅ PR description provided ($PR_BODY_LENGTH chars)"
           fi
         env:
           PR_BODY: ${{ github.event.pull_request.body }}
 
-      # 第四步：检查变更的文件数量
+      # Bước 4: Kiểm tra số lượng file đã thay đổi
       - name: Check changed files
         run: |
           CHANGED_FILES=$(git diff --name-only origin/${{ github.base_ref }}...HEAD | wc -l)
           echo "📝 Changed files: $CHANGED_FILES"
-          
+
           if [[ $CHANGED_FILES -gt 50 ]]; then
             echo "⚠️  Warning: This PR changes $CHANGED_FILES files. Consider splitting into smaller PRs."
           fi
-          
-          # 显示变更统计
+
+          # Hiển thị số liệu thống kê thay đổi
           echo "## Changed Files Summary" >> $GITHUB_STEP_SUMMARY
           git diff --stat origin/${{ github.base_ref }}...HEAD >> $GITHUB_STEP_SUMMARY
 
-      # 第五步：检查是否存在合并冲突
+      # Bước 5: Kiểm tra xung đột hợp nhất
       - name: Check for conflicts
         run: |
           git fetch origin ${{ github.base_ref }}
-          
-          # 尝试模拟合并，检查是否有冲突
+
+          # Hãy thử mô phỏng việc hợp nhất và kiểm tra xem có bất kỳ xung đột nào không
           if ! git merge-tree $(git merge-base HEAD origin/${{ github.base_ref }}) origin/${{ github.base_ref }} HEAD > /tmp/merge-result 2>&1; then
             echo "❌ Merge simulation failed"
             cat /tmp/merge-result
             exit 1
           fi
-          
-          # 检查合并结果中是否包含冲突标记
+
+          # Kiểm tra xem kết quả đã hợp nhất có chứa các dấu hiệu xung đột hay không
           if grep -q '<<<<<<<' /tmp/merge-result; then
             echo "❌ This PR has merge conflicts. Please resolve them before merging."
-            echo "冲突文件："
+            echo "Tệp xung đột: ."
             grep -B 2 '<<<<<<<' /tmp/merge-result | grep -E '^\+\+\+' || true
             exit 1
           else
             echo "✅ No merge conflicts detected"
           fi
 
-  # Job 5: 汇总检查结果
+  # Job 5: Tổng hợp kết quả kiểm tra
   summary:
     name: Check Summary
     runs-on: ubuntu-latest
@@ -592,97 +592,97 @@ jobs:
     if: always()
 
     steps:
-      # 生成检查结果汇总报告
+      # Lập báo cáo tóm tắt kết quả kiểm tra
       - name: Generate check summary
         env:
           PR_NUMBER: ${{ github.event.pull_request.number }}
           PR_TITLE: ${{ github.event.pull_request.title }}
         run: |
-          # 将检查结果写入 GitHub Step Summary（在 Actions 页面显示）
+          # Viết kết quả kiểm tra GitHub Step Summary（Vào Actions hiển thị trang)
           echo "## 🔍 PR Check Summary" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "**PR #${PR_NUMBER}**: ${PR_TITLE}" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          
-          # 检查结果表格
-          echo "| 检查项 | 状态 | 详情 |" >> $GITHUB_STEP_SUMMARY
+
+          # Kiểm tra mẫu kết quả
+          echo "| Kiểm tra các mục | trạng thái | Chi tiết |" >> $GITHUB_STEP_SUMMARY
           echo "|--------|------|------|" >> $GITHUB_STEP_SUMMARY
-          
-          # Build 结果
+
+          # Build kết quả
           if [[ "${{ needs.build.result }}" == "success" ]]; then
-            echo "| 🏗️ 构建和测试 | ✅ 通过 | JAR 构建成功，单元测试通过 |" >> $GITHUB_STEP_SUMMARY
+            echo "| 🏗️ Xây dựng và thử nghiệm | ✅ vượt qua | JAR Quá trình xây dựng thành công và các bài kiểm tra đơn vị đã vượt qua |" >> $GITHUB_STEP_SUMMARY
           else
-            echo "| 🏗️ 构建和测试 | ❌ 失败 | 请检查构建或测试日志 |" >> $GITHUB_STEP_SUMMARY
+            echo "| 🏗️ Xây dựng và thử nghiệm | ❌ thất bại | Please check the build or test logs |" >> $GITHUB_STEP_SUMMARY
           fi
-          
-          # Windows 打包测试结果
+
+          # Windows Kết quả kiểm tra gói
           if [[ "${{ needs.test-windows-package.result }}" == "success" ]]; then
-            echo "| 🪟 Windows 打包 | ✅ 通过 | EXE 安装包和便携版打包成功，启动测试通过 |" >> $GITHUB_STEP_SUMMARY
+            echo "| 🪟 Windows Đóng gói | ✅ vượt qua | EXE Gói cài đặt và phiên bản di động đã được đóng gói thành công và quá trình kiểm tra khởi động đã vượt qua |" >> $GITHUB_STEP_SUMMARY
           elif [[ "${{ needs.test-windows-package.result }}" == "skipped" ]]; then
-            echo "| 🪟 Windows 打包 | ⏭️ 跳过 | 因前置任务失败而跳过 |" >> $GITHUB_STEP_SUMMARY
+            echo "| 🪟 Windows Đóng gói | ⏭️ Bỏ qua | Bị bỏ qua do nhiệm vụ trước đó không thành công |" >> $GITHUB_STEP_SUMMARY
           else
-            echo "| 🪟 Windows 打包 | ❌ 失败 | 打包或启动测试失败 |" >> $GITHUB_STEP_SUMMARY
+            echo "| 🪟 Windows Đóng gói | ❌ thất bại | Không thể đóng gói hoặc khởi chạy thử nghiệm |" >> $GITHUB_STEP_SUMMARY
           fi
-          
-          # macOS 打包测试结果
+
+          # macOS Kết quả kiểm tra gói
           if [[ "${{ needs.test-macos-package.result }}" == "success" ]]; then
-            echo "| 🍎 macOS 打包 | ✅ 通过 | App bundle 打包成功，启动测试通过 |" >> $GITHUB_STEP_SUMMARY
+            echo "| 🍎 macOS Đóng gói | ✅ vượt qua | App bundle Việc đóng gói đã thành công và thử nghiệm khởi động đã vượt qua |" >> $GITHUB_STEP_SUMMARY
           elif [[ "${{ needs.test-macos-package.result }}" == "skipped" ]]; then
-            echo "| 🍎 macOS 打包 | ⏭️ 跳过 | 因前置任务失败而跳过 |" >> $GITHUB_STEP_SUMMARY
+            echo "| 🍎 macOS Đóng gói | ⏭️ Bỏ qua | Bị bỏ qua do nhiệm vụ trước đó không thành công |" >> $GITHUB_STEP_SUMMARY
           else
-            echo "| 🍎 macOS 打包 | ❌ 失败 | 打包或启动测试失败 |" >> $GITHUB_STEP_SUMMARY
+            echo "| 🍎 macOS Đóng gói | ❌ thất bại | Không thể đóng gói hoặc khởi chạy thử nghiệm |" >> $GITHUB_STEP_SUMMARY
           fi
-          
-          # Code Quality 结果
+
+          # Code Quality kết quả
           if [[ "${{ needs.code-quality.result }}" == "success" ]]; then
-            echo "| 📊 代码质量 | ✅ 通过 | 编译成功，代码规范符合要求 |" >> $GITHUB_STEP_SUMMARY
+            echo "| 📊 Chất lượng mã | ✅ vượt qua | Quá trình biên dịch thành công và các đặc tả mã đáp ứng yêu cầu |" >> $GITHUB_STEP_SUMMARY
           else
-            echo "| 📊 代码质量 | ❌ 失败 | 请检查编译错误或代码规范问题 |" >> $GITHUB_STEP_SUMMARY
+            echo "| 📊 Chất lượng mã | ❌ thất bại | Vui lòng kiểm tra lỗi biên dịch hoặc vấn đề về đặc tả mã |" >> $GITHUB_STEP_SUMMARY
           fi
-          
-          # PR Validation 结果
+
+          # PR Validation kết quả
           if [[ "${{ needs.pr-validation.result }}" == "success" ]]; then
-            echo "| 📋 PR 规范 | ✅ 通过 | 标题、描述符合规范，无冲突 |" >> $GITHUB_STEP_SUMMARY
+            echo "| 📋 PR đặc điểm kỹ thuật | ✅ vượt qua | Tiêu đề và mô tả tuân thủ các thông số kỹ thuật và không có xung đột |" >> $GITHUB_STEP_SUMMARY
           elif [[ "${{ needs.pr-validation.result }}" == "skipped" ]]; then
-            echo "| 📋 PR 规范 | ⏭️ 跳过 | Dependabot 自动化 PR，跳过验证 |" >> $GITHUB_STEP_SUMMARY
+            echo "| 📋 PR đặc điểm kỹ thuật | ⏭️ Bỏ qua | Dependabot tự động hóa PR，Bỏ qua xác minh |" >> $GITHUB_STEP_SUMMARY
           else
-            echo "| 📋 PR 规范 | ❌ 失败 | 请检查标题、描述或解决合并冲突 |" >> $GITHUB_STEP_SUMMARY
+            echo "| 📋 PR đặc điểm kỹ thuật | ❌ thất bại | Please check the title, description or resolve merge conflicts |" >> $GITHUB_STEP_SUMMARY
           fi
-          
+
           echo "" >> $GITHUB_STEP_SUMMARY
-          
-          # 根据检查结果给出不同的消息
-          # pr-validation 可能是 success 或 skipped（dependabot 跳过），都视为通过
+
+          # Các thông báo khác nhau được đưa ra dựa trên kết quả kiểm tra
+          # pr-validation Có lẽ success hoặc skipped（dependabot Bỏ qua), tất cả đều được coi là đã đạt
           if [[ "${{ needs.build.result }}" == "success" ]] && \
              [[ "${{ needs.test-windows-package.result }}" == "success" ]] && \
              [[ "${{ needs.test-macos-package.result }}" == "success" ]] && \
              [[ "${{ needs.code-quality.result }}" == "success" ]] && \
              ( [[ "${{ needs.pr-validation.result }}" == "success" ]] || [[ "${{ needs.pr-validation.result }}" == "skipped" ]] ); then
-            echo "### ✅ 所有检查通过！" >> $GITHUB_STEP_SUMMARY
+            echo "### ✅ Tất cả các kiểm tra đã được thông qua! ." >> $GITHUB_STEP_SUMMARY
             echo "" >> $GITHUB_STEP_SUMMARY
-            echo "🎉 恭喜！此 PR 已通过以下验证：" >> $GITHUB_STEP_SUMMARY
-            echo "- ✅ JAR 构建和测试" >> $GITHUB_STEP_SUMMARY
-            echo "- ✅ Windows 应用打包和启动测试" >> $GITHUB_STEP_SUMMARY
-            echo "- ✅ macOS 应用打包和启动测试" >> $GITHUB_STEP_SUMMARY
-            echo "- ✅ 代码质量检查" >> $GITHUB_STEP_SUMMARY
-            echo "- ✅ PR 规范验证" >> $GITHUB_STEP_SUMMARY
+            echo "🎉 Xin chúc mừng! Cái này PR Đã vượt qua các xác minh sau:" >> $GITHUB_STEP_SUMMARY
+            echo "- ✅ JAR Xây dựng và thử nghiệm" >> $GITHUB_STEP_SUMMARY
+            echo "- ✅ Windows Đóng gói ứng dụng và thử nghiệm khởi chạy" >> $GITHUB_STEP_SUMMARY
+            echo "- ✅ macOS Đóng gói ứng dụng và thử nghiệm khởi chạy" >> $GITHUB_STEP_SUMMARY
+            echo "- ✅ Kiểm tra chất lượng mã" >> $GITHUB_STEP_SUMMARY
+            echo "- ✅ PR Xác minh thông số kỹ thuật" >> $GITHUB_STEP_SUMMARY
             echo "" >> $GITHUB_STEP_SUMMARY
-            echo "此 PR 已准备好进行代码审查和合并。" >> $GITHUB_STEP_SUMMARY
+            echo "Cái này PR Sẵn sàng để xem xét và hợp nhất mã." >> $GITHUB_STEP_SUMMARY
           else
-            echo "### ⚠️ 部分检查失败" >> $GITHUB_STEP_SUMMARY
+            echo "### ⚠️ Một số lần kiểm tra không thành công" >> $GITHUB_STEP_SUMMARY
             echo "" >> $GITHUB_STEP_SUMMARY
-            echo "请修复以下问题后重新提交：" >> $GITHUB_STEP_SUMMARY
+            echo "Please fix the following issues and resubmit:" >> $GITHUB_STEP_SUMMARY
             echo "" >> $GITHUB_STEP_SUMMARY
-          
-            # 列出失败的检查项
-            [[ "${{ needs.build.result }}" != "success" ]] && echo "- 🏗️ 构建和测试失败" >> $GITHUB_STEP_SUMMARY
-            [[ "${{ needs.test-windows-package.result }}" == "failure" ]] && echo "- 🪟 Windows 打包/启动测试失败" >> $GITHUB_STEP_SUMMARY
-            [[ "${{ needs.test-macos-package.result }}" == "failure" ]] && echo "- 🍎 macOS 打包/启动测试失败" >> $GITHUB_STEP_SUMMARY
-            [[ "${{ needs.code-quality.result }}" != "success" ]] && echo "- 📊 代码质量检查失败" >> $GITHUB_STEP_SUMMARY
-            [[ "${{ needs.pr-validation.result }}" == "failure" ]] && echo "- 📋 PR 规范验证失败" >> $GITHUB_STEP_SUMMARY
-          
+
+            # Liệt kê các lần kiểm tra không thành công
+            [[ "${{ needs.build.result }}" != "success" ]] && echo "- 🏗️ Xây dựng và thử nghiệm không thành công" >> $GITHUB_STEP_SUMMARY
+            [[ "${{ needs.test-windows-package.result }}" == "failure" ]] && echo "- 🪟 Windows Đóng gói/Kiểm tra khởi động không thành công" >> $GITHUB_STEP_SUMMARY
+            [[ "${{ needs.test-macos-package.result }}" == "failure" ]] && echo "- 🍎 macOS Đóng gói/Kiểm tra khởi động không thành công" >> $GITHUB_STEP_SUMMARY
+            [[ "${{ needs.code-quality.result }}" != "success" ]] && echo "- 📊 Kiểm tra chất lượng mã không thành công" >> $GITHUB_STEP_SUMMARY
+            [[ "${{ needs.pr-validation.result }}" == "failure" ]] && echo "- 📋 PR Xác minh chuẩn không thành công" >> $GITHUB_STEP_SUMMARY
+
             echo "" >> $GITHUB_STEP_SUMMARY
-            echo "💡 **提示**: 点击上方失败的 Job 查看详细日志" >> $GITHUB_STEP_SUMMARY
-            echo "📝 **说明**: 打包测试确保应用在目标平台能正常启动运行" >> $GITHUB_STEP_SUMMARY
+            echo "💡 **gợi ý**: Nhấp chuột ở trên không thành công Job Xem nhật ký chi tiết" >> $GITHUB_STEP_SUMMARY
+            echo "📝 **Mô tả**: Kiểm thử đóng gói đảm bảo rằng ứng dụng có thể khởi động và chạy bình thường trên nền tảng đích" >> $GITHUB_STEP_SUMMARY
             exit 1
           fi

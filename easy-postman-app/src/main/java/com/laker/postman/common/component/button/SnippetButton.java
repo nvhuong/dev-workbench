@@ -9,8 +9,8 @@ import javax.swing.*;
 import java.awt.*;
 
 /**
- * 代码片段按钮
- * 用于打开代码片段对话框
+ * Nút đoạn mã
+ * Được sử dụng để mở hộp thoại đoạn mã
  */
 public class SnippetButton extends JButton {
     public SnippetButton() {

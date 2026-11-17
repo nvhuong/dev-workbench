@@ -16,7 +16,7 @@ import java.awt.Graphics2D;
 import java.awt.Insets;
 
 /**
- * 大块工具窗口的统一外壳，负责 IDEA 风格的外层背景、圆角卡片和 split 间距。
+ * Một shell hợp nhất cho các cửa sổ công cụ lớn, chịu trách nhiệm về IDEA Nền bên ngoài được tạo kiểu, các góc bo tròn cho thẻ và split khoảng cách.
  */
 public final class ToolWindowChrome {
     public static final int DEFAULT_SIDE_WIDTH = 310;
@@ -244,7 +244,7 @@ public final class ToolWindowChrome {
 
     private static JSplitPane createInnerSplitPane(int orientation, Component first, Component second,
                                                   int dividerLocation, SplitDividerStyle dividerStyle) {
-        // 内部 split 只用于一个圆角卡片内的二级分区：不再套新的圆角卡片。
+        // nội bộ split Chỉ được sử dụng cho các phân vùng phụ trong thẻ góc tròn: sẽ không có thẻ góc tròn mới nào được chèn vào.
         JSplitPane splitPane = new ToolWindowInnerSplitPane(orientation, first, second, normalizeStyle(dividerStyle));
         splitPane.setContinuousLayout(true);
         splitPane.setDividerLocation(dividerLocation);

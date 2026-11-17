@@ -5,9 +5,9 @@ import java.nio.file.Path;
 import java.util.Optional;
 
 /**
- * 插件私有持久化空间。
+ * Plug-in không gian lưu giữ riêng tư.
  * <p>
- * 插件只能使用相对路径读写自己的数据目录，不应该直接依赖宿主 app 的设置文件或内部路径。
+ * Các plug-in chỉ có thể sử dụng các đường dẫn tương đối để đọc và ghi các thư mục dữ liệu của riêng chúng và không được dựa trực tiếp vào máy chủ app tập tin cài đặt hoặc đường dẫn nội bộ.
  * </p>
  */
 public interface PluginStorage {

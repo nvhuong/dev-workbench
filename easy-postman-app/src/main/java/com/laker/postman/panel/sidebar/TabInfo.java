@@ -7,7 +7,7 @@ import javax.swing.*;
 import java.util.function.Supplier;
 
 /**
- * 侧边栏 Tab 元数据，面板内容按需懒加载。
+ * Thanh bên Tab Siêu dữ liệu và nội dung bảng điều khiển được tải một cách lười biếng theo yêu cầu.
  */
 @Getter
 public class TabInfo {

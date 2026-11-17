@@ -131,7 +131,7 @@ public class CollectionInheritance {
             }
         }
         if (hasText(requestScript)) {
-            scripts.add(new ScriptPart("请求级脚本", requestScript));
+            scripts.add(new ScriptPart("Kịch bản cấp độ yêu cầu", requestScript));
         }
         return mergeScripts(scripts);
     }
@@ -139,7 +139,7 @@ public class CollectionInheritance {
     private static String mergePostScripts(String requestScript, List<RequestGroup> groupChain) {
         List<ScriptPart> scripts = new ArrayList<>();
         if (hasText(requestScript)) {
-            scripts.add(new ScriptPart("请求级脚本", requestScript));
+            scripts.add(new ScriptPart("Kịch bản cấp độ yêu cầu", requestScript));
         }
         for (int i = groupChain.size() - 1; i >= 0; i--) {
             RequestGroup group = groupChain.get(i);

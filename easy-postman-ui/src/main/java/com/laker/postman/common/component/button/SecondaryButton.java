@@ -8,9 +8,9 @@ import javax.swing.*;
 import java.awt.*;
 
 /**
- * 次要按钮 - 现代化设计
- * 完全支持亮色和暗色主题自适应
- * 用于次要操作（如取消、保存等）
+ * Nút phụ - Thiết kế hiện đại
+ * Hỗ trợ đầy đủ việc thích ứng chủ đề sáng và tối
+ * Được sử dụng cho các hoạt động phụ (chẳng hạn như hủy, lưu, v.v.)
  *
  * @author laker
  */
@@ -29,7 +29,7 @@ public class SecondaryButton extends JButton {
             setIconTextGap(4);
         }
 
-        // 设置字体和样式
+        // Đặt phông chữ và phong cách
         setFont(FontsUtil.getDefaultFont(Font.PLAIN));
         putClientProperty(FlatClientProperties.STYLE_CLASS, ModernButtonFactory.SECONDARY_STYLE_CLASS);
         setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));

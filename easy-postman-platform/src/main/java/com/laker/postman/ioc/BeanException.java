@@ -1,7 +1,7 @@
 package com.laker.postman.ioc;
 
 /**
- * IOC容器相关异常的基类
+ * IOCLớp cơ sở cho các ngoại lệ liên quan đến vùng chứa
  */
 public class BeanException extends RuntimeException {
 

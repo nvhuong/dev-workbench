@@ -1,89 +1,89 @@
-# 🎯 功能详细说明
+# 🎯 Mô tả chi tiết các chức năng
 
-## 🏢 工作区管理
+## 🏢 Quản lý không gian làm việc
 
-### 本地工作区
-- ✅ 适合个人项目
-- ✅ 数据完全本地存储，隐私安全
-- ✅ 无需网络连接
-- ✅ 完全掌控您的数据
+### Không gian làm việc cục bộ
+- ✅ Thích hợp cho các dự án cá nhân
+- ✅ Dữ liệu được lưu trữ hoàn toàn cục bộ và quyền riêng tư được bảo mật
+- ✅ Không cần kết nối internet
+- ✅ Kiểm soát hoàn toàn dữ liệu của bạn
 
-### Git 工作区
-- ✅ 支持版本控制
-- ✅ 支持团队协作
-- ✅ 从远程仓库克隆（GitHub/Gitee/GitLab）
-- ✅ 本地初始化 Git 仓库
-- ✅ 项目级别数据隔离
-- ✅ 快速工作区切换
-- ✅ 多种认证方式：
-  - 用户名/密码
+### Git khu vực làm việc
+- ✅ Kiểm soát phiên bản được hỗ trợ
+- ✅ Hỗ trợ hợp tác nhóm
+- ✅ Sao chép từ kho lưu trữ từ xa (GitHub/Gitee/GitLab）
+- ✅ Khởi tạo cục bộ Git nhà kho
+- ✅ Cách ly dữ liệu cấp dự án
+- ✅ Chuyển đổi không gian làm việc nhanh chóng
+- ✅ Nhiều phương thức xác thực:
+  - Tên người dùng/mật khẩu
   - Personal Access Token
   - SSH Key
 
-### Git 操作
-- **提交（Commit）**：保存本地变更到版本控制
-- **推送（Push）**：将本地提交推送到远程仓库
-- **拉取（Pull）**：从远程仓库获取最新变更
-- **冲突检测**：智能冲突处理和解决方案
+### Git hoạt động
+- **Gửi(Commit）**：Lưu các thay đổi cục bộ vào kiểm soát phiên bản
+- **đẩy(Push）**：Đẩy các cam kết cục bộ vào kho lưu trữ từ xa
+- **kéo(Pull）**：Nhận những thay đổi mới nhất từ kho lưu trữ từ xa
+- **Phát hiện xung đột**：Xử lý và giải quyết xung đột thông minh
 
-### 团队协作流程
-1. **团队领导者**：
-   - 创建 Git 工作区（从远程克隆或本地初始化）
-   - 配置接口集合和环境变量
-   - 提交并推送到远程仓库
-2. **团队成员**：
-   - 创建 Git 工作区（从远程克隆）
-   - 获取最新的接口数据和环境配置
-   - 本地修改后提交并推送更新
-3. **日常协作**：
-   - 开始工作前：先执行 **Pull** 拉取最新变更
-   - 完成修改后：执行 **Commit** 提交本地变更
-   - 分享更新：执行 **Push** 推送到远程仓库
+### Quá trình hợp tác nhóm
+1. **Đội trưởng**：
+   - Tạo Git Không gian làm việc (sao chép từ xa hoặc khởi tạo cục bộ)
+   - Cấu hình bộ sưu tập giao diện và các biến môi trường
+   - Gửi và đẩy đến kho lưu trữ từ xa
+2. **thành viên trong nhóm**：
+   - Tạo Git Không gian làm việc (sao chép từ xa)
+   - Nhận dữ liệu giao diện và cấu hình môi trường mới nhất
+   - Gửi và đẩy bản cập nhật sau khi sửa đổi cục bộ
+3. **Hợp tác hàng ngày**：
+   - Trước khi bắt đầu làm việc: Thực hiện **Pull** Kéo những thay đổi mới nhất
+   - Sau khi hoàn thành việc sửa đổi: thực thi **Commit** Cam kết thay đổi cục bộ
+   - Chia sẻ thông tin cập nhật: Đã thực hiện **Push** Đẩy vào kho lưu trữ từ xa
 
 ---
 
-## 🔌 接口调试
+## 🔌 Gỡ lỗi giao diện
 
-### 协议支持
-- ✅ HTTP/1.1 和 HTTP/2
-- ✅ 完整的 REST API 方法：GET、POST、PUT、DELETE、PATCH、HEAD、OPTIONS
+### Hỗ trợ giao thức
+- ✅ HTTP/1.1 và HTTP/2
+- ✅ Hoàn thành REST API Phương pháp:GET、POST、PUT、DELETE、PATCH、HEAD、OPTIONS
 - ✅ SSE（Server-Sent Events）
 - ✅ WebSocket
 
-### 请求体格式
+### Yêu cầu định dạng cơ thể
 - Form Data
 - x-www-form-urlencoded
 - JSON
 - XML
 - Binary
 
-### 功能特性
-- ✅ 文件上传下载（支持拖拽）
-- ✅ Cookie 自动管理和手动编辑
-- ✅ 请求头、查询参数可视化编辑
-- ✅ 响应数据格式化显示（JSON、XML、HTML）
-- ✅ 响应时间、状态码、大小统计
+### Các tính năng chức năng
+- ✅ Tải lên và tải xuống tệp (hỗ trợ kéo và thả)
+- ✅ Cookie Quản lý tự động và chỉnh sửa thủ công
+- ✅ Chỉnh sửa trực quan các tiêu đề yêu cầu và tham số truy vấn
+- ✅ Hiển thị định dạng dữ liệu phản hồi (JSON、XML、HTML）
+- ✅ Thời gian phản hồi, mã trạng thái, thống kê kích thước
 
-### 自托管 Mock Server
-- ✅ 从左侧一级菜单“Mock Server”为当前工作区创建服务
-- ✅ 集合不是必选项；一个服务可关联 0～多个集合，并列出其中全部 HTTP 请求（包括尚未配置响应的请求）
-- ✅ 无需先调用真实接口或创建集合，可直接新增独立路由并编辑状态码、响应头、Body 和延迟
-- ✅ 集合右键可创建 Mock Server，请求右键可直接添加 Mock 响应
-- ✅ 集合请求的响应仍保存为集合 Example；独立路由直接保存在 `mock_servers.json`
-- ✅ 匹配 method/path/query，可选匹配指定 header 和 JSON/文本 body
-- ✅ 支持 `x-mock-response-id`、`x-mock-response-name`、`x-mock-response-code` 选择 Example
-- ✅ 支持 `x-mock-match-request-body`、`x-mock-match-request-headers` 按单次请求启用精确匹配
-- ✅ 支持路由级 **Code Mock** 和可选全局脚本，通过 `pm.request`、`pm.response`、`pm.state` 动态响应
-- ✅ Code Mock 编辑器支持 `pm.*` 自动补全、启用状态、API 速查，以及 8 个精选常用示例，可预览、插入或替换
-- ✅ 支持 CORS、固定/路由延迟、`x-mock-response-delay` 临时延迟、有界/可关闭的调用日志和 `x-mock-session-id` 会话状态
-- ✅ 使用零额外服务端依赖的 JDK `HttpServer`，按 CPU 扩展工作线程并按 HTTP Method 预索引路由，适合并发联调和轻量压测
-- ✅ 默认监听所有网卡，界面显示本机访问 URL `127.0.0.1`；局域网设备可使用本机可达的 IP 和相同端口访问，可通过 `x-api-key` 设置共享访问密钥
-- ✅ `mock_servers.json` 与 `collections.json` 一同保存在当前工作区，Git 工作区会一起版本管理
-- ✅ 支持 `mock run` 无界面运行，可将工作区复制到服务器或 CI 自行托管
-- ✅ 管理页可直接复制对应工作区和服务的自托管启动命令
-- ✅ 不包含 EasyPostman 云端托管、团队权限、外部 npm 包或 AI 生成
+### Tự lưu trữ Mock Server
+- ✅ Menu cấp độ đầu tiên từ bên trái“Mock Server”Tạo một dịch vụ cho không gian làm việc hiện tại
+- ✅ Bộ sưu tập là không cần thiết; một dịch vụ có thể được liên kết 0～Nhiều bộ sưu tập và liệt kê tất cả HTTP Yêu cầu (bao gồm cả các yêu cầu chưa được định cấu hình phản hồi)
+- ✅ Bạn có thể trực tiếp thêm các tuyến độc lập và chỉnh sửa mã trạng thái cũng như tiêu đề phản hồi mà không cần gọi giao diện thực hoặc tạo bộ sưu tập trước.Body và trì hoãn
+- ✅ Bộ sưu tập có thể được tạo bằng cách nhấp chuột phải vào chúng Mock Server，Nhấp chuột phải vào yêu cầu để thêm nó trực tiếp Mock phản hồi
+- ✅ Phản hồi cho yêu cầu thu thập vẫn được lưu dưới dạng bộ sưu tập Example；Các tuyến đường độc lập được lưu trực tiếp vào `mock_servers.json`
+- ✅ cuộc thi đấu method/path/query，Đặc điểm kỹ thuật phù hợp tùy chọn header và JSON/văn bản body
+- ✅ Hỗ trợ `x-mock-response-id`、`x-mock-response-name`、`x-mock-response-code` Chọn Example
+- ✅ Hỗ trợ `x-mock-match-request-body`、`x-mock-match-request-headers` Cho phép kết hợp chính xác trên cơ sở mỗi yêu cầu
+- ✅ Hỗ trợ cấp độ định tuyến **Code Mock** và các tập lệnh toàn cầu tùy chọn, thông qua  `pm.request`、`pm.response`、`pm.state` Phản ứng năng động
+- ✅ Code Mock Hỗ trợ biên tập `pm.*` Tự động hoàn thành, trạng thái đã bật,API Kiểm tra nhanh là tốt 8 Tuyển tập các ví dụ thường được sử dụng có thể được xem trước, chèn hoặc thay thế
+- ✅ Hỗ trợ CORS、đã sửa/Độ trễ định tuyến,`x-mock-response-delay` Tạm thời bị trì hoãn, bị giới hạn/Tắt tính năng ghi nhật ký cuộc gọi và `x-mock-session-id` trạng thái phiên
+- ✅ Không sử dụng thêm phụ thuộc phía máy chủ JDK `HttpServer`，Nhấn CPU Mở rộng chuỗi công nhân và nhấn HTTP Method Định tuyến được lập chỉ mục trước, thích hợp cho việc gỡ lỗi chung đồng thời và kiểm tra mức độ căng thẳng nhẹ
+- ✅ Theo mặc định, tất cả các card mạng đều được giám sát và giao diện hiển thị quyền truy cập cục bộ URL `127.0.0.1`；Các thiết bị LAN có thể được truy cập cục bộ IP và có thể được truy cập thông qua cùng một cổng `x-api-key` Đặt khóa truy cập được chia sẻ
+- ✅ `mock_servers.json` Và `collections.json` Lưu cùng nhau trong không gian làm việc hiện tại.Git Không gian làm việc sẽ được phiên bản cùng nhau
+- ✅ Hỗ trợ `mock run` Chạy không có giao diện, không gian làm việc có thể được sao chép vào máy chủ hoặc CI Tự lưu trữ
+- ✅ Trang quản lý có thể sao chép trực tiếp các lệnh khởi động tự lưu trữ cho các không gian làm việc và dịch vụ tương ứng
+- ✅ Không bao gồm EasyPostman Lưu trữ đám mây, quyền nhóm, bên ngoài npm gói hoặc AI phát ra
 
-服务器启动示例：
+Ví dụ khởi động máy chủ: .
 
 ```bash
 EASY_POSTMAN_MOCK_API_KEY=change-me \
@@ -91,9 +91,9 @@ java -jar easy-postman.jar mock run /path/to/workspace \
   --server "Payments Mock" --host 0.0.0.0 --port 3001
 ```
 
-公网使用建议放在 Nginx、Caddy 或云负载均衡后面终止 HTTPS，并限制防火墙入站端口。
+Nên sử dụng mạng công cộng Nginx、Caddy Hoặc việc cân bằng tải trên đám mây sẽ bị chấm dứt sau đó HTTPS，Và hạn chế các cổng vào của tường lửa.
 
-脚本示例：
+Ví dụ về tập lệnh: .
 
 ```javascript
 const input = JSON.parse(pm.request.body || "{}");
@@ -106,175 +106,175 @@ if (Number(input.amount) === 0.5) {
 }
 ```
 
-`pm.request` 提供 `method`、`path`、`body`、`header(name)`、`query(name)` 和 `pathVariable(name)`；`pm.response` 可设置状态码、header、body 和 `delayMs`。状态仅存于内存，清空状态、刷新服务运行时或退出应用后不保留。
+`pm.request` cung cấp `method`、`path`、`body`、`header(name)`、`query(name)` và `pathVariable(name)`；`pm.response` Mã trạng thái có thể được đặt.header、body và `delayMs`。Trạng thái chỉ tồn tại trong bộ nhớ và không được giữ lại khi xóa trạng thái, làm mới thời gian chạy dịch vụ hoặc thoát khỏi ứng dụng.
 
 ---
 
-## 🤖 MCP 与 AI 客户端
+## 🤖 MCP Và AI khách hàng
 
-- ✅ 内置标准 MCP stdio Server，可连接 Codex、Claude Desktop、Claude Code、Cursor 等本地客户端
-- ✅ 原生安装包和 Windows 便携版内置 `EasyPostmanMCP` 与 JRE，不需要另装 Java 或单独下载 MCP
-- ✅ 列出已授权工作区、集合、环境和已保存请求；环境列表不返回变量值
-- ✅ 按每次 Tool 调用选择 `workspaceId` 和 `environmentId`，不修改桌面端当前选择
-- ✅ 执行单个已保存 HTTP 请求或整个顶层集合，复用变量继承、前后置脚本、断言、Cookie、TLS 和 HTTP 执行链
-- ✅ 支持一次性 `environmentOverrides`，只在内存中生效，不写回工作区
-- ✅ MCP 进程与桌面应用可同时运行；一个连接内复用同一进程，不会为每个 API 调用重复启动
-- ✅ 响应体和明细有上限，常见认证数据与错误路径会脱敏，stdout 只输出 MCP JSON-RPC
-- 🔒 MCP 可发起真实外部请求并把响应返回客户端，仅应授权可信客户端和必要工作区
+- ✅ Tiêu chuẩn tích hợp MCP stdio Server，Có thể kết nối Codex、Claude Desktop、Claude Code、Cursor Đợi khách hàng địa phương
+- ✅ Gói cài đặt gốc và Windows Phiên bản di động tích hợp `EasyPostmanMCP` Và JRE，Không cần cài đặt thêm Java Hoặc tải xuống riêng biệt MCP
+- ✅ Liệt kê các không gian làm việc, bộ sưu tập, môi trường và yêu cầu đã lưu được ủy quyền; danh sách môi trường không trả về giá trị biến
+- ✅ Nhấn mỗi lần Tool Lựa chọn cuộc gọi `workspaceId` và `environmentId`，Không sửa đổi lựa chọn hiện tại trên màn hình nền
+- ✅ Thực hiện một lưu duy nhất HTTP Yêu cầu hoặc toàn bộ bộ sưu tập cấp cao nhất, sử dụng lại tính kế thừa biến, tập lệnh trước và sau cũng như xác nhận.Cookie、TLS và HTTP chuỗi thực thi
+- ✅ Hỗ trợ sử dụng một lần `environmentOverrides`，Nó chỉ có hiệu lực trong bộ nhớ và không được ghi lại vào vùng làm việc
+- ✅ MCP Các quy trình và ứng dụng máy tính để bàn có thể chạy đồng thời; quy trình tương tự được sử dụng lại trong một kết nối chứ không phải cho mỗi kết nối API Bắt đầu lặp lại cuộc gọi
+- ✅ Có giới hạn trên đối với nội dung và thông tin chi tiết của phản hồi, đồng thời, dữ liệu xác thực chung và đường dẫn lỗi sẽ bị loại bỏ.stdout Chỉ đầu ra MCP JSON-RPC
+- 🔒 MCP Một yêu cầu thực sự bên ngoài có thể được thực hiện và phản hồi được trả về cho khách hàng. Chỉ những khách hàng đáng tin cậy và không gian làm việc cần thiết mới được ủy quyền
 
-安装与完整边界见 [MCP Server 文档](MCP_SERVER_DESIGN_zh.md)。
-
----
-
-## 🌍 环境管理
-
-- ✅ 多环境快速切换（开发/测试/生产）
-- ✅ 全局变量和环境变量支持
-- ✅ 变量嵌套引用：`{{baseUrl}}/api/{{version}}`
-- ✅ 动态变量：
-  - `{{$timestamp}}` - 当前时间戳
-  - `{{$randomInt}}` - 随机整数
-  - `{{$uuid}}` - UUID 生成器
-- ✅ 环境变量导入导出
+Xem cài đặt với đường viền hoàn chỉnh [MCP Server Tài liệu](MCP_SERVER_DESIGN_zh.md)。
 
 ---
 
-## 📝 脚本支持
+## 🌍 Quản lý môi trường
 
-### Pre-request Script（请求前脚本）
-- 在发送请求前执行 JavaScript
-- 动态设置变量
-- 准备测试数据
-- 修改请求参数
-
-### Tests Script（测试脚本）
-- 在收到响应后执行 JavaScript
-- 解析响应数据
-- 从响应中设置变量
-- 实现请求链路
-- 断言支持
-
-### 内置功能
-- ✅ 代码片段库
-- ✅ JavaScript 运行时环境
-- ✅ 断言测试
-- ✅ 请求链路
+- ✅ Chuyển đổi nhanh chóng giữa nhiều môi trường ( Development/Bài kiểm tra/Sản xuất)
+- ✅ Hỗ trợ biến toàn cục và biến môi trường
+- ✅ Tham chiếu lồng nhau biến:`{{baseUrl}}/api/{{version}}`
+- ✅ Biến động:
+  - `{{$timestamp}}` - Dấu thời gian hiện tại
+  - `{{$randomInt}}` - Số nguyên ngẫu nhiên
+  - `{{$uuid}}` - UUID máy phát điện
+- ✅ Nhập và xuất các biến môi trường
 
 ---
 
-## ⚡ 性能测试
+## 📝 Hỗ trợ viết kịch bản
 
-### 线程组模式
-1. **固定线程数**：稳定负载测试
-   - 恒定线程数
-   - 适合基准性能测试
+### Pre-request Script（tập lệnh yêu cầu trước)
+- Thực hiện trước khi gửi yêu cầu JavaScript
+- Đặt biến động
+- Chuẩn bị dữ liệu thử nghiệm
+- Sửa đổi các tham số yêu cầu
 
-2. **递增式**：逐步增加负载
-   - 逐步增加线程
-   - 测试系统在递增负载下的行为
+### Tests Script（kịch bản thử nghiệm)
+- Thực hiện sau khi nhận được phản hồi JavaScript
+- Phân tích dữ liệu phản hồi
+- Đặt các biến từ phản hồi
+- Thực hiện liên kết yêu cầu
+- Hỗ trợ khẳng định
 
-3. **阶梯式**：分阶段负载测试
-   - 负载分阶段增加
-   - 识别不同级别的性能瓶颈
-
-4. **尖刺式**：突发流量测试
-   - 突然的流量激增
-   - 测试系统弹性
-
-### 监控与报告
-- ✅ 实时性能监控
-- ✅ 详细测试报告：
-  - 响应时间分布
-  - TPS（每秒事务数）
-  - 错误率分析
-  - 成功/失败统计
-- ✅ 结果树分析
-- ✅ 性能趋势图表
-- ✅ 导出测试结果
+### Chức năng tích hợp
+- ✅ Thư viện đoạn mã
+- ✅ JavaScript Môi trường thời gian chạy
+- ✅ Kiểm tra khẳng định
+- ✅ Yêu cầu liên kết
 
 ---
 
-## 📊 数据分析
+## ⚡ Kiểm tra hiệu suất
 
-### 请求历史
-- ✅ 所有请求的时间线视图
-- ✅ 快速重放之前的请求
-- ✅ 按状态码、方法、URL 过滤
-- ✅ 自动保存和持久化存储
+### Chế độ nhóm chủ đề
+1. **Số lượng chủ đề cố định**：Kiểm tra tải ổn định
+   - Số lượng chủ đề không đổi
+   - Thích hợp để kiểm tra hiệu suất điểm chuẩn
 
-### 网络事件日志
-- ✅ 详细的网络事件监控
-- ✅ 请求/响应头
-- ✅ 时间分解
-- ✅ 错误诊断
+2. **Tăng dần**：Tăng dần tải
+   - Dần dần thêm chủ đề
+   - Kiểm tra hành vi của hệ thống khi tải tăng dần
 
-### 响应统计
-- ✅ 响应时间分析
-- ✅ 数据大小跟踪
-- ✅ 错误请求自动分类
-- ✅ 导出统计数据
+3. **Cầu thang**：Kiểm tra tải theo giai đoạn
+   - Tải được tăng lên theo từng giai đoạn
+   - Identify different levels of performance bottlenecks
 
----
+4. **Tăng vọt**：Kiểm tra giao thông bùng nổ
+   - Lưu lượng truy cập tăng đột ngột
+   - Kiểm tra khả năng phục hồi của hệ thống
 
-## 🔄 数据管理
-
-### 导入支持
-- ✅ **Postman Collection v2.1**：支持导入导出
-- ✅ **cURL 命令**：转换为请求
-- 🚧 **HAR 文件**：开发中
-- 🚧 **OpenAPI/Swagger**：开发中
-
-### 导出支持
-- ✅ Postman Collection 格式
-- ✅ cURL 命令
-- ✅ 环境变量
-- ✅ 测试结果
+### Giám sát và báo cáo
+- ✅ Giám sát hiệu suất thời gian thực
+- ✅ Detailed test report:
+  - Phân phối thời gian đáp ứng
+  - TPS（giao dịch mỗi giây)
+  - Phân tích tỷ lệ lỗi
+  - thành công/Thống kê thất bại
+- ✅ Phân tích cây kết quả
+- ✅ Biểu đồ xu hướng hiệu suất
+- ✅ Xuất kết quả kiểm tra
 
 ---
 
-## 🎨 用户界面
+## 📊 Phân tích dữ liệu
 
-### 主题
-- ✅ 亮色模式
-- ✅ 暗色模式
-- ✅ 根据系统偏好自动切换
+### Yêu cầu lịch sử
+- ✅ Chế độ xem dòng thời gian của tất cả các yêu cầu
+- ✅ Nhanh chóng phát lại các yêu cầu trước đó
+- ✅ Bằng mã trạng thái, phương thức,URL lọc
+- ✅ Tự động lưu và lưu trữ liên tục
 
-### 编辑器功能
-- ✅ 语法高亮：
+### Nhật ký sự kiện mạng
+- ✅ Detailed network event monitoring
+- ✅ yêu cầu/tiêu đề phản hồi
+- ✅ Sự cố thời gian
+- ✅ Chẩn đoán lỗi
+
+### Thống kê phản hồi
+- ✅ Phân tích thời gian đáp ứng
+- ✅ Theo dõi kích thước dữ liệu
+- ✅ Tự động phân loại các yêu cầu xấu
+- ✅ Thống kê xuất khẩu
+
+---
+
+## 🔄 Quản lý dữ liệu
+
+### Hỗ trợ nhập khẩu
+- ✅ **Postman Collection v2.1**：Hỗ trợ xuất nhập khẩu
+- ✅ **cURL Đặt hàng**：Chuyển đổi thành yêu cầu
+- 🚧 **HAR tập tin**：Đang được phát triển
+- 🚧 **OpenAPI/Swagger**：Đang được phát triển
+
+### Hỗ trợ xuất khẩu
+- ✅ Postman Collection định dạng
+- ✅ cURL Đặt hàng
+- ✅ các biến môi trường
+- ✅ Kết quả kiểm tra
+
+---
+
+## 🎨 Giao diện người dùng
+
+### chủ đề
+- ✅ Chế độ màu sắc tươi sáng
+- ✅ Chế độ tối
+- ✅ Tự động chuyển đổi dựa trên tùy chọn hệ thống
+
+### Chức năng soạn thảo
+- ✅ Syntax Highlighting:
   - JSON
   - XML
   - JavaScript
   - HTML
-- ✅ 自动格式化
-- ✅ 代码折叠
-- ✅ 搜索和替换
+- ✅ Định dạng tự động
+- ✅ Gấp mã
+- ✅ Tìm kiếm và thay thế
 
-### 国际化
-- ✅ 简体中文
+### quốc tế hóa
+- ✅ Tiếng Trung giản thể
 - ✅ English
-- 🚧 更多语言即将推出
+- 🚧 Sắp có thêm nhiều ngôn ngữ
 
 ---
 
-## ☕ 附加工具
+## ☕ Công cụ bổ sung
 
-### Java 反编译器
-- ✅ 内置反编译器用于分析 Java 类
-- ✅ 从 JAR 文件查看源代码
-- ✅ 适用于调试和逆向工程
+### Java Trình giải mã
+- ✅ Trình dịch ngược tích hợp để phân tích Java lớp học
+- ✅ Từ JAR Mã nguồn xem tập tin
+- ✅ Thích hợp cho việc gỡ lỗi và kỹ thuật đảo ngược
 
-### 客户端证书
-- ✅ 支持 mTLS（双向 TLS）
-- ✅ 导入客户端证书
-- ✅ 安全的 API 测试
+### Giấy chứng nhận của khách hàng
+- ✅ Hỗ trợ mTLS（Cả hai hướng TLS）
+- ✅ Nhập chứng chỉ ứng dụng khách
+- ✅ An toàn API Bài kiểm tra
 
 ---
 
-## 🔒 隐私与安全
+## 🔒 Quyền riêng tư và bảo mật
 
-- ✅ **默认本地存储**：不启用 Git 同步或 MCP 时，工作区数据不会主动上传
-- 🔒 **连接由用户控制**：Git 远程、被测 API 和 MCP 客户端都可能接收用户显式发送的数据
-- ✅ **无遥测**：无跟踪，无分析
-- ✅ **离线优先**：完全离线工作
-- ✅ **开源**：代码透明可审查
-- ✅ **Git 加密**：支持加密的 Git 仓库
+- ✅ **Bộ nhớ cục bộ mặc định**：Chưa được kích hoạt Git đồng bộ hóa hoặc MCP , dữ liệu không gian làm việc sẽ không được tự động tải lên
+- 🔒 **Các kết nối được kiểm soát bởi người dùng**：Git Từ xa, đo lường API và MCP Khách hàng có thể nhận được dữ liệu được gửi rõ ràng bởi người dùng
+- ✅ **Không có đo từ xa**：Không theo dõi, không phân tích
+- ✅ **Ưu tiên ngoại tuyến**：Hoạt động hoàn toàn ngoại tuyến
+- ✅ **Nguồn mở**：Mã là minh bạch và có thể xem xét
+- ✅ **Git Mã hóa**：Mã hóa được hỗ trợ Git nhà kho

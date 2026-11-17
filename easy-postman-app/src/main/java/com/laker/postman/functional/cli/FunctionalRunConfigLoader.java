@@ -33,7 +33,7 @@ class FunctionalRunConfigLoader {
             throw ex;
         } catch (Exception ex) {
             throw new IllegalArgumentException(
-                    "Unable to read EasyPostman functional config: " + configPath + ": " + describe(ex),
+                    "Unable to read Dev Workbench functional config: " + configPath + ": " + describe(ex),
                     ex
             );
         }
@@ -102,7 +102,7 @@ class FunctionalRunConfigLoader {
         Path normalized = path.toAbsolutePath().normalize();
         if (!Files.isRegularFile(normalized) || !Files.isReadable(normalized)) {
             throw new IllegalArgumentException(
-                    "EasyPostman functional config does not exist or is not readable: " + normalized
+                    "Dev Workbench functional config does not exist or is not readable: " + normalized
             );
         }
         return normalized;

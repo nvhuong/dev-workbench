@@ -32,7 +32,7 @@ import java.util.*;
 import java.util.List;
 
 /**
- * CSV 数据管理面板 - 独立的CSV功能组件
+ * CSV Bảng quản lý dữ liệu - độc lậpCSVCác thành phần chức năng
  */
 @Slf4j
 public class CsvDataPanel extends JPanel {
@@ -77,10 +77,10 @@ public class CsvDataPanel extends JPanel {
     private File csvFile;
     private String csvSourceName;
     private List<Map<String, String>> csvData;
-    private List<String> csvHeaders; // 保存CSV列标题的顺序
-    private JPanel csvStatusPanel;  // CSV 状态显示面板
-    private JLabel csvStatusLabel;  // CSV 状态标签
-    private String contextHelpText; // 调用方注入的场景说明
+    private List<String> csvHeaders; // cứuCSVThứ tự các tiêu đề cột
+    private JPanel csvStatusPanel;  // CSV Bảng hiển thị trạng thái
+    private JLabel csvStatusLabel;  // CSV nhãn trạng thái
+    private String contextHelpText; // Mô tả kịch bản chèn người gọi
     private Runnable changeListener;
 
 
@@ -211,15 +211,15 @@ public class CsvDataPanel extends JPanel {
         setLayout(new BorderLayout());
         setOpaque(false);
 
-        // 创建CSV状态面板和CSV按钮
+        // TạoCSVbảng trạng thái vàCSVnút
         JPanel csvPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
         csvPanel.setOpaque(false);
 
-        // CSV按钮
+        // CSVnút
         JButton csvBtn = createCsvMenuButton();
         csvPanel.add(csvBtn);
 
-        // CSV状态显示面板
+        // CSVBảng hiển thị trạng thái
         csvStatusPanel = createCsvStatusPanel();
         csvPanel.add(csvStatusPanel);
 
@@ -227,21 +227,21 @@ public class CsvDataPanel extends JPanel {
     }
 
     /**
-     * 创建 CSV 状态显示面板
+     * Tạo CSV Bảng hiển thị trạng thái
      */
     private JPanel createCsvStatusPanel() {
         JPanel statusPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 4, 0));
         statusPanel.setOpaque(false);
-        statusPanel.setVisible(false); // 初始隐藏
+        statusPanel.setVisible(false); // Ẩn ban đầu
 
-        // 状态文本
+        // Văn bản trạng thái
         csvStatusLabel = new JLabel(I18nUtil.getMessage(MessageKeys.CSV_STATUS_NO_DATA));
         csvStatusLabel.setFont(FontsUtil.getDefaultFontWithOffset(Font.PLAIN, -1));
-        csvStatusLabel.setForeground(ModernColors.getTextSecondary()); // 使用次要文本颜色
-        csvStatusLabel.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR)); // 设置手型光标
-        csvStatusLabel.setToolTipText(I18nUtil.getMessage(MessageKeys.CSV_MENU_MANAGE_DATA)); // 添加提示文本
+        csvStatusLabel.setForeground(ModernColors.getTextSecondary()); // Sử dụng màu văn bản phụ
+        csvStatusLabel.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR)); // Đặt con trỏ tay
+        csvStatusLabel.setToolTipText(I18nUtil.getMessage(MessageKeys.CSV_MENU_MANAGE_DATA)); // Thêm văn bản nhắc nhở
 
-        // 添加点击事件监听器，点击文字打开数据管理对话框
+        // Thêm trình xử lý sự kiện nhấp chuột và nhấp vào văn bản để mở hộp thoại quản lý dữ liệu
         csvStatusLabel.addMouseListener(new java.awt.event.MouseAdapter() {
             private Color originalColor;
 
@@ -255,7 +255,7 @@ public class CsvDataPanel extends JPanel {
             @Override
             public void mouseEntered(java.awt.event.MouseEvent e) {
                 if (csvData != null && !csvData.isEmpty()) {
-                    // 鼠标悬停时改变颜色（使用更明亮的颜色）
+                    // Thay đổi màu khi di chuột qua (sử dụng màu sáng hơn)
                     originalColor = csvStatusLabel.getForeground();
                     csvStatusLabel.setForeground(ModernColors.getPrimary());
                 }
@@ -264,13 +264,13 @@ public class CsvDataPanel extends JPanel {
             @Override
             public void mouseExited(java.awt.event.MouseEvent e) {
                 if (csvData != null && !csvData.isEmpty() && originalColor != null) {
-                    // 鼠标离开时恢复原始颜色
+                    // Khôi phục màu gốc khi chuột rời đi
                     csvStatusLabel.setForeground(originalColor);
                 }
             }
         });
 
-        // CSV 清除按钮
+        // CSV Nút xóa
         CloseButton csvClearBtn = new CloseButton();
         csvClearBtn.setToolTipText(I18nUtil.getMessage(MessageKeys.CSV_BUTTON_CLEAR_TOOLTIP));
         csvClearBtn.addActionListener(e -> clearCsvData());
@@ -282,7 +282,7 @@ public class CsvDataPanel extends JPanel {
     }
 
     /**
-     * 创建带下拉菜单的 CSV 按钮
+     * Tạo một menu thả xuống CSV nút
      */
     private JButton createCsvMenuButton() {
         JButton csvBtn = new CSVButton();
@@ -303,7 +303,7 @@ public class CsvDataPanel extends JPanel {
         JMenuItem manageCsvItem = new JMenuItem(I18nUtil.getMessage(MessageKeys.CSV_MENU_MANAGE_DATA),
                 IconUtil.createThemed("icons/code.svg", 16, 16));
         manageCsvItem.addActionListener(e -> showCsvDataManageDialog());
-        manageCsvItem.setEnabled(false); // 默认禁用，有数据时启用
+        manageCsvItem.setEnabled(false); // Bị tắt theo mặc định, được bật khi có dữ liệu
         manageCsvItem.setToolTipText(I18nUtil.getMessage(MessageKeys.CSV_ACTION_REQUIRES_DATA));
         csvMenu.add(manageCsvItem);
 
@@ -312,12 +312,12 @@ public class CsvDataPanel extends JPanel {
         JMenuItem clearCsvItem = new JMenuItem(I18nUtil.getMessage(MessageKeys.CSV_MENU_CLEAR_DATA),
                 IconUtil.createThemed("icons/clear.svg", 16, 16));
         clearCsvItem.addActionListener(e -> clearCsvData());
-        clearCsvItem.setEnabled(false); // 默认禁用，有数据时启用
+        clearCsvItem.setEnabled(false); // Bị tắt theo mặc định, được bật khi có dữ liệu
         clearCsvItem.setToolTipText(I18nUtil.getMessage(MessageKeys.CSV_ACTION_REQUIRES_DATA));
         csvMenu.add(clearCsvItem);
 
         csvBtn.addActionListener(e -> {
-            // 更新菜单项状态
+            // Cập nhật trạng thái mục menu
             boolean hasCsvData = csvData != null && !csvData.isEmpty();
             manageCsvItem.setEnabled(hasCsvData);
             clearCsvItem.setEnabled(hasCsvData);
@@ -328,7 +328,7 @@ public class CsvDataPanel extends JPanel {
                     ? I18nUtil.getMessage(MessageKeys.CSV_BUTTON_CLEAR_TOOLTIP)
                     : I18nUtil.getMessage(MessageKeys.CSV_ACTION_REQUIRES_DATA));
 
-            // 显示菜单
+            // Trình đơn hiển thị
             csvMenu.show(csvBtn, 0, csvBtn.getHeight());
         });
 
@@ -336,7 +336,7 @@ public class CsvDataPanel extends JPanel {
     }
 
     /**
-     * 设置调用场景专属说明，仅在说明面板中追加展示。
+     * Thiết lập mô tả dành riêng cho cảnh gọi và chỉ hiển thị mô tả đó trong bảng mô tả.
      */
     public void setContextHelpText(String contextHelpText) {
         this.contextHelpText = contextHelpText;
@@ -361,7 +361,7 @@ public class CsvDataPanel extends JPanel {
     }
 
     /**
-     * 清除 CSV 数据
+     * Thông thoáng CSV dữ liệu
      */
     public void clearCsvData() {
         csvFile = null;
@@ -374,7 +374,7 @@ public class CsvDataPanel extends JPanel {
     }
 
     /**
-     * 打开文件选择器导入 CSV 数据。
+     * Mở trình chọn tệp để nhập CSV dữ liệu.
      */
     public boolean importCsvFile() {
         boolean imported = selectCsvFile();
@@ -385,14 +385,14 @@ public class CsvDataPanel extends JPanel {
     }
 
     /**
-     * 更新 CSV 状态显示
+     * đổi mới CSV hiển thị trạng thái
      */
     private void updateCsvStatus() {
         if (csvData == null || csvData.isEmpty()) {
             csvStatusPanel.setVisible(false);
         } else {
             csvStatusLabel.setText(I18nUtil.getMessage(MessageKeys.CSV_STATUS_LOADED, csvData.size()));
-            csvStatusLabel.setForeground(ModernColors.getTextSecondary()); // 使用次要文本颜色
+            csvStatusLabel.setForeground(ModernColors.getTextSecondary()); // Sử dụng màu văn bản phụ
             csvStatusLabel.setToolTipText(buildStatusTooltip());
             csvStatusPanel.setVisible(true);
         }
@@ -418,7 +418,7 @@ public class CsvDataPanel extends JPanel {
     }
 
     /**
-     * 手动创建 CSV 数据对话框
+     * Tạo thủ công CSV Hộp thoại dữ liệu
      */
     public void showManualCreateDialog() {
         JDialog dialog = new JDialog(UiSingletonFactory.getInstance(MainFrame.class),
@@ -432,7 +432,7 @@ public class CsvDataPanel extends JPanel {
         rootPanel.setBorder(BorderFactory.createEmptyBorder(16, 20, 12, 20));
         dialog.add(rootPanel, BorderLayout.CENTER);
 
-        // 顶部说明面板
+        // Bảng hướng dẫn hàng đầu
         JPanel topPanel = new JPanel(new BorderLayout(0, 6));
         ToolWindowSurfaceStyle.applyDialogSurface(topPanel);
 
@@ -449,7 +449,7 @@ public class CsvDataPanel extends JPanel {
 
         rootPanel.add(topPanel, BorderLayout.NORTH);
 
-        // 中间内容面板
+        // Bảng nội dung ở giữa
         JPanel contentPanel = new JPanel(new GridBagLayout());
         ToolWindowSurfaceStyle.applyDialogSurface(contentPanel);
         contentPanel.setBorder(BorderFactory.createEmptyBorder(10, 0, 8, 0));
@@ -457,7 +457,7 @@ public class CsvDataPanel extends JPanel {
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.insets = new Insets(5, 6, 5, 6);
 
-        // 列标题输入
+        // Đầu vào tiêu đề cột
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.anchor = GridBagConstraints.NORTHWEST;
@@ -475,7 +475,7 @@ public class CsvDataPanel extends JPanel {
         ToolWindowSurfaceStyle.applyTextComponentInput(headersField);
         contentPanel.add(headersField, gbc);
 
-        // 占位符提示
+        // Lời nhắc giữ chỗ
         gbc.gridx = 1;
         gbc.gridy = 1;
         JLabel placeholderLabel = new JLabel();
@@ -502,14 +502,14 @@ public class CsvDataPanel extends JPanel {
 
         rootPanel.add(contentPanel, BorderLayout.CENTER);
 
-        // 底部按钮面板
+        // Bảng nút dưới cùng
         JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         ToolWindowSurfaceStyle.applyDialogFooter(bottomPanel);
 
         JButton createBtn = ModernButtonFactory.createButton(I18nUtil.getMessage(MessageKeys.GENERAL_OK), true);
         createBtn.addActionListener(e -> {
             try {
-                // 默认创建1行数据
+                // Được tạo theo mặc định1dữ liệu hàng
                 int rowCount = 1;
 
                 List<String> headers = parseManualHeaders(headersField.getText());
@@ -524,14 +524,14 @@ public class CsvDataPanel extends JPanel {
                     return;
                 }
 
-                // 验证列数范围（从列标题自动计算）
+                // Xác thực phạm vi số cột (được tính tự động từ tiêu đề cột)
                 int columnCount = headers.size();
                 if (columnCount > 50) {
                     NotificationCenter.showError(I18nUtil.getMessage(MessageKeys.CSV_CREATE_MANUAL_TOO_MANY_COLUMNS, columnCount));
                     return;
                 }
 
-                // 创建空数据
+                // Tạo dữ liệu trống
                 List<Map<String, String>> newData = new ArrayList<>();
                 for (int i = 0; i < rowCount; i++) {
                     Map<String, String> row = new java.util.LinkedHashMap<>();
@@ -541,21 +541,21 @@ public class CsvDataPanel extends JPanel {
                     newData.add(row);
                 }
 
-                // 设置数据
+                // Đặt dữ liệu
                 csvData = newData;
                 csvHeaders = headers;
-                csvFile = null; // 清除文件引用，标记为手动创建
+                csvFile = null; // Xóa tham chiếu tệp và đánh dấu là được tạo thủ công
                 csvSourceName = null;
                 updateCsvStatus();
                 notifyChangeListener();
 
                 dialog.dispose();
 
-                // 自动打开数据管理对话框
+                // Tự động mở hộp thoại quản lý dữ liệu
                 showCsvDataManageDialog();
 
             } catch (Exception ex) {
-                log.error("创建 CSV 数据失败", ex);
+                log.error("Tạo CSV Dữ liệu không thành công", ex);
                 JOptionPane.showMessageDialog(dialog,
                         I18nUtil.getMessage(MessageKeys.GENERAL_ERROR) + ": " + ex.getMessage(),
                         I18nUtil.getMessage(MessageKeys.GENERAL_ERROR),
@@ -580,8 +580,8 @@ public class CsvDataPanel extends JPanel {
     }
 
     /**
-     * 增强的 CSV 文件管理对话框
-     * 布局：标题固定 → 说明文字可滚动 → 当前状态+操作按钮固定 → 关闭按钮固定
+     * Tăng cường CSV Hộp thoại quản lý tập tin
+     * Bố cục: Đã sửa tiêu đề → Description text is scrollable → Tình trạng hiện tại+Đã sửa các nút hành động → Đã sửa nút đóng
      */
     private void showEnhancedCsvManagementDialog() {
         JDialog dialog = new JDialog(UiSingletonFactory.getInstance(MainFrame.class),
@@ -777,7 +777,7 @@ public class CsvDataPanel extends JPanel {
     }
 
     /**
-     * CSV 数据管理对话框 - 集成预览和编辑功能
+     * CSV Hộp thoại quản lý dữ liệu - Tích hợp chức năng xem trước và chỉnh sửa
      */
     public void showCsvDataManageDialog() {
         if (csvData == null || csvData.isEmpty()) {
@@ -799,32 +799,32 @@ public class CsvDataPanel extends JPanel {
                 csvData.size()));
         infoLabel.setFont(FontsUtil.getDefaultFont(Font.PLAIN));
 
-        // 创建可编辑的表格
+        // Tạo các bảng có thể chỉnh sửa
         List<String> headers;
         try {
             if (csvHeaders != null && !csvHeaders.isEmpty()) {
-                // 优先使用保存的列标题顺序
+                // Thứ tự tiêu đề cột đã lưu được ưu tiên
                 headers = new ArrayList<>(csvHeaders);
             } else if (csvFile != null) {
                 headers = CsvDataUtil.getCsvHeaders(csvFile);
-                csvHeaders = headers; // 保存列标题顺序
+                csvHeaders = headers; // Lưu thứ tự tiêu đề cột
             } else {
-                // 从现有数据中获取列名，使用LinkedHashMap保持顺序
+                // Để lấy tên cột từ dữ liệu hiện có, hãy sử dụng LinkedHashMapGiữ trật tự
                 if (csvData.isEmpty()) {
                     headers = new ArrayList<>();
                 } else {
-                    // 如果数据使用的是LinkedHashMap，keySet()会保持插入顺序
+                    // Nếu dữ liệu được sử dụngLinkedHashMap，keySet()Thứ tự chèn sẽ được duy trì
                     headers = new ArrayList<>(csvData.get(0).keySet());
-                    csvHeaders = headers; // 保存列标题顺序
+                    csvHeaders = headers; // Lưu thứ tự tiêu đề cột
                 }
             }
         } catch (Exception e) {
-            log.error("获取 CSV 列标题失败", e);
+            log.error("Lấy CSV Tiêu đề cột không thành công", e);
             headers = csvHeaders != null ? new ArrayList<>(csvHeaders) :
                     (csvData.isEmpty() ? new ArrayList<>() : new ArrayList<>(csvData.get(0).keySet()));
         }
 
-        // 创建表格数据，确保至少有5行用于编辑
+        // Tạo dữ liệu bảng, đảm bảo có ít nhất 5hàng để chỉnh sửa
         Object[][] tableData = new Object[csvData.size()][headers.size()];
         for (int i = 0; i < csvData.size(); i++) {
             Map<String, String> row = csvData.get(i);
@@ -833,24 +833,24 @@ public class CsvDataPanel extends JPanel {
             }
         }
 
-        // 创建可编辑的表格模型
+        // Tạo các mô hình bảng có thể chỉnh sửa
         DefaultTableModel editTableModel = new DefaultTableModel(tableData, headers.toArray()) {
             @Override
             public boolean isCellEditable(int row, int column) {
-                return true; // 所有单元格都可编辑
+                return true; // Tất cả các ô đều có thể chỉnh sửa được
             }
         };
 
         JTable csvTable = new JTable(editTableModel);
         configureCsvTable(csvTable);
 
-        // 创建带样式的滚动面板
+        // Tạo một bảng cuộn theo kiểu
         JScrollPane scrollPane = new JScrollPane(csvTable);
         scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         ToolWindowSurfaceStyle.applyTableScrollPaneCard(scrollPane, csvTable);
         installResponsiveTableLayout(csvTable, scrollPane);
 
-        // 创建表格容器面板，应用背景色
+        // Tạo bảng chứa bảng và áp dụng màu nền
         JPanel tablePanel = new JPanel(new BorderLayout());
         ToolWindowSurfaceStyle.applyDialogSurface(tablePanel);
         tablePanel.setBorder(BorderFactory.createEmptyBorder(10, 16, 8, 16));
@@ -858,12 +858,12 @@ public class CsvDataPanel extends JPanel {
 
         manageDialog.add(tablePanel, BorderLayout.CENTER);
 
-        // 底部面板
+        // Bảng dưới cùng
         JPanel bottomPanel = new JPanel(new BorderLayout(0, 0));
         ToolWindowSurfaceStyle.applyDialogSurface(bottomPanel);
         bottomPanel.setBorder(BorderFactory.createEmptyBorder());
 
-        // 工具栏
+        // Thanh công cụ
         JPanel toolPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 0));
         ToolWindowSurfaceStyle.applyDialogSurface(toolPanel);
 
@@ -882,7 +882,7 @@ public class CsvDataPanel extends JPanel {
                 I18nUtil.getMessage(MessageKeys.CSV_BUTTON_DELETE_ROW), false, "icons/clear.svg", 16);
         styleToolbarButton(deleteRowBtn);
         deleteRowBtn.addActionListener(e -> {
-            // 先停止单元格编辑，避免编辑状态下删除行导致问题
+            // Dừng chỉnh sửa ô trước để tránh các sự cố do xóa hàng trong khi chỉnh sửa
             if (csvTable.isEditing()) {
                 csvTable.getCellEditor().stopCellEditing();
             }
@@ -925,7 +925,7 @@ public class CsvDataPanel extends JPanel {
                 I18nUtil.getMessage(MessageKeys.CSV_BUTTON_DELETE_COLUMN), false, "icons/clear.svg", 16);
         styleToolbarButton(deleteColumnBtn);
         deleteColumnBtn.addActionListener(e -> {
-            // 先停止单元格编辑，避免编辑状态下删除列导致问题
+            // Dừng chỉnh sửa ô trước để tránh các sự cố do xóa cột trong khi chỉnh sửa
             if (csvTable.isEditing()) {
                 csvTable.getCellEditor().stopCellEditing();
             }
@@ -937,14 +937,14 @@ public class CsvDataPanel extends JPanel {
                 return;
             }
 
-            // 检查是否要删除所有列
+            // Kiểm tra xem bạn có muốn xóa tất cả các cột không
             if (selectedColumns.length >= editTableModel.getColumnCount()) {
                 JOptionPane.showMessageDialog(manageDialog, I18nUtil.getMessage(MessageKeys.CSV_CANNOT_DELETE_ALL_COLUMNS),
                         I18nUtil.getMessage(MessageKeys.GENERAL_TIP), JOptionPane.WARNING_MESSAGE);
                 return;
             }
 
-            // 显示要删除的列名
+            // Hiển thị tên cột cần xóa
             StringBuilder columnNames = new StringBuilder();
             for (int i = 0; i < selectedColumns.length; i++) {
                 if (i > 0) columnNames.append(", ");
@@ -956,22 +956,22 @@ public class CsvDataPanel extends JPanel {
                     I18nUtil.getMessage(MessageKeys.CSV_CONFIRM_DELETE), JOptionPane.YES_NO_OPTION);
 
             if (confirm == JOptionPane.YES_OPTION) {
-                // 从后往前删除，避免索引变化问题
+                // Xóa từ sau ra trước để tránh vấn đề thay đổi chỉ mục
                 for (int i = selectedColumns.length - 1; i >= 0; i--) {
                     int columnIndex = selectedColumns[i];
 
-                    // 删除列数据
+                    // Xóa dữ liệu cột
                     for (int row = 0; row < editTableModel.getRowCount(); row++) {
-                        // 移动后面的列数据
+                        // Di chuyển dữ liệu cột sau
                         for (int col = columnIndex; col < editTableModel.getColumnCount() - 1; col++) {
                             editTableModel.setValueAt(editTableModel.getValueAt(row, col + 1), row, col);
                         }
                     }
 
-                    // 删除列
+                    // Xóa cột
                     editTableModel.setColumnCount(editTableModel.getColumnCount() - 1);
 
-                    // 更新列标识符
+                    // Cập nhật mã định danh cột
                     java.util.Vector<String> columnIdentifiers = new java.util.Vector<>();
                     for (int j = 0; j < editTableModel.getColumnCount(); j++) {
                         if (j < columnIndex) {
@@ -1002,7 +1002,7 @@ public class CsvDataPanel extends JPanel {
         );
         bottomPanel.add(helpPanel, BorderLayout.CENTER);
 
-        // 按钮面板
+        // Bảng nút
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         ToolWindowSurfaceStyle.applyDialogFooter(buttonPanel);
 
@@ -1011,21 +1011,21 @@ public class CsvDataPanel extends JPanel {
         styleFooterButton(saveBtn);
         saveBtn.addActionListener(e -> {
             try {
-                // 先停止单元格编辑，确保正在编辑的内容被保存
+                // Trước tiên hãy dừng chỉnh sửa ô để đảm bảo rằng nội dung đang chỉnh sửa được lưu
                 if (csvTable.isEditing()) {
                     csvTable.getCellEditor().stopCellEditing();
                 }
 
-                // 将表格数据转换为 CSV 数据格式
+                // Chuyển đổi dữ liệu dạng bảng sang  CSV Định dạng dữ liệu
                 List<Map<String, String>> newCsvData = new ArrayList<>();
 
-                // 获取当前的列名
+                // Lấy tên cột hiện tại
                 List<String> currentHeaders = new ArrayList<>();
                 for (int i = 0; i < editTableModel.getColumnCount(); i++) {
                     currentHeaders.add(editTableModel.getColumnName(i));
                 }
 
-                // 转换每一行数据
+                // Chuyển đổi từng hàng dữ liệu
                 for (int i = 0; i < editTableModel.getRowCount(); i++) {
                     Map<String, String> rowData = new LinkedHashMap<>();
                     boolean hasData = false;
@@ -1050,10 +1050,10 @@ public class CsvDataPanel extends JPanel {
                     return;
                 }
 
-                // 更新 CSV 数据和列标题顺序
+                // đổi mới CSV Thứ tự tiêu đề cột và dữ liệu
                 csvData = newCsvData;
-                csvHeaders = currentHeaders; // 保存列标题顺序
-                csvFile = null; // 清除原文件引用，避免后续误以为仍需重新读文件
+                csvHeaders = currentHeaders; // Lưu thứ tự tiêu đề cột
+                csvFile = null; // Xóa tham chiếu tệp gốc để tránh những hiểu lầm tiếp theo rằng tệp vẫn cần được đọc lại
                 if (CharSequenceUtil.isBlank(csvSourceName)) {
                     csvSourceName = null;
                 }
@@ -1067,7 +1067,7 @@ public class CsvDataPanel extends JPanel {
                 manageDialog.dispose();
 
             } catch (Exception ex) {
-                log.error("保存 CSV 数据失败", ex);
+                log.error("cứu CSV Dữ liệu không thành công", ex);
                 JOptionPane.showMessageDialog(manageDialog, I18nUtil.getMessage(MessageKeys.CSV_SAVE_FAILED, ex.getMessage()),
                         I18nUtil.getMessage(MessageKeys.GENERAL_ERROR), JOptionPane.ERROR_MESSAGE);
             }
@@ -1086,11 +1086,11 @@ public class CsvDataPanel extends JPanel {
     }
 
     /**
-     * 显示批量编辑对话框
-     * 支持以 CSV 格式批量粘贴和编辑数据
+     * Hiển thị hộp thoại chỉnh sửa hàng loạt
+     * Được hỗ trợ bởi CSV Định dạng dán và chỉnh sửa dữ liệu hàng loạt
      */
     private void showBulkEditDialog(Window parentWindow, DefaultTableModel tableModel, JTable csvTable, List<String> headers, Runnable applyEmptyCellRenderer) {
-        // 1. 将当前表格数据转换为文本格式（用逗号分隔）
+        // 1. Chuyển đổi dữ liệu bảng hiện tại sang định dạng văn bản (cách nhau bằng dấu phẩy)
         StringBuilder text = new StringBuilder();
         for (int i = 0; i < tableModel.getRowCount(); i++) {
             boolean hasData = false;
@@ -1104,7 +1104,7 @@ public class CsvDataPanel extends JPanel {
                 if (j > 0) {
                     rowText.append(",");
                 }
-                // 如果值包含逗号、换行符或引号，用引号包裹并转义引号
+                // Nếu giá trị chứa dấu phẩy, dòng mới hoặc dấu ngoặc kép, hãy bọc giá trị đó trong dấu ngoặc kép và thoát khỏi dấu ngoặc kép
                 if (strValue.contains(",") || strValue.contains("\n") || strValue.contains("\"")) {
                     rowText.append("\"").append(strValue.replace("\"", "\"\"")).append("\"");
                 } else {
@@ -1116,7 +1116,7 @@ public class CsvDataPanel extends JPanel {
             }
         }
 
-        // 2. 创建文本编辑区域
+        // 2. Tạo vùng soạn thảo văn bản
         JTextArea textArea = new JTextArea(text.toString());
         textArea.setLineWrap(false);
         textArea.setTabSize(4);
@@ -1124,7 +1124,7 @@ public class CsvDataPanel extends JPanel {
         ToolWindowSurfaceStyle.applyTextComponentInput(textArea);
         textArea.setCaretColor(ModernColors.getPrimary());
 
-        // 将光标定位到文本末尾
+        // Đặt con trỏ ở cuối văn bản
         textArea.setCaretPosition(textArea.getDocument().getLength());
 
         JScrollPane scrollPane = new JScrollPane(textArea);
@@ -1132,17 +1132,17 @@ public class CsvDataPanel extends JPanel {
         ToolWindowSurfaceStyle.applyDialogInputBorder(scrollPane, false);
         scrollPane.setPreferredSize(new Dimension(700, 450));
 
-        // 3. 创建提示标签 - 使用国际化，垂直排列
+        // 3. Tạo nhãn nhắc nhở - Sử dụng quốc tế hóa, sắp xếp theo chiều dọc
         JPanel hintPanel = new JPanel();
         hintPanel.setLayout(new BoxLayout(hintPanel, BoxLayout.Y_AXIS));
         hintPanel.setOpaque(false);
 
-        // 主提示文本
+        // Văn bản nhắc nhở chính
         JLabel hintLabel = new JLabel(I18nUtil.getMessage(MessageKeys.CSV_BULK_EDIT_HINT));
         hintLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
         hintLabel.setForeground(ModernColors.getTextPrimary());
 
-        // 支持格式说明
+        // Hỗ trợ mô tả định dạng
         JLabel formatLabel = new JLabel(I18nUtil.getMessage(MessageKeys.CSV_BULK_EDIT_SUPPORTED_FORMATS));
         formatLabel.setForeground(ModernColors.getTextSecondary());
         formatLabel.setFont(FontsUtil.getDefaultFontWithOffset(Font.PLAIN, -2));
@@ -1153,14 +1153,14 @@ public class CsvDataPanel extends JPanel {
         hintPanel.add(formatLabel);
         hintPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 
-        // 4. 组装内容面板
+        // 4. Lắp ráp bảng nội dung
         JPanel contentPanel = new JPanel(new BorderLayout(0, 5));
         ToolWindowSurfaceStyle.applyDialogSurface(contentPanel);
         contentPanel.add(hintPanel, BorderLayout.NORTH);
         contentPanel.add(scrollPane, BorderLayout.CENTER);
         contentPanel.setBorder(BorderFactory.createEmptyBorder(14, 16, 14, 16));
 
-        // 5. 创建按钮面板
+        // 5. Tạo một bảng nút
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 0));
         ToolWindowSurfaceStyle.applyDialogFooter(buttonPanel);
         JButton cancelButton = ModernButtonFactory.createButton(I18nUtil.getMessage(MessageKeys.BUTTON_CANCEL), false);
@@ -1169,7 +1169,7 @@ public class CsvDataPanel extends JPanel {
         buttonPanel.add(cancelButton);
         buttonPanel.add(okButton);
 
-        // 6. 创建对话框
+        // 6. Tạo một hộp thoại
         JDialog dialog = new JDialog(parentWindow, I18nUtil.getMessage(MessageKeys.CSV_BULK_EDIT), Dialog.ModalityType.APPLICATION_MODAL);
         ToolWindowSurfaceStyle.applyDialogWindowChrome(dialog);
         dialog.setLayout(new BorderLayout());
@@ -1179,9 +1179,9 @@ public class CsvDataPanel extends JPanel {
         dialog.setSize(750, 550);
         dialog.setMinimumSize(new Dimension(600, 400));
         dialog.setResizable(true);
-        dialog.setLocationRelativeTo(parentWindow); // 相对于父窗口（CSV数据管理对话框）居中
+        dialog.setLocationRelativeTo(parentWindow); // Liên quan đến cửa sổ cha mẹ (CSVHộp thoại Quản lý dữ liệu) được căn giữa
 
-        // 7. 按钮事件处理
+        // 7. Xử lý sự kiện nút
         okButton.addActionListener(e -> {
             parseBulkCsvText(textArea.getText(), tableModel, headers, csvTable, applyEmptyCellRenderer);
             dialog.dispose();
@@ -1189,38 +1189,38 @@ public class CsvDataPanel extends JPanel {
 
         cancelButton.addActionListener(e -> dialog.dispose());
 
-        // 8. 支持 ESC 键关闭对话框
+        // 8. Hỗ trợ ESC phím để đóng hộp thoại
         dialog.getRootPane().registerKeyboardAction(
                 e -> dialog.dispose(),
                 KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_ESCAPE, 0),
                 JComponent.WHEN_IN_FOCUSED_WINDOW
         );
 
-        // 9. 设置默认按钮
+        // 9. Đặt nút mặc định
         dialog.getRootPane().setDefaultButton(okButton);
 
-        // 10. 显示对话框
+        // 10. Hiển thị hộp thoại
         dialog.setVisible(true);
     }
 
     /**
-     * 解析批量编辑的 CSV 文本内容
-     * 支持标准 CSV 格式（逗号分隔）
-     * 空行会被忽略
+     * Phân tích cú pháp chỉnh sửa hàng loạt CSV Nội dung văn bản
+     * Hỗ trợ tiêu chuẩn CSV định dạng (cách nhau bằng dấu phẩy)
+     * Các dòng trống sẽ bị bỏ qua
      */
     private void parseBulkCsvText(String text, DefaultTableModel tableModel, List<String> headers, JTable csvTable, Runnable applyEmptyCellRenderer) {
         if (text == null || text.trim().isEmpty()) {
-            // 如果文本为空，清空所有数据行
+            // Nếu văn bản trống, hãy xóa tất cả các hàng dữ liệu
             tableModel.setRowCount(0);
             return;
         }
 
-        // 先停止单元格编辑
+        // Dừng chỉnh sửa ô trước
         if (csvTable.isEditing()) {
             csvTable.getCellEditor().stopCellEditing();
         }
 
-        // 清空现有数据
+        // Xóa dữ liệu hiện có
         tableModel.setRowCount(0);
 
         for (List<String> values : CsvDataUtil.parseCsvText(buildBulkEditCsvText(headers, text)).rows()) {
@@ -1228,13 +1228,13 @@ public class CsvDataPanel extends JPanel {
                 continue;
             }
 
-            // 创建新行
+            // Tạo hàng mới
             Object[] rowData = new Object[headers.size()];
             for (int i = 0; i < headers.size() && i < values.size(); i++) {
                 rowData[i] = values.get(i);
             }
 
-            // 填充剩余列为空字符串
+            // Đệm các cột còn lại bằng các chuỗi trống
             for (int i = values.size(); i < headers.size(); i++) {
                 rowData[i] = "";
             }
@@ -1242,7 +1242,7 @@ public class CsvDataPanel extends JPanel {
             tableModel.addRow(rowData);
         }
 
-        // 重新应用空单元格渲染器
+        // Áp dụng lại trình kết xuất ô trống
         if (applyEmptyCellRenderer != null) {
             applyEmptyCellRenderer.run();
         }
@@ -1588,7 +1588,7 @@ public class CsvDataPanel extends JPanel {
     }
 
     /**
-     * 选择 CSV 文件
+     * Chọn CSV tập tin
      */
     private boolean selectCsvFile() {
         SystemFileChooser fileChooser = FileChooserUtil.createOpenFileChooser(
@@ -1608,7 +1608,7 @@ public class CsvDataPanel extends JPanel {
         if (result == SystemFileChooser.APPROVE_OPTION) {
             File selectedFile = fileChooser.getSelectedFile();
 
-            // 验证文件
+            // Xác minh tài liệu
             String validationMsg = CsvDataUtil.validateCsvFile(selectedFile);
             if (CharSequenceUtil.isNotBlank(validationMsg)) {
                 JOptionPane.showMessageDialog(this, validationMsg,
@@ -1627,7 +1627,7 @@ public class CsvDataPanel extends JPanel {
                 csvFile = selectedFile;
                 csvSourceName = selectedFile.getName();
                 csvData = newCsvData;
-                csvHeaders = CsvDataUtil.getCsvHeaders(selectedFile); // 获取列标题
+                csvHeaders = CsvDataUtil.getCsvHeaders(selectedFile); // Nhận tiêu đề cột
                 File directoryToRemember = CsvFileChooserDirectoryMemory.resolveDirectoryToRemember(selectedFile);
                 if (directoryToRemember != null) {
                     SettingManager.setCsvLastImportDirectory(directoryToRemember.getAbsolutePath());
@@ -1636,7 +1636,7 @@ public class CsvDataPanel extends JPanel {
                 return true;
 
             } catch (Exception e) {
-                log.error("加载 CSV 文件失败", e);
+                log.error("trọng tải CSV Tệp không thành công", e);
                 JOptionPane.showMessageDialog(this, I18nUtil.getMessage(MessageKeys.CSV_LOAD_FAILED, e.getMessage()),
                         I18nUtil.getMessage(MessageKeys.GENERAL_ERROR), JOptionPane.ERROR_MESSAGE);
                 return false;
@@ -1646,21 +1646,21 @@ public class CsvDataPanel extends JPanel {
     }
 
     /**
-     * 获取当前是否有CSV数据
+     * Nhận xem hiện tại có mộtCSVdữ liệu
      */
     public boolean hasData() {
         return csvData != null && !csvData.isEmpty();
     }
 
     /**
-     * 获取CSV数据行数
+     * LấyCSVSố lượng hàng dữ liệu
      */
     public int getRowCount() {
         return csvData != null ? csvData.size() : 0;
     }
 
     /**
-     * 获取指定行的数据
+     * Lấy dữ liệu của hàng được chỉ định
      */
     public Map<String, String> getRowData(int index) {
         if (csvData != null && index >= 0 && index < csvData.size()) {

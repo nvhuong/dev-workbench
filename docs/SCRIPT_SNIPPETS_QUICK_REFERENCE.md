@@ -1,104 +1,104 @@
-# Script 代码片段速查表
+# Script Bảng cheat đoạn mã
 
-本文档提供了常用脚本代码片段的快速索引，方便快速查找和复制使用。
+Tài liệu này cung cấp chỉ mục nhanh về các đoạn mã tập lệnh thường được sử dụng để tạo điều kiện cho việc tìm kiếm và sao chép nhanh chóng.
 
-## 📑 目录
+## 📑 Thư mục
 
-### 基础操作
-- [设置环境变量](#设置环境变量)
-- [获取环境变量](#获取环境变量)
-- [生成UUID](#生成uuid)
-- [获取时间戳](#获取时间戳)
-- [添加请求头](#添加请求头)
-- [添加查询参数](#添加查询参数)
-- [前置脚本发送 HTTP 请求](#前置脚本发送-http-请求)
+### Các thao tác cơ bản
+- [Đặt các biến môi trường](#Đặt các biến môi trường)
+- [Nhận các biến môi trường](#Nhận các biến môi trường)
+- [phát raUUID](#phát rauuid)
+- [Nhận dấu thời gian](#Nhận dấu thời gian)
+- [Thêm tiêu đề yêu cầu](#Thêm tiêu đề yêu cầu)
+- [Thêm tham số truy vấn](#Thêm tham số truy vấn)
+- [Kịch bản trước được gửi đi HTTP yêu cầu](#Kịch bản trước được gửi đi-http-yêu cầu)
 
-### 认证相关
-- [Bearer Token 认证](#bearer-token-认证)
-- [Basic 认证](#basic-认证)
-- [API Key 认证](#api-key-认证)
-- [HMAC 签名](#hmac-签名)
-- [OAuth 2.0 Token 刷新](#oauth-20-token-刷新)
+### Chứng nhận liên quan
+- [Bearer Token Chứng nhận](#bearer-token-Chứng nhận)
+- [Basic Chứng nhận](#basic-Chứng nhận)
+- [API Key Chứng nhận](#api-key-Chứng nhận)
+- [HMAC dấu hiệu](#hmac-dấu hiệu)
+- [OAuth 2.0 Token Làm mới](#oauth-20-token-Làm mới)
 
-### 数据处理
-- [解析 JSON 响应](#解析-json-响应)
-- [提取嵌套数据](#提取嵌套数据)
-- [数组遍历和过滤](#数组遍历和过滤)
-- [数据转换](#数据转换)
-- [JSON 模板填充](#json-模板填充)
+### Xử lý dữ liệu
+- [phân tích JSON phản hồi](#phân tích-json-phản hồi)
+- [Trích xuất dữ liệu lồng nhau](#Trích xuất dữ liệu lồng nhau)
+- [Truyền tải mảng và lọc](#Truyền tải mảng và lọc)
+- [Chuyển đổi dữ liệu](#Chuyển đổi dữ liệu)
+- [JSON Điền mẫu](#json-Điền mẫu)
 
-### 测试断言
-- [状态码断言](#状态码断言)
-- [响应时间断言](#响应时间断言)
-- [响应体断言](#响应体断言)
-- [响应头断言](#响应头断言)
-- [JSON 结构断言](#json-结构断言)
+### Kiểm tra khẳng định
+- [Xác nhận mã trạng thái](#Xác nhận mã trạng thái)
+- [Khẳng định thời gian đáp ứng](#Khẳng định thời gian đáp ứng)
+- [Cơ quan phản hồi khẳng định](#Cơ quan phản hồi khẳng định)
+- [Xác nhận tiêu đề phản hồi](#Xác nhận tiêu đề phản hồi)
+- [JSON Khẳng định mang tính cấu trúc](#json-Khẳng định mang tính cấu trúc)
 
-### 加密和编码
-- [MD5 哈希](#md5-哈希)
-- [SHA256 哈希](#sha256-哈希)
-- [HMAC-SHA256 签名](#hmac-sha256-签名)
-- [AES 加密/解密](#aes-加密解密)
-- [Base64 编码/解码](#base64-编码解码)
+### Mã hóa và mã hóa
+- [MD5 Băm](#md5-Băm)
+- [SHA256 Băm](#sha256-Băm)
+- [HMAC-SHA256 dấu hiệu](#hmac-sha256-dấu hiệu)
+- [AES Mã hóa/Giải mã](#aes-Mã hóa và giải mã)
+- [Base64 Mã hóa/giải mã](#base64-Mã hóa và giải mã)
 
-### 日期时间
-- [格式化当前时间](#格式化当前时间)
-- [日期计算](#日期计算)
-- [日期比较](#日期比较)
-- [解析日期字符串](#解析日期字符串)
+### Ngày giờ
+- [Định dạng thời gian hiện tại](#Định dạng thời gian hiện tại)
+- [Tính toán ngày](#Tính toán ngày)
+- [So sánh ngày](#So sánh ngày)
+- [Phân tích chuỗi ngày](#Phân tích chuỗi ngày)
 
-### Cookie 管理
-- [获取 Cookie](#获取-cookie)
-- [设置 Cookie](#设置-cookie)
-- [跨域 Cookie 管理](#跨域-cookie-管理)
+### Cookie quản lý
+- [Lấy Cookie](#Lấy-cookie)
+- [cài đặt Cookie](#cài đặt-cookie)
+- [Tên miền chéo Cookie quản lý](#Tên miền chéo-cookie-quản lý)
 
-### 外部数据源
-- [Redis 读写断言](#redis-读写断言)
-- [Kafka 发消息断言](#kafka-发消息断言)
-- [Elasticsearch 写入断言](#elasticsearch-写入断言)
-- [InfluxDB 查询与写入断言](#influxdb-查询与写入断言)
+### Nguồn dữ liệu bên ngoài
+- [Redis Đọc và viết các khẳng định](#redis-Đọc và viết các khẳng định)
+- [Kafka Gửi tin nhắn khẳng định](#kafka-Gửi tin nhắn khẳng định)
+- [Elasticsearch Viết các khẳng định](#elasticsearch-Viết các khẳng định)
+- [InfluxDB Truy vấn và viết các khẳng định](#influxdb-Truy vấn và viết các khẳng định)
 
-### 实用工具
-- [生成随机数据](#生成随机数据)
-- [数据验证](#数据验证)
-- [性能监控](#性能监控)
-- [调试日志](#调试日志)
+### Công cụ thực tế
+- [Tạo dữ liệu ngẫu nhiên](#Tạo dữ liệu ngẫu nhiên)
+- [Xác thực dữ liệu](#Xác thực dữ liệu)
+- [Giám sát hiệu suất](#Giám sát hiệu suất)
+- [Nhật ký gỡ lỗi](#Nhật ký gỡ lỗi)
 
 ---
 
-## 基础操作
+## Các thao tác cơ bản
 
-### 设置环境变量
+### Đặt các biến môi trường
 ```javascript
 pm.environment.set('key', 'value');
 pm.environment.set('userId', '123');
 pm.environment.set('token', 'abc123xyz');
 ```
 
-### 获取环境变量
+### Nhận các biến môi trường
 ```javascript
 const value = pm.environment.get('key');
 const userId = pm.environment.get('userId');
 const token = pm.environment.get('token');
 ```
 
-### 生成UUID
+### phát raUUID
 ```javascript
 const uuid = pm.uuid();
 pm.environment.set('requestId', uuid);
 ```
 
-### 获取时间戳
+### Nhận dấu thời gian
 ```javascript
-// 毫秒时间戳
+// Dấu thời gian mili giây
 const timestamp = pm.getTimestamp();
 pm.environment.set('timestamp', timestamp);
 
-// 秒级时间戳
+// Dấu thời gian cấp hai
 const unixTime = Math.floor(Date.now() / 1000);
 ```
 
-### 添加请求头
+### Thêm tiêu đề yêu cầu
 ```javascript
 // Pre-request Script
 pm.request.headers.add({
@@ -106,14 +106,14 @@ pm.request.headers.add({
     value: 'custom-value'
 });
 
-// 更新或插入请求头
+// Cập nhật hoặc chèn tiêu đề yêu cầu
 pm.request.headers.upsert({
     key: 'Authorization',
     value: 'Bearer ' + pm.environment.get('token')
 });
 ```
 
-### 添加查询参数
+### Thêm tham số truy vấn
 ```javascript
 // Pre-request Script
 pm.request.params.add({
@@ -127,7 +127,7 @@ pm.request.params.add({
 });
 ```
 
-### 前置脚本发送 HTTP 请求
+### Kịch bản trước được gửi đi HTTP yêu cầu
 ```javascript
 // Pre-request Script
 pm.sendRequest({
@@ -138,23 +138,23 @@ pm.sendRequest({
     }
 }, function (err, response) {
     if (err) {
-        console.error('请求失败:', err.message);
+        console.error('Yêu cầu không thành công:', err.message);
         return;
     }
 
     const data = response.json();
     pm.environment.set('lastHttpbinUrl', data.url || '');
-    pm.environment.set('lastHttpbinSource', data.args?.source || '');
-    console.log('响应状态:', response.code, response.status);
+    pm.environment.set('lastHttpbinSource', data.args?source || '');
+    console.log('Trạng thái phản hồi:', response.code, response.status);
     console.log('httpbin args:', data.args);
 });
 ```
 
 ---
 
-## 认证相关
+## Chứng nhận liên quan
 
-### Bearer Token 认证
+### Bearer Token Chứng nhận
 ```javascript
 // Pre-request Script
 const token = pm.environment.get('authToken');
@@ -164,7 +164,7 @@ pm.request.headers.upsert({
 });
 ```
 
-### Basic 认证
+### Basic Chứng nhận
 ```javascript
 // Pre-request Script
 const username = pm.environment.get('username');
@@ -179,25 +179,25 @@ pm.request.headers.upsert({
 });
 ```
 
-### API Key 认证
+### API Key Chứng nhận
 ```javascript
 // Pre-request Script
 const apiKey = pm.environment.get('apiKey');
 
-// 方式1: 请求头
+// cách1: Tiêu đề yêu cầu
 pm.request.headers.upsert({
     key: 'X-API-Key',
     value: apiKey
 });
 
-// 方式2: 查询参数
+// cách2: Tham số truy vấn
 pm.request.params.add({
     key: 'apiKey',
     value: apiKey
 });
 ```
 
-### HMAC 签名
+### HMAC dấu hiệu
 ```javascript
 // Pre-request Script
 const timestamp = Date.now().toString();
@@ -205,10 +205,10 @@ const method = pm.request.method;
 const path = pm.request.url.getPath();
 const secretKey = pm.environment.get('secretKey');
 
-// 生成签名字符串
+// Tạo chuỗi chữ ký
 const signString = method + '\n' + path + '\n' + timestamp;
 
-// 计算 HMAC-SHA256
+// Tính toán HMAC-SHA256
 const signature = CryptoJS.HmacSHA256(signString, secretKey).toString();
 
 pm.request.headers.upsert({
@@ -222,7 +222,7 @@ pm.request.headers.upsert({
 });
 ```
 
-### OAuth 2.0 Token 刷新
+### OAuth 2.0 Token Làm mới
 ```javascript
 // Pre-request Script
 const tokenExpireTime = pm.environment.get('tokenExpireTime');
@@ -243,7 +243,7 @@ if (!tokenExpireTime || currentTime > (parseInt(tokenExpireTime) - 300000)) {
         }
     }, function (err, response) {
         if (err) {
-            console.error('刷新失败:', err.message);
+            console.error('Làm mới không thành công:', err.message);
             return;
         }
 
@@ -268,58 +268,58 @@ if (!tokenExpireTime || currentTime > (parseInt(tokenExpireTime) - 300000)) {
 
 ---
 
-## 数据处理
+## Xử lý dữ liệu
 
-### 解析 JSON 响应
+### phân tích JSON phản hồi
 ```javascript
 // Post-request Script
 const jsonData = pm.response.json();
-console.log('响应数据:', jsonData);
+console.log('dữ liệu phản hồi:', jsonData);
 
-// 保存数据到环境变量
+// Lưu dữ liệu vào các biến môi trường
 pm.environment.set('userId', jsonData.data.userId);
 pm.environment.set('username', jsonData.data.username);
 ```
 
-### 提取嵌套数据
+### Trích xuất dữ liệu lồng nhau
 ```javascript
 // Post-request Script
 const jsonData = pm.response.json();
 
-// 使用 lodash 安全提取
+// sử dụng lodash Khai thác an toàn
 const userId = _.get(jsonData, 'data.user.id');
 const userName = _.get(jsonData, 'data.user.profile.name');
 const firstEmail = _.get(jsonData, 'data.user.emails[0]');
 
 pm.environment.set('userId', userId);
-console.log('用户名:', userName);
+console.log('Tên người dùng:', userName);
 ```
 
-### 数组遍历和过滤
+### Truyền tải mảng và lọc
 ```javascript
 // Post-request Script
 const jsonData = pm.response.json();
 const users = jsonData.data.users;
 
-// 过滤活跃用户
+// Lọc người dùng đang hoạt động
 const activeUsers = _.filter(users, { status: 'active' });
-console.log('活跃用户数:', activeUsers.length);
+console.log('Số lượng người dùng đang hoạt động:', activeUsers.length);
 
-// 提取所有用户ID
+// Trích xuất tất cả người dùngID
 const userIds = _.map(users, 'id');
 pm.environment.set('userIds', JSON.stringify(userIds));
 
-// 按角色分组
+// Nhóm theo vai trò
 const groupedByRole = _.groupBy(users, 'role');
-console.log('按角色分组:', groupedByRole);
+console.log('Nhóm theo vai trò:', groupedByRole);
 ```
 
-### 数据转换
+### Chuyển đổi dữ liệu
 ```javascript
 // Post-request Script
 const jsonData = pm.response.json();
 
-// 转换为指定格式
+// Chuyển đổi sang định dạng được chỉ định
 const transformed = _.map(jsonData.data.items, function(item) {
     return {
         id: item.id,
@@ -329,10 +329,10 @@ const transformed = _.map(jsonData.data.items, function(item) {
     };
 });
 
-console.log('转换后的数据:', transformed);
+console.log('Dữ liệu được chuyển đổi:', transformed);
 ```
 
-### JSON 模板填充
+### JSON Điền mẫu
 ```javascript
 // Pre-request Script
 const template = {
@@ -352,73 +352,73 @@ _.forEach(data, function(value, key) {
     json = json.replace('{{' + key + '}}', value);
 });
 
-console.log('填充后的JSON:', json);
+console.log('Sau khi điềnJSON:', json);
 ```
 
 ---
 
-## 测试断言
+## Kiểm tra khẳng định
 
-### 状态码断言
+### Xác nhận mã trạng thái
 ```javascript
 // Post-request Script
-pm.test("状态码是 200", function () {
+pm.test("Mã trạng thái là  200", function () {
     pm.response.to.have.status(200);
 });
 
-pm.test("状态码是 2xx", function () {
+pm.test("Mã trạng thái là  2xx", function () {
     pm.expect(pm.response.code).to.be.below(300);
     pm.expect(pm.response.code).to.be.above(199);
 });
 ```
 
-### 响应时间断言
+### Khẳng định thời gian đáp ứng
 ```javascript
 // Post-request Script
-pm.test("响应时间小于 500ms", function () {
+pm.test("Thời gian đáp ứng ít hơn 500ms", function () {
     pm.expect(pm.response.responseTime).to.be.below(500);
 });
 
-pm.test("响应时间小于 1 秒", function () {
+pm.test("Thời gian đáp ứng ít hơn 1 giây", function () {
     pm.expect(pm.response.responseTime).to.be.below(1000);
 });
 ```
 
-### 响应体断言
+### Cơ quan phản hồi khẳng định
 ```javascript
 // Post-request Script
-pm.test("响应包含成功标识", function () {
+pm.test("Phản hồi có chứa một chỉ báo thành công", function () {
     pm.expect(pm.response.text()).to.include('success');
 });
 
-pm.test("响应体不为空", function () {
+pm.test("Nội dung phản hồi không trống", function () {
     pm.expect(pm.response.text().length).to.be.above(0);
 });
 ```
 
-### 响应头断言
+### Xác nhận tiêu đề phản hồi
 ```javascript
 // Post-request Script
-pm.test("响应包含 Content-Type", function () {
+pm.test("Câu trả lời có chứa Content-Type", function () {
     pm.response.to.have.header('Content-Type');
 });
 
-pm.test("Content-Type 是 JSON", function () {
+pm.test("Content-Type Vâng JSON", function () {
     const contentType = pm.response.headers.get('Content-Type');
     pm.expect(contentType).to.include('application/json');
 });
 ```
 
-### JSON 结构断言
+### JSON Khẳng định mang tính cấu trúc
 ```javascript
 // Post-request Script
-pm.test("响应包含必要字段", function () {
+pm.test("Phản hồi chứa các trường bắt buộc", function () {
     const jsonData = pm.response.json();
-    
+
     pm.expect(jsonData).to.have.property('code');
     pm.expect(jsonData).to.have.property('message');
     pm.expect(jsonData).to.have.property('data');
-    
+
     pm.expect(jsonData.code).to.equal(200);
     pm.expect(jsonData.data).to.have.property('userId');
 });
@@ -426,9 +426,9 @@ pm.test("响应包含必要字段", function () {
 
 ---
 
-## 加密和编码
+## Mã hóa và mã hóa
 
-### MD5 哈希
+### MD5 Băm
 ```javascript
 // Pre-request Script
 const password = 'myPassword123';
@@ -438,7 +438,7 @@ pm.environment.set('passwordHash', md5Hash);
 console.log('MD5:', md5Hash);
 ```
 
-### SHA256 哈希
+### SHA256 Băm
 ```javascript
 // Pre-request Script
 const data = 'sensitive data';
@@ -448,7 +448,7 @@ pm.environment.set('dataHash', sha256Hash);
 console.log('SHA256:', sha256Hash);
 ```
 
-### HMAC-SHA256 签名
+### HMAC-SHA256 dấu hiệu
 ```javascript
 // Pre-request Script
 const data = 'userId=123&timestamp=' + Date.now();
@@ -456,55 +456,55 @@ const secretKey = pm.environment.get('secretKey');
 const signature = CryptoJS.HmacSHA256(data, secretKey).toString();
 
 pm.environment.set('signature', signature);
-console.log('签名:', signature);
+console.log('dấu hiệu:', signature);
 ```
 
-### AES 加密/解密
+### AES Mã hóa/Giải mã
 ```javascript
-// 加密
+// Mã hóa
 const message = 'secret message';
 const key = 'my-secret-key';
 const encrypted = CryptoJS.AES.encrypt(message, key).toString();
 pm.environment.set('encrypted', encrypted);
 
-// 解密
+// Giải mã
 const encryptedData = pm.environment.get('encrypted');
 const decrypted = CryptoJS.AES.decrypt(encryptedData, key);
 const decryptedText = decrypted.toString(CryptoJS.enc.Utf8);
-console.log('解密结果:', decryptedText);
+console.log('Giải mã kết quả:', decryptedText);
 ```
 
-### Base64 编码/解码
+### Base64 Mã hóa/giải mã
 ```javascript
-// 编码
+// Mã hóa
 const text = 'Hello World';
 const base64 = CryptoJS.enc.Base64.stringify(CryptoJS.enc.Utf8.parse(text));
 console.log('Base64:', base64);
 
-// 解码
+// giải mã
 const decoded = CryptoJS.enc.Base64.parse(base64).toString(CryptoJS.enc.Utf8);
-console.log('解码:', decoded);
+console.log('giải mã:', decoded);
 ```
 
 ---
 
-## 日期时间
+## Ngày giờ
 
-### 格式化当前时间
+### Định dạng thời gian hiện tại
 ```javascript
-// 各种格式
+// Các định dạng khác nhau
 pm.environment.set('dateYMD', moment().format('YYYY-MM-DD'));
 pm.environment.set('dateTime', moment().format('YYYY-MM-DD HH:mm:ss'));
 pm.environment.set('isoTime', moment().toISOString());
 pm.environment.set('timestamp', moment().valueOf().toString());
 pm.environment.set('unixTime', moment().unix().toString());
 
-console.log('当前时间:', moment().format('YYYY-MM-DD HH:mm:ss'));
+console.log('thời điểm hiện tại:', moment().format('YYYY-MM-DD HH:mm:ss'));
 ```
 
-### 日期计算
+### Tính toán ngày
 ```javascript
-// 加减日期
+// Cộng và trừ ngày tháng
 const tomorrow = moment().add(1, 'days').format('YYYY-MM-DD');
 const nextWeek = moment().add(7, 'days').format('YYYY-MM-DD');
 const nextMonth = moment().add(1, 'months').format('YYYY-MM-DD');
@@ -516,7 +516,7 @@ pm.environment.set('startDate', lastWeek);
 pm.environment.set('endDate', tomorrow);
 ```
 
-### 日期比较
+### So sánh ngày
 ```javascript
 const date1 = moment('2024-01-01');
 const date2 = moment('2024-12-31');
@@ -525,23 +525,23 @@ console.log('date1 < date2:', date1.isBefore(date2));
 console.log('date1 > date2:', date1.isAfter(date2));
 console.log('date1 == date2:', date1.isSame(date2));
 
-// 计算天数差
+// Tính sự khác biệt trong ngày
 const diffDays = date2.diff(date1, 'days');
-console.log('相差天数:', diffDays);
+console.log('Sự khác biệt là ngày:', diffDays);
 ```
 
-### 解析日期字符串
+### Phân tích chuỗi ngày
 ```javascript
-// 解析各种格式
+// Phân tích các định dạng khác nhau
 const date1 = moment('2024-01-01', 'YYYY-MM-DD');
 const date2 = moment('01/15/2024', 'MM/DD/YYYY');
-const date3 = moment('2024年1月1日', 'YYYY年M月D日');
+const date3 = moment('2024Năm1mặt trăng1Ngày', 'YYYYNămMmặt trăngDNgày');
 
-// 验证日期
+// Ngày xác minh
 const isValid = moment('2024-13-01', 'YYYY-MM-DD', true).isValid();
-console.log('日期有效:', isValid); // false
+console.log('Ngày hợp lệ:', isValid); // false
 
-// 获取时间范围
+// Lấy phạm vi thời gian
 const startOfDay = moment().startOf('day').valueOf();
 const endOfDay = moment().endOf('day').valueOf();
 
@@ -551,9 +551,9 @@ pm.environment.set('endTimestamp', endOfDay.toString());
 
 ---
 
-## Cookie 管理
+## Cookie quản lý
 
-### 获取 Cookie
+### Lấy Cookie
 ```javascript
 // Post-request Script
 const sessionCookie = pm.cookies.get('sessionId');
@@ -562,17 +562,17 @@ if (sessionCookie) {
     pm.environment.set('sessionId', sessionCookie.value);
 }
 
-// 检查 Cookie 是否存在
+// nghiên cứu Cookie tồn tại
 if (pm.cookies.has('authToken')) {
-    console.log('认证 Cookie 存在');
+    console.log('Chứng nhận Cookie tồn tại');
 }
 
-// 获取所有 Cookie
+// Nhận tất cả chúng Cookie
 const allCookies = pm.cookies.getAll();
-console.log('Cookie 总数:', allCookies.length);
+console.log('Cookie tổng cộng:', allCookies.length);
 ```
 
-### 设置 Cookie
+### cài đặt Cookie
 ```javascript
 // Post-request Script
 pm.cookies.set({
@@ -585,21 +585,21 @@ pm.cookies.set({
 });
 ```
 
-### 跨域 Cookie 管理
+### Tên miền chéo Cookie quản lý
 ```javascript
 // Post-request Script
 const jar = pm.cookies.jar();
 
-// 设置 Cookie
+// cài đặt Cookie
 jar.set('https://api.example.com', 'token=xyz123', function(error, cookie) {
     if (error) {
-        console.error('设置失败:', error);
+        console.error('Thiết lập không thành công:', error);
     } else {
-        console.log('Cookie 已设置');
+        console.log('Cookie Đã đặt rồi');
     }
 });
 
-// 获取 Cookie
+// Lấy Cookie
 jar.get('https://api.example.com', 'token', function(error, cookie) {
     if (!error && cookie) {
         console.log('Token:', cookie.value);
@@ -610,9 +610,9 @@ jar.get('https://api.example.com', 'token', function(error, cookie) {
 
 ---
 
-## 外部数据源
+## Nguồn dữ liệu bên ngoài
 
-### Redis 读写断言
+### Redis Đọc và viết các khẳng định
 ```javascript
 const redis = pm.plugin('redis');
 
@@ -638,7 +638,7 @@ pm.test('Redis value exists', function () {
 });
 ```
 
-### Kafka 发消息断言
+### Kafka Gửi tin nhắn khẳng định
 ```javascript
 const kafka = pm.plugin('kafka');
 
@@ -655,7 +655,7 @@ pm.test('Kafka send success', function () {
 });
 ```
 
-### Elasticsearch 写入断言
+### Elasticsearch Viết các khẳng định
 ```javascript
 const resp = pm.elasticsearch.request({
     baseUrl: 'http://localhost:9200',
@@ -669,7 +669,7 @@ pm.test('ES index success', function () {
 });
 ```
 
-### InfluxDB 查询与写入断言
+### InfluxDB Truy vấn và viết các khẳng định
 ```javascript
 const writeResp = pm.influxdb.write({
     baseUrl: 'http://localhost:8086',
@@ -702,88 +702,88 @@ pm.test('Influx query success', function () {
 
 ---
 
-## 实用工具
+## Công cụ thực tế
 
-### 生成随机数据
+### Tạo dữ liệu ngẫu nhiên
 ```javascript
 // Pre-request Script
 
-// 随机整数
+// Số nguyên ngẫu nhiên
 const randomId = _.random(10000, 99999);
 const randomAge = _.random(18, 60);
 
-// 随机选择
+// Chọn ngẫu nhiên
 const randomStatus = _.sample(['pending', 'approved', 'rejected']);
 const randomCity = _.sample(['Beijing', 'Shanghai', 'Guangzhou', 'Shenzhen']);
 
-// 随机UUID
+// ngẫu nhiênUUID
 const uuid = pm.uuid();
 
-// 随机字符串
+// Chuỗi ngẫu nhiên
 const randomStr = CryptoJS.lib.WordArray.random(16).toString(CryptoJS.enc.Hex);
 
-// 随机邮箱
+// Email ngẫu nhiên
 const randomEmail = 'test_' + Date.now() + '@example.com';
 
-// 随机手机号
+// Số điện thoại di động ngẫu nhiên
 const randomPhone = '138' + _.random(10000000, 99999999);
 
 pm.environment.set('testUserId', randomId.toString());
 pm.environment.set('testEmail', randomEmail);
 pm.environment.set('testPhone', randomPhone);
 
-console.log('生成的随机数据:');
+console.log('Dữ liệu ngẫu nhiên được tạo ra:');
 console.log('  ID:', randomId);
 console.log('  Email:', randomEmail);
 console.log('  Phone:', randomPhone);
 ```
 
-### 数据验证
+### Xác thực dữ liệu
 ```javascript
 // Pre-request Script
 const userId = pm.environment.get('userId');
 const email = pm.environment.get('email');
 
-// 验证必填参数
+// Xác thực các tham số cần thiết
 if (!userId) {
-    throw new Error('userId 不能为空');
+    throw new Error('userId Không thể để trống');
 }
 
-// 验证邮箱格式
+// Xác minh định dạng email
 const emailPattern = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/;
 if (email && !emailPattern.test(email)) {
-    throw new Error('邮箱格式不正确');
+    throw new Error('Định dạng email không chính xác');
 }
 
-// 验证数值范围
+// Xác minh phạm vi số
 const age = parseInt(pm.environment.get('age'));
 if (age && (age < 0 || age > 150)) {
-    throw new Error('年龄必须在 0-150 之间');
+    throw new Error('Phải có tuổi 0-150 giữa');
 }
 
-console.log('✓ 参数验证通过');
+console.log('✓ Xác minh tham số đã được thông qua');
 ```
 
-### 性能监控
+### Giám sát hiệu suất
 ```javascript
 // Post-request Script
 const responseTime = pm.response.responseTime;
 
-// 记录响应时间
-console.log('响应时间:', responseTime, 'ms');
+// Ghi lại thời gian phản hồi
+console.log('thời gian đáp ứng:', responseTime, 'ms');
 
-// 性能等级
+// Mức hiệu suất
 if (responseTime < 100) {
-    console.log('性能: 优秀 ⭐⭐⭐⭐⭐');
+    console.log('hiệu suất: Tuyệt vời ⭐⭐⭐⭐⭐');
 } else if (responseTime < 300) {
-    console.log('性能: 良好 ⭐⭐⭐⭐');
+    console.log('hiệu suất: Tốt ⭐⭐⭐⭐');
 } else if (responseTime < 1000) {
-    console.log('性能: 一般 ⭐⭐⭐');
+    console.log('hiệu suất: Trung bình ⭐⭐⭐');
 } else {
-    console.log('性能: 较慢 ⭐⭐');
+    console.log('hiệu suất: chậm hơn ⭐⭐');
 }
 
-// 累计统计
+// Thống kê tích lũy
 let totalTime = parseFloat(pm.environment.get('totalResponseTime') || '0');
 let count = parseInt(pm.environment.get('requestCount') || '0');
 
@@ -793,56 +793,56 @@ count += 1;
 pm.environment.set('totalResponseTime', totalTime.toString());
 pm.environment.set('requestCount', count.toString());
 
-console.log('平均响应时间:', (totalTime / count).toFixed(2), 'ms');
-console.log('请求总数:', count);
+console.log('Thời gian phản hồi trung bình:', (totalTime / count).toFixed(2), 'ms');
+console.log('Tổng số yêu cầu:', count);
 ```
 
-### 调试日志
+### Nhật ký gỡ lỗi
 ```javascript
-// 详细的调试信息
-console.log('=== 请求信息 ===');
+// Detailed debugging information
+console.log('=== Yêu cầu thông tin ===');
 console.log('URL:', pm.request.url.toString());
 console.log('Method:', pm.request.method);
 console.log('Headers:', pm.request.headers.all());
 
 // Post-request Script
-console.log('=== 响应信息 ===');
+console.log('=== Thông tin phản hồi ===');
 console.log('Status:', pm.response.code, pm.response.status);
 console.log('Time:', pm.response.responseTime, 'ms');
 console.log('Size:', pm.response.size().total, 'bytes');
 
-// 条件日志
+// Nhật ký tình trạng
 const debug = pm.environment.get('debug') === 'true';
 if (debug) {
-    console.log('Debug 模式: 开启');
-    console.log('响应体:', pm.response.text());
+    console.log('Debug người mẫu: Bật lên');
+    console.log('cơ quan phản ứng:', pm.response.text());
 }
 
-// 错误日志
+// Nhật ký lỗi
 if (pm.response.code !== 200) {
-    console.error('✗ 请求失败');
-    console.error('状态码:', pm.response.code);
-    console.error('响应:', pm.response.text());
+    console.error('✗ Yêu cầu không thành công');
+    console.error('mã trạng thái:', pm.response.code);
+    console.error('phản hồi:', pm.response.text());
 }
 ```
 
 ---
 
-## 常用组合模式
+## Các chế độ kết hợp thường được sử dụng
 
-### 完整的请求准备流程
+### Hoàn tất quá trình chuẩn bị yêu cầu
 ```javascript
-// Pre-request Script - 综合示例
+// Pre-request Script - Ví dụ toàn diện
 
-// 1. 生成请求ID
+// 1. Tạo yêu cầuID
 const requestId = pm.uuid();
 pm.environment.set('requestId', requestId);
 
-// 2. 生成时间戳
+// 2. Tạo dấu thời gian
 const timestamp = Date.now();
 pm.environment.set('timestamp', timestamp.toString());
 
-// 3. 准备认证
+// 3. Chuẩn bị cho việc chứng nhận
 const token = pm.environment.get('authToken');
 if (token) {
     pm.request.headers.upsert({
@@ -851,7 +851,7 @@ if (token) {
     });
 }
 
-// 4. 添加通用请求头
+// 4. Thêm tiêu đề yêu cầu chung
 pm.request.headers.upsert({
     key: 'X-Request-ID',
     value: requestId
@@ -862,13 +862,13 @@ pm.request.headers.upsert({
     value: timestamp.toString()
 });
 
-// 5. 添加查询参数
+// 5. Thêm tham số truy vấn
 pm.request.params.add({
     key: 'timestamp',
     value: timestamp.toString()
 });
 
-// 6. 生成签名
+// 6. Tạo chữ ký
 const secretKey = pm.environment.get('secretKey');
 const signData = requestId + timestamp + secretKey;
 const signature = CryptoJS.HmacSHA256(signData, secretKey).toString();
@@ -878,66 +878,66 @@ pm.request.headers.upsert({
     value: signature
 });
 
-console.log('✓ 请求准备完成');
+console.log('✓ Yêu cầu đã sẵn sàng');
 console.log('  Request ID:', requestId);
 console.log('  Timestamp:', timestamp);
 console.log('  Signature:', signature.substring(0, 16) + '...');
 ```
 
-### 完整的响应验证流程
+### Hoàn tất quá trình xác minh phản hồi
 ```javascript
-// Post-request Script - 综合示例
+// Post-request Script - Ví dụ toàn diện
 
-// 1. 基础验证
-pm.test("请求成功", function () {
+// 1. Xác minh cơ bản
+pm.test("Yêu cầu đã thành công", function () {
     pm.response.to.have.status(200);
     pm.expect(pm.response.responseTime).to.be.below(2000);
 });
 
-// 2. 解析响应
+// 2. Phân tích phản hồi
 const jsonData = pm.response.json();
 
-// 3. 业务验证
-pm.test("业务响应正确", function () {
+// 3. Xác minh doanh nghiệp
+pm.test("Phản hồi của doanh nghiệp là chính xác", function () {
     pm.expect(jsonData).to.have.property('code');
     pm.expect(jsonData.code).to.equal(200);
     pm.expect(jsonData).to.have.property('data');
 });
 
-// 4. 提取数据
+// 4. Trích xuất dữ liệu
 if (jsonData.code === 200 && jsonData.data) {
     const userId = _.get(jsonData, 'data.userId');
     const userName = _.get(jsonData, 'data.userName');
     const token = _.get(jsonData, 'data.token');
-    
+
     if (userId) pm.environment.set('userId', userId);
     if (userName) pm.environment.set('userName', userName);
     if (token) pm.environment.set('authToken', token);
-    
-    console.log('✓ 数据已提取并保存');
+
+    console.log('✓ Dữ liệu được trích xuất và lưu');
 }
 
-// 5. 性能记录
+// 5. Kỷ lục hiệu suất
 const responseTime = pm.response.responseTime;
-console.log('响应时间:', responseTime, 'ms');
+console.log('thời gian đáp ứng:', responseTime, 'ms');
 
-// 6. 记录关键指标；测试结果由运行器统一汇总
-console.log('业务状态:', jsonData.code);
+// 6. Ghi lại các chỉ số chính; kết quả kiểm tra được người chạy tóm tắt
+console.log('Tình trạng kinh doanh:', jsonData.code);
 ```
 
 ---
 
-## 快速复制模板
+## Sao chép mẫu nhanh chóng
 
-### Pre-request 基础模板
+### Pre-request Mẫu cơ bản
 ```javascript
 // Pre-request Script
 
-// 环境变量
+// các biến môi trường
 pm.environment.set('timestamp', Date.now().toString());
 pm.environment.set('requestId', pm.uuid());
 
-// 认证
+// Chứng nhận
 const token = pm.environment.get('authToken');
 if (token) {
     pm.request.headers.upsert({
@@ -946,57 +946,57 @@ if (token) {
     });
 }
 
-// 通用请求头
+// Tiêu đề yêu cầu chung
 pm.request.headers.upsert({
     key: 'X-Request-ID',
     value: pm.environment.get('requestId')
 });
 
-console.log('✓ Pre-request 完成');
+console.log('✓ Pre-request Hoàn thành');
 ```
 
-### Post-request 基础模板
+### Post-request Mẫu cơ bản
 ```javascript
 // Post-request Script
 
-// 状态码检查
-pm.test("状态码正确", function () {
+// Kiểm tra mã trạng thái
+pm.test("Mã trạng thái là chính xác", function () {
     pm.response.to.have.status(200);
 });
 
-// 响应时间检查
-pm.test("响应时间合理", function () {
+// Kiểm tra thời gian đáp ứng
+pm.test("Thời gian đáp ứng là hợp lý", function () {
     pm.expect(pm.response.responseTime).to.be.below(1000);
 });
 
-// 解析响应
+// Phân tích phản hồi
 const jsonData = pm.response.json();
 
-// 业务验证
-pm.test("业务响应正确", function () {
+// Xác minh doanh nghiệp
+pm.test("Phản hồi của doanh nghiệp là chính xác", function () {
     pm.expect(jsonData.code).to.equal(200);
 });
 
-// 提取数据
+// Trích xuất dữ liệu
 if (jsonData.data) {
-    // 根据需要提取数据
-    console.log('响应数据:', jsonData.data);
+    // Trích xuất dữ liệu khi cần thiết
+    console.log('dữ liệu phản hồi:', jsonData.data);
 }
 
-console.log('✓ Post-request 完成');
+console.log('✓ Post-request Hoàn thành');
 ```
 
 ---
 
-## 提示
+## gợi ý
 
-1. **直接使用全局变量**：`CryptoJS`、`_`（lodash）、`moment` 已预加载，无需 `require()`
-2. **也支持 require()**：`var CryptoJS = require('crypto-js')` 也可以使用
-3. **善用 console.log**：调试时输出关键信息
-4. **环境变量命名**：使用有意义的名称，如 `authToken`、`userId`
-5. **错误处理**：关键操作使用 try-catch 包裹
-6. **性能优化**：避免在循环中执行重复计算
+1. **Sử dụng trực tiếp các biến toàn cục**：`CryptoJS`、`_`（lodash）、`moment` Đã tải sẵn, không cần `require()`
+2. **Cũng được hỗ trợ require()**：`var CryptoJS = require('crypto-js')` Cũng có sẵn
+3. **Hãy tận dụng nó thật tốt console.log**：Thông tin khóa đầu ra trong quá trình gỡ lỗi
+4. **Đặt tên biến môi trường**：Sử dụng những tên có ý nghĩa như  `authToken`、`userId`
+5. **Xử lý lỗi**：Được sử dụng cho các hoạt động quan trọng try-catch đóng gói
+6. **Tối ưu hóa hiệu suất**：Tránh thực hiện các phép tính lặp đi lặp lại trong vòng lặp
 
 ---
 
-**更多详细信息请参考：** [SCRIPT_API_REFERENCE_zh.md](./SCRIPT_API_REFERENCE_zh.md)
+**Để biết thêm chi tiết vui lòng tham khảo:** [SCRIPT_API_REFERENCE_zh.md](./SCRIPT_API_REFERENCE_zh.md)

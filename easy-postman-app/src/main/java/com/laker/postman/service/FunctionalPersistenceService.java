@@ -32,8 +32,8 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
 /**
- * 功能测试配置持久化服务
- * 用于保存和加载功能测试面板中的请求配置
+ * Kiểm tra chức năng cấu hình dịch vụ kiên trì
+ * Được sử dụng để lưu và tải cấu hình yêu cầu trong bảng kiểm tra chức năng
  */
 @Slf4j
 @Component
@@ -69,8 +69,8 @@ public class FunctionalPersistenceService {
     }
 
     /**
-     * 保存功能测试配置
-     * 只保存请求ID引用，不保存完整配置，确保与集合中的请求保持同步
+     * Lưu cấu hình kiểm tra chức năng
+     * Chỉ có yêu cầu được lưuIDTham chiếu, không lưu cấu hình đầy đủ, đảm bảo đồng bộ hóa với các yêu cầu trong bộ sưu tập
      */
     public void save(FunctionalConfigSnapshot snapshot) {
         Path configPath = getConfigFilePath();
@@ -88,7 +88,7 @@ public class FunctionalPersistenceService {
                 root.set("csvState", serializeCsvState(safeSnapshot.getCsvState()));
             }
 
-            // 写入文件
+            // Viết vào tập tin
             String jsonString = JSONUtil.toJsonPrettyStr(root);
             Files.writeString(configPath, jsonString, StandardCharsets.UTF_8);
 
@@ -99,17 +99,17 @@ public class FunctionalPersistenceService {
     }
 
     /**
-     * 异步保存配置
+     * Lưu cấu hình không đồng bộ
      */
     public void saveAsync(FunctionalConfigSnapshot snapshot) {
-        // 提交保存任务前先固定路径，防止用户切换 workspace 后把旧数据写到新 workspace。
+        // Đã sửa đường dẫn trước khi gửi tác vụ lưu để ngăn người dùng chuyển đổi workspace Sau đó ghi dữ liệu cũ vào dữ liệu mới workspace。
         Path configPath = getConfigFilePath();
         saveExecutor.execute(() -> writeSnapshot(configPath, snapshot));
     }
 
     /**
-     * 加载功能测试配置
-     * 通过ID从集合中获取最新的请求配置，确保与集合保持同步
+     * Tải cấu hình kiểm tra chức năng
+     * vượt quaIDNhận cấu hình yêu cầu mới nhất từ bộ sưu tập, đảm bảo luôn đồng bộ hóa với bộ sưu tập
      */
     public FunctionalConfigSnapshot loadSnapshot() {
         List<FunctionalConfigRow> rows = new ArrayList<>();
@@ -122,7 +122,7 @@ public class FunctionalPersistenceService {
         }
 
         try {
-            // 检查文件大小
+            // Kiểm tra kích thước tập tin
             long fileSizeInBytes = file.length();
             if (fileSizeInBytes > MAX_FILE_SIZE) {
                 log.warn("Config file is too large ({} bytes), deleting and starting fresh", fileSizeInBytes);
@@ -134,7 +134,7 @@ public class FunctionalPersistenceService {
                 return FunctionalConfigSnapshot.empty();
             }
 
-            // 读取文件
+            // Đọc tập tin
             String jsonString = Files.readString(configPath, StandardCharsets.UTF_8);
             if (jsonString.trim().isEmpty()) {
                 return FunctionalConfigSnapshot.empty();
@@ -156,7 +156,7 @@ public class FunctionalPersistenceService {
     }
 
     /**
-     * 清空配置
+     * Cấu hình rõ ràng
      */
     public void clear() {
         Path configPath = getConfigFilePath();
@@ -164,7 +164,7 @@ public class FunctionalPersistenceService {
     }
 
     private void writeAndWait(Runnable writeAction) {
-        // 最终保存和清空也排在旧的自动保存之后，避免旧快照覆盖最新配置。
+        // Lần lưu và xóa cuối cùng cũng được lên lịch sau lần lưu tự động cũ để ngăn các ảnh chụp nhanh cũ ghi đè lên cấu hình mới nhất.
         Future<?> write = saveExecutor.submit(writeAction);
         try {
             write.get();
@@ -177,7 +177,7 @@ public class FunctionalPersistenceService {
     }
 
     /**
-     * 删除配置文件
+     * Xóa tập tin cấu hình
      */
     private void deleteFile(File file) {
         try {

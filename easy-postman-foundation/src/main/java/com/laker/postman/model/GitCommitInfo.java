@@ -5,49 +5,49 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * Git 提交信息
+ * Git Gửi thông tin
  */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class GitCommitInfo {
     /**
-     * 提交ID（完整SHA）
+     * nộpID（trọnSHA）
      */
     private String commitId;
 
     /**
-     * 短提交ID（前8位）
+     * Trình bày ngắn gọnID（trước đây8chút)
      */
     private String shortCommitId;
 
     /**
-     * 提交消息
+     * Gửi tin nhắn
      */
     private String message;
 
     /**
-     * 作者名称
+     * Tên tác giả
      */
     private String authorName;
 
     /**
-     * 作者邮箱
+     * Địa chỉ email của tác giả
      */
     private String authorEmail;
 
     /**
-     * 提交时间（毫秒时间戳）
+     * Thời gian gửi (dấu thời gian mili giây)
      */
     private long commitTime;
 
     /**
-     * 提交者名称
+     * Tên người gửi
      */
     private String committerName;
 
     /**
-     * 提交者邮箱
+     * Địa chỉ email của người gửi
      */
     private String committerEmail;
 }

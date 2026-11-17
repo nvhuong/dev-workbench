@@ -17,7 +17,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 /**
- * OkHttp 请求构建工具类
+ * OkHttp Yêu cầu lớp công cụ xây dựng
  */
 @UtilityClass
 public class OkHttpRequestBuilder {
@@ -32,7 +32,7 @@ public class OkHttpRequestBuilder {
     private static final byte[] EMPTY_BODY = new byte[0];
 
     /**
-     * 构建普通请求
+     * Xây dựng một yêu cầu bình thường
      */
     public static Request buildRequest(PreparedRequest req) {
         String methodUpper = req.method.toUpperCase();
@@ -49,7 +49,7 @@ public class OkHttpRequestBuilder {
     }
 
     /**
-     * 构建 binary 请求。req.body 保存本地文件路径，HTTP body 发送文件原始字节。
+     * Xây dựng binary yêu cầu.req.body Lưu đường dẫn tệp cục bộ, .HTTP body Gửi byte thô của tệp.
      */
     public static Request buildBinaryRequest(PreparedRequest req) {
         String methodUpper = req.method.toUpperCase();
@@ -66,7 +66,7 @@ public class OkHttpRequestBuilder {
     }
 
     /**
-     * 构建 multipart/form-data 的 OkHttp Request
+     * Xây dựng multipart/form-data của OkHttp Request
      */
     public static Request buildMultipartRequest(PreparedRequest req) {
         MultipartBody.Builder multipartBuilder = new MultipartBody.Builder().setType(MultipartBody.FORM);
@@ -83,7 +83,7 @@ public class OkHttpRequestBuilder {
     }
 
     /**
-     * 构建 application/x-www-form-urlencoded 请求
+     * Xây dựng application/x-www-form-urlencoded yêu cầu
      */
     public static Request buildFormRequest(PreparedRequest req) {
         FormBody.Builder formBuilder = new FormBody.Builder();
@@ -104,7 +104,7 @@ public class OkHttpRequestBuilder {
     }
 
     /**
-     * 从 headersList 中提取 Content-Type
+     * Từ headersList được chiết xuất từ Content-Type
      */
     private static String extractContentType(List<HttpHeader> headersList) {
         if (headersList == null) {
@@ -123,7 +123,7 @@ public class OkHttpRequestBuilder {
     }
 
     /**
-     * 构建请求体
+     * Xây dựng phần thân yêu cầu
      */
     private static RequestBody buildRequestBody(String body, String method, String contentType) {
         if (METHOD_GET.equals(method) || METHOD_HEAD.equals(method)) {
@@ -156,7 +156,7 @@ public class OkHttpRequestBuilder {
     }
 
     /**
-     * 创建包含内容的请求体
+     * Tạo nội dung yêu cầu chứa nội dung
      */
     private static RequestBody createRequestBodyWithContent(String body, String contentType) {
         String actualContentType = contentType != null ? contentType : DEFAULT_JSON_CONTENT_TYPE;
@@ -211,26 +211,26 @@ public class OkHttpRequestBuilder {
     }
 
     /**
-     * 判断是否为 JSON Content-Type
+     * Xác định xem có phải như vậy không JSON Content-Type
      */
     private static boolean isJsonContentType(String contentType) {
         return contentType != null && contentType.toLowerCase().contains(APPLICATION_JSON);
     }
 
     /**
-     * 清理 JSON 注释（支持 JSON5）
+     * Dọn dẹp JSON chú thích (được hỗ trợ JSON5）
      */
     private static String cleanJsonComments(String json) {
         try {
             return JsonUtil.cleanJsonComments(json);
         } catch (Exception e) {
-            // 如果清理失败，返回原始内容
+            // Nếu việc dọn dẹp không thành công, nội dung gốc sẽ được trả về
             return json;
         }
     }
 
     /**
-     * 创建空请求体
+     * Tạo một nội dung yêu cầu trống
      */
     private static RequestBody createEmptyRequestBody(String contentType) {
         MediaType mediaType = contentType != null ? MediaType.parse(contentType) : null;
@@ -239,14 +239,14 @@ public class OkHttpRequestBuilder {
 
 
     /**
-     * 检测文件 MIME 类型
+     * Phát hiện tập tin MIME loại
      */
     private static String detectMimeType(File file) {
         return FileMimeTypeUtil.detectMimeType(file);
     }
 
     /**
-     * 判断 header name 是否为合法的 ASCII 字符且不包含非法字符
+     * phán xét header name Nó có hợp pháp không? ASCII ký tự và không chứa các ký tự không hợp lệ
      */
     private static boolean isValidHeaderName(String key) {
         if (key == null || key.isEmpty()) {
@@ -255,7 +255,7 @@ public class OkHttpRequestBuilder {
 
         for (int i = 0; i < key.length(); i++) {
             char c = key.charAt(i);
-            // 仅允许 33~126 范围的 ASCII 字符，且不能包含冒号
+            // Chỉ được phép 33~126 phạm vi ASCII ký tự và không thể chứa dấu hai chấm
             if (c < 33 || c > 126 || c == ':') {
                 return false;
             }
@@ -264,7 +264,7 @@ public class OkHttpRequestBuilder {
     }
 
     /**
-     * 从 List 添加 HTTP 请求头（支持相同 key）
+     * Từ List Thêm vào HTTP Tiêu đề yêu cầu (hỗ trợ tương tự key）
      */
     private static boolean addHeadersFromList(Request.Builder builder, List<HttpHeader> headersList) {
         if (headersList == null || headersList.isEmpty()) {
@@ -293,7 +293,7 @@ public class OkHttpRequestBuilder {
     }
 
     /**
-     * 从 List 添加 Form-Data（支持相同 key）
+     * Từ List Thêm vào Form-Data（Hỗ trợ tương tự key）
      */
     private static void addFormDataPartsFromList(MultipartBody.Builder builder, List<HttpFormData> formDataList) {
         if (formDataList == null || formDataList.isEmpty()) {
@@ -325,8 +325,8 @@ public class OkHttpRequestBuilder {
                                 RequestBody.create(file, MediaType.parse(mimeType))
                         );
                     } else {
-                        // 文件不存在或不是一个普通文件时，添加空文件占位
-                        // 这样用户可以在响应中看到该字段，而不是静默失败
+                        // Khi tệp không tồn tại hoặc không phải là tệp thông thường, hãy thêm phần giữ chỗ cho tệp trống
+                        // Bằng cách này, người dùng có thể nhìn thấy trường trong phản hồi thay vì âm thầm thất bại
                         builder.addFormDataPart(
                                 key,
                                 "",
@@ -339,7 +339,7 @@ public class OkHttpRequestBuilder {
     }
 
     /**
-     * 从 List 添加 URL-Encoded Form（支持相同 key）
+     * Từ List Thêm vào URL-Encoded Form（Hỗ trợ tương tự key）
      */
     private static void addFormUrlEncodedPartsFromList(FormBody.Builder builder, List<HttpFormUrlencoded> urlencodedList) {
         if (urlencodedList == null || urlencodedList.isEmpty()) {

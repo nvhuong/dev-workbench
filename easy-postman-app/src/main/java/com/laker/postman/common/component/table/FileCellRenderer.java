@@ -6,12 +6,12 @@ import java.awt.*;
 import java.io.File;
 
 /**
- * 文件类型单元格渲染器
- * 增强版：支持文件状态提示和路径截断
+ * Trình kết xuất ô loại tệp
+ * Phiên bản nâng cao: Hỗ trợ nhắc nhở trạng thái tệp và cắt ngắn đường dẫn
  */
 public class FileCellRenderer implements TableCellRenderer {
 
-    // 文件路径显示的最大长度，超过则截断
+    // Độ dài tối đa của đường dẫn tệp được hiển thị. Nếu vượt quá chiều dài, nó sẽ bị cắt bớt
     private static final int MAX_PATH_DISPLAY_LENGTH = 35;
     private final JLabel label = new JLabel();
 
@@ -47,7 +47,7 @@ public class FileCellRenderer implements TableCellRenderer {
     }
 
     /**
-     * 格式化文件路径，过长时截断中间部分
+     * Định dạng đường dẫn file và cắt bớt phần giữa nếu quá dài
      */
     private String formatFilePath(String path) {
         if (path == null || path.length() <= MAX_PATH_DISPLAY_LENGTH) {
@@ -61,14 +61,14 @@ public class FileCellRenderer implements TableCellRenderer {
             return path;
         }
 
-        // 如果文件名已经很长，只显示文件名的一部分
+        // Nếu tên tệp đã rất dài thì chỉ một phần tên tệp được hiển thị
         if (fileName.length() > MAX_PATH_DISPLAY_LENGTH) {
             return fileName.substring(0, 10) + "..." +
                     fileName.substring(fileName.length() - 20);
         }
 
-        // 否则保留完整文件名，但截断父路径
-        int remainingLength = MAX_PATH_DISPLAY_LENGTH - fileName.length() - 5; // 5为"..."和分隔符的长度
+        // Nếu không, tên tệp đầy đủ sẽ được giữ lại nhưng đường dẫn gốc bị cắt bớt
+        int remainingLength = MAX_PATH_DISPLAY_LENGTH - fileName.length() - 5; // 5vì"..."và độ dài dấu phân cách
         if (remainingLength < 10) remainingLength = 10;
 
         return parentPath.substring(0, Math.min(remainingLength, parentPath.length()))

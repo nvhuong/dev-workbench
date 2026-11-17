@@ -16,41 +16,41 @@ import static com.laker.postman.request.model.RequestAuthTypes.AUTH_TYPE_BEARER;
 import static org.testng.Assert.*;
 
 /**
- * HttpFileParser 单元测试类
- * 测试 HTTP 文件解析器的各种功能
+ * HttpFileParser Lớp kiểm tra đơn vị
+ * Bài kiểm tra HTTP Các chức năng khác nhau của trình phân tích cú pháp tập tin
  */
 public class IntelliJHttpParserTest {
 
-    @Test(description = "测试解析空内容")
+    @Test(description = "Kiểm tra phân tích nội dung trống")
     public void testParseEmptyContent() {
         CollectionParseResult result = IntelliJHttpParser.parseHttpFile(null, "test.http");
-        assertNull(result, "null 内容应该返回 null");
+        assertNull(result, "null Nội dung nên được trả lại null");
 
         result = IntelliJHttpParser.parseHttpFile("", "test.http");
-        assertNull(result, "空字符串应该返回 null");
+        assertNull(result, "Một chuỗi trống sẽ được trả về null");
 
         result = IntelliJHttpParser.parseHttpFile("   ", "test.http");
-        assertNull(result, "空白字符串应该返回 null");
+        assertNull(result, "Một chuỗi trống sẽ được trả về null");
     }
 
-    @Test(description = "测试解析简单的 GET 请求")
+    @Test(description = "Kiểm tra phân tích cú pháp rất đơn giản GET yêu cầu")
     public void testParseSimpleGetRequest() {
         String content = "GET https://api.example.com/users";
         CollectionParseResult result = IntelliJHttpParser.parseHttpFile(content, "test.http");
 
-        assertNotNull(result, "应该成功解析");
-        assertEquals(result.getChildren().size(), 1, "应该有一个请求");
+        assertNotNull(result, "nên phân tích thành công");
+        assertEquals(result.getChildren().size(), 1, "Nên có một yêu cầu");
 
         HttpRequestItem request = result.getChildren().get(0).asRequest();
         assertEquals(request.getMethod(), "GET");
         assertEquals(request.getUrl(), "https://api.example.com/users");
-        assertNotNull(request.getName(), "应该有请求名称");
+        assertNotNull(request.getName(), "Cần có một tên yêu cầu");
     }
 
-    @Test(description = "测试解析带名称的请求")
+    @Test(description = "Kiểm tra các yêu cầu phân tích cú pháp bằng tên")
     public void testParseRequestWithName() {
         String content = """
-                ### 获取用户列表
+                ### Lấy danh sách người dùng
                 GET https://api.example.com/users
                 """;
 
@@ -59,43 +59,43 @@ public class IntelliJHttpParserTest {
         assertEquals(result.getChildren().size(), 1);
 
         HttpRequestItem request = result.getChildren().get(0).asRequest();
-        assertEquals(request.getName(), "获取用户列表");
+        assertEquals(request.getName(), "Lấy danh sách người dùng");
         assertEquals(request.getMethod(), "GET");
         assertEquals(request.getUrl(), "https://api.example.com/users");
     }
 
-    @Test(description = "测试解析多个请求")
+    @Test(description = "Kiểm tra phân tích cú pháp nhiều yêu cầu")
     public void testParseMultipleRequests() {
         String content = """
-                ### 获取用户列表
+                ### Lấy danh sách người dùng
                 GET https://api.example.com/users
-                
-                ### 创建用户
+
+                ### Tạo người dùng
                 POST https://api.example.com/users
                 """;
 
         CollectionParseResult result = IntelliJHttpParser.parseHttpFile(content, "test.http");
         assertNotNull(result);
-        assertEquals(result.getChildren().size(), 2, "应该有两个请求");
+        assertEquals(result.getChildren().size(), 2, "Nên có hai yêu cầu");
 
-        // 验证第一个请求
+        // Xác minh yêu cầu đầu tiên
         HttpRequestItem request1 = result.getChildren().get(0).asRequest();
-        assertEquals(request1.getName(), "获取用户列表");
+        assertEquals(request1.getName(), "Lấy danh sách người dùng");
         assertEquals(request1.getMethod(), "GET");
 
-        // 验证第二个请求
+        // Xác minh yêu cầu thứ hai
         HttpRequestItem request2 = result.getChildren().get(1).asRequest();
-        assertEquals(request2.getName(), "创建用户");
+        assertEquals(request2.getName(), "Tạo người dùng");
         assertEquals(request2.getMethod(), "POST");
     }
 
-    @Test(description = "测试解析 POST 请求带 JSON body")
+    @Test(description = "Kiểm tra phân tích cú pháp POST Yêu cầu mang theo JSON body")
     public void testParsePostRequestWithJsonBody() {
         String content = """
-                ### 创建用户
+                ### Tạo người dùng
                 POST https://api.example.com/users
                 Content-Type: application/json
-                
+
                 {
                   "name": "John Doe",
                   "email": "john@example.com"
@@ -113,18 +113,18 @@ public class IntelliJHttpParserTest {
         assertTrue(request.getBody().contains("John Doe"));
         assertTrue(request.getBody().contains("john@example.com"));
 
-        // 验证 Content-Type 头部
+        // Xác minh Content-Type cái đầu
         assertNotNull(request.getHeadersList());
         boolean hasContentType = request.getHeadersList().stream()
                 .anyMatch(h -> "Content-Type".equals(h.getKey()) &&
                         h.getValue().contains("application/json"));
-        assertTrue(hasContentType, "应该有 Content-Type 头部");
+        assertTrue(hasContentType, "Nên có Content-Type cái đầu");
     }
 
-    @Test(description = "测试解析带多个请求头的请求")
+    @Test(description = "Kiểm tra các yêu cầu phân tích cú pháp với nhiều tiêu đề yêu cầu")
     public void testParseRequestWithMultipleHeaders() {
         String content = """
-                ### API 请求
+                ### API yêu cầu
                 GET https://api.example.com/data
                 Accept: application/json
                 User-Agent: EasyPostman/1.0
@@ -136,18 +136,18 @@ public class IntelliJHttpParserTest {
 
         HttpRequestItem request = getRequestFromResult(result, 0);
         assertNotNull(request.getHeadersList());
-        assertEquals(request.getHeadersList().size(), 3, "应该有 3 个请求头");
+        assertEquals(request.getHeadersList().size(), 3, "Nên có 3 tiêu đề yêu cầu");
 
-        // 验证请求头
+        // Xác minh tiêu đề yêu cầu
         assertTrue(hasHeader(request, "Accept", "application/json"));
         assertTrue(hasHeader(request, "User-Agent", "EasyPostman/1.0"));
         assertTrue(hasHeader(request, "X-Custom-Header", "custom-value"));
     }
 
-    @Test(description = "测试解析 Basic 认证")
+    @Test(description = "Kiểm tra phân tích cú pháp Basic Chứng nhận")
     public void testParseBasicAuth() {
         String content = """
-                ### 需要认证的请求
+                ### Một yêu cầu yêu cầu xác thực
                 GET https://api.example.com/protected
                 Authorization: Basic dXNlcm5hbWU6cGFzc3dvcmQ=
                 """;
@@ -158,17 +158,17 @@ public class IntelliJHttpParserTest {
         HttpRequestItem request = getRequestFromResult(result, 0);
         assertEquals(request.getAuthType(), AUTH_TYPE_BASIC);
 
-        // 验证 Base64 解码
+        // Xác minh Base64 giải mã
         String decoded = new String(Base64.getDecoder().decode("dXNlcm5hbWU6cGFzc3dvcmQ="));
         String[] parts = decoded.split(":", 2);
         assertEquals(request.getAuthUsername(), parts[0]);
         assertEquals(request.getAuthPassword(), parts[1]);
     }
 
-    @Test(description = "测试解析 Basic 认证（变量格式）")
+    @Test(description = "Kiểm tra phân tích cú pháp Basic Xác thực (định dạng thay đổi)")
     public void testParseBasicAuthWithVariables() {
         String content = """
-                ### 需要认证的请求
+                ### Một yêu cầu yêu cầu xác thực
                 GET https://api.example.com/protected
                 Authorization: Basic {{username}} {{password}}
                 """;
@@ -182,10 +182,10 @@ public class IntelliJHttpParserTest {
         assertEquals(request.getAuthPassword(), "{{password}}");
     }
 
-    @Test(description = "测试解析 Bearer 认证")
+    @Test(description = "Kiểm tra phân tích cú pháp Bearer Chứng nhận")
     public void testParseBearerAuth() {
         String content = """
-                ### 需要 Bearer Token 的请求
+                ### Cần thiết Bearer Token lời yêu cầu
                 GET https://api.example.com/protected
                 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9
                 """;
@@ -198,13 +198,13 @@ public class IntelliJHttpParserTest {
         assertEquals(request.getAuthToken(), "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9");
     }
 
-    @Test(description = "测试解析 urlencoded body")
+    @Test(description = "Kiểm tra phân tích cú pháp urlencoded body")
     public void testParseUrlencodedBody() {
         String content = """
-                ### 提交表单
+                ### Gửi biểu mẫu
                 POST https://api.example.com/submit
                 Content-Type: application/x-www-form-urlencoded
-                
+
                 name=John+Doe&email=john%40example.com&age=30
                 """;
 
@@ -215,30 +215,30 @@ public class IntelliJHttpParserTest {
         assertEquals(request.getMethod(), "POST");
         assertEquals(request.getBodyType(), "x-www-form-urlencoded");
         assertNotNull(request.getUrlencodedList());
-        assertEquals(request.getUrlencodedList().size(), 3, "应该有 3 个 urlencoded 字段");
+        assertEquals(request.getUrlencodedList().size(), 3, "Nên có 3 cá nhân urlencoded lĩnh vực");
 
-        // 验证字段值
+        // Xác thực các giá trị trường
         assertTrue(hasUrlencodedField(request, "name", "John+Doe"));
         assertTrue(hasUrlencodedField(request, "email", "john%40example.com"));
         assertTrue(hasUrlencodedField(request, "age", "30"));
     }
 
-    @Test(description = "测试解析 multipart/form-data body")
+    @Test(description = "Kiểm tra phân tích cú pháp multipart/form-data body")
     public void testParseMultipartFormData() {
         String content = """
                 ### Send a form with text and file fields
                 POST https://examples.http-client.intellij.net/post
                 Content-Type: multipart/form-data; boundary=WebAppBoundary
-                
+
                 --WebAppBoundary
                 Content-Disposition: form-data; name="element-name"
                 Content-Type: text/plain
-                
+
                 Name
                 --WebAppBoundary
                 Content-Disposition: form-data; name="data"; filename="data.json"
                 Content-Type: application/json
-                
+
                 < ./request-form-data.json
                 --WebAppBoundary--
                 """;
@@ -250,51 +250,51 @@ public class IntelliJHttpParserTest {
         assertEquals(request.getMethod(), "POST");
         assertEquals(request.getBodyType(), "form-data");
         assertNotNull(request.getFormDataList());
-        assertEquals(request.getFormDataList().size(), 2, "应该有 2 个 form-data 字段");
+        assertEquals(request.getFormDataList().size(), 2, "Nên có 2 cá nhân form-data lĩnh vực");
 
-        // 验证文本字段
+        // Xác thực các trường văn bản
         boolean hasTextField = request.getFormDataList().stream()
                 .anyMatch(f -> "element-name".equals(f.getKey()) &&
                         "Name".equals(f.getValue()) &&
                         f.isText());
-        assertTrue(hasTextField, "应该有名为 element-name 的文本字段");
+        assertTrue(hasTextField, "Nó nên được đặt tên element-name trường văn bản");
 
-        // 验证文件字段
+        // Xác thực các trường tệp
         boolean hasFileField = request.getFormDataList().stream()
                 .anyMatch(f -> "data".equals(f.getKey()) &&
                         f.getValue().contains("request-form-data.json") &&
                         !f.isText());
-        assertTrue(hasFileField, "应该有名为 data 的文件字段");
+        assertTrue(hasFileField, "Nó nên được đặt tên data các trường tập tin");
     }
 
-    @Test(description = "测试解析各种 HTTP 方法")
+    @Test(description = "Kiểm tra phân tích cú pháp khác nhau HTTP phương pháp")
     public void testParseVariousHttpMethods() {
         String content = """
-                ### GET 请求
+                ### GET yêu cầu
                 GET https://api.example.com/get
-                
-                ### POST 请求
+
+                ### POST yêu cầu
                 POST https://api.example.com/post
-                
-                ### PUT 请求
+
+                ### PUT yêu cầu
                 PUT https://api.example.com/put
-                
-                ### DELETE 请求
+
+                ### DELETE yêu cầu
                 DELETE https://api.example.com/delete
-                
-                ### PATCH 请求
+
+                ### PATCH yêu cầu
                 PATCH https://api.example.com/patch
-                
-                ### HEAD 请求
+
+                ### HEAD yêu cầu
                 HEAD https://api.example.com/head
-                
-                ### OPTIONS 请求
+
+                ### OPTIONS yêu cầu
                 OPTIONS https://api.example.com/options
                 """;
 
         CollectionParseResult result = IntelliJHttpParser.parseHttpFile(content, "test.http");
         assertNotNull(result);
-        assertEquals(result.getChildren().size(), 7, "应该有 7 个请求");
+        assertEquals(result.getChildren().size(), 7, "Nên có 7 lời yêu cầu");
 
         assertEquals(getRequestFromResult(result, 0).getMethod(), "GET");
         assertEquals(getRequestFromResult(result, 1).getMethod(), "POST");
@@ -305,13 +305,13 @@ public class IntelliJHttpParserTest {
         assertEquals(getRequestFromResult(result, 6).getMethod(), "OPTIONS");
     }
 
-    @Test(description = "测试解析 POST 请求带多行 body")
+    @Test(description = "Kiểm tra phân tích cú pháp POST Yêu cầu nhiều dòng body")
     public void testParsePostRequestWithMultilineBody() {
         String content = """
-                ### 创建复杂对象
+                ### Tạo các đối tượng phức tạp
                 POST https://api.example.com/complex
                 Content-Type: application/json
-                
+
                 {
                   "name": "John",
                   "address": {
@@ -334,7 +334,7 @@ public class IntelliJHttpParserTest {
         assertTrue(request.getBody().contains("\"tags\":"));
     }
 
-    @Test(description = "测试解析没有名称的请求（使用 URL 作为名称）")
+    @Test(description = "Kiểm tra các yêu cầu phân tích cú pháp không có tên (sử dụng  URL như tên)")
     public void testParseRequestWithoutName() {
         String content = """
                 ###
@@ -345,15 +345,15 @@ public class IntelliJHttpParserTest {
         assertNotNull(result);
 
         HttpRequestItem request = getRequestFromResult(result, 0);
-        // 如果没有名称，应该使用 URL 的路径部分作为名称
+        // Nếu không có tên thì nên sử dụng URL phần đường dẫn như tên
         assertNotNull(request.getName());
         assertFalse(request.getName().isEmpty());
     }
 
-    @Test(description = "测试解析 SSE 请求")
+    @Test(description = "Kiểm tra phân tích cú pháp SSE yêu cầu")
     public void testParseSSERequest() {
         String content = """
-                ### SSE 流式请求
+                ### SSE Truyền phát các yêu cầu
                 GET https://api.example.com/events
                 Accept: text/event-stream
                 """;
@@ -366,10 +366,10 @@ public class IntelliJHttpParserTest {
         assertTrue(hasHeader(request, "Accept", "text/event-stream"));
     }
 
-    @Test(description = "测试解析 WebSocket 请求")
+    @Test(description = "Kiểm tra phân tích cú pháp WebSocket yêu cầu")
     public void testParseWebSocketRequest() {
         String content = """
-                ### WebSocket 连接
+                ### WebSocket kết nối
                 GET wss://echo-websocket.hoppscotch.io/
                 """;
 
@@ -381,14 +381,14 @@ public class IntelliJHttpParserTest {
         assertEquals(request.getUrl(), "wss://echo-websocket.hoppscotch.io/");
     }
 
-    @Test(description = "测试解析包含空行的请求")
+    @Test(description = "Kiểm tra các yêu cầu phân tích cú pháp có chứa các dòng trống")
     public void testParseRequestWithEmptyLines() {
         String content = """
-                ### 带空行的请求
+                ### Yêu cầu có dòng trống
                 POST https://api.example.com/data
                 Content-Type: application/json
-                
-                
+
+
                 {
                   "data": "value"
                 }
@@ -403,7 +403,7 @@ public class IntelliJHttpParserTest {
         assertTrue(request.getBody().contains("\"data\": \"value\""));
     }
 
-    @Test(description = "测试解析没有分隔符的单个请求")
+    @Test(description = "Kiểm tra phân tích cú pháp một yêu cầu duy nhất mà không có dấu phân cách")
     public void testParseSingleRequestWithoutSeparator() {
         String content = "GET https://api.example.com/users";
         CollectionParseResult result = IntelliJHttpParser.parseHttpFile(content, "test.http");
@@ -416,10 +416,10 @@ public class IntelliJHttpParserTest {
         assertEquals(request.getUrl(), "https://api.example.com/users");
     }
 
-    @Test(description = "测试解析带查询参数的 URL")
+    @Test(description = "Kiểm tra phân tích cú pháp với các tham số truy vấn URL")
     public void testParseRequestWithQueryParams() {
         String content = """
-                ### 搜索请求
+                ### Yêu cầu tìm kiếm
                 GET https://api.example.com/search?q=test&limit=10&page=1
                 """;
 
@@ -430,42 +430,42 @@ public class IntelliJHttpParserTest {
         assertEquals(request.getUrl(), "https://api.example.com/search?q=test&limit=10&page=1");
     }
 
-    @Test(description = "测试解析分组节点")
+    @Test(description = "Kiểm tra các nút nhóm phân tích cú pháp")
     public void testParseGroupNode() {
         String content = """
-                ### 第一个请求
+                ### Yêu cầu đầu tiên
                 GET https://api.example.com/one
-                
-                ### 第二个请求
+
+                ### Yêu cầu thứ hai
                 POST https://api.example.com/two
                 """;
 
         CollectionParseResult result = IntelliJHttpParser.parseHttpFile(content, "test.http");
         assertNotNull(result);
 
-        // 验证分组信息
+        // Xác minh thông tin nhóm
         RequestGroup group = result.getGroup();
         assertNotNull(group);
         assertNotNull(group.getName());
         assertEquals(result.getChildren().size(), 2);
     }
 
-    @Test(description = "测试解析无效请求（没有 URL）")
+    @Test(description = "Kiểm tra phân tích cú pháp yêu cầu không hợp lệ (không URL）")
     public void testParseInvalidRequestWithoutUrl() {
         String content = """
-                ### 无效请求
+                ### Yêu cầu không hợp lệ
                 GET
                 """;
 
         CollectionParseResult result = IntelliJHttpParser.parseHttpFile(content, "test.http");
-        // 没有有效 URL 的请求不应该被添加到结果中
-        assertNull(result, "没有有效 URL 的请求应该返回 null");
+        // Không hợp lệ URL Yêu cầu không nên được thêm vào kết quả
+        assertNull(result, "Không hợp lệ URL Yêu cầu nên được trả lại null");
     }
 
-    @Test(description = "测试解析带特殊字符的请求头值")
+    @Test(description = "Kiểm tra phân tích giá trị tiêu đề yêu cầu bằng các ký tự đặc biệt")
     public void testParseHeaderWithSpecialCharacters() {
         String content = """
-                ### 特殊字符测试
+                ### Kiểm tra ký tự đặc biệt
                 GET https://api.example.com/test
                 X-Custom: value:with:colons
                 X-Another: value with spaces
@@ -479,13 +479,13 @@ public class IntelliJHttpParserTest {
         assertTrue(hasHeader(request, "X-Another", "value with spaces"));
     }
 
-    @Test(description = "测试解析 DELETE 请求带 body")
+    @Test(description = "Kiểm tra phân tích cú pháp DELETE Yêu cầu mang theo body")
     public void testParseDeleteRequestWithBody() {
         String content = """
-                ### 删除资源
+                ### Xóa tài nguyên
                 DELETE https://api.example.com/resource/123
                 Content-Type: application/json
-                
+
                 {
                   "reason": "No longer needed"
                 }
@@ -500,13 +500,13 @@ public class IntelliJHttpParserTest {
         assertTrue(request.getBody().contains("\"reason\""));
     }
 
-    @Test(description = "测试解析 PUT 请求")
+    @Test(description = "Kiểm tra phân tích cú pháp PUT yêu cầu")
     public void testParsePutRequest() {
         String content = """
-                ### 更新资源
+                ### Cập nhật tài nguyên
                 PUT https://api.example.com/resource/123
                 Content-Type: application/json
-                
+
                 {
                   "name": "Updated Name"
                 }
@@ -521,13 +521,13 @@ public class IntelliJHttpParserTest {
         assertTrue(request.getBody().contains("Updated Name"));
     }
 
-    @Test(description = "测试解析 urlencoded body 带空值")
+    @Test(description = "Kiểm tra phân tích cú pháp urlencoded body Với giá trị null")
     public void testParseUrlencodedWithEmptyValues() {
         String content = """
-                ### 表单提交
+                ### Gửi biểu mẫu
                 POST https://api.example.com/form
                 Content-Type: application/x-www-form-urlencoded
-                
+
                 name=John&email=&age=30&empty=
                 """;
 
@@ -542,65 +542,65 @@ public class IntelliJHttpParserTest {
         assertTrue(hasUrlencodedField(request, "empty", ""));
     }
 
-    @Test(description = "测试解析复杂场景：多个请求带各种配置")
+    @Test(description = "Kiểm tra và phân tích các tình huống phức tạp: nhiều yêu cầu với nhiều cấu hình khác nhau")
     public void testParseComplexScenario() {
         String content = """
-                ### 获取用户
+                ### Nhận người dùng
                 GET https://api.example.com/users
                 Accept: application/json
                 Authorization: Bearer token123
-                
-                ### 创建用户
+
+                ### Tạo người dùng
                 POST https://api.example.com/users
                 Content-Type: application/json
                 Authorization: Basic dXNlcm5hbWU6cGFzc3dvcmQ=
-                
+
                 {
                   "name": "John",
                   "email": "john@example.com"
                 }
-                
-                ### 提交表单
+
+                ### Gửi biểu mẫu
                 POST https://api.example.com/form
                 Content-Type: application/x-www-form-urlencoded
-                
+
                 name=John&email=john@example.com
                 """;
 
         CollectionParseResult result = IntelliJHttpParser.parseHttpFile(content, "test.http");
         assertNotNull(result);
-        assertEquals(result.getChildren().size(), 3, "应该有 3 个请求");
+        assertEquals(result.getChildren().size(), 3, "Nên có 3 lời yêu cầu");
 
-        // 验证第一个请求（GET with Bearer）
+        // Xác minh yêu cầu đầu tiên (GET with Bearer）
         HttpRequestItem req1 = getRequestFromResult(result, 0);
         assertEquals(req1.getMethod(), "GET");
         assertEquals(req1.getAuthType(), AUTH_TYPE_BEARER);
         assertEquals(req1.getAuthToken(), "token123");
 
-        // 验证第二个请求（POST with JSON and Basic Auth）
+        // Xác minh yêu cầu thứ hai (POST with JSON and Basic Auth）
         HttpRequestItem req2 = getRequestFromResult(result, 1);
         assertEquals(req2.getMethod(), "POST");
         assertEquals(req2.getAuthType(), AUTH_TYPE_BASIC);
         assertEquals(req2.getBodyType(), "raw");
         assertTrue(req2.getBody().contains("John"));
 
-        // 验证第三个请求（POST with urlencoded）
+        // Xác minh yêu cầu thứ ba (POST with urlencoded）
         HttpRequestItem req3 = getRequestFromResult(result, 2);
         assertEquals(req3.getMethod(), "POST");
         assertEquals(req3.getBodyType(), "x-www-form-urlencoded");
         assertTrue(hasUrlencodedField(req3, "name", "John"));
     }
 
-    @Test(description = "测试解析带注释的请求（# 开头）")
+    @Test(description = "Kiểm tra phân tích cú pháp các yêu cầu có chú thích (# đầu)")
     public void testParseRequestWithComments() {
         String content = """
-                ### 获取认证 Token
+                ### Được chứng nhận Token
                 # @no-cookie-jar
                 # @no-log
                 # @name GetAuthToken
                 POST https://api.example.com/auth/token
                 Content-Type: application/json
-                
+
                 {
                   "username": "testuser",
                   "password": "testpass"
@@ -612,18 +612,18 @@ public class IntelliJHttpParserTest {
         assertEquals(result.getChildren().size(), 1);
 
         HttpRequestItem request = getRequestFromResult(result, 0);
-        assertEquals(request.getName(), "获取认证 Token");
+        assertEquals(request.getName(), "Được chứng nhận Token");
         assertEquals(request.getMethod(), "POST");
         assertEquals(request.getUrl(), "https://api.example.com/auth/token");
     }
 
-    @Test(description = "测试解析多行 urlencoded body")
+    @Test(description = "Kiểm tra phân tích cú pháp nhiều dòng urlencoded body")
     public void testParseMultilineUrlencodedBody() {
         String content = """
-                ### 提交多行表单
+                ### Gửi biểu mẫu nhiều dòng
                 POST https://api.example.com/form
                 Content-Type: application/x-www-form-urlencoded
-                
+
                 grant_type = password &
                 username = testuser &
                 password = testpass &
@@ -638,58 +638,58 @@ public class IntelliJHttpParserTest {
         assertEquals(request.getBodyType(), "x-www-form-urlencoded");
         assertNotNull(request.getUrlencodedList());
 
-        // 验证字段
+        // Xác thực các trường
         assertTrue(hasUrlencodedField(request, "grant_type", "password"));
         assertTrue(hasUrlencodedField(request, "username", "testuser"));
         assertTrue(hasUrlencodedField(request, "password", "testpass"));
         assertTrue(hasUrlencodedField(request, "scope", "read write"));
     }
 
-    @Test(description = "测试解析带响应处理脚本的请求")
+    @Test(description = "Kiểm tra các yêu cầu phân tích cú pháp bằng các tập lệnh xử lý phản hồi")
     public void testParseRequestWithResponseScript() {
         String content = """
-                ### 获取 Token
+                ### Lấy Token
                 POST https://api.example.com/token
                 Content-Type: application/json
-                
+
                 {
                   "username": "test"
                 }
-                
+
                 > {% client.global.set("token", response.body.token); %}
-                
-                ### 使用 Token
+
+                ### sử dụng Token
                 GET https://api.example.com/data
                 Authorization: Bearer {{token}}
                 """;
 
         CollectionParseResult result = IntelliJHttpParser.parseHttpFile(content, "test.http");
         assertNotNull(result);
-        assertEquals(result.getChildren().size(), 2, "应该解析出 2 个请求");
+        assertEquals(result.getChildren().size(), 2, "nên được phân tích cú pháp 2 lời yêu cầu");
 
         HttpRequestItem req1 = getRequestFromResult(result, 0);
-        assertEquals(req1.getName(), "获取 Token");
+        assertEquals(req1.getName(), "Lấy Token");
         assertEquals(req1.getMethod(), "POST");
 
-        // 验证响应脚本被转换为 Postman 格式
-        assertNotNull(req1.getPostscript(), "应该有后置脚本");
-        assertFalse(req1.getPostscript().isEmpty(), "后置脚本不应为空");
-        assertTrue(req1.getPostscript().contains("pm.environment.set"), "应该转换为 pm.environment.set");
-        assertTrue(req1.getPostscript().contains("pm.response.json()"), "应该转换为 pm.response.json()");
-        assertFalse(req1.getPostscript().contains("client.global.set"), "不应该包含 client.global.set");
+        // Tập lệnh phản hồi xác thực được chuyển đổi thành Postman định dạng
+        assertNotNull(req1.getPostscript(), "Nên có phần tái bút");
+        assertFalse(req1.getPostscript().isEmpty(), "Phần tái bút không được để trống");
+        assertTrue(req1.getPostscript().contains("pm.environment.set"), "nên chuyển đổi thành  pm.environment.set");
+        assertTrue(req1.getPostscript().contains("pm.response.json()"), "nên chuyển đổi thành  pm.response.json()");
+        assertFalse(req1.getPostscript().contains("client.global.set"), "không nên được đưa vào client.global.set");
 
         HttpRequestItem req2 = getRequestFromResult(result, 1);
-        assertEquals(req2.getName(), "使用 Token");
+        assertEquals(req2.getName(), "sử dụng Token");
         assertEquals(req2.getMethod(), "GET");
     }
 
-    @Test(description = "测试脚本转换的各种场景")
+    @Test(description = "Kiểm tra các kịch bản khác nhau để chuyển đổi tập lệnh")
     public void testScriptConversion() {
         String content = """
-                ### 测试多种脚本语法
+                ### Kiểm tra các cú pháp tập lệnh khác nhau
                 POST https://api.example.com/test
-                
-                > {% 
+
+                > {%
                 client.global.set("var1", response.body.value1);
                 client.global.set("var2", response.body.data.value2);
                 client.global.get("existingVar");
@@ -706,98 +706,98 @@ public class IntelliJHttpParserTest {
         HttpRequestItem req = getRequestFromResult(result, 0);
         String postscript = req.getPostscript();
 
-        // 打印脚本以便调试
-        System.out.println("转换后的脚本:");
+        // In tập lệnh để gỡ lỗi
+        System.out.println("Kịch bản đã chuyển đổi:");
         System.out.println(postscript);
         System.out.println("---");
 
-        assertNotNull(postscript, "应该有后置脚本");
-        assertTrue(postscript.contains("pm.environment.set(\"var1\""), "应该转换 client.global.set");
-        assertTrue(postscript.contains("pm.response.json().value1"), "应该转换 response.body.value1");
-        assertTrue(postscript.contains("pm.response.json().data.value2"), "应该转换 response.body.data.value2");
-        assertTrue(postscript.contains("pm.environment.get(\"existingVar\")"), "应该转换 client.global.get");
-        assertTrue(postscript.contains("pm.test(\"Status is 200\""), "应该转换 client.test");
-        assertTrue(postscript.contains("pm.response.code"), "应该转换 response.status");
+        assertNotNull(postscript, "Nên có phần tái bút");
+        assertTrue(postscript.contains("pm.environment.set(\"var1\""), "nên được chuyển đổi client.global.set");
+        assertTrue(postscript.contains("pm.response.json().value1"), "nên được chuyển đổi response.body.value1");
+        assertTrue(postscript.contains("pm.response.json().data.value2"), "nên được chuyển đổi response.body.data.value2");
+        assertTrue(postscript.contains("pm.environment.get(\"existingVar\")"), "nên được chuyển đổi client.global.get");
+        assertTrue(postscript.contains("pm.test(\"Status is 200\""), "nên được chuyển đổi client.test");
+        assertTrue(postscript.contains("pm.response.code"), "nên được chuyển đổi response.status");
     }
 
-    @Test(description = "测试解析完整的认证流程（实际案例）")
+    @Test(description = "Kiểm tra và phân tích toàn bộ quy trình chứng nhận (trường hợp thực tế)")
     public void testParseRealWorldAuthFlow() {
         String content = """
-                ### STEP 1: 获取 Bearer Token
+                ### STEP 1: Lấy Bearer Token
                 # @no-cookie-jar
                 # @no-log
                 # @name GetBearerToken
                 POST https://{{auth_server}}/api/v1/auth/bearer-token
                 Content-Type: application/json
-                
+
                 {
                   "username": "{{username}}",
                   "password": "{{password}}"
                 }
-                
+
                 > {% client.global.set("bearerToken", response.body.token); %}
-                
-                ### STEP 2: 生成 Access Token
+
+                ### STEP 2: phát ra Access Token
                 # @no-cookie-jar
                 # @no-log
                 # @name GenerateAccessToken
                 POST https://{{auth_server}}/api/v1/oauth/token
                 Content-Type: application/x-www-form-urlencoded
-                
+
                 grant_type = {{grant_type}} &
                 assertion = {{bearerToken}} &
                 scope = {{scope}} &
                 include_refresh_token = true &
                 client_id = {{client_id}} &
                 client_secret = {{client_secret}}
-                
+
                 > {% client.global.set("accessToken", response.body.access_token); %}
-                
-                ### STEP 3: 验证 Access Token
+
+                ### STEP 3: Xác minh Access Token
                 # @no-cookie-jar
                 # @no-log
                 # @name ValidateAccessToken
                 POST https://{{auth_server}}/api/v1/oauth/validate
                 Authorization: Basic {{client_id}} {{client_secret}}
                 Content-Type: application/x-www-form-urlencoded
-                
+
                 access_token = {{accessToken}}
                 """;
 
         CollectionParseResult result = IntelliJHttpParser.parseHttpFile(content, "test.http");
-        assertNotNull(result, "应该成功解析");
-        assertEquals(result.getChildren().size(), 3, "应该有 3 个请求");
+        assertNotNull(result, "nên phân tích thành công");
+        assertEquals(result.getChildren().size(), 3, "Nên có 3 lời yêu cầu");
 
-        // 验证 STEP 1
+        // Xác minh STEP 1
         HttpRequestItem req1 = getRequestFromResult(result, 0);
-        assertEquals(req1.getName(), "STEP 1: 获取 Bearer Token");
+        assertEquals(req1.getName(), "STEP 1: Lấy Bearer Token");
         assertEquals(req1.getMethod(), "POST");
         assertTrue(req1.getUrl().contains("bearer-token"));
         assertEquals(req1.getBodyType(), "raw");
         assertTrue(req1.getBody().contains("{{username}}"));
 
-        // 验证 STEP 1 的响应脚本
-        assertNotNull(req1.getPostscript(), "STEP 1 应该有后置脚本");
-        assertTrue(req1.getPostscript().contains("pm.environment.set(\"bearerToken\""), "应该设置 bearerToken");
-        assertTrue(req1.getPostscript().contains("pm.response.json().token"), "应该从响应中获取 token");
+        // Xác minh STEP 1 kịch bản phản hồi
+        assertNotNull(req1.getPostscript(), "STEP 1 Nên có phần tái bút");
+        assertTrue(req1.getPostscript().contains("pm.environment.set(\"bearerToken\""), "nên được thiết lập bearerToken");
+        assertTrue(req1.getPostscript().contains("pm.response.json().token"), "Nên thu được từ phản hồi token");
 
-        // 验证 STEP 2
+        // Xác minh STEP 2
         HttpRequestItem req2 = getRequestFromResult(result, 1);
-        assertEquals(req2.getName(), "STEP 2: 生成 Access Token");
+        assertEquals(req2.getName(), "STEP 2: phát ra Access Token");
         assertEquals(req2.getMethod(), "POST");
         assertEquals(req2.getBodyType(), "x-www-form-urlencoded");
         assertTrue(hasUrlencodedField(req2, "grant_type", "{{grant_type}}"));
         assertTrue(hasUrlencodedField(req2, "assertion", "{{bearerToken}}"));
         assertTrue(hasUrlencodedField(req2, "scope", "{{scope}}"));
 
-        // 验证 STEP 2 的响应脚本
-        assertNotNull(req2.getPostscript(), "STEP 2 应该有后置脚本");
-        assertTrue(req2.getPostscript().contains("pm.environment.set(\"accessToken\""), "应该设置 accessToken");
-        assertTrue(req2.getPostscript().contains("pm.response.json().access_token"), "应该从响应中获取 access_token");
+        // Xác minh STEP 2 kịch bản phản hồi
+        assertNotNull(req2.getPostscript(), "STEP 2 Nên có phần tái bút");
+        assertTrue(req2.getPostscript().contains("pm.environment.set(\"accessToken\""), "nên được thiết lập accessToken");
+        assertTrue(req2.getPostscript().contains("pm.response.json().access_token"), "Nên thu được từ phản hồi access_token");
 
-        // 验证 STEP 3
+        // Xác minh STEP 3
         HttpRequestItem req3 = getRequestFromResult(result, 2);
-        assertEquals(req3.getName(), "STEP 3: 验证 Access Token");
+        assertEquals(req3.getName(), "STEP 3: Xác minh Access Token");
         assertEquals(req3.getMethod(), "POST");
         assertEquals(req3.getAuthType(), AUTH_TYPE_BASIC);
         assertEquals(req3.getAuthUsername(), "{{client_id}}");
@@ -806,12 +806,12 @@ public class IntelliJHttpParserTest {
         assertTrue(hasUrlencodedField(req3, "access_token", "{{accessToken}}"));
     }
 
-    // 辅助方法：从解析结果获取 HttpRequestItem
+    // Phương pháp phụ trợ: Thu được từ kết quả phân tích cú pháp HttpRequestItem
     private HttpRequestItem getRequestFromResult(CollectionParseResult result, int index) {
         return result.getChildren().get(index).asRequest();
     }
 
-    // 辅助方法：检查请求是否有指定的请求头
+    // Phương thức trợ giúp: Kiểm tra xem yêu cầu có tiêu đề yêu cầu được chỉ định hay không
     private boolean hasHeader(HttpRequestItem request, String key, String value) {
         if (request.getHeadersList() == null) {
             return false;
@@ -820,7 +820,7 @@ public class IntelliJHttpParserTest {
                 .anyMatch(h -> key.equals(h.getKey()) && value.equals(h.getValue()));
     }
 
-    // 辅助方法：检查请求是否有指定的 urlencoded 字段
+    // Phương thức trợ giúp: Kiểm tra xem yêu cầu có được chỉ định hay không urlencoded lĩnh vực
     private boolean hasUrlencodedField(HttpRequestItem request, String key, String value) {
         if (request.getUrlencodedList() == null) {
             return false;
@@ -829,7 +829,7 @@ public class IntelliJHttpParserTest {
                 .anyMatch(f -> key.equals(f.getKey()) && value.equals(f.getValue()));
     }
 
-    // 辅助方法：检查分组是否有指定的变量
+    // Phương thức trợ giúp: Kiểm tra xem nhóm có biến được chỉ định hay không
     private boolean hasVariable(RequestGroup group, String key, String value) {
         if (group.getVariables() == null) {
             return false;
@@ -838,7 +838,7 @@ public class IntelliJHttpParserTest {
                 .anyMatch(v -> key.equals(v.getKey()) && value.equals(v.getValue()));
     }
 
-    @Test(description = "测试解析环境变量定义（@ 开头）")
+    @Test(description = "Kiểm tra các định nghĩa biến môi trường phân tích cú pháp (@ đầu)")
     public void testParseEnvironmentVariables() {
         String content = """
                 ##############################################################################################################################################
@@ -848,7 +848,7 @@ public class IntelliJHttpParserTest {
                 @orgId=test-org-uuid-67890
                 @displayName=Test User
                 @userEmail=test@example.com
-                
+
                 ### get user by uuid
                 GET {{ciUrl}}/identity/scim/v1/Users?startIndex=0&filter=id eq "{{ciUserId}}"
                 Content-Type: application/json
@@ -856,43 +856,43 @@ public class IntelliJHttpParserTest {
                 """;
 
         CollectionParseResult result = IntelliJHttpParser.parseHttpFile(content, "ci-service.http");
-        assertNotNull(result, "应该成功解析");
+        assertNotNull(result, "nên phân tích thành công");
 
-        // 验证分组级别的变量
+        // Xác thực các biến cấp độ nhóm
         RequestGroup group = result.getGroup();
-        assertNotNull(group, "应该有分组对象");
-        assertNotNull(group.getVariables(), "分组应该有变量列表");
-        assertFalse(group.getVariables().isEmpty(), "变量列表不应为空");
-        assertEquals(group.getVariables().size(), 4, "应该有4个变量");
+        assertNotNull(group, "Nên có các đối tượng được nhóm lại");
+        assertNotNull(group.getVariables(), "Nhóm nên có danh sách các biến");
+        assertFalse(group.getVariables().isEmpty(), "Danh sách biến không được để trống");
+        assertEquals(group.getVariables().size(), 4, "Nên có4các biến");
 
-        // 验证变量值
+        // Xác thực các giá trị biến
         assertTrue(hasVariable(group, "ciUserId", "test-user-uuid-12345"));
         assertTrue(hasVariable(group, "orgId", "test-org-uuid-67890"));
         assertTrue(hasVariable(group, "displayName", "Test User"));
         assertTrue(hasVariable(group, "userEmail", "test@example.com"));
 
-        // 验证请求被正确解析
-        assertEquals(result.getChildren().size(), 1, "应该有一个请求");
+        // Xác minh rằng yêu cầu đã được phân tích cú pháp chính xác
+        assertEquals(result.getChildren().size(), 1, "Nên có một yêu cầu");
         HttpRequestItem request = getRequestFromResult(result, 0);
         assertEquals(request.getName(), "get user by uuid");
-        assertTrue(request.getUrl().contains("{{ciUserId}}"), "URL 应该包含变量引用");
+        assertTrue(request.getUrl().contains("{{ciUserId}}"), "URL Nên chứa các tham chiếu biến");
     }
 
-    @Test(description = "测试解析多个请求与环境变量")
+    @Test(description = "Kiểm tra phân tích cú pháp nhiều yêu cầu và biến môi trường")
     public void testParseMultipleRequestsWithVariables() {
         String content = """
                 @ciUrl=https://api.example.com
                 @accessToken=test-token-123
-                
+
                 ### get user by email
                 GET {{ciUrl}}/users?email={{userEmail}}
                 Authorization: Bearer {{accessToken}}
-                
+
                 ### create user
                 POST {{ciUrl}}/users
                 Content-Type: application/json
                 Authorization: Bearer {{accessToken}}
-                
+
                 {
                   "email": "{{userEmail}}",
                   "name": "{{displayName}}"
@@ -902,25 +902,25 @@ public class IntelliJHttpParserTest {
         CollectionParseResult result = IntelliJHttpParser.parseHttpFile(content, "test.http");
         assertNotNull(result);
 
-        // 验证分组级别的变量
+        // Xác thực các biến cấp độ nhóm
         RequestGroup group = result.getGroup();
         assertNotNull(group.getVariables());
-        assertEquals(group.getVariables().size(), 2, "应该有2个变量");
+        assertEquals(group.getVariables().size(), 2, "Nên có2các biến");
         assertTrue(hasVariable(group, "ciUrl", "https://api.example.com"));
         assertTrue(hasVariable(group, "accessToken", "test-token-123"));
 
-        // 验证两个请求
+        // Xác minh cả hai yêu cầu
         assertEquals(result.getChildren().size(), 2);
     }
 
-    @Test(description = "测试解析 JetBrains 官方 # @name、pre-request 和内联 response handler")
+    @Test(description = "Kiểm tra phân tích cú pháp JetBrains chính thức # @name、pre-request và nội tuyến response handler")
     public void testParseJetBrainsOfficialScriptSyntax() {
         String content = """
                 # @name CreatePet
                 < {% request.variables.set("petName", "Bella") %}
                 POST https://example.org/pets/{{petName}} HTTP/2 > {% client.global.set("createdPet", response.body.id); %}
                 Content-Type: application/json
-                
+
                 {
                   "name": "{{petName}}"
                 }
@@ -939,7 +939,7 @@ public class IntelliJHttpParserTest {
         assertTrue(request.getUrl().contains("{{petName}}"));
     }
 
-    @Test(description = "测试解析多行 pre-request 脚本")
+    @Test(description = "Kiểm tra phân tích cú pháp nhiều dòng pre-request kịch bản")
     public void testParseMultilinePreRequestScript() {
         String content = """
                 # @name Login
@@ -949,7 +949,7 @@ public class IntelliJHttpParserTest {
                 %}
                 POST https://example.org/login HTTP/1.1
                 Content-Type: application/json
-                
+
                 {
                   "user": "{{user}}"
                 }

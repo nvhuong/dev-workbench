@@ -23,7 +23,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 
 /**
- * 插件更新检查协调器。
+ * Điều phối viên kiểm tra cập nhật plugin.
  */
 @Slf4j
 @Component

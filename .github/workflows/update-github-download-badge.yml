@@ -1,4 +1,4 @@
-name: Update GitHub Download Badge（更新 GitHub 下载徽章）
+name: Update GitHub Download Badge（đổi mới GitHub Huy hiệu tải xuống)
 
 permissions:
   contents: write
@@ -21,11 +21,11 @@ concurrency:
 
 jobs:
   update-badge:
-    name: Update Badge（更新徽章）
+    name: Update Badge（Cập nhật huy hiệu)
     if: github.repository == 'lakernote/easy-postman'
     runs-on: ubuntu-latest
     steps:
-      - name: Calculate all release downloads（统计全部 Release 下载量）
+      - name: Calculate all release downloads（Thống kê hết Release lượt tải xuống)
         id: downloads
         env:
           GH_TOKEN: ${{ github.token }}
@@ -63,7 +63,7 @@ jobs:
           echo "formatted_total=$formatted_total" >> "$GITHUB_OUTPUT"
           echo "GitHub release downloads: $formatted_total" >> "$GITHUB_STEP_SUMMARY"
 
-      - name: Publish badge data（发布徽章数据）
+      - name: Publish badge data（xuất bản dữ liệu huy hiệu)
         env:
           GH_TOKEN: ${{ github.token }}
           DOWNLOAD_TOTAL: ${{ steps.downloads.outputs.formatted_total }}

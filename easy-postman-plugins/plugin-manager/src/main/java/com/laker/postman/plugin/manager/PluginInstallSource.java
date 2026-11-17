@@ -1,7 +1,7 @@
 package com.laker.postman.plugin.manager;
 
 /**
- * 当前已安装插件的来源元数据。
+ * Nguồn siêu dữ liệu cho các plugin hiện được cài đặt.
  */
 public record PluginInstallSource(
         String type,

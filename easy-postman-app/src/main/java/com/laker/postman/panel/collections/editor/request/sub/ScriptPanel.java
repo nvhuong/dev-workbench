@@ -46,50 +46,50 @@ public class ScriptPanel extends JPanel {
     static {
         AbstractTokenMakerFactory atmf = (AbstractTokenMakerFactory) TokenMakerFactory.getDefaultInstance();
         atmf.putMapping(POSTMAN_JS_SYNTAX, PostmanJavaScriptTokenMaker.class.getName());
-        // 为自定义语法注册 FoldParser，使代码折叠功能生效
+        // Đăng ký cú pháp tùy chỉnh FoldParser，Kích hoạt tính năng gấp mã
         FoldParserManager.get().addFoldParserMapping(POSTMAN_JS_SYNTAX, new CurlyFoldParser());
     }
 
     public ScriptPanel() {
         setLayout(new BorderLayout());
         ToolWindowSurfaceStyle.applyCard(this);
-        // 设置边距
+        // Đặt lề
         setBorder(new EmptyBorder(5, 0, 5, 5));
 
-        // 初始化并配置 PreScript 编辑器
+        // Khởi tạo và cấu hình PreScript Biên tập viên
         prescriptArea = new FallbackAwareRSyntaxTextArea(6, 40);
         prescriptAc = configureEditor(prescriptArea);
         SearchableTextArea prescriptSearchableArea = new SearchableTextArea(prescriptArea);
 
-        // 初始化并配置 PostScript 编辑器
+        // Khởi tạo và cấu hình PostScript Biên tập viên
         postscriptArea = new FallbackAwareRSyntaxTextArea(6, 40);
         postscriptAc = configureEditor(postscriptArea);
         SearchableTextArea postscriptSearchableArea = new SearchableTextArea(postscriptArea);
 
-        // 创建选项卡面板 垂直方向
+        // Tạo một bảng tab hướng dọc
         tabbedPane = new JTabbedPane(SwingConstants.LEFT);
         ToolWindowSurfaceStyle.applyTabbedPaneCard(tabbedPane);
         String prescriptTabTitle = I18nUtil.getMessage(MessageKeys.SCRIPT_PRESCRIPT_TAB_TITLE);
         String postscriptTabTitle = I18nUtil.getMessage(MessageKeys.SCRIPT_POSTSCRIPT_TAB_TITLE);
 
-        // 创建带指示器的 Tab 组件
+        // Tạo bằng chỉ báo Tab thành phần
         preScriptTab = new IndicatorTabComponent(prescriptTabTitle);
         postScriptTab = new IndicatorTabComponent(postscriptTabTitle);
 
-        // Pre-script 标签带指示器
+        // Pre-script Nhãn với chỉ số
         tabbedPane.addTab(prescriptTabTitle, prescriptSearchableArea);
         tabbedPane.setTabComponentAt(0, preScriptTab);
 
-        // Post-script 标签带指示器
+        // Post-script Nhãn với chỉ số
         tabbedPane.addTab(postscriptTabTitle, postscriptSearchableArea);
         tabbedPane.setTabComponentAt(1, postScriptTab);
 
-        // 添加文档监听器以更新指示器
+        // Thêm trình nghe tài liệu để cập nhật chỉ báo
         addIndicatorListeners();
 
         add(tabbedPane, BorderLayout.CENTER);
 
-        // 右下角添加帮助按钮和 Snippets 按钮
+        // Thêm nút trợ giúp ở góc dưới bên phải và Snippets nút
         snippetBtn = new SnippetButton();
 
         HelpButton helpBtn = new HelpButton();
@@ -101,18 +101,18 @@ public class ScriptPanel extends JPanel {
         btnPanel.add(snippetBtn);
         add(btnPanel, BorderLayout.SOUTH);
 
-        // 标签页切换监听器 - 只在脚本标签页显示 Snippets 按钮
+        // Trình nghe chuyển đổi tab - Chỉ hiển thị trên tab Tập lệnh Snippets nút
         tabbedPane.addChangeListener(e -> {
             int selectedIndex = tabbedPane.getSelectedIndex();
             snippetBtn.setVisible(selectedIndex == 0 || selectedIndex == 1);
         });
 
-        // Snippets 按钮点击事件
+        // Snippets Sự kiện nhấn nút
         snippetBtn.addActionListener(e -> openSnippetDialog());
     }
 
     /**
-     * 显示帮助对话框
+     * Hiển thị hộp thoại trợ giúp
      */
     private void showHelpDialog() {
         JDialog dialog = new JDialog((Frame) SwingUtilities.getWindowAncestor(this),
@@ -129,50 +129,50 @@ public class ScriptPanel extends JPanel {
     }
 
     /**
-     * 创建帮助面板
+     * Tạo bảng trợ giúp
      */
     private JPanel createHelpPanel() {
         JPanel panel = new JPanel(new BorderLayout(10, 10));
         ToolWindowSurfaceStyle.applyDialogSurface(panel);
         panel.setBorder(new EmptyBorder(15, 20, 15, 20));
 
-        // 主内容面板
+        // Bảng nội dung chính
         JPanel contentPanel = new JPanel();
         ToolWindowSurfaceStyle.applyDialogSurface(contentPanel);
         contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.Y_AXIS));
 
-        // 标题
+        // tiêu đề
         JLabel titleLabel = new JLabel(I18nUtil.getMessage(MessageKeys.SCRIPT_HELP_TITLE));
         titleLabel.setFont(FontsUtil.getDefaultFontWithOffset(Font.BOLD, +1));
         titleLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
         contentPanel.add(titleLabel);
         contentPanel.add(Box.createVerticalStrut(10));
 
-        // 简介
+        // Giới thiệu
         JTextArea introArea = createHelpTextArea(I18nUtil.getMessage(MessageKeys.SCRIPT_HELP_INTRO));
         introArea.setAlignmentX(Component.LEFT_ALIGNMENT);
         contentPanel.add(introArea);
         contentPanel.add(Box.createVerticalStrut(15));
 
-        // 主要功能
+        // Các chức năng chính
         JTextArea featuresArea = createHelpTextArea(I18nUtil.getMessage(MessageKeys.SCRIPT_HELP_FEATURES));
         featuresArea.setAlignmentX(Component.LEFT_ALIGNMENT);
         contentPanel.add(featuresArea);
         contentPanel.add(Box.createVerticalStrut(15));
 
-        // 快捷键
+        // phím tắt
         JTextArea shortcutsArea = createHelpTextArea(I18nUtil.getMessage(MessageKeys.SCRIPT_HELP_SHORTCUTS));
         shortcutsArea.setAlignmentX(Component.LEFT_ALIGNMENT);
         contentPanel.add(shortcutsArea);
         contentPanel.add(Box.createVerticalStrut(15));
 
-        // 常用示例
+        // Ví dụ phổ biến
         JTextArea examplesArea = createHelpTextArea(I18nUtil.getMessage(MessageKeys.SCRIPT_HELP_EXAMPLES));
         examplesArea.setFont(FontsUtil.getDefaultFontWithOffset(Font.PLAIN, -1));
         examplesArea.setAlignmentX(Component.LEFT_ALIGNMENT);
         contentPanel.add(examplesArea);
 
-        // 将内容面板放入滚动面板
+        // Đặt bảng nội dung vào bảng cuộn
         JScrollPane scrollPane = new JScrollPane(contentPanel);
         ToolWindowSurfaceStyle.applyDialogScrollPane(scrollPane);
         scrollPane.setBorder(null);
@@ -184,7 +184,7 @@ public class ScriptPanel extends JPanel {
     }
 
     /**
-     * 创建帮助文本区域
+     * Tạo một vùng văn bản trợ giúp
      */
     private JTextArea createHelpTextArea(String text) {
         JTextArea area = new JTextArea(text);
@@ -199,36 +199,36 @@ public class ScriptPanel extends JPanel {
 
 
     /**
-     * 配置编辑器的通用设置，返回安装好的 AutoCompletion 实例
+     * Định cấu hình cài đặt chung của trình chỉnh sửa và quay lại cài đặt đã cài đặt AutoCompletion Ví dụ
      */
     private AutoCompletion configureEditor(RSyntaxTextArea area) {
-        // 设置语法高亮
+        // Đặt đánh dấu cú pháp
         area.setSyntaxEditingStyle(POSTMAN_JS_SYNTAX);
 
-        // 代码编辑功能
-        area.setCodeFoldingEnabled(true);           // 代码折叠
-        area.setAutoIndentEnabled(true);            // 自动缩进
-        area.setBracketMatchingEnabled(true);       // 括号匹配
-        area.setMarkOccurrences(false);             // 脚本编辑器不标记相同标识符
+        // Chức năng chỉnh sửa mã
+        area.setCodeFoldingEnabled(true);           // Gấp mã
+        area.setAutoIndentEnabled(true);            // Tự động thụt lề
+        area.setBracketMatchingEnabled(true);       // Khớp khung
+        area.setMarkOccurrences(false);             // Trình chỉnh sửa tập lệnh không đánh dấu các mã định danh giống hệt nhau
 
-        // 显示设置
-        area.setAntiAliasingEnabled(true);          // 抗锯齿，文字更清晰
-        area.setPaintTabLines(true);                // 显示缩进参考线
-        area.setTabSize(4);                         // Tab = 4 个空格
+        // Cài đặt hiển thị
+        area.setAntiAliasingEnabled(true);          // Khử răng cưa giúp văn bản rõ ràng hơn
+        area.setPaintTabLines(true);                // Hiển thị hướng dẫn thụt lề
+        area.setTabSize(4);                         // Tab = 4 không gian
 
-        // 统一加载主题、编辑器字体和缺字回退绘制
+        // Tải thống nhất các chủ đề, phông chữ soạn thảo và bản vẽ dự phòng cho các ký tự bị thiếu
         EditorThemeUtil.loadTheme(area);
 
         return addAutoCompletion(area);
     }
 
     /**
-     * 打开代码片段对话框
+     * Mở hộp thoại đoạn mã
      */
     private void openSnippetDialog() {
         int tab = tabbedPane.getSelectedIndex();
         if (tab != 0 && tab != 1) {
-            return;  // 不在脚本标签页，不执行
+            return;  // Không có trong tab tập lệnh, không được thực thi
         }
 
         SnippetDialog dialog = new SnippetDialog();
@@ -238,11 +238,11 @@ public class ScriptPanel extends JPanel {
         if (selected != null) {
             RSyntaxTextArea targetArea = (tab == 0) ? prescriptArea : postscriptArea;
 
-            // 智能插入：如果有选中文本，替换它；否则在光标位置插入
+            // Smart insertion: If there is selected text, replace it; nếu không thì chèn vào vị trí con trỏ
             String selectedText = targetArea.getSelectedText();
             String codeToInsert = selected.code;
 
-            // 如果光标不在行首且前面有内容，添加换行
+            // Nếu con trỏ không ở đầu dòng và có nội dung trước nó, hãy thêm dòng mới
             int caretPosition = targetArea.getCaretPosition();
             try {
                 int lineStart = targetArea.getLineStartOffsetOfCurrentLine();
@@ -262,14 +262,14 @@ public class ScriptPanel extends JPanel {
     }
 
     /**
-     * 程序性地设置编辑器内容，临时禁用 AutoCompletion 自动激活，
-     * 避免 setText() 触发补全弹窗（AutoCompletion 无法区分用户输入与程序赋值）。
+     * Nội dung soạn thảo được thiết lập theo chương trình, tạm thời bị vô hiệu hóa AutoCompletion Tự động kích hoạt.
+     * tránh setText() Cửa sổ bật lên hoàn thành kích hoạt (AutoCompletion Không thể phân biệt giữa đầu vào của người dùng và phân công chương trình).
      */
     private void setEditorText(RSyntaxTextArea area, AutoCompletion ac, String text) {
         if (ac != null) ac.setAutoActivationEnabled(false);
         area.setText(text == null ? "" : text);
         area.setCaretPosition(0);
-        // 切换请求时的 setText 是数据加载，不是用户编辑；否则第一次 Ctrl/Cmd+Z 会撤销加载动作并清空脚本。
+        // Khi chuyển đổi yêu cầu setText Đó là tải dữ liệu chứ không phải chỉnh sửa của người dùng; nếu không thì đây là lần đầu tiên Ctrl/Cmd+Z Sẽ hoàn tác hành động tải và xóa tập lệnh.
         area.discardAllEdits();
         if (ac != null) ac.setAutoActivationEnabled(true);
     }
@@ -307,7 +307,7 @@ public class ScriptPanel extends JPanel {
     }
 
     /**
-     * 添加脏监听，内容变更时回调
+     * Thêm giám sát và gọi lại bẩn khi nội dung thay đổi
      */
     public void addDirtyListeners(Runnable dirtyCallback) {
         DocumentListener listener = new DocumentListener() {
@@ -329,10 +329,10 @@ public class ScriptPanel extends JPanel {
 
 
     /**
-     * 添加文档监听器以更新指示器状态
+     * Thêm trình nghe tài liệu để cập nhật trạng thái chỉ báo
      */
     private void addIndicatorListeners() {
-        // Pre-script 监听器
+        // Pre-script người nghe
         prescriptArea.getDocument().addDocumentListener(new DocumentListener() {
             @Override
             public void insertUpdate(DocumentEvent e) {
@@ -350,7 +350,7 @@ public class ScriptPanel extends JPanel {
             }
         });
 
-        // Post-script 监听器
+        // Post-script người nghe
         postscriptArea.getDocument().addDocumentListener(new DocumentListener() {
             @Override
             public void insertUpdate(DocumentEvent e) {
@@ -370,10 +370,10 @@ public class ScriptPanel extends JPanel {
     }
 
     /**
-     * 根据文本内容更新指示器状态
+     * Cập nhật trạng thái chỉ báo dựa trên nội dung văn bản
      *
-     * @param tabComponent Tab组件
-     * @param text         文本内容
+     * @param tabComponent Tabthành phần
+     * @param text         Nội dung văn bản
      */
     private void updateIndicator(IndicatorTabComponent tabComponent, String text) {
         boolean hasContent = text != null && !text.trim().isEmpty();
@@ -381,7 +381,7 @@ public class ScriptPanel extends JPanel {
     }
 
     /**
-     * 为 RSyntaxTextArea 安装自动补全并返回 AutoCompletion 实例
+     * vì RSyntaxTextArea Cài đặt tự động hoàn tất và quay lại AutoCompletion Ví dụ
      */
     private AutoCompletion addAutoCompletion(RSyntaxTextArea area) {
         var provider = ScriptSnippetManager.createCompletionProvider();

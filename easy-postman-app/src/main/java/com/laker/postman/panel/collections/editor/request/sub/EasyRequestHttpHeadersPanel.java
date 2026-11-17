@@ -20,11 +20,11 @@ import java.util.*;
 import java.util.List;
 
 /**
- * 高仿Postman的Headers面板
- * 1. 二列表格，第一列为Key，第二列为Value
- * 2. 默认请求头 User-Agent: EasyPostman/版本号 Accept: *, Accept-Encoding: gzip, deflate, br, Connection: keep-alive
- * 3. 左上角有Headers标签和eye图标按钮和(4)标签，点击可切换显示/隐藏 默认请求头
- * 4. 中间是表格
+ * Tính bắt chước caoPostmancủaHeadersbảng điều khiển
+ * 1. Bảng hai cột, cột đầu tiênKey，Cột thứ hai làValue
+ * 2. Tiêu đề yêu cầu mặc định User-Agent: EasyPostman/Số phiên bản Accept: *, Accept-Encoding: gzip, deflate, br, Connection: keep-alive
+ * 3. Có ở góc trên bên tráiHeadersThẻ vàeyenút biểu tượng và(4)Nhãn, bấm vào để chuyển đổi hiển thị/trốn Tiêu đề yêu cầu mặc định
+ * 4. Ở giữa là cái bàn
  */
 public class EasyRequestHttpHeadersPanel extends JPanel {
     private EasyRequestHeadersTablePanel tablePanel;
@@ -44,7 +44,7 @@ public class EasyRequestHttpHeadersPanel extends JPanel {
 
     public EasyRequestHttpHeadersPanel(GeneratedRequestHeaderPolicy generatedHeaderPolicy) {
         this.generatedHeaderPolicy = Objects.requireNonNull(generatedHeaderPolicy, "generatedHeaderPolicy");
-        // 初始化图标（添加颜色过滤器以适配主题）
+        // Khởi tạo biểu tượng (thêm bộ lọc màu cho phù hợp với chủ đề)
         eyeOpenIcon = IconUtil.createThemed("icons/eye-open.svg", IconUtil.SIZE_SMALL, IconUtil.SIZE_SMALL);
         eyeCloseIcon = IconUtil.createThemed("icons/eye-close.svg", IconUtil.SIZE_SMALL, IconUtil.SIZE_SMALL);
 
@@ -56,9 +56,9 @@ public class EasyRequestHttpHeadersPanel extends JPanel {
 
 
     /**
-     * 创建眼睛按钮（用于切换默认请求头的显示/隐藏）
+     * Tạo một nút mắt (được sử dụng để chuyển đổi hiển thị các tiêu đề yêu cầu mặc định/trốn)
      *
-     * @return 配置好的眼睛按钮
+     * @return Nút mắt được cấu hình
      */
     private JButton createEyeButton() {
         JButton button = new JButton(eyeOpenIcon);
@@ -71,13 +71,13 @@ public class EasyRequestHttpHeadersPanel extends JPanel {
     }
 
     /**
-     * 创建计数标签（显示隐藏的默认请求头数量）
+     * Tạo nhãn đếm (hiển thị số lượng tiêu đề yêu cầu mặc định ẩn)
      *
-     * @return 配置好的计数标签
+     * @return Thẻ đếm được cấu hình
      */
     private JLabel createCountLabel() {
         JLabel label = new JLabel();
-        // 设置初始文本（隐藏状态显示数量）
+        // Đặt văn bản ban đầu (số hiển thị ở trạng thái ẩn)
         int count = generatedHeaderPolicy.generatedHeaderCount();
         String countText = "(" + count + ")";
         String countHtml = createSuccessCountHtml(countText);
@@ -96,7 +96,7 @@ public class EasyRequestHttpHeadersPanel extends JPanel {
     private void initializeComponents() {
         setLayout(new BorderLayout());
         ToolWindowSurfaceStyle.applyCard(this);
-        // 设置边距
+        // Đặt lề
         setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
         // Create header panel
         JPanel headerPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 1, 0));
@@ -115,7 +115,7 @@ public class EasyRequestHttpHeadersPanel extends JPanel {
         headerPanel.add(label);
         headerPanel.add(eyeButton);
         headerPanel.add(countLabel);
-        headerPanel.add(Box.createHorizontalStrut(5)); // 添加间距
+        headerPanel.add(Box.createHorizontalStrut(5)); // Thêm khoảng cách
         headerPanel.add(bulkEditButton);
 
         // Create table panel and set parent reference
@@ -126,12 +126,12 @@ public class EasyRequestHttpHeadersPanel extends JPanel {
     }
 
     private void setupLayout() {
-        // tablePanel 已经内部包含了 JScrollPane，直接添加即可
+        // tablePanel Đã bao gồm nội bộ JScrollPane，Chỉ cần thêm nó trực tiếp
         add(tablePanel, BorderLayout.CENTER);
     }
 
     private void initializeTableWithDefaults() {
-        // 将默认请求头添加到表格
+        // Thêm tiêu đề yêu cầu mặc định vào bảng
         for (HttpHeader header : generatedHeaderPolicy.generatedHeaders()) {
             tablePanel.addRow(header.getKey(), header.getValue());
         }
@@ -232,7 +232,7 @@ public class EasyRequestHttpHeadersPanel extends JPanel {
         }
     }
 
-    /** 提交当前正在编辑的单元格（用于手动保存前确保最新输入被提交）。 */
+    /** Gửi ô hiện đang được chỉnh sửa (được sử dụng để đảm bảo dữ liệu đầu vào mới nhất được gửi trước khi lưu theo cách thủ công). */
     public void stopCellEditing() {
         if (tablePanel != null) {
             tablePanel.stopCellEditing();
@@ -273,8 +273,8 @@ public class EasyRequestHttpHeadersPanel extends JPanel {
     }
 
     /**
-     * 从 tableModel 直接读取 headers，不停止当前单元格编辑。
-     * 用于自动保存 / tab 指示器等后台场景，避免打断用户正在进行的输入（如 Tab 导航）。
+     * Từ tableModel Đọc trực tiếp headers，Không ngừng chỉnh sửa ô hiện tại.
+     * để lưu tự động / tab Các cảnh nền như chỉ báo để tránh làm gián đoạn quá trình nhập liệu đang diễn ra của người dùng (ví dụ: Tab điều hướng).
      */
     public List<HttpHeader> getHeadersListFromModel() {
         List<HttpHeader> headersList = new ArrayList<>();
@@ -304,7 +304,7 @@ public class EasyRequestHttpHeadersPanel extends JPanel {
      */
     public void setHeadersList(List<HttpHeader> headersList) {
         if (headersList == null || headersList.isEmpty()) {
-            // 清空并恢复默认请求头
+            // Xóa và khôi phục tiêu đề yêu cầu mặc định
             tablePanel.clear();
             initializeTableWithDefaults();
             applyCurrentFilter();
@@ -355,10 +355,10 @@ public class EasyRequestHttpHeadersPanel extends JPanel {
     }
 
     /**
-     * 聚焦到指定的 header 行并开始编辑 Value 列
-     * 用于从自定义 header 行跳转到默认 header 行
+     * Tập trung vào những gì được chỉ định header dòng và bắt đầu chỉnh sửa Value cột
+     * Được sử dụng để tùy chỉnh từ header Hàng nhảy về mặc định header Được rồi
      *
-     * @param key header 的 key 名称（大小写不敏感）
+     * @param key header của key Tên (không phân biệt chữ hoa chữ thường)
      */
     public void focusOnHeader(String key) {
         if (tablePanel == null || key == null || key.trim().isEmpty()) {
@@ -368,28 +368,28 @@ public class EasyRequestHttpHeadersPanel extends JPanel {
         JTable table = tablePanel.getTable();
         DefaultTableModel model = (DefaultTableModel) table.getModel();
 
-        // 在模型中查找匹配的行
+        // Tìm các hàng phù hợp trong mô hình
         int modelRow = findHeaderRowInModel(model, key);
         if (modelRow < 0) {
             return;
         }
 
-        // 转换为视图行索引（考虑过滤器）
+        // Chuyển đổi để xem chỉ mục hàng (có tính đến bộ lọc)
         int viewRow = table.convertRowIndexToView(modelRow);
         if (viewRow < 0) {
             return;
         }
 
-        // 选中并滚动到该行
+        // Chọn và cuộn đến hàng
         table.setRowSelectionInterval(viewRow, viewRow);
         table.scrollRectToVisible(table.getCellRect(viewRow, 2, true));
 
-        // 延迟启动编辑，确保UI已更新
+        // Chắc chắn là trì hoãn việc bắt đầu chỉnh sửaUIĐã cập nhật
         startEditingValueCell(table, viewRow);
     }
 
     /**
-     * 在表格模型中查找指定 key 的行
+     * Tìm bài tập trong mô hình dạng bảng key ĐƯỢC RỒI
      */
     private int findHeaderRowInModel(DefaultTableModel model, String key) {
         for (int row = 0; row < model.getRowCount(); row++) {
@@ -402,7 +402,7 @@ public class EasyRequestHttpHeadersPanel extends JPanel {
     }
 
     /**
-     * 启动 Value 单元格的编辑
+     * Bắt đầu Value Chỉnh sửa tế bào
      */
     private void startEditingValueCell(JTable table, int viewRow) {
         SwingUtilities.invokeLater(() -> {
@@ -512,7 +512,7 @@ public class EasyRequestHttpHeadersPanel extends JPanel {
         }
     }
 
-    /** 返回默认 header 应插入的行索引，-1 表示追加到末尾 */
+    /** Trở về mặc định header Chỉ mục của hàng cần được chèn.-1 Biểu thị việc thêm vào cuối */
     private int findInsertPositionForDefaultHeader(String key, DefaultTableModel model) {
         int keyIndex = generatedHeaderOrder(key);
         if (keyIndex < 0) return -1;
@@ -528,7 +528,7 @@ public class EasyRequestHttpHeadersPanel extends JPanel {
         return -1;
     }
 
-    /** 返回默认 header 的顺序索引，不存在返回 -1 */
+    /** Trở về mặc định header Chỉ số tuần tự của , không có kết quả trả về -1 */
     private int generatedHeaderOrder(String target) {
         List<HttpHeader> generatedHeaders = generatedHeaderPolicy.generatedHeaders();
         for (int i = 0; i < generatedHeaders.size(); i++) {
@@ -569,11 +569,11 @@ public class EasyRequestHttpHeadersPanel extends JPanel {
     }
 
     /**
-     * 显示批量编辑对话框
-     * 支持以 "Key: Value" 格式批量粘贴和编辑请求头
+     * Hiển thị hộp thoại chỉnh sửa hàng loạt
+     * Được hỗ trợ bởi "Key: Value" Định dạng dán hàng loạt và chỉnh sửa tiêu đề yêu cầu
      */
     private void showBulkEditDialog() {
-        // 1. 将当前表格数据转换为文本格式（Key: Value\n）
+        // 1. Chuyển đổi dữ liệu bảng hiện tại sang định dạng văn bản (Key: Value\n）
         StringBuilder text = new StringBuilder();
         List<HttpHeader> currentHeaders = getHeadersList();
         for (HttpHeader header : currentHeaders) {
@@ -582,14 +582,14 @@ public class EasyRequestHttpHeadersPanel extends JPanel {
             }
         }
 
-        // 2. 创建文本编辑区域
+        // 2. Tạo vùng soạn thảo văn bản
         JTextArea textArea = new JTextArea(text.toString());
         textArea.setLineWrap(false);
         textArea.setTabSize(4);
         ToolWindowSurfaceStyle.applyTextComponentInput(textArea);
         textArea.setCaretColor(ModernColors.getPrimary());
 
-        // 将光标定位到文本末尾
+        // Đặt con trỏ ở cuối văn bản
         textArea.setCaretPosition(textArea.getDocument().getLength());
 
         JScrollPane scrollPane = new JScrollPane(textArea);
@@ -597,35 +597,35 @@ public class EasyRequestHttpHeadersPanel extends JPanel {
         ToolWindowSurfaceStyle.applyDialogInputBorder(scrollPane, false);
         scrollPane.setPreferredSize(new Dimension(600, 400));
 
-        // 3. 创建提示标签 - 使用国际化，垂直排列
+        // 3. Tạo nhãn nhắc nhở - Sử dụng quốc tế hóa, sắp xếp theo chiều dọc
         JPanel hintPanel = new JPanel();
         hintPanel.setLayout(new BoxLayout(hintPanel, BoxLayout.Y_AXIS));
         hintPanel.setOpaque(false);
 
-        // 主提示文本
+        // Văn bản nhắc nhở chính
         JLabel hintLabel = new JLabel(I18nUtil.getMessage(MessageKeys.BULK_EDIT_HINT));
         hintLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
         hintLabel.setForeground(ModernColors.getTextPrimary());
 
-        // 支持格式说明
+        // Hỗ trợ mô tả định dạng
         JLabel formatLabel = new JLabel(I18nUtil.getMessage(MessageKeys.BULK_EDIT_SUPPORTED_FORMATS));
         formatLabel.setForeground(ModernColors.getTextSecondary());
         formatLabel.setFont(FontsUtil.getDefaultFontWithOffset(Font.PLAIN, -2));
         formatLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         hintPanel.add(hintLabel);
-        hintPanel.add(Box.createVerticalStrut(6)); // 添加3像素的间距
+        hintPanel.add(Box.createVerticalStrut(6)); // Thêm vào3Khoảng cách pixel
         hintPanel.add(formatLabel);
         hintPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 
-        // 4. 组装内容面板
+        // 4. Lắp ráp bảng nội dung
         JPanel contentPanel = new JPanel(new BorderLayout(0, 5));
         ToolWindowSurfaceStyle.applyDialogSurface(contentPanel);
         contentPanel.add(hintPanel, BorderLayout.NORTH);
         contentPanel.add(scrollPane, BorderLayout.CENTER);
         contentPanel.setBorder(BorderFactory.createEmptyBorder(14, 16, 14, 16));
 
-        // 5. 创建按钮面板
+        // 5. Tạo một bảng nút
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 0));
         ToolWindowSurfaceStyle.applyDialogFooter(buttonPanel);
         JButton cancelButton = ModernButtonFactory.createButton(I18nUtil.getMessage(MessageKeys.BUTTON_CANCEL), false);
@@ -634,7 +634,7 @@ public class EasyRequestHttpHeadersPanel extends JPanel {
         buttonPanel.add(cancelButton);
         buttonPanel.add(okButton);
 
-        // 6. 创建自定义对话框
+        // 6. Tạo hộp thoại tùy chỉnh
         Window window = SwingUtilities.getWindowAncestor(tablePanel);
         JDialog dialog = new JDialog(window, I18nUtil.getMessage(MessageKeys.BULK_EDIT_HEADERS), Dialog.ModalityType.APPLICATION_MODAL);
         ToolWindowSurfaceStyle.applyDialogWindowChrome(dialog);
@@ -642,13 +642,13 @@ public class EasyRequestHttpHeadersPanel extends JPanel {
         dialog.add(contentPanel, BorderLayout.CENTER);
         dialog.add(buttonPanel, BorderLayout.SOUTH);
 
-        // 设置对话框属性
+        // Đặt thuộc tính hộp thoại
         dialog.setSize(650, 400);
         dialog.setMinimumSize(new Dimension(500, 300));
         dialog.setResizable(true);
         dialog.setLocationRelativeTo(tablePanel);
 
-        // 7. 按钮事件处理
+        // 7. Xử lý sự kiện nút
         okButton.addActionListener(e -> {
             parseBulkText(textArea.getText());
             dialog.dispose();
@@ -656,39 +656,39 @@ public class EasyRequestHttpHeadersPanel extends JPanel {
 
         cancelButton.addActionListener(e -> dialog.dispose());
 
-        // 8. 支持 ESC 键关闭对话框
+        // 8. Hỗ trợ ESC phím để đóng hộp thoại
         dialog.getRootPane().registerKeyboardAction(
                 e -> dialog.dispose(),
                 KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
                 JComponent.WHEN_IN_FOCUSED_WINDOW
         );
 
-        // 9. 设置默认按钮
+        // 9. Đặt nút mặc định
         dialog.getRootPane().setDefaultButton(okButton);
 
-        // 10. 显示对话框
+        // 10. Hiển thị hộp thoại
         dialog.setVisible(true);
     }
 
 
     /**
-     * 解析批量编辑的文本内容
-     * 支持格式：
+     * Phân tích nội dung văn bản chỉnh sửa hàng loạt
+     * Các định dạng được hỗ trợ: .
      * - Key: Value
      * - Key:Value
      * - Key = Value
      * - Key=Value
-     * 空行和 # // 注释行会被忽略。
-     * 已存在 header 的 enabled 状态会被保留。
+     * Các dòng trống và  # // Dòng bình luận được bỏ qua.
+     * đã tồn tại rồi header của enabled Trạng thái sẽ được giữ nguyên.
      */
     private void parseBulkText(String text) {
         if (text == null || text.trim().isEmpty()) {
-            // 如果文本为空，清空所有非默认请求头
+            // Nếu văn bản trống, hãy xóa tất cả các tiêu đề yêu cầu không mặc định
             clearNonDefaultHeaders();
             return;
         }
 
-        // 构建当前 header 的 enabled 状态快照，供后续复用
+        // Xây dựng hiện tại header của enabled Ảnh chụp trạng thái để sử dụng lại sau này
         Map<String, Boolean> enabledSnapshot = new java.util.LinkedHashMap<>();
         Map<String, String> descriptionSnapshot = new java.util.LinkedHashMap<>();
         for (HttpHeader existing : getHeadersList()) {
@@ -698,19 +698,19 @@ public class EasyRequestHttpHeadersPanel extends JPanel {
         }
 
         List<HttpHeader> headers = new ArrayList<>();
-        // 支持 \r\n（Windows 粘贴）和 \n
+        // Hỗ trợ \r\n（Windows Dán) và \n
         String[] lines = text.split("\\r?\\n");
 
         for (String line : lines) {
             line = line.trim();
             if (line.isEmpty() || line.startsWith("#") || line.startsWith("//")) {
-                continue; // 忽略空行和注释
+                continue; // Các dòng trống và nhận xét sẽ bị bỏ qua
             }
 
             String key;
             String value;
 
-            // 优先以第一个 ':' 分割（HTTP Header 标准格式），其次以第一个 '=' 分割
+            // Cái đầu tiên được ưu tiên ':' chia (HTTP Header định dạng chuẩn), tiếp theo là định dạng đầu tiên '=' sự phân đoạn
             int colonIdx = line.indexOf(':');
             int equalsIdx = line.indexOf('=');
 
@@ -721,13 +721,13 @@ public class EasyRequestHttpHeadersPanel extends JPanel {
                 key   = line.substring(0, equalsIdx).trim();
                 value = line.substring(equalsIdx + 1).trim();
             } else {
-                // 只有 key，没有分隔符 → 当作 key="" 处理
+                // Chỉ key，Không có dấu phân cách → Như key="" xử lý
                 key   = line;
                 value = "";
             }
 
             if (!key.isEmpty()) {
-                // 保留原来的 enabled 状态
+                // Giữ bản gốc enabled trạng thái
                 String normalizedKey = key.toLowerCase(java.util.Locale.ROOT);
                 boolean enabled = enabledSnapshot.getOrDefault(normalizedKey, true);
                 String description = descriptionSnapshot.getOrDefault(normalizedKey, "");
@@ -735,12 +735,12 @@ public class EasyRequestHttpHeadersPanel extends JPanel {
             }
         }
 
-        // 更新表格数据
+        // Cập nhật dữ liệu bảng
         setHeadersList(headers);
     }
 
     /**
-     * 清空所有非默认请求头
+     * Xóa tất cả các tiêu đề yêu cầu không mặc định
      */
     private void clearNonDefaultHeaders() {
         setHeadersList(generatedHeaderPolicy.generatedHeaders());

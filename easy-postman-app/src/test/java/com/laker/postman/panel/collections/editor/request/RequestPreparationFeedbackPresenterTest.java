@@ -11,7 +11,7 @@ import static org.testng.Assert.assertNull;
 
 public class RequestPreparationFeedbackPresenterTest extends AbstractSwingUiTest {
 
-    @Test(description = "清理 URL 校验反馈时只应清除 outline，不应改动 tooltip")
+    @Test(description = "Dọn dẹp URL Chỉ nên xóa khi xác minh phản hồi outline，Nó không nên được thay đổi tooltip")
     public void testClearUrlValidationFeedback_ShouldOnlyClearOutline() {
         RequestPreparationFeedbackPresenter presenter = new RequestPreparationFeedbackPresenter();
         JTextField urlField = new JTextField("{{test}}");

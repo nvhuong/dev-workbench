@@ -13,14 +13,14 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
- * Cookie 管理相关工具类，负责监听、获取、设置 Cookie
+ * Cookie Các lớp công cụ liên quan đến quản lý, chịu trách nhiệm giám sát, thu thập và thiết lập Cookie
  */
 public class HttpCookieStore {
-    // 监听器列表
+    // Danh sách người nghe
     private static final CopyOnWriteArrayList<Runnable> listeners = new CopyOnWriteArrayList<>();
     private static final AtomicBoolean notificationPending = new AtomicBoolean(false);
     private static volatile HttpCallbackDispatcher notificationDispatcher = HttpCallbackDispatcher.direct();
-    // 全局 CookieManager
+    // Bức tranh lớn CookieManager
     private static final CookieManager GLOBAL_COOKIE_MANAGER = OkHttpClientManager.getGlobalCookieManager();
 
     public static void setNotificationDispatcher(HttpCallbackDispatcher dispatcher) {

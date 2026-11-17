@@ -1,6 +1,6 @@
 package com.laker.postman.stream;
 
-// 消息类型
+// Loại tin nhắn
 public enum MessageType {
     SENT,
     RECEIVED,

@@ -28,8 +28,8 @@ import java.text.SimpleDateFormat;
 import java.util.List;
 
 /**
- * CookieTablePanel: 高仿Postman，展示和管理所有Cookie（含属性/删除/清空）
- * 支持搜索、排序、双击编辑、图标按钮、空状态提示
+ * CookieTablePanel: Tính bắt chước caoPostman，Hiển thị và quản lý tất cảCookie（Chứa các thuộc tính/xóa bỏ/thông thoáng)
+ * Hỗ trợ tìm kiếm, sắp xếp, chỉnh sửa bằng cách nhấp đúp, nút biểu tượng và lời nhắc trạng thái trống
  */
 public class CookieTablePanel extends JPanel {
     private final JTable table;
@@ -44,15 +44,15 @@ public class CookieTablePanel extends JPanel {
         setBorder(BorderFactory.createEmptyBorder(12, 12, 12, 12));
         ToolWindowSurfaceStyle.applyDialogSurface(this);
 
-        // 顶部搜索和操作栏
+        // Thanh tìm kiếm và hành động hàng đầu
         JPanel topPanel = createTopPanel();
         add(topPanel, BorderLayout.NORTH);
 
-        // 中间表格区域（包含空状态提示）
+        // Khu vực bảng ở giữa (chứa các lời nhắc trạng thái trống)
         JPanel centerPanel = new JPanel(new CardLayout());
         ToolWindowSurfaceStyle.applyDialogSurface(centerPanel);
 
-        // 创建表格
+        // Tạo một bảng
         String[] columns = {
                 I18nUtil.getMessage(MessageKeys.COOKIE_COLUMN_NAME),
                 I18nUtil.getMessage(MessageKeys.COOKIE_COLUMN_VALUE),
@@ -71,7 +71,7 @@ public class CookieTablePanel extends JPanel {
 
             @Override
             public Class<?> getColumnClass(int column) {
-                // Secure 和 HttpOnly 列使用 Boolean 类型以显示复选框
+                // Secure và HttpOnly Sử dụng cột Boolean Nhập để hiển thị hộp kiểm
                 if (column == 5 || column == 6) {
                     return Boolean.class;
                 }
@@ -82,20 +82,20 @@ public class CookieTablePanel extends JPanel {
         table = new JTable(model);
         setupTable();
 
-        // 添加排序和过滤支持
+        // Đã thêm hỗ trợ sắp xếp và lọc
         sorter = new TableRowSorter<>(model);
         table.setRowSorter(sorter);
 
         JScrollPane scrollPane = new JScrollPane(table);
         ToolWindowSurfaceStyle.applyTableScrollPaneCard(scrollPane, table);
-        // 空状态提示
+        // Lời nhắc trạng thái trống
         emptyStatePanel = createEmptyStatePanel();
 
         centerPanel.add(scrollPane, "table");
         centerPanel.add(emptyStatePanel, "empty");
         add(centerPanel, BorderLayout.CENTER);
 
-        // 双击编辑
+        // Nhấp đúp chuột để chỉnh sửa
         table.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
@@ -105,27 +105,27 @@ public class CookieTablePanel extends JPanel {
             }
         });
 
-        // 注册监听器并加载数据
+        // Đăng ký người nghe và tải dữ liệu
         HttpCookieStore.setNotificationDispatcher(SwingHttpRuntimeInteractionAdapter.callbackDispatcher());
         HttpCookieStore.registerCookieChangeListener(cookieListener);
         loadCookies();
 
-        // 禁用搜索框的自动聚焦
+        // Tắt tự động lấy nét cho hộp tìm kiếm
         searchField.setFocusable(false);
         SwingUtilities.invokeLater(() -> {
             searchField.setFocusable(true);
-            table.requestFocusInWindow(); // 让表格获得焦点
+            table.requestFocusInWindow(); // Tạo điểm nhấn cho bảng
         });
     }
 
     /**
-     * 创建顶部面板（搜索框和按钮）
+     * Tạo bảng trên cùng (hộp tìm kiếm và các nút)
      */
     private JPanel createTopPanel() {
         JPanel topPanel = new JPanel(new BorderLayout(8, 0));
         ToolWindowSurfaceStyle.applyDialogSurface(topPanel);
 
-        // 左侧搜索框（SearchTextField 已自带图标、占位符和清除按钮）
+        // Hộp tìm kiếm ở bên trái (SearchTextField Đi kèm với biểu tượng, trình giữ chỗ và nút xóa)
         searchField.setPlaceholderText(I18nUtil.getMessage(MessageKeys.COOKIE_SEARCH_PLACEHOLDER));
         searchField.setPreferredSize(new Dimension(250, 28));
         searchField.setMaximumSize(new Dimension(250, 28));
@@ -145,7 +145,7 @@ public class CookieTablePanel extends JPanel {
 
         topPanel.add(searchField, BorderLayout.WEST);
 
-        // 右侧按钮
+        // Nút phải
         JPanel btnPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 4, 0));
         btnPanel.setOpaque(false);
 
@@ -179,10 +179,10 @@ public class CookieTablePanel extends JPanel {
 
 
     /**
-     * 配置表格样式
+     * Định cấu hình kiểu bảng
      */
     private void setupTable() {
-        // 设置表格样式
+        // Đặt kiểu bảng
         table.setRowHeight(28);
         table.setShowGrid(true);
         table.setFocusable(false);
@@ -191,14 +191,14 @@ public class CookieTablePanel extends JPanel {
         table.setFont(FontsUtil.getDefaultFont(Font.PLAIN));
         table.getTableHeader().setFont(FontsUtil.getDefaultFont(Font.BOLD));
 
-        // 设置列宽
+        // Đặt chiều rộng cột
         setColumnWidths();
 
-        // 设置单元格渲染器
+        // Đặt trình kết xuất ô
         DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
         centerRenderer.setHorizontalAlignment(SwingConstants.CENTER);
 
-        // Value 列左对齐，可能很长
+        // Value Các cột được căn trái và có thể dài
         DefaultTableCellRenderer leftRenderer = new DefaultTableCellRenderer();
         leftRenderer.setHorizontalAlignment(SwingConstants.LEFT);
 
@@ -210,7 +210,7 @@ public class CookieTablePanel extends JPanel {
     }
 
     /**
-     * 设置列宽
+     * Đặt chiều rộng cột
      */
     private void setColumnWidths() {
         TableColumn column;
@@ -252,7 +252,7 @@ public class CookieTablePanel extends JPanel {
     }
 
     /**
-     * 创建空状态提示标签
+     * Tạo nhãn cảnh báo trạng thái trống
      */
     private JPanel createEmptyStatePanel() {
         JPanel panel = new JPanel(new GridBagLayout());
@@ -266,7 +266,7 @@ public class CookieTablePanel extends JPanel {
         try {
             iconLabel.setIcon(IconUtil.createThemed("icons/cookie.svg", 48, 48));
         } catch (Exception e) {
-            // 图标加载失败也不影响
+            // Việc không tải biểu tượng sẽ không ảnh hưởng đến nó
         }
 
         JLabel titleLabel = new JLabel(I18nUtil.getMessage(MessageKeys.COOKIE_EMPTY_STATE), SwingConstants.CENTER);
@@ -289,7 +289,7 @@ public class CookieTablePanel extends JPanel {
     }
 
     /**
-     * 过滤表格
+     * Bảng lọc
      */
     private void filterTable() {
         String text = searchField.getText().trim();
@@ -315,12 +315,12 @@ public class CookieTablePanel extends JPanel {
                     c.domain,
                     c.path,
                     expires,
-                    c.secure,   // Boolean 类型，自动显示为复选框
-                    c.httpOnly  // Boolean 类型，自动显示为复选框
+                    c.secure,   // Boolean Nhập, tự động hiển thị dưới dạng hộp kiểm
+                    c.httpOnly  // Boolean Nhập, tự động hiển thị dưới dạng hộp kiểm
             });
         }
 
-        // 切换显示状态（表格 or 空状态）
+        // Chuyển đổi trạng thái hiển thị (table or trạng thái trống)
         Container parent = table.getParent().getParent().getParent();
         if (parent instanceof JPanel && parent.getLayout() instanceof CardLayout) {
             CardLayout layout = (CardLayout) parent.getLayout();
@@ -333,7 +333,7 @@ public class CookieTablePanel extends JPanel {
     }
 
     /**
-     * 编辑选中的 Cookie
+     * Đã chọn chỉnh sửa Cookie
      */
     private void editSelectedCookie() {
         int row = table.getSelectedRow();
@@ -345,7 +345,7 @@ public class CookieTablePanel extends JPanel {
             return;
         }
 
-        // 获取实际行索引（考虑排序）
+        // Lấy chỉ mục hàng thực tế (có tính đến việc sắp xếp)
         int modelRow = table.convertRowIndexToModel(row);
 
         String name = (String) model.getValueAt(modelRow, 0);
@@ -355,7 +355,7 @@ public class CookieTablePanel extends JPanel {
         boolean secure = (Boolean) model.getValueAt(modelRow, 5);
         boolean httpOnly = (Boolean) model.getValueAt(modelRow, 6);
 
-        // 显示编辑对话框（预填充当前值）
+        // Hiển thị hộp thoại chỉnh sửa (được điền sẵn các giá trị hiện tại)
         showCookieDialog(name, value, domain, path, secure, httpOnly, true);
     }
 
@@ -369,14 +369,14 @@ public class CookieTablePanel extends JPanel {
             return;
         }
 
-        // 获取实际行索引（考虑排序）
+        // Lấy chỉ mục hàng thực tế (có tính đến việc sắp xếp)
         int modelRow = table.convertRowIndexToModel(row);
 
         String name = (String) model.getValueAt(modelRow, 0);
         String domain = (String) model.getValueAt(modelRow, 2);
         String path = (String) model.getValueAt(modelRow, 3);
 
-        // 确认删除
+        // Xác nhận xóa
         int confirm = JOptionPane.showConfirmDialog(this,
                 String.format(I18nUtil.getMessage(MessageKeys.COOKIE_DELETE_CONFIRM), name, domain),
                 I18nUtil.getMessage(MessageKeys.COOKIE_DELETE_CONFIRM_TITLE),
@@ -402,7 +402,7 @@ public class CookieTablePanel extends JPanel {
     }
 
     /**
-     * 显示 Cookie 对话框（新增或编辑）
+     * trình diễn Cookie Hộp thoại (thêm hoặc chỉnh sửa)
      */
     private void showCookieDialog(String defaultName, String defaultValue, String defaultDomain,
                                   String defaultPath, boolean defaultSecure, boolean defaultHttpOnly,
@@ -421,9 +421,9 @@ public class CookieTablePanel extends JPanel {
         for (JTextField field : List.of(nameField, valueField, domainField, pathField)) {
             SettingsInputStyle.apply(field);
         }
-        nameField.setEditable(!isEdit); // 编辑模式下名称不可修改
-        domainField.setEditable(!isEdit); // 编辑模式下域名不可修改
-        pathField.setEditable(!isEdit); // 编辑模式下路径不可修改
+        nameField.setEditable(!isEdit); // Tên không thể được sửa đổi trong chế độ chỉnh sửa
+        domainField.setEditable(!isEdit); // Tên miền không thể được sửa đổi trong chế độ chỉnh sửa
+        pathField.setEditable(!isEdit); // Đường dẫn không thể được sửa đổi trong chế độ chỉnh sửa
 
         panel.add(createFormLabel(I18nUtil.getMessage(MessageKeys.COOKIE_FIELD_NAME) + ":"));
         panel.add(nameField, "growx");
@@ -434,7 +434,7 @@ public class CookieTablePanel extends JPanel {
         panel.add(createFormLabel(I18nUtil.getMessage(MessageKeys.COOKIE_FIELD_PATH) + ":"));
         panel.add(pathField, "growx");
 
-        // Secure 和 HttpOnly 复选框
+        // Secure và HttpOnly hộp kiểm
         JCheckBox secureBox = new JCheckBox(I18nUtil.getMessage(MessageKeys.COOKIE_FIELD_SECURE), defaultSecure);
         JCheckBox httpOnlyBox = new JCheckBox(I18nUtil.getMessage(MessageKeys.COOKIE_FIELD_HTTPONLY), defaultHttpOnly);
         secureBox.setOpaque(false);
@@ -442,7 +442,7 @@ public class CookieTablePanel extends JPanel {
         panel.add(secureBox, "span 2, growx");
         panel.add(httpOnlyBox, "span 2, growx");
 
-        // 添加说明
+        // Thêm mô tả
         if (isEdit) {
             JLabel hint = new JLabel(I18nUtil.getMessage(MessageKeys.COOKIE_EDIT_HINT));
             hint.setFont(FontsUtil.getDefaultFontWithOffset(Font.ITALIC, -1));
@@ -464,7 +464,7 @@ public class CookieTablePanel extends JPanel {
             boolean secure = secureBox.isSelected();
             boolean httpOnly = httpOnlyBox.isSelected();
 
-            // 验证必填字段
+            // Xác thực các trường bắt buộc
             if (name.isEmpty() || domain.isEmpty()) {
                 JOptionPane.showMessageDialog(this,
                         I18nUtil.getMessage(MessageKeys.COOKIE_DIALOG_ERROR_EMPTY),
@@ -473,7 +473,7 @@ public class CookieTablePanel extends JPanel {
                 return;
             }
 
-            // 编辑模式：先删除旧的，再添加新的
+            // Chế độ chỉnh sửa: Xóa cái cũ trước, sau đó thêm cái mới
             if (isEdit) {
                 HttpCookieStore.removeCookie(defaultName, defaultDomain, defaultPath);
             }

@@ -7,12 +7,12 @@ import javax.swing.*;
 import java.awt.*;
 
 /**
- * 环境下拉框的渲染器
+ * Trình kết xuất thả xuống cho môi trường
  */
 public class EnvironmentItemRenderer extends DefaultListCellRenderer {
     @Override
     public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
-        // 使用默认渲染器获取基础组件
+        // Lấy thành phần cơ sở bằng trình kết xuất mặc định
         JLabel label = (JLabel) super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
         if (value instanceof EnvironmentItem item) {
             Environment env = item.getEnvironment();

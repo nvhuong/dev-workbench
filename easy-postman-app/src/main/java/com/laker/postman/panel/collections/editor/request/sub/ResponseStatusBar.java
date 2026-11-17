@@ -17,9 +17,9 @@ import java.awt.event.MouseListener;
 import java.util.List;
 
 /**
- * 响应顶部状态栏。
+ * Thanh trạng thái hàng đầu đáp ứng.
  * <p>
- * 负责状态码、耗时、响应大小和大小明细提示；ResponsePanel 只负责把响应数据交给它。
+ * Chịu trách nhiệm về mã trạng thái, thời gian tiêu thụ, kích thước phản hồi và lời nhắc chi tiết về kích thước;ResponsePanel Nó chỉ chịu trách nhiệm bàn giao dữ liệu phản hồi cho nó.
  */
 final class ResponseStatusBar extends JPanel {
     private final JLabel statusCodeLabel;

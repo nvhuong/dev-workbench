@@ -21,7 +21,7 @@ import static org.testng.Assert.assertEquals;
 
 public class TopMenuBarGitOperationTest {
 
-    @Test(description = "打开 Git 操作对话框前应先保存已加载的工作区级面板")
+    @Test(description = "Mở Git Các bảng cấp độ không gian làm việc đã tải phải được lưu trước khi vận hành các hộp thoại")
     public void shouldSaveWorkspaceScopedPanelsBeforeOpeningGitOperationDialog() throws Exception {
         if (!GraphicsEnvironment.isHeadless()) {
             throw new SkipException("This ordering test relies on headless mode to stop before showing the dialog");

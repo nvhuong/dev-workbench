@@ -23,7 +23,7 @@ import java.awt.geom.RoundRectangle2D;
 @Slf4j
 public class SearchReplacePanel extends JPanel {
 
-    // 图标路径常量 - chevron-right 表示替换面板已收起，chevron-down 表示替换面板已展开
+    // Đường dẫn biểu tượng không đổi - chevron-right Cho biết bảng điều khiển thay thế đã bị sập.chevron-down Cho biết bảng thay thế được mở rộng
     private static final String ICON_EXPAND = "icons/chevron-right.svg";
     private static final String ICON_COLLAPSE = "icons/chevron-down.svg";
 
@@ -47,24 +47,24 @@ public class SearchReplacePanel extends JPanel {
     private final JButton toggleReplaceBtn;
     private final JPanel replacePanel;
     private final Component replaceGap;
-    private final JLabel statusLabel;  // 搜索结果状态标签
-    private final boolean enableReplace;  // 是否启用替换功能
+    private final JLabel statusLabel;  // Nhãn trạng thái kết quả tìm kiếm
+    private final boolean enableReplace;  // Có bật chức năng thay thế hay không
 
-    // 防抖Timer，避免输入时频繁搜索
+    // Chống rungTimer，Tránh tìm kiếm thường xuyên trong khi gõ
     private Timer searchDebounceTimer;
 
     /**
-     * 创建搜索替换面板（默认启用替换功能）
+     * Tạo bảng tìm kiếm và thay thế (thay thế được bật theo mặc định)
      */
     public SearchReplacePanel(RSyntaxTextArea textArea) {
         this(textArea, true);
     }
 
     /**
-     * 创建搜索替换面板
+     * Tạo bảng tìm kiếm và thay thế
      *
-     * @param textArea      目标文本区域
-     * @param enableReplace 是否启用替换功能
+     * @param textArea      Khu vực văn bản mục tiêu
+     * @param enableReplace Có bật chức năng thay thế hay không
      */
     public SearchReplacePanel(RSyntaxTextArea textArea, boolean enableReplace) {
         this.textArea = textArea;
@@ -77,15 +77,15 @@ public class SearchReplacePanel extends JPanel {
                 PANEL_VERTICAL_PADDING,
                 PANEL_HORIZONTAL_PADDING
         ));
-        // 保持透明，背景和边框由 paintComponent 绘制。
+        // Giữ nền và đường viền trong suốt paintComponent vẽ.
         setOpaque(false);
-        // 搜索面板
+        // Bảng tìm kiếm
         JPanel searchPanel = new JPanel();
         searchPanel.setLayout(new BoxLayout(searchPanel, BoxLayout.X_AXIS));
         searchPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
-        searchPanel.setOpaque(false);  // 透明以显示父面板的圆角背景
+        searchPanel.setOpaque(false);  // Trong suốt để hiển thị nền tròn của bảng điều khiển chính
 
-        // 展开/收起替换面板的按钮（放在最左边，类似 Postman）
+        // Mở rộng/Nút thu gọn bảng thay thế (ở ngoài cùng bên trái, tương tự Postman）
         toggleReplaceBtn = new JButton(IconUtil.createThemed(ICON_EXPAND, 16, 16));
         toggleReplaceBtn.setToolTipText(UiI18n.get(UiMessageKeys.SEARCH_TOGGLE_REPLACE));
         toggleReplaceBtn.setFocusable(false);
@@ -97,7 +97,7 @@ public class SearchReplacePanel extends JPanel {
         Component toggleGap = Box.createHorizontalStrut(ROW_GAP);
         toggleGap.setVisible(enableReplace);
 
-        // 搜索输入框 - 使用 SearchTextField 复用大小写敏感和整词匹配功能
+        // Hộp nhập tìm kiếm - sử dụng SearchTextField Tái sử dụng chức năng phân biệt chữ hoa chữ thường và khớp toàn bộ từ
         searchField = new SearchTextField();
         configureOverlayTextField(searchField);
         searchField.addKeyListener(new KeyAdapter() {
@@ -115,7 +115,7 @@ public class SearchReplacePanel extends JPanel {
             }
         });
 
-        // 添加文本变化监听器，实时更新搜索结果状态（使用防抖）
+        // Thêm trình nghe thay đổi văn bản để cập nhật trạng thái kết quả tìm kiếm theo thời gian thực (sử dụng tính năng chống rung)
         searchField.getDocument().addDocumentListener(new javax.swing.event.DocumentListener() {
             @Override
             public void insertUpdate(javax.swing.event.DocumentEvent e) {
@@ -124,9 +124,9 @@ public class SearchReplacePanel extends JPanel {
 
             @Override
             public void removeUpdate(javax.swing.event.DocumentEvent e) {
-                // 如果搜索框被清空，立即清除文本区域的选中内容和状态
+                // Nếu hộp tìm kiếm bị xóa, lựa chọn và trạng thái của vùng văn bản sẽ bị xóa ngay lập tức
                 if (searchField.getText().isEmpty()) {
-                    // 取消之前的定时器
+                    // Hủy bộ hẹn giờ trước đó
                     if (searchDebounceTimer != null && searchDebounceTimer.isRunning()) {
                         searchDebounceTimer.stop();
                     }
@@ -144,12 +144,12 @@ public class SearchReplacePanel extends JPanel {
             }
         });
 
-        // 查找按钮
+        // Nút tìm
         JButton findPrevBtn = createIconButton("icons/arrow-up.svg", UiI18n.get(UiMessageKeys.SEARCH_PREVIOUS), e -> findPrevious());
         JButton findNextBtn = createIconButton("icons/arrow-down.svg", UiI18n.get(UiMessageKeys.SEARCH_NEXT), e -> findNext());
 
 
-        // 状态标签
+        // nhãn trạng thái
         statusLabel = new JLabel("");
         statusLabel.setFont(FontsUtil.getDefaultFontWithOffset(Font.PLAIN, -2));
         statusLabel.setForeground(ModernColors.getTextHint());
@@ -157,11 +157,11 @@ public class SearchReplacePanel extends JPanel {
         statusLabel.setMaximumSize(new Dimension(STATUS_MAX_WIDTH, TOOL_BUTTON_SIZE));
         statusLabel.setHorizontalAlignment(SwingConstants.CENTER);
 
-        // 关闭按钮
+        // Nút đóng
         JButton closeBtn = createIconButton("icons/x.svg", UiI18n.get(UiMessageKeys.SEARCH_CLOSE), e -> hidePanel());
 
 
-        // 组装搜索面板
+        // Lắp ráp bảng tìm kiếm
         searchPanel.add(toggleReplaceBtn);
         searchPanel.add(toggleGap);
         searchPanel.add(searchField);
@@ -176,20 +176,20 @@ public class SearchReplacePanel extends JPanel {
 
         add(searchPanel);
 
-        // 替换面板（默认隐藏）
+        // Bảng thay thế (ẩn theo mặc định)
         replacePanel = new JPanel();
         replacePanel.setLayout(new BoxLayout(replacePanel, BoxLayout.X_AXIS));
         replacePanel.setAlignmentX(Component.LEFT_ALIGNMENT);
         replacePanel.setVisible(false);
-        replacePanel.setOpaque(false);  // 透明以显示父面板的圆角背景
+        replacePanel.setOpaque(false);  // Trong suốt để hiển thị nền tròn của bảng điều khiển chính
 
-        // 左侧占位符，保持与搜索框对齐（切换按钮宽度 + 水平间距）
+        // Phần giữ chỗ bên trái, luôn căn chỉnh với hộp tìm kiếm (chuyển đổi chiều rộng của nút + khoảng cách ngang)
         int spacerWidth = TOOL_BUTTON_SIZE + ROW_GAP;
         JPanel spacer = new JPanel();
         spacer.setOpaque(false);
         setFixedSize(spacer, spacerWidth, TOOL_BUTTON_SIZE);
 
-        // 替换输入框
+        // Thay thế hộp đầu vào
         replaceField = new FlatTextField();
         replaceField.setPlaceholderText(UiI18n.get(UiMessageKeys.SEARCH_REPLACE_PLACEHOLDER));
         configureOverlayTextField(replaceField);
@@ -204,12 +204,12 @@ public class SearchReplacePanel extends JPanel {
             }
         });
 
-        // 替换按钮
+        // Nút thay thế
         JButton replaceBtn = createIconButton("icons/replace.svg", UiI18n.get(UiMessageKeys.SEARCH_REPLACE), e -> replace());
         JButton replaceAllBtn = createIconButton("icons/replace-all.svg", UiI18n.get(UiMessageKeys.SEARCH_REPLACE_ALL), e -> replaceAll());
 
-        // 组装替换面板
-        replacePanel.add(spacer);  // 左侧占位符（已包含按钮宽度+间距）
+        // Lắp ráp các tấm thay thế
+        replacePanel.add(spacer);  // Phần giữ chỗ bên trái (bao gồm chiều rộng nút+khoảng cách)
         replacePanel.add(replaceField);
         replacePanel.add(Box.createHorizontalStrut(ROW_GAP));
         replacePanel.add(replaceBtn);
@@ -222,12 +222,12 @@ public class SearchReplacePanel extends JPanel {
         add(replaceGap);
         add(replacePanel);
 
-        // 设置 toggleReplaceBtn 的 actionListener（现在 replacePanel 已经初始化）
+        // cài đặt toggleReplaceBtn của actionListener（Hiện nay replacePanel đã được khởi tạo)
         toggleReplaceBtn.addActionListener(e -> {
             setReplaceVisible(!replacePanel.isVisible());
         });
 
-        // 默认隐藏
+        // Bị ẩn theo mặc định
         setVisible(false);
     }
 
@@ -235,13 +235,13 @@ public class SearchReplacePanel extends JPanel {
     protected void paintComponent(Graphics g) {
         Graphics2D g2 = (Graphics2D) g.create();
 
-        // 启用抗锯齿以获得平滑的圆角
+        // Bật khử răng cưa để các góc bo tròn mượt mà
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
         int width = getWidth();
         int height = getHeight();
 
-        // 绘制圆角背景
+        // Vẽ một nền tròn
         g2.setColor(ModernColors.getCardBackgroundColor());
         g2.fill(new RoundRectangle2D.Float(
                 0,
@@ -252,7 +252,7 @@ public class SearchReplacePanel extends JPanel {
                 CORNER_RADIUS
         ));
 
-        // 绘制细微的边框
+        // Vẽ đường viền tinh tế
         g2.setColor(ModernColors.getBorderLightColor());
         g2.draw(new RoundRectangle2D.Float(
                 0,
@@ -277,7 +277,7 @@ public class SearchReplacePanel extends JPanel {
     }
 
     /**
-     * 创建图标按钮 - 现代化扁平设计
+     * Tạo một nút biểu tượng - Thiết kế phẳng hiện đại
      */
     private JButton createIconButton(String iconPath, String tooltip, java.awt.event.ActionListener listener) {
         JButton btn = new JButton(IconUtil.createThemed(iconPath, 16, 16));
@@ -325,13 +325,13 @@ public class SearchReplacePanel extends JPanel {
 
 
     /**
-     * 显示搜索面板（仅搜索模式）
+     * Hiển thị bảng tìm kiếm (chỉ ở chế độ tìm kiếm)
      */
     public void showSearch() {
         setReplaceVisible(false);
         setVisible(true);
 
-        // 如果有选中文本，将其作为搜索内容
+        // Nếu có văn bản được chọn, hãy sử dụng nó làm nội dung tìm kiếm
         String selectedText = textArea.getSelectedText();
         if (selectedText != null && !selectedText.isEmpty() && !selectedText.contains("\n")) {
             searchField.setText(selectedText);
@@ -342,18 +342,18 @@ public class SearchReplacePanel extends JPanel {
     }
 
     /**
-     * 显示搜索替换面板（替换模式）
+     * Hiển thị bảng tìm kiếm và thay thế (chế độ thay thế)
      */
     public void showReplace() {
         if (!enableReplace) {
-            // 如果未启用替换功能，则只显示搜索
+            // Nếu tính năng thay thế không được bật, chỉ các tìm kiếm được hiển thị
             showSearch();
             return;
         }
         setReplaceVisible(true);
         setVisible(true);
 
-        // 如果有选中文本，将其作为搜索内容
+        // Nếu có văn bản được chọn, hãy sử dụng nó làm nội dung tìm kiếm
         String selectedText = textArea.getSelectedText();
         if (selectedText != null && !selectedText.isEmpty() && !selectedText.contains("\n")) {
             searchField.setText(selectedText);
@@ -364,17 +364,17 @@ public class SearchReplacePanel extends JPanel {
     }
 
     /**
-     * 隐藏搜索面板
+     * Ẩn bảng tìm kiếm
      */
     public void hidePanel() {
-        // 清除搜索高亮和选中状态
+        // Xóa trạng thái đánh dấu tìm kiếm và lựa chọn
         clearSearchHighlights();
         setVisible(false);
         textArea.requestFocusInWindow();
     }
 
     /**
-     * 查找下一个
+     * Tìm tiếp theo
      */
     private void findNext() {
         String searchText = searchField.getText();
@@ -390,12 +390,12 @@ public class SearchReplacePanel extends JPanel {
         SearchResult result = SearchEngine.find(textArea, context);
         updateStatusFromResult(result);
 
-        // 确保文本区域获得焦点以显示选中效果
+        // Đảm bảo vùng văn bản có tiêu điểm để hiển thị hiệu ứng lựa chọn
         textArea.requestFocusInWindow();
     }
 
     /**
-     * 查找上一个
+     * Tìm cái trước đó
      */
     private void findPrevious() {
         String searchText = searchField.getText();
@@ -410,12 +410,12 @@ public class SearchReplacePanel extends JPanel {
         SearchResult result = SearchEngine.find(textArea, context);
         updateStatusFromResult(result);
 
-        // 确保文本区域获得焦点以显示选中效果
+        // Đảm bảo vùng văn bản có tiêu điểm để hiển thị hiệu ứng lựa chọn
         textArea.requestFocusInWindow();
     }
 
     /**
-     * 替换当前匹配项
+     * Thay thế trận đấu hiện tại
      */
     private void replace() {
         String searchText = searchField.getText();
@@ -429,7 +429,7 @@ public class SearchReplacePanel extends JPanel {
 
         SearchResult result = SearchEngine.replace(textArea, context);
         if (result.wasFound()) {
-            // 替换成功后自动查找下一个
+            // Sau khi thay thế thành công, cái tiếp theo sẽ tự động được tìm thấy
             findNext();
         } else {
             statusLabel.setText(noResultsText());
@@ -437,7 +437,7 @@ public class SearchReplacePanel extends JPanel {
     }
 
     /**
-     * 替换所有匹配项
+     * Thay thế tất cả các trận đấu
      */
     private void replaceAll() {
         String searchText = searchField.getText();
@@ -451,10 +451,10 @@ public class SearchReplacePanel extends JPanel {
         SearchResult result = SearchEngine.replaceAll(textArea, context);
         int count = result.getCount();
 
-        // 显示替换结果
+        // Hiển thị kết quả thay thế
         if (count > 0) {
             statusLabel.setText(UiI18n.get(UiMessageKeys.SEARCH_REPLACED_COUNT, count));
-            // 2秒后清除状态
+            // 2Xóa trạng thái sau vài giây
             Timer timer = new Timer(2000, e -> updateSearchStatus());
             timer.setRepeats(false);
             timer.start();
@@ -464,38 +464,38 @@ public class SearchReplacePanel extends JPanel {
     }
 
     /**
-     * 创建搜索上下文。禁用 markAll，避免搜索/替换时触发全量高亮扫描。
+     * Tạo bối cảnh tìm kiếm. Bị vô hiệu hóa markAll，Tránh tìm kiếm/Kích hoạt quét toàn bộ điểm nổi bật khi thay thế.
      */
     private SearchContext createSearchContext() {
         SearchContext context = new SearchContext();
         context.setSearchFor(searchField.getText());
         context.setReplaceWith(replaceField.getText());
         context.setMatchCase(searchField.isCaseSensitive());
-        context.setRegularExpression(false);  // 不支持正则表达式
+        context.setRegularExpression(false);  // Biểu thức thông thường không được hỗ trợ
         context.setWholeWord(searchField.isWholeWord());
         context.setMarkAll(false);
         return context;
     }
 
     /**
-     * 根据搜索结果更新状态标签，并通过 outline 给搜索框着色反馈
+     * Cập nhật nhãn trạng thái dựa trên kết quả tìm kiếm và vượt qua outline Tô màu hộp tìm kiếm để phản hồi
      */
     private void updateStatusFromResult(SearchResult result) {
         if (result.wasFound()) {
-            // 计算总匹配数和当前索引
+            // Tính tổng số trận đấu và chỉ số hiện tại
             int totalCount = calculateTotalMatches();
             if (totalCount > 0) {
-                // 计算当前是第几个匹配
+                // Tính số phù hợp hiện tại
                 int currentIndex = getCurrentMatchIndex(totalCount);
                 statusLabel.setText(UiI18n.get(UiMessageKeys.SEARCH_STATUS_COUNT, currentIndex, totalCount));
             } else {
                 statusLabel.setText("");
             }
-            // 有结果：清除红色边框
+            // Có kết quả: xóa viền đỏ
             searchField.putClientProperty(FlatClientProperties.OUTLINE, null);
         } else {
             statusLabel.setText(noResultsText());
-            // 无结果且搜索框非空：显示红色边框（同 IDEA 行为）
+            // Không có kết quả và hộp tìm kiếm không trống: hiển thị đường viền màu đỏ (giống như IDEA hành vi)
             if (!searchField.getText().isEmpty()) {
                 searchField.putClientProperty(FlatClientProperties.OUTLINE, FlatClientProperties.OUTLINE_ERROR);
             }
@@ -503,7 +503,7 @@ public class SearchReplacePanel extends JPanel {
     }
 
     /**
-     * 计算文档中的总匹配数
+     * Đếm tổng số kết quả phù hợp trong tài liệu
      */
     private int calculateTotalMatches() {
         try {
@@ -535,7 +535,7 @@ public class SearchReplacePanel extends JPanel {
     }
 
     /**
-     * 计算当前选中位置对应的匹配索引
+     * Tính chỉ số phù hợp tương ứng với vị trí hiện được chọn
      */
     private int calculateCurrentIndex(int selStart) {
         try {
@@ -552,7 +552,7 @@ public class SearchReplacePanel extends JPanel {
             while (matchStart >= 0) {
                 index++;
 
-                // 找到第一个起始位置 >= 当前选中位置的匹配项
+                // Tìm vị trí bắt đầu đầu tiên >= Trận đấu ở vị trí hiện được chọn
                 if (matchStart >= selStart) {
                     return index;
                 }
@@ -560,7 +560,7 @@ public class SearchReplacePanel extends JPanel {
                 matchStart = findNextMatch(text, searchText, matchStart + searchLength);
             }
 
-            // 如果所有匹配都在选中位置之前，返回总数
+            // Nếu tất cả các kết quả trùng khớp xảy ra trước vị trí đã chọn thì tổng số sẽ được trả về
             return Math.max(1, index);
         } catch (Exception e) {
             log.warn("Failed to calculate current index", e);
@@ -609,7 +609,7 @@ public class SearchReplacePanel extends JPanel {
     }
 
     /**
-     * 计算当前匹配项是第几个
+     * Tính số trận đấu hiện tại
      */
     private int getCurrentMatchIndex(int totalCount) {
         try {
@@ -618,7 +618,7 @@ public class SearchReplacePanel extends JPanel {
                 return 1;
             }
 
-            // 获取当前选中的位置
+            // Nhận vị trí hiện đang được chọn
             int currentSelStart = textArea.getSelectionStart();
 
             return calculateCurrentIndex(currentSelStart);
@@ -629,22 +629,22 @@ public class SearchReplacePanel extends JPanel {
     }
 
     /**
-     * 调度搜索状态更新（防抖）
+     * Lên lịch cập nhật trạng thái tìm kiếm (chống rung)
      */
     private void scheduleSearchUpdate() {
-        // 取消之前的定时器
+        // Hủy bộ hẹn giờ trước đó
         if (searchDebounceTimer != null && searchDebounceTimer.isRunning()) {
             searchDebounceTimer.stop();
         }
 
-        // 创建新的防抖定时器，300ms 后执行
+        // Tạo bộ hẹn giờ chống rung mới.300ms được thực hiện sau này
         searchDebounceTimer = new Timer(300, e -> updateSearchStatus());
         searchDebounceTimer.setRepeats(false);
         searchDebounceTimer.start();
     }
 
     /**
-     * 更新搜索状态（用于实时更新）
+     * Cập nhật trạng thái tìm kiếm (để cập nhật theo thời gian thực)
      */
     private void updateSearchStatus() {
         String searchText = searchField.getText();
@@ -654,24 +654,24 @@ public class SearchReplacePanel extends JPanel {
             return;
         }
 
-        // 保存当前状态
+        // Lưu trạng thái hiện tại
         int savedCaret = textArea.getCaretPosition();
         int savedSelStart = textArea.getSelectionStart();
         int savedSelEnd = textArea.getSelectionEnd();
 
         try {
-            // 计算总匹配数
+            // Tính tổng số trận đấu
             int totalCount = calculateTotalMatches();
 
             if (totalCount > 0) {
-                // 输入搜索文本时，从文档开头开始搜索并高亮第一个匹配
+                // Khi nhập văn bản tìm kiếm, tìm kiếm bắt đầu ở đầu tài liệu và đánh dấu kết quả phù hợp đầu tiên
                 textArea.setCaretPosition(0);
                 SearchContext context = createSearchContext();
                 context.setSearchForward(true);
                 SearchResult firstResult = SearchEngine.find(textArea, context);
 
                 if (firstResult.wasFound()) {
-                    // 显示当前匹配位置和总匹配数。
+                    // Hiển thị vị trí trận đấu hiện tại và tổng số trận đấu.
                     statusLabel.setText(UiI18n.get(UiMessageKeys.SEARCH_STATUS_COUNT, 1, totalCount));
                     searchField.putClientProperty(FlatClientProperties.OUTLINE, null);
                 } else {
@@ -683,8 +683,8 @@ public class SearchReplacePanel extends JPanel {
                 searchField.putClientProperty(FlatClientProperties.OUTLINE, FlatClientProperties.OUTLINE_ERROR);
             }
         } finally {
-            // 不恢复光标，保持在第一个匹配位置
-            // 但如果没有找到，恢复原来的位置
+            // Con trỏ không được khôi phục và vẫn ở vị trí khớp đầu tiên
+            // Nhưng nếu không tìm thấy thì khôi phục lại vị trí ban đầu
             if (statusLabel.getText().equals(noResultsText())) {
                 textArea.setCaretPosition(savedCaret);
                 textArea.setSelectionStart(savedSelStart);
@@ -698,7 +698,7 @@ public class SearchReplacePanel extends JPanel {
     }
 
     /**
-     * 清除文本区域的选中内容
+     * Xóa vùng chọn của vùng văn bản
      */
     private void clearTextSelection() {
         if (textArea != null) {
@@ -708,14 +708,14 @@ public class SearchReplacePanel extends JPanel {
     }
 
     /**
-     * 清除搜索高亮和选中状态
+     * Xóa trạng thái đánh dấu tìm kiếm và lựa chọn
      */
     private void clearSearchHighlights() {
         if (textArea != null) {
-            // 清除选中状态
+            // Xóa lựa chọn
             clearTextSelection();
-            // 使 SearchEngine 清除之前的搜索状态
-            // 通过执行一次空搜索来重置状态
+            // làm SearchEngine Xóa trạng thái tìm kiếm trước đó
+            // Đặt lại trạng thái bằng cách thực hiện tìm kiếm trống
             SearchContext context = new SearchContext();
             context.setSearchFor("");
             context.setMarkAll(false);

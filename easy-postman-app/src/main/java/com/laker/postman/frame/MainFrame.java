@@ -19,7 +19,7 @@ import java.awt.event.WindowEvent;
 import java.util.function.Consumer;
 
 /**
- * 主窗口类，继承自 JFrame。
+ * Lớp cửa sổ chính, được kế thừa từ JFrame。
  */
 @Slf4j
 public class MainFrame extends JFrame {
@@ -28,7 +28,7 @@ public class MainFrame extends JFrame {
     private transient JPanel startupShellPanel;
     private boolean closing;
 
-    // 单例模式，确保只有一个实例
+    // Chế độ Singleton đảm bảo rằng chỉ có một phiên bản
     private MainFrame() {
         super();
         startupLifecycle = new MainFrameStartupLifecycle();
@@ -48,7 +48,7 @@ public class MainFrame extends JFrame {
     private void initStartupShell() {
         installStartupShell();
 
-        // 设置最小窗口尺寸，防止窗口被拖得太小
+        // Đặt kích thước cửa sổ tối thiểu để ngăn cửa sổ bị kéo quá nhỏ
         Dimension minSize = windowStateController.getMinWindowSize();
         setMinimumSize(minSize);
         if (startupShellPanel != null) {
@@ -59,12 +59,12 @@ public class MainFrame extends JFrame {
         initWindowCloseListener();
         windowStateController.installStateListeners();
 
-        // 如果没有保存的窗口状态，使用 pack() 自适应组件大小
+        // Được sử dụng nếu không có trạng thái cửa sổ được lưu pack() Kích thước thành phần thích ứng
         if (!windowStateController.hasSavedWindowState()) {
             pack();
         }
 
-        // 只有在非最大化状态下才居中窗口，避免最大化恢复路径上的额外跳变
+        // Chỉ căn giữa cửa sổ ở trạng thái không được tối đa hóa để tránh phải nhảy thêm trên đường khôi phục tối đa hóa
         boolean isMaximized = (getExtendedState() & Frame.MAXIMIZED_BOTH) == Frame.MAXIMIZED_BOTH;
         if (!isMaximized) {
             setLocationRelativeTo(null);
@@ -77,7 +77,7 @@ public class MainFrame extends JFrame {
         if (!startupLifecycle.markMainContentLoadRequested()) {
             return;
         }
-        // 主内容延后到启动壳显示后加载，避免首次展示窗口时被完整工作区初始化阻塞。
+        // Nội dung chính được hoãn lại để tải cho đến khi shell khởi động được hiển thị để tránh bị chặn bởi quá trình khởi tạo không gian làm việc hoàn chỉnh khi cửa sổ được hiển thị lần đầu tiên.
         Runnable task = () -> {
             if (closing) {
                 return;
@@ -155,7 +155,7 @@ public class MainFrame extends JFrame {
     }
 
     /**
-     * 用户确认退出后保存窗口状态并停止窗口后台活动。
+     * Sau khi người dùng xác nhận thoát, trạng thái cửa sổ sẽ được lưu và các hoạt động trong nền cửa sổ sẽ dừng lại.
      */
     public void prepareForExit() {
         closing = true;

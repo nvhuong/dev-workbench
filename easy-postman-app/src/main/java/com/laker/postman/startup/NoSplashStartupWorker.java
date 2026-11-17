@@ -7,7 +7,7 @@ import javax.swing.SwingWorker;
 import java.util.concurrent.CountDownLatch;
 
 /**
- * 无 Splash 模式的主窗口后台启动任务。
+ * Không Splash Cửa sổ chính của phương thức bắt đầu tác vụ ở chế độ nền.
  */
 @RequiredArgsConstructor
 class NoSplashStartupWorker extends SwingWorker<MainFrame, Void> {
@@ -15,8 +15,8 @@ class NoSplashStartupWorker extends SwingWorker<MainFrame, Void> {
     private final CountDownLatch edtStartupCompleted = new CountDownLatch(1);
 
     void start() {
-        // SwingWorker 的默认线程为 daemon；无窗口时 AWT 也会自动退出。
-        // 由短生命周期的非 daemon 线程保活，直到 done 在 EDT 上显示窗口或处理失败。
+        // SwingWorker Chuỗi mặc định cho  daemon；Khi không có cửa sổ AWT Nó cũng sẽ tự động thoát.
+        // Bởi vòng đời ngắn ngủi không daemon Chủ đề được giữ cho đến khi done Vào EDT Cửa sổ được hiển thị hoặc xử lý không thành công.
         Thread startupThread = new Thread(() -> {
             run();
             boolean interrupted = false;

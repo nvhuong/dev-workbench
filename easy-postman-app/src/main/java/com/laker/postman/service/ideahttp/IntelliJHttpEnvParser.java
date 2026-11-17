@@ -11,16 +11,16 @@ import java.util.Map;
 import java.util.UUID;
 
 /**
- * IntelliJ IDEA HTTP Client 环境变量解析器
- * 负责解析 IntelliJ IDEA HTTP Client 的 http-client.env.json 格式
+ * IntelliJ IDEA HTTP Client Trình phân tích cú pháp biến môi trường
+ * Chịu trách nhiệm phân tích IntelliJ IDEA HTTP Client của http-client.env.json định dạng
  */
 @UtilityClass
 public class IntelliJHttpEnvParser {
 
     /**
-     * 解析 IntelliJ IDEA HTTP Client 环境变量JSON，转换为Environment列表
+     * phân tích IntelliJ IDEA HTTP Client các biến môi trườngJSON，Chuyển đổi sang Environmentdanh sách
      * <p>
-     * 支持格式示例：
+     * Ví dụ về các định dạng được hỗ trợ: .
      * {
      * "dev": {
      * "host": "localhost",
@@ -32,24 +32,24 @@ public class IntelliJHttpEnvParser {
      * }
      * }
      *
-     * @param json IntelliJ IDEA HTTP Client 环境变量JSON字符串
-     * @return Environment列表
+     * @param json IntelliJ IDEA HTTP Client các biến môi trườngJSONchuỗi
+     * @return Environmentdanh sách
      */
     public static List<Environment> parseIntelliJEnvironments(String json) {
         List<Environment> result = new ArrayList<>();
 
         try {
-            // 预处理JSON: 移除可能的语法错误（如行尾的分号）
+            // tiền xử lýJSON: Loại bỏ các lỗi cú pháp có thể xảy ra (chẳng hạn như dấu chấm phẩy ở cuối dòng)
             String cleanedJson = preprocessJson(json);
 
             JSONObject rootObj = JSONUtil.parseObj(cleanedJson);
 
-            // 遍历每个环境（顶层的每个key都是一个环境）
+            // Lặp lại qua từng môi trường (mỗi môi trường ở cấp cao nhấtkeyTất cả đều giống nhau về môi trường)
             for (Map.Entry<String, Object> entry : rootObj.entrySet()) {
                 String envName = entry.getKey();
                 Object envValue = entry.getValue();
 
-                // 跳过非对象类型的值
+                // Bỏ qua các giá trị không phải là loại đối tượng
                 if (!(envValue instanceof JSONObject envVariables)) {
                     continue;
                 }
@@ -57,12 +57,12 @@ public class IntelliJHttpEnvParser {
                 Environment env = new Environment(envName);
                 env.setId("env-" + UUID.randomUUID());
 
-                // 将该环境下的所有键值对添加为环境变量
+                // Thêm tất cả các cặp khóa-giá trị trong môi trường này dưới dạng biến môi trường
                 for (Map.Entry<String, Object> varEntry : envVariables.entrySet()) {
                     String key = varEntry.getKey();
                     Object value = varEntry.getValue();
 
-                    // 将值转换为字符串
+                    // Chuyển đổi giá trị thành chuỗi
                     String valueStr = value != null ? value.toString() : "";
                     env.addVariable(key, valueStr);
                 }
@@ -77,20 +77,20 @@ public class IntelliJHttpEnvParser {
     }
 
     /**
-     * 预处理JSON字符串，修复常见的语法错误
-     * 例如：将字符串值后面的分号替换为逗号 "value"; -> "value",
+     * tiền xử lýJSONChuỗi, sửa các lỗi cú pháp thường gặp
+     * Ví dụ: Thay thế dấu chấm phẩy sau giá trị chuỗi bằng dấu phẩy "value"; -> "value",
      */
     private static String preprocessJson(String json) {
-        // 将字符串后紧跟的分号替换为逗号（这是IntelliJ IDEA HTTP文件可能出现的错误）
-        // 匹配模式: "任意内容";  替换为: "任意内容",
+        // Thay thế dấu chấm phẩy ngay sau chuỗi bằng dấu phẩy (đây là IntelliJ IDEA HTTPcó thể có lỗi trong tệp)
+        // Mô hình phù hợp: "Bất kỳ nội dung nào";  Thay thế bằng : "Bất kỳ nội dung nào",
         return json.replaceAll("\";", "\",");
     }
 
     /**
-     * 导出单个环境为 IntelliJ IDEA HTTP Client 环境变量格式
+     * Xuất một môi trường duy nhất dưới dạng  IntelliJ IDEA HTTP Client Định dạng biến môi trường
      *
-     * @param env Environment对象
-     * @return IntelliJ IDEA HTTP Client 格式的JSON字符串
+     * @param env Environmentđối tượng
+     * @return IntelliJ IDEA HTTP Client định dạngJSONchuỗi
      */
     public static String toIntelliJEnvironmentJson(Environment env) {
         JSONObject rootObj = new JSONObject();
@@ -105,10 +105,10 @@ public class IntelliJHttpEnvParser {
     }
 
     /**
-     * 导出多个环境为 IntelliJ IDEA HTTP Client 环境变量格式
+     * Xuất nhiều môi trường dưới dạng IntelliJ IDEA HTTP Client Định dạng biến môi trường
      *
-     * @param environments Environment列表
-     * @return IntelliJ IDEA HTTP Client 格式的JSON字符串
+     * @param environments Environmentdanh sách
+     * @return IntelliJ IDEA HTTP Client định dạngJSONchuỗi
      */
     public static String toIntelliJEnvironmentsJson(List<Environment> environments) {
         JSONObject rootObj = new JSONObject();

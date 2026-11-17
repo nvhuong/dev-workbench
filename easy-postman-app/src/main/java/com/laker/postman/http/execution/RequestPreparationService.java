@@ -27,7 +27,7 @@ public final class RequestPreparationService {
                 return RequestPreparationResult.validationFailure(protocolValidation);
             }
 
-            // 这里把“面板态”转换成真正可发送的 PreparedRequest，后续 helper 都只消费这个对象。
+            // Đặt nó ở đây“Trạng thái bảng điều khiển”Chuyển đổi thành một cái gì đó thực sự có thể gửi được PreparedRequest，Theo dõi helper Họ chỉ tiêu thụ đối tượng này.
             PreparedRequest request = PreparedRequestFactory.build(item);
             ScriptExecutionPipeline pipeline = createScriptPipeline(item, request);
 
@@ -36,7 +36,7 @@ public final class RequestPreparationService {
                 return RequestPreparationResult.error(preScriptError);
             }
 
-            // 前置脚本可能会写入变量，所以变量替换必须放到 pre-script 之后再做一次。
+            // Pre-script có thể ghi các biến, do đó phải thay thế biến pre-script Làm lại sau.
             pipeline.finalizeRequest();
 
             HttpRequestValidationResult validationResult = HttpRequestValidator.validate(request, item);

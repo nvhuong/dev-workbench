@@ -21,7 +21,7 @@ import java.util.function.Supplier;
 public class UiFontCatalog {
 
     private static final int INSPECTION_FONT_SIZE = 13;
-    private static final String CJK_SAMPLE = "界面字体汉字";
+    private static final String CJK_SAMPLE = "Giao diện font chữ tiếng Trung";
     private static final String EMOJI_SAMPLE = "😀🚀✨";
     private static final List<String> LOGICAL_FONT_FAMILIES = List.of(
             Font.DIALOG,

@@ -75,10 +75,10 @@ public class PerformanceProtocolReportDataTest {
     @Test
     public void shouldKeepFirstSeenApiOrderAndTotalLast() {
         PerformanceStatsCollector collector = new PerformanceStatsCollector();
-        collector.record(new RequestResult(1_000, 1_010, true, "2", "2-商品详情", PerformanceProtocol.HTTP));
-        collector.record(new RequestResult(1_010, 1_020, true, "10", "10-订单管理列表", PerformanceProtocol.HTTP));
-        collector.record(new RequestResult(1_020, 1_030, true, "1", "1-商品列表查询", PerformanceProtocol.HTTP));
-        collector.record(new RequestResult(1_030, 1_040, true, "2", "2-商品详情", PerformanceProtocol.HTTP));
+        collector.record(new RequestResult(1_000, 1_010, true, "2", "2-Chi tiết sản phẩm", PerformanceProtocol.HTTP));
+        collector.record(new RequestResult(1_010, 1_020, true, "10", "10-Danh sách quản lý đơn hàng", PerformanceProtocol.HTTP));
+        collector.record(new RequestResult(1_020, 1_030, true, "1", "1-Truy vấn danh sách sản phẩm", PerformanceProtocol.HTTP));
+        collector.record(new RequestResult(1_030, 1_040, true, "2", "2-Chi tiết sản phẩm", PerformanceProtocol.HTTP));
 
         PerformanceProtocolReportData reportData = PerformanceProtocolReportData.fromStatsSnapshot(
                 collector.snapshot(),
@@ -88,7 +88,7 @@ public class PerformanceProtocolReportDataTest {
         List<String> names = reportData.httpRows().stream()
                 .map(PerformanceProtocolReportData.HttpReportRow::name)
                 .toList();
-        assertEquals(names, List.of("2-商品详情", "10-订单管理列表", "1-商品列表查询", "Total"));
+        assertEquals(names, List.of("2-Chi tiết sản phẩm", "10-Danh sách quản lý đơn hàng", "1-Truy vấn danh sách sản phẩm", "Total"));
     }
 
     @Test
@@ -269,7 +269,7 @@ public class PerformanceProtocolReportDataTest {
                                 .apis(List.of(
                                         PerformanceJsonReportApi.builder()
                                                 .apiId("2")
-                                                .name("2-商品详情")
+                                                .name("2-Chi tiết sản phẩm")
                                                 .protocol("HTTP")
                                                 .total(1L)
                                                 .success(1L)
@@ -278,7 +278,7 @@ public class PerformanceProtocolReportDataTest {
                                                 .build(),
                                         PerformanceJsonReportApi.builder()
                                                 .apiId("10")
-                                                .name("10-订单管理列表")
+                                                .name("10-Danh sách quản lý đơn hàng")
                                                 .protocol("HTTP")
                                                 .total(1L)
                                                 .success(1L)
@@ -287,7 +287,7 @@ public class PerformanceProtocolReportDataTest {
                                                 .build(),
                                         PerformanceJsonReportApi.builder()
                                                 .apiId("1")
-                                                .name("1-商品列表查询")
+                                                .name("1-Truy vấn danh sách sản phẩm")
                                                 .protocol("HTTP")
                                                 .total(1L)
                                                 .success(1L)
@@ -304,7 +304,7 @@ public class PerformanceProtocolReportDataTest {
         List<String> names = reportData.httpRows().stream()
                 .map(PerformanceProtocolReportData.HttpReportRow::name)
                 .toList();
-        assertEquals(names, List.of("2-商品详情", "10-订单管理列表", "1-商品列表查询", "Total"));
+        assertEquals(names, List.of("2-Chi tiết sản phẩm", "10-Danh sách quản lý đơn hàng", "1-Truy vấn danh sách sản phẩm", "Total"));
     }
 
     private static com.laker.postman.performance.core.model.PerformanceStatsSnapshot statsSnapshot(

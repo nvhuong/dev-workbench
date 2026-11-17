@@ -14,7 +14,7 @@ import static org.testng.Assert.assertEquals;
 
 public class TreeNodeTransferHandlerTest {
 
-    @Test(description = "协议阶段节点的拖拽规则应与右键复制/删除规则一致")
+    @Test(description = "Quy tắc kéo cho các nút giai đoạn giao thức phải được sao chép bằng nhấp chuột phải/Các quy tắc xóa là như nhau")
     public void shouldAllowProtocolStageNodesAsDragSource() {
         assertEquals(sourceActionFor(NodeType.SSE_CONNECT), TransferHandler.MOVE);
         assertEquals(sourceActionFor(NodeType.SSE_READ), TransferHandler.MOVE);

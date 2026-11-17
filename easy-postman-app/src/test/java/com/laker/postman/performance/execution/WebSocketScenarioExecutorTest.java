@@ -125,7 +125,7 @@ public class WebSocketScenarioExecutorTest {
 
     @Test
     public void shouldRetainReadMessagePreviewByUtf8Bytes() {
-        assertEquals(WebSocketReceivedMessageBuffer.retainUtf8Prefix("你好abc", 4), "你");
+        assertEquals(WebSocketReceivedMessageBuffer.retainUtf8Prefix("Xin chàoabc", 4), "Bạn");
         assertEquals(WebSocketReceivedMessageBuffer.retainUtf8Prefix("🙂abc", 4), "🙂");
     }
 
@@ -1410,7 +1410,7 @@ public class WebSocketScenarioExecutorTest {
             assertTrue(serverReceivedMessage.await(1, TimeUnit.SECONDS));
             assertFalse(result.executionFailed, result.errorMsg);
             assertEquals(metrics.uniqueSessionKeyCount(), 1,
-                    "同一个 WebSocket 会话的 start/send/receive/match/end 必须落在同一个统计 key 上");
+                    "Cùng một WebSocket Đàm thoại start/send/receive/match/end Phải rơi vào cùng một thống kê key thượng đẳng");
         }
     }
 

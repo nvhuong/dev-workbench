@@ -50,7 +50,7 @@ public class HttpRequestValidator {
             String targetPart = queryIndex >= 0 ? req.url.substring(0, queryIndex) : req.url;
             List<String> unresolvedInTarget = findUnresolvedVariables(targetPart);
             if (!unresolvedInTarget.isEmpty()) {
-                log.warn("URL 目标地址中存在未解析的变量占位符，将阻止发送。未解析变量={}, 当前激活环境=[{}], URL={}",
+                log.warn("URL Một trình giữ chỗ biến chưa được giải quyết trong địa chỉ đích sẽ ngăn việc gửi. Biến chưa được giải quyết={}, Môi trường hiện đang hoạt động=[{}], URL={}",
                         unresolvedInTarget, activeEnvName, req.url);
                 return HttpRequestValidationResult.error(I18nUtil.getMessage(
                         MessageKeys.REQUEST_VALIDATION_UNRESOLVED_URL_VARIABLES,
@@ -59,7 +59,7 @@ public class HttpRequestValidator {
                 ), true);
             }
 
-            log.warn("URL 查询参数中存在未解析的变量占位符，将继续发送请求。未解析变量={}, 当前激活环境=[{}], URL={}",
+            log.warn("URL Có các phần giữ chỗ biến chưa được giải quyết trong tham số truy vấn và yêu cầu sẽ tiếp tục được gửi. Biến chưa được giải quyết={}, Môi trường hiện đang hoạt động=[{}], URL={}",
                     unresolved, activeEnvName, req.url);
             return HttpRequestValidationResult.okWithWarning(I18nUtil.getMessage(
                     MessageKeys.REQUEST_VALIDATION_UNRESOLVED_QUERY_VARIABLES,

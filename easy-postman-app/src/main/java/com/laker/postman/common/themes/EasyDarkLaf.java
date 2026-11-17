@@ -3,11 +3,11 @@ package com.laker.postman.common.themes;
 import com.formdev.flatlaf.FlatDarkLaf;
 
 /**
- * Easy Postman 自定义暗色主题（继承自 FlatDarkLaf）。
+ * Easy Postman Chủ đề tối tùy chỉnh (kế thừa từ  FlatDarkLaf）。
  * <p>
- * 配置文件：com/laker/postman/common/themes/EasyDarkLaf.properties
+ * Tệp cấu hình:com/laker/postman/common/themes/EasyDarkLaf.properties
  * <p>
- * 参考：<a href="https://www.formdev.com/flatlaf/how-to-customize/">FlatLaf 自定义文档</a>
+ * tham khảo:<a href="https://www.formdev.com/flatlaf/how-to-customize/">FlatLaf Tài liệu tùy chỉnh</a>
  */
 public class EasyDarkLaf extends FlatDarkLaf {
     public static final String NAME = "EasyDarkLaf";

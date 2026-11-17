@@ -20,7 +20,7 @@ public class WorkspaceRunWorkspaceResolver {
         }
         if (Files.isRegularFile(direct)) {
             throw new IllegalArgumentException(
-                    "EasyPostman CLI expects a workspace directory, not a collection file: " + direct
+                    "Dev Workbench CLI expects a workspace directory, not a collection file: " + direct
             );
         }
         throw new IllegalArgumentException("Workspace directory does not exist: " + direct);

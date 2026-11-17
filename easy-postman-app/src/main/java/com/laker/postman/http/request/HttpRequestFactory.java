@@ -22,7 +22,7 @@ public class HttpRequestFactory {
     public static final String TEXT_EVENT_STREAM = "text/event-stream";
     public static final String ACCEPT = HttpRequestDefaults.ACCEPT;
     public static final String USER_AGENT = HttpRequestDefaults.USER_AGENT;
-    public static final String EASY_POSTMAN_CLIENT = "EasyPostman/" + resolveUserAgentVersion();
+    public static final String EASY_POSTMAN_CLIENT = "DevWorkbench/" + resolveUserAgentVersion();
     public static final String ACCEPT_ENCODING = HttpRequestDefaults.ACCEPT_ENCODING;
     public static final String CONNECTION = HttpRequestDefaults.CONNECTION;
     public static final String ACCEPT_ENCODING_VALUE = HttpRequestDefaults.ACCEPT_ENCODING_VALUE;
@@ -58,7 +58,7 @@ public class HttpRequestFactory {
         request.setMethod("GET");
         request.setUrl("");
 
-        // 新增请求使用“空白模板”，协议差异只在工厂集中处理，避免 Swing/JavaFX/CLI 各自复制初始化规则。
+        // Đã thêm cách sử dụng yêu cầu“Mẫu trống”，Những khác biệt trong thỏa thuận chỉ được xử lý tập trung tại nhà máy và tránh được Swing/JavaFX/CLI Sao chép các quy tắc khởi tạo riêng lẻ.
         if (resolvedProtocol.isWebSocketProtocol()) {
             request.setBodyType(RequestBodyTypes.BODY_TYPE_RAW);
             appendHeader(request, CONTENT_TYPE, APPLICATION_JSON);

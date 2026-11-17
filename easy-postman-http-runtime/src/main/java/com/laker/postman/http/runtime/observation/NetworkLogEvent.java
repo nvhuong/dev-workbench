@@ -1,12 +1,12 @@
 package com.laker.postman.http.runtime.observation;
 
 /**
- * HTTP 执行层向外发布的网络日志事件。
+ * HTTP Các sự kiện nhật ký mạng được lớp thực thi xuất bản ra bên ngoài.
  *
- * @param stage      执行阶段
- * @param message    日志内容
- * @param elapsedMs  相对本次 callStart 的耗时；重定向这类外部事件可为空
- * @param durationMs 当前阶段自身耗时；start 事件、外部事件或不可计算时为空
+ * @param stage      giai đoạn thực hiện
+ * @param message    Ghi lại nội dung
+ * @param elapsedMs  So với thời điểm này callStart Tốn thời gian; chuyển hướng các sự kiện bên ngoài như thế này có thể trống
+ * @param durationMs Bản thân giai đoạn hiện tại cần có thời gian;start Để trống nếu sự kiện, sự kiện bên ngoài hoặc không thể tính toán được
  */
 public record NetworkLogEvent(NetworkLogEventStage stage, String message, Long elapsedMs, Long durationMs) {
 

@@ -11,9 +11,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * 脚本中的作用域变量 API。
+ * Biến phạm vi trong tập lệnh API。
  * <p>
- * 仅暴露 Postman 风格的变量方法，避免直接把 Environment 模型的内部方法暴露给脚本。
+ * Chỉ tiếp xúc Postman Tạo kiểu cho các phương thức biến để tránh đặt chúng trực tiếp Environment Các phương thức nội bộ của mô hình được hiển thị dưới dạng tập lệnh.
  */
 public class ScriptScopedVariablesApi {
     private static final Pattern VARIABLE_PLACEHOLDER_PATTERN = Pattern.compile("\\{\\{\\s*([^{}]+?)\\s*}}");

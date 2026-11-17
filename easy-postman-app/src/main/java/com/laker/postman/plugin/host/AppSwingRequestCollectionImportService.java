@@ -19,8 +19,8 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
 /**
- * GUI 宿主的请求导入服务实现。
- * 通过 Swing 选择目标集合，并把导入结果同步到集合树和请求编辑器。
+ * GUI Yêu cầu của máy chủ nhập việc triển khai dịch vụ.
+ * vượt qua Swing Chọn bộ sưu tập đích và đồng bộ hóa kết quả nhập vào cây bộ sưu tập và yêu cầu trình chỉnh sửa.
  */
 @Slf4j
 public class AppSwingRequestCollectionImportService implements RequestCollectionImportService {

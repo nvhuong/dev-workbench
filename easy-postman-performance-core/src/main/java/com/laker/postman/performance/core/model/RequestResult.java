@@ -1,24 +1,24 @@
 package com.laker.postman.performance.core.model;
 
 /**
- * 请求结果记录
+ * Yêu cầu ghi lại kết quả
  */
 public class RequestResult {
-    public long startTime;    // 开始时间（毫秒）
-    public long endTime;      // 结束时间（毫秒）
-    public boolean success;   // 是否成功
-    public String apiId;      // API唯一ID（用于统计和查询）
-    public String apiName;    // API显示名（运行内携带，避免依赖全局元数据）
+    public long startTime;    // Thời gian bắt đầu (mili giây)
+    public long endTime;      // Thời gian kết thúc (mili giây)
+    public boolean success;   // Liệu nó có thành công hay không
+    public String apiId;      // APIchỉ mộtID（để thống kê và truy vấn)
+    public String apiName;    // APITên hiển thị (được mang trong thời gian chạy để tránh dựa vào siêu dữ liệu chung)
     public PerformanceProtocol protocol = PerformanceProtocol.HTTP;
     public int sentMessages;
     public int receivedMessages;
     public int matchedMessages;
-    public long sentBytes;      // 发送字节数：请求头 + 请求体，用于计算 Sent KB/s
-    public long receivedBytes;  // 接收字节数：响应头 + 响应体，用于计算 Received KB/s
+    public long sentBytes;      // Số byte được gửi: tiêu đề yêu cầu + Nội dung yêu cầu, được sử dụng để tính toán Sent KB/s
+    public long receivedBytes;  // Số byte nhận được: tiêu đề phản hồi + Nội dung phản hồi, được sử dụng để tính toán Received KB/s
     public long firstMessageLatencyMs = -1;
 
     /**
-     * 主构造函数
+     * Nhà xây dựng chính
      */
     public RequestResult(long startTime, long endTime, boolean success, String apiId) {
         this(startTime, endTime, success, apiId, PerformanceProtocol.HTTP);
@@ -43,9 +43,9 @@ public class RequestResult {
     }
 
     /**
-     * 获取响应时间（动态计算，不存储）
+     * Nhận thời gian phản hồi (được tính toán động, không được lưu trữ)
      *
-     * @return 响应时间（毫秒）
+     * @return Thời gian đáp ứng (mili giây)
      */
     public long getResponseTime() {
         return endTime - startTime;

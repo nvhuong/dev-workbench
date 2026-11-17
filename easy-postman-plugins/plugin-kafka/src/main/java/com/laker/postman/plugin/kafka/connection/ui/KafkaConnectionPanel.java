@@ -18,7 +18,7 @@ public class KafkaConnectionPanel extends JPanel {
     private static final String CARD_CONNECT = "connect";
     private static final String CARD_DISCONNECT = "disconnect";
     private static final int GROUP_GAP = 12;
-    /** 四组“标签 + 输入框”列：第 1 行 配置 / Host / Client ID / 操作区，第 2 行 协议 / SASL / 用户 / 密码。 */
+    /** Bốn nhóm“Nhãn + hộp đầu vào”Cột: Không 1 Được rồi cấu hình / Host / Client ID / Khu vực điều hành, trang 2 Được rồi thỏa thuận / SASL / Người dùng / mật khẩu. */
     private static final int PROFILE_GROUP_MIN_WIDTH = 150;
     private static final int PROFILE_GROUP_PREF_WIDTH = 240;
     private static final int HOST_GROUP_MIN_WIDTH = 110;
@@ -39,7 +39,7 @@ public class KafkaConnectionPanel extends JPanel {
     public final JComboBox<String> saslMechanismCombo;
     public final JTextField usernameField;
     public final JPasswordField passwordField;
-    /** 两行共用同一个网格，保证各列左右边缘严格对齐。 */
+    /** Hai hàng chia sẻ cùng một lưới, đảm bảo rằng các cạnh trái và phải của mỗi cột được căn chỉnh chặt chẽ. */
     public final JPanel formGrid;
     public final JButton connectBtn;
     public final JButton disconnectBtn;
@@ -147,7 +147,7 @@ public class KafkaConnectionPanel extends JPanel {
         formGrid.setOpaque(false);
         String controlHeight = "wmin 0, h " + ConnectionToolbarUi.FORM_CONTROL_HEIGHT + "!";
 
-        // 第 1 行：基础连接
+        // KHÔNG.  1 Hàng: Kết nối cơ bản
         formGrid.add(ConnectionToolbarUi.label(t(MessageKeys.TOOLBOX_KAFKA_PROFILE)));
         formGrid.add(profileGroup);
         formGrid.add(ConnectionToolbarUi.label(t(MessageKeys.TOOLBOX_KAFKA_HOST)));
@@ -156,7 +156,7 @@ public class KafkaConnectionPanel extends JPanel {
         formGrid.add(clientIdField, controlHeight);
         formGrid.add(actions, "span 2, right, wrap");
 
-        // 第 2 行：安全认证
+        // KHÔNG.  2 Hàng: Chứng nhận bảo mật
         JLabel saslLabel = compactLabel(
                 MessageKeys.TOOLBOX_KAFKA_SASL_MECHANISM_SHORT,
                 MessageKeys.TOOLBOX_KAFKA_SASL_MECHANISM);
@@ -182,7 +182,7 @@ public class KafkaConnectionPanel extends JPanel {
     }
 
     /**
-     * 标签列按本列最长标签自适应；字段列窄窗口可压缩到 min，宽窗口均分多余空间避免右侧留白，最多拉伸到 2 倍。
+     * Cột nhãn thích ứng theo nhãn dài nhất trong cột; cửa sổ hẹp của cột trường có thể được nén thành min，Cửa sổ rộng phân chia đều không gian thừa để tránh để lại khoảng trống ở phía bên phải và có thể kéo dài tối đa 2 lần.
      */
     private static String growFieldColumns(int minWidth, int prefWidth) {
         int maxWidth = prefWidth * 2;
@@ -196,7 +196,7 @@ public class KafkaConnectionPanel extends JPanel {
     }
 
     /**
-     * 非 SASL 协议下禁用（而非隐藏）SASL 机制与账号密码：布局保持稳定，用户也能看到切换协议后可填写哪些项。
+     * Không SASL Bị vô hiệu hóa (không bị ẩn) theo giao thứcSASL Cơ chế và mật khẩu tài khoản: Bố cục vẫn ổn định và người dùng cũng có thể xem những mục nào có thể điền sau khi chuyển đổi giao thức.
      */
     public void setSaslFieldsEnabled(boolean enabled) {
         for (JComponent component : saslComponents) {

@@ -28,7 +28,7 @@ public record PerformanceTrendSnapshot(
             );
 
     /**
-     * 压测结束后追加的展示补点：只表示活跃用户/连接归零，吞吐、耗时、错误率都不代表真实采样窗口。
+     * Điểm hiển thị bổ sung được thêm vào sau bài kiểm tra căng thẳng: chỉ những người dùng đang hoạt động/Kết nối được đặt lại về 0 và thông lượng, mức tiêu thụ thời gian cũng như tỷ lệ lỗi không đại diện cho cửa sổ lấy mẫu thực.
      */
     public static PerformanceTrendSnapshot terminalIdle() {
         return new PerformanceTrendSnapshot(
@@ -123,7 +123,7 @@ public record PerformanceTrendSnapshot(
             double receivedRate,
             double matchedRate,
             double avgFirstMessageLatencyMs,
-            /* 窗口内最大响应时间，用于暴露被平均值掩盖的慢请求；未知为 NaN。 */
+            /* Thời gian phản hồi tối đa trong cửa sổ, được sử dụng để hiển thị các yêu cầu chậm bị che khuất bởi mức trung bình; không rõ NaN。 */
             double maxDurationMs
     ) {
         public ProtocolWindowMetrics(int samples,

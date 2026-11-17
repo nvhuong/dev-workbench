@@ -17,9 +17,9 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * 插件加载器。
+ * Trình tải plugin.
  * <p>
- * 负责类加载、实例化、生命周期调用，以及把插件注册动作接入运行时注册表。
+ * Chịu trách nhiệm tải lớp, khởi tạo, gọi vòng đời và kết nối các hành động đăng ký phần bổ trợ với sổ đăng ký thời gian chạy.
  * </p>
  */
 @Slf4j

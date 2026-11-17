@@ -8,17 +8,17 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
- * 采集 HTTP 全流程事件信息
+ * bộ sưu tập HTTP Thông tin sự kiện đầy đủ của quá trình
  */
 @Data
 public class HttpEventInfo {
-    // 连接信息
+    // Thông tin kết nối
     private String localAddress;
     private String remoteAddress;
     /** All concrete IPv4/IPv6 routes attempted by OkHttp during connection setup. */
     private final List<HttpRouteAttempt> routeAttempts = new CopyOnWriteArrayList<>();
-    // 各阶段时间戳
-    private long queueStart; // newCall前的时间戳 自己额外定义的发起请求时间
+    // Dấu thời gian cho từng giai đoạn
+    private long queueStart; // newCalldấu thời gian trước đó Thời gian yêu cầu bổ sung do chính bạn xác định
     private long callStart;
     private long dispatcherQueueStart;
     private long dispatcherQueueEnd;
@@ -47,29 +47,29 @@ public class HttpEventInfo {
     private long callFailed;
     private long canceled;
 
-    // 耗时统计
-    private long queueingCost; // 排队耗时
-    private long stalledCost; // 阻塞耗时
+    // Thống kê tốn thời gian
+    private long queueingCost; // Xếp hàng mất thời gian
+    private long stalledCost; // Việc chặn cần có thời gian
     private int retryDecisionCount;
     private int retryCount;
     private int followUpDecisionCount;
     private int followUpCount;
-    // 协议
+    // thỏa thuận
     private String protocol;
-    // TLS/证书
+    // TLS/giấy chứng nhận
     private List<Certificate> peerCertificates = new ArrayList<>();
     private List<Certificate> localCertificates = new ArrayList<>();
     private String tlsVersion;
-    // 加密套件
+    // Bộ mã hóa
     private String cipherName;
-    // SSL 证书验证警告信息（如过期、域名不匹配、自签名等）
+    // SSL Certificate verification warning information (such as expiration, domain name mismatch, self-signed, etc.)
     private String sslCertWarning;
-    // 异常
+    // bất thường
     private String errorMessage;
     private Throwable error;
-    /** 中间尝试失败、但 OkHttp 自动重试后已恢复的错误信息，不代表最终请求失败。 */
+    /** Nỗ lực ở giữa đã thất bại, nhưng OkHttp Thông báo lỗi được khôi phục sau khi thử lại tự động không có nghĩa là yêu cầu cuối cùng không thành công. */
     private String recoveredErrorMessage;
-    // 其他
+    // khác
     private String threadName;
 
     private long bodyBytesSent;

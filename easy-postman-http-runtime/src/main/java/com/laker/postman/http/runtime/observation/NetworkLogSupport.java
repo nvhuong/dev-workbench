@@ -5,9 +5,9 @@ import com.laker.postman.http.runtime.model.PreparedRequest;
 import lombok.experimental.UtilityClass;
 
 /**
- * 网络日志发布保护层。
+ * Lớp bảo vệ xuất bản nhật ký web.
  * <p>
- * 真实请求不能被日志面板影响，所有协议统一通过这里判断开关、解析 sink 并吞掉日志异常。
+ * Các yêu cầu thực sự không thể bị ảnh hưởng bởi bảng nhật ký và tất cả các giao thức đều được đánh giá, chuyển đổi và phân tích cú pháp tại đây sink Và nuốt ngoại lệ nhật ký.
  */
 @UtilityClass
 public class NetworkLogSupport {
@@ -41,7 +41,7 @@ public class NetworkLogSupport {
         try {
             resolveSink(request).append(stage, message, elapsedMs, durationMs);
         } catch (Throwable ignored) {
-            // 网络日志是观察能力，异常不能影响真实请求、SSE 或 WebSocket。
+            // Nhật ký mạng là khả năng quan sát và các trường hợp ngoại lệ không thể ảnh hưởng đến các yêu cầu thực.SSE hoặc WebSocket。
         }
     }
 }

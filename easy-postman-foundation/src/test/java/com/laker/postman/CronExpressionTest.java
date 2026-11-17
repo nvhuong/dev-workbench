@@ -12,82 +12,82 @@ import java.util.List;
 import static org.testng.Assert.*;
 
 /**
- * Cron表达式工具测试 - 覆盖 Spring/Quartz (6/7位) 和 Linux Crontab (5位) 两种模式
+ * CronKiểm tra công cụ biểu hiện - che phủ Spring/Quartz (6/7Chút) và Linux Crontab (5Chút) Hai chế độ
  */
 public class CronExpressionTest {
 
 
     /**
-     * Spring/Quartz 有效表达式 (6/7位: 秒 分 时 日 月 周 [年])
+     * Spring/Quartz Biểu thức hợp lệ (6/7Chút: giây điểm thời gian Ngày mặt trăng tuần [Năm])
      */
     @DataProvider(name = "validSpringExpressions")
     public Object[][] validSpringExpressions() {
         return new Object[][]{
                 // expr,                 description,          expectedHour, expectedMinute, expectedSecond
-                {"0 0 12 * * ?", "每天中午12点", 12, 0, 0},
-                {"0 */5 * * * ?", "每5分钟整秒", -1, -1, 0},
-                {"0 0 */2 * * ?", "每2小时整点", -1, 0, 0},
-                {"0 0 9 ? * MON-FRI", "工作日09:00", 9, 0, 0},
-                {"0 0 0 1 * ?", "每月1日零点", 0, 0, 0},
-                {"0 15 10 * * ?", "每天10:15", 10, 15, 0},
-                {"0 0/30 * * * ?", "每30分钟", -1, -1, 0},
-                {"0 0 0 * * ?", "每天零点", 0, 0, 0},
-                {"*/10 * * * * ?", "每10秒", -1, -1, -1},
-                {"0 0 8-18/2 * * ?", "8-18点每2小时", -1, 0, 0},
-                {"0 0 9 ? * 2", "每周一09:00", 9, 0, 0},
-                {"0 0 0 L * ?", "每月最后一天零点", 0, 0, 0},
+                {"0 0 12 * * ?", "Mỗi ngày vào buổi trưa12điểm", 12, 0, 0},
+                {"0 */5 * * * ?", "Mọi5Phút và cả giây", -1, -1, 0},
+                {"0 0 */2 * * ?", "Mọi2Đúng giờ", -1, 0, 0},
+                {"0 0 9 ? * MON-FRI", "ngày làm việc09:00", 9, 0, 0},
+                {"0 0 0 1 * ?", "mỗi tháng10 giờ trong ngày", 0, 0, 0},
+                {"0 15 10 * * ?", "mỗi ngày10:15", 10, 15, 0},
+                {"0 0/30 * * * ?", "Mọi30phút", -1, -1, 0},
+                {"0 0 0 * * ?", "Mỗi ngày vào lúc nửa đêm", 0, 0, 0},
+                {"*/10 * * * * ?", "Mọi10giây", -1, -1, -1},
+                {"0 0 8-18/2 * * ?", "8-18Bấm vào từng cái2giờ", -1, 0, 0},
+                {"0 0 9 ? * 2", "Thứ Hai hàng tuần09:00", 9, 0, 0},
+                {"0 0 0 L * ?", "nửa đêm vào ngày cuối cùng hàng tháng", 0, 0, 0},
         };
     }
 
     /**
-     * Linux Crontab 有效表达式 (5位: 分 时 日 月 周)
+     * Linux Crontab Biểu thức hợp lệ (5Chút: điểm thời gian Ngày mặt trăng tuần)
      */
     @DataProvider(name = "validLinuxExpressions")
     public Object[][] validLinuxExpressions() {
         return new Object[][]{
                 // expr,            description,       expectedHour, expectedMinute
-                {"* * * * *", "每分钟", -1, -1},
-                {"*/5 * * * *", "每5分钟", -1, -1},
-                {"0 * * * *", "每小时整点", -1, 0},
-                {"0 12 * * *", "每天12:00", 12, 0},
-                {"0 0 * * *", "每天午夜", 0, 0},
-                {"0 9 * * 1-5", "工作日09:00", 9, 0},
-                {"0 9 * * 1", "每周一09:00", 9, 0},
-                {"0 0 1 * *", "每月1日零点", 0, 0},
-                {"30 8 * * 0", "每周日08:30", 8, 30},
-                {"0 */2 * * *", "每2小时整点", -1, 0},
+                {"* * * * *", "mỗi phút", -1, -1},
+                {"*/5 * * * *", "Mọi5phút", -1, -1},
+                {"0 * * * *", "Vào giờ mỗi giờ", -1, 0},
+                {"0 12 * * *", "mỗi ngày12:00", 12, 0},
+                {"0 0 * * *", "nửa đêm mỗi ngày", 0, 0},
+                {"0 9 * * 1-5", "ngày làm việc09:00", 9, 0},
+                {"0 9 * * 1", "Thứ Hai hàng tuần09:00", 9, 0},
+                {"0 0 1 * *", "mỗi tháng10 giờ trong ngày", 0, 0},
+                {"30 8 * * 0", "Chủ nhật hàng tuần08:30", 8, 30},
+                {"0 */2 * * *", "Mọi2Đúng giờ", -1, 0},
         };
     }
 
     /**
-     * 无效 Spring/Quartz 表达式
+     * không hợp lệ Spring/Quartz biểu hiện
      */
     @DataProvider(name = "invalidSpringExpressions")
     public Object[][] invalidSpringExpressions() {
         return new Object[][]{
                 {""},
-                {"* * * *"},           // 4字段不够
-                {"* * * * *"},         // 5字段(Linux格式)对Spring无效
-                {"* * * * * * * *"},   // 8字段太多
+                {"* * * *"},           // 4Không đủ trường
+                {"* * * * *"},         // 5lĩnh vực(Linuxđịnh dạng)VângSpringkhông hợp lệ
+                {"* * * * * * * *"},   // 8Quá nhiều lĩnh vực
                 {"invalid"},
         };
     }
 
     /**
-     * 无效 Linux Crontab 表达式
+     * không hợp lệ Linux Crontab biểu hiện
      */
     @DataProvider(name = "invalidLinuxExpressions")
     public Object[][] invalidLinuxExpressions() {
         return new Object[][]{
                 {""},
-                {"* * * *"},           // 4字段不够
-                {"* * * * * *"},       // 6字段(Spring格式)对Linux无效
+                {"* * * *"},           // 4Không đủ trường
+                {"* * * * * *"},       // 6lĩnh vực(Springđịnh dạng)VângLinuxkhông hợp lệ
                 {"invalid cron"},
         };
     }
 
     /**
-     * 模式自动检测
+     * Chế độ được tự động phát hiện
      */
     @DataProvider(name = "modeDetection")
     public Object[][] modeDetection() {
@@ -102,7 +102,7 @@ public class CronExpressionTest {
     }
 
     // =========================================================
-    // Spring/Quartz 有效表达式
+    // Spring/Quartz Biểu thức hợp lệ
     // =========================================================
 
     @Test(dataProvider = "validSpringExpressions")
@@ -142,7 +142,7 @@ public class CronExpressionTest {
     }
 
     // =========================================================
-    // Spring/Quartz 无效表达式
+    // Spring/Quartz Biểu thức không hợp lệ
     // =========================================================
 
     @Test(dataProvider = "invalidSpringExpressions")
@@ -153,7 +153,7 @@ public class CronExpressionTest {
     }
 
     // =========================================================
-    // Linux Crontab 有效表达式
+    // Linux Crontab Biểu thức hợp lệ
     // =========================================================
 
     @Test(dataProvider = "validLinuxExpressions")
@@ -179,7 +179,7 @@ public class CronExpressionTest {
             assertTrue(t.after(now), "Time must be in the future");
             if (i > 0) assertTrue(t.after(times.get(i - 1)), "Times must be ascending");
             cal.setTime(t);
-            // Linux crontab 最小粒度是分钟，秒必须为 0
+            // Linux crontab Độ chi tiết tối thiểu là phút, giây phải có 0
             assertEquals(cal.get(Calendar.SECOND), 0, "Linux cron second must be 0: " + expr);
             if (expectedHour >= 0) {
                 assertEquals(cal.get(Calendar.HOUR_OF_DAY), expectedHour, "Hour: " + expr);
@@ -192,7 +192,7 @@ public class CronExpressionTest {
     }
 
     // =========================================================
-    // Linux Crontab 无效表达式
+    // Linux Crontab Biểu thức không hợp lệ
     // =========================================================
 
     @Test(dataProvider = "invalidLinuxExpressions")
@@ -203,7 +203,7 @@ public class CronExpressionTest {
     }
 
     // =========================================================
-    // 模式自动检测: detectMode()
+    // Chế độ được tự động phát hiện: detectMode()
     // =========================================================
 
     @Test(dataProvider = "modeDetection")
@@ -214,7 +214,7 @@ public class CronExpressionTest {
     }
 
     // =========================================================
-    // normalizeCron: Linux 5位 → 补秒 → 6位
+    // normalizeCron: Linux 5Chút → Những giây bổ sung → 6Chút
     // =========================================================
 
     @Test
@@ -234,7 +234,7 @@ public class CronExpressionTest {
     }
 
     // =========================================================
-    // 自动检测 isValid (无 mode 参数)
+    // Tự động phát hiện isValid (Không mode các thông số)
     // =========================================================
 
     @Test
@@ -248,7 +248,7 @@ public class CronExpressionTest {
     }
 
     // =========================================================
-    // 自动检测 getNextExecutionTimes (无 mode 参数)
+    // Tự động phát hiện getNextExecutionTimes (Không mode các thông số)
     // =========================================================
 
     @Test
@@ -280,7 +280,7 @@ public class CronExpressionTest {
     }
 
     // =========================================================
-    // Linux: 工作日过滤 (1-5 = Mon-Fri)
+    // Linux: Lọc theo ngày trong tuần (1-5 = Mon-Fri)
     // =========================================================
 
     @Test
@@ -302,7 +302,7 @@ public class CronExpressionTest {
     }
 
     // =========================================================
-    // Linux: Sunday 别名 - 0 和 7 均表示周日
+    // Linux: Sunday Bí danh - 0 và 7 Cả hai đều có nghĩa là Chủ nhật
     // =========================================================
 
     @Test
@@ -324,7 +324,7 @@ public class CronExpressionTest {
     }
 
     // =========================================================
-    // Spring: 工作日过滤 MON-FRI
+    // Spring: Lọc theo ngày trong tuần MON-FRI
     // =========================================================
 
     @Test
@@ -346,7 +346,7 @@ public class CronExpressionTest {
     }
 
     // =========================================================
-    // Spring: 范围+步长  8-18/2
+    // Spring: phạm vi+độ dài bước  8-18/2
     // =========================================================
 
     @Test
@@ -367,7 +367,7 @@ public class CronExpressionTest {
     }
 
     // =========================================================
-    // Spring: L - 每月最后一天
+    // Spring: L - Ngày cuối cùng của mỗi tháng
     // =========================================================
 
     @Test
@@ -386,19 +386,19 @@ public class CronExpressionTest {
     }
 
     // =========================================================
-    // Spring: 年份字段
+    // Spring: Trường năm
     // =========================================================
 
     @Test
     public void testSpringYearField() {
-        // 未来年份 2099 应有结果
+        // những năm tương lai 2099 Nên có kết quả
         List<Date> future = CronExpressionUtil.getNextExecutionTimes("0 0 12 1 1 ? 2099", 1, CronMode.SPRING_QUARTZ);
         assertFalse(future.isEmpty(), "Future year 2099 should have results");
         Calendar cal = Calendar.getInstance();
         cal.setTime(future.get(0));
         assertEquals(cal.get(Calendar.YEAR), 2099, "Year should be 2099");
 
-        // 过去年份 2000 应为空
+        // những năm qua 2000 Nên trống rỗng
         List<Date> past = CronExpressionUtil.getNextExecutionTimes("0 0 12 1 1 ? 2000", 1, CronMode.SPRING_QUARTZ);
         assertTrue(past.isEmpty(), "Past year 2000 should return empty list");
         System.out.println("✅ Year field works correctly");
@@ -452,7 +452,7 @@ public class CronExpressionTest {
     }
 
     // =========================================================
-    // 边界: null / 空字符串
+    // biên giới: null / Chuỗi trống
     // =========================================================
 
     @Test
@@ -469,7 +469,7 @@ public class CronExpressionTest {
     }
 
     // =========================================================
-    // 跨模式互斥: Linux 5位在Spring下无效，Spring 6位在Linux下无效
+    // Loại trừ lẫn nhau giữa các chế độ: Linux 5Xác định vị tríSpringKhông hợp lệ bên dưới.Spring 6Xác định vị tríLinuxKhông hợp lệ bên dưới
     // =========================================================
 
     @Test

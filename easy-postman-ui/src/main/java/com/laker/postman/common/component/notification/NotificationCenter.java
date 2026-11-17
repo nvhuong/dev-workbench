@@ -13,7 +13,7 @@ import java.awt.*;
 import java.util.function.Supplier;
 
 /**
- * IntelliJ IDEA 风格的全局 Toast 通知入口。
+ * IntelliJ IDEA Bức tranh lớn về phong cách Toast Lối vào thông báo.
  */
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public final class NotificationCenter {
@@ -53,7 +53,7 @@ public final class NotificationCenter {
     }
 
     /**
-     * 通知默认挂到最外层可用 owner 上，避免在模态对话框里触发时贴在子窗口边缘。
+     * Thông báo có sẵn ở cấp độ ngoài cùng theo mặc định owner để tránh dính vào mép cửa sổ con khi được kích hoạt trong hộp thoại phương thức.
      */
     private static Window resolveNotificationAnchor(Window window) {
         if (window == null || !window.isShowing()) {
@@ -71,8 +71,8 @@ public final class NotificationCenter {
     }
 
     /**
-     * 应用被其他窗口遮挡时，AWT 可能没有 active/focused window。此时仍应挂到
-     * EasyPostman 已显示的主窗口，而不是落到 JOptionPane 的 0x0 shared owner。
+     * Khi ứng dụng bị chặn bởi các cửa sổ khác.AWT Có lẽ là không active/focused window。Nó vẫn nên được treo vào thời điểm này
+     * EasyPostman Cửa sổ chính đã được hiển thị thay vì bị bỏ JOptionPane của 0x0 shared owner。
      */
     private static Window findVisibleFallbackWindow() {
         Window dialogAnchor = null;
@@ -105,7 +105,7 @@ public final class NotificationCenter {
         return !(window instanceof Frame frame && (frame.getExtendedState() & Frame.ICONIFIED) == Frame.ICONIFIED);
     }
 
-    // ==================== 通知类型 ====================
+    // ==================== Loại thông báo ====================
 
     @Getter
     @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
@@ -128,7 +128,7 @@ public final class NotificationCenter {
         }
     }
 
-    // ==================== 公开 API ====================
+    // ==================== công cộng API ====================
 
     public static void setDefaultPosition(NotificationPosition position) {
         DEFAULT.defaultPosition = position != null ? position : NotificationPosition.BOTTOM_RIGHT;
@@ -170,7 +170,7 @@ public final class NotificationCenter {
         DEFAULT.show(message, type, seconds, DEFAULT.defaultPosition, title);
     }
 
-    // ==================== 内部实现 ====================
+    // ==================== Được triển khai nội bộ ====================
 
     private void show(String message, NotificationType type, int seconds,
                       NotificationPosition position, String title) {

@@ -39,7 +39,7 @@ import java.util.Set;
 import java.awt.*;
 
 /**
- * 现代化界面设置面板 - 下载进度、历史记录等UI相关配置
+ * Bảng cài đặt giao diện hiện đại - Tiến trình tải xuống, lịch sử, v.vUIcấu hình liên quan
  */
 @Slf4j
 public class UISettingsPanelModern extends ModernSettingsPanel {
@@ -82,7 +82,7 @@ public class UISettingsPanelModern extends ModernSettingsPanel {
 
     @Override
     protected void buildContent(JPanel contentPanel) {
-        // 整页共用同一标签列宽，保证各分区的输入框左边缘对齐
+        // Toàn bộ trang có chung chiều rộng cột nhãn, đảm bảo cạnh trái của hộp nhập liệu trong mỗi phần được căn chỉnh
         fieldLabelWidth = calculateFieldLabelWidth(List.of(
                 I18nUtil.getMessage(MessageKeys.SETTINGS_DOWNLOAD_THRESHOLD),
                 I18nUtil.getMessage(MessageKeys.SETTINGS_GENERAL_MAX_HISTORY),
@@ -97,13 +97,13 @@ public class UISettingsPanelModern extends ModernSettingsPanel {
                 I18nUtil.getMessage(MessageKeys.SETTINGS_EDITOR_FONT_SIZE)
         ));
 
-        // 下载设置区域
+        // Khu vực cài đặt tải xuống
         JPanel downloadSection = createModernSection(
                 I18nUtil.getMessage(MessageKeys.SETTINGS_DOWNLOAD_TITLE),
                 ""
         );
 
-        // 显示下载进度对话框
+        // Hiển thị hộp thoại tiến trình tải xuống
         showDownloadProgressCheckBox = new JCheckBox(
                 I18nUtil.getMessage(MessageKeys.SETTINGS_DOWNLOAD_SHOW_PROGRESS),
                 SettingManager.isShowDownloadProgressDialog()
@@ -115,7 +115,7 @@ public class UISettingsPanelModern extends ModernSettingsPanel {
         downloadSection.add(showProgressRow);
         downloadSection.add(createVerticalSpace(FIELD_SPACING));
 
-        // 下载阈值
+        // Ngưỡng tải xuống
         downloadProgressDialogThresholdField = new JTextField(10);
         int thresholdMB = SettingManager.getDownloadProgressDialogThreshold() / (1024 * 1024);
         downloadProgressDialogThresholdField.setText(String.valueOf(thresholdMB));
@@ -130,7 +130,7 @@ public class UISettingsPanelModern extends ModernSettingsPanel {
         );
         downloadSection.add(downloadProgressDialogThresholdRow);
 
-        // 设置阈值字段的启用状态
+        // Đặt trạng thái kích hoạt của trường ngưỡng
         downloadProgressDialogThresholdRow.setEnabled(showDownloadProgressCheckBox.isSelected());
 
         showDownloadProgressCheckBox.addItemListener(e -> {
@@ -141,7 +141,7 @@ public class UISettingsPanelModern extends ModernSettingsPanel {
         contentPanel.add(downloadSection);
         contentPanel.add(createVerticalSpace(SECTION_SPACING));
 
-        // 通用设置区域
+        // Khu vực cài đặt chung
         JPanel generalSection = createModernSection(
                 I18nUtil.getMessage(MessageKeys.SETTINGS_GENERAL_TITLE),
                 ""
@@ -151,7 +151,7 @@ public class UISettingsPanelModern extends ModernSettingsPanel {
         String gitDiffThresholdLabel = I18nUtil.getMessage(MessageKeys.SETTINGS_GIT_DIFF_LARGE_FILE_THRESHOLD);
         String notificationPositionLabel = I18nUtil.getMessage(MessageKeys.SETTINGS_GENERAL_NOTIFICATION_POSITION);
 
-        // 请求标签页
+        // Yêu cầu một tab
         maxOpenedRequestsCountField = new JTextField(10);
         maxOpenedRequestsCountField.setText(String.valueOf(SettingManager.getMaxOpenedRequestsCount()));
         JPanel requestsRow = createFieldRow(
@@ -175,7 +175,7 @@ public class UISettingsPanelModern extends ModernSettingsPanel {
         generalSection.add(requestTabsMultiLineRow);
         generalSection.add(createVerticalSpace(FIELD_SPACING));
 
-        // 历史记录数量
+        // Số lượng hồ sơ lịch sử
         maxHistoryCountField = new JTextField(10);
         maxHistoryCountField.setText(String.valueOf(SettingManager.getMaxHistoryCount()));
         JPanel historyRow = createFieldRow(
@@ -188,7 +188,7 @@ public class UISettingsPanelModern extends ModernSettingsPanel {
         generalSection.add(historyRow);
         generalSection.add(createVerticalSpace(FIELD_SPACING));
 
-        // 自动格式化响应体
+        // Tự động định dạng nội dung phản hồi
         autoFormatResponseCheckBox = new JCheckBox(
                 I18nUtil.getMessage(MessageKeys.SETTINGS_GENERAL_AUTO_FORMAT_RESPONSE),
                 SettingManager.isAutoFormatResponse()
@@ -211,7 +211,7 @@ public class UISettingsPanelModern extends ModernSettingsPanel {
         generalSection.add(startupSplashRow);
         generalSection.add(createVerticalSpace(FIELD_SPACING));
 
-        // 侧边栏展开设置
+        // Cài đặt mở rộng thanh bên
         sidebarExpandedCheckBox = new JCheckBox(
                 I18nUtil.getMessage(MessageKeys.SETTINGS_GENERAL_SIDEBAR_EXPANDED),
                 SettingManager.isSidebarExpanded()
@@ -227,7 +227,7 @@ public class UISettingsPanelModern extends ModernSettingsPanel {
         generalSection.add(sidebarTabsRow);
         generalSection.add(createVerticalSpace(FIELD_SPACING));
 
-        // 通知位置设置 - 使用枚举的 i18nKey
+        // Cài đặt vị trí thông báo - Sử dụng phép liệt kê i18nKey
         NotificationPosition[] positions = NotificationPosition.values();
         String[] positionLabels = new String[positions.length];
         for (int i = 0; i < positions.length; i++) {
@@ -235,7 +235,7 @@ public class UISettingsPanelModern extends ModernSettingsPanel {
         }
         notificationPositionComboBox = new JComboBox<>(positionLabels);
 
-        // 设置当前值 - 直接从 SettingManager 获取枚举
+        // Đặt giá trị hiện tại - Trực tiếp từ SettingManager Lấy bảng liệt kê
         NotificationPosition currentPosition = SettingManager.getNotificationPosition();
         notificationPositionComboBox.setSelectedIndex(currentPosition.getIndex());
 
@@ -270,7 +270,7 @@ public class UISettingsPanelModern extends ModernSettingsPanel {
 
         setupValidators();
 
-        // 跟踪所有组件的初始值
+        // Theo dõi các giá trị ban đầu cho tất cả các thành phần
         trackComponentValue(showDownloadProgressCheckBox);
         trackComponentValue(downloadProgressDialogThresholdField);
         trackComponentValue(gitDiffLargeFileThresholdField);
@@ -648,31 +648,31 @@ public class UISettingsPanelModern extends ModernSettingsPanel {
     }
 
     /**
-     * 更新字体预览
+     * Cập nhật xem trước phông chữ
      */
     private void updateFontPreview() {
         try {
             String selectedFont = (String) fontNameComboBox.getSelectedItem();
             if (selectedFont == null) return;
 
-            int fontSize = SettingManager.getUiFontSize(); // 使用当前设置的字体大小（首次使用会根据操作系统返回默认值）
+            int fontSize = SettingManager.getUiFontSize(); // Sử dụng cỡ chữ hiện được đặt (trở về giá trị mặc định dựa trên hệ điều hành trong lần sử dụng đầu tiên)
             String sizeText = fontSizeField.getText().trim();
             if (!sizeText.isEmpty()) {
                 try {
                     fontSize = Integer.parseInt(sizeText);
                     fontSize = Math.max(10, Math.min(24, fontSize));
                 } catch (NumberFormatException e) {
-                    // 使用默认大小
+                    // Sử dụng kích thước mặc định
                 }
             }
 
-            // 字体预览处理：
-            // 1. 如果选择系统默认，使用 deriveFont 保留降级链（确保 emoji 显示）
-            // 2. 如果选择自定义字体，使用 new Font 让用户看到实际字体效果
-            //    （注意：自定义字体可能不支持 emoji，这是预期行为，用户需要知道选择的字体效果）
+            // Xử lý xem trước phông chữ:
+            // 1. Sử dụng nếu mặc định hệ thống được chọn deriveFont Giữ chuỗi hạ cấp (đảm bảo emoji trình diễn)
+            // 2. Nếu bạn chọn một phông chữ tùy chỉnh, hãy sử dụng nó new Font Hãy để người dùng nhìn thấy hiệu ứng phông chữ thực tế
+            //    （LƯU Ý: Phông chữ tùy chỉnh có thể không được hỗ trợ emoji，Đây là hành vi được mong đợi và người dùng cần biết về hiệu ứng phông chữ đã chọn)
 
             if (fontNameComboBox.getSelectedIndex() == 0) {
-                // 选择了"系统默认"，使用 deriveFont 保留降级链
+                // Được chọn"Mặc định hệ thống"，sử dụng deriveFont Giữ chuỗi hạ cấp
                 Font baseFont = UIManager.getFont("Label.font");
                 if (baseFont == null) {
                     baseFont = fontPreviewLabel.getFont();
@@ -681,8 +681,8 @@ public class UISettingsPanelModern extends ModernSettingsPanel {
                 fontSupportHintLabel.setPlainText(I18nUtil.getMessage(MessageKeys.SETTINGS_UI_FONT_STATUS_SYSTEM_DEFAULT));
                 fontSupportHintLabel.setForeground(getTextSecondaryColor());
             } else {
-                // 选择了具体字体，创建该字体实例以展示真实效果
-                // 这样用户可以看到选择的字体是否支持 emoji
+                // Với một phông chữ cụ thể được chọn, một phiên bản của phông chữ đó sẽ được tạo để hiển thị hiệu ứng thực sự
+                // Bằng cách này, người dùng có thể biết liệu phông chữ đã chọn có được hỗ trợ hay không emoji
                 fontPreviewLabel.setFont(new Font(selectedFont, Font.PLAIN, fontSize));
                 UiFontCatalog.FontSupport support = getFontSupport(selectedFont);
                 if (support == UiFontCatalog.FontSupport.FULL) {
@@ -697,7 +697,7 @@ public class UISettingsPanelModern extends ModernSettingsPanel {
                 }
             }
         } catch (Exception e) {
-            // 忽略预览更新错误
+            // Bỏ qua các lỗi cập nhật bản xem trước
         }
     }
 
@@ -710,7 +710,7 @@ public class UISettingsPanelModern extends ModernSettingsPanel {
                     fontSize = Integer.parseInt(sizeText);
                     fontSize = Math.max(8, Math.min(32, fontSize));
                 } catch (NumberFormatException e) {
-                    // 使用默认大小
+                    // Sử dụng kích thước mặc định
                 }
             }
 
@@ -734,7 +734,7 @@ public class UISettingsPanelModern extends ModernSettingsPanel {
                 );
             }
         } catch (Exception e) {
-            // 忽略预览更新错误
+            // Bỏ qua các lỗi cập nhật bản xem trước
         }
     }
 
@@ -1011,7 +1011,7 @@ public class UISettingsPanelModern extends ModernSettingsPanel {
     }
 
     private void saveSettings(boolean closeAfterSave) {
-        // 验证所有字段
+        // Xác thực tất cả các trường
         if (!validateAllFields()) {
             NotificationCenter.showError(I18nUtil.getMessage(MessageKeys.SETTINGS_VALIDATION_ERROR_MESSAGE));
             return;
@@ -1027,14 +1027,14 @@ public class UISettingsPanelModern extends ModernSettingsPanel {
         try {
             String oldSidebarTabsState = getPersistedSidebarTabsStateSnapshot();
 
-            // 保存下载设置
+            // Lưu cài đặt tải xuống
             SettingManager.setShowDownloadProgressDialog(showDownloadProgressCheckBox.isSelected());
             if (downloadProgressDialogThresholdField.isEnabled()) {
                 int thresholdMB = Integer.parseInt(downloadProgressDialogThresholdField.getText().trim());
                 SettingManager.setDownloadProgressDialogThreshold(thresholdMB * 1024 * 1024);
             }
 
-            // 保存通用设置
+            // Lưu cài đặt chung
             SettingManager.setMaxHistoryCount(Integer.parseInt(maxHistoryCountField.getText().trim()));
             SettingManager.setMaxOpenedRequestsCount(Integer.parseInt(maxOpenedRequestsCountField.getText().trim()));
             SettingManager.setRequestEditorTabsMultiLineEnabled(requestEditorTabsMultiLineCheckBox.isSelected());
@@ -1043,7 +1043,7 @@ public class UISettingsPanelModern extends ModernSettingsPanel {
             SettingManager.setAutoFormatResponse(autoFormatResponseCheckBox.isSelected());
             SettingManager.setStartupSplashEnabled(startupSplashCheckBox.isSelected());
 
-            // 保存侧边栏展开设置并更新UI
+            // Lưu cài đặt mở rộng thanh bên và cập nhậtUI
             boolean oldSidebarExpanded = SettingManager.isSidebarExpanded();
             boolean newSidebarExpanded = sidebarExpandedCheckBox.isSelected();
             SettingManager.setSidebarExpanded(newSidebarExpanded);
@@ -1054,23 +1054,23 @@ public class UISettingsPanelModern extends ModernSettingsPanel {
                 updateSidebarConfiguration();
             }
 
-            // 保存通知位置设置并更新NotificationCenter - 使用枚举的 fromIndex 方法
+            // Lưu cài đặt vị trí thông báo và cập nhậtNotificationCenter - Sử dụng phép liệt kê fromIndex phương pháp
             NotificationPosition selectedPosition = NotificationPosition.fromIndex(notificationPositionComboBox.getSelectedIndex());
             SettingManager.setNotificationPosition(selectedPosition);
             NotificationCenter.setDefaultPosition(selectedPosition);
 
-            // 检测字体是否有变化（在保存前获取旧值）
+            // Phát hiện xem phông chữ có thay đổi không (lấy giá trị cũ trước khi lưu)
             String oldFontName = SettingManager.getUiFontName();
             int oldFontSize = SettingManager.getUiFontSize();
             String oldEditorFontName = SettingManager.getEditorFontName();
             String oldEditorFontFallbackName = SettingManager.getEditorFontFallbackName();
             int oldEditorFontSize = SettingManager.getEditorFontSize();
 
-            // 保存字体设置
+            // Lưu cài đặt phông chữ
             int fontNameIndex = fontNameComboBox.getSelectedIndex();
             String newFontName;
             if (fontNameIndex == 0) {
-                // 系统默认
+                // Mặc định hệ thống
                 newFontName = "";
                 SettingManager.setUiFontName("");
             } else {
@@ -1090,20 +1090,20 @@ public class UISettingsPanelModern extends ModernSettingsPanel {
             SettingManager.setEditorFontFallbackName(newEditorFontFallbackName);
             SettingManager.setEditorFontSize(newEditorFontSize);
 
-            // 判断字体是否真的有变化（处理 null 情况）
+            // Xác định xem phông chữ có thực sự thay đổi hay không (process null Tình trạng)
             boolean fontChanged = !Objects.equals(newFontName, oldFontName) || newFontSize != oldFontSize;
             boolean editorFontChanged = !Objects.equals(newEditorFontName, oldEditorFontName)
                     || !Objects.equals(newEditorFontFallbackName, oldEditorFontFallbackName)
                     || newEditorFontSize != oldEditorFontSize;
 
-            // 如果字体有变化，立即应用字体设置到整个应用
+            // Nếu phông chữ thay đổi, cài đặt phông chữ sẽ ngay lập tức được áp dụng cho toàn bộ ứng dụng
             if (fontChanged) {
                 FontManager.applyFont(newFontName, newFontSize);
             } else if (editorFontChanged) {
                 UIRefreshManager.refreshEditorFonts();
             }
 
-            // 重新跟踪当前值
+            // Truy xuất giá trị hiện tại
             originalValues.clear();
             trackComponentValue(showDownloadProgressCheckBox);
             trackComponentValue(downloadProgressDialogThresholdField);
@@ -1123,14 +1123,14 @@ public class UISettingsPanelModern extends ModernSettingsPanel {
             trackComponentValue(sidebarTabsStateField);
             setHasUnsavedChanges(false);
 
-            // 根据是否修改了字体显示不同的提示信息
+            // Các thông báo nhắc nhở khác nhau sẽ được hiển thị tùy thuộc vào việc phông chữ đã được sửa đổi hay chưa
             if (fontChanged || editorFontChanged) {
                 NotificationCenter.showInfo(I18nUtil.getMessage(MessageKeys.SETTINGS_UI_FONT_APPLIED));
             } else {
                 NotificationCenter.showSuccess(I18nUtil.getMessage(MessageKeys.SETTINGS_SAVE_SUCCESS_MESSAGE));
             }
 
-            // 根据参数决定是否关闭对话框
+            // Xác định có nên đóng hộp thoại hay không dựa trên các tham số
             if (closeAfterSave) {
                 Window window = SwingUtilities.getWindowAncestor(this);
                 if (window instanceof JDialog dialog) {
@@ -1143,7 +1143,7 @@ public class UISettingsPanelModern extends ModernSettingsPanel {
     }
 
     /**
-     * 更新侧边栏配置
+     * Cập nhật cấu hình thanh bên
      */
     private void updateSidebarConfiguration() {
         try {
@@ -1248,7 +1248,7 @@ public class UISettingsPanelModern extends ModernSettingsPanel {
         }
 
         /**
-         * 按字体切分连续文本段整体绘制，与代码编辑器一致；逐字绘制会累积取整误差，导致字距偏大。
+         * Các đoạn văn bản liên tục được chia theo phông chữ và được vẽ tổng thể, phù hợp với trình soạn thảo mã; vẽ từng chữ sẽ tích lũy các lỗi làm tròn, dẫn đến kerning lớn hơn.
          */
         private List<FontRun> splitFontRuns(String text, Font primary, Font fallback) {
             List<FontRun> runs = new ArrayList<>();
@@ -1272,7 +1272,7 @@ public class UISettingsPanelModern extends ModernSettingsPanel {
 
         private static void applyEditorTextHints(Graphics2D g2) {
             FontsUtil.applyTextRenderingHints(g2);
-            // RSyntaxTextArea 默认关闭小数字宽，保持预览与真实编辑器字距一致
+            // RSyntaxTextArea Độ rộng số nhỏ bị tắt theo mặc định, giữ cho bản xem trước nhất quán với độ sâu của trình soạn thảo thực
             g2.setRenderingHint(RenderingHints.KEY_FRACTIONALMETRICS, RenderingHints.VALUE_FRACTIONALMETRICS_OFF);
         }
 

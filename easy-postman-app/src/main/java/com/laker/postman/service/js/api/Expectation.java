@@ -19,9 +19,9 @@ import java.util.Set;
 import java.util.regex.Pattern;
 
 /**
- * 支持 pm.expect(xxx) 断言的链式断言对象。
+ * Hỗ trợ pm.expect(xxx) Một đối tượng xác nhận được xâu chuỗi để xác nhận.
  * <p>
- * 这里实现的是 Postman / Chai 常用子集，重点覆盖内置 snippet 和用户脚本高频写法。
+ * Những gì được thực hiện ở đây là Postman / Chai Các tập hợp con thường được sử dụng, tập trung vào vùng phủ sóng tích hợp snippet và viết các tập lệnh người dùng với tần suất cao.
  */
 public class Expectation {
     private final Object actual;

@@ -1,7 +1,7 @@
 package com.laker.postman.plugin.api;
 
 /**
- * 插件向宿主提交脚本补全项的中立出口。
+ * Lối thoát trung lập cho các plugin gửi các bản hoàn thành tập lệnh tới máy chủ.
  */
 public interface ScriptCompletionSink {
 

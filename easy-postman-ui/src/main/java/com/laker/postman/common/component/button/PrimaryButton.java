@@ -9,9 +9,9 @@ import javax.swing.*;
 import java.awt.*;
 
 /**
- * 主按钮 - 现代化设计
- * 蓝色背景，白色文字，用于主要操作（如发送、连接等）
- * 支持亮色和暗色主题自适应
+ * Nút chính - Thiết kế hiện đại
+ * Nền xanh, chữ trắng, dùng cho các thao tác chính (như gửi, kết nối,…)
+ * Hỗ trợ thích ứng chủ đề sáng và tối
  */
 public class PrimaryButton extends JButton {
     private static final int ICON_SIZE = 14;
@@ -32,7 +32,7 @@ public class PrimaryButton extends JButton {
             setIconTextGap(4);
         }
 
-        // 设置字体和样式
+        // Đặt phông chữ và phong cách
         setFont(FontsUtil.getDefaultFont(Font.BOLD));
         putClientProperty(FlatClientProperties.STYLE_CLASS, ModernButtonFactory.PRIMARY_STYLE_CLASS);
         setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));

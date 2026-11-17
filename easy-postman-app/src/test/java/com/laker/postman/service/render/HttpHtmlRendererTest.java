@@ -44,7 +44,7 @@ public class HttpHtmlRendererTest {
         restore(previousThemeTokens);
     }
 
-    @Test(description = "响应 body 的 HTML code block 应消除 pre 默认外边距，避免 Swing 详情页首行错位")
+    @Test(description = "phản hồi body của HTML code block nên được loại bỏ pre Lề mặc định, tránh Swing The top line of the details page is misplaced")
     public void testRenderResponseShouldWrapPreWithZeroMargin() {
         HttpResponse response = new HttpResponse();
         response.code = 101;

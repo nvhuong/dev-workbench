@@ -9,8 +9,8 @@ import javax.swing.*;
 import java.awt.*;
 
 /**
- * Cookie 管理器对话框
- * 全局 Cookie 管理界面，显示和管理所有域名的 Cookie
+ * Cookie Hộp thoại quản lý
+ * Bức tranh lớn Cookie Giao diện quản lý hiển thị và quản lý toàn bộ tên miền Cookie
  */
 public class CookieManagerDialog extends JDialog {
 
@@ -25,7 +25,7 @@ public class CookieManagerDialog extends JDialog {
         ToolWindowSurfaceStyle.applyDialogSurface(cookiePanel);
         setContentPane(cookiePanel);
 
-        // 设置对话框属性
+        // Đặt thuộc tính hộp thoại
         setSize(900, 500);
         setMinimumSize(new Dimension(760, 420));
         setLocationRelativeTo(getOwner());

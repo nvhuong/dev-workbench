@@ -1,7 +1,7 @@
 # Plugin Decompiler
 
-Java 反编译插件，提供 Toolbox 中的反编译面板。
+Java Dịch ngược plug-in, được cung cấp Toolbox Dịch ngược bảng điều khiển ở định dạng .
 
-构建后产物：
+Sản phẩm được xây dựng:
 
 - `target/easy-postman-${project.version}-plugin-decompiler.jar`

@@ -4,7 +4,7 @@ import com.laker.postman.performance.core.model.PerformanceProtocol;
 import com.laker.postman.performance.core.model.PerformanceTrendSnapshot;
 
 /**
- * 从 worker/master JSON 报表的累计值中切出单个趋势采样窗口，GUI/CLI/master 只负责传入当前报表。
+ * Từ worker/master JSON Một cửa sổ lấy mẫu xu hướng duy nhất được cắt ra khỏi giá trị tích lũy của báo cáo.GUI/CLI/master Chỉ chịu trách nhiệm thông qua báo cáo hiện tại.
  */
 public final class PerformanceJsonReportTrendWindowSampler {
     private long lastSampleAtMs;
@@ -26,7 +26,7 @@ public final class PerformanceJsonReportTrendWindowSampler {
     }
 
     /**
-     * 对 worker 累计报表做差分并推进内部游标，结果只代表本次 poll 到上次 poll 之间的窗口。
+     * Vâng worker Báo cáo tích lũy được phân biệt và con trỏ bên trong được nâng cao. Kết quả chỉ đại diện cho thời gian này poll Cho đến lần cuối cùng poll giữa các cửa sổ.
      */
     public PerformanceTrendSnapshot drainReportDelta(int activeUsers,
                                                      int activeWebSocketConnections,
@@ -81,7 +81,7 @@ public final class PerformanceJsonReportTrendWindowSampler {
             return Math.max(0, activeUsers);
         }
         if (hasWindowActivity(overviewMetrics, httpMetrics, webSocketMetrics, sseMetrics)) {
-            // 远程 worker 可能在本轮 poll 时已经完成，activeUsers 已归零，但本轮报表仍有刚完成的样本。
+            // Điều khiển từ xa worker Có lẽ là vòng này poll đã được hoàn thành.activeUsers Nó đã được đặt lại về 0 nhưng vẫn còn những mẫu vừa được hoàn thiện cho đợt báo cáo này.
             return Math.max(0, lastWindowActiveUsers);
         }
         return 0;

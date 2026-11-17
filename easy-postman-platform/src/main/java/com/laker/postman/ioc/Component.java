@@ -3,14 +3,14 @@ package com.laker.postman.ioc;
 import java.lang.annotation.*;
 
 /**
- * 标记一个类为组件，会被IOC容器管理
+ * Đánh dấu một lớp là một thành phần sẽ đượcIOCQuản lý thùng chứa
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 public @interface Component {
     /**
-     * Bean名称，默认为类名首字母小写
+     * BeanTên, chữ cái đầu tiên của tên lớp mặc định là chữ thường
      */
     String value() default "";
 }

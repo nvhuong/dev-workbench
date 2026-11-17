@@ -395,15 +395,15 @@ public final class PerformanceProtocolReportData {
                                 long success,
                                 long fail,
                                 double successRate,
-                                // QPS：请求数 / 样本窗口，GUI 只负责格式化展示，不重新计算。
+                                // QPS：Số lượng yêu cầu / Cửa sổ mẫu,GUI Nó chỉ chịu trách nhiệm định dạng hiển thị và không tính toán lại.
                                 double qps,
-                                // 发送字节速率：请求头 + 请求体，单位 bytes/s，展示层换算为 KB/s。
+                                // Tốc độ byte gửi: tiêu đề yêu cầu + Cơ quan, đơn vị yêu cầu bytes/s，Lớp hiển thị được chuyển đổi thành KB/s。
                                 double sentBytesPerSecond,
-                                // 接收字节速率：响应头 + 响应体，单位 bytes/s，展示层换算为 KB/s。
+                                // Tốc độ byte nhận được: tiêu đề phản hồi + Cơ quan, đơn vị phản hồi bytes/s，Lớp hiển thị được chuyển đổi thành KB/s。
                                 double receivedBytesPerSecond,
-                                // 平均接收字节数：receivedBytes / total，对齐 JMeter Avg. Bytes 口径。
+                                // Số byte trung bình nhận được:receivedBytes / total，Căn chỉnh JMeter Avg. Bytes tầm cỡ.
                                 long avgReceivedBytes,
-                                // 请求耗时分布：只包含 sampler/request 耗时，不包含脚本、断言和 UI 刷新。
+                                // Yêu cầu phân phối tốn thời gian: chỉ bao gồm sampler/request Tốn thời gian, không bao gồm script, xác nhận và UI Làm mới.
                                 long avg,
                                 long min,
                                 long max,

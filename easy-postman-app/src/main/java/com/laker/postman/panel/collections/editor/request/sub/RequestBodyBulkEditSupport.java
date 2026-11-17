@@ -21,7 +21,7 @@ import java.util.List;
 import java.util.function.Consumer;
 
 /**
- * Request body 批量编辑支持。
+ * Request body Hỗ trợ chỉnh sửa hàng loạt.
  */
 final class RequestBodyBulkEditSupport {
     private static final String FORM_DATA_FILE_PREFIX = "@";

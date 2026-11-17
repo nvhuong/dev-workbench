@@ -83,7 +83,7 @@ public class ResponseFileTypeDetectorTest {
 
     @Test
     public void shouldFallBackToKeywordsWhenZipDirectoryIsUnreadable() throws IOException {
-        // 旧版本把二进制按 UTF-8 解码后保存，偏移已失效，只能依赖 ASCII 关键字
+        // Các phiên bản cũ hơn nhấn nhị phân UTF-8 Sau khi giải mã và lưu, phần bù không hợp lệ và chỉ có thể dựa vào ASCII Từ khóa
         byte[] legacyText = new String(ResponseFileFixtures.xlsx(), StandardCharsets.UTF_8)
                 .getBytes(StandardCharsets.UTF_8);
 
@@ -94,8 +94,8 @@ public class ResponseFileTypeDetectorTest {
     public void shouldDetectBinaryControlBytesLikeWhatwgSniffing() {
         assertTrue(ResponseFileTypeDetector.looksBinary(bytes(0x08, 0x96, 0x01, 0x12, 0x03)));
         assertFalse(ResponseFileTypeDetector.looksBinary("{\"a\":1}\r\n\t".getBytes(StandardCharsets.UTF_8)));
-        assertFalse(ResponseFileTypeDetector.looksBinary("中文 GBK".getBytes(java.nio.charset.Charset.forName("GBK"))));
-        assertFalse(ResponseFileTypeDetector.looksBinary("ab".getBytes(StandardCharsets.UTF_16)), "带 BOM 的 UTF-16 是文本");
+        assertFalse(ResponseFileTypeDetector.looksBinary("Tiếng Trung Quốc GBK".getBytes(java.nio.charset.Charset.forName("GBK"))));
+        assertFalse(ResponseFileTypeDetector.looksBinary("ab".getBytes(StandardCharsets.UTF_16)), "mang đến BOM của UTF-16 là văn bản");
         assertFalse(ResponseFileTypeDetector.looksBinary(new byte[0]));
         assertFalse(ResponseFileTypeDetector.looksBinary(null));
     }
@@ -156,37 +156,37 @@ public class ResponseFileTypeDetectorTest {
         ResponseFileTypeDetector.Detection guessed = ResponseFileTypeDetector.detect(ResponseFileFixtures.xlsx());
 
         assertEquals(confirmed, new ResponseFileTypeDetector.Detection(".xlsx", true));
-        assertEquals(guessed, new ResponseFileTypeDetector.Detection(".xlsx", false), "只按关键字认出时未确认子类型");
-        assertEquals(ResponseFileTypeDetector.reconcile(".xlsm", confirmed), ".xlsx", "已确认是标准 xlsx，纠正错误的 .xlsm");
+        assertEquals(guessed, new ResponseFileTypeDetector.Detection(".xlsx", false), "Các loại phụ không được xác nhận khi chỉ xác định theo từ khóa");
+        assertEquals(ResponseFileTypeDetector.reconcile(".xlsm", confirmed), ".xlsx", "Được xác nhận là tiêu chuẩn xlsx，Sửa lỗi .xlsm");
         assertEquals(ResponseFileTypeDetector.reconcile(".xlsm", guessed), ".xlsm");
         assertEquals(ResponseFileTypeDetector.reconcile(".jpeg",
-                new ResponseFileTypeDetector.Detection(".jpg", true)), ".jpeg", "同一格式的写法始终保留");
+                new ResponseFileTypeDetector.Detection(".jpg", true)), ".jpeg", "Văn bản có cùng định dạng luôn được giữ lại");
         assertEquals(ResponseFileTypeDetector.reconcile(".xlt", ResponseFileTypeDetector.detect(ole2("Workbook"))), ".xlt",
-                "OLE2 无法区分模板");
+                "OLE2 Không thể phân biệt giữa các mẫu");
         assertNull(ResponseFileTypeDetector.detect("plain".getBytes(StandardCharsets.UTF_8)));
     }
 
     @Test
     public void shouldReconcileClaimedExtensionWithSignature() {
-        assertEquals(ResponseFileTypeDetector.reconcile(".png", ".pdf"), ".pdf", "唯一文件头冲突时以内容为准");
+        assertEquals(ResponseFileTypeDetector.reconcile(".png", ".pdf"), ".pdf", "Khi có xung đột trong tiêu đề tệp duy nhất, nội dung sẽ chiếm ưu thế");
         assertEquals(ResponseFileTypeDetector.reconcile(".xls", ".xlsx"), ".xlsx");
         assertEquals(ResponseFileTypeDetector.reconcile(".png", ".zip"), ".zip");
-        assertEquals(ResponseFileTypeDetector.reconcile(".yaml", ".zip"), ".zip", "只保留允许列表中的容器格式");
+        assertEquals(ResponseFileTypeDetector.reconcile(".yaml", ".zip"), ".zip", "Chỉ giữ các định dạng vùng chứa trong danh sách được phép");
         assertEquals(ResponseFileTypeDetector.reconcile(".exe", ".zip"), ".zip");
         assertEquals(ResponseFileTypeDetector.reconcile(".mp4", ".bin"), ".bin");
         assertEquals(ResponseFileTypeDetector.reconcile(".odt", ".zip"), ".odt");
-        assertEquals(ResponseFileTypeDetector.reconcile(".xlsm", ".xlsx"), ".xlsm", "识别结果宽泛时保留更具体的扩展名");
-        assertEquals(ResponseFileTypeDetector.reconcile(".xlsx", ".xlsm"), ".xlsm", "识别出明确变体时以识别结果为准");
+        assertEquals(ResponseFileTypeDetector.reconcile(".xlsm", ".xlsx"), ".xlsm", "Retain more specific extensions when recognition results are broad");
+        assertEquals(ResponseFileTypeDetector.reconcile(".xlsx", ".xlsm"), ".xlsm", "When a clear variant is identified, the identification result shall prevail");
         assertEquals(ResponseFileTypeDetector.reconcile(".docx", ".dotm"), ".dotm");
         assertEquals(ResponseFileTypeDetector.reconcile(".JPEG", ".jpg"), ".JPEG");
-        assertEquals(ResponseFileTypeDetector.reconcile(".jar", ".zip"), ".jar", "通用容器不否定基于容器的格式");
-        assertEquals(ResponseFileTypeDetector.reconcile(".xlsx", ".bin"), ".xlsx", "加密 Office 是 OLE2 容器");
+        assertEquals(ResponseFileTypeDetector.reconcile(".jar", ".zip"), ".jar", "Vùng chứa phổ quát không phủ nhận các định dạng dựa trên vùng chứa");
+        assertEquals(ResponseFileTypeDetector.reconcile(".xlsx", ".bin"), ".xlsx", "Mã hóa Office Vâng OLE2 thùng chứa");
         assertEquals(ResponseFileTypeDetector.reconcile(".msg", ".bin"), ".msg");
         assertEquals(ResponseFileTypeDetector.reconcile(null, ".pdf"), ".pdf");
         assertEquals(ResponseFileTypeDetector.reconcile(".pdf", (String) null), ".pdf");
     }
 
-    /** ODF/EPUB：第一个条目是未压缩的 mimetype。 */
+    /** ODF/EPUB：Mục đầu tiên không được nén mimetype。 */
     private static byte[] odf(String mimeType) throws IOException {
         byte[] content = mimeType.getBytes(StandardCharsets.US_ASCII);
         java.util.zip.CRC32 crc = new java.util.zip.CRC32();

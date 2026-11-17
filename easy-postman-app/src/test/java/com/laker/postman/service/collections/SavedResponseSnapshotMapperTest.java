@@ -175,7 +175,7 @@ public class SavedResponseSnapshotMapperTest {
     @Test
     public void shouldKeepRestorableTextAttachmentWithItsCharset() {
         java.nio.charset.Charset gbk = java.nio.charset.Charset.forName("GBK");
-        byte[] csv = "姓名,金额\n张三,10\n".getBytes(gbk);
+        byte[] csv = "Tên,số tiền\nTrương San,10\n".getBytes(gbk);
         HttpResponse response = new HttpResponse();
         response.body = new String(csv, gbk);
         response.rawBodyBytes = csv;
@@ -194,7 +194,7 @@ public class SavedResponseSnapshotMapperTest {
         assertTrue(restored.fileAttachment);
         assertFalse(restored.fileContentOmitted);
         assertEquals(restored.fileName, "orders.csv");
-        assertEquals(restored.rawBodyBytes, csv, "恢复后下载必须得到原始 GBK 字节");
+        assertEquals(restored.rawBodyBytes, csv, "Tải xuống phải là bản gốc sau khi khôi phục GBK Byte");
     }
 
     @Test
@@ -221,7 +221,7 @@ public class SavedResponseSnapshotMapperTest {
     public void shouldMigrateLegacyTextAttachmentExample() {
         SavedResponse legacy = new SavedResponse();
         legacy.setCode(200);
-        legacy.setBody("名称,数量\n");
+        legacy.setBody("tên,Số lượng\n");
         legacy.setHeaders(List.of(
                 new HttpHeader(true, "Content-Type", "text/csv; charset=GBK"),
                 new HttpHeader(true, "Content-Disposition", "attachment")));
@@ -233,7 +233,7 @@ public class SavedResponseSnapshotMapperTest {
 
         assertTrue(restored.fileAttachment);
         assertEquals(restored.fileName, "orders.csv");
-        assertEquals(restored.rawBodyBytes, "名称,数量\n".getBytes(java.nio.charset.Charset.forName("GBK")));
+        assertEquals(restored.rawBodyBytes, "tên,Số lượng\n".getBytes(java.nio.charset.Charset.forName("GBK")));
         assertFalse(restored.fileContentOmitted);
 
         legacy.setBody("a\uFFFDb");
@@ -243,11 +243,11 @@ public class SavedResponseSnapshotMapperTest {
         HttpResponse lossy = SavedResponseSnapshotMapper.toRuntimeResponse(legacy);
         assertTrue(lossy.fileAttachment);
         assertEquals(lossy.fileName, "report.txt");
-        assertNull(lossy.rawBodyBytes, "保存时已有损的正文不再还原字节");
+        assertNull(lossy.rawBodyBytes, "Byte sẽ không còn được khôi phục đối với văn bản bị hỏng khi lưu");
 
         legacy.setHeaders(List.of(new HttpHeader(true, "Content-Type", "text/csv")));
         legacy.setBody("a,b");
-        assertFalse(SavedResponseSnapshotMapper.toRuntimeResponse(legacy).fileAttachment, "非附件保持普通文本");
+        assertFalse(SavedResponseSnapshotMapper.toRuntimeResponse(legacy).fileAttachment, "Các tệp không đính kèm vẫn là văn bản thuần túy");
     }
 
     @Test
@@ -268,7 +268,7 @@ public class SavedResponseSnapshotMapperTest {
         handWritten.setBody("abc");
         handWritten.setBodySize(3);
         handWritten.setHeaders(List.of(new HttpHeader(true, "Content-Type", "application/octet-stream")));
-        assertFalse(SavedResponseSnapshotMapper.isLegacyBinaryPlaceholder(handWritten), "正文与大小一致说明是真实正文");
+        assertFalse(SavedResponseSnapshotMapper.isLegacyBinaryPlaceholder(handWritten), "Nếu văn bản và kích thước nhất quán thì có nghĩa đó là văn bản thật");
 
         SavedResponse text = new SavedResponse();
         text.setBody("{}");

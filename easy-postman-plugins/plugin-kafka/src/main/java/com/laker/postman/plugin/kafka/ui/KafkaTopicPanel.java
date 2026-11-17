@@ -115,7 +115,7 @@ public class KafkaTopicPanel extends JPanel {
     }
 
     /**
-     * 侧栏底部的连接状态：彩色圆点 + 单行文本，完整内容放到 tooltip 中避免长错误撑开侧栏。
+     * Trạng thái kết nối ở cuối thanh bên: chấm màu + Văn bản một dòng, nội dung hoàn chỉnh được đặt tooltip Tránh những sai lầm kéo dài khi mở ray bên.
      */
     public void setStatus(Supplier<Color> color, String message) {
         statusLabel.setIcon(new StatusDotIcon(color));
@@ -191,7 +191,7 @@ public class KafkaTopicPanel extends JPanel {
     }
 
     /**
-     * Topic 名称左对齐，分区数以次要颜色右对齐，窄侧栏下名称优先截断。
+     * Topic Tên được căn trái, số phân vùng được căn phải theo màu phụ và tên dưới cột bên hẹp được cắt ngắn trước.
      */
     private static final class TopicCellRenderer extends JPanel implements ListCellRenderer<KafkaTopicItem> {
         private final JLabel nameLabel = new JLabel();
@@ -211,7 +211,7 @@ public class KafkaTopicPanel extends JPanel {
             nameLabel.setText(value == null ? "" : value.name());
             nameLabel.setFont(list.getFont());
             partitionLabel.setText(value == null ? "" : t(MessageKeys.TOOLBOX_KAFKA_TOPIC_PARTITION_COUNT, value.partitionCount()));
-            // FlatLaf 只会把渲染器根组件切换为失焦选中色，子标签需自行处理，否则亮色主题下失焦选中行会白字浅底看不清
+            // FlatLaf Chỉ thành phần gốc của trình kết xuất sẽ được chuyển sang màu lựa chọn ngoài tiêu điểm và các thẻ phụ cần phải được xử lý riêng. Nếu không, đường chọn mất nét trong chủ đề màu sáng sẽ có màu trắng với nền nông và không thể nhìn rõ
             boolean focused = FlatUIUtils.isPermanentFocusOwner(list);
             Color selectionBg = focused ? list.getSelectionBackground()
                     : uiColor("List.selectionInactiveBackground", list.getSelectionBackground());

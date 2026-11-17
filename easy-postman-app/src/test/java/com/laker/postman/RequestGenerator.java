@@ -20,7 +20,7 @@ public class RequestGenerator {
     public static final int INT = 1000;
 
     public static void main(String[] args) {
-        // 构建根对象
+        // Xây dựng đối tượng gốc
         JSONArray jsonArray = new JSONArray();
         JSONObject group1 = new JSONObject();
         group1.set("type", "group");
@@ -34,9 +34,9 @@ public class RequestGenerator {
 
         group1.set("children", children);
         jsonArray.add(group1);
-        // 写入文件
+        // Viết vào tập tin
         FileUtil.writeUtf8String(jsonArray.toStringPretty(), new File(SystemUtil.getEasyPostmanPath() + "collections.json"));
-        System.out.println("✅ 已生成 " + INT + " 个请求，保存为 collections.json");
+        System.out.println("✅ Đã tạo " + INT + " yêu cầu, được lưu dưới dạng collections.json");
     }
 
     private static JSONObject generateRequest(int i) {
@@ -44,7 +44,7 @@ public class RequestGenerator {
         String method = METHODS[methodIndex];
         String url = ENDPOINTS[methodIndex];
 
-        // 创建 request 对象
+        // Tạo request đối tượng
         JSONObject request = new JSONObject();
         request.set("type", "request");
 
@@ -76,7 +76,7 @@ public class RequestGenerator {
         params.set("reqId", String.valueOf(i));
         data.set("params", params);
 
-        // 其他空对象
+        // Các đối tượng trống khác
         data.set("formData", new JSONObject());
         data.set("formFiles", new JSONObject());
         data.set("urlencoded", new JSONObject());
@@ -90,7 +90,7 @@ public class RequestGenerator {
 
         data.set("prescript", "");
 
-        // postscript 测试状态码
+        // postscript Mã trạng thái kiểm tra
         String postscript = String.format(
                 "pm.test('Status 200 for Request %d', function () { pm.response.to.have.status(200); });",
                 i

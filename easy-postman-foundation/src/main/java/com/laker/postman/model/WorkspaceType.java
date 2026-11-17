@@ -1,6 +1,6 @@
 package com.laker.postman.model;
 
-// 工作空间类型枚举
+// Bảng liệt kê loại không gian làm việc
 public enum WorkspaceType {
     LOCAL, GIT
 }

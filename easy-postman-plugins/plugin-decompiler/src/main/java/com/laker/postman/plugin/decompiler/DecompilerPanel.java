@@ -44,8 +44,8 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
 /**
- * Java反编译器面板
- * 使用CFR反编译器，支持查看JAR、ZIP、Class文件
+ * JavaBảng dịch ngược
+ * sử dụngCFRTrình dịch ngược hỗ trợ xemJAR、ZIP、Classtập tin
  *
  * @author laker
  */
@@ -69,7 +69,7 @@ public class DecompilerPanel extends JPanel {
     private DefaultTreeModel treeModel;
     private RSyntaxTextArea codeArea;
     private JLabel statusLabel;
-    private JLabel compressionInfoLabel; // 显示压缩信息的标签
+    private JLabel compressionInfoLabel; // Nhãn hiển thị thông tin nén
 
     private File currentFile;
     private transient JarFile currentJarFile;
@@ -99,7 +99,7 @@ public class DecompilerPanel extends JPanel {
     }
 
     /**
-     * 创建文件选择面板 - 优化布局和视觉效果
+     * Tạo bảng chọn tập tin - Tối ưu hóa bố cục và hiệu ứng hình ảnh
      */
     private JPanel createFileSelectionPanel() {
         JPanel wrapper = new JPanel(new BorderLayout());
@@ -152,7 +152,7 @@ public class DecompilerPanel extends JPanel {
     }
 
     /**
-     * 创建文件树面板
+     * Tạo một bảng cây tập tin
      */
     private JPanel createTreePanel() {
         JPanel panel = new JPanel(new BorderLayout(0, SECTION_GAP));
@@ -180,11 +180,11 @@ public class DecompilerPanel extends JPanel {
         fileTree.setFont(FontsUtil.getDefaultFont(Font.PLAIN));
         fileTree.setCellRenderer(new FileTreeCellRenderer());
 
-        // 单击打开文件或展开/收起目录（更灵敏）
+        // Bấm để mở tập tin hoặc mở rộng nó/Thu gọn mục lục (phản hồi nhanh hơn)
         fileTree.addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
-                // 只处理左键单击
+                // Chỉ các nhấp chuột trái được xử lý
                 if (e.getButton() == MouseEvent.BUTTON1 && e.getClickCount() == 1) {
                     TreePath path = fileTree.getPathForLocation(e.getX(), e.getY());
                     if (path != null) {
@@ -193,7 +193,7 @@ public class DecompilerPanel extends JPanel {
 
                         if (userObject instanceof FileNodeData fileData) {
                             if (fileData.isDirectory) {
-                                // 目录：单击展开/收起
+                                // Mục lục: Click để mở rộng/Bỏ đi
                                 if (fileTree.isExpanded(path)) {
                                     fileTree.collapsePath(path);
                                 } else {
@@ -201,7 +201,7 @@ public class DecompilerPanel extends JPanel {
                                 }
                                 e.consume();
                             } else {
-                                // 文件：单击打开
+                                // Tập tin: Bấm để mở
                                 handleTreeNodeClick(node);
                                 e.consume();
                             }
@@ -211,7 +211,7 @@ public class DecompilerPanel extends JPanel {
             }
         });
 
-        // 添加回车键支持
+        // Đã thêm hỗ trợ nhập phím
         fileTree.addKeyListener(new java.awt.event.KeyAdapter() {
             @Override
             public void keyPressed(java.awt.event.KeyEvent e) {
@@ -230,7 +230,7 @@ public class DecompilerPanel extends JPanel {
         ToolWindowSurfaceStyle.applyTreeScrollPaneCard(scrollPane, fileTree);
         panel.add(scrollPane, BorderLayout.CENTER);
 
-        // 为树面板添加拖拽支持
+        // Đã thêm hỗ trợ kéo vào bảng cây
         setupDragAndDrop(scrollPane);
 
         JButton expandAllBtn = createToolbarIconButton(
@@ -272,7 +272,7 @@ public class DecompilerPanel extends JPanel {
     }
 
     /**
-     * 创建代码显示面板 - 优化工具栏和布局
+     * Tạo bảng hiển thị mã - Tối ưu hóa thanh công cụ và bố cục
      */
     private JPanel createCodePanel() {
         JPanel panel = new JPanel(new BorderLayout(0, SECTION_GAP));
@@ -292,7 +292,7 @@ public class DecompilerPanel extends JPanel {
 
         panel.add(headerPanel, BorderLayout.NORTH);
 
-        // 创建代码编辑器
+        // Tạo một trình soạn thảo mã
         codeArea = new FallbackAwareRSyntaxTextArea();
         codeArea.setSyntaxEditingStyle(SyntaxConstants.SYNTAX_STYLE_JAVA);
         codeArea.setCodeFoldingEnabled(true);
@@ -300,7 +300,7 @@ public class DecompilerPanel extends JPanel {
         codeArea.setEditable(false);
         codeArea.setMargin(new Insets(10, 10, 10, 10));
 
-        // 统一加载主题、编辑器字体和缺字回退绘制
+        // Tải thống nhất các chủ đề, phông chữ soạn thảo và bản vẽ dự phòng cho các ký tự bị thiếu
         EditorThemeUtil.loadTheme(codeArea);
 
         RTextScrollPane scrollPane = new RTextScrollPane(codeArea);
@@ -309,14 +309,14 @@ public class DecompilerPanel extends JPanel {
         ToolWindowSurfaceStyle.applyFramedScrollPaneCard(scrollPane);
         panel.add(scrollPane, BorderLayout.CENTER);
 
-        // 为代码面板添加拖拽支持
+        // Đã thêm hỗ trợ kéo và thả vào bảng mã
         setupDragAndDrop(codeArea);
 
         return panel;
     }
 
     /**
-     * 创建状态栏 - 优化样式和分隔
+     * Tạo một thanh trạng thái - Tối ưu hóa kiểu dáng và sự tách biệt
      */
     private JPanel createStatusPanel() {
         JPanel panel = new JPanel(new BorderLayout(0, 4));
@@ -365,7 +365,7 @@ public class DecompilerPanel extends JPanel {
     }
 
     /**
-     * 设置拖拽支持
+     * Đặt hỗ trợ kéo và thả
      */
     private void setupDragAndDrop(JComponent component) {
         if (GraphicsEnvironment.isHeadless()) {
@@ -376,7 +376,7 @@ public class DecompilerPanel extends JPanel {
             public void dragEnter(DropTargetDragEvent dtde) {
                 if (isDragAcceptable(dtde)) {
                     dtde.acceptDrag(DnDConstants.ACTION_COPY);
-                    // 添加视觉反馈
+                    // Thêm phản hồi trực quan
                     component.putClientProperty(FlatClientProperties.OUTLINE, ModernColors.getPrimary());
                 } else {
                     dtde.rejectDrag();
@@ -385,13 +385,13 @@ public class DecompilerPanel extends JPanel {
 
             @Override
             public void dragExit(DropTargetEvent dte) {
-                // 移除视觉反馈
+                // Loại bỏ phản hồi trực quan
                 component.putClientProperty(FlatClientProperties.OUTLINE, null);
             }
 
             @Override
             public void drop(DropTargetDropEvent dtde) {
-                // 移除视觉反馈
+                // Loại bỏ phản hồi trực quan
                 component.putClientProperty(FlatClientProperties.OUTLINE, null);
 
                 try {
@@ -424,14 +424,14 @@ public class DecompilerPanel extends JPanel {
     }
 
     /**
-     * 检查拖拽的数据是否可接受
+     * Kiểm tra xem dữ liệu được kéo có được chấp nhận hay không
      */
     private boolean isDragAcceptable(DropTargetDragEvent dtde) {
         return dtde.isDataFlavorSupported(DataFlavor.javaFileListFlavor);
     }
 
     /**
-     * 浏览并选择文件
+     * Duyệt và chọn tập tin
      */
     private void browseFile() {
         SystemFileChooser fileChooser = FileChooserUtil.createOpenFileChooser(
@@ -453,7 +453,7 @@ public class DecompilerPanel extends JPanel {
     }
 
     /**
-     * 加载文件
+     * Tải tập tin
      */
     private void loadFile(File file) {
         if (file == null || !file.exists()) {
@@ -467,20 +467,20 @@ public class DecompilerPanel extends JPanel {
             return;
         }
 
-        // 关闭之前打开的文件
+        // Đóng các tập tin đã mở trước đó
         closeCurrentJar();
 
         currentFile = file;
         filePathField.setText(file.getAbsolutePath());
 
-        // 在后台线程中加载文件
+        // Tải tập tin trong một chủ đề nền
         SwingWorker<Void, Void> worker = new SwingWorker<>() {
             @Override
             protected Void doInBackground() {
                 statusLabel.setText(DecompilerI18n.t(MessageKeys.TOOLBOX_DECOMPILER_LOADING));
                 try {
                     if (fileName.endsWith(JAR_EXTENSION) || fileName.endsWith(WAR_EXTENSION)) {
-                        // JAR 和 WAR 都使用 JarFile 加载（WAR 本质是特殊的 JAR）
+                        // JAR và WAR Sử dụng cả hai JarFile Tải(WAR Bản chất là đặc biệt JAR）
                         loadJarFile(file);
                     } else if (fileName.endsWith(ZIP_EXTENSION)) {
                         loadZipFile(file);
@@ -508,41 +508,41 @@ public class DecompilerPanel extends JPanel {
     }
 
     /**
-     * 加载JAR文件
+     * trọng tảiJARtập tin
      */
     private void loadJarFile(File file) throws IOException {
         currentJarFile = new JarFile(file);
         classFileCache.clear();
 
-        // 为根节点创建FileNodeData
+        // Được tạo cho nút gốcFileNodeData
         FileNodeData rootData = new FileNodeData(file.getName(), true, false);
         rootData.fullPath = file.getName();
-        rootData.size = file.length(); // 设置为 JAR 文件实际大小（压缩后）
+        rootData.size = file.length(); // Đặt thành  JAR Kích thước file thực tế (sau khi nén)
         DefaultMutableTreeNode root = new DefaultMutableTreeNode(rootData);
         Map<String, DefaultMutableTreeNode> packageNodes = new HashMap<>();
 
-        long uncompressedTotal = 0; // 统计未压缩总大小
+        long uncompressedTotal = 0; // Thống kê tổng kích thước không nén
         Enumeration<JarEntry> entries = currentJarFile.entries();
         while (entries.hasMoreElements()) {
             JarEntry entry = entries.nextElement();
             String entryName = entry.getName();
 
-            // 缓存所有非目录文件（包括class、jar/zip、文本文件以及其他未知类型文件）
+            // Lưu trữ tất cả các tệp không có thư mục (bao gồm class、jar/zip、tệp văn bản và các loại tệp không xác định khác)
             if (!entry.isDirectory()) {
                 try (InputStream is = currentJarFile.getInputStream(entry)) {
                     classFileCache.put(entryName, is.readAllBytes());
                 }
-                uncompressedTotal += entry.getSize(); // 累加未压缩大小
+                uncompressedTotal += entry.getSize(); // Kích thước không nén tích lũy
             }
 
-            // 注意：entry.getSize() 是未压缩大小，所以子文件大小之和会大于JAR文件本身
+            // Lưu ý:entry.getSize() là kích thước chưa nén nên tổng kích thước của các file con sẽ lớn hơnJARBản thân tập tin
             addEntryToTree(root, packageNodes, entryName, entry.isDirectory(), entry.getSize());
         }
 
-        // 计算所有子目录的大小（不修改根节点，因为根节点已设置为实际JAR大小）
+        // Tính kích thước của tất cả các thư mục con (không sửa đổi nút gốc, vì nút gốc đã được đặt thành thựcJARkích thước)
         calculateDirectorySizesExceptRoot(root);
 
-        // 计算压缩率
+        // Tính tỷ số nén
         long compressedSize = file.length();
         final long finalUncompressedTotal = uncompressedTotal;
 
@@ -550,7 +550,7 @@ public class DecompilerPanel extends JPanel {
             treeModel.setRoot(root);
             expandTree(fileTree, 2);
 
-            // 在树顶部显示压缩信息（始终可见）
+            // Hiển thị thông tin nén ở đầu cây (luôn hiển thị)
             if (finalUncompressedTotal > 0) {
                 double compressionRatio = (1 - (double) compressedSize / finalUncompressedTotal) * 100;
                 String compressionRatioStr = String.format("%.1f%%", compressionRatio);
@@ -576,41 +576,41 @@ public class DecompilerPanel extends JPanel {
     }
 
     /**
-     * 加载ZIP文件
+     * trọng tảiZIPtập tin
      */
     private void loadZipFile(File file) throws IOException {
         currentZipFile = new ZipFile(file);
         classFileCache.clear();
 
-        // 为根节点创建FileNodeData
+        // Được tạo cho nút gốcFileNodeData
         FileNodeData rootData = new FileNodeData(file.getName(), true, false);
         rootData.fullPath = file.getName();
-        rootData.size = file.length(); // 设置为 ZIP 文件实际大小（压缩后）
+        rootData.size = file.length(); // Đặt thành  ZIP Kích thước file thực tế (sau khi nén)
         DefaultMutableTreeNode root = new DefaultMutableTreeNode(rootData);
         Map<String, DefaultMutableTreeNode> packageNodes = new HashMap<>();
 
-        long uncompressedTotal = 0; // 统计未压缩总大小
+        long uncompressedTotal = 0; // Thống kê tổng kích thước không nén
         Enumeration<? extends ZipEntry> entries = currentZipFile.entries();
         while (entries.hasMoreElements()) {
             ZipEntry entry = entries.nextElement();
             String entryName = entry.getName();
 
-            // 缓存所有非目录文件（包括class、jar/zip、文本文件以及其他未知类型文件）
+            // Lưu trữ tất cả các tệp không có thư mục (bao gồm class、jar/zip、tệp văn bản và các loại tệp không xác định khác)
             if (!entry.isDirectory()) {
                 try (InputStream is = currentZipFile.getInputStream(entry)) {
                     classFileCache.put(entryName, is.readAllBytes());
                 }
-                uncompressedTotal += entry.getSize(); // 累加未压缩大小
+                uncompressedTotal += entry.getSize(); // Kích thước không nén tích lũy
             }
 
-            // 注意：entry.getSize() 是未压缩大小，所以子文件大小之和会大于ZIP文件本身
+            // Lưu ý:entry.getSize() là kích thước chưa nén nên tổng kích thước của các file con sẽ lớn hơnZIPBản thân tập tin
             addEntryToTree(root, packageNodes, entryName, entry.isDirectory(), entry.getSize());
         }
 
-        // 计算所有子目录的大小（不修改根节点，因为根节点已设置为实际ZIP大小）
+        // Tính kích thước của tất cả các thư mục con (không sửa đổi nút gốc, vì nút gốc đã được đặt thành thựcZIPkích thước)
         calculateDirectorySizesExceptRoot(root);
 
-        // 计算压缩率
+        // Tính tỷ số nén
         long compressedSize = file.length();
         final long finalUncompressedTotal = uncompressedTotal;
 
@@ -618,7 +618,7 @@ public class DecompilerPanel extends JPanel {
             treeModel.setRoot(root);
             expandTree(fileTree, 2);
 
-            // 在树顶部显示压缩信息（始终可见）
+            // Hiển thị thông tin nén ở đầu cây (luôn hiển thị)
             if (finalUncompressedTotal > 0) {
                 double compressionRatio = (1 - (double) compressedSize / finalUncompressedTotal) * 100;
                 String compressionRatioStr = String.format("%.1f%%", compressionRatio);
@@ -645,7 +645,7 @@ public class DecompilerPanel extends JPanel {
 
 
     /**
-     * 加载单个Class文件
+     * Tải đơnClasstập tin
      */
     private void loadClassFile(File file) throws IOException {
         classFileCache.clear();
@@ -662,7 +662,7 @@ public class DecompilerPanel extends JPanel {
     }
 
     /**
-     * 添加条目到树中
+     * Thêm các mục vào cây
      */
     private void addEntryToTree(DefaultMutableTreeNode root, Map<String, DefaultMutableTreeNode> packageNodes,
                                 String entryName, boolean isDirectory, long size) {
@@ -674,7 +674,7 @@ public class DecompilerPanel extends JPanel {
             String part = parts[i];
             if (part.isEmpty()) continue;
 
-            // 构建当前节点的完整路径
+            // Xây dựng đường dẫn đầy đủ của nút hiện tại
             if (!currentPath.isEmpty()) {
                 currentPath.append("/");
             }
@@ -688,14 +688,14 @@ public class DecompilerPanel extends JPanel {
                     part.toLowerCase().endsWith(ZIP_EXTENSION) ||
                     part.toLowerCase().endsWith(WAR_EXTENSION));
 
-            // 检查节点是否已存在
+            // Kiểm tra xem nút đã tồn tại chưa
             DefaultMutableTreeNode node = packageNodes.get(nodePath);
             if (node == null) {
-                // 创建新节点
+                // Tạo nút mới
                 FileNodeData nodeData = new FileNodeData(part, !isFile, isClassFile);
                 nodeData.fullPath = nodePath;
                 nodeData.isJarFile = isJarFile;
-                // 只为文件设置大小，目录大小稍后计算
+                // Chỉ đặt kích thước cho tệp, kích thước thư mục sẽ được tính sau
                 if (isFile && size >= 0) {
                     nodeData.size = size;
                 }
@@ -704,13 +704,13 @@ public class DecompilerPanel extends JPanel {
                 parentNode.add(node);
             }
 
-            // 移动到下一层
+            // Chuyển sang cấp độ tiếp theo
             parentNode = node;
         }
     }
 
     /**
-     * 递归计算目录大小（所有子文件的总和）
+     * Tính toán đệ quy kích thước thư mục (tổng của tất cả các tệp con)
      */
     private long calculateDirectorySizes(DefaultMutableTreeNode node) {
         Object userObject = node.getUserObject();
@@ -718,29 +718,29 @@ public class DecompilerPanel extends JPanel {
             return 0;
         }
 
-        // 如果是文件，直接返回其大小
+        // Nếu đó là một tập tin, kích thước của nó sẽ được trả về trực tiếp
         if (!fileData.isDirectory) {
             return fileData.size;
         }
 
-        // 如果是目录，递归计算所有子节点的大小
+        // Nếu đó là một thư mục, kích thước của tất cả các nút con được tính toán đệ quy
         long totalSize = 0;
         for (int i = 0; i < node.getChildCount(); i++) {
             DefaultMutableTreeNode childNode = (DefaultMutableTreeNode) node.getChildAt(i);
             totalSize += calculateDirectorySizes(childNode);
         }
 
-        // 设置目录的总大小
+        // Đặt tổng kích thước của thư mục
         fileData.size = totalSize;
         return totalSize;
     }
 
     /**
-     * 递归计算所有子目录大小，但不修改根节点
-     * （用于JAR/ZIP文件，根节点显示实际文件大小，子节点显示未压缩大小）
+     * Tính toán đệ quy kích thước của tất cả các thư mục con mà không sửa đổi nút gốc
+     * （Được sử dụng choJAR/ZIPtệp, nút gốc hiển thị kích thước tệp thực tế và các nút con hiển thị kích thước không nén)
      */
     private void calculateDirectorySizesExceptRoot(DefaultMutableTreeNode root) {
-        // 只计算根节点的直接子节点及其后代
+        // Chỉ có nút con trực tiếp của nút gốc và con cháu của chúng mới được tính
         for (int i = 0; i < root.getChildCount(); i++) {
             DefaultMutableTreeNode childNode = (DefaultMutableTreeNode) root.getChildAt(i);
             calculateDirectorySizes(childNode);
@@ -748,7 +748,7 @@ public class DecompilerPanel extends JPanel {
     }
 
     /**
-     * 处理树节点点击
+     * Xử lý các lần nhấp chuột vào nút cây
      */
     private void handleTreeNodeClick(DefaultMutableTreeNode node) {
         Object userObject = node.getUserObject();
@@ -757,23 +757,23 @@ public class DecompilerPanel extends JPanel {
             if (fileData.isClassFile) {
                 decompileAndShow(fileData.fullPath != null ? fileData.fullPath : fileData.name);
             } else if (fileData.isJarFile) {
-                // 处理嵌套的JAR/ZIP文件
+                // Xử lý những cái lồng nhauJAR/ZIPtập tin
                 loadNestedJar(fileData.fullPath, node);
             } else if (!fileData.isDirectory) {
-                // 尝试显示文本文件
+                // Hãy thử hiển thị một tập tin văn bản
                 showTextFile(fileData.fullPath != null ? fileData.fullPath : fileData.name);
             }
         } else if (userObject instanceof String fileName && fileName.endsWith(CLASS_EXTENSION)) {
-            // 单个class文件的情况
+            // đơnclassTrạng thái của tập tin
             decompileAndShow(fileName);
         }
     }
 
     /**
-     * 加载嵌套的JAR/ZIP文件
+     * Tải lồng nhauJAR/ZIPtập tin
      */
     private void loadNestedJar(String jarPath, DefaultMutableTreeNode parentNode) {
-        // 如果节点已经有子节点，说明已经展开过，直接返回
+        // Nếu nút đã có nút con, điều đó có nghĩa là nút đó đã được mở rộng và trả về trực tiếp
         if (parentNode.getChildCount() > 0) {
             return;
         }
@@ -790,12 +790,12 @@ public class DecompilerPanel extends JPanel {
                 try {
                     statusLabel.setText(DecompilerI18n.t(MessageKeys.TOOLBOX_DECOMPILER_LOADING) + ": " + jarPath);
 
-                    // 创建临时文件保存嵌套的JAR
+                    // Tạo tập tin tạm thời để lưu lồng nhauJAR
                     File tempJar = Files.createTempFile("nested-jar-", ".jar").toFile();
                     tempJar.deleteOnExit();
                     Files.write(tempJar.toPath(), jarBytes);
 
-                    // 使用JarFile读取嵌套的JAR
+                    // sử dụngJarFileĐọc lồng nhauJAR
                     Map<String, DefaultMutableTreeNode> packageNodes = new HashMap<>();
                     try (JarFile nestedJar = new JarFile(tempJar)) {
                         Enumeration<JarEntry> entries = nestedJar.entries();
@@ -804,23 +804,23 @@ public class DecompilerPanel extends JPanel {
                             String entryName = entry.getName();
                             String fullEntryPath = jarPath + "!/" + entryName;
 
-                            // 缓存所有非目录文件（包括class、jar/zip、文本文件以及其他未知类型文件）
+                            // Lưu trữ tất cả các tệp không có thư mục (bao gồm class、jar/zip、tệp văn bản và các loại tệp không xác định khác)
                             if (!entry.isDirectory()) {
                                 try (InputStream is = nestedJar.getInputStream(entry)) {
                                     classFileCache.put(fullEntryPath, is.readAllBytes());
                                 }
                             }
 
-                            // 添加到树中（相对于当前JAR节点）
+                            // Thêm vào cây (so với hiện tạiJARnút)
                             addNestedEntryToTree(parentNode, packageNodes, entryName,
                                     fullEntryPath, entry.isDirectory(), entry.getSize());
                         }
                     }
 
-                    // 计算嵌套JAR中所有目录的大小
+                    // Tính toán lồng nhauJARKích thước của tất cả các thư mục trong
                     calculateDirectorySizes(parentNode);
 
-                    // 删除临时文件
+                    // Xóa các tập tin tạm thời
                     Files.deleteIfExists(tempJar.toPath());
 
                 } catch (Exception e) {
@@ -834,9 +834,9 @@ public class DecompilerPanel extends JPanel {
 
             @Override
             protected void done() {
-                // 刷新树显示
+                // Làm mới màn hình cây
                 treeModel.nodeStructureChanged(parentNode);
-                // 展开节点
+                // Mở rộng nút
                 TreePath path = new TreePath(parentNode.getPath());
                 fileTree.expandPath(path);
                 statusLabel.setText(DecompilerI18n.t(MessageKeys.TOOLBOX_DECOMPILER_READY));
@@ -846,7 +846,7 @@ public class DecompilerPanel extends JPanel {
     }
 
     /**
-     * 添加嵌套JAR的条目到树中
+     * Thêm lồng nhauJARcác mục vào trong cây
      */
     private void addNestedEntryToTree(DefaultMutableTreeNode parentNode,
                                       Map<String, DefaultMutableTreeNode> packageNodes,
@@ -859,7 +859,7 @@ public class DecompilerPanel extends JPanel {
             String part = parts[i];
             if (part.isEmpty()) continue;
 
-            // 构建当前节点的相对路径
+            // Xây dựng một đường dẫn tương đối đến nút hiện tại
             if (!currentPath.isEmpty()) {
                 currentPath.append("/");
             }
@@ -873,15 +873,15 @@ public class DecompilerPanel extends JPanel {
                     part.toLowerCase().endsWith(ZIP_EXTENSION) ||
                     part.toLowerCase().endsWith(WAR_EXTENSION));
 
-            // 检查节点是否已存在
+            // Kiểm tra xem nút đã tồn tại chưa
             DefaultMutableTreeNode node = packageNodes.get(nodePath);
             if (node == null) {
-                // 创建新节点
+                // Tạo nút mới
                 FileNodeData nodeData = new FileNodeData(part, !isFile, isClassFile);
-                // 使用完整路径（包含父JAR路径）
+                // Sử dụng đường dẫn đầy đủ (bao gồm cả parentJARcon đường)
                 nodeData.fullPath = fullPath.substring(0, fullPath.lastIndexOf("!/") + 2) + nodePath;
                 nodeData.isJarFile = isJarFile;
-                // 只为文件设置大小，目录大小稍后计算
+                // Chỉ đặt kích thước cho tệp, kích thước thư mục sẽ được tính sau
                 if (isFile && size >= 0) {
                     nodeData.size = size;
                 }
@@ -890,13 +890,13 @@ public class DecompilerPanel extends JPanel {
                 currentParent.add(node);
             }
 
-            // 移动到下一层
+            // Chuyển sang cấp độ tiếp theo
             currentParent = node;
         }
     }
 
     /**
-     * 反编译并显示代码
+     * Dịch ngược và hiển thị mã
      */
     private void decompileAndShow(String className) {
         byte[] classBytes = classFileCache.get(className);
@@ -906,7 +906,7 @@ public class DecompilerPanel extends JPanel {
             return;
         }
 
-        // 特殊处理：module-info.class 是 Java 9+ 的模块描述符，CFR 无法反编译
+        // Xử lý đặc biệt:module-info.class Vâng Java 9+ mô tả mô-đun,CFR Không thể dịch ngược được
         if (className.toLowerCase().endsWith("module-info.class") ||
                 className.toLowerCase().contains("/module-info.class")) {
             codeArea.setSyntaxEditingStyle(SyntaxConstants.SYNTAX_STYLE_JAVA);
@@ -943,12 +943,12 @@ public class DecompilerPanel extends JPanel {
             protected void done() {
                 try {
                     String code = get();
-                    // 设置 Java 语法高亮（反编译后的代码是 Java）
+                    // cài đặt Java Syntax highlighting (the decompiled code is Java）
                     codeArea.setSyntaxEditingStyle(SyntaxConstants.SYNTAX_STYLE_JAVA);
                     codeArea.setText(code);
                     codeArea.setCaretPosition(0);
 
-                    // 显示类信息
+                    // Hiển thị thông tin lớp học
                     String classInfo = extractClassInfo(classBytes);
                     statusLabel.setText(classInfo);
                 } catch (Exception e) {
@@ -961,14 +961,14 @@ public class DecompilerPanel extends JPanel {
     }
 
     /**
-     * 使用CFR反编译Class字节码
+     * sử dụngCFRDịch ngượcClassMã byte
      */
     private String decompileClass(byte[] classBytes, String className) {
         try {
-            // 创建临时目录保存class文件
+            // Tạo một thư mục tạm thời để lưuclasstập tin
             File tempDir = Files.createTempDirectory("cfr-decompile").toFile();
 
-            // 保存 class 文件
+            // cứu class tập tin
             File classFile = new File(tempDir, className);
             File parentDir = classFile.getParentFile();
             if (parentDir != null && !parentDir.exists() && !parentDir.mkdirs()) {
@@ -976,34 +976,34 @@ public class DecompilerPanel extends JPanel {
             }
             Files.write(classFile.toPath(), classBytes);
 
-            // 创建输出目录
+            // Tạo một thư mục đầu ra
             File outputDir = new File(tempDir, "output");
             if (!outputDir.mkdirs() && !outputDir.exists()) {
                 log.warn("Failed to create output directory: {}", outputDir);
             }
 
-            // CFR配置 - 输出到文件
+            // CFRcấu hình - Xuất ra tập tin
             Map<String, String> options = new HashMap<>();
-            options.put("outputpath", outputDir.getAbsolutePath());  // 使用 outputpath 而不是 outputdir
-            options.put("showversion", "false");  // 不显示版本信息
-            options.put("hideutf", "false");      // 显示 UTF-8 字符
-            options.put("innerclasses", "true");  // 反编译内部类
-            options.put("skipbatchinnerclasses", "false");  // 不跳过批处理内部类
+            options.put("outputpath", outputDir.getAbsolutePath());  // sử dụng outputpath Thay vào đó outputdir
+            options.put("showversion", "false");  // Không hiển thị thông tin phiên bản
+            options.put("hideutf", "false");      // trình diễn UTF-8 nhân vật
+            options.put("innerclasses", "true");  // Dịch ngược các lớp bên trong
+            options.put("skipbatchinnerclasses", "false");  // Đừng bỏ qua việc phân nhóm các lớp bên trong
 
             log.debug("CFR decompiling: {} to {}", classFile.getAbsolutePath(), outputDir.getAbsolutePath());
 
-            // 执行反编译
+            // Thực hiện dịch ngược
             CfrDriver driver = new CfrDriver.Builder()
                     .withOptions(options)
                     .build();
             driver.analyse(Collections.singletonList(classFile.getAbsolutePath()));
 
-            // 读取反编译后的 Java 文件
+            // Đọc phiên bản đã dịch ngược Java tập tin
             String result = readDecompiledFile(outputDir, className);
 
             log.debug("Decompilation result length: {}", result.length());
 
-            // 清理临时文件
+            // Làm sạch các tập tin tạm thời
             deleteDirectory(tempDir);
 
             return !result.isEmpty() ? result : "// Failed to decompile: No output from CFR";
@@ -1015,22 +1015,22 @@ public class DecompilerPanel extends JPanel {
     }
 
     /**
-     * 从输出目录读取反编译后的 Java 文件
+     * Đọc phiên bản đã dịch ngược từ thư mục đầu ra Java tập tin
      */
     private String readDecompiledFile(File outputDir, String className) {
         try {
             log.debug("Reading decompiled file for class: {} from dir: {}", className, outputDir.getAbsolutePath());
 
-            // 处理嵌套 JAR 路径：BOOT-INF/lib/xxx.jar!/com/example/Test.class
-            // 提取实际的类路径（!/ 之后的部分）
+            // Xử lý việc lồng nhau JAR con đường:BOOT-INF/lib/xxx.jar!/com/example/Test.class
+            // Trích xuất đường dẫn lớp thực tế (!/ các phần tiếp theo)
             String actualClassName = className;
             if (className.contains("!/")) {
                 actualClassName = className.substring(className.lastIndexOf("!/") + 2);
                 log.debug("Detected nested JAR path, extracted actual class: {}", actualClassName);
             }
 
-            // 将 className 转换为文件路径
-            // 例如: com/example/Test.class -> com/example/Test.java
+            // Sẽ className Chuyển đổi sang đường dẫn tập tin
+            // Ví dụ: com/example/Test.class -> com/example/Test.java
             String javaFileName = actualClassName.replace(CLASS_EXTENSION, JAVA_EXTENSION);
             File javaFile = new File(outputDir, javaFileName);
 
@@ -1039,23 +1039,23 @@ public class DecompilerPanel extends JPanel {
             if (javaFile.exists()) {
                 log.debug("Found Java file directly at expected path");
                 String content = Files.readString(javaFile.toPath(), StandardCharsets.UTF_8);
-                // 清理可能的调试信息
+                // Dọn dẹp thông tin gỡ lỗi có thể
                 return cleanupDecompiledCode(content);
             }
 
-            // 如果直接路径不存在，尝试在输出目录中查找 .java 文件
+            // Nếu đường dẫn trực tiếp không tồn tại, hãy thử tìm trong thư mục đầu ra .java tập tin
             log.debug("Java file not found at expected path, searching in output directory...");
             File[] javaFiles = findJavaFiles(outputDir);
             log.debug("Found {} Java files in output directory", javaFiles.length);
 
             if (javaFiles.length > 0) {
                 log.debug("Using first found Java file: {}", javaFiles[0].getAbsolutePath());
-                // 返回第一个找到的 Java 文件
+                // Trả về cái đầu tiên được tìm thấy Java tập tin
                 String content = Files.readString(javaFiles[0].toPath(), StandardCharsets.UTF_8);
                 return cleanupDecompiledCode(content);
             }
 
-            // 列出输出目录内容以便调试
+            // Liệt kê nội dung thư mục đầu ra cho mục đích gỡ lỗi
             log.debug("Output directory contents:");
             listDirectoryContents(outputDir, "  ");
 
@@ -1068,7 +1068,7 @@ public class DecompilerPanel extends JPanel {
     }
 
     /**
-     * 列出目录内容（用于调试）
+     * Liệt kê nội dung thư mục (để gỡ lỗi)
      */
     private void listDirectoryContents(File dir, String indent) {
         File[] files = dir.listFiles();
@@ -1083,7 +1083,7 @@ public class DecompilerPanel extends JPanel {
     }
 
     /**
-     * 递归查找目录中的所有 .java 文件
+     * Tìm kiếm đệ quy tất cả các mục trong một thư mục .java tập tin
      */
     private File[] findJavaFiles(File dir) {
         if (!dir.isDirectory()) {
@@ -1096,7 +1096,7 @@ public class DecompilerPanel extends JPanel {
     }
 
     /**
-     * 递归查找 Java 文件
+     * Tìm kiếm đệ quy Java tập tin
      */
     private void findJavaFilesRecursive(File dir, List<File> javaFiles) {
         File[] files = dir.listFiles();
@@ -1112,10 +1112,10 @@ public class DecompilerPanel extends JPanel {
     }
 
     /**
-     * 清理反编译后的代码，移除调试信息
+     * Làm sạch mã đã dịch ngược và xóa thông tin gỡ lỗi
      */
     private String cleanupDecompiledCode(String code) {
-        // 按行分割
+        // Chia theo hàng
         String[] lines = code.split("\n");
         StringBuilder cleaned = new StringBuilder();
         boolean startedOutput = false;
@@ -1123,17 +1123,17 @@ public class DecompilerPanel extends JPanel {
         for (String line : lines) {
             String trimmed = line.trim();
 
-            // 跳过开头的调试信息行
+            // Bỏ qua các dòng thông tin gỡ lỗi hàng đầu
             if (!startedOutput && isDebugLine(trimmed)) {
                 continue;
             }
 
-            // 一旦遇到非调试信息的内容，就开始输出
+            // Khi gặp thông tin không gỡ lỗi, đầu ra sẽ bắt đầu
             if (!startedOutput && !trimmed.isEmpty() && !isDebugLine(trimmed)) {
                 startedOutput = true;
             }
 
-            // 开始输出后，保留所有内容（包括空行）
+            // Khi đầu ra bắt đầu, hãy giữ mọi thứ (kể cả các dòng trống)
             if (startedOutput) {
                 cleaned.append(line).append("\n");
             }
@@ -1143,7 +1143,7 @@ public class DecompilerPanel extends JPanel {
     }
 
     /**
-     * 判断是否为调试信息行
+     * Xác định xem đó có phải là dòng thông tin gỡ lỗi hay không
      */
     private boolean isDebugLine(String trimmed) {
         return trimmed.startsWith("Analysing ") ||
@@ -1153,7 +1153,7 @@ public class DecompilerPanel extends JPanel {
     }
 
     /**
-     * 提取类信息（版本号等）
+     * Trích xuất thông tin lớp (số phiên bản, v.v.)
      */
     private String extractClassInfo(byte[] classBytes) {
         if (classBytes.length < 8) {
@@ -1161,7 +1161,7 @@ public class DecompilerPanel extends JPanel {
         }
 
         try {
-            // Class文件格式: magic(4) + minor(2) + major(2)
+            // ClassĐịnh dạng tập tin: magic(4) + minor(2) + major(2)
             int major = ((classBytes[6] & 0xFF) << 8) | (classBytes[7] & 0xFF);
             String javaVersion = getJavaVersion(major);
 
@@ -1173,18 +1173,18 @@ public class DecompilerPanel extends JPanel {
     }
 
     /**
-     * 显示文本文件内容
+     * Hiển thị nội dung tập tin văn bản
      */
     private void showTextFile(String fileName) {
         try {
             String content = null;
 
-            // 优先从缓存中读取（支持嵌套 JAR 中的文件）
+            // Đọc từ bộ đệm trước (hỗ trợ lồng nhau JAR các tập tin trong )
             byte[] cachedBytes = classFileCache.get(fileName);
             if (cachedBytes != null) {
                 content = new String(cachedBytes, StandardCharsets.UTF_8);
             }
-            // 从当前打开的 JAR 文件中读取
+            // Mở từ cái hiện tại JAR Đọc từ tập tin
             else if (currentJarFile != null) {
                 JarEntry entry = currentJarFile.getJarEntry(fileName);
                 if (entry != null) {
@@ -1193,7 +1193,7 @@ public class DecompilerPanel extends JPanel {
                     }
                 }
             }
-            // 从当前打开的 ZIP 文件中读取
+            // Mở từ cái hiện tại ZIP Đọc từ tập tin
             else if (currentZipFile != null) {
                 ZipEntry entry = currentZipFile.getEntry(fileName);
                 if (entry != null) {
@@ -1219,11 +1219,11 @@ public class DecompilerPanel extends JPanel {
     }
 
     /**
-     * 获取语法高亮样式
+     * Nhận kiểu đánh dấu cú pháp
      */
     private String getSyntaxStyle(String fileName) {
         String name = fileName.toLowerCase();
-        // .java 和 .class 都使用 Java 语法高亮（.class 反编译后是 Java 代码）
+        // .java và .class Sử dụng cả hai Java Syntax highlighting (.class Sau khi dịch ngược nó là Java mã số)
         if (name.endsWith(JAVA_EXTENSION) || name.endsWith(CLASS_EXTENSION)) {
             return SyntaxConstants.SYNTAX_STYLE_JAVA;
         }
@@ -1237,7 +1237,7 @@ public class DecompilerPanel extends JPanel {
     }
 
     /**
-     * 复制代码到剪贴板
+     * Sao chép mã vào clipboard
      */
     private void copyCode() {
         String code = codeArea.getText();
@@ -1251,37 +1251,37 @@ public class DecompilerPanel extends JPanel {
 
 
     /**
-     * 清空所有内容
+     * Xóa tất cả nội dung
      */
     private void clearAll() {
-        // 关闭当前打开的文件
+        // Đóng tập tin hiện đang mở
         closeCurrentJar();
 
-        // 清空文件路径
+        // Xóa đường dẫn tập tin
         currentFile = null;
         filePathField.setText("");
 
-        // 清空代码区域
+        // Xóa vùng mã
         codeArea.setText("");
 
-        // 清空压缩信息
+        // Xóa thông tin nén
         if (compressionInfoLabel != null) {
             compressionInfoLabel.setText("");
             compressionInfoLabel.setToolTipText(null);
         }
 
-        // 重置树
+        // Đặt lại cây
         DefaultMutableTreeNode root = new DefaultMutableTreeNode(DecompilerI18n.t(MessageKeys.TOOLBOX_DECOMPILER_NO_FILE));
         treeModel.setRoot(root);
 
-        // 更新状态
+        // Cập nhật trạng thái
         statusLabel.setText(DecompilerI18n.t(MessageKeys.TOOLBOX_DECOMPILER_READY));
 
         NotificationCenter.showSuccess(DecompilerI18n.t(MessageKeys.TOOLBOX_DECOMPILER_CLEARED));
     }
 
     /**
-     * 关闭当前打开的JAR/ZIP文件
+     * Đóng cái hiện đang mởJAR/ZIPtập tin
      */
     private void closeCurrentJar() {
         try {
@@ -1300,7 +1300,7 @@ public class DecompilerPanel extends JPanel {
     }
 
     /**
-     * 格式化文件大小
+     * Định dạng kích thước tập tin
      */
     private String formatFileSize(long size) {
         if (size < 1024) return size + " " + DecompilerI18n.t(MessageKeys.TOOLBOX_DECOMPILER_BYTES);
@@ -1309,7 +1309,7 @@ public class DecompilerPanel extends JPanel {
     }
 
     /**
-     * 获取Java版本号
+     * LấyJavaSố phiên bản
      */
     private String getJavaVersion(int majorVersion) {
         return switch (majorVersion) {
@@ -1339,7 +1339,7 @@ public class DecompilerPanel extends JPanel {
     }
 
     /**
-     * 展开树到指定层级
+     * Mở rộng cây đến mức quy định
      */
     private void expandTree(JTree tree, int level) {
         DefaultMutableTreeNode root = (DefaultMutableTreeNode) tree.getModel().getRoot();
@@ -1357,7 +1357,7 @@ public class DecompilerPanel extends JPanel {
     }
 
     /**
-     * 收起整个树
+     * Nhét toàn bộ cây vào
      */
     private void collapseTree(JTree tree) {
         for (int i = tree.getRowCount() - 1; i >= 1; i--) {
@@ -1366,7 +1366,7 @@ public class DecompilerPanel extends JPanel {
     }
 
     /**
-     * 按名称排序树节点
+     * Sắp xếp các nút cây theo tên
      */
     private void sortTreeByName() {
         DefaultMutableTreeNode root = (DefaultMutableTreeNode) treeModel.getRoot();
@@ -1377,46 +1377,46 @@ public class DecompilerPanel extends JPanel {
     }
 
     /**
-     * 递归按名称排序节点的子节点
+     * Sắp xếp đệ quy các nút con của nút theo tên
      */
     private void sortNodeByName(DefaultMutableTreeNode node) {
         if (node.getChildCount() == 0) {
             return;
         }
 
-        // 获取所有子节点
+        // Nhận tất cả các nút con
         List<DefaultMutableTreeNode> children = new ArrayList<>();
         for (int i = 0; i < node.getChildCount(); i++) {
             children.add((DefaultMutableTreeNode) node.getChildAt(i));
         }
 
-        // 按名称排序（目录优先，然后按名称字母顺序）
+        // Sắp xếp theo tên (thư mục đầu tiên, sau đó theo thứ tự bảng chữ cái tên)
         children.sort((n1, n2) -> {
             Object o1 = n1.getUserObject();
             Object o2 = n2.getUserObject();
 
             if (o1 instanceof FileNodeData f1 && o2 instanceof FileNodeData f2) {
-                // 目录排在文件前面
+                // Thư mục có trước tập tin
                 if (f1.isDirectory != f2.isDirectory) {
                     return f1.isDirectory ? -1 : 1;
                 }
-                // 同类型按名称排序
+                // Các loại giống nhau được sắp xếp theo tên
                 return f1.name.compareToIgnoreCase(f2.name);
             }
             return 0;
         });
 
-        // 移除所有子节点并按排序后的顺序重新添加
+        // Xóa tất cả các nút con và thêm chúng trở lại theo thứ tự được sắp xếp
         node.removeAllChildren();
         for (DefaultMutableTreeNode child : children) {
             node.add(child);
-            // 递归排序子节点
+            // Sắp xếp các nút con theo cách đệ quy
             sortNodeByName(child);
         }
     }
 
     /**
-     * 按大小排序树节点
+     * Sắp xếp các nút cây theo kích thước
      */
     private void sortTreeBySize() {
         DefaultMutableTreeNode root = (DefaultMutableTreeNode) treeModel.getRoot();
@@ -1427,46 +1427,46 @@ public class DecompilerPanel extends JPanel {
     }
 
     /**
-     * 递归按大小排序节点的子节点
+     * Sắp xếp đệ quy các nút con của nút theo kích thước
      */
     private void sortNodeBySize(DefaultMutableTreeNode node) {
         if (node.getChildCount() == 0) {
             return;
         }
 
-        // 获取所有子节点
+        // Nhận tất cả các nút con
         List<DefaultMutableTreeNode> children = new ArrayList<>();
         for (int i = 0; i < node.getChildCount(); i++) {
             children.add((DefaultMutableTreeNode) node.getChildAt(i));
         }
 
-        // 按大小排序（降序，大文件在前）
+        // Sắp xếp theo kích thước (giảm dần, tệp lớn trước)
         children.sort((n1, n2) -> {
             Object o1 = n1.getUserObject();
             Object o2 = n2.getUserObject();
 
             if (o1 instanceof FileNodeData f1 && o2 instanceof FileNodeData f2) {
-                // 目录排在文件前面
+                // Thư mục có trước tập tin
                 if (f1.isDirectory != f2.isDirectory) {
                     return f1.isDirectory ? -1 : 1;
                 }
-                // 同类型按大小降序排序
+                // Các loại giống nhau được sắp xếp theo thứ tự kích thước giảm dần
                 return Long.compare(f2.size, f1.size);
             }
             return 0;
         });
 
-        // 移除所有子节点并按排序后的顺序重新添加
+        // Xóa tất cả các nút con và thêm chúng trở lại theo thứ tự được sắp xếp
         node.removeAllChildren();
         for (DefaultMutableTreeNode child : children) {
             node.add(child);
-            // 递归排序子节点
+            // Sắp xếp các nút con theo cách đệ quy
             sortNodeBySize(child);
         }
     }
 
     /**
-     * 删除目录
+     * Xóa thư mục
      */
     private void deleteDirectory(File dir) {
         if (dir.isDirectory()) {
@@ -1485,7 +1485,7 @@ public class DecompilerPanel extends JPanel {
     }
 
     /**
-     * 文件节点数据
+     * Dữ liệu nút tệp
      */
     private static class FileNodeData {
         String name;
@@ -1493,7 +1493,7 @@ public class DecompilerPanel extends JPanel {
         boolean isClassFile;
         boolean isJarFile;
         String fullPath;
-        long size; // 文件大小（字节），目录为其所有子文件的总大小
+        long size; // Kích thước tệp, tính bằng byte, của một thư mục, tổng kích thước của tất cả các tệp con của nó
 
         FileNodeData(String name, boolean isDirectory, boolean isClassFile) {
             this.name = name;
@@ -1510,12 +1510,12 @@ public class DecompilerPanel extends JPanel {
     }
 
     /**
-     * 文件树渲染器 - 使用彩色 SVG 图标，根据文件类型显示
+     * Trình kết xuất cây tập tin - Sử dụng màu sắc SVG Biểu tượng, hiển thị dựa trên loại tập tin
      */
     private static class FileTreeCellRenderer extends DefaultTreeCellRenderer {
         private static final int ICON_SIZE = 16;
 
-        // 缓存图标以提高性能
+        // Biểu tượng bộ đệm để cải thiện hiệu suất
         private static final Map<String, Icon> iconCache = new HashMap<>();
 
         @Override
@@ -1531,18 +1531,18 @@ public class DecompilerPanel extends JPanel {
                         setIcon(icon);
                     }
 
-                    // 显示文件/目录名称和大小
+                    // Hiển thị tập tin/Tên và kích thước thư mục
                     if (fileData.size > 0) {
                         String sizeStr = formatFileSize(fileData.size);
 
-                        // 判断是否是根节点（JAR/ZIP/WAR文件）
+                        // Xác định xem đó có phải là nút gốc (JAR/ZIP/WARtập tin)
                         boolean isRootNode = node.getParent() == null;
                         boolean isArchiveFile = fileData.name.toLowerCase().endsWith(".jar") ||
                                 fileData.name.toLowerCase().endsWith(".zip") ||
                                 fileData.name.toLowerCase().endsWith(".war");
 
                         if (isRootNode && isArchiveFile) {
-                            // 根节点特殊标记，显示为压缩后的实际大小
+                            // Nút gốc được đánh dấu đặc biệt và hiển thị dưới dạng kích thước thực của nó sau khi nén
                             String compressedLabel = DecompilerI18n.t(MessageKeys.TOOLBOX_DECOMPILER_COMPRESSED);
                             setText(fileData.name + " (" + sizeStr + " " + compressedLabel + ")");
 
@@ -1564,7 +1564,7 @@ public class DecompilerPanel extends JPanel {
         }
 
         /**
-         * 格式化文件大小为人类可读格式
+         * Định dạng kích thước tệp thành định dạng mà con người có thể đọc được
          */
         private String formatFileSize(long size) {
             if (size < 1024) return size + " B";
@@ -1574,25 +1574,25 @@ public class DecompilerPanel extends JPanel {
         }
 
         /**
-         * 根据文件数据获取对应的彩色 SVG 图标
+         * Lấy màu tương ứng dựa trên dữ liệu tệp SVG biểu tượng
          */
         private Icon getIconForFileData(FileNodeData fileData) {
             String iconKey = "java-file";
 
             if (fileData.isDirectory) {
-                // 目录图标 - 根据展开状态
+                // Biểu tượng thư mục - Theo trạng thái mở rộng
                 iconKey = "group";
             } else if (fileData.isClassFile) {
-                // Class 文件也使用 java-file 图标
+                // Class Các tập tin cũng được sử dụng java-file biểu tượng
                 iconKey = "java-file";
             } else if (fileData.isJarFile) {
-                // JAR/ZIP 文件 - 根据扩展名区分
+                // JAR/ZIP tập tin - Phân biệt dựa trên phần mở rộng
                 String fileName = fileData.name.toLowerCase();
                 if (fileName.endsWith(".jar")) {
                     iconKey = "jar-file";
                 }
             } else {
-                // 其他文件 - 根据扩展名区分
+                // Các tài liệu khác - Phân biệt dựa trên phần mở rộng
                 iconKey = getIconKeyByExtension(fileData.name);
             }
 
@@ -1600,12 +1600,12 @@ public class DecompilerPanel extends JPanel {
         }
 
         /**
-         * 根据文件扩展名获取图标键
+         * Lấy khóa biểu tượng dựa trên phần mở rộng của tệp
          */
         private String getIconKeyByExtension(String fileName) {
             String lowerName = fileName.toLowerCase();
 
-            // .java 和 .class 都使用 java-file 图标
+            // .java và .class Sử dụng cả hai java-file biểu tượng
             if (lowerName.endsWith(JAVA_EXTENSION) || lowerName.endsWith(CLASS_EXTENSION)) {
                 return "java-file";
             } else if (lowerName.endsWith(".xml")) {
@@ -1624,7 +1624,7 @@ public class DecompilerPanel extends JPanel {
         }
 
         /**
-         * 获取或创建图标（带缓存）
+         * Nhận hoặc tạo biểu tượng (có bộ nhớ đệm)
          */
         private Icon getOrCreateIcon(String iconKey) {
             return iconCache.computeIfAbsent(iconKey, key -> new FlatSVGIcon("icons/" + key + ".svg", ICON_SIZE, ICON_SIZE));

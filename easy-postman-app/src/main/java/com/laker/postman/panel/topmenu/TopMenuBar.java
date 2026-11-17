@@ -32,7 +32,7 @@ public class TopMenuBar extends UiSingletonMenuBar implements IRefreshable {
     @Override
     public void updateUI() {
         super.updateUI();
-        // 主题切换时重新创建边框，确保菜单栏留白保持稳定。
+        // Tạo lại đường viền khi chuyển đổi chủ đề để đảm bảo không gian trống trên thanh menu vẫn ổn định.
         setBorder(createPanelBorder());
     }
 
@@ -40,7 +40,7 @@ public class TopMenuBar extends UiSingletonMenuBar implements IRefreshable {
     protected void registerListeners() {
         FlatDesktop.setAboutHandler(this::showAboutDialog);
         FlatDesktop.setQuitHandler(e -> {
-            // 由应用统一处理保存、取消及异步清理，阻止 macOS 直接结束进程。
+            // Ứng dụng xử lý việc lưu, hủy, dọn dẹp không đồng bộ và chặn một cách thống nhất macOS Kết thúc quá trình trực tiếp.
             e.cancelQuit();
             BeanFactory.getBean(AppExitCoordinator.class).exitApplication();
         });
@@ -51,28 +51,28 @@ public class TopMenuBar extends UiSingletonMenuBar implements IRefreshable {
 
 
     /**
-     * 刷新菜单栏（实现 IRefreshable 接口）
+     * Làm mới thanh menu (đã triển khai IRefreshable giao diện)
      * <p>
-     * 重新加载菜单栏（包括菜单项、快捷键、Git 工具栏等所有组件）
-     * 在以下场景调用：
-     * 1. 语言切换后（需要更新所有菜单文本）
-     * 2. 快捷键设置修改后
-     * 3. 工作区切换后（需要更新 Git 工具栏显示状态）
+     * Tải lại thanh menu (bao gồm các mục menu, phím tắt,Git tất cả các thành phần bao gồm cả thanh công cụ)
+     * Được gọi trong các trường hợp sau:
+     * 1. Sau khi chuyển đổi ngôn ngữ (tất cả văn bản menu cần được cập nhật)
+     * 2. Sau khi cài đặt phím tắt được sửa đổi
+     * 3. Sau khi chuyển đổi không gian làm việc (cần được cập nhật Git trạng thái hiển thị thanh công cụ)
      */
     @Override
     public void refresh() {
         removeAll();
-        // 重新创建菜单栏所有组件
+        // Tạo lại tất cả các thành phần thanh menu
         initComponents();
-        // 刷新界面
+        // Làm mới giao diện
         revalidate();
         repaint();
     }
 
     private void initComponents() {
         if (SystemInfo.isMacFullWindowContentSupported) {
-            // macOS Full Window Content 模式下，左侧留出更多空间给红黄绿按钮
-            // macOS 红黄绿按钮宽度约 70-76px
+            // macOS Full Window Content chế độ này, chừa nhiều không gian hơn ở phía bên trái cho các nút màu đỏ, vàng và xanh lục
+            // macOS Chiều rộng của các nút màu đỏ, vàng và xanh lục là khoảng 70-76px
             add(Box.createHorizontalStrut(70));
         }
 
@@ -84,7 +84,7 @@ public class TopMenuBar extends UiSingletonMenuBar implements IRefreshable {
         add(TopMenuHelpMenu.create(this));
         addAboutMenu();
 
-        add(Box.createGlue()); // 添加弹性空间，将后续组件推到右侧
+        add(Box.createGlue()); // Thêm không gian linh hoạt để đẩy các thành phần tiếp theo sang bên phải
 
         workspaceControls().addTo(this);
     }
@@ -98,17 +98,17 @@ public class TopMenuBar extends UiSingletonMenuBar implements IRefreshable {
     }
 
     /**
-     * 更新工作区下拉框内容（不重新加载整个菜单栏）
-     * 用于工作区列表变化但当前工作区类型未变化的场景（如创建、重命名）
+     * Cập nhật nội dung hộp thả xuống của không gian làm việc (không cần tải lại toàn bộ thanh menu)
+     * Được sử dụng cho các tình huống trong đó danh sách không gian làm việc thay đổi nhưng loại không gian làm việc hiện tại không thay đổi (chẳng hạn như tạo, đổi tên)
      */
     public void updateWorkspaceComboBox() {
         workspaceControls().updateWorkspaceComboBox();
     }
 
     /**
-     * 更新工作区显示（包括工作区下拉框和 Git 工具栏）
-     * 在外部切换工作区后调用（例如从 WorkspacePanel 切换）
-     * 会重新加载整个菜单栏以更新 Git 工具栏显示状态
+     * Hiển thị không gian làm việc được cập nhật (bao gồm hộp thả xuống không gian làm việc và các tệp  Git thanh công cụ)
+     * Được gọi sau khi chuyển đổi không gian làm việc bên ngoài (ví dụ: from WorkspacePanel chuyển đổi)
+     * Toàn bộ thanh menu sẽ được tải lại để cập nhật Git Thanh công cụ hiển thị trạng thái
      */
     public void updateWorkspaceDisplay() {
         workspaceControls().updateWorkspaceDisplay();

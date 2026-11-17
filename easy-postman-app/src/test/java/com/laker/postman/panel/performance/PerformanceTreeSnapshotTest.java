@@ -25,7 +25,7 @@ import static org.testng.Assert.assertNotSame;
 
 public class PerformanceTreeSnapshotTest {
 
-    @Test(description = "执行快照应深拷贝树和节点数据，并保留原请求 id")
+    @Test(description = "Việc thực hiện ảnh chụp nhanh sẽ sao chép sâu dữ liệu cây và nút và giữ nguyên yêu cầu ban đầu id")
     public void shouldDeepCopyExecutionTreeWithoutChangingRequestIds() {
         HttpRequestItem item = new HttpRequestItem();
         item.setId("request-id");
@@ -55,7 +55,7 @@ public class PerformanceTreeSnapshotTest {
         assertEquals(snapshotRequestData.webSocketPerformanceData.connectTimeoutMs, 15000);
     }
 
-    @Test(description = "执行快照应保留仅存在于请求快照中的旧请求数据")
+    @Test(description = "Ảnh chụp nhanh thực thi phải lưu giữ dữ liệu yêu cầu cũ chỉ tồn tại trong ảnh chụp nhanh yêu cầu")
     public void shouldCopyRequestSnapshotWhenRequestItemIsAbsent() {
         PerformanceRequestSnapshot requestSnapshot = PerformanceRequestSnapshot.builder()
                 .id("snapshot-id")
@@ -80,7 +80,7 @@ public class PerformanceTreeSnapshotTest {
         assertEquals(snapshotRequestData.requestSnapshot.getBody(), "payload");
     }
 
-    @Test(description = "粘贴请求快照节点时也应刷新请求 id，避免重复请求标识")
+    @Test(description = "Yêu cầu cũng phải được làm mới khi dán nút chụp nhanh yêu cầu id，Tránh trùng lặp các yêu cầu nhận dạng")
     public void copyForPasteShouldRegenerateRequestSnapshotId() {
         PerformanceRequestSnapshot requestSnapshot = PerformanceRequestSnapshot.builder()
                 .id("original-id")
@@ -154,7 +154,7 @@ public class PerformanceTreeSnapshotTest {
         assertEquals(protocols, Set.of(PerformanceProtocol.HTTP));
     }
 
-    @Test(description = "执行快照应深拷贝条件控制器配置")
+    @Test(description = "Ảnh chụp nhanh thực thi sẽ tạo bản sao sâu của cấu hình bộ điều khiển có điều kiện")
     public void shouldDeepCopyConditionData() {
         ConditionData conditionData = new ConditionData();
         conditionData.expression = "{{enabled}} == true";

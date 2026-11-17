@@ -64,7 +64,7 @@ public class PerformanceReportPanel extends JPanel {
         return thread;
     });
 
-    // 成功率阈值
+    // Ngưỡng tỷ lệ thành công
     private static final double SUCCESS_RATE_EXCELLENT = 99.0;
     private static final double SUCCESS_RATE_GOOD = 90.0;
 
@@ -76,7 +76,7 @@ public class PerformanceReportPanel extends JPanel {
     private final String[] sseColumns;
     private final String totalRowName;
 
-    // 单例渲染器，避免重复创建
+    // Trình kết xuất Singleton để tránh việc tạo lặp lại
     private final DefaultTableCellRenderer failRenderer;
     private final DefaultTableCellRenderer rateRenderer;
     private final DefaultTableCellRenderer generalRenderer;
@@ -102,7 +102,7 @@ public class PerformanceReportPanel extends JPanel {
         this.sseColumns = PerformanceReportTableSchema.sseColumns();
         this.totalRowName = I18nUtil.getMessage(MessageKeys.PERFORMANCE_REPORT_TOTAL_ROW);
 
-        // 创建单例渲染器
+        // Tạo một trình kết xuất đơn lẻ
         this.failRenderer = createFailRenderer();
         this.rateRenderer = createRateRenderer();
         this.generalRenderer = createGeneralRenderer();
@@ -347,67 +347,67 @@ public class PerformanceReportPanel extends JPanel {
 
     private void configureColumnWidths(JTable table) {
         if (table.getColumnModel().getColumnCount() > 0) {
-            // API Name 列
+            // API Name cột
             table.getColumnModel().getColumn(0).setMinWidth(PerformanceReportTableSchema.API_NAME_MIN_WIDTH);
             table.getColumnModel().getColumn(0).setPreferredWidth(PerformanceReportTableSchema.API_NAME_PREFERRED_WIDTH);
 
-            // Total 列 - 显示 "Total"（5个字符）+ 数字
+            // Total cột - trình diễn "Total"（5ký tự)+ con số
             table.getColumnModel().getColumn(1).setMinWidth(65);
             table.getColumnModel().getColumn(1).setPreferredWidth(75);
 
-            // Success 列 - 显示 "Success"（7个字符）+ 数字
+            // Success cột - trình diễn "Success"（7ký tự)+ con số
             table.getColumnModel().getColumn(2).setMinWidth(75);
             table.getColumnModel().getColumn(2).setPreferredWidth(85);
 
-            // Fail 列 - 显示 "Fail"（4个字符）+ 数字
+            // Fail cột - trình diễn "Fail"（4ký tự)+ con số
             table.getColumnModel().getColumn(3).setMinWidth(60);
             table.getColumnModel().getColumn(3).setPreferredWidth(65);
 
-            // Success Rate 列 - 显示 "Success Rate"（12个字符）+ 百分比
+            // Success Rate cột - trình diễn "Success Rate"（12ký tự)+ Tỷ lệ phần trăm
             table.getColumnModel().getColumn(4).setMinWidth(110);
             table.getColumnModel().getColumn(4).setPreferredWidth(120);
 
-            // QPS 列 - 显示 "QPS"（3个字符）+ 数字
+            // QPS cột - trình diễn "QPS"（3ký tự)+ con số
             table.getColumnModel().getColumn(5).setMinWidth(60);
             table.getColumnModel().getColumn(5).setPreferredWidth(70);
 
-            // Sent KB/s 列 - 发送字节速率
+            // Sent KB/s cột - Gửi tốc độ byte
             table.getColumnModel().getColumn(6).setMinWidth(85);
             table.getColumnModel().getColumn(6).setPreferredWidth(95);
 
-            // Received KB/s 列 - 接收字节速率
+            // Received KB/s cột - Nhận tốc độ byte
             table.getColumnModel().getColumn(7).setMinWidth(90);
             table.getColumnModel().getColumn(7).setPreferredWidth(105);
 
-            // Avg 列 - 显示 "Avg"（3个字符）+ 时间
+            // Avg cột - trình diễn "Avg"（3ký tự)+ thời gian
             table.getColumnModel().getColumn(8).setMinWidth(65);
             table.getColumnModel().getColumn(8).setPreferredWidth(75);
 
-            // Min 列 - 显示 "Min"（3个字符）+ 时间
+            // Min cột - trình diễn "Min"（3ký tự)+ thời gian
             table.getColumnModel().getColumn(9).setMinWidth(65);
             table.getColumnModel().getColumn(9).setPreferredWidth(75);
 
-            // Max 列 - 显示 "Max"（3个字符）+ 时间
+            // Max cột - trình diễn "Max"（3ký tự)+ thời gian
             table.getColumnModel().getColumn(10).setMinWidth(65);
             table.getColumnModel().getColumn(10).setPreferredWidth(75);
 
-            // P90 列 - 显示 "P90"（3个字符）+ 时间
+            // P90 cột - trình diễn "P90"（3ký tự)+ thời gian
             table.getColumnModel().getColumn(11).setMinWidth(65);
             table.getColumnModel().getColumn(11).setPreferredWidth(75);
 
-            // P95 列 - 显示 "P95"（3个字符）+ 时间
+            // P95 cột - trình diễn "P95"（3ký tự)+ thời gian
             table.getColumnModel().getColumn(12).setMinWidth(65);
             table.getColumnModel().getColumn(12).setPreferredWidth(75);
 
-            // P99 列 - 显示 "P99"（3个字符）+ 时间
+            // P99 cột - trình diễn "P99"（3ký tự)+ thời gian
             table.getColumnModel().getColumn(13).setMinWidth(65);
             table.getColumnModel().getColumn(13).setPreferredWidth(75);
         }
     }
 
     private void configureColumnRenderers(JTable table) {
-        // 使用单例渲染器，避免重复创建
-        // 需要居中的列索引（从第2列到最后一列）
+        // Sử dụng trình kết xuất đơn lẻ để tránh việc tạo lặp lại
+        // Chỉ mục cột cần được căn giữa (từ 2đến cột cuối cùng)
         for (int col = 1; col < columns.length; col++) {
             if (col == PerformanceReportTableSchema.FAIL_COLUMN_INDEX) {
                 table.getColumnModel().getColumn(col).setCellRenderer(failRenderer);

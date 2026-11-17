@@ -7,31 +7,31 @@ import javax.swing.UIManager;
 import java.awt.*;
 
 /**
- * 现代化UI配色方案
- * 统一的配色常量，确保整个应用的视觉一致性
- * 完全支持亮色和暗色主题自适应
+ * hiện đại hóaUICách phối màu
+ * Các hằng số khớp màu thống nhất đảm bảo tính nhất quán về mặt hình ảnh trên toàn bộ ứng dụng
+ * Hỗ trợ đầy đủ việc thích ứng chủ đề sáng và tối
  * <p>
- * 设计理念：
- * - 主色调：Blue（信任、专业、科技）
- * - 辅助色：Sky Blue（清新、现代）
- * - 强调色：Cyan（活力、突出）
- * - 中性色：Slate（优雅、易读）
+ * Ý tưởng thiết kế:
+ * - Màu chủ đạo:Blue（Niềm tin, tính chuyên nghiệp, công nghệ)
+ * - Màu phụ: .Sky Blue（Mới mẻ và hiện đại)
+ * - Màu nhấn:Cyan（sức sống, sự nổi bật)
+ * - Màu sắc trung tính:Slate（Thanh lịch và dễ đọc)
  * <p>
- * - 背景、文字、边框等UI元素颜色全部主题自适应
- * 面板背景色（暗色主题 - 外层边界）38, 40, 44
+ * - Nền, văn bản, đường viền, v.vUITất cả các màu của phần tử đều thích ứng với chủ đề
+ * Màu nền của bảng điều khiển (chủ đề tối - ranh giới bên ngoài)38, 40, 44
  * @panelBg=#26282c
- * 面板背景色（亮色主题 - 主背景色浅灰色）
+ * Màu nền của bảng điều khiển (chủ đề nhẹ - Màu nền chính là xám nhạt)
  * @panelBg=#e9eaee
  *
  */
 @UtilityClass
 public final class ModernColors {
 
-    // ==================== 主题检测 ====================
+    // ==================== Phát hiện chủ đề ====================
 
     /**
-     * 检查当前是否为暗色主题
-     * @return true 如果当前是暗色主题，false 如果是亮色主题
+     * Kiểm tra xem chủ đề tối hiện tại có tồn tại không
+     * @return true Nếu chủ đề tối hiện tại là.false Nếu đó là một chủ đề màu sắc tươi sáng
      */
     public static boolean isDarkTheme() {
         return FlatLaf.isLafDark();
@@ -58,149 +58,149 @@ public final class ModernColors {
         return ThemeColors.explicit(color != null ? color : fallback);
     }
 
-    // ==================== 主色系 ====================
+    // ==================== Màu sắc chính ====================
 
     /**
-     * 主色 - IDEA-inspired Blue
+     * Màu chính - IDEA-inspired Blue
      */
     public static final Color PRIMARY = new Color(55, 113, 225);
 
     /**
-     * 主色深色 - IDEA-inspired Blue-600
+     * Màu chủ đạo là màu tối - IDEA-inspired Blue-600
      */
     public static final Color PRIMARY_DARK = new Color(47, 98, 201);
 
     /**
-     * 主色超深 - IDEA-inspired Blue-700
+     * Màu sắc chủ đạo là siêu tối - IDEA-inspired Blue-700
      */
     public static final Color PRIMARY_DARKER = new Color(40, 84, 173);
 
     /**
-     * 主色浅色 - IDEA-inspired Blue-400
+     * Màu sắc chủ đạo là ánh sáng - IDEA-inspired Blue-400
      */
     public static final Color PRIMARY_LIGHT = new Color(94, 143, 240);
 
     /**
-     * 主色超浅 - IDEA-inspired Blue-100
+     * Màu sắc chủ đạo là siêu nhẹ - IDEA-inspired Blue-100
      */
     public static final Color PRIMARY_LIGHTER = new Color(212, 227, 255);
 
-    // ==================== 辅助色系 ====================
+    // ==================== Màu sắc phụ trợ ====================
 
     /**
-     * 辅助色 - Sky-500
+     * Màu thứ cấp - Sky-500
      */
     public static final Color SECONDARY = new Color(14, 165, 233);
 
     /**
-     * 辅助色深色 - Sky-600
+     * Màu thứ cấp tối - Sky-600
      */
     public static final Color SECONDARY_DARK = new Color(2, 132, 199);
 
     /**
-     * 辅助色浅色 - Sky-400
+     * Ánh sáng màu thứ cấp - Sky-400
      */
     public static final Color SECONDARY_LIGHT = new Color(56, 189, 248);
 
     /**
-     * 辅助色超浅 - Sky-100
+     * Màu thứ cấp siêu nhẹ - Sky-100
      */
     public static final Color SECONDARY_LIGHTER = new Color(224, 242, 254);
 
-    // ==================== 强调色系 ====================
+    // ==================== Màu sắc nhấn mạnh ====================
 
     /**
-     * 强调色 - Cyan-500
+     * Màu nhấn - Cyan-500
      */
     public static final Color ACCENT = new Color(6, 182, 212);
 
     /**
-     * 强调色浅色 - Cyan-400
+     * Màu sắc nhấn là ánh sáng - Cyan-400
      */
     public static final Color ACCENT_LIGHT = new Color(34, 211, 238);
 
-    // ==================== 成功/错误/警告色 ====================
+    // ==================== thành công/sai lầm/Màu cảnh báo ====================
 
     /**
-     * 成功 - IDEA-like muted green.
+     * thành công - IDEA-like muted green.
      */
     public static final Color SUCCESS = new Color(87, 150, 92);
 
     /**
-     * 成功深色 - IDEA-like muted green.
+     * Tối thành công - IDEA-like muted green.
      */
     public static final Color SUCCESS_DARK = new Color(78, 143, 85);
 
     /**
-     * 错误 - IDEA-like muted red.
+     * sai lầm - IDEA-like muted red.
      */
     public static final Color ERROR = new Color(219, 88, 96);
 
     /**
-     * 错误深色 - IDEA-like muted red.
+     * Sai màu tối - IDEA-like muted red.
      */
     public static final Color ERROR_DARK = new Color(199, 84, 80);
 
     /**
-     * 错误超深 - IDEA-like muted red.
+     * Lỗi rất sâu sắc - IDEA-like muted red.
      */
     public static final Color ERROR_DARKER = new Color(166, 69, 69);
 
     /**
-     * 警告 - IDEA-like muted amber.
+     * Cảnh báo - IDEA-like muted amber.
      */
     public static final Color WARNING = new Color(194, 158, 73);
 
     /**
-     * 警告深色 - IDEA-like muted amber.
+     * Cảnh báo màu tối - IDEA-like muted amber.
      */
     public static final Color WARNING_DARK = new Color(168, 135, 63);
 
     /**
-     * 警告超深 - IDEA-like muted amber.
+     * Cảnh báo siêu sâu - IDEA-like muted amber.
      */
     public static final Color WARNING_DARKER = new Color(138, 109, 50);
 
     /**
-     * 信息 - IDEA-like cyan.
+     * thông tin - IDEA-like cyan.
      */
     public static final Color INFO = new Color(79, 174, 208);
 
-    // ==================== 中性色系（用于 Close 等操作）====================
+    // ==================== Màu sắc trung tính (cho Close v.v.)====================
 
     /**
-     * 中性 - Slate-500
+     * trung lập - Slate-500
      */
     public static final Color NEUTRAL = new Color(100, 116, 139);
 
     /**
-     * 中性深色 - Slate-600
+     * Màu tối trung tính - Slate-600
      */
     public static final Color NEUTRAL_DARK = new Color(71, 85, 105);
 
     /**
-     * 中性超深 - Slate-700
+     * Trung tính cực sâu - Slate-700
      */
     public static final Color NEUTRAL_DARKER = new Color(51, 65, 85);
 
-    // ==================== Git 操作颜色（现代简约风格）====================
+    // ==================== Git Màu sắc hoạt động (phong cách tối giản hiện đại)====================
 
     /**
-     * Git Commit（提交）- 柔和翠绿色
+     * Git Commit（Gửi)- Màu xanh ngọc dịu dàng
      */
     public static final Color GIT_COMMIT = SUCCESS;
 
     /**
-     * Git Push（推送）- 优雅深蓝色
+     * Git Push（đẩy)- Màu xanh đậm sang trọng
      */
     public static final Color GIT_PUSH = new Color(59, 130, 246);  // Blue-500
 
     /**
-     * Git Pull（拉取）- 清新紫色
+     * Git Pull（kéo)- Màu tím tươi
      */
     public static final Color GIT_PULL = new Color(168, 85, 247);  // Purple-500
 
-    // ==================== 变量类型颜色 ====================
+    // ==================== Màu sắc đa dạng ====================
 
     public static final Color VARIABLE_CONTEXT = WARNING;
     public static final Color VARIABLE_ITERATION_DATA = new Color(25, 118, 210);
@@ -337,7 +337,7 @@ public final class ModernColors {
         return color(ThemeColors.VARIABLE_BUILT_IN, VARIABLE_BUILT_IN);
     }
 
-    // ==================== HTTP 方法/协议颜色 ====================
+    // ==================== HTTP phương pháp/Màu giao thức ====================
 
     public static Color getHttpMethodGet() {
         return color(ThemeColors.HTTP_METHOD_GET, new Color(0x2E7D32), new Color(0x6AAB73));
@@ -371,209 +371,209 @@ public final class ModernColors {
         return color(ThemeColors.HTTP_PROTOCOL_SSE, new Color(0x00796B), new Color(0x4DB6AC));
     }
 
-    // ==================== 变量徽标颜色 ====================
+    // ==================== Màu sắc logo đa dạng ====================
 
     /**
-     * 已定义变量的徽标背景色。
-     * 保持与 EasyTextField / RequestBodyPanel 现有视觉一致。
+     * Màu nền logo của biến được xác định.
+     * Ở lại với EasyTextField / RequestBodyPanel Tầm nhìn hiện tại là nhất quán.
      */
     public static Color getDefinedVariableBadgeBackground() {
         return new Color(180, 210, 255, 120);
     }
 
     /**
-     * 已定义变量的徽标边框色。
+     * Màu đường viền logo cho biến được xác định.
      */
     public static Color getDefinedVariableBadgeBorder() {
         return new Color(80, 150, 255);
     }
 
     /**
-     * 未定义变量的徽标背景色。
+     * Màu nền logo của biến không xác định.
      */
     public static Color getUndefinedVariableBadgeBackground() {
         return new Color(255, 200, 200, 120);
     }
 
     /**
-     * 未定义变量的徽标边框色。
+     * Màu đường viền logo của biến không xác định.
      */
     public static Color getUndefinedVariableBadgeBorder() {
         return new Color(255, 100, 100);
     }
 
-    // ==================== 文字颜色（主题适配）====================
+    // ==================== Màu văn bản (thích ứng chủ đề)====================
 
     /**
-     * 文字主色 - 根据主题自适应
-     * 亮色主题：Slate-900 (深色文字)
-     * 暗色主题：Slate-100 (浅色文字)
+     * Màu văn bản chính - Thích ứng với chủ đề
+     * Chủ đề tươi sáng:Slate-900 (Văn bản tối)
+     * Chủ đề tối:Slate-100 (Văn bản nhẹ nhàng)
      */
     public static Color getTextPrimary() {
         return color(ThemeColors.TEXT_PRIMARY, new Color(15, 23, 42), new Color(201, 204, 211));
     }
 
     /**
-     * 文字次要色 - 根据主题自适应
-     * 亮色主题：Slate-700
-     * 暗色主题：Slate-300
+     * Màu phụ của văn bản - Thích ứng với chủ đề
+     * Chủ đề tươi sáng:Slate-700
+     * Chủ đề tối:Slate-300
      */
     public static Color getTextSecondary() {
         return color(ThemeColors.TEXT_SECONDARY, new Color(51, 65, 85), new Color(185, 189, 197));
     }
 
     /**
-     * 文字提示色 - 根据主题自适应
-     * 亮色主题：Slate-500
-     * 暗色主题：Slate-400
+     * Màu nhắc văn bản - Thích ứng với chủ đề
+     * Chủ đề tươi sáng:Slate-500
+     * Chủ đề tối:Slate-400
      */
     public static Color getTextHint() {
         return color(ThemeColors.TEXT_HINT, new Color(100, 116, 139), new Color(123, 128, 137));
     }
 
     /**
-     * 文字禁用色 - 根据主题自适应
-     * 亮色主题：Slate-400
-     * 暗色主题：Slate-600
+     * Màu văn bản bị vô hiệu hóa - Thích ứng với chủ đề
+     * Chủ đề tươi sáng:Slate-400
+     * Chủ đề tối:Slate-600
      */
     public static Color getTextDisabled() {
         return color(ThemeColors.TEXT_DISABLED, new Color(148, 163, 184), new Color(86, 91, 100));
     }
 
     /**
-     * 文字反色（用于深色背景）- 主题自适应
-     * 两种主题都返回浅色文字
+     * Đảo ngược văn bản (đối với nền tối)- Chủ đề thích ứng
+     * Cả hai chủ đề đều trả về văn bản nhẹ
      */
     public static Color getTextInverse() {
         return color(ThemeColors.TEXT_INVERSE, new Color(248, 250, 252));
     }
 
-    // ==================== 背景颜色（主题适配）====================
+    // ==================== Màu nền (thích ứng chủ đề)====================
 
     /**
-     * 获取主背景色 - 根据主题自适应
-     * 亮色主题：IDEA-like workspace gray (233, 234, 238)
-     * 暗色主题：IDEA-like workspace chrome (38, 40, 44)
+     * Lấy màu nền chính - Thích ứng với chủ đề
+     * Chủ đề tươi sáng:IDEA-like workspace gray (233, 234, 238)
+     * Chủ đề tối:IDEA-like workspace chrome (38, 40, 44)
      */
     public static Color getBackgroundColor() {
         return color(ThemeColors.BACKGROUND, new Color(233, 234, 238), new Color(38, 40, 44));
     }
 
     /**
-     * 获取卡片/区域背景色 - 根据主题自适应
-     * 亮色主题：白色 (255, 255, 255)
-     * 暗色主题：IDEA-like inner surface (30, 31, 34)
+     * Lấy thẻ/Màu nền vùng - Thích ứng với chủ đề
+     * Chủ đề nhẹ: màu trắng (255, 255, 255)
+     * Chủ đề tối:IDEA-like inner surface (30, 31, 34)
      */
     public static Color getCardBackgroundColor() {
         return color(ThemeColors.SURFACE, new Color(255, 255, 255), new Color(30, 31, 34));
     }
 
     /**
-     * 获取窗口顶部 chrome 背景色 - 菜单栏和主窗口 TitlePane 共用。
+     * Lấy phần trên cùng của cửa sổ chrome Màu nền - Thanh menu và cửa sổ chính TitlePane đã chia sẻ.
      */
     public static Color getWindowChromeBackgroundColor() {
         return color(ThemeColors.WINDOW_CHROME_BACKGROUND, new Color(233, 234, 238), new Color(38, 40, 44));
     }
 
     /**
-     * 获取 Dialog chrome 背景色 - 仅用于 JDialog 标题栏、背景和 footer。
+     * Lấy Dialog chrome Màu nền - Chỉ để sử dụng JDialog thanh tiêu đề, nền và footer。
      */
     public static Color getDialogChromeBackgroundColor() {
         return color(ThemeColors.DIALOG_CHROME_BACKGROUND, new Color(247, 248, 249), new Color(30, 31, 34));
     }
 
     /**
-     * 获取输入框背景色 - 根据主题自适应
-     * 亮色主题：白色 (255, 255, 255)
-     * 暗色主题：外层灰上的输入区 (43, 45, 48)
+     * Lấy màu nền của hộp nhập liệu - Thích ứng với chủ đề
+     * Chủ đề nhẹ: màu trắng (255, 255, 255)
+     * Chủ đề tối: Vùng nhập liệu ở màu xám bên ngoài (43, 45, 48)
      */
     public static Color getInputBackgroundColor() {
         return color(ThemeColors.INPUT_BACKGROUND, new Color(255, 255, 255), new Color(43, 45, 48));
     }
 
     /**
-     * 获取输入框禁用状态背景色。
-     * 优先跟随 FlatLaf 文本框自身 token，避免复用按钮禁用色导致表单块过重。
+     * Lấy màu nền của trạng thái vô hiệu hóa của hộp nhập liệu.
+     * Theo dõi đầu tiên FlatLaf Hộp văn bản chính nó token，Tránh sử dụng lại màu của nút đã bị vô hiệu hóa khiến khối biểu mẫu trở nên quá nặng.
      */
     public static Color getInputDisabledBackgroundColor() {
         return uiColor("TextField.disabledBackground", new Color(241, 243, 246), new Color(40, 42, 46));
     }
 
     /**
-     * 获取 Tab 区域未选中背景色 - 根据主题自适应。
+     * Lấy Tab Vùng này không có màu nền được chọn - Thích ứng với chủ đề.
      */
     public static Color getTabBackgroundColor() {
         return color(ThemeColors.TAB_BACKGROUND, new Color(255, 255, 255), new Color(30, 31, 34));
     }
 
     /**
-     * 获取 Tab 选中背景色 - 根据主题自适应。
+     * Lấy Tab Chọn màu nền - Thích ứng với chủ đề.
      */
     public static Color getTabSelectedBackgroundColor() {
         return color(ThemeColors.TAB_SELECTED_BACKGROUND, new Color(226, 235, 254), new Color(43, 45, 48));
     }
 
     /**
-     * 获取 Tab 悬停背景色 - 根据主题自适应。
+     * Lấy Tab Màu nền di chuột - Thích ứng với chủ đề.
      */
     public static Color getTabHoverBackgroundColor() {
         return color(ThemeColors.TAB_HOVER_BACKGROUND, new Color(242, 246, 255), new Color(38, 40, 44));
     }
 
     /**
-     * 获取 Tab 区域分割线颜色 - 根据主题自适应。
+     * Lấy Tab Màu sắc của đường phân chia khu vực - Thích ứng với chủ đề.
      */
     public static Color getTabSeparatorColor() {
         return color(ThemeColors.TAB_SEPARATOR, new Color(233, 234, 238), new Color(43, 45, 48));
     }
 
     /**
-     * 获取悬停背景色 - 根据主题自适应
-     * 亮色主题：浅蓝灰 hover
-     * 暗色主题：比卡片稍亮
+     * Lấy màu nền di chuột - Thích ứng với chủ đề
+     * Chủ đề màu sắc tươi sáng: xám xanh nhạt hover
+     * Chủ đề tối: nhạt hơn thẻ một chút
      */
     public static Color getHoverBackgroundColor() {
         return color(ThemeColors.HOVER_BACKGROUND, new Color(239, 244, 255), new Color(43, 45, 48));
     }
 
     /**
-     * 获取通用选中背景色 - 根据主题自适应
+     * Lấy màu nền được chọn phổ quát - Thích ứng với chủ đề
      */
     public static Color getSelectionBackgroundColor() {
         return color(ThemeColors.SELECTION_BACKGROUND, new Color(212, 227, 255), new Color(43, 67, 113));
     }
 
     /**
-     * 获取表格主体背景色。
-     * 优先读取 FlatLaf 标准 Table token，便于不同主题保持一致。
+     * Lấy màu nền của thân bảng.
+     * Đọc đầu tiên FlatLaf tiêu chuẩn Table token，Để tạo điều kiện thống nhất giữa các chủ đề khác nhau.
      */
     public static Color getTableBackgroundColor() {
         return uiColor("Table.background", new Color(255, 255, 255), new Color(30, 31, 34));
     }
 
     /**
-     * 获取表头背景色，接近 IntelliJ IDEA 的轻量灰色表头。
+     * Lấy màu nền của tiêu đề, đóng IntelliJ IDEA đầu đồng hồ màu xám nhẹ.
      */
     public static Color getTableHeaderBackgroundColor() {
         return uiColor("TableHeader.background", new Color(244, 246, 248), new Color(43, 45, 48));
     }
 
     /**
-     * 获取表格网格/分隔线颜色。
+     * Lấy lưới bảng/Màu chia.
      */
     public static Color getTableGridColor() {
         return uiColor("Table.gridColor", new Color(232, 235, 239), new Color(43, 45, 48));
     }
 
     /**
-     * 获取表格选中背景色。
+     * Lấy màu nền đã chọn của bảng.
      */
     public static Color getTableSelectionBackgroundColor() {
         return uiColor("Table.selectionBackground", getSelectionBackgroundColor());
     }
 
     /**
-     * 获取表格选中文字色。
+     * Lấy màu văn bản đã chọn của bảng.
      */
     public static Color getTableSelectionForegroundColor() {
         return uiColor("Table.selectionForeground", getTextPrimary());
@@ -581,120 +581,120 @@ public final class ModernColors {
 
 
     /**
-     * 获取按钮按下状态背景 - 根据主题自适应
-     * 亮色主题：Slate-200 (226, 232, 240)
-     * 暗色主题：比背景更暗 (34, 36, 39)
+     * Lấy nút trạng thái nhấn nút - Thích ứng với chủ đề
+     * Chủ đề tươi sáng:Slate-200 (226, 232, 240)
+     * Chủ đề tối: Tối hơn nền (34, 36, 39)
      */
     public static Color getButtonPressedColor() {
         return color(ThemeColors.BUTTON_PRESSED_BACKGROUND, new Color(220, 233, 255), new Color(36, 38, 42));
     }
 
     /**
-     * 获取按钮禁用状态背景 - 根据主题自适应
-     * 亮色主题：Slate-200 (226, 232, 240)
-     * 暗色主题：深灰色 (60, 60, 65)
+     * Lấy nền trạng thái nút bị vô hiệu hóa - Thích ứng với chủ đề
+     * Chủ đề tươi sáng:Slate-200 (226, 232, 240)
+     * Chủ đề tối: màu xám đậm (60, 60, 65)
      */
     public static Color getButtonDisabledBackgroundColor() {
         return color(ThemeColors.BUTTON_DISABLED_BACKGROUND, new Color(226, 232, 240), new Color(40, 42, 46));
     }
 
-    // ==================== 边框颜色（主题适配）====================
+    // ==================== Màu viền (thích ứng chủ đề)====================
 
     /**
-     * 获取边框颜色（浅色）- 根据主题自适应
-     * 亮色主题：Slate-200 (226, 232, 240)
-     * 暗色主题：比背景稍亮 (59, 61, 66) - 对应 @borderColor
+     * Lấy màu viền (màu sáng)- Thích ứng với chủ đề
+     * Chủ đề tươi sáng:Slate-200 (226, 232, 240)
+     * Dark theme: slightly lighter than the background (59, 61, 66) - tương ứng @borderColor
      */
     public static Color getBorderLightColor() {
         return color(ThemeColors.BORDER_LIGHT, new Color(211, 218, 230), new Color(50, 52, 56));
     }
 
     /**
-     * 获取边框颜色（中等）- 根据主题自适应
-     * 亮色主题：Slate-300 (203, 213, 225)
-     * 暗色主题：更明显的边框 (70, 73, 80)
+     * Lấy màu đường viền (trung bình)- Thích ứng với chủ đề
+     * Chủ đề tươi sáng:Slate-300 (203, 213, 225)
+     * Chủ đề tối: đường viền rõ ràng hơn (70, 73, 80)
      */
     public static Color getBorderMediumColor() {
         return color(ThemeColors.BORDER_MEDIUM, new Color(190, 199, 213), new Color(58, 61, 66));
     }
 
     /**
-     * 获取分隔线/边框颜色 - 主题适配
-     * 用于面板之间的分隔线、边框等
-     * 亮色主题：浅灰色 (213, 216, 222)
-     * 暗色主题：比背景亮的灰色 (49, 51, 56)
+     * Lấy dải phân cách/Màu viền - Chuyển thể chủ đề
+     * Được sử dụng để ngăn, viền, v.v. giữa các bảng
+     * Chủ đề nhẹ: xám nhạt (213, 216, 222)
+     * Chủ đề tối: Màu xám nhạt hơn nền (49, 51, 56)
      */
     public static Color getDividerBorderColor() {
         return color(ThemeColors.DIVIDER, new Color(213, 216, 222), new Color(43, 45, 48));
     }
 
     /**
-     * 获取空单元格背景色 - 主题适配
-     * 亮色主题：白色（清晰区分）
-     * 暗色主题：比有值单元格稍亮的颜色（便于区分空单元格）
+     * Lấy màu nền của ô trống - Chuyển thể chủ đề
+     * Chủ đề nhẹ: màu trắng (phân biệt rõ ràng)
+     * Dark theme: A slightly lighter color than cells with values ​​(to help distinguish empty cells)
      */
     public static Color getEmptyCellBackground() {
         return color(ThemeColors.EMPTY_CELL_BACKGROUND, Color.WHITE, new Color(40, 42, 46));
     }
 
-    // ==================== 滚动条颜色（主题适配）====================
+    // ==================== Màu thanh cuộn (thích ứng chủ đề)====================
 
     /**
-     * 获取滚动条轨道颜色 - 根据主题自适应
-     * 亮色主题：Slate-50 (245, 247, 250)
-     * 暗色主题：与内容面相同 (30, 31, 34)
+     * Lấy màu theo dõi thanh cuộn - Thích ứng với chủ đề
+     * Chủ đề tươi sáng:Slate-50 (245, 247, 250)
+     * Chủ đề tối: Tương tự như mặt nội dung (30, 31, 34)
      */
     public static Color getScrollbarTrackColor() {
         return color(ThemeColors.SCROLLBAR_TRACK, new Color(243, 244, 247), new Color(30, 31, 34));
     }
 
     /**
-     * 获取滚动条滑块颜色 - 根据主题自适应
-     * 亮色主题：浅灰 (200, 204, 212)
-     * 暗色主题：比背景亮的灰色 (70, 72, 78)
+     * Lấy màu thanh trượt thanh cuộn - Thích ứng với chủ đề
+     * Chủ đề tươi sáng: xám nhạt (200, 204, 212)
+     * Chủ đề tối: Màu xám nhạt hơn nền (70, 72, 78)
      */
     public static Color getScrollbarThumbColor() {
         return color(ThemeColors.SCROLLBAR_THUMB, new Color(200, 204, 212), new Color(63, 66, 72));
     }
 
     /**
-     * 获取滚动条滑块悬停颜色 - 根据主题自适应
-     * 亮色主题：中灰 (183, 189, 200)
-     * 暗色主题：更亮的灰色 (85, 88, 96)
+     * Lấy màu di chuột của thanh trượt thanh cuộn - Thích ứng với chủ đề
+     * Chủ đề nhẹ: xám vừa (183, 189, 200)
+     * Chủ đề tối: màu xám nhạt hơn (85, 88, 96)
      */
     public static Color getScrollbarThumbHoverColor() {
         return color(ThemeColors.SCROLLBAR_THUMB_HOVER, new Color(183, 189, 200), new Color(76, 80, 87));
     }
 
-    // ==================== 警告/提示颜色（主题适配）====================
+    // ==================== Cảnh báo/Màu sắc nhắc nhở (thích ứng chủ đề)====================
 
     /**
-     * 获取警告背景色 - 根据主题自适应
-     * 亮色主题：浅黄色 (255, 243, 205)
-     * 暗色主题：暗黄色调 (70, 65, 50)
+     * Lấy màu nền cảnh báo - Thích ứng với chủ đề
+     * Chủ đề màu sắc tươi sáng: vàng nhạt (255, 243, 205)
+     * Chủ đề tối: tông màu vàng đậm (70, 65, 50)
      */
     public static Color getWarningBackgroundColor() {
         return color(ThemeColors.WARNING_BACKGROUND, new Color(255, 243, 205), new Color(58, 52, 39));
     }
 
     /**
-     * 获取警告边框颜色 - 根据主题自适应
-     * 亮色主题：黄色 (255, 193, 7)
-     * 暗色主题：较亮的黄色 (120, 100, 60)
+     * Lấy màu đường viền cảnh báo - Thích ứng với chủ đề
+     * Chủ đề màu sắc tươi sáng: màu vàng (255, 193, 7)
+     * Chủ đề tối: màu vàng nhạt hơn (120, 100, 60)
      */
     public static Color getWarningBorderColor() {
         return color(ThemeColors.WARNING_BORDER, new Color(255, 193, 7), new Color(98, 84, 50));
     }
 
     /**
-     * 获取搜索普通匹配高亮背景色。
+     * Nhận màu nền nổi bật phù hợp tìm kiếm phổ biến.
      */
     public static Color getSearchHighlightBackgroundColor() {
         return color(ThemeColors.SEARCH_HIGHLIGHT_BACKGROUND, new Color(255, 241, 168), new Color(91, 75, 0));
     }
 
     /**
-     * 获取搜索当前匹配高亮背景色。
+     * Lấy màu nền nổi bật của kết quả tìm kiếm hiện tại.
      */
     public static Color getSearchCurrentHighlightBackgroundColor() {
         return color(ThemeColors.SEARCH_CURRENT_HIGHLIGHT_BACKGROUND, new Color(254, 215, 170), new Color(150, 100, 50));
@@ -709,11 +709,11 @@ public final class ModernColors {
     }
 
     /**
-     * 获取阴影颜色 - 根据主题自适应
-     * 暗色主题使用更柔和的阴影（黑色，增强透明度）
-     * 亮色主题使用深蓝黑色调
+     * Lấy màu bóng - Thích ứng với chủ đề
+     * Chủ đề tối sử dụng các sắc thái nhẹ nhàng hơn (màu đen, độ trong suốt nâng cao)
+     * Chủ đề nhẹ nhàng sử dụng tông màu xanh đen đậm
      *
-     * @param alpha 基础透明度 (0-255)
+     * @param alpha Cơ bản minh bạch (0-255)
      */
     public static Color getShadowColor(int alpha) {
         if (isDarkTheme()) {
@@ -722,102 +722,102 @@ public final class ModernColors {
         return new Color(15, 23, 42, alpha);
     }
 
-    // ==================== Console 控制台专用色（主题适配）====================
+    // ==================== Console Màu dành riêng cho bảng điều khiển (điều chỉnh theo chủ đề)====================
 
     /**
-     * Console 文本区域背景色 - 根据主题自适应
-     * 亮色主题：浅灰色 (243, 244, 247) - #f3f4f7
-     * 暗色主题：内容面深灰 (30, 31, 34) - #1e1f22
+     * Console Màu nền của vùng văn bản - Thích ứng với chủ đề
+     * Chủ đề nhẹ: xám nhạt (243, 244, 247) - #f3f4f7
+     * Chủ đề tối: Phần nội dung có màu xám đậm (30, 31, 34) - #1e1f22
      */
     public static Color getConsoleTextAreaBg() {
         return color(ThemeColors.CONSOLE_TEXT_AREA_BACKGROUND, new Color(243, 244, 247), new Color(30, 31, 34));
     }
 
     /**
-     * Console 普通文本颜色 - 根据主题自适应
-     * 亮色主题：Slate-700 (51, 65, 85)
-     * 暗色主题：浅灰 (220, 220, 220)
+     * Console Màu văn bản bình thường - Thích ứng với chủ đề
+     * Chủ đề tươi sáng:Slate-700 (51, 65, 85)
+     * Chủ đề tối: xám nhạt (220, 220, 220)
      */
     public static Color getConsoleText() {
         return color(ThemeColors.CONSOLE_TEXT, new Color(51, 65, 85), new Color(201, 204, 211));
     }
 
     /**
-     * Console INFO 级别颜色 - 根据主题自适应
-     * 亮色主题：Blue-700 (37, 99, 235)
-     * 暗色主题：Blue-400 (96, 165, 250)
+     * Console INFO Màu sắc đẳng cấp - Thích ứng với chủ đề
+     * Chủ đề tươi sáng:Blue-700 (37, 99, 235)
+     * Chủ đề tối:Blue-400 (96, 165, 250)
      */
     public static Color getConsoleInfo() {
         return color(ThemeColors.CONSOLE_INFO, new Color(37, 99, 235), new Color(96, 165, 250));
     }
 
     /**
-     * Console DEBUG 级别颜色 - 根据主题自适应
-     * 亮色主题：Green-600 (22, 163, 74)
-     * 暗色主题：Green-400 (74, 222, 128)
+     * Console DEBUG Màu sắc đẳng cấp - Thích ứng với chủ đề
+     * Chủ đề tươi sáng:Green-600 (22, 163, 74)
+     * Chủ đề tối:Green-400 (74, 222, 128)
      */
     public static Color getConsoleDebug() {
         return color(ThemeColors.CONSOLE_DEBUG, new Color(22, 163, 74), SUCCESS);
     }
 
     /**
-     * Console WARN 级别颜色 - 根据主题自适应
-     * 亮色主题：Orange-600 (234, 88, 12)
-     * 暗色主题：Orange-400 (251, 146, 60)
+     * Console WARN Màu sắc đẳng cấp - Thích ứng với chủ đề
+     * Chủ đề tươi sáng:Orange-600 (234, 88, 12)
+     * Chủ đề tối:Orange-400 (251, 146, 60)
      */
     public static Color getConsoleWarn() {
         return color(ThemeColors.CONSOLE_WARN, new Color(234, 88, 12), WARNING);
     }
 
     /**
-     * Console ERROR 级别颜色 - 根据主题自适应
-     * 亮色主题：Red-600 (220, 38, 38)
-     * 暗色主题：Red-400 (248, 113, 113)
+     * Console ERROR Màu sắc đẳng cấp - Thích ứng với chủ đề
+     * Chủ đề tươi sáng:Red-600 (220, 38, 38)
+     * Chủ đề tối:Red-400 (248, 113, 113)
      */
     public static Color getConsoleError() {
         return color(ThemeColors.CONSOLE_ERROR, new Color(220, 38, 38), ERROR);
     }
 
     /**
-     * Console 类名颜色 - 根据主题自适应
-     * 亮色主题：Purple-700 (147, 51, 234)
-     * 暗色主题：Purple-400 (192, 132, 252)
+     * Console Màu tên lớp - Thích ứng với chủ đề
+     * Chủ đề tươi sáng:Purple-700 (147, 51, 234)
+     * Chủ đề tối:Purple-400 (192, 132, 252)
      */
     public static Color getConsoleClassName() {
         return color(ThemeColors.CONSOLE_CLASS_NAME, new Color(147, 51, 234), new Color(192, 132, 252));
     }
 
     /**
-     * Console 方法名颜色 - 根据主题自适应
-     * 亮色主题：Sky-600 (14, 165, 233)
-     * 暗色主题：Sky-400 (56, 189, 248)
+     * Console Màu tên phương thức - Thích ứng với chủ đề
+     * Chủ đề tươi sáng:Sky-600 (14, 165, 233)
+     * Chủ đề tối:Sky-400 (56, 189, 248)
      */
     public static Color getConsoleMethodName() {
         return color(ThemeColors.CONSOLE_METHOD_NAME, new Color(14, 165, 233), new Color(56, 189, 248));
     }
 
     /**
-     * Console 工具栏背景色 - 根据主题自适应
-     * 亮色主题：Slate-50 (248, 250, 252)
-     * 暗色主题：略浅的灰色 (58, 60, 62) - #3a3c3e
+     * Console Màu nền của thanh công cụ - Thích ứng với chủ đề
+     * Chủ đề tươi sáng:Slate-50 (248, 250, 252)
+     * Chủ đề tối: màu xám nhạt hơn một chút (58, 60, 62) - #3a3c3e
      */
     public static Color getConsoleToolbarBg() {
         return color(ThemeColors.CONSOLE_TOOLBAR_BACKGROUND, new Color(248, 250, 252), new Color(38, 40, 44));
     }
 
     /**
-     * Console 工具栏边框色 - 根据主题自适应
-     * 亮色主题：Slate-200 (226, 232, 240)
-     * 暗色主题：深灰 (60, 60, 70)
+     * Console Màu đường viền thanh công cụ - Thích ứng với chủ đề
+     * Chủ đề tươi sáng:Slate-200 (226, 232, 240)
+     * Chủ đề tối: màu xám đậm (60, 60, 70)
      */
     public static Color getConsoleToolbarBorder() {
         return color(ThemeColors.CONSOLE_TOOLBAR_BORDER, new Color(226, 232, 240), new Color(50, 52, 56));
     }
 
     /**
-     * Console 选中文本背景色 - 根据主题自适应
-     * 亮色主题：Blue-200 (191, 219, 254)
-     * 暗色主题：深蓝 (60, 90, 120)
+     * Console Chọn màu nền văn bản - Thích ứng với chủ đề
+     * Chủ đề tươi sáng:Blue-200 (191, 219, 254)
+     * Chủ đề tối: xanh đậm (60, 90, 120)
      */
     public static Color getConsoleSelectionBg() {
         return color(ThemeColors.CONSOLE_SELECTION_BACKGROUND, new Color(191, 219, 254), new Color(43, 67, 113));
@@ -839,7 +839,7 @@ public final class ModernColors {
         return color(ThemeColors.NOTIFICATION_BODY_FOREGROUND, new Color(44, 46, 50), new Color(201, 204, 211));
     }
 
-    // ==================== 工具方法 ====================
+    // ==================== Phương pháp công cụ ====================
 
     public static Color withAlpha(Color color, int alpha) {
         return new Color(color.getRed(), color.getGreen(), color.getBlue(), alpha);
@@ -853,75 +853,75 @@ public final class ModernColors {
     }
 
     /**
-     * 获取带透明度的警告色
+     * Nhận màu cảnh báo với độ trong suốt
      *
-     * @param alpha 透明度 (0-255)
+     * @param alpha Minh bạch (0-255)
      */
     public static Color warningWithAlpha(int alpha) {
         return withAlpha(getWarning(), alpha);
     }
 
     /**
-     * 获取带透明度的主色
+     * Lấy màu chính với độ trong suốt
      *
-     * @param alpha 透明度 (0-255)
+     * @param alpha Minh bạch (0-255)
      */
     public static Color primaryWithAlpha(int alpha) {
         return withAlpha(getPrimary(), alpha);
     }
 
     /**
-     * 获取带透明度的辅助色
+     * Nhận được màu thứ cấp với độ trong suốt
      *
-     * @param alpha 透明度 (0-255)
+     * @param alpha Minh bạch (0-255)
      */
     public static Color secondaryWithAlpha(int alpha) {
         return withAlpha(getSecondary(), alpha);
     }
 
     /**
-     * 获取带透明度的强调色
+     * Có được màu nhấn với độ trong suốt
      *
-     * @param alpha 透明度 (0-255)
+     * @param alpha Minh bạch (0-255)
      */
     public static Color accentWithAlpha(int alpha) {
         return withAlpha(getAccent(), alpha);
     }
 
     /**
-     * 获取带透明度的白色
+     * Có được màu trắng trong suốt
      *
-     * @param alpha 透明度 (0-255)
+     * @param alpha Minh bạch (0-255)
      */
     public static Color whiteWithAlpha(int alpha) {
         return new Color(255, 255, 255, alpha);
     }
 
     /**
-     * 获取带透明度的黑色
+     * Nhận màu đen với độ trong suốt
      *
-     * @param alpha 透明度 (0-255)
+     * @param alpha Minh bạch (0-255)
      */
     public static Color blackWithAlpha(int alpha) {
         return new Color(0, 0, 0, alpha);
     }
 
     /**
-     * 创建主色渐变
+     * Tạo một gradient màu chính
      */
     public static GradientPaint createPrimaryGradient(int width, int height) {
         return new GradientPaint(0, 0, getPrimary(), width, height, getPrimaryDark());
     }
 
     /**
-     * 创建辅助色渐变
+     * Tạo một gradient màu thứ cấp
      */
     public static GradientPaint createSecondaryGradient(int width, int height) {
         return new GradientPaint(0, 0, getSecondaryLight(), width, height, getSecondaryDark());
     }
 
     /**
-     * 创建主色到辅助色渐变
+     * Tạo gradient màu chính đến phụ
      */
     public static GradientPaint createPrimaryToSecondaryGradient(int width, int height) {
         return new GradientPaint(0, 0, getPrimary(), width, height, getSecondary());
@@ -929,11 +929,11 @@ public final class ModernColors {
 
 
     /**
-     * 混合两种颜色
+     * Trộn hai màu
      *
-     * @param c1    颜色1
-     * @param c2    颜色2
-     * @param ratio 混合比例 (0.0 = 全部c1, 1.0 = 全部c2)
+     * @param c1    màu sắc1
+     * @param c2    màu sắc2
+     * @param ratio Tỷ lệ trộn (0.0 = tất cảc1, 1.0 = tất cảc2)
      */
     public static Color blendColors(Color c1, Color c2, float ratio) {
         float invRatio = 1 - ratio;

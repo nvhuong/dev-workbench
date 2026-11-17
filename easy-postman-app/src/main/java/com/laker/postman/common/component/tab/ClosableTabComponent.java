@@ -26,43 +26,43 @@ import java.util.Objects;
 import java.util.function.UnaryOperator;
 
 /**
- * 可关闭的 Tab 标题组件。
+ * Có thể đóng cửa Tab Thành phần tiêu đề.
  *
- * <p>功能：
+ * <p>Chức năng:
  * <ul>
- *   <li>显示请求方法/协议标识或业务图标 + 标题（超长自动截断）</li>
- *   <li>右侧绘制关闭按钮（hover 才可见，点击关闭 Tab）</li>
- *   <li>右上角小圆点：黄色=新建未保存、红色=已修改（脏）</li>
- *   <li>临时模式：标题斜体，表示可被复用的临时 Tab</li>
- *   <li>右键菜单：关闭当前 / 关闭其他 / 关闭右侧 / 关闭所有</li>
- *   <li>支持 Tab 拖拽排序（附加 TabbedPaneDragHandler 监听器）</li>
+ *   <li>Hiển thị phương thức yêu cầu/Logo thỏa thuận hoặc biểu tượng doanh nghiệp + Tiêu đề (tự động cắt ngắn nếu quá dài)</li>
+ *   <li>Vẽ một nút đóng ở bên phải (hover hiển thị, nhấp để đóng Tab）</li>
+ *   <li>Chấm nhỏ ở góc trên bên phải: màu vàng=Mới chưa được lưu, màu đỏ=Đã sửa đổi (bẩn)</li>
+ *   <li>Chế độ tạm thời: Tiêu đề in nghiêng, biểu thị tạm thời có thể được sử dụng lại Tab</li>
+ *   <li>Menu chuột phải: Đóng hiện tại / Đóng những người khác / Đóng phía bên phải / Đóng tất cả</li>
+ *   <li>Hỗ trợ Tab Sắp xếp kéo và thả (append TabbedPaneDragHandler người nghe)</li>
  * </ul>
  */
 @Slf4j
 public class ClosableTabComponent extends JPanel {
 
-    // ── 布局常量 ─────────────────────────────────────────────────────────────
+    // ── Các hằng số bố cục ─────────────────────────────────────────────────────────────
     public static final String ELLIPSIS = "...";
     private static final int MAX_TAB_WIDTH     = 160;
     private static final int MIN_TAB_WIDTH     = 80;
     private static final int TAB_HEIGHT        = 28;
-    private static final int CLOSE_DIAMETER    = 11;   // 关闭按钮圆圈直径
-    private static final int CLOSE_MARGIN      = 0;    // 关闭按钮距右边距
-    private static final int CLOSE_TEXT_SPACING = 0;   // 关闭按钮与文字间距
-    private static final int CLOSE_HIT_PADDING = 3;    // 扩大关闭按钮命中区域，提升易用性
-    private static final int LABEL_LEFT_PAD    = 4;    // 标题 label 左内边距
+    private static final int CLOSE_DIAMETER    = 11;   // Đường kính vòng tròn nút đóng
+    private static final int CLOSE_MARGIN      = 0;    // Nút đóng ở lề phải
+    private static final int CLOSE_TEXT_SPACING = 0;   // Nút đóng và giãn cách văn bản
+    private static final int CLOSE_HIT_PADDING = 3;    // Mở rộng khu vực nhấn nút đóng để cải thiện tính dễ sử dụng
+    private static final int LABEL_LEFT_PAD    = 4;    // tiêu đề label Đệm trái
 
-    // ── 数据 ─────────────────────────────────────────────────────────────────
+    // ── dữ liệu ─────────────────────────────────────────────────────────────────
     private final JLabel label;
     private final String labelText;
     private final JTabbedPane tabbedPane;
 
-    // ── 状态 ─────────────────────────────────────────────────────────────────
+    // ── trạng thái ─────────────────────────────────────────────────────────────────
     private RequestTabMarkers markers = RequestTabMarkers.clean();
-    private boolean hoverTab = false;            // 鼠标是否在整个 Tab 上
-    private boolean hoverClose = false;          // 鼠标是否在关闭按钮上
+    private boolean hoverTab = false;            // Liệu con chuột có vượt qua toàn bộ hay không Tab thượng đẳng
+    private boolean hoverClose = false;          // Liệu con chuột có ở trên nút đóng hay không
 
-    // ── 构造器 ───────────────────────────────────────────────────────────────
+    // ── Người xây dựng ───────────────────────────────────────────────────────────────
 
     public ClosableTabComponent(String title, RequestItemProtocolEnum protocol, boolean isRoot) {
         this(title, null, protocol, isRoot, false);
@@ -87,16 +87,16 @@ public class ClosableTabComponent extends JPanel {
         setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
         setToolTipText(safeTitle);
 
-        // 计算 Tab 宽度并创建 label
+        // Tính toán Tab chiều rộng và tạo label
         LabelPresentation labelPresentation = buildLabel(safeTitle, method, protocol, isRoot, requestTab);
         label = labelPresentation.label();
         labelText = labelPresentation.text();
         add(label, BorderLayout.CENTER);
 
-        // 右键菜单
+        // Trình đơn nhấp chuột phải
         setComponentPopupMenu(buildPopupMenu());
 
-        // 鼠标：hover 显示关闭按钮、关闭按钮点击、选中 Tab
+        // Chuột:hover Hiển thị nút đóng, nhấp vào nút đóng, chọn Tab
         addMouseMotionListener(new MouseMotionAdapter() {
             @Override public void mouseMoved(MouseEvent e) {
                 updateHoverState(e.getX(), e.getY());
@@ -108,12 +108,12 @@ public class ClosableTabComponent extends JPanel {
             @Override public void mousePressed(MouseEvent e) { handleMousePress(e); }
         });
 
-        // 拖拽排序支持
+        // Hỗ trợ sắp xếp kéo và thả
         TabbedPaneDragHandler handler = UiSingletonFactory.getInstance(RequestEditorPanel.class).getDragHandler();
         if (handler != null) handler.attachTo(this);
     }
 
-    // ── 构造辅助：构建 label ─────────────────────────────────────────────────
+    // ── Hỗ trợ xây dựng: Xây dựng label ─────────────────────────────────────────────────
 
     private LabelPresentation buildLabel(String title, String method, RequestItemProtocolEnum protocol,
                                          boolean isRoot, boolean requestTab) {
@@ -133,11 +133,11 @@ public class ClosableTabComponent extends JPanel {
                 MIN_TAB_WIDTH);
         setPreferredSize(new Dimension(tabWidth, TAB_HEIGHT));
 
-        // 文字超长时截断
+        // Văn bản sẽ bị cắt ngắn nếu quá dài
         String displayTitle = truncate(title, fm, tabWidth - badgeSpace - iconSpace - closeSpace - padding);
         String renderedText = RequestTabDisplayMetadata.labelText(badge, displayTitle);
 
-        // label 本身不消费鼠标事件（避免遮挡关闭按钮）
+        // label Nó không tự tiêu thụ các sự kiện chuột (để tránh chặn nút đóng)
         JLabel lbl = new JLabel(renderedText) {
             @Override public boolean contains(int x, int y) { return false; }
         };
@@ -169,7 +169,7 @@ public class ClosableTabComponent extends JPanel {
     private record LabelPresentation(JLabel label, String text) {
     }
 
-    // ── 鼠标事件处理 ─────────────────────────────────────────────────────────
+    // ── Xử lý sự kiện chuột ─────────────────────────────────────────────────────────
 
     private void updateHoverState(int x, int y) {
         boolean nextHoverTab = contains(x, y);
@@ -187,11 +187,11 @@ public class ClosableTabComponent extends JPanel {
         if (idx < 0) return;
 
         if (isInCloseButton(e.getX(), e.getY())) {
-            // 点击关闭按钮：先选中再关闭
+            // Bấm vào nút đóng: chọn trước rồi đóng
             tabbedPane.setSelectedIndex(idx);
             UiSingletonFactory.getInstance(RequestEditorPanel.class).closeCurrentTab();
         } else {
-            // 普通点击：选中并在左侧树中定位
+            // Click bình thường: Chọn và định vị ở cây bên trái
             tabbedPane.setSelectedIndex(idx);
             locateInTree(idx);
         }
@@ -207,12 +207,12 @@ public class ClosableTabComponent extends JPanel {
                 UiSingletonFactory.getInstance(CollectionTreePanel.class)
                         .locateAndSelectRequest(req.getId());
             } catch (Exception ex) {
-                log.error("定位请求节点时出错", ex);
+                log.error("Đã xảy ra lỗi khi định vị nút yêu cầu", ex);
             }
         });
     }
 
-    // ── 关闭按钮区域 ─────────────────────────────────────────────────────────
+    // ── Đóng khu vực nút ─────────────────────────────────────────────────────────
 
     private Rectangle closeButtonBounds() {
         int x = getWidth() - CLOSE_DIAMETER - CLOSE_MARGIN;
@@ -220,14 +220,14 @@ public class ClosableTabComponent extends JPanel {
         return new Rectangle(x, y, CLOSE_DIAMETER, CLOSE_DIAMETER);
     }
 
-    /** 判断坐标是否在关闭按钮上（供自身和 TabbedPaneDragHandler 使用） */
+    /** Xác định xem tọa độ có nằm trên nút đóng hay không (cho chính nó và TabbedPaneDragHandler sử dụng) */
     public boolean isInCloseButton(int x, int y) {
         Rectangle hitBounds = closeButtonBounds();
         hitBounds.grow(CLOSE_HIT_PADDING, CLOSE_HIT_PADDING);
         return hitBounds.contains(x, y);
     }
 
-    // ── 绘制 ─────────────────────────────────────────────────────────────────
+    // ── vẽ ─────────────────────────────────────────────────────────────────
 
     @Override
     protected void paintComponent(Graphics g) {
@@ -255,16 +255,16 @@ public class ClosableTabComponent extends JPanel {
             g2.drawLine(x + pad, y + pad, x + r - pad, y + r - pad);
             g2.drawLine(x + r - pad, y + pad, x + pad, y + r - pad);
         } else if (markers.isNewRequest()) {
-            g2.setColor(new Color(255, 204, 0, 180));   // 黄点
+            g2.setColor(new Color(255, 204, 0, 180));   // Chấm màu vàng
             g2.fillOval(x, y, r, r);
         } else if (markers.isDirty()) {
-            g2.setColor(dirtyColor());                   // 红点
+            g2.setColor(dirtyColor());                   // chấm đỏ
             g2.fillOval(x, y, r, r);
         }
         g2.dispose();
     }
 
-    // ── 主题适配色 ───────────────────────────────────────────────────────────
+    // ── Màu sắc phù hợp với chủ đề ───────────────────────────────────────────────────────────
 
     private Color closeButtonBg() {
         Color hoverColor = UIManager.getColor("TabbedPane.hoverColor");
@@ -290,7 +290,7 @@ public class ClosableTabComponent extends JPanel {
         return ModernColors.withAlpha(ModernColors.getError(), 180);
     }
 
-    // ── 右键菜单 ─────────────────────────────────────────────────────────────
+    // ── Trình đơn nhấp chuột phải ─────────────────────────────────────────────────────────────
 
     private JPopupMenu buildPopupMenu() {
         JPopupMenu menu = new JPopupMenu();

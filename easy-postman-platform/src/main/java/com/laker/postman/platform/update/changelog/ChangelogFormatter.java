@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * 更新日志格式化器 - 将发布信息格式化为可读文本
+ * Cập nhật định dạng nhật ký - Định dạng thông tin xuất bản thành văn bản có thể đọc được
  */
 @Slf4j
 public class ChangelogFormatter {
@@ -19,17 +19,17 @@ public class ChangelogFormatter {
     private static final int MAX_RELEASES = 10;
 
     /**
-     * 格式化发布信息列表
+     * Định dạng danh sách thông tin phát hành
      *
-     * @param releases 发布信息数组
-     * @return 格式化后的文本
+     * @param releases Đăng mảng thông tin
+     * @return Văn bản được định dạng
      */
     public String format(JSONArray releases) {
         if (releases == null || releases.isEmpty()) {
             return I18nUtil.getMessage(MessageKeys.CHANGELOG_NO_RELEASES);
         }
 
-        // 按发布时间降序排序
+        // Sắp xếp theo ngày xuất bản theo thứ tự giảm dần
         List<JSONObject> releaseList = sortReleases(releases);
 
         StringBuilder sb = new StringBuilder();
@@ -44,7 +44,7 @@ public class ChangelogFormatter {
     }
 
     /**
-     * 排序发布信息（最新的在前）
+     * Sắp xếp thông tin phát hành (mới nhất trước)
      */
     private List<JSONObject> sortReleases(JSONArray releases) {
         List<JSONObject> releaseList = new ArrayList<>();
@@ -55,17 +55,17 @@ public class ChangelogFormatter {
         releaseList.sort((a, b) -> {
             String dateA = getPublishDate(a);
             String dateB = getPublishDate(b);
-            return dateB.compareTo(dateA); // 降序
+            return dateB.compareTo(dateA); // Thứ tự giảm dần
         });
 
         return releaseList;
     }
 
     /**
-     * 获取发布日期（兼容 GitHub 和 Gitee）
+     * Nhận ngày phát hành (tương thích GitHub và Gitee）
      */
     private String getPublishDate(JSONObject release) {
-        // GitHub 使用 published_at，Gitee 使用 created_at
+        // GitHub sử dụng published_at，Gitee sử dụng created_at
         String date = release.getStr("published_at");
         if (StrUtil.isBlank(date)) {
             date = release.getStr("created_at");
@@ -74,7 +74,7 @@ public class ChangelogFormatter {
     }
 
     /**
-     * 添加单个发布信息
+     * Thêm thông tin phát hành riêng lẻ
      */
     private void appendRelease(StringBuilder sb, JSONObject release) {
         String tagName = release.getStr("tag_name");

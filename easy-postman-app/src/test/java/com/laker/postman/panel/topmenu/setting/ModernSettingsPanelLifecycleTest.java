@@ -18,7 +18,7 @@ import static org.testng.Assert.assertTrue;
 
 public class ModernSettingsPanelLifecycleTest {
 
-    @Test(description = "ModernSettingsPanel 不应在父类构造阶段调用子类 buildContent")
+    @Test(description = "ModernSettingsPanel Các lớp con không nên được gọi trong giai đoạn xây dựng của lớp cha buildContent")
     public void testSubclassFieldsAreAvailableWhenBuildContentRuns() {
         SampleSettingsPanel panel = new SampleSettingsPanel();
         panel.getPreferredSize();
@@ -28,7 +28,7 @@ public class ModernSettingsPanelLifecycleTest {
         assertEquals(panel.fieldCountAtBuildContent, 1);
     }
 
-    @Test(description = "设置对话框默认高度应能容纳压力测试页新增字段")
+    @Test(description = "Chiều cao mặc định của hộp thoại cài đặt phải phù hợp với các trường mới trên trang kiểm tra sức chịu đựng")
     public void settingsDialogPreferredHeightShouldFitPerformanceSettings() throws Exception {
         Field heightField = ModernSettingsDialog.class.getDeclaredField("PREFERRED_HEIGHT");
         heightField.setAccessible(true);
@@ -36,7 +36,7 @@ public class ModernSettingsPanelLifecycleTest {
         assertTrue(heightField.getInt(null) >= 640);
     }
 
-    @Test(description = "设置对话框固定尺寸，避免用户拖拽后内容被裁切")
+    @Test(description = "Đặt hộp thoại có kích thước cố định để tránh bị cắt nội dung sau khi người dùng kéo")
     public void settingsDialogShouldDisableResize() throws Exception {
         String source = Files.readString(Path.of(
                 "src/main/java/com/laker/postman/panel/topmenu/setting/ModernSettingsDialog.java"
@@ -46,7 +46,7 @@ public class ModernSettingsPanelLifecycleTest {
         assertFalse(source.contains("setResizable(true)"));
     }
 
-    @Test(description = "设置页初始化和切换 tab 后应回到内容顶部")
+    @Test(description = "Cài đặt khởi tạo và chuyển đổi trang tab nên quay lại đầu nội dung")
     public void settingsPanelShouldResetMainScrollPaneToTop() throws Exception {
         SampleSettingsPanel panel = new SampleSettingsPanel();
         panel.getPreferredSize();
@@ -60,7 +60,7 @@ public class ModernSettingsPanelLifecycleTest {
         assertEquals(scrollPane.getViewport().getViewPosition().y, 0);
     }
 
-    @Test(description = "设置页主内容应跟随 viewport 宽度，避免右侧内容被裁切")
+    @Test(description = "Đặt nội dung chính của trang nên tuân theo viewport Chiều rộng để ngăn nội dung phù hợp bị cắt")
     public void settingsPanelContentShouldTrackViewportWidth() {
         SampleSettingsPanel panel = new SampleSettingsPanel();
         panel.getPreferredSize();
@@ -71,7 +71,7 @@ public class ModernSettingsPanelLifecycleTest {
         assertTrue(view.getScrollableTracksViewportWidth());
     }
 
-    @Test(description = "设置页内容短于 viewport 时应撑满高度，避免底部露出无意义灰色空白")
+    @Test(description = "Nội dung trang cài đặt ngắn hơn viewport Nó phải được lấp đầy đến hết chiều cao để tránh khoảng trống màu xám vô nghĩa ở phía dưới")
     public void settingsPanelContentShouldTrackViewportHeightWhenShorterThanViewport() {
         SampleSettingsPanel panel = new SampleSettingsPanel();
         panel.getPreferredSize();

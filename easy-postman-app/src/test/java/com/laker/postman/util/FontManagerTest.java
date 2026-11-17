@@ -73,7 +73,7 @@ public class FontManagerTest {
     @Test
     public void shouldIgnoreSavedCjkUnsafeUiFontForChineseLocale() {
         assertEquals(
-                FontManager.resolveAllowedUiFontName("Consolas", Locale.CHINESE, UiFontCatalog.FontSupport.NO_CJK),
+                FontManager.resolveAllowedUiFontName("Consolas", Locale.forLanguageTag("vi"), UiFontCatalog.FontSupport.NO_CJK),
                 ""
         );
         assertEquals(

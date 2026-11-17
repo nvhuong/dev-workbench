@@ -22,12 +22,12 @@ import java.util.List;
 import java.util.function.Supplier;
 
 /**
- * 顶部请求行面板 - 现代化设计
- * 包含：方法选择、URL输入、发送/保存按钮
- * 设计理念：简洁、专业、易用
+ * Bảng điều khiển dòng yêu cầu hàng đầu - Thiết kế hiện đại
+ * Bao gồm: lựa chọn phương pháp,URLNhập, gửi/Nút lưu
+ * Khái niệm thiết kế: đơn giản, chuyên nghiệp và dễ sử dụng
  */
 public class RequestLinePanel extends JPanel {
-    // 尺寸常量
+    // Hằng số kích thước
     private static final int ICON_SIZE = 14;
     private static final int COMPONENT_HEIGHT = 32;
     private static final int METHOD_COMBO_WIDTH = 95;
@@ -35,7 +35,7 @@ public class RequestLinePanel extends JPanel {
     private static final int SAVE_BUTTON_MIN_WIDTH = 80;
     private static final int PANEL_PADDING = 5;
 
-    // 组件
+    // thành phần
     @Getter
     private final JComboBox<String> methodBox;
     @Getter
@@ -49,22 +49,22 @@ public class RequestLinePanel extends JPanel {
     public RequestLinePanel(ActionListener sendAction, RequestItemProtocolEnum protocol) {
         this.protocol = protocol;
 
-        // 初始化组件
+        // Khởi tạo thành phần
         methodBox = createMethodComboBox();
         urlField = createUrlField();
         sendButton = createSendButton(sendAction);
         saveButton = createSaveButton();
 
 
-        // 设置面板样式
+        // Đặt kiểu bảng điều khiển
         setupPanelStyle();
 
-        // 构建布局
+        // Xây dựng bố cục
         buildLayout();
     }
 
     /**
-     * 设置面板整体样式
+     * Đặt phong cách tổng thể của bảng điều khiển
      */
     private void setupPanelStyle() {
         setLayout(new BorderLayout(0, 0));
@@ -73,23 +73,23 @@ public class RequestLinePanel extends JPanel {
     }
 
     /**
-     * 创建方法选择下拉框
+     * Tạo hộp thả xuống lựa chọn phương pháp
      */
     private JComboBox<String> createMethodComboBox() {
         String[] methods = {"GET", "POST", "PUT", "DELETE", "PATCH", "HEAD", "OPTIONS", "TRACE"};
         JComboBox<String> combo = new JComboBox<>(methods);
 
-        // 设置尺寸
+        // Đặt kích thước
         Dimension size = new Dimension(METHOD_COMBO_WIDTH, COMPONENT_HEIGHT);
         combo.setPreferredSize(size);
         combo.setMaximumSize(size);
         combo.setMinimumSize(size);
         combo.setAlignmentY(Component.CENTER_ALIGNMENT);
 
-        // 设置字体
+        // Đặt phông chữ
         combo.setFont(FontsUtil.getDefaultFontWithOffset(Font.BOLD, -1));
 
-        // WebSocket 协议特殊处理
+        // WebSocket Xử lý đặc biệt các giao thức
         if (protocol.isWebSocketProtocol()) {
             combo.setVisible(false);
             combo.setSelectedItem("GET");
@@ -99,7 +99,7 @@ public class RequestLinePanel extends JPanel {
     }
 
     /**
-     * 创建 URL 输入框
+     * Tạo URL hộp đầu vào
      */
     private JTextField createUrlField() {
         JTextField field = new RequestUrlField(
@@ -108,13 +108,13 @@ public class RequestLinePanel extends JPanel {
                 I18nUtil.getMessage(MessageKeys.REQUEST_URL_PLACEHOLDER)
         );
 
-        // 设置尺寸
+        // Đặt kích thước
         field.setPreferredSize(new Dimension(500, COMPONENT_HEIGHT));
         field.setMinimumSize(new Dimension(300, COMPONENT_HEIGHT));
         field.setMaximumSize(new Dimension(Integer.MAX_VALUE, COMPONENT_HEIGHT));
         field.setAlignmentY(Component.CENTER_ALIGNMENT);
 
-        // 设置字体
+        // Đặt phông chữ
         field.setFont(FontsUtil.getDefaultFont(Font.PLAIN));
 
         return field;
@@ -127,7 +127,7 @@ public class RequestLinePanel extends JPanel {
     }
 
     /**
-     * 创建发送/连接按钮
+     * Tạo Gửi/Nút kết nối
      */
     private JButton createSendButton(ActionListener sendAction) {
         String text = protocol.isWebSocketProtocol() ?
@@ -148,7 +148,7 @@ public class RequestLinePanel extends JPanel {
     }
 
     /**
-     * 创建保存按钮
+     * Tạo nút lưu
      */
     private JButton createSaveButton() {
         SecondaryButton button = new SecondaryButton(
@@ -178,10 +178,10 @@ public class RequestLinePanel extends JPanel {
 
 
     /**
-     * 构建面板布局
+     * Xây dựng bố cục bảng điều khiển
      */
     private void buildLayout() {
-        // 左侧：方法选择 + URL
+        // Bên trái: lựa chọn phương pháp + URL
         JPanel leftPanel = new JPanel();
         leftPanel.setLayout(new BoxLayout(leftPanel, BoxLayout.X_AXIS));
         leftPanel.setOpaque(false);
@@ -191,9 +191,9 @@ public class RequestLinePanel extends JPanel {
             leftPanel.add(Box.createHorizontalStrut(6));
         }
         leftPanel.add(urlField);
-        leftPanel.add(Box.createHorizontalStrut(10)); // URL输入框与按钮组之间的间距
+        leftPanel.add(Box.createHorizontalStrut(10)); // URLKhoảng cách giữa hộp nhập và nhóm nút
 
-        // 右侧：按钮组
+        // Phải: nhóm nút
         JPanel rightPanel = new JPanel();
         rightPanel.setLayout(new BoxLayout(rightPanel, BoxLayout.X_AXIS));
         rightPanel.setOpaque(false);
@@ -202,38 +202,38 @@ public class RequestLinePanel extends JPanel {
         rightPanel.add(Box.createHorizontalStrut(6));
         rightPanel.add(saveButton);
 
-        // 添加到主面板
+        // Thêm vào bảng điều khiển chính
         add(leftPanel, BorderLayout.CENTER);
         add(rightPanel, BorderLayout.EAST);
     }
 
 
     /**
-     * 动态更新按钮样式（颜色）
+     * Tự động cập nhật kiểu nút (màu sắc)
      */
     private void updateButtonStyle(JButton button, Color baseColor, Color hoverColor, Color pressColor) {
-        // 设置按钮颜色到 ClientProperty
+        // Đặt màu nút thành  ClientProperty
         button.putClientProperty("baseColor", baseColor);
         button.putClientProperty("hoverColor", hoverColor);
         button.putClientProperty("pressColor", pressColor);
 
-        // 重置缓存标志，强制下次绘制时重新读取颜色
+        // Đặt lại cờ bộ đệm để buộc đọc lại màu vào lần vẽ tiếp theo
         button.putClientProperty("colorsInitialized", false);
 
-        // 强制刷新
+        // Buộc làm mới
         button.repaint();
     }
 
     /**
-     * 切换按钮为 Send 状态
+     * Nút chuyển đổi là  Send trạng thái
      */
     public void setSendButtonToSend(ActionListener sendAction) {
-        // 移除旧监听器
+        // Loại bỏ trình nghe cũ
         for (ActionListener al : sendButton.getActionListeners()) {
             sendButton.removeActionListener(al);
         }
 
-        // 设置文本和图标
+        // Đặt văn bản và biểu tượng
         if (protocol.isWebSocketProtocol()) {
             sendButton.setText(I18nUtil.getMessage(MessageKeys.BUTTON_CONNECT));
             sendButton.setIcon(IconUtil.createOnPrimary("icons/connect.svg", ICON_SIZE, ICON_SIZE));
@@ -247,56 +247,56 @@ public class RequestLinePanel extends JPanel {
         sendButton.setEnabled(true);
         applyActionButtonSize(sendButton, SEND_BUTTON_MIN_WIDTH);
 
-        // 重置为默认蓝色
+        // Đặt lại về màu xanh mặc định
         updateButtonStyle(sendButton, ModernColors.getPrimary(), ModernColors.getPrimaryLight(),
                 ModernColors.getPrimaryDarker());
 
-        // 添加新监听器
+        // Thêm người nghe mới
         sendButton.addActionListener(sendAction);
     }
 
     /**
-     * 切换按钮为 Cancel 状态
+     * Nút chuyển đổi là  Cancel trạng thái
      */
     public void setSendButtonToCancel(ActionListener cancelAction) {
-        // 移除旧监听器
+        // Loại bỏ trình nghe cũ
         for (ActionListener al : sendButton.getActionListeners()) {
             sendButton.removeActionListener(al);
         }
 
-        // 设置为取消按钮样式
+        // Đặt làm kiểu nút hủy
         sendButton.setText(I18nUtil.getMessage(MessageKeys.BUTTON_CANCEL));
         sendButton.setIcon(IconUtil.createOnPrimary("icons/cancel.svg", ICON_SIZE, ICON_SIZE));
         sendButton.setEnabled(true);
         applyActionButtonSize(sendButton, SEND_BUTTON_MIN_WIDTH);
 
-        // 改变按钮为警告色（橙色）
+        // Nút thay đổi sang màu cảnh báo (màu cam)
         updateButtonStyle(sendButton, ModernColors.getWarning(), ModernColors.getWarningDark(),
                 ModernColors.getWarningDarker());
 
-        // 添加新监听器
+        // Thêm người nghe mới
         sendButton.addActionListener(cancelAction);
     }
 
     /**
-     * 切换按钮为 Close 状态
+     * Nút chuyển đổi là  Close trạng thái
      */
     public void setSendButtonToClose(ActionListener closeAction) {
-        // 移除旧监听器
+        // Loại bỏ trình nghe cũ
         for (ActionListener al : sendButton.getActionListeners()) {
             sendButton.removeActionListener(al);
         }
 
-        // 设置为关闭按钮样式
+        // Đặt làm kiểu nút đóng
         sendButton.setText(I18nUtil.getMessage(MessageKeys.BUTTON_CLOSE));
         sendButton.setIcon(IconUtil.createOnPrimary("icons/close.svg", ICON_SIZE, ICON_SIZE));
         sendButton.setEnabled(true);
 
-        // 改变按钮为中性灰色
+        // Thay đổi nút thành màu xám trung tính
         updateButtonStyle(sendButton, ModernColors.getNeutral(), ModernColors.getNeutralDark(),
                 ModernColors.getNeutralDarker());
 
-        // 添加新监听器
+        // Thêm người nghe mới
         sendButton.addActionListener(closeAction);
     }
 

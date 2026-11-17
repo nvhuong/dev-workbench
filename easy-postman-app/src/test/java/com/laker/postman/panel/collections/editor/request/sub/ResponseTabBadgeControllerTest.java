@@ -17,17 +17,17 @@ import static org.testng.Assert.assertNull;
 import static org.testng.Assert.assertTrue;
 
 public class ResponseTabBadgeControllerTest {
-    private boolean originalChinese;
+    private boolean originalVietnamese;
 
     @BeforeMethod
     public void useEnglishLabels() {
-        originalChinese = I18nUtil.isChinese();
+        originalVietnamese = I18nUtil.isVietnamese();
         I18nUtil.setLocale("en");
     }
 
     @AfterMethod
     public void restoreLocale() {
-        I18nUtil.setLocale(originalChinese ? "zh" : "en");
+        I18nUtil.setLocale(originalVietnamese ? "vi" : "en");
     }
 
     @Test

@@ -42,7 +42,7 @@ public class OkHttpResponseHandlerTest {
 
         assertEquals(response.bodySize, largeBody.length());
         assertFalse(response.body.contains(largeBody.substring(0, 1024)));
-        assertTrue(response.body.contains("skipped") || response.body.contains("跳过"), response.body);
+        assertTrue(response.body.contains("skipped") || response.body.contains("Bỏ qua"), response.body);
     }
 
     @Test
@@ -158,7 +158,7 @@ public class OkHttpResponseHandlerTest {
 
     @Test
     public void shouldKeepSmartFileNameAndSkipRawBytesForPlainUtf8Json() throws Exception {
-        String json = "{\"name\":\"测试\"}";
+        String json = "{\"name\":\"Bài kiểm tra\"}";
         HttpResponse response = new HttpResponse();
 
         OkHttpResponseHandler.handleResponse(
@@ -216,7 +216,7 @@ public class OkHttpResponseHandlerTest {
     @Test
     public void shouldKeepRawBytesForNonUtf8Charset() throws Exception {
         Charset gbk = Charset.forName("GBK");
-        byte[] text = "中文内容".getBytes(gbk);
+        byte[] text = "Nội dung Trung Quốc".getBytes(gbk);
         HttpResponse response = new HttpResponse();
 
         OkHttpResponseHandler.handleResponse(
@@ -225,7 +225,7 @@ public class OkHttpResponseHandlerTest {
                 null
         );
 
-        assertEquals(response.body, "中文内容");
+        assertEquals(response.body, "Nội dung Trung Quốc");
         assertEquals(response.rawBodyBytes, text);
     }
 
@@ -260,7 +260,7 @@ public class OkHttpResponseHandlerTest {
             assertNotNull(octetStream.filePath);
             assertEquals(octetStream.detectedFileExtension, ".xlsx");
             assertEquals(octetStream.fileName, "export.xlsx");
-            assertEquals(wrongExcelMime.detectedFileExtension, ".xlsx", "声明具体但与内容冲突时提示");
+            assertEquals(wrongExcelMime.detectedFileExtension, ".xlsx", "Nhắc khi phát biểu cụ thể nhưng mâu thuẫn với nội dung");
             assertEquals(wrongExcelMime.fileName, "report.xlsx");
         } finally {
             deleteTempFile(octetStream);
@@ -284,7 +284,7 @@ public class OkHttpResponseHandlerTest {
             assertTrue(declaredPng.isImage);
             assertEquals(octetPng.detectedFileExtension, ".png");
             assertEquals(octetPng.fileName, "avatar.png");
-            assertTrue(octetPng.isImage, "按内容识别出的图片也可以预览");
+            assertTrue(octetPng.isImage, "Hình ảnh được nhận dạng theo nội dung cũng có thể được xem trước");
         } finally {
             deleteTempFile(declaredPng);
             deleteTempFile(octetPng);
@@ -301,7 +301,7 @@ public class OkHttpResponseHandlerTest {
 
             assertEquals(response.detectedFileExtension, ".pdf");
             assertEquals(response.fileName, "photo.pdf");
-            assertFalse(response.isImage, "实际是 PDF，不能按图片预览");
+            assertFalse(response.isImage, "Trên thực tế là có PDF，Không thể xem trước bằng hình ảnh");
         } finally {
             deleteTempFile(response);
         }
@@ -322,12 +322,12 @@ public class OkHttpResponseHandlerTest {
                     com.laker.postman.http.runtime.file.ResponseFileFixtures.ooxml("xl/workbook.xml",
                             "application/vnd.ms-excel.sheet.macroEnabled.main+xml")), xlsm, null);
 
-            assertNull(zip.detectedFileExtension, "application/zip + ZIP 不提示类型不符");
+            assertNull(zip.detectedFileExtension, "application/zip + ZIP Không có lời nhắc về loại không khớp");
             assertEquals(zip.fileName, "archive.zip");
             assertNull(docx.detectedFileExtension);
             assertEquals(docx.fileName, "doc.docx");
             assertEquals(xlsm.detectedFileExtension, ".xlsm");
-            assertEquals(xlsm.fileName, "report.xlsm", "启用宏的工作簿必须使用 .xlsm 才能被 Excel 打开");
+            assertEquals(xlsm.fileName, "report.xlsm", "Cần thiết cho sổ làm việc hỗ trợ macro .xlsm Để được Excel Mở");
 
             HttpResponse plainXlsx = new HttpResponse();
             OkHttpResponseHandler.handleResponse(response("http://example.test/report.xlsm",
@@ -336,7 +336,7 @@ public class OkHttpResponseHandlerTest {
                             "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml")), plainXlsx, null);
             deleteTempFile(plainXlsx);
             assertEquals(plainXlsx.detectedFileExtension, ".xlsx");
-            assertEquals(plainXlsx.fileName, "report.xlsx", "已确认是标准 xlsx 时纠正错误声明的 .xlsm");
+            assertEquals(plainXlsx.fileName, "report.xlsx", "Được xác nhận là tiêu chuẩn xlsx Khi sửa chữa những sai sót .xlsm");
         } finally {
             deleteTempFile(zip);
             deleteTempFile(docx);
@@ -357,7 +357,7 @@ public class OkHttpResponseHandlerTest {
 
             assertNull(apk.detectedFileExtension);
             assertEquals(apk.fileName, "download.apk");
-            assertNull(unmapped.detectedFileExtension, "未映射的具体 MIME 不应被通用 ZIP 识别误报为不符");
+            assertNull(unmapped.detectedFileExtension, "Bê tông chưa được lập bản đồ MIME Không nên sử dụng một cách tổng quát ZIP Identify false positives as discrepancies");
             assertEquals(unmapped.fileName, "download");
         } finally {
             deleteTempFile(apk);
@@ -373,7 +373,7 @@ public class OkHttpResponseHandlerTest {
                 response("http://example.test/data.pb", null, null, protobuf), response, null);
 
         assertEquals(response.detectedFileExtension, ".bin");
-        assertEquals(response.fileName, "data.pb", "仅按控制字节判断的未知二进制不能否定 URL 后缀");
+        assertEquals(response.fileName, "data.pb", "Không thể phủ định một nhị phân không xác định chỉ được đánh giá bởi byte điều khiển URL hậu tố");
     }
 
     @Test
@@ -404,19 +404,19 @@ public class OkHttpResponseHandlerTest {
                         "attachment; filename*=UTF-8''%E8%AE%A2%E5%8D%95.xlsx", xlsx),
                 response, null);
 
-        assertEquals(response.fileName, "订单.xlsx");
+        assertEquals(response.fileName, "đặt hàng.xlsx");
     }
 
     @Test
     public void shouldKeepUtf16TextWithoutBomAsText() throws Exception {
-        byte[] utf16 = "hello 中文".getBytes(StandardCharsets.UTF_16LE);
+        byte[] utf16 = "hello Tiếng Trung Quốc".getBytes(StandardCharsets.UTF_16LE);
         HttpResponse response = new HttpResponse();
 
         OkHttpResponseHandler.handleResponse(
                 response("http://example.test/text", "text/plain; charset=UTF-16LE", null, utf16), response, null);
 
         assertNull(response.detectedFileExtension);
-        assertEquals(response.body, "hello 中文");
+        assertEquals(response.body, "hello Tiếng Trung Quốc");
     }
 
     @Test
@@ -435,9 +435,9 @@ public class OkHttpResponseHandlerTest {
 
             assertEquals(download.fileName, "download.zip");
             assertEquals(download.detectedFileExtension, ".zip");
-            assertEquals(disguised.fileName, "photo.zip", "png 有唯一文件头，ZIP 内容的 .png 后缀一定是错的");
+            assertEquals(disguised.fileName, "photo.zip", "png Có một tiêu đề tập tin duy nhất.ZIP nội dung .png Hậu tố phải sai");
             assertEquals(jar.fileName, "app.jar");
-            assertNull(jar.detectedFileExtension, "具体的声明类型不应被通用 ZIP 识别误报为不符");
+            assertNull(jar.detectedFileExtension, "Các loại khai báo cụ thể không nên được khái quát hóa ZIP Identify false positives as discrepancies");
         } finally {
             deleteTempFile(download);
             deleteTempFile(disguised);
@@ -504,9 +504,9 @@ public class OkHttpResponseHandlerTest {
                     "application/octet-stream", null, zipWithEntry("a.csv")), yamlZip, null);
 
             assertEquals(pdfResponse.fileName, "export.pdf");
-            assertNull(pdfResponse.detectedFileExtension, "内容与声明一致，不提示类型不符");
+            assertNull(pdfResponse.detectedFileExtension, "Nội dung nhất quán với khai báo và không có sự không thống nhất về loại nào được nhắc nhở");
             assertEquals(pngResponse.fileName, "avatar.png");
-            assertEquals(yamlZip.fileName, "data.zip", "非容器格式的后缀以内容为准");
+            assertEquals(yamlZip.fileName, "data.zip", "Hậu tố cho các định dạng không chứa phụ thuộc vào nội dung");
         } finally {
             deleteTempFile(pdfResponse);
             deleteTempFile(pngResponse);
@@ -522,7 +522,7 @@ public class OkHttpResponseHandlerTest {
                     "application/vnd.ms-excel.sheet.macroEnabled.12", null,
                     com.laker.postman.http.runtime.file.ResponseFileFixtures.xlsx()), response, null);
 
-            assertEquals(response.fileName, "export.xlsm", "文件头只能确定 .xlsx 时不能覆盖声明的 .xlsm");
+            assertEquals(response.fileName, "export.xlsm", "Tiêu đề tập tin chỉ có thể được xác định .xlsx Tuyên bố không thể được ghi đè .xlsm");
             assertNull(response.detectedFileExtension);
         } finally {
             deleteTempFile(response);

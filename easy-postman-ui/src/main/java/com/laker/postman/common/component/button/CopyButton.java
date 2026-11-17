@@ -9,8 +9,8 @@ import javax.swing.*;
 import java.awt.*;
 
 /**
- * 复制按钮
- * 用于复制文本内容到剪贴板
+ * Nút sao chép
+ * Dùng để sao chép nội dung văn bản vào clipboard
  */
 public class CopyButton extends JButton {
     public CopyButton() {

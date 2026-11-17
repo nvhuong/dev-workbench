@@ -22,7 +22,7 @@ import java.util.function.IntSupplier;
 import java.util.function.Supplier;
 
 /**
- * 创建和刷新侧边栏自定义 tab 组件。
+ * Tạo và làm mới các tùy chỉnh thanh bên tab thành phần.
  */
 @RequiredArgsConstructor
 final class SidebarTabComponentFactory {

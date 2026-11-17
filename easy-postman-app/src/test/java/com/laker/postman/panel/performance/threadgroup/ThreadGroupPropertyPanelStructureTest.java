@@ -112,10 +112,10 @@ public class ThreadGroupPropertyPanelStructureTest extends AbstractSwingUiTest {
 
     @Test
     public void fixedExecutionModeChineseToggleLabelsShouldStayShort() {
-        ResourceBundle zhMessages = ResourceBundle.getBundle("messages", Locale.SIMPLIFIED_CHINESE);
+        ResourceBundle zhMessages = ResourceBundle.getBundle("messages", Locale.forLanguageTag("vi"));
 
-        assertEquals(zhMessages.getString(MessageKeys.THREADGROUP_FIXED_EXECUTION_COUNT), "次数");
-        assertEquals(zhMessages.getString(MessageKeys.THREADGROUP_FIXED_EXECUTION_TIME), "时间");
+        assertEquals(zhMessages.getString(MessageKeys.THREADGROUP_FIXED_EXECUTION_COUNT), "lần");
+        assertEquals(zhMessages.getString(MessageKeys.THREADGROUP_FIXED_EXECUTION_TIME), "thời gian");
     }
 
     @Test

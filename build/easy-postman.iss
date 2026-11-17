@@ -1,9 +1,9 @@
-; EasyPostman Inno Setup 脚本
-; 详细文档请参考：https://jrsoftware.org/ishelp/
+; EasyPostman Inno Setup kịch bản
+; For detailed documentation, please refer to:https://jrsoftware.org/ishelp/
 
-; ==================== 外部传入的变量 ====================
-; 这些变量可以通过命令行传入：iscc /DMyAppVersion=4.0.9 easy-postman.iss
-; 注意：路径是相对于 ISS 脚本位置（build 目录），所以需要 ..\ 返回上级
+; ==================== Các biến được truyền vào từ bên ngoài ====================
+; Các biến này có thể được truyền vào thông qua dòng lệnh: .iscc /DMyAppVersion=4.0.9 easy-postman.iss
+; LƯU Ý: Đường dẫn có liên quan đến  ISS vị trí tập lệnh (build thư mục), vì vậy cần thiết ..\ Trở lại cấp độ trước đó
 #ifndef MyAppVersion
   #define MyAppVersion "4.0.9"
 #endif
@@ -17,7 +17,7 @@
   #define MyArch "x64"
 #endif
 
-; ==================== 应用常量定义 ====================
+; ==================== Áp dụng định nghĩa hằng ====================
 #define MyAppName "EasyPostman"
 #define MyAppPublisher "Laker"
 #define MyAppURL "https://github.com/lakernote/easy-postman"
@@ -26,70 +26,70 @@
 #define MyAppExeName "EasyPostman.exe"
 
 [Setup]
-; AppId 是应用的唯一标识符（GUID），不要修改！用于支持升级安装
-; 注意：AppId 直接使用 GUID（不带花括号），Inno Setup 会自动添加 _is1 后缀生成注册表键
-; 最终注册表路径: HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\8B9C5D6E-7F8A-9B0C-1D2E-3F4A5B6C7D8E_is1
+; AppId là mã định danh duy nhất của ứng dụng (GUID），Đừng sửa đổi nó! Được sử dụng để hỗ trợ cài đặt nâng cấp
+; Lưu ý:AppId Sử dụng trực tiếp GUID（không có dấu ngoặc nhọn).Inno Setup sẽ được thêm tự động _is1 Suffix tạo khóa đăng ký
+; Đường dẫn đăng ký cuối cùng: HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\8B9C5D6E-7F8A-9B0C-1D2E-3F4A5B6C7D8E_is1
 AppId=8B9C5D6E-7F8A-9B0C-1D2E-3F4A5B6C7D8E
-; 应用基本信息
+; Thông tin ứng dụng cơ bản
 AppName={#MyAppName}
 AppVersion={#MyAppVersion}
 AppPublisher={#MyAppPublisher}
 AppPublisherURL={#MyAppURL}
 AppSupportURL={#MyAppSupportURL}
 AppUpdatesURL={#MyAppUpdatesURL}
-; 默认安装路径：C:\Program Files\EasyPostman
+; Đường dẫn cài đặt mặc định: .C:\Program Files\EasyPostman
 DefaultDirName={autopf}\{#MyAppName}
-; 卸载程序显示的图标
+; Biểu tượng được hiển thị bởi trình gỡ cài đặt
 UninstallDisplayIcon={app}\{#MyAppExeName}
-; 支持的架构：x64 和 ARM64（Windows 11 on ARM）
+; Các kiến trúc được hỗ trợ:x64 và ARM64（Windows 11 on ARM）
 ArchitecturesAllowed=x64compatible arm64
 ArchitecturesInstallIn64BitMode=x64compatible arm64
-; 不显示"选择开始菜单文件夹"页面
+; Không được hiển thị"Chọn thư mục menu Bắt đầu"trang
 DisableProgramGroupPage=yes
-; 输出配置
+; Cấu hình đầu ra
 OutputDir={#MyOutputDir}
 OutputBaseFilename={#MyAppName}-{#MyAppVersion}-windows-{#MyArch}
-; 压缩配置：使用最高级别的压缩
+; Cấu hình nén: Sử dụng mức nén cao nhất
 Compression=lzma2/max
 SolidCompression=yes
-; 安装向导界面风格：modern（现代扁平化）
+; Kiểu giao diện trình hướng dẫn cài đặt:modern（căn hộ hiện đại)
 WizardStyle=modern
-; 安装程序的图标（相对于 ISS 脚本的路径）
+; Biểu tượng của trình cài đặt (liên quan đến  ISS đường dẫn đến tập lệnh)
 SetupIconFile=..\assets\win\EasyPostman.ico
 
 [Languages]
-; 安装向导语言
+; Ngôn ngữ hướng dẫn cài đặt
 Name: "english"; MessagesFile: "compiler:Default.isl"
 
 [Tasks]
-; 可选任务：创建桌面快捷方式（默认选中）
+; Tác vụ tùy chọn: Tạo lối tắt trên màn hình (được chọn theo mặc định)
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"
 
 [Files]
-; 复制 jpackage 生成的所有文件到安装目录
+; Sao chép jpackage Tạo tất cả các tập tin vào thư mục cài đặt
 Source: "{#MyAppSourceDir}\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion
 Source: "{#MyAppSourceDir}\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 
 [Icons]
-; 创建快捷方式
+; Tạo lối tắt
 Name: "{autoprograms}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"
 Name: "{autodesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Tasks: desktopicon
 
 [InstallDelete]
-; 升级安装时清理旧版本的文件（避免文件冗余和版本冲突）
+; Dọn dẹp các phiên bản cũ của tệp trong quá trình cài đặt nâng cấp (để tránh dư thừa tệp và xung đột phiên bản)
 Type: files; Name: "{app}\app\*.jar"
 Type: filesandordirs; Name: "{app}\runtime\*"
 Type: filesandordirs; Name: "{app}\plugins\*"
 
 [Run]
-; 安装完成后的启动选项
-; 交互式安装：提示用户是否启动应用
+; Tùy chọn khởi động sau khi cài đặt hoàn tất
+; Cài đặt tương tác: Nhắc người dùng có nên khởi chạy ứng dụng hay không
 Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; Flags: nowait postinstall skipifsilent; Check: ShouldPromptStart
-; 静默安装：如果指定了 /AUTOSTART 参数，则后台自动启动（用于自动更新场景）
+; Cài đặt im lặng: nếu được chỉ định /AUTOSTART các thông số, nền sẽ tự động bắt đầu (để tự động cập nhật cảnh)
 Filename: "{app}\{#MyAppExeName}"; Flags: nowait runhidden; Check: ShouldAutoStart
 
 [Code]
-{ 检查命令行参数是否存在 }
+{ Kiểm tra xem các tham số dòng lệnh có tồn tại không }
 function CmdLineParamExists(const Value: string): Boolean;
 var
   I: Integer;
@@ -103,14 +103,14 @@ begin
     end;
 end;
 
-{ 判断是否应该自动启动应用 }
-{ 使用场景：EasyPostman-Setup.exe /VERYSILENT /AUTOSTART }
+{ Xác định xem ứng dụng có nên được khởi chạy tự động hay không }
+{ Tình huống sử dụng:EasyPostman-Setup.exe /VERYSILENT /AUTOSTART }
 function ShouldAutoStart: Boolean;
 begin
   Result := WizardSilent and CmdLineParamExists('/AUTOSTART');
 end;
 
-{ 判断是否应该提示用户启动应用（交互式安装时） }
+{ Xác định xem người dùng có được nhắc khởi chạy ứng dụng hay không (khi cài đặt tương tác) }
 function ShouldPromptStart: Boolean;
 begin
   Result := not WizardSilent;

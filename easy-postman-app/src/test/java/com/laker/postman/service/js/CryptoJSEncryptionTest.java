@@ -17,21 +17,21 @@ import java.util.ArrayList;
 import static org.testng.Assert.*;
 
 /**
- * CryptoJS AES 加密测试 - 完整场景测试
- * 测试 pm.environment、pm.request、CryptoJS、btoa、encodeURIComponent 等功能的集成使用
+ * CryptoJS AES Kiểm tra mã hóa - Hoàn thành thử nghiệm kịch bản
+ * Bài kiểm tra pm.environment、pm.request、CryptoJS、btoa、encodeURIComponent Sử dụng tích hợp các chức năng
  */
 public class CryptoJSEncryptionTest {
 
-    @Test(description = "测试完整的 CryptoJS AES 加密脚本场景")
+    @Test(description = "Kiểm tra hoàn tất CryptoJS AES Kịch bản tập lệnh được mã hóa")
     public void testCryptoJSEncryptionWithPmContext() {
-        // 1. 准备环境变量
+        // 1. Chuẩn bị các biến môi trường
         Environment env = new Environment();
         env.setName("Test Environment");
-        env.set("secret_key", "1234567890123456"); // 16字节密钥
+        env.set("secret_key", "1234567890123456"); // 16Khóa byte
         env.set("app_code", "myAppCode");
         env.set("app_secret", "myAppSecret");
 
-        // 2. 准备请求对象
+        // 2. Chuẩn bị đối tượng yêu cầu
         PreparedRequest preparedRequest = new PreparedRequest();
         preparedRequest.id = "test-request-001";
         preparedRequest.url = "https://api.example.com/login?username=testuser&password=mypassword123";
@@ -39,7 +39,7 @@ public class CryptoJSEncryptionTest {
         preparedRequest.headersList = new ArrayList<>();
         preparedRequest.paramsList = new ArrayList<>();
 
-        // 添加查询参数
+        // Thêm tham số truy vấn
         HttpParam usernameParam = new HttpParam();
         usernameParam.setKey("username");
         usernameParam.setValue("testuser");
@@ -52,11 +52,11 @@ public class CryptoJSEncryptionTest {
         passwordParam.setEnabled(true);
         preparedRequest.paramsList.add(passwordParam);
 
-        // 3. 创建 PostmanApiContext
+        // 3. Tạo PostmanApiContext
         PostmanApiContext pm = new PostmanApiContext(env);
         pm.request = new ScriptRequestAccessor(preparedRequest);
 
-        // 4. 执行 JavaScript 脚本
+        // 4. thực hiện JavaScript kịch bản
         try (Context context = Context.newBuilder("js")
                 .allowAllAccess(true)
                 .allowNativeAccess(true)
@@ -65,31 +65,31 @@ public class CryptoJSEncryptionTest {
                 .err(System.err)
                 .build()) {
 
-            // 注入 CryptoJS 和 Polyfill
+            // tiêm CryptoJS và Polyfill
             JsLibraryLoader.injectBuiltinLibraries(context);
             JsPolyfillInjector.injectAll(context);
 
-            // 注入 pm 对象
+            // tiêm pm đối tượng
             context.getBindings("js").putMember("pm", pm);
 
-            // 执行完整的加密脚本
+            // Thực thi tập lệnh mã hóa hoàn chỉnh
             String script = """
-                    // 从环境变量获取配置
+                    // Nhận cấu hình từ các biến môi trường
                     var secret_key = pm.environment.get("secret_key");
                     var app_code = pm.environment.get("app_code");
                     var app_secret = pm.environment.get("app_secret");
-                    
-                    // 生成 Basic 认证头
+
+                    // phát ra Basic Tiêu đề xác thực
                     var authz_header = "Basic " + btoa(app_code + ":" + app_secret);
-                    
-                    // 获取密码参数（使用 Postman 标准 API）
+
+                    // Lấy tham số mật khẩu (sử dụng  Postman tiêu chuẩn API）
                     var password = pm.request.url.query.all()[1].value;
-                    
-                    // 解析密钥
+
+                    // Phân tích chìa khóa
                     var key = CryptoJS.enc.Latin1.parse(secret_key);
                     var iv = key;
-                    
-                    // AES 加密
+
+                    // AES Mã hóa
                     var encrypted = CryptoJS.AES.encrypt(
                         password,
                         key, {
@@ -98,62 +98,62 @@ public class CryptoJSEncryptionTest {
                             padding: CryptoJS.pad.ZeroPadding
                         }
                     );
-                    
-                    // URL 编码
+
+                    // URL Mã hóa
                     var encrypted_password = encodeURIComponent(encrypted.toString());
-                    
-                    // 输出日志
+
+                    // Nhật ký đầu ra
                     console.log("Original Password: " + password);
                     console.log("Encrypted Password: " + encrypted_password);
                     console.log("Authorization Header: " + authz_header);
-                    
-                    // 修改请求参数（使用 Postman 标准 API）
+
+                    // Sửa đổi các tham số yêu cầu (bằng cách sử dụng Postman tiêu chuẩn API）
                     pm.request.url.query.all()[1].value = encrypted_password;
-                    
-                    // 添加认证头
+
+                    // Thêm tiêu đề xác thực
                     pm.request.headers.add({
                         key: 'Authorization',
                         value: authz_header
                     });
-                    
-                    // 返回加密后的密码用于验证
+
+                    // Trả về mật khẩu được mã hóa để xác minh
                     encrypted_password;
                     """;
 
             Value result = context.eval("js", script);
             String encryptedPassword = result.asString();
 
-            // 同步 JavaScript 对字段的修改回底层对象
+            // đồng bộ JavaScript Sửa đổi các trường được trả về đối tượng cơ bản
             pm.request.url.query.sync();
 
-            // 5. 验证结果
-            assertNotNull(encryptedPassword, "加密后的密码不应为空");
-            assertFalse(encryptedPassword.isEmpty(), "加密后的密码不应为空字符串");
-            assertTrue(encryptedPassword.contains("%"), "URL 编码后应包含 %");
-            assertNotEquals(encryptedPassword, "mypassword123", "密码应该已被加密");
+            // 5. Xác minh kết quả
+            assertNotNull(encryptedPassword, "Mật khẩu được mã hóa không được để trống");
+            assertFalse(encryptedPassword.isEmpty(), "Mật khẩu được mã hóa không được là một chuỗi trống");
+            assertTrue(encryptedPassword.contains("%"), "URL Nên được bao gồm sau khi mã hóa %");
+            assertNotEquals(encryptedPassword, "mypassword123", "Mật khẩu phải được mã hóa");
 
-            // 验证请求参数已被修改
+            // Xác minh rằng các tham số yêu cầu đã được sửa đổi
             assertEquals(preparedRequest.paramsList.get(1).getValue(), encryptedPassword,
-                    "请求中的密码参数应该已被更新为加密后的值");
+                    "The password parameter in the request should have been updated with the encrypted value");
 
-            // 验证 Authorization 头已添加
-            assertEquals(preparedRequest.headersList.size(), 1, "应该添加了一个请求头");
+            // Xác minh Authorization Tiêu đề đã được thêm vào
+            assertEquals(preparedRequest.headersList.size(), 1, "Một tiêu đề yêu cầu nên được thêm vào");
             HttpHeader authHeader = preparedRequest.headersList.get(0);
-            assertEquals(authHeader.getKey(), "Authorization", "请求头名称应为 Authorization");
-            assertTrue(authHeader.getValue().startsWith("Basic "), "应该是 Basic 认证");
+            assertEquals(authHeader.getKey(), "Authorization", "Tên tiêu đề yêu cầu phải là Authorization");
+            assertTrue(authHeader.getValue().startsWith("Basic "), "Nó nên như vậy Basic Chứng nhận");
 
-            // 验证 Basic 认证头的内容
+            // Xác minh Basic Nội dung của tiêu đề xác thực
             String expectedAuth = "Basic bXlBcHBDb2RlOm15QXBwU2VjcmV0"; // Base64("myAppCode:myAppSecret")
-            assertEquals(authHeader.getValue(), expectedAuth, "Basic 认证头应该正确编码");
+            assertEquals(authHeader.getValue(), expectedAuth, "Basic Tiêu đề xác thực phải được mã hóa chính xác");
 
-            System.out.println("✅ 完整加密脚本测试通过!");
-            System.out.println("   原始密码: mypassword123");
-            System.out.println("   加密后: " + encryptedPassword);
-            System.out.println("   认证头: " + authHeader.getValue());
+            System.out.println("✅ Đã vượt qua bài kiểm tra tập lệnh mã hóa hoàn chỉnh!");
+            System.out.println("   Mật khẩu gốc: mypassword123");
+            System.out.println("   Sau khi mã hóa: " + encryptedPassword);
+            System.out.println("   Tiêu đề xác thực: " + authHeader.getValue());
         }
     }
 
-    @Test(description = "测试 CryptoJS AES 加密的可逆性")
+    @Test(description = "Bài kiểm tra CryptoJS AES Khả năng đảo ngược của mã hóa")
     public void testCryptoJSEncryptionDecryption() {
         try (Context context = Context.newBuilder("js")
                 .allowAllAccess(true)
@@ -168,11 +168,11 @@ public class CryptoJSEncryptionTest {
             String script = """
                     var secret_key = "1234567890123456";
                     var password = "mypassword123";
-                    
-                    // 加密
+
+                    // Mã hóa
                     var key = CryptoJS.enc.Latin1.parse(secret_key);
                     var iv = key;
-                    
+
                     var encrypted = CryptoJS.AES.encrypt(
                         password,
                         key, {
@@ -181,11 +181,11 @@ public class CryptoJSEncryptionTest {
                             padding: CryptoJS.pad.ZeroPadding
                         }
                     );
-                    
+
                     var encryptedStr = encrypted.toString();
                     console.log("Encrypted: " + encryptedStr);
-                    
-                    // 解密
+
+                    // Giải mã
                     var decrypted = CryptoJS.AES.decrypt(
                         encryptedStr,
                         key, {
@@ -194,22 +194,22 @@ public class CryptoJSEncryptionTest {
                             padding: CryptoJS.pad.ZeroPadding
                         }
                     );
-                    
+
                     var decryptedStr = decrypted.toString(CryptoJS.enc.Utf8).replace(/\\0+$/, '');
                     console.log("Decrypted: " + decryptedStr);
-                    
+
                     decryptedStr;
                     """;
 
             Value result = context.eval("js", script);
             String decrypted = result.asString();
 
-            assertEquals(decrypted, "mypassword123", "解密后应该恢复原始密码");
-            System.out.println("✅ 加密解密测试通过!");
+            assertEquals(decrypted, "mypassword123", "Mật khẩu ban đầu sẽ được khôi phục sau khi giải mã");
+            System.out.println("✅ Quá trình kiểm tra mã hóa và giải mã đã vượt qua!");
         }
     }
 
-    @Test(description = "测试不同密钥长度的 AES 加密")
+    @Test(description = "Kiểm tra độ dài khóa khác nhau AES Mã hóa")
     public void testDifferentKeyLengths() {
         try (Context context = Context.newBuilder("js")
                 .allowAllAccess(true)
@@ -221,38 +221,38 @@ public class CryptoJSEncryptionTest {
             JsLibraryLoader.injectBuiltinLibraries(context);
             JsPolyfillInjector.injectAll(context);
 
-            // 测试 128-bit (16字节)
+            // Bài kiểm tra 128-bit (16Byte)
             String script128 = """
                     var key = CryptoJS.enc.Latin1.parse("1234567890123456");
                     var encrypted = CryptoJS.AES.encrypt("test", key, {iv: key, mode: CryptoJS.mode.CBC});
                     encrypted.toString();
                     """;
             Value result128 = context.eval("js", script128);
-            assertNotNull(result128.asString(), "128-bit 密钥加密应该成功");
+            assertNotNull(result128.asString(), "128-bit Mã hóa khóa sẽ thành công");
 
-            // 测试 192-bit (24字节)
+            // Bài kiểm tra 192-bit (24Byte)
             String script192 = """
                     var key = CryptoJS.enc.Latin1.parse("123456789012345678901234");
                     var encrypted = CryptoJS.AES.encrypt("test", key, {iv: key, mode: CryptoJS.mode.CBC});
                     encrypted.toString();
                     """;
             Value result192 = context.eval("js", script192);
-            assertNotNull(result192.asString(), "192-bit 密钥加密应该成功");
+            assertNotNull(result192.asString(), "192-bit Mã hóa khóa sẽ thành công");
 
-            // 测试 256-bit (32字节)
+            // Bài kiểm tra 256-bit (32Byte)
             String script256 = """
                     var key = CryptoJS.enc.Latin1.parse("12345678901234567890123456789012");
                     var encrypted = CryptoJS.AES.encrypt("test", key, {iv: key, mode: CryptoJS.mode.CBC});
                     encrypted.toString();
                     """;
             Value result256 = context.eval("js", script256);
-            assertNotNull(result256.asString(), "256-bit 密钥加密应该成功");
+            assertNotNull(result256.asString(), "256-bit Mã hóa khóa sẽ thành công");
 
-            System.out.println("✅ 不同密钥长度测试通过!");
+            System.out.println("✅ Đã vượt qua các thử nghiệm với độ dài khóa khác nhau!");
         }
     }
 
-    @Test(description = "测试 btoa 和 atob 功能")
+    @Test(description = "Bài kiểm tra btoa và atob Chức năng")
     public void testBtoaAndAtob() {
         try (Context context = Context.newBuilder("js")
                 .allowAllAccess(true)
@@ -261,21 +261,21 @@ public class CryptoJSEncryptionTest {
 
             JsPolyfillInjector.injectAll(context);
 
-            // 测试 btoa
+            // Bài kiểm tra btoa
             String btoaScript = "btoa('myAppCode:myAppSecret')";
             Value encoded = context.eval("js", btoaScript);
-            assertEquals(encoded.asString(), "bXlBcHBDb2RlOm15QXBwU2VjcmV0", "btoa 编码应该正确");
+            assertEquals(encoded.asString(), "bXlBcHBDb2RlOm15QXBwU2VjcmV0", "btoa Việc mã hóa phải chính xác");
 
-            // 测试 atob
+            // Bài kiểm tra atob
             String atobScript = "atob('bXlBcHBDb2RlOm15QXBwU2VjcmV0')";
             Value decoded = context.eval("js", atobScript);
-            assertEquals(decoded.asString(), "myAppCode:myAppSecret", "atob 解码应该正确");
+            assertEquals(decoded.asString(), "myAppCode:myAppSecret", "atob Giải mã phải chính xác");
 
-            System.out.println("✅ btoa/atob 测试通过!");
+            System.out.println("✅ btoa/atob Thử nghiệm đã trôi qua!");
         }
     }
 
-    @Test(description = "测试 encodeURIComponent 和 decodeURIComponent")
+    @Test(description = "Bài kiểm tra encodeURIComponent và decodeURIComponent")
     public void testEncodeDecodeURIComponent() {
         try (Context context = Context.newBuilder("js")
                 .allowAllAccess(true)
@@ -284,27 +284,27 @@ public class CryptoJSEncryptionTest {
 
             JsPolyfillInjector.injectAll(context);
 
-            String testString = "Hello World! 你好世界 #special@chars&=+";
+            String testString = "Hello World! Xin chào thế giới #special@chars&=+";
 
             String encodeScript = String.format("encodeURIComponent('%s')",
                     testString.replace("'", "\\'"));
             Value encoded = context.eval("js", encodeScript);
             String encodedStr = encoded.asString();
 
-            assertTrue(encodedStr.contains("%"), "编码后应包含 %");
-            assertFalse(encodedStr.contains(" "), "空格应该被编码");
-            assertFalse(encodedStr.contains("#"), "# 应该被编码");
+            assertTrue(encodedStr.contains("%"), "Nên được bao gồm sau khi mã hóa %");
+            assertFalse(encodedStr.contains(" "), "Dấu cách phải được mã hóa");
+            assertFalse(encodedStr.contains("#"), "# nên được mã hóa");
 
-            // 测试解码
+            // Giải mã thử nghiệm
             String decodeScript = String.format("decodeURIComponent('%s')", encodedStr);
             Value decoded = context.eval("js", decodeScript);
-            assertEquals(decoded.asString(), testString, "解码后应恢复原始字符串");
+            assertEquals(decoded.asString(), testString, "Chuỗi gốc sẽ được khôi phục sau khi giải mã");
 
-            System.out.println("✅ encodeURIComponent/decodeURIComponent 测试通过!");
+            System.out.println("✅ encodeURIComponent/decodeURIComponent Thử nghiệm đã trôi qua!");
         }
     }
 
-    @Test(description = "测试 decodeURIComponent 保留加号")
+    @Test(description = "Bài kiểm tra decodeURIComponent Giữ dấu cộng")
     public void testDecodeURIComponentKeepsPlusSign() {
         try (Context context = Context.newBuilder("js")
                 .allowAllAccess(true)
@@ -314,11 +314,11 @@ public class CryptoJSEncryptionTest {
             JsPolyfillInjector.injectAll(context);
 
             Value decoded = context.eval("js", "decodeURIComponent('a+b%20c')");
-            assertEquals(decoded.asString(), "a+b c", "decodeURIComponent 不应把 + 解码为空格");
+            assertEquals(decoded.asString(), "a+b c", "decodeURIComponent Không nên sử dụng + Được giải mã dưới dạng khoảng trắng");
         }
     }
 
-    @Test(description = "测试 decodeURI 保留 URL 保留字符")
+    @Test(description = "Bài kiểm tra decodeURI Đã đặt trước URL Ký tự dành riêng")
     public void testDecodeUriKeepsReservedCharactersEscaped() {
         try (Context context = Context.newBuilder("js")
                 .allowAllAccess(true)
@@ -330,13 +330,13 @@ public class CryptoJSEncryptionTest {
             Value decoded = context.eval("js", "decodeURI('https://example.com/a%2Fb?q=a%2Bb%20c&x=%E6%B5%8B%E8%AF%95#frag')");
             assertEquals(
                     decoded.asString(),
-                    "https://example.com/a%2Fb?q=a%2Bb c&x=测试#frag",
-                    "decodeURI 应保留路径和查询中的保留字符编码"
+                    "https://example.com/a%2Fb?q=a%2Bb c&x=Bài kiểm tra#frag",
+                    "decodeURI Mã hóa ký tự dành riêng trong đường dẫn và truy vấn phải được giữ nguyên"
             );
         }
     }
 
-    @Test(description = "测试环境变量获取和设置")
+    @Test(description = "Kiểm tra việc nhận và cài đặt biến môi trường")
     public void testEnvironmentVariables() {
         Environment env = new Environment();
         env.setName("Test Env");
@@ -352,20 +352,20 @@ public class CryptoJSEncryptionTest {
 
             context.getBindings("js").putMember("pm", pm);
 
-            // 测试获取环境变量
+            // Kiểm tra để thu được các biến môi trường
             String getScript = "pm.environment.get('key1')";
             Value value1 = context.eval("js", getScript);
-            assertEquals(value1.asString(), "value1", "应该能获取环境变量");
+            assertEquals(value1.asString(), "value1", "Bạn sẽ có thể nhận được các biến môi trường");
 
-            // 测试设置环境变量
+            // Kiểm tra các biến môi trường cài đặt
             context.eval("js", "pm.environment.set('key3', 'value3')");
-            assertEquals(env.get("key3"), "value3", "应该能设置环境变量");
+            assertEquals(env.get("key3"), "value3", "Có thể thiết lập các biến môi trường");
 
-            System.out.println("✅ 环境变量测试通过!");
+            System.out.println("✅ Đã vượt qua bài kiểm tra biến môi trường!");
         }
     }
 
-    @Test(description = "测试请求参数的访问和修改")
+    @Test(description = "Kiểm tra quyền truy cập và sửa đổi các tham số yêu cầu")
     public void testRequestParamsAccess() {
         PreparedRequest preparedRequest = new PreparedRequest();
         preparedRequest.url = "https://example.com?param1=value1&param2=value2";
@@ -394,30 +394,30 @@ public class CryptoJSEncryptionTest {
 
             context.getBindings("js").putMember("pm", pm);
 
-            // 测试访问参数（使用 Postman 标准 API）
+            // Kiểm tra các tham số truy cập (sử dụng  Postman tiêu chuẩn API）
             String accessScript = "pm.request.url.query.all()[0].value";
             Value value = context.eval("js", accessScript);
-            assertEquals(value.asString(), "value1", "应该能访问第一个参数");
+            assertEquals(value.asString(), "value1", "Tham số đầu tiên phải có thể truy cập được");
 
-            // 测试修改参数（使用 Postman 标准 API）
+            // Kiểm tra các tham số đã sửa đổi (sử dụng  Postman tiêu chuẩn API）
             context.eval("js", "pm.request.url.query.all()[1].value = 'newvalue2'");
 
-            // 同步修改
+            // Sửa đổi đồng bộ
             pm.request.url.query.sync();
 
             assertEquals(preparedRequest.paramsList.get(1).getValue(), "newvalue2",
-                    "参数值应该被修改");
+                    "Giá trị tham số nên được sửa đổi");
 
-            // 测试获取参数数量
+            // Bài kiểm tra nhận được số lượng tham số
             String countScript = "pm.request.url.query.all().length";
             Value count = context.eval("js", countScript);
-            assertEquals(count.asInt(), 2, "应该有2个参数");
+            assertEquals(count.asInt(), 2, "Nên có2các thông số");
 
-            System.out.println("✅ 请求参数访问测试通过!");
+            System.out.println("✅ Kiểm tra truy cập tham số yêu cầu đã vượt qua!");
         }
     }
 
-    @Test(description = "测试请求头的添加")
+    @Test(description = "Kiểm tra việc bổ sung các tiêu đề yêu cầu")
     public void testRequestHeadersAdd() {
         PreparedRequest preparedRequest = new PreparedRequest();
         preparedRequest.headersList = new ArrayList<>();
@@ -433,7 +433,7 @@ public class CryptoJSEncryptionTest {
 
             context.getBindings("js").putMember("pm", pm);
 
-            // 添加请求头
+            // Thêm tiêu đề yêu cầu
             context.eval("js", """
                     pm.request.headers.add({
                         key: 'Authorization',
@@ -441,11 +441,11 @@ public class CryptoJSEncryptionTest {
                     })
                     """);
 
-            assertEquals(preparedRequest.headersList.size(), 1, "应该添加了一个请求头");
+            assertEquals(preparedRequest.headersList.size(), 1, "Một tiêu đề yêu cầu nên được thêm vào");
             assertEquals(preparedRequest.headersList.get(0).getKey(), "Authorization");
             assertEquals(preparedRequest.headersList.get(0).getValue(), "Bearer token123");
 
-            // 添加多个请求头
+            // Thêm nhiều tiêu đề yêu cầu
             context.eval("js", """
                     pm.request.headers.add({
                         key: 'Content-Type',
@@ -453,15 +453,15 @@ public class CryptoJSEncryptionTest {
                     })
                     """);
 
-            assertEquals(preparedRequest.headersList.size(), 2, "应该有2个请求头");
+            assertEquals(preparedRequest.headersList.size(), 2, "Nên có2tiêu đề yêu cầu");
 
-            System.out.println("✅ 请求头添加测试通过!");
+            System.out.println("✅ Kiểm tra bổ sung tiêu đề yêu cầu đã vượt qua!");
         }
     }
 
-    @Test(description = "测试用户提供的原始 Postman 脚本 - 完全使用 .value 属性")
+    @Test(description = "Người dùng thử nghiệm được cung cấp thô Postman kịch bản - Được sử dụng đầy đủ .value tài sản")
     public void testUserOriginalPostmanScript() {
-        // 模拟真实的 Postman 场景
+        // Mô phỏng đồ thật Postman bối cảnh
         Environment env = new Environment();
         env.setName("Production");
         env.set("secret_key", "1234567890123456");
@@ -474,7 +474,7 @@ public class CryptoJSEncryptionTest {
         preparedRequest.headersList = new ArrayList<>();
         preparedRequest.paramsList = new ArrayList<>();
 
-        // 添加查询参数
+        // Thêm tham số truy vấn
         HttpParam usernameParam = new HttpParam();
         usernameParam.setKey("username");
         usernameParam.setValue("admin");
@@ -502,19 +502,19 @@ public class CryptoJSEncryptionTest {
             JsPolyfillInjector.injectAll(context);
             context.getBindings("js").putMember("pm", pm);
 
-            // 用户原始的 Postman 脚本（完全不修改，使用 .value 属性）
+            // Bản gốc của người dùng Postman Script (hoàn toàn không được sửa đổi, hãy sử dụng .value thuộc tính)
             String userScript = """
                     var secret_key = pm.environment.get("secret_key");
                     var app_code = pm.environment.get("app_code");
                     var app_secret = pm.environment.get("app_secret");
-                    
+
                     var authz_header = "Basic " + btoa(app_code + ":" + app_secret);
                     var password = pm.request.url.query.all()[1].value;
-                    
+
                     var key = CryptoJS.enc.Latin1.parse(secret_key);
                     var iv = key;
-                    
-                    // 加密
+
+                    // Mã hóa
                     var encrypted = CryptoJS.AES.encrypt(
                       password,
                       key, {
@@ -524,40 +524,40 @@ public class CryptoJSEncryptionTest {
                       }
                     );
                     var encrypted_password = encodeURIComponent(encrypted.toString());
-                    
+
                     console.log(encrypted_password);
                     pm.request.url.query.all()[1].value = encrypted_password;
                     pm.request.headers.add(
                         {key: 'Authorization', value: authz_header }
                     );
-                    
+
                     encrypted_password;
                     """;
 
             Value result = context.eval("js", userScript);
             String encryptedPassword = result.asString();
 
-            // 同步 JavaScript 对字段的修改
+            // đồng bộ JavaScript Sửa đổi các trường
             pm.request.url.query.sync();
 
-            // 验证结果
-            assertNotNull(encryptedPassword, "加密后的密码不应为空");
-            assertTrue(encryptedPassword.contains("%"), "URL 编码后应包含 %");
-            assertNotEquals(encryptedPassword, "mypassword123", "密码应该已被加密");
+            // Xác minh kết quả
+            assertNotNull(encryptedPassword, "Mật khẩu được mã hóa không được để trống");
+            assertTrue(encryptedPassword.contains("%"), "URL Nên được bao gồm sau khi mã hóa %");
+            assertNotEquals(encryptedPassword, "mypassword123", "Mật khẩu phải được mã hóa");
 
-            // 验证密码参数已被修改
+            // Xác minh rằng tham số mật khẩu đã được sửa đổi
             assertEquals(preparedRequest.paramsList.get(1).getValue(), encryptedPassword,
-                    "请求中的密码参数应该已被更新为加密后的值");
+                    "The password parameter in the request should have been updated with the encrypted value");
 
-            // 验证认证头
-            assertEquals(preparedRequest.headersList.size(), 1, "应该添加了一个请求头");
+            // Xác minh tiêu đề xác thực
+            assertEquals(preparedRequest.headersList.size(), 1, "Một tiêu đề yêu cầu nên được thêm vào");
             HttpHeader authHeader = preparedRequest.headersList.get(0);
             assertEquals(authHeader.getKey(), "Authorization");
             assertTrue(authHeader.getValue().startsWith("Basic "));
 
-            System.out.println("✅ 用户原始 Postman 脚本测试通过!");
-            System.out.println("   加密后的密码: " + encryptedPassword);
-            System.out.println("   认证头: " + authHeader.getValue());
+            System.out.println("✅ Bản gốc của người dùng Postman Bài kiểm tra kịch bản đã trôi qua!");
+            System.out.println("   Mật khẩu được mã hóa: " + encryptedPassword);
+            System.out.println("   Tiêu đề xác thực: " + authHeader.getValue());
         }
     }
 }

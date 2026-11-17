@@ -297,7 +297,7 @@ public class RedisPanel extends JPanel {
         actions.add(testConnectionBtn, buttonHeight);
         actions.add(btnCard, buttonHeight);
 
-        // 与 Kafka 一致：两行共用同一网格，各列左右边缘严格对齐；最后一列是操作区，密码框跨列与连接按钮右对齐。
+        // Và Kafka Nhất quán: hai hàng chia sẻ cùng một lưới và các cạnh trái và phải của mỗi cột được căn chỉnh chặt chẽ; cột cuối cùng là vùng thao tác, ô mật khẩu và nút kết nối được căn phải theo các cột.
         connectionForm = new JPanel(new MigLayout(
                 "insets 0, novisualpadding, gapy 4",
                 growFieldColumns(PROFILE_GROUP_MIN_WIDTH, PROFILE_GROUP_PREF_WIDTH) + GROUP_GAP
@@ -308,7 +308,7 @@ public class RedisPanel extends JPanel {
         ));
         connectionForm.setOpaque(false);
 
-        // 第 1 行：基础连接
+        // KHÔNG.  1 Hàng: Kết nối cơ bản
         connectionForm.add(ConnectionToolbarUi.label(t(MessageKeys.TOOLBOX_REDIS_PROFILE)));
         connectionForm.add(profileGroup, controlHeight);
         connectionForm.add(ConnectionToolbarUi.label(t(MessageKeys.TOOLBOX_REDIS_HOST)));
@@ -317,7 +317,7 @@ public class RedisPanel extends JPanel {
         connectionForm.add(portDbGroup, controlHeight);
         connectionForm.add(actions, "right, wrap");
 
-        // 第 2 行：认证
+        // KHÔNG.  2 Dòng: Xác thực
         JLabel userLabel = ConnectionToolbarUi.label(t(MessageKeys.TOOLBOX_REDIS_USER));
         JLabel passLabel = ConnectionToolbarUi.label(t(MessageKeys.TOOLBOX_REDIS_PASS));
         connectionForm.add(ConnectionToolbarUi.label(t(MessageKeys.TOOLBOX_REDIS_AUTH)));
@@ -341,14 +341,14 @@ public class RedisPanel extends JPanel {
     }
 
     /**
-     * 标签列按本列最长标签自适应；字段列窄窗口可压缩到 min，宽窗口均分多余空间，最多拉伸到 2 倍。
+     * Cột nhãn thích ứng theo nhãn dài nhất trong cột; cửa sổ hẹp của cột trường có thể được nén thành min，Cửa sổ rộng chia đều không gian thừa, kéo dài tới 2 lần.
      */
     private static String growFieldColumns(int minWidth, int prefWidth) {
         return "[pref!,right]4[" + minWidth + ":" + prefWidth + ":" + (prefWidth * 2) + ",fill,grow,shrink]";
     }
 
     /**
-     * 无认证时禁用（而非隐藏）用户名与密码：布局保持稳定，用户也能看到切换认证方式后可填写哪些项。
+     * Vô hiệu hóa (thay vì ẩn) tên người dùng và mật khẩu mà không cần xác thực: bố cục vẫn ổn định và người dùng có thể xem trường nào có thể điền sau khi chuyển đổi phương thức xác thực.
      */
     private void setAuthFieldsEnabled(boolean enabled) {
         if (authModeCombo != null) {
@@ -403,7 +403,7 @@ public class RedisPanel extends JPanel {
                 t(MessageKeys.TOOLBOX_REDIS_KEYS_MANAGEMENT), refreshKeysBtn);
 
         keySearchField = new SearchTextField();
-        // 过滤仅做不区分大小写的包含匹配，隐藏不生效的大小写/整词选项
+        // Chỉ lọc không phân biệt chữ hoa chữ thường, bao gồm các trường hợp trùng khớp và ẩn các trường hợp không hiệu quả/Tùy chọn toàn bộ từ
         keySearchField.putClientProperty(FlatClientProperties.TEXT_FIELD_TRAILING_COMPONENT, null);
         keySearchField.putClientProperty(FlatClientProperties.PLACEHOLDER_TEXT, t(MessageKeys.TOOLBOX_REDIS_KEYS_SEARCH_PLACEHOLDER));
         keySearchField.setMaximumSize(new Dimension(Integer.MAX_VALUE, 28));
@@ -530,7 +530,7 @@ public class RedisPanel extends JPanel {
     }
 
     private JPanel buildActionBar() {
-        // 与 Kafka 生产表单一致的单网格：模板/命令标签同列右对齐，加载模板与执行按钮同列右对齐。
+        // Và Kafka Hình thức sản xuất lưới đơn nhất quán: mẫu/Các nhãn lệnh được căn phải trong cùng một cột, còn các mẫu tải và nút thực thi được căn phải trong cùng một cột.
         JPanel panel = new JPanel(new MigLayout(
                 "insets 4 6 4 6, fillx, novisualpadding, gapy 4",
                 "[right]8[pref!,fill]8[]8[grow,fill]8[]8[grow,fill]8[right]",
@@ -617,14 +617,14 @@ public class RedisPanel extends JPanel {
         JPanel panel = new JPanel(new BorderLayout());
         panel.setOpaque(false);
         panel.setMinimumSize(new Dimension(0, 0));
-        // title 固定, keyMetaLabel 可伸缩但有最大宽, respStatusLabel 固定右侧
+        // title đã sửa, keyMetaLabel Có thể mở rộng nhưng có chiều rộng tối đa, respStatusLabel Đã sửa bên phải
         JPanel header = new JPanel(new MigLayout("insets 4 8 4 8, fillx", "[]8[grow,fill]push[]", "[]"));
         ToolWindowSurfaceStyle.applySectionHeader(header);
         JLabel title = new JLabel(t(MessageKeys.TOOLBOX_REDIS_RESPONSE_TITLE));
         title.setFont(FontsUtil.getDefaultFontWithOffset(Font.BOLD, -2));
         keyMetaLabel = new JLabel("");
         keyMetaLabel.setForeground(ModernColors.getPrimary());
-        // 超长 key 名用省略号截断，不撑开面板
+        // Thêm dài key Tên được cắt ngắn bằng dấu chấm lửng và không mở bảng điều khiển
         keyMetaLabel.setMinimumSize(new Dimension(0, 0));
         respStatusLabel = new JLabel("");
         respStatusLabel.setForeground(ModernColors.getTextSecondary());
@@ -768,7 +768,7 @@ public class RedisPanel extends JPanel {
     }
 
     /**
-     * 连接/测试连接进行中时互斥，避免重复点击触发并发连接。
+     * kết nối/Loại trừ lẫn nhau khi kết nối thử nghiệm đang diễn ra, để tránh các lần nhấp chuột lặp lại kích hoạt các kết nối đồng thời.
      */
     private void setConnectionBusy(boolean busy) {
         connectBtn.setEnabled(!busy);
@@ -824,7 +824,7 @@ public class RedisPanel extends JPanel {
     }
 
     /**
-     * 读取并校验当前表单的连接参数；地址非法时提示并返回 null。
+     * Đọc và xác minh các tham số kết nối của biểu mẫu hiện tại; nhắc và trả lại khi địa chỉ đó không hợp lệ null。
      */
     private ConnectionParams readConnectionParams() {
         String hostInput = getHostText();
@@ -848,7 +848,7 @@ public class RedisPanel extends JPanel {
     }
 
     /**
-     * 创建客户端并 PING 验证；失败时关闭客户端后抛出原异常。
+     * Tạo khách hàng và PING Xác minh; khi thất bại, ngoại lệ ban đầu sẽ được đưa ra sau khi đóng máy khách.
      */
     private static JedisPooled openVerifiedClient(ConnectionParams params) {
         DefaultJedisClientConfig.Builder builder = DefaultJedisClientConfig.builder()
@@ -875,7 +875,7 @@ public class RedisPanel extends JPanel {
     }
 
     /**
-     * 仅验证当前表单配置能否连通，不加载 Key、不改变已连接状态。
+     * Nó chỉ xác minh xem cấu hình biểu mẫu hiện tại có thể được kết nối và không tải hay không Key、Trạng thái kết nối không thay đổi.
      */
     private void testConnection() {
         ConnectionParams params = readConnectionParams();
@@ -1314,7 +1314,7 @@ public class RedisPanel extends JPanel {
                     String type = Objects.toString(map.get("type"), "-");
                     long ttl = ((Number) map.get("ttl")).longValue();
                     if ("none".equals(type)) {
-                        // key 已不存在，清除过期缓存
+                        // key Không còn tồn tại, hãy xóa bộ nhớ đệm đã hết hạn
                         keyTypeMap.remove(key);
                         keyTtlMap.remove(key);
                         keyMetaLabel.setText("");
@@ -1343,7 +1343,7 @@ public class RedisPanel extends JPanel {
             applyQuickReadCommand("string");
             return;
         }
-        // 异步获取 type，避免在 EDT 上阻塞
+        // Thu thập không đồng bộ type，Tránh vào EDT chặn
         new SwingWorker<String, Void>() {
             @Override
             protected String doInBackground() {

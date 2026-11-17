@@ -17,7 +17,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.BooleanSupplier;
 
 /**
- * 性能测试定时器管理器
+ * Trình quản lý hẹn giờ kiểm tra hiệu suất
  *
  * @author laker
  */
@@ -25,17 +25,17 @@ import java.util.function.BooleanSupplier;
 public class PerformanceTimerManager {
 
     /**
-     * 定时任务调度器（后台线程池）
+     * Lập lịch tác vụ theo lịch trình (nhóm luồng nền)
      */
     private ScheduledExecutorService scheduler;
 
     /**
-     * 趋势图采样定时任务
+     * Nhiệm vụ theo lịch trình lấy mẫu biểu đồ xu hướng
      */
     private ScheduledFuture<?> trendSamplingTask;
 
     /**
-     * 报表刷新定时任务
+     * Báo cáo làm mới nhiệm vụ theo lịch trình
      */
     private ScheduledFuture<?> reportRefreshTask;
 
@@ -43,12 +43,12 @@ public class PerformanceTimerManager {
     private long samplingIntervalMs = 1000;
 
     /**
-     * 报表刷新间隔（毫秒）
+     * Khoảng thời gian làm mới báo cáo (mili giây)
      */
     private static final int REPORT_REFRESH_INTERVAL_MS = 1000;
 
     /**
-     * 运行状态检查器 - 用于判断是否应该继续执行定时任务
+     * Chạy trình kiểm tra trạng thái - Được sử dụng để xác định xem các tác vụ đã lên lịch có nên tiếp tục được thực hiện hay không
      */
     private final BooleanSupplier runningChecker;
 
@@ -59,44 +59,44 @@ public class PerformanceTimerManager {
     private Runnable reportRefreshCallback;
 
     /**
-     * 是否启用趋势图采样。关闭时不创建采样定时任务，减少采样与图表刷新开销。
+     * Có bật lấy mẫu biểu đồ xu hướng hay không. Khi đóng, sẽ không có tác vụ lấy mẫu theo lịch trình nào được tạo để giảm chi phí lấy mẫu và làm mới biểu đồ.
      */
     private volatile boolean trendSamplingEnabled = true;
 
     /**
-     * 是否启用运行中报表刷新。默认结束后统一生成，减少压测过程中的快照与表格刷新开销。
+     * Có bật tính năng làm mới báo cáo đang chạy hay không. Theo mặc định, chúng được tạo đồng nhất sau khi hoàn thành để giảm chi phí cho các ảnh chụp nhanh và làm mới bảng trong quá trình kiểm tra sức chịu đựng.
      */
     private volatile boolean reportRefreshEnabled = false;
 
     /**
-     * 管理器是否已启动
+     * Cho dù người quản lý đã được bắt đầu
      */
     private final AtomicBoolean started = new AtomicBoolean(false);
 
     /**
-     * 构造函数
+     * Người xây dựng
      *
-     * @param runningChecker 运行状态检查器，返回 true 表示正在运行
+     * @param runningChecker Chạy trình kiểm tra trạng thái, quay lại true Cho biết đang chạy
      */
     public PerformanceTimerManager(BooleanSupplier runningChecker) {
         this.runningChecker = runningChecker;
     }
 
     /**
-     * 启动所有定时器
-     * 包括趋势图采样定时器和报表刷新定时器
+     * Bắt đầu tất cả các bộ tính giờ
+     * Bao gồm bộ đếm thời gian lấy mẫu biểu đồ xu hướng và bộ đếm thời gian làm mới báo cáo
      */
     public void startAll() {
         if (started.getAndSet(true)) {
-            log.warn("定时器管理器已经启动，跳过重复启动");
+            log.warn("Trình quản lý hẹn giờ đã được khởi động, bỏ qua các lần khởi động lặp lại");
             return;
         }
 
-        // 从设置中读取采样间隔
+        // Đọc khoảng thời gian lấy mẫu từ cài đặt
         int samplingIntervalSeconds = SettingManager.getTrendSamplingIntervalSeconds();
         samplingIntervalMs = samplingIntervalSeconds * 1000L;
 
-        log.info("启动性能测试定时器 - 采样间隔: {}秒, 报表实时刷新: {}",
+        log.info("Bắt đầu hẹn giờ kiểm tra hiệu suất - Khoảng thời gian lấy mẫu: {}giây, Báo cáo được làm mới trong thời gian thực: {}",
                 samplingIntervalSeconds, reportRefreshEnabled);
 
         scheduler = Executors.newSingleThreadScheduledExecutor(
@@ -106,12 +106,12 @@ public class PerformanceTimerManager {
         if (trendSamplingEnabled) {
             startTrendSamplingTimer();
         } else {
-            log.info("趋势图采样已关闭，跳过采样定时器");
+            log.info("Việc lấy mẫu biểu đồ xu hướng bị tắt và bộ đếm thời gian lấy mẫu bị bỏ qua");
         }
         if (reportRefreshEnabled) {
             startReportRefreshTimer();
         } else {
-            log.info("报表实时刷新已关闭，结束后统一生成报表");
+            log.info("Tính năng làm mới báo cáo theo thời gian thực bị tắt và báo cáo sẽ được tạo thống nhất sau khi hoàn thành");
         }
     }
 
@@ -122,13 +122,13 @@ public class PerformanceTimerManager {
         trendSamplingEnabled = enabled;
         if (!enabled) {
             stopTrendSamplingTimer();
-            log.info("趋势图采样已关闭");
+            log.info("Lấy mẫu xu hướng bị tắt");
             return;
         }
         if (started.get() && scheduler != null && !scheduler.isShutdown()) {
             startTrendSamplingTimer();
         }
-        log.info("趋势图采样已开启");
+        log.info("Lấy mẫu biểu đồ xu hướng được bật");
     }
 
     public synchronized void setReportRefreshEnabled(boolean enabled) {
@@ -138,28 +138,28 @@ public class PerformanceTimerManager {
         reportRefreshEnabled = enabled;
         if (!enabled) {
             stopReportRefreshTimer();
-            log.info("报表实时刷新已关闭");
+            log.info("Báo cáo làm mới thời gian thực bị tắt");
             return;
         }
         if (started.get() && scheduler != null && !scheduler.isShutdown()) {
             startReportRefreshTimer();
         }
-        log.info("报表实时刷新已开启");
+        log.info("Làm mới báo cáo theo thời gian thực được bật");
     }
 
     /**
-     * 启动趋势图采样定时器
+     * Bắt đầu hẹn giờ lấy mẫu biểu đồ xu hướng
      */
     private void startTrendSamplingTimer() {
         if (!trendSamplingEnabled) {
             return;
         }
         if (trendSamplingCallback == null) {
-            log.warn("趋势图采样回调未设置，跳过启动采样定时器");
+            log.warn("Cuộc gọi lại lấy mẫu biểu đồ xu hướng không được đặt và bộ đếm thời gian lấy mẫu bị bỏ qua");
             return;
         }
         if (scheduler == null || scheduler.isShutdown()) {
-            log.warn("定时器调度器未就绪，跳过启动采样定时器");
+            log.warn("Bộ lập lịch hẹn giờ chưa sẵn sàng, hãy bỏ qua việc khởi động bộ hẹn giờ lấy mẫu");
             return;
         }
         if (trendSamplingTask != null && !trendSamplingTask.isCancelled() && !trendSamplingTask.isDone()) {
@@ -168,17 +168,17 @@ public class PerformanceTimerManager {
 
         trendSamplingTask = scheduler.scheduleAtFixedRate(() -> {
             if (!runningChecker.getAsBoolean()) {
-                log.debug("运行状态检查失败，跳过趋势图采样");
+                log.debug("Kiểm tra trạng thái đang chạy không thành công và việc lấy mẫu biểu đồ xu hướng bị bỏ qua");
                 return;
             }
             try {
                 trendSamplingCallback.run();
             } catch (Exception ex) {
-                log.error("趋势图采样执行失败", ex);
+                log.error("Việc thực hiện lấy mẫu biểu đồ xu hướng không thành công", ex);
             }
         }, samplingIntervalMs, samplingIntervalMs, TimeUnit.MILLISECONDS);
 
-        log.debug("趋势图采样定时器已启动 - 间隔: {}ms", samplingIntervalMs);
+        log.debug("Bộ đếm thời gian lấy mẫu xu hướng đã được bắt đầu - khoảng thời gian: {}ms", samplingIntervalMs);
     }
 
     private void stopTrendSamplingTimer() {
@@ -189,18 +189,18 @@ public class PerformanceTimerManager {
     }
 
     /**
-     * 启动报表刷新定时器
+     * Bắt đầu hẹn giờ làm mới báo cáo
      */
     private void startReportRefreshTimer() {
         if (!reportRefreshEnabled) {
             return;
         }
         if (reportRefreshCallback == null) {
-            log.warn("报表刷新回调未设置，跳过启动刷新定时器");
+            log.warn("Cuộc gọi lại làm mới báo cáo không được đặt và bộ đếm thời gian làm mới bị bỏ qua");
             return;
         }
         if (scheduler == null || scheduler.isShutdown()) {
-            log.warn("定时器调度器未就绪，跳过启动报表刷新定时器");
+            log.warn("Bộ lập lịch hẹn giờ chưa sẵn sàng, bỏ qua việc bắt đầu hẹn giờ làm mới báo cáo");
             return;
         }
         if (reportRefreshTask != null && !reportRefreshTask.isCancelled() && !reportRefreshTask.isDone()) {
@@ -209,17 +209,17 @@ public class PerformanceTimerManager {
 
         reportRefreshTask = scheduler.scheduleAtFixedRate(() -> {
             if (!runningChecker.getAsBoolean()) {
-                log.debug("运行状态检查失败，跳过报表刷新");
+                log.debug("Kiểm tra trạng thái đang chạy không thành công và quá trình làm mới báo cáo bị bỏ qua");
                 return;
             }
             try {
                 reportRefreshCallback.run();
             } catch (Exception ex) {
-                log.error("报表刷新执行失败", ex);
+                log.error("Việc thực hiện làm mới báo cáo không thành công", ex);
             }
         }, 0, REPORT_REFRESH_INTERVAL_MS, TimeUnit.MILLISECONDS);
 
-        log.debug("报表刷新定时器已启动 - 间隔: {}ms", REPORT_REFRESH_INTERVAL_MS);
+        log.debug("Đã bắt đầu hẹn giờ làm mới báo cáo - khoảng thời gian: {}ms", REPORT_REFRESH_INTERVAL_MS);
     }
 
     private void stopReportRefreshTimer() {
@@ -230,49 +230,49 @@ public class PerformanceTimerManager {
     }
 
     /**
-     * 停止所有定时器
+     * Dừng tất cả các bộ tính giờ
      */
     public void stopAll() {
         if (!started.getAndSet(false)) {
-            log.debug("定时器管理器未启动，无需停止");
+            log.debug("Trình quản lý hẹn giờ không được khởi động và không cần phải dừng");
             return;
         }
 
-        log.info("停止所有性能测试定时器");
+        log.info("Dừng tất cả các bộ tính giờ kiểm tra hiệu suất");
 
-        // 取消定时任务
+        // Hủy bỏ các nhiệm vụ đã lên lịch
         stopTrendSamplingTimer();
         stopReportRefreshTimer();
 
-        // 关闭调度器
+        // Đóng lịch trình
         ScheduledExecutorService schedulerToStop = scheduler;
         scheduler = null;
         if (schedulerToStop != null) {
             schedulerToStop.shutdown();
             if (SwingUtilities.isEventDispatchThread()) {
-                log.debug("在 EDT 上跳过等待定时器关闭，避免阻塞界面");
+                log.debug("Vào EDT Bỏ qua việc chờ hết giờ để tránh chặn giao diện");
                 return;
             }
             try {
                 if (!schedulerToStop.awaitTermination(2, TimeUnit.SECONDS)) {
-                    log.warn("定时器未能在 2 秒内正常关闭，强制停止");
+                    log.warn("Đồng hồ hẹn giờ không thành công 2 Tắt máy bình thường trong vài giây và buộc phải dừng");
                     schedulerToStop.shutdownNow();
                 }
             } catch (InterruptedException e) {
-                log.warn("等待定时器关闭时被中断，强制停止");
+                log.warn("Bộ đếm thời gian chờ bị gián đoạn khi nó đóng và buộc phải dừng lại");
                 schedulerToStop.shutdownNow();
                 Thread.currentThread().interrupt();
             }
         }
 
-        log.debug("性能测试定时器已停止");
+        log.debug("Bộ đếm thời gian kiểm tra hiệu suất đã dừng");
     }
 
     /**
-     * 清理资源
+     * Dọn dẹp tài nguyên
      */
     public void dispose() {
-        log.info("销毁定时器管理器");
+        log.info("Phá hủy trình quản lý hẹn giờ");
         stopAll();
         trendSamplingCallback = null;
         reportRefreshCallback = null;

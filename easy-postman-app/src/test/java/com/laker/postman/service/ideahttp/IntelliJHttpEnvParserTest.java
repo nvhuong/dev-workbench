@@ -8,7 +8,7 @@ import java.util.List;
 import static org.testng.Assert.*;
 
 /**
- * IntelliJHttpEnvironmentParser 单元测试
+ * IntelliJHttpEnvironmentParser Kiểm tra đơn vị
  */
 public class IntelliJHttpEnvParserTest {
 
@@ -45,7 +45,7 @@ public class IntelliJHttpEnvParserTest {
         assertNotNull(envs);
         assertEquals(envs.size(), 3);
 
-        // 验证第一个环境 - local
+        // Xác minh môi trường đầu tiên - local
         Environment localEnv = envs.stream()
                 .filter(e -> "local".equals(e.getName()))
                 .findFirst()
@@ -57,7 +57,7 @@ public class IntelliJHttpEnvParserTest {
         assertEquals(localEnv.getVariable("apiUrl"), "https://api-local.example.com");
         assertEquals(localEnv.getVariable("serviceUrl"), "http://localhost:9221");
 
-        // 验证第二个环境 - dev
+        // Xác minh môi trường thứ hai - dev
         Environment devEnv = envs.stream()
                 .filter(e -> "dev".equals(e.getName()))
                 .findFirst()
@@ -66,7 +66,7 @@ public class IntelliJHttpEnvParserTest {
         assertEquals(devEnv.getVariable("serviceUrl"), "https://api-dev.example.com/service/api/v1");
         assertEquals(devEnv.getVariable("apiUrl"), "https://api-dev.example.com");
 
-        // 验证第三个环境 - prod
+        // Xác minh môi trường thứ ba - prod
         Environment prodEnv = envs.stream()
                 .filter(e -> "prod".equals(e.getName()))
                 .findFirst()
@@ -135,19 +135,19 @@ public class IntelliJHttpEnvParserTest {
 
     @Test
     public void testRoundTrip() {
-        // 原始环境
+        // môi trường hoang sơ
         Environment original = new Environment("test");
         original.addVariable("key1", "value1");
         original.addVariable("key2", "value2");
         original.addVariable("key3", "value3");
 
-        // 导出为JSON
+        // Xuất dưới dạngJSON
         String json = IntelliJHttpEnvParser.toIntelliJEnvironmentJson(original);
 
-        // 重新导入
+        // Nhập lại
         List<Environment> imported = IntelliJHttpEnvParser.parseIntelliJEnvironments(json);
 
-        // 验证
+        // Xác minh
         assertEquals(imported.size(), 1);
         Environment reimported = imported.get(0);
         assertEquals(reimported.getName(), original.getName());
@@ -164,7 +164,7 @@ public class IntelliJHttpEnvParserTest {
 
     @Test
     public void testParseJsonWithTrailingSemicolons() {
-        // 测试处理带有尾随分号的JSON（常见的语法错误）
+        // Kiểm tra xử lý bằng dấu chấm phẩy ở cuốiJSON（lỗi ngữ pháp thường gặp)
         String jsonWithSemicolons = """
                 {
                     "dev": {

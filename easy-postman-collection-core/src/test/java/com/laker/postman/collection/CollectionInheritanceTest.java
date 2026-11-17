@@ -49,11 +49,11 @@ public class CollectionInheritanceTest {
 
                 innerPre();
 
-                // === 请求级脚本 ===
+                // === Kịch bản cấp độ yêu cầu ===
 
                 requestPre();""");
         assertEquals(merged.getPostscript(), """
-                // === 请求级脚本 ===
+                // === Kịch bản cấp độ yêu cầu ===
 
                 requestPost();
 

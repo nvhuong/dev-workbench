@@ -4,7 +4,7 @@ import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * IOC容器工具类，提供便捷的访问方法
+ * IOCLớp công cụ vùng chứa cung cấp các phương thức truy cập thuận tiện
  */
 @Slf4j
 @UtilityClass
@@ -13,29 +13,29 @@ public class BeanFactory {
     private final ApplicationContext context = ApplicationContext.getInstance();
 
     /**
-     * 初始化IOC容器，扫描指定包
+     * khởi tạoIOCContainer, quét gói hàng được chỉ định
      */
     public void init(String... basePackages) {
         context.scan(basePackages);
     }
 
     /**
-     * 根据名称获取Bean
+     * Nhận nó theo tênBean
      */
     public <T> T getBean(String beanName) {
         return context.getBean(beanName);
     }
 
     /**
-     * 根据类型获取Bean
+     * Nhận dựa trên loạiBean
      */
     public <T> T getBean(Class<T> requiredType) {
         return context.getBean(requiredType);
     }
 
     /**
-     * 销毁所有Bean，调用@PreDestroy方法
-     * 建议在应用程序关闭时调用此方法
+     * Tiêu diệt tất cảBean，gọi@PreDestroyphương pháp
+     * Nên gọi phương thức này khi đóng ứng dụng
      */
     public void destroy() {
         log.info("Destroying IOC container...");

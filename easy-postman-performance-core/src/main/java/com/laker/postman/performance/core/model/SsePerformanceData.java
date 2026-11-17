@@ -1,7 +1,7 @@
 package com.laker.postman.performance.core.model;
 
 /**
- * SSE 压测配置，挂载在 SSE 阶段节点上。
+ * SSE Cấu hình kiểm tra sức chịu đựng, được gắn vào SSE trên nút sân khấu.
  */
 public class SsePerformanceData {
 

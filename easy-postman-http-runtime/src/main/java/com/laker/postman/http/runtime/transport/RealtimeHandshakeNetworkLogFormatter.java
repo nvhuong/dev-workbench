@@ -9,7 +9,7 @@ import okhttp3.Response;
 import java.util.Locale;
 
 /**
- * 统一渲染 SSE/WebSocket 握手响应日志，避免两个实时协议显示字段不一致。
+ * Kết xuất thống nhất SSE/WebSocket Nhật ký phản hồi bắt tay để tránh sự không nhất quán trong các trường hiển thị của hai giao thức thời gian thực.
  */
 @UtilityClass
 class RealtimeHandshakeNetworkLogFormatter {

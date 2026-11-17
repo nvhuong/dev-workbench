@@ -10,24 +10,24 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * 统一的 Collection 解析结果
- * 支持树形结构的分组和请求
- * 可用于多种导入格式的解析结果
+ * thống nhất Collection Phân tích kết quả
+ * Hỗ trợ nhóm và yêu cầu theo cấu trúc cây
+ * Kết quả được phân tích cú pháp có sẵn ở nhiều định dạng nhập khác nhau
  */
 @Getter
 public class CollectionParseResult {
     /**
-     * 分组信息
+     * Thông tin nhóm
      */
     private final RequestGroup group;
 
     /**
-     * 子节点列表（可以是子分组或请求）
+     * Danh sách các nút con (có thể là nhóm con hoặc yêu cầu)
      */
     private final List<CollectionNode> children;
 
     /**
-     * 环境变量列表（可选，用于导入时创建环境）
+     * Danh sách các biến môi trường (tùy chọn, dùng để tạo môi trường khi nhập)
      */
     private final List<Environment> environments;
 
@@ -42,7 +42,7 @@ public class CollectionParseResult {
     }
 
     /**
-     * 添加环境变量
+     * Thêm các biến môi trường
      */
     public void addEnvironment(Environment environment) {
         if (environment != null) {
@@ -51,7 +51,7 @@ public class CollectionParseResult {
     }
 
     /**
-     * 添加多个环境变量
+     * Thêm nhiều biến môi trường
      */
     public void addEnvironments(List<Environment> envList) {
         if (envList != null && !envList.isEmpty()) {
@@ -60,11 +60,11 @@ public class CollectionParseResult {
     }
 
     /**
-     * 便捷工厂方法：创建扁平结构的解析结果
+     * Phương pháp nhà máy tiện lợi: Tạo cấu trúc phẳng của các kết quả được phân tích cú pháp
      *
-     * @param group 分组信息
-     * @param requests 请求列表
-     * @return 解析结果
+     * @param group Thông tin nhóm
+     * @param requests Danh sách yêu cầu
+     * @return Phân tích kết quả
      */
     public static CollectionParseResult createFlat(RequestGroup group, List<HttpRequestItem> requests) {
         CollectionParseResult result = new CollectionParseResult(group);

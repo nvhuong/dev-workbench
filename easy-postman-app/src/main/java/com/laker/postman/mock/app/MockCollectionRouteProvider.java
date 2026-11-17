@@ -226,16 +226,16 @@ public class MockCollectionRouteProvider {
     }
 
     /**
-     * 文件示例只保存了文件信息（或是旧版本保存的乱码文本），没有可返回的原始内容。
+     * Ví dụ về tệp chỉ lưu thông tin tệp (hoặc văn bản bị cắt xén được lưu bởi phiên bản cũ) và không có nội dung gốc nào có thể được trả lại.
      */
     static boolean isFileContentUnavailable(SavedResponse example, String method, int statusCode) {
-        // HEAD、1xx、204、205、304 本就没有正文，Mock 时无需文件内容
+        // HEAD、1xx、204、205、304 Không có văn bản nào cả.Mock Không có nội dung tập tin được yêu cầu
         if (LocalMockServer.isBodyless(method, statusCode)) {
             return false;
         }
         SavedResponse.FileInfo file = example.getFile();
         if (file != null) {
-            // 零字节文件不需要内容即可如实返回
+            // Các tệp 0 byte không yêu cầu phải trả lại nội dung một cách trung thực
             return !file.isContentInBody() && example.getBodySize() > 0;
         }
         return ResponseFiles.detectFromLegacyText(example.getBody()) != null
@@ -243,8 +243,8 @@ public class MockCollectionRouteProvider {
     }
 
     /**
-     * 不能用原状态码和响应头返回空正文（客户端会收到 0 字节的“文件”），改为明确的 501 说明；
-     * Mock 脚本仍可覆盖该响应。
+     * Bạn không thể trả về phần thân trống với mã trạng thái ban đầu và tiêu đề phản hồi (máy khách sẽ nhận được nó 0 Byte“tập tin”），Đã thay đổi thành rõ ràng 501 Mô tả;
+     * Mock Tập lệnh vẫn có thể ghi đè phản hồi.
      */
     private MockResponse fileContentUnavailableResponse(SavedResponse example) {
         Map<String, String> headers = new LinkedHashMap<>();

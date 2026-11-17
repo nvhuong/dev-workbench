@@ -100,7 +100,7 @@ public class PerformanceRunControlSupportTest extends AbstractSwingUiTest {
             );
 
             Thread runThread = runControlSupport.startRun(
-                    new DefaultMutableTreeNode(new PerformanceTreeNode("测试计划", NodeType.ROOT)),
+                    new DefaultMutableTreeNode(new PerformanceTreeNode("Kế hoạch kiểm tra", NodeType.ROOT)),
                     new JLabel(),
                     false,
                     ignored -> {
@@ -319,9 +319,9 @@ public class PerformanceRunControlSupportTest extends AbstractSwingUiTest {
     private static JTabbedPane createResultTabbedPane(PerformanceResultTablePanel resultTablePanel,
                                                      PerformanceReportPanel reportPanel) {
         JTabbedPane resultTabbedPane = new JTabbedPane();
-        resultTabbedPane.addTab("趋势", new JPanel());
-        resultTabbedPane.addTab("报表", reportPanel);
-        resultTabbedPane.addTab("结果表", resultTablePanel);
+        resultTabbedPane.addTab("xu hướng", new JPanel());
+        resultTabbedPane.addTab("Báo cáo", reportPanel);
+        resultTabbedPane.addTab("Bảng kết quả", resultTablePanel);
         resultTabbedPane.setSelectedIndex(PerformancePanelViewFactory.RESULT_TAB_TREND);
         return resultTabbedPane;
     }
@@ -354,13 +354,13 @@ public class PerformanceRunControlSupportTest extends AbstractSwingUiTest {
     }
 
     private static DefaultMutableTreeNode rootWithSingleFailingRequest() {
-        DefaultMutableTreeNode root = new DefaultMutableTreeNode(new PerformanceTreeNode("测试计划", NodeType.ROOT));
+        DefaultMutableTreeNode root = new DefaultMutableTreeNode(new PerformanceTreeNode("Kế hoạch kiểm tra", NodeType.ROOT));
         ThreadGroupData threadGroupData = new ThreadGroupData();
         threadGroupData.numThreads = 1;
         threadGroupData.useTime = false;
         threadGroupData.loops = 1;
         DefaultMutableTreeNode group = new DefaultMutableTreeNode(
-                new PerformanceTreeNode("用户组", NodeType.THREAD_GROUP, threadGroupData)
+                new PerformanceTreeNode("Nhóm người dùng", NodeType.THREAD_GROUP, threadGroupData)
         );
         HttpRequestItem request = new HttpRequestItem();
         request.setId("request-1");
@@ -374,13 +374,13 @@ public class PerformanceRunControlSupportTest extends AbstractSwingUiTest {
     }
 
     private static DefaultMutableTreeNode rootWithFalseConditionRequest() {
-        DefaultMutableTreeNode root = new DefaultMutableTreeNode(new PerformanceTreeNode("测试计划", NodeType.ROOT));
+        DefaultMutableTreeNode root = new DefaultMutableTreeNode(new PerformanceTreeNode("Kế hoạch kiểm tra", NodeType.ROOT));
         ThreadGroupData threadGroupData = new ThreadGroupData();
         threadGroupData.numThreads = 1;
         threadGroupData.useTime = false;
         threadGroupData.loops = 1;
         DefaultMutableTreeNode group = new DefaultMutableTreeNode(
-                new PerformanceTreeNode("用户组", NodeType.THREAD_GROUP, threadGroupData)
+                new PerformanceTreeNode("Nhóm người dùng", NodeType.THREAD_GROUP, threadGroupData)
         );
         ConditionData conditionData = new ConditionData();
         conditionData.expression = "false";

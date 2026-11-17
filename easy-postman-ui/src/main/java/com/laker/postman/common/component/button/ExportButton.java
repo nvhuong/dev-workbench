@@ -9,7 +9,7 @@ import javax.swing.*;
 import java.awt.*;
 
 /**
- * 通用导出按钮,带图标和统一样式。
+ * Nút xuất phổ quát,Với các biểu tượng và phong cách thống nhất.
  */
 public class ExportButton extends JButton {
     public ExportButton() {

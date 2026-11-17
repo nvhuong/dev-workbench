@@ -231,7 +231,7 @@ public final class LocalMockServer implements AutoCloseable {
             delay(resolveDelay(request, response));
             statusCode = sanitizeStatusCode(response.getStatusCode());
             response.setStatusCode(statusCode);
-            // 日志只记录实际发送的内容
+            // Nhật ký chỉ ghi lại những gì thực sự đã được gửi
             responseBody = isBodyless(exchange.getRequestMethod(), statusCode) ? "" : response.getBody();
             writeResponse(exchange, response);
         } catch (RequestTooLargeException ex) {
@@ -325,15 +325,15 @@ public final class LocalMockServer implements AutoCloseable {
     }
 
     /**
-     * HEAD 请求以及 1xx、204、205、304 响应按 HTTP 规范不携带正文。
-     * Mock Server 实际只发送 200–599（见 {@link #sanitizeStatusCode}），1xx 用于判断示例本身是否需要正文。
+     * HEAD Request as well 1xx、204、205、304 báo chí phản hồi HTTP Thông số kỹ thuật không mang theo văn bản.
+     * Mock Server Thực tế chỉ được gửi 200–599（Nhìn thấy {@link #sanitizeStatusCode}），1xx Được sử dụng để xác định xem bản thân ví dụ có yêu cầu văn bản hay không.
      */
     public static boolean isBodyless(String method, int status) {
         return "HEAD".equalsIgnoreCase(method) || status < 200 || status == 204 || status == 205 || status == 304;
     }
 
     /**
-     * 按 Content-Type 声明的 charset 编码正文，保证 GBK/UTF-16 等示例返回与响应头一致的原始字节；未声明或不支持时用 UTF-8。
+     * Nhấn Content-Type tuyên bố charset Văn bản được mã hóa, đảm bảo GBK/UTF-16 Các ví dụ như trả về byte thô phù hợp với tiêu đề phản hồi; được sử dụng khi không được khai báo hoặc không được hỗ trợ UTF-8。
      */
     static Charset declaredCharset(String contentType) {
         if (contentType != null) {

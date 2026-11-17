@@ -12,10 +12,10 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
- * JS脚本执行器，使用GraalVM的Polyglot API执行JavaScript脚本。
- * 提供统一的脚本执行入口，支持变量注入、polyfill、输出回调和错误处理。
+ * JSTrình thực thi tập lệnh, sử dụngGraalVMcủaPolyglot APIthực hiệnJavaScriptkịch bản.
+ * Cung cấp lối vào thực thi tập lệnh thống nhất và hỗ trợ chèn biến.polyfill、Lệnh gọi lại đầu ra và xử lý lỗi.
  * <p>
- * 使用 Context Pool 复用 Context 对象，避免高并发场景下的内存溢出问题。
+ * sử dụng Context Pool Tái sử dụng Context Đối tượng để tránh sự cố tràn bộ nhớ trong các tình huống có tính tương tranh cao.
  * </p>
  */
 @Slf4j
@@ -23,7 +23,7 @@ import java.util.Map;
 public class JsScriptExecutor {
 
     /**
-     * 普通 collection/function 脚本共享池。压测使用 PooledScriptExecutor 的运行级独立池。
+     * bình thường collection/function Nhóm chia sẻ tập lệnh. Được sử dụng để kiểm tra căng thẳng PooledScriptExecutor Nhóm độc lập ở cấp độ chạy.
      */
     static final int DEFAULT_SHARED_CONTEXT_POOL_SIZE = Math.max(
             4,
@@ -32,7 +32,7 @@ public class JsScriptExecutor {
     private static final int DEFAULT_SHARED_CONTEXT_ACQUIRE_TIMEOUT_MS = 1_000;
     private static volatile JsContextPool contextPool;
     private static volatile int contextPoolSize;
-    private static volatile int contextAcquireTimeoutMs; // 获取 Context 超时时间
+    private static volatile int contextAcquireTimeoutMs; // Lấy Context khoảng thời gian chờ
     private static final Object CONTEXT_POOL_LOCK = new Object();
     private static final int SCRIPT_SOURCE_CACHE_MAX_SIZE = 512;
     private static final Map<String, Source> SCRIPT_SOURCE_CACHE = new LinkedHashMap<>(
@@ -47,7 +47,7 @@ public class JsScriptExecutor {
     };
 
     /**
-     * ThreadLocal 存储当前正在执行的原始脚本，用于错误报告
+     * ThreadLocal Lưu trữ tập lệnh gốc hiện đang được thực thi để báo cáo lỗi
      */
     private static final ThreadLocal<String> CURRENT_SCRIPT = new ThreadLocal<>();
 
@@ -90,7 +90,7 @@ public class JsScriptExecutor {
     }
 
     static {
-        // 注册 shutdown hook，在应用退出时关闭池
+        // Đăng ký shutdown hook，Đóng nhóm khi ứng dụng thoát
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             log.info("Shutting down JS Context Pool...");
             JsContextPool pool = contextPool;
@@ -122,10 +122,10 @@ public class JsScriptExecutor {
     }
 
     /**
-     * 执行JS脚本（使用上下文对象）
+     * thực hiệnJSScript (sử dụng đối tượng bối cảnh)
      *
-     * @param context 脚本执行上下文
-     * @throws ScriptExecutionException 脚本执行异常
+     * @param context Bối cảnh thực thi tập lệnh
+     * @throws ScriptExecutionException Ngoại lệ thực thi tập lệnh
      */
     public static void executeScript(ScriptExecutionContext context) throws ScriptExecutionException {
         executeScript(context, null, 0, SCRIPT_SOURCE_CACHE);
@@ -159,17 +159,17 @@ public class JsScriptExecutor {
     }
 
     /**
-     * 执行JS脚本，自动注入所有变量、polyfill，并支持输出回调。
+     * thực hiệnJSTập lệnh tự động chèn tất cả các biến.polyfill，Và hỗ trợ gọi lại đầu ra.
      * <p>
-     * 使用 Context Pool 复用 Context 对象，提高性能并避免内存溢出。
-     * 使用 IIFE (Immediately Invoked Function Expression) 包装用户脚本，
-     * 避免 let/const 变量污染全局作用域，使 Context 可以安全复用。
+     * sử dụng Context Pool Tái sử dụng Context Object, cải thiện hiệu suất và tránh tràn bộ nhớ.
+     * sử dụng IIFE (Immediately Invoked Function Expression) Tập lệnh người dùng trình bao bọc, .
+     * tránh let/const Các biến gây ô nhiễm phạm vi toàn cầu, tạo ra Context Có thể được tái sử dụng một cách an toàn.
      * </p>
      *
-     * @param script         脚本内容
-     * @param bindings       需要注入的变量（变量名->对象），如 pm
-     * @param outputCallback 输出回调（可为null）
-     * @throws ScriptExecutionException 脚本执行异常
+     * @param script         Nội dung kịch bản
+     * @param bindings       Các biến cần được chèn (tên biến->đối tượng), chẳng hạn như pm
+     * @param outputCallback Gọi lại đầu ra (tùy chọnnull）
+     * @throws ScriptExecutionException Ngoại lệ thực thi tập lệnh
      */
     public static void executeScript(String script, Map<String, Object> bindings, OutputCallback outputCallback)
             throws ScriptExecutionException {
@@ -191,10 +191,10 @@ public class JsScriptExecutor {
         JsContextPool borrowedPool = null;
 
         try {
-            // 保存原始脚本到 ThreadLocal，用于错误报告
+            // Lưu tập lệnh gốc vào  ThreadLocal，để báo cáo lỗi
             CURRENT_SCRIPT.set(script);
 
-            // 从池中获取 Context
+            // Lấy nó từ hồ bơi Context
             while (pooledContext == null) {
                 borrowedPool = pool == null ? sharedContextPool() : pool;
                 if (borrowedPool == null) {
@@ -213,12 +213,12 @@ public class JsScriptExecutor {
             }
             Context context = pooledContext.getContext();
 
-            // 注入输出回调（如果有）
+            // Thực hiện lệnh gọi lại đầu ra (nếu có)
             if (outputCallback != null) {
                 injectConsoleLog(context, outputCallback);
             }
 
-            // 注入变量（polyfill 已在池创建时注入）
+            // Chèn các biến (polyfill đã được chèn khi nhóm được tạo)
             injectBindings(context, bindings);
 
             context.eval(getCachedScriptSource(script, scriptSourceCache));
@@ -229,7 +229,7 @@ public class JsScriptExecutor {
             log.error(errorMsg, e);
             throw new ScriptExecutionException(errorMsg, e);
         } catch (PolyglotException e) {
-            // GraalVM特定异常
+            // GraalVMNgoại lệ cụ thể
             String errorMsg = formatPolyglotError(e);
             log.error("Script execution error: {}", errorMsg, e);
             throw new ScriptExecutionException(errorMsg, e);
@@ -238,10 +238,10 @@ public class JsScriptExecutor {
             log.error(errorMsg, e);
             throw new ScriptExecutionException(errorMsg, e);
         } finally {
-            // 清理 ThreadLocal
+            // Dọn dẹp ThreadLocal
             CURRENT_SCRIPT.remove();
 
-            // 归还 Context 到池中
+            // Trở về Context đến hồ bơi
             if (pooledContext != null) {
                 borrowedPool.returnContext(pooledContext);
             }
@@ -258,27 +258,27 @@ public class JsScriptExecutor {
     }
 
     /**
-     * 用户脚本在包装后的起始行号偏移量
-     * IIFE 包装器会添加一行: (function() {
-     * 因此用户脚本从第 2 行开始
+     * Phần bù số dòng bắt đầu của tập lệnh người dùng sau khi gói
+     * IIFE Trình bao bọc thêm một dòng: (function() {
+     * Vì vậy, tập lệnh người dùng bắt đầu từ s 2 dòng bắt đầu
      */
     private static final int USER_SCRIPT_LINE_OFFSET = 1;
 
     /**
-     * 使用 IIFE 包装脚本，避免 let/const 变量污染全局作用域
+     * sử dụng IIFE Tập lệnh bao bọc, tránh let/const Các biến gây ô nhiễm phạm vi toàn cầu
      * <p>
-     * 原理：将用户脚本包装在一个立即执行的函数中，
-     * 使所有 let/const/var 声明的变量都成为局部变量。
+     * Nguyên tắc: Gói tập lệnh người dùng vào một hàm được thực thi ngay lập tức.
+     * làm tất cả let/const/var Tất cả các biến được khai báo đều trở thành biến cục bộ.
      * </p>
      * <p>
-     * 包装格式：
-     * 第1行: (function() {
-     * 第2行开始: 用户脚本
-     * 最后: })();
+     * Hình thức đóng gói:
+     * KHÔNG. 1Được rồi: (function() {
+     * KHÔNG. 2dòng bắt đầu: Kịch bản người dùng
+     * Cuối cùng: })();
      * </p>
      *
-     * @param script 原始脚本
-     * @return 包装后的脚本
+     * @param script Kịch bản gốc
+     * @return Kịch bản được gói gọn
      */
     private static String wrapScriptWithIIFE(String script) {
         return "(function() {\n" + script + "\n})();";
@@ -309,22 +309,22 @@ public class JsScriptExecutor {
     }
 
     /**
-     * 注入自定义的 console 方法实现（使用 Java 回调）
-     * 支持 console.log, console.error, console.warn, console.info, console.debug
+     * Tiêm tùy chỉnh console Phương pháp thực hiện (sử dụng Java gọi lại)
+     * Hỗ trợ console.log, console.error, console.warn, console.info, console.debug
      */
     private static void injectConsoleLog(Context context, OutputCallback outputCallback) {
         if (outputCallback == null) {
             return;
         }
 
-        // 确保 console 对象存在
+        // Hãy chắc chắn console Đối tượng tồn tại
         context.eval("js", """
                 if (typeof console === 'undefined') {
                     globalThis.console = {};
                 }
                 """);
 
-        // 批量注入所有 console 方法
+        // Tiêm tất cả theo đợt console phương pháp
         var consoleObj = context.getBindings("js").getMember("console");
         for (ConsoleType type : ConsoleType.values()) {
             consoleObj.putMember(type.getMethodName(), createConsoleFunc(outputCallback, type));
@@ -332,11 +332,11 @@ public class JsScriptExecutor {
     }
 
     /**
-     * 创建 console 方法的 ProxyExecutable
+     * Tạo console phương pháp ProxyExecutable
      *
-     * @param callback    输出回调
-     * @param consoleType Console 方法类型
-     * @return ProxyExecutable 实例
+     * @param callback    Đầu ra gọi lại
+     * @param consoleType Console Loại phương pháp
+     * @return ProxyExecutable Ví dụ
      */
     private static ProxyExecutable createConsoleFunc(OutputCallback callback, ConsoleType consoleType) {
         return args -> {
@@ -354,10 +354,10 @@ public class JsScriptExecutor {
 
 
     /**
-     * 格式化Polyglot异常信息
+     * Định dạngPolyglotThông tin ngoại lệ
      * <p>
-     * 注意：由于脚本可能被 Group/Request 合并，以及 IIFE 包装，
-     * 行号可能不准确。因此主要依赖显示错误代码内容来帮助定位问题。
+     * LƯU Ý: Vì tập lệnh có thể Group/Request Hợp nhất, là tốt IIFE Bưu kiện,
+     * Số dòng có thể không chính xác. Do đó, nó chủ yếu dựa vào việc hiển thị nội dung mã lỗi để giúp xác định vấn đề.
      */
     private static String formatPolyglotError(PolyglotException e) {
         if (e.isHostException()) {
@@ -370,12 +370,12 @@ public class JsScriptExecutor {
             if (e.getSourceLocation() != null) {
                 int reportedLine = e.getSourceLocation().getStartLine();
 
-                // 尝试获取错误代码行（基于包装后的行号）
+                // Cố gắng lấy dòng mã lỗi (dựa trên số dòng được gói)
                 int adjustedLine = reportedLine - USER_SCRIPT_LINE_OFFSET;
                 adjustedLine = Math.max(1, adjustedLine);
                 String codeAtLine = getCodeLineFromScript(adjustedLine);
 
-                // 显示错误代码（这是最重要的，用户可以直接搜索定位）
+                // Hiển thị mã lỗi (đây là mã quan trọng nhất, người dùng có thể tìm kiếm và định vị trực tiếp)
                 if (codeAtLine != null && !codeAtLine.trim().isEmpty()) {
                     sb.append("\n>>> ").append(codeAtLine.trim());
                 }
@@ -386,10 +386,10 @@ public class JsScriptExecutor {
     }
 
     /**
-     * 从原始脚本中获取指定行号的代码
+     * Lấy mã ở số dòng được chỉ định từ tập lệnh gốc
      *
-     * @param lineNumber 行号（1-based）
-     * @return 代码行内容，如果无法获取则返回 null
+     * @param lineNumber Số dòng (1-based）
+     * @return Nội dung của dòng mã, được trả về nếu không lấy được null
      */
     private static String getCodeLineFromScript(int lineNumber) {
         try {
@@ -409,7 +409,7 @@ public class JsScriptExecutor {
     }
 
     /**
-     * 注入变量到JS上下文
+     * Chèn các biến vàoJSbối cảnh
      */
     private static void injectBindings(Context context, Map<String, Object> bindings) {
         if (bindings != null && !bindings.isEmpty()) {
@@ -425,7 +425,7 @@ public class JsScriptExecutor {
     }
 
     /**
-     * Console 方法类型枚举
+     * Console Kiểu phương thức enum
      */
     @Getter
     public enum ConsoleType {
@@ -444,19 +444,19 @@ public class JsScriptExecutor {
     }
 
     /**
-     * 输出回调接口
+     * Giao diện gọi lại đầu ra
      */
     public interface OutputCallback {
         void onOutput(String output);
 
         /**
-         * 带日志类型的输出回调
+         * Gọi lại đầu ra với loại nhật ký
          *
-         * @param output      输出内容
-         * @param consoleType Console 方法类型
+         * @param output      Nội dung đầu ra
+         * @param consoleType Console Loại phương pháp
          */
         default void onOutput(String output, ConsoleType consoleType) {
-            onOutput(output); // 默认回退到无类型的方法
+            onOutput(output); // Dự phòng các phương thức chưa được gõ theo mặc định
         }
     }
 }

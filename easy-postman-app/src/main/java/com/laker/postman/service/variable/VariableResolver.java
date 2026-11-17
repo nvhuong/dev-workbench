@@ -11,11 +11,11 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * 变量解析服务
+ * Dịch vụ có độ phân giải thay đổi
  * <p>
- * 解析字符串中的 {{variableName}} 占位符，支持嵌套解析
+ * Phân tích chuỗi {{variableName}} Giữ chỗ, hỗ trợ phân tích cú pháp lồng nhau
  * <p>
- * 变量优先级：执行变量 > 迭代数据 > 分组变量 > 环境变量 > 全局变量 > 内置函数
+ * Mức độ ưu tiên của biến: biến thực thi > Lặp lại dữ liệu > Nhóm các biến > các biến môi trường > Các biến toàn cầu > Các chức năng tích hợp
  */
 @Slf4j
 @UtilityClass
@@ -24,7 +24,7 @@ public class VariableResolver {
     private static final Pattern VAR_PATTERN = Pattern.compile("\\{\\{(.+?)}}");
 
     /**
-     * 变量提供者列表（按优先级排序）
+     * Danh sách các nhà cung cấp biến (sắp xếp theo mức độ ưu tiên)
      */
     private static final List<VariableProvider> PROVIDERS;
 
@@ -42,16 +42,16 @@ public class VariableResolver {
     }
 
     /**
-     * 替换文本中的变量占位符（支持嵌套解析）
+     * Replace variable placeholders in text (nested parsing supported)
      * <p>
-     * 示例: {{baseUrl}}/api/users -> http://api.example.com/api/users
+     * Ví dụ: {{baseUrl}}/api/users -> http://api.example.com/api/users
      */
     public static String resolve(String text) {
         if (text == null || text.isEmpty()) {
             return text;
         }
 
-        // 多轮解析支持嵌套变量，最多 10 轮防止循环引用
+        // Nhiều vòng phân tích cú pháp hỗ trợ các biến lồng nhau, tối đa  10 Bánh xe ngăn chặn các tham chiếu vòng tròn
         String result = text;
         int maxIterations = 10;
         int iteration = 0;
@@ -61,21 +61,21 @@ public class VariableResolver {
             result = resolveOnce(result);
 
             if (result.equals(beforeResolve)) {
-                break; // 无变化，已完成解析
+                break; // Không có thay đổi nào, quá trình phân tích cú pháp đã hoàn tất
             }
 
             iteration++;
         }
 
         if (iteration >= maxIterations) {
-            log.warn("变量解析达到最大迭代次数({}), 可能存在循环引用: {}", maxIterations, text);
+            log.warn("Độ phân giải thay đổi đạt đến số lần lặp tối đa({}), Có thể có tài liệu tham khảo vòng tròn: {}", maxIterations, text);
         }
 
         return result;
     }
 
     /**
-     * 执行一轮变量解析
+     * Thực hiện một vòng phân tích biến
      */
     private static String resolveOnce(String text) {
         if (text == null || text.isEmpty()) {
@@ -90,7 +90,7 @@ public class VariableResolver {
             String value = resolveVariable(varName);
 
             if (value == null) {
-                // 变量不存在，保留原样
+                // Biến không tồn tại và được giữ nguyên
                 matcher.appendReplacement(result, Matcher.quoteReplacement(matcher.group(0)));
             } else {
                 matcher.appendReplacement(result, Matcher.quoteReplacement(value));
@@ -102,7 +102,7 @@ public class VariableResolver {
     }
 
     /**
-     * 解析单个变量（按优先级查找）
+     * Phân tích một biến duy nhất (tìm theo mức độ ưu tiên)
      */
     public static String resolveVariable(String varName) {
         if (varName == null || varName.isEmpty()) {
@@ -122,7 +122,7 @@ public class VariableResolver {
     }
 
     /**
-     * 检查变量是否已定义
+     * Kiểm tra xem biến đã được xác định chưa
      */
     public static boolean isVariableDefined(String varName) {
         if (varName == null || varName.isEmpty()) {
@@ -133,10 +133,10 @@ public class VariableResolver {
     }
 
     /**
-     * 获取变量的类型
+     * Lấy loại biến
      *
-     * @param varName 变量名
-     * @return 变量类型，如果变量不存在则返回 null
+     * @param varName tên biến
+     * @return Kiểu biến, trả về nếu biến không tồn tại null
      */
     public static VariableType getVariableType(String varName) {
         if (varName == null || varName.isEmpty()) {
@@ -153,14 +153,14 @@ public class VariableResolver {
     }
 
     /**
-     * 获取所有可用变量（包含类型信息）
+     * Nhận tất cả các biến có sẵn (chứa thông tin loại)
      *
-     * @return 变量信息列表
+     * @return Danh sách thông tin thay đổi
      */
     public static List<VariableInfo> getAllAvailableVariablesWithType() {
         Map<String, VariableInfo> varMap = new LinkedHashMap<>();
 
-        // 按优先级添加，使用 putIfAbsent 避免被低优先级覆盖
+        // Thêm theo mức độ ưu tiên, sử dụng putIfAbsent Tránh bị ghi đè bởi mức độ ưu tiên thấp
         for (VariableProvider provider : PROVIDERS) {
             Map<String, String> providerVars = provider.getAll();
             for (Map.Entry<String, String> entry : providerVars.entrySet()) {
@@ -173,10 +173,10 @@ public class VariableResolver {
     }
 
     /**
-     * 根据前缀过滤变量列表（包含类型信息）
+     * Lọc danh sách các biến (chứa thông tin loại) dựa trên tiền tố
      *
-     * @param prefix 过滤前缀
-     * @return 变量信息列表
+     * @param prefix Lọc tiền tố
+     * @return Danh sách thông tin thay đổi
      */
     public static List<VariableInfo> filterVariablesWithType(String prefix) {
         List<VariableInfo> allVars = getAllAvailableVariablesWithType();

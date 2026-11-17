@@ -7,8 +7,8 @@ import org.testng.annotations.*;
 import static org.testng.Assert.*;
 
 /**
- * 循环依赖测试 - 使用 TestNG
- * 测试三级缓存是否能正确解决循环依赖问题
+ * Kiểm tra phụ thuộc vòng tròn - sử dụng TestNG
+ * Kiểm tra xem bộ đệm cấp ba có thể giải quyết chính xác vấn đề phụ thuộc vòng tròn hay không
  */
 @Slf4j
 public class CircularDependencyTest {
@@ -17,80 +17,80 @@ public class CircularDependencyTest {
 
     @BeforeMethod
     public void setUp() {
-        log.info("========== 测试初始化 ==========");
+        log.info("========== Khởi tạo thử nghiệm ==========");
         context = ApplicationContext.getInstance();
         context.clear();
     }
 
     @AfterMethod
     public void tearDown() {
-        log.info("========== 测试清理 ==========");
+        log.info("========== Kiểm tra dọn dẹp ==========");
         if (context != null) {
             context.clear();
         }
     }
 
-    @Test(description = "完整的循环依赖解决流程测试")
+    @Test(description = "Hoàn thành thử nghiệm quy trình giải quyết phụ thuộc vòng tròn")
     public void testCompleteCircularDependencyResolution() {
-        log.info("========== 开始测试循环依赖解决（使用三级缓存） ==========");
+        log.info("========== Bắt đầu thử nghiệm độ phân giải phụ thuộc vòng tròn (sử dụng bộ đệm L3) ==========");
 
-        // 1. 扫描包，注册Bean
-        log.info("1. 扫描并注册Bean...");
+        // 1. Quét gói và đăng kýBean
+        log.info("1. Quét và đăng kýBean...");
         context.scan("com.laker.postman.ioc.test");
 
-        // 2. 获取ServiceA（此时会触发循环依赖）
-        log.info("\n2. 获取ServiceA（会触发循环依赖解决）...");
+        // 2. LấyServiceA（Điều này sẽ kích hoạt sự phụ thuộc vòng tròn)
+        log.info("\n2. LấyServiceA（sẽ kích hoạt độ phân giải phụ thuộc vòng tròn)...");
         ServiceA serviceA = context.getBean(ServiceA.class);
         assertNotNull(serviceA, "ServiceA should not be null");
-        log.info("✅ 成功获取 ServiceA: {}", serviceA);
+        log.info("✅ Đã nhận được thành công ServiceA: {}", serviceA);
 
-        // 3. 获取ServiceB
-        log.info("\n3. 获取ServiceB...");
+        // 3. LấyServiceB
+        log.info("\n3. LấyServiceB...");
         ServiceB serviceB = context.getBean(ServiceB.class);
         assertNotNull(serviceB, "ServiceB should not be null");
-        log.info("✅ 成功获取 ServiceB: {}", serviceB);
+        log.info("✅ Đã nhận được thành công ServiceB: {}", serviceB);
 
-        // 4. 验证循环依赖是否正确注入
-        log.info("\n4. 验证循环依赖注入...");
+        // 4. Xác minh rằng các phần phụ thuộc vòng tròn được chèn chính xác
+        log.info("\n4. Xác minh nội dung phụ thuộc vòng tròn...");
         assertNotNull(serviceA.getServiceB(), "ServiceA.serviceB should not be null");
         assertNotNull(serviceB.getServiceA(), "ServiceB.serviceA should not be null");
-        log.info("✅ ServiceA.serviceB 不为 null");
-        log.info("✅ ServiceB.serviceA 不为 null");
+        log.info("✅ ServiceA.serviceB Không null");
+        log.info("✅ ServiceB.serviceA Không null");
 
-        // 5. 验证是同一个实例（单例）
-        log.info("\n5. 验证单例模式...");
+        // 5. Xác minh đó là cùng một phiên bản (singleton)
+        log.info("\n5. Xác minh mẫu đơn...");
         assertSame(serviceA.getServiceB(), serviceB, "ServiceA.serviceB should be the same instance as ServiceB");
         assertSame(serviceB.getServiceA(), serviceA, "ServiceB.serviceA should be the same instance as ServiceA");
         log.info("ServiceA.serviceB == ServiceB: true");
         log.info("ServiceB.serviceA == ServiceA: true");
-        log.info("✅ 单例模式验证通过！");
+        log.info("✅ Xác minh chế độ Singleton đã được thông qua! .");
 
-        // 6. 测试功能是否正常
-        log.info("\n6. 测试Bean功能...");
+        // 6. Kiểm tra xem chức năng có bình thường không
+        log.info("\n6. Bài kiểm traBeanChức năng...");
         serviceA.doSomething();
         serviceB.doSomething();
 
-        // 7. 测试多次获取
-        log.info("\n7. 测试多次获取相同Bean...");
+        // 7. Thử nghiệm nhiều lần mua lại
+        log.info("\n7. Kiểm tra để có được điều tương tự nhiều lầnBean...");
         ServiceA serviceA2 = context.getBean("serviceA");
         ServiceB serviceB2 = context.getBean("serviceB");
 
         assertSame(serviceA, serviceA2, "Multiple gets should return the same ServiceA instance");
         assertSame(serviceB, serviceB2, "Multiple gets should return the same ServiceB instance");
-        log.info("多次获取是否返回同一实例: true");
-        log.info("✅ 多次获取测试通过！");
+        log.info("Liệu nhiều lần truy xuất có trả về cùng một phiên bản hay không: true");
+        log.info("✅ Đã vượt qua bài kiểm tra nhiều lần! .");
 
-        log.info("\n========== 🎉 循环依赖测试全部通过！三级缓存工作正常！ ==========");
-        log.info("\n总结：");
-        log.info("✅ 成功解决了 ServiceA 和 ServiceB 之间的循环依赖");
-        log.info("✅ 单例Bean只创建了一个实例");
-        log.info("✅ 依赖注入正确完成");
-        log.info("✅ 三级缓存机制正常工作");
+        log.info("\n========== 🎉 Tất cả các bài kiểm tra phụ thuộc vòng tròn đã vượt qua! Bộ đệm cấp 3 đang hoạt động tốt! . ==========");
+        log.info("\nTóm tắt:");
+        log.info("✅ Đã giải quyết thành công ServiceA và ServiceB sự phụ thuộc theo chu kỳ giữa");
+        log.info("✅ SingletonBeanChỉ có một phiên bản được tạo ra");
+        log.info("✅ Việc tiêm phụ thuộc được thực hiện chính xác");
+        log.info("✅ Cơ chế bộ đệm cấp ba hoạt động bình thường");
     }
 
-    @Test(description = "测试Bean注入不为null", priority = 1)
+    @Test(description = "Bài kiểm traBeanTiêm không có tác dụngnull", priority = 1)
     public void testBeanInjectionNotNull() {
-        log.info("========== 测试Bean注入不为null ==========");
+        log.info("========== Bài kiểm traBeanTiêm không có tác dụngnull ==========");
 
         context.scan("com.laker.postman.ioc.test");
 
@@ -100,43 +100,43 @@ public class CircularDependencyTest {
         assertNotNull(serviceA.getServiceB(), "ServiceA's serviceB field should be injected");
         assertNotNull(serviceB.getServiceA(), "ServiceB's serviceA field should be injected");
 
-        log.info("✅ 所有依赖注入验证通过！");
+        log.info("✅ Tất cả xác minh nội dung phụ thuộc đã được thông qua! .");
     }
 
-    @Test(description = "测试单例一致性", priority = 2)
+    @Test(description = "Kiểm tra tính nhất quán đơn lẻ", priority = 2)
     public void testSingletonConsistency() {
-        log.info("========== 测试单例一致性 ==========");
+        log.info("========== Kiểm tra tính nhất quán đơn lẻ ==========");
 
         context.scan("com.laker.postman.ioc.test");
 
         ServiceA serviceA = context.getBean(ServiceA.class);
         ServiceB serviceB = context.getBean(ServiceB.class);
 
-        // 验证循环引用的一致性
+        // Xác minh tính nhất quán tham chiếu vòng tròn
         assertSame(serviceA.getServiceB(), serviceB, "ServiceA's serviceB should reference the same ServiceB instance");
         assertSame(serviceB.getServiceA(), serviceA, "ServiceB's serviceA should reference the same ServiceA instance");
 
-        // 验证深层引用
+        // Xác minh tài liệu tham khảo sâu
         assertSame(serviceA, serviceA.getServiceB().getServiceA(), "Deep circular reference should work");
         assertSame(serviceB, serviceB.getServiceA().getServiceB(), "Deep circular reference should work");
 
-        log.info("✅ 单例一致性验证通过！");
+        log.info("✅ Xác minh tính nhất quán của Singleton đã được thông qua! .");
     }
 
-    @Test(description = "测试Bean功能正常", priority = 3)
+    @Test(description = "Bài kiểm traBeanChức năng bình thường", priority = 3)
     public void testBeanFunctionality() {
-        log.info("========== 测试Bean功能正常 ==========");
+        log.info("========== Bài kiểm traBeanChức năng bình thường ==========");
 
         context.scan("com.laker.postman.ioc.test");
 
         ServiceA serviceA = context.getBean(ServiceA.class);
         ServiceB serviceB = context.getBean(ServiceB.class);
 
-        // 调用方法，不应该抛出异常
+        // Khi gọi một phương thức, không được phép ném ra ngoại lệ
         try {
             serviceA.doSomething();
             serviceB.doSomething();
-            log.info("✅ Bean功能测试通过！");
+            log.info("✅ BeanKiểm tra chức năng đã thông qua! .");
         } catch (Exception e) {
             fail("Bean methods should not throw exception: " + e.getMessage());
         }

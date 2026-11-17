@@ -91,7 +91,7 @@ public class LocalMockServerTest {
         MockRoute route = new MockRoute(
                 "route-gbk", "request-gbk", "Export", "example-gbk", "gbk",
                 "GET", "/export.csv", Map.of(), Map.of(), "",
-                new MockResponse(200, Map.of("Content-Type", "text/csv; charset=GBK"), "名称,数量\n"), ""
+                new MockResponse(200, Map.of("Content-Type", "text/csv; charset=GBK"), "tên,Số lượng\n"), ""
         );
 
         try (LocalMockServer server = new LocalMockServer(definition, List.of(route), null)) {
@@ -99,7 +99,7 @@ public class LocalMockServerTest {
             HttpResponse<byte[]> response = HttpClient.newHttpClient().send(
                     request(server, "/export.csv"), HttpResponse.BodyHandlers.ofByteArray());
 
-            assertEquals(response.body(), "名称,数量\n".getBytes(java.nio.charset.Charset.forName("GBK")));
+            assertEquals(response.body(), "tên,Số lượng\n".getBytes(java.nio.charset.Charset.forName("GBK")));
         }
         assertEquals(LocalMockServer.declaredCharset("text/plain; charset=\"UTF-16LE\"; format=flowed"),
                 java.nio.charset.StandardCharsets.UTF_16LE);
@@ -124,7 +124,7 @@ public class LocalMockServerTest {
 
             assertEquals(response.statusCode(), 205);
             assertEquals(response.body(), "");
-            assertEquals(server.logs().get(0).responseBody(), "", "日志只记录实际发送的正文");
+            assertEquals(server.logs().get(0).responseBody(), "", "Nhật ký chỉ ghi lại văn bản thực sự được gửi");
         }
         assertTrue(LocalMockServer.isBodyless("HEAD", 200));
         assertTrue(LocalMockServer.isBodyless("GET", 205));

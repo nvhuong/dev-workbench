@@ -12,7 +12,7 @@ import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 
 /**
- * 在空列表/空表格内部绘制居中的提示文本（支持 \n 多行），替代额外的提示标签。
+ * trong danh sách trống/Vẽ văn bản lời nhắc ở giữa bên trong một bảng trống (được hỗ trợ \n nhiều dòng), thay vì các nhãn nhắc nhở bổ sung.
  */
 @UtilityClass
 public class ListEmptyTextPainter {

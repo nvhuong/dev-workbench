@@ -6,57 +6,57 @@ import java.awt.*;
 import java.util.WeakHashMap;
 
 /**
- * 文本或文件组合单元格编辑器
- * 增强版：支持文件类型过滤、动态配置、编辑器缓存
+ * Trình soạn thảo ô kết hợp văn bản hoặc tập tin
+ * Phiên bản nâng cao: hỗ trợ lọc loại tệp, cấu hình động và bộ nhớ đệm của trình soạn thảo
  */
 public class TextOrFileTableCellEditor extends DefaultCellEditor {
-    // 使用缓存避免频繁创建对象
+    // Sử dụng bộ nhớ đệm để tránh việc tạo đối tượng thường xuyên
     private static final WeakHashMap<Component, FileCellEditor> FILE_EDITOR_CACHE = new WeakHashMap<>();
 
-    // 可配置的类型列索引，默认为2（Form-Data表格中Type列的索引）
+    // Chỉ mục cột loại có thể định cấu hình, mặc định là 2（Form-Datatrong bảngTypechỉ mục cột)
     private static final int typeColumnIndex = 2;
 
     private final EasySmartValueCellEditor textEditor;
     private FileCellEditor fileEditor;
     private String currentType;
 
-    // 文件类型过滤器配置
+    // Cấu hình bộ lọc loại tệp
     private String fileFilterDescription;
     private String[] fileExtensions;
 
     /**
-     * 创建默认的文本或文件组合编辑器
+     * Tạo trình soạn thảo kết hợp văn bản hoặc tập tin mặc định
      */
     public TextOrFileTableCellEditor() {
         super(new JTextField());
-        textEditor = new EasySmartValueCellEditor(); // 启用智能多行编辑
+        textEditor = new EasySmartValueCellEditor(); // Cho phép chỉnh sửa nhiều dòng thông minh
     }
 
     /**
-     * 设置文件类型过滤器
+     * Đặt bộ lọc loại tệp
      *
-     * @param description 过滤器描述
-     * @param extensions  文件扩展名，如 "json", "txt"
+     * @param description Lọc mô tả
+     * @param extensions  Phần mở rộng tệp, chẳng hạn như  "json", "txt"
      */
     public void setFileFilter(String description, String... extensions) {
         this.fileFilterDescription = description;
         this.fileExtensions = extensions;
 
-        // 如果文件编辑器已创建，则立即应用过滤器
+        // Nếu trình chỉnh sửa tệp đã được tạo, bộ lọc sẽ được áp dụng ngay lập tức
         if (fileEditor != null) {
             fileEditor.setFileFilter(description, extensions);
         }
     }
 
     /**
-     * 获取缓存的文件编辑器或创建新的
+     * Nhận trình chỉnh sửa tệp được lưu trong bộ nhớ đệm hoặc tạo một trình chỉnh sửa mới
      */
     private FileCellEditor getOrCreateFileEditor(Component parent) {
         FileCellEditor editor = FILE_EDITOR_CACHE.get(parent);
         if (editor == null) {
             editor = new FileCellEditor(parent);
 
-            // 如果有文件过滤器配置，应用到新创建的编辑器
+            // Nếu bộ lọc tệp được định cấu hình, bộ lọc đó sẽ được áp dụng cho các trình chỉnh sửa mới được tạo
             if (fileFilterDescription != null && fileExtensions != null) {
                 editor.setFileFilter(fileFilterDescription, fileExtensions);
             }
@@ -68,11 +68,11 @@ public class TextOrFileTableCellEditor extends DefaultCellEditor {
 
     @Override
     public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column) {
-        // 从类型列获取单元格类型
+        // Lấy loại ô từ cột loại
         Object type = table.getValueAt(row, typeColumnIndex);
         currentType = type == null ? "" : type.toString();
 
-        // 根据类型选择合适的编辑器
+        // Chọn trình soạn thảo thích hợp dựa trên loại
         if (TableUIConstants.FILE_TYPE.equals(currentType)) {
             fileEditor = getOrCreateFileEditor(table);
             return fileEditor.getTableCellEditorComponent(table, value, isSelected, row, column);
@@ -94,8 +94,8 @@ public class TextOrFileTableCellEditor extends DefaultCellEditor {
     }
 
     /**
-     * 获取当前选中的文件
-     * 如果当前不是文件类型，或未选择文件，返回null
+     * Lấy tập tin hiện đang được chọn
+     * Nếu loại tệp hiện tại không được chọn hoặc không có tệp nào được chọn, hãy quay lạinull
      */
     public java.io.File getSelectedFile() {
         if (fileEditor != null && TableUIConstants.FILE_TYPE.equals(currentType)) {

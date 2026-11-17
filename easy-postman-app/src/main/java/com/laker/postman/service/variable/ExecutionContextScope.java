@@ -3,7 +3,7 @@ package com.laker.postman.service.variable;
 import java.util.Map;
 
 /**
- * 绑定/恢复脚本执行上下文的作用域对象。
+ * Ràng buộc/Khôi phục đối tượng phạm vi của bối cảnh thực thi tập lệnh.
  */
 public final class ExecutionContextScope implements AutoCloseable {
 

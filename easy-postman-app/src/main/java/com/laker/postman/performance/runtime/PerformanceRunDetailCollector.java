@@ -148,7 +148,7 @@ public final class PerformanceRunDetailCollector implements PerformanceResultLis
         if (response == null) {
             return null;
         }
-        // 文件响应的正文只是乱码或临时文件提示，不随详情传输
+        // Nội dung của phản hồi tệp chỉ là một lời nhắc vô nghĩa hoặc một tệp tạm thời và không được truyền đi cùng với các chi tiết
         boolean fileContentOmitted = ResponseFiles.isFileResponse(response);
         return DetailResponse.builder()
                 .code(response.code)

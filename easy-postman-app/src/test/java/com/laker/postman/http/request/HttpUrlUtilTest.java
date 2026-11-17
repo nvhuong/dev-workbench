@@ -17,7 +17,7 @@ public class HttpUrlUtilTest {
 
         assertEquals(
                 displayUrl,
-                "https://example.com/a%2Fb?filter=测试中文&lang=en#frag"
+                "https://example.com/a%2Fb?filter=Kiểm tra tiếng Trung&lang=en#frag"
         );
     }
 
