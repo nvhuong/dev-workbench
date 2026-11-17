@@ -17,8 +17,9 @@ public class I18nGovernanceTest {
     @Test
     public void shouldExposeSupportedLocalesAndFallbackLocale() {
         assertEquals(I18nUtil.fallbackLocale(), Locale.ENGLISH);
-        assertEquals(I18nUtil.supportedLocales(), List.of(Locale.ENGLISH, Locale.CHINESE));
-        assertEquals(I18nUtil.normalizeSupportedLocale(Locale.SIMPLIFIED_CHINESE), Locale.CHINESE);
+        assertEquals(I18nUtil.supportedLocales(), List.of(Locale.ENGLISH, Locale.forLanguageTag("vi")));
+        assertEquals(I18nUtil.normalizeSupportedLocale(Locale.forLanguageTag("vi-VN")), Locale.forLanguageTag("vi"));
+        assertEquals(I18nUtil.normalizeSupportedLocale(Locale.SIMPLIFIED_CHINESE), Locale.ENGLISH);
         assertEquals(I18nUtil.normalizeSupportedLocale(Locale.FRENCH), Locale.ENGLISH);
     }
 
@@ -63,7 +64,7 @@ public class I18nGovernanceTest {
                 duplicated=First
                 duplicated=Second
                 """);
-        Files.writeString(resourcesRoot.resolve("demo-messages_zh.properties"),
+        Files.writeString(resourcesRoot.resolve("demo-messages_vi.properties"),
                 """
                 hello=你好
                 """);
@@ -76,7 +77,7 @@ public class I18nGovernanceTest {
         assertTrue(report.hasIssues());
         assertTrue(report.missingKeys().stream()
                 .anyMatch(key -> "demo-messages".equals(key.bundleName())
-                        && Locale.CHINESE.equals(key.locale())
+                        && Locale.forLanguageTag("vi").equals(key.locale())
                         && "english.only".equals(key.key())));
         assertTrue(report.duplicateKeys().stream()
                 .anyMatch(key -> key.resourceFile().endsWith("demo-messages_en.properties")
@@ -92,7 +93,7 @@ public class I18nGovernanceTest {
                 hello=Hello
                 goodbye=Goodbye
                 """);
-        Files.writeString(resourcesRoot.resolve("clean-messages_zh.properties"),
+        Files.writeString(resourcesRoot.resolve("clean-messages_vi.properties"),
                 """
                 hello=你好
                 goodbye=再见

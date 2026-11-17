@@ -23,7 +23,8 @@ public class I18nUtil {
     private static final String BUNDLE_NAME = "messages";
     private static final String COMMON_BUNDLE_NAME = CommonI18n.BUNDLE_NAME;
     private static final Locale FALLBACK_LOCALE = Locale.ENGLISH;
-    private static final List<Locale> SUPPORTED_LOCALES = List.of(Locale.ENGLISH, Locale.CHINESE);
+    private static final Locale VIETNAMESE = Locale.forLanguageTag("vi");
+    private static final List<Locale> SUPPORTED_LOCALES = List.of(Locale.ENGLISH, VIETNAMESE);
     private static final ResourceBundle EMPTY_RESOURCE_BUNDLE = new ResourceBundle() {
         @Override
         protected Object handleGetObject(String key) {
@@ -84,7 +85,7 @@ public class I18nUtil {
         if (locale == null) {
             return FALLBACK_LOCALE;
         }
-        return "zh".equals(locale.getLanguage()) ? Locale.CHINESE : FALLBACK_LOCALE;
+        return "vi".equals(locale.getLanguage()) ? VIETNAMESE : FALLBACK_LOCALE;
     }
 
     /**
@@ -221,12 +222,12 @@ public class I18nUtil {
     /**
      * 设置语言环境（通过语言代码）
      *
-     * @param languageCode 语言代码 (zh, en)
+     * @param languageCode 语言代码 (en, vi)
      */
     public static void setLocale(String languageCode) {
         Locale locale = switch (languageCode == null ? "" : languageCode.toLowerCase(Locale.ROOT)) {
-            case "zh", "zh_cn", "zh-cn", "chinese" -> Locale.CHINESE;
             case "en", "en_us", "en-us", "english" -> Locale.ENGLISH;
+            case "vi", "vi_vn", "vi-vn", "vietnamese" -> VIETNAMESE;
             default -> {
                 log.warn("Unsupported language code: {}, using English as default", languageCode);
                 yield FALLBACK_LOCALE;

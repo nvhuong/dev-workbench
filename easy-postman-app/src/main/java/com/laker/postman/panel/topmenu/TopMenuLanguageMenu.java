@@ -22,22 +22,22 @@ class TopMenuLanguageMenu {
         ButtonGroup languageGroup = new ButtonGroup();
 
         JRadioButtonMenuItem englishItem = new JRadioButtonMenuItem("English");
-        JRadioButtonMenuItem chineseItem = new JRadioButtonMenuItem("中文");
+        JRadioButtonMenuItem vietnameseItem = new JRadioButtonMenuItem("Tiếng Việt");
 
         languageGroup.add(englishItem);
-        languageGroup.add(chineseItem);
+        languageGroup.add(vietnameseItem);
 
-        if (I18nUtil.isChinese()) {
-            chineseItem.setSelected(true);
+        if ("vi".equals(I18nUtil.currentLocale().getLanguage())) {
+            vietnameseItem.setSelected(true);
         } else {
             englishItem.setSelected(true);
         }
 
         englishItem.addActionListener(e -> switchLanguage("en"));
-        chineseItem.addActionListener(e -> switchLanguage("zh"));
+        vietnameseItem.addActionListener(e -> switchLanguage("vi"));
 
         languageMenu.add(englishItem);
-        languageMenu.add(chineseItem);
+        languageMenu.add(vietnameseItem);
         return languageMenu;
     }
 
