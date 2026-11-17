@@ -55,7 +55,7 @@ public class PerformanceHtmlReportExporter {
                 .append("</p></header>");
         appendSetup(html, safe);
         appendSummary(html, populated);
-        appendCharts(html, safe.trendPoints());
+        appendCharts(html, safe.trendPoints(), safe.samples());
         appendSlowest(html, populated);
         html.append("<section><h2>2. Metrics for each request</h2>");
         for (var table : populated) appendTable(html, table);
@@ -170,17 +170,86 @@ public class PerformanceHtmlReportExporter {
         html.append("</div></section>");
     }
 
-    private void appendCharts(StringBuilder html, List<PerformanceTrendView.TrendReportPoint> points) {
-        html.append("<section><div class=\"chart-block\"><h2>1.1 Response time</h2><p class=\"muted\">Average and maximum response time over the test duration.</p>");
-        if (points == null || points.isEmpty()) {
+    private void appendCharts(StringBuilder html, List<PerformanceTrendView.TrendReportPoint> trendPoints,
+                              List<PerformanceSampleResult> samples) {
+        boolean fromTrend = hasChartData(trendPoints);
+        List<PerformanceTrendView.TrendReportPoint> points = fromTrend
+                ? trendPoints : chartPointsFromSamples(samples);
+        String source = fromTrend ? "Sampled during the run." : "Reconstructed from retained request results.";
+        html.append("<section><div class=\"chart-block\"><h2>1.1 Response time</h2><p class=\"muted\">Average and maximum response time over the test duration. ")
+                .append(source).append("</p>");
+        if (points.isEmpty()) {
             html.append("<div class=\"empty\">Chart data is unavailable.</div>");
         } else {
             chart(html, points, "Response time", "ms", false);
         }
-        html.append("</div><div class=\"chart-block\"><h2>1.2 Throughput</h2><p class=\"muted\">Requests completed per second.</p>");
-        if (points == null || points.isEmpty()) html.append("<div class=\"empty\">Chart data is unavailable.</div>");
+        html.append("</div><div class=\"chart-block\"><h2>1.2 Throughput</h2><p class=\"muted\">Requests completed per second. ")
+                .append(source).append("</p>");
+        if (points.isEmpty()) html.append("<div class=\"empty\">Chart data is unavailable.</div>");
         else chart(html, points, "Throughput", "req/s", true);
         html.append("</div></section>");
+    }
+
+    private boolean hasChartData(List<PerformanceTrendView.TrendReportPoint> points) {
+        if (points == null || points.isEmpty()) return false;
+        return points.stream().filter(point -> point != null && point.snapshot() != null)
+                .map(point -> point.snapshot().http())
+                .anyMatch(metric -> metric.samples() > 0
+                        && (Double.isFinite(metric.avgDurationMs()) || Double.isFinite(metric.maxDurationMs())
+                        || Double.isFinite(metric.sampleRate())));
+    }
+
+    private List<PerformanceTrendView.TrendReportPoint> chartPointsFromSamples(List<PerformanceSampleResult> samples) {
+        if (samples == null || samples.isEmpty()) return List.of();
+        List<PerformanceSampleResult> valid = samples.stream()
+                .filter(sample -> sample != null && sample.getStartTimeMs() > 0 && sample.getElapsedTimeMs() >= 0)
+                .sorted(java.util.Comparator.comparingLong(PerformanceSampleResult::getStartTimeMs))
+                .toList();
+        if (valid.isEmpty()) return List.of();
+
+        long start = valid.getFirst().getStartTimeMs();
+        long end = valid.stream().mapToLong(sample -> Math.max(sample.getEndTimeMs(),
+                sample.getStartTimeMs() + sample.getElapsedTimeMs())).max().orElse(start);
+        long duration = Math.max(1L, end - start);
+        long bucketWidthMs = Math.max(1L, (duration + 59L) / 60L);
+        Map<Long, ChartBucket> buckets = new LinkedHashMap<>();
+        for (PerformanceSampleResult sample : valid) {
+            long index = Math.max(0L, (sample.getStartTimeMs() - start) / bucketWidthMs);
+            buckets.computeIfAbsent(index, ignored -> new ChartBucket()).add(sample);
+        }
+
+        List<PerformanceTrendView.TrendReportPoint> points = new ArrayList<>(buckets.size());
+        for (Map.Entry<Long, ChartBucket> entry : buckets.entrySet()) {
+            long bucketStart = start + entry.getKey() * bucketWidthMs;
+            long bucketEnd = Math.min(end, bucketStart + bucketWidthMs);
+            long actualWidthMs = Math.max(1L, bucketEnd - bucketStart);
+            ChartBucket bucket = entry.getValue();
+            double averageMs = bucket.totalElapsedMs / (double) bucket.count;
+            double throughput = bucket.count * 1000d / actualWidthMs;
+            double failurePercent = bucket.count == 0 ? 0 : bucket.failures * 100d / bucket.count;
+            var http = new PerformanceTrendSnapshot.ProtocolWindowMetrics(
+                    bucket.count, bucket.failures, failurePercent, throughput, averageMs,
+                    0, 0, 0, Double.NaN, Double.NaN, Double.NaN, Double.NaN, bucket.maximumElapsedMs);
+            var idle = PerformanceTrendSnapshot.terminalIdle();
+            points.add(new PerformanceTrendView.TrendReportPoint(bucketStart,
+                    new PerformanceTrendSnapshot(0, 0, 0, http, idle.http(), idle.webSocket(), idle.sse())));
+        }
+        return List.copyOf(points);
+    }
+
+    private static final class ChartBucket {
+        private int count;
+        private int failures;
+        private long totalElapsedMs;
+        private long maximumElapsedMs;
+
+        private void add(PerformanceSampleResult sample) {
+            count++;
+            if (!sample.isSuccessful()) failures++;
+            long elapsed = Math.max(0L, sample.getElapsedTimeMs());
+            totalElapsedMs += elapsed;
+            maximumElapsedMs = Math.max(maximumElapsedMs, elapsed);
+        }
     }
 
     private void chart(StringBuilder html, List<PerformanceTrendView.TrendReportPoint> points,
