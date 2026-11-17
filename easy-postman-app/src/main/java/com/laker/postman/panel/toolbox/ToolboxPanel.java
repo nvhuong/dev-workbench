@@ -204,6 +204,7 @@ public class ToolboxPanel extends UiSingletonPanel {
         regBuiltIn("crypto", MessageKeys.TOOLBOX_CRYPTO, "icons/security.svg", GRP_CONVERT, CryptoPanel::new);
         // 生成
         regBuiltIn("uuid", MessageKeys.TOOLBOX_UUID, "icons/plus.svg", GRP_GEN, UuidPanel::new);
+        regBuiltIn("qrcode", MessageKeys.TOOLBOX_QR_CODE, "icons/format.svg", GRP_GEN, QrCodePanel::new);
         regBuiltIn("hash", MessageKeys.TOOLBOX_HASH, "icons/hash.svg", GRP_GEN, HashPanel::new);
         regBuiltIn("cron", MessageKeys.TOOLBOX_CRON, "icons/time.svg", GRP_GEN, CronPanel::new);
         // 数据库

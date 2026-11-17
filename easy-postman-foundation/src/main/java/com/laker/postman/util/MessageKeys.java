@@ -2771,6 +2771,23 @@ public final class MessageKeys {
     // ============ YAML / XML 工具相关 ============
     public static final String TOOLBOX_YAML = "toolbox.yaml";
     public static final String TOOLBOX_XML = "toolbox.xml";
+    public static final String TOOLBOX_QR_CODE = "toolbox.qrcode";
+    public static final String TOOLBOX_QR_TEXT = "toolbox.qrcode.text";
+    public static final String TOOLBOX_QR_FOREGROUND = "toolbox.qrcode.foreground";
+    public static final String TOOLBOX_QR_BACKGROUND = "toolbox.qrcode.background";
+    public static final String TOOLBOX_QR_ERROR_CORRECTION = "toolbox.qrcode.error_correction";
+    public static final String TOOLBOX_QR_LOW = "toolbox.qrcode.level.low";
+    public static final String TOOLBOX_QR_MEDIUM = "toolbox.qrcode.level.medium";
+    public static final String TOOLBOX_QR_QUARTILE = "toolbox.qrcode.level.quartile";
+    public static final String TOOLBOX_QR_HIGH = "toolbox.qrcode.level.high";
+    public static final String TOOLBOX_QR_DOWNLOAD = "toolbox.qrcode.download";
+    public static final String TOOLBOX_QR_STATUS_READY = "toolbox.qrcode.status.ready";
+    public static final String TOOLBOX_QR_STATUS_EMPTY = "toolbox.qrcode.status.empty";
+    public static final String TOOLBOX_QR_STATUS_INVALID_COLOR = "toolbox.qrcode.status.invalid_color";
+    public static final String TOOLBOX_QR_STATUS_TOO_LONG = "toolbox.qrcode.status.too_long";
+    public static final String TOOLBOX_QR_STATUS_SAVED = "toolbox.qrcode.status.saved";
+    public static final String TOOLBOX_QR_STATUS_SAVE_FAILED = "toolbox.qrcode.status.save_failed";
+    public static final String TOOLBOX_QR_COLOR_PICKER = "toolbox.qrcode.color_picker";
     public static final String TOOLBOX_YAML_INPUT = "toolbox.yaml.input";
     public static final String TOOLBOX_XML_INPUT = "toolbox.xml.input";
     public static final String TOOLBOX_STRUCTURED_OUTPUT = "toolbox.structured.output";
