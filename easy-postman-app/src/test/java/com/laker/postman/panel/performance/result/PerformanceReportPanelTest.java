@@ -6,6 +6,8 @@ import com.laker.postman.performance.core.model.PerformanceProtocol;
 import com.laker.postman.performance.core.model.RequestResult;
 import com.laker.postman.performance.core.model.PerformanceStatsCollector;
 import com.laker.postman.performance.core.model.PerformanceStatsSnapshot;
+import com.laker.postman.performance.core.model.PerformanceTrendSnapshot;
+import com.laker.postman.panel.performance.result.PerformanceTrendView.TrendReportPoint;
 import com.laker.postman.performance.model.PerformanceProtocolLabels;
 import com.laker.postman.test.AbstractSwingUiTest;
 import com.laker.postman.util.I18nUtil;
@@ -27,6 +29,7 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.ResourceBundle;
+import java.util.concurrent.atomic.AtomicReference;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
@@ -48,6 +51,26 @@ public class PerformanceReportPanelTest extends AbstractSwingUiTest {
         DefaultTableModel model = getReportTableModel(panel);
         assertEquals(model.getValueAt(0, 5).toString(), "1.50");
         assertEquals(model.getValueAt(1, 5).toString(), "1.50");
+    }
+
+    @Test
+    public void finalSummaryRefreshShouldPreserveTrendPointsForReportCharts() throws Exception {
+        PerformanceReportPanel panel = new PerformanceReportPanel();
+        List<TrendReportPoint> points = List.of(
+                new TrendReportPoint(1_000L, PerformanceTrendSnapshot.terminalIdle()),
+                new TrendReportPoint(2_000L, PerformanceTrendSnapshot.terminalIdle())
+        );
+        panel.setTrendReportPoints(points);
+        panel.updateReport(statsSnapshot(
+                new RequestResult(1_000L, 1_150L, true, "search", "Search API", PerformanceProtocol.HTTP)
+        ));
+
+        Field field = PerformanceReportPanel.class.getDeclaredField("trendPoints");
+        field.setAccessible(true);
+        @SuppressWarnings("unchecked")
+        AtomicReference<List<TrendReportPoint>> trendPoints =
+                (AtomicReference<List<TrendReportPoint>>) field.get(panel);
+        assertEquals(trendPoints.get(), points);
     }
 
     @Test

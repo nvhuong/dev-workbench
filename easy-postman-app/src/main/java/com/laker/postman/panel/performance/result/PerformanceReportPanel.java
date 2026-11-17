@@ -597,19 +597,18 @@ public class PerformanceReportPanel extends JPanel {
 
 
     public void clearReport() {
-        clearReportData();
+        clearReportTables();
+        trendPoints.set(List.of());
+        sampleResults = List.of();
+        reportError = "";
         htmlReportPath = Path.of(SystemUtil.getEasyPostmanPath(), "performance-reports", "latest", "index.html");
         scheduleHtmlReportWrite();
     }
 
-    private void clearReportData() {
+    private void clearReportTables() {
         reportTableModel.setRowCount(0);
         webSocketReportTableModel.setRowCount(0);
         sseReportTableModel.setRowCount(0);
-        trendPoints.set(List.of());
-        sampleResults = List.of();
-        reportEnvironment = "";
-        reportError = "";
     }
 
     public void setReportContext(PerformanceRunPlan plan, String environment) {
@@ -669,7 +668,8 @@ public class PerformanceReportPanel extends JPanel {
     }
 
     private void updateReport(PerformanceProtocolReportData reportData) {
-        clearReportData();
+        // Updating the final summary must not erase trend samples collected during the run.
+        clearReportTables();
 
         for (PerformanceProtocolReportData.HttpReportRow row : reportData.httpRows()) {
             addReportRow(reportTableModel, toHttpRowData(row));
