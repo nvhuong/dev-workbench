@@ -9,10 +9,10 @@ Rà soát tĩnh hiện tại **chưa phát hiện dấu hiệu rõ ràng** về 
 
 ## Phạm vi đã kiểm tra
 
-- Source Java của app và plugin: khoảng 863 file, rà các điểm dùng mạng, socket, tiến trình, class loading, file và cập nhật.
+- Source Java của app và plugin: khoảng 863 file (773 trong app và 90 trong plugin source), rà các điểm dùng mạng, socket, tiến trình, class loading, file và cập nhật.
 - Artifact JAR hiện diện: 18 file JAR, tổng cộng khoảng 51.622 class; gồm app uber-JAR, các module, plugin manager và 5 plugin đóng gói.
 - App uber-JAR có 27.098 class, trong đó 2.273 class của EasyPostman và khoảng 24.825 class thư viện bên thứ ba.
-- Đã tạo inventory dependency Maven cho host app, dò URL/hằng chuỗi trong class, và bắt đầu decompile bytecode bằng CFR 0.152. Quá trình decompile toàn bộ class bên thứ ba của app còn đang chạy; không coi danh sách chuỗi hoặc quét marker đơn lẻ là kết luận malware.
+- Đã tạo inventory dependency Maven cho host app, dò URL/hằng chuỗi trong class, và decompile bằng CFR 0.152. Tại thời điểm ghi báo cáo, CFR đã xuất 1.913 class thư viện từ app uber-JAR; decompile toàn bộ 24.825 class thư viện app chưa hoàn tất. Source của EasyPostman đã được rà bằng API/hành vi nhạy cảm; class thư viện có API mạng/file/process được tính là khả năng chức năng, không coi marker đơn lẻ là kết luận malware.
 - Artifact JAR SHA-256 được ghi ở phần cuối để đối chiếu đúng file đã rà.
 
 ## Hành vi mạng hợp lệ quan sát được
