@@ -15,7 +15,7 @@ public class MinioPlugin implements EasyPostmanPlugin {
                 "icons/minio.svg",
                 "toolbox.group.database",
                 MinioI18n.t("group"),
-                () -> new MinioPanel(),
+                () -> new MinioPanel(context.storage()),
                 MinioPlugin.class
         );
     }

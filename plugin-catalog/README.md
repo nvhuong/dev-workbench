@@ -3,7 +3,6 @@
 This directory stores the official online plugin catalogs consumed by EasyPostman.
 
 - `catalog-github.json`: official GitHub source
-- `catalog-gitee.json`: official Gitee source
 
 These files are treated as generated release metadata.
 

@@ -2,6 +2,7 @@ package com.laker.postman.plugin.minio;
 
 import com.formdev.flatlaf.FlatClientProperties;
 import com.laker.postman.common.component.ToolWindowSurfaceStyle;
+import com.laker.postman.plugin.api.PluginStorage;
 import com.laker.postman.util.FontsUtil;
 import io.minio.GetObjectArgs;
 import io.minio.ListObjectsArgs;
@@ -27,11 +28,16 @@ import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 
 @Slf4j
 public final class MinioPanel extends JPanel {
     private static final int MAX_ROWS = 2000;
+    private static final String PROFILE_FILE = "connection-profiles.txt";
+    private static final String ACTIVE_PROFILE_FILE = "active-profile.txt";
+    private final PluginStorage storage;
+    private final JComboBox<ConnectionProfile> profiles = new JComboBox<>();
     private final JTextField endpoint = new JTextField("http://localhost:9000");
     private final JTextField accessKey = new JTextField();
     private final JPasswordField secretKey = new JPasswordField();
@@ -50,9 +56,19 @@ public final class MinioPanel extends JPanel {
     private JButton downloadButton;
     private JButton deleteButton;
     private JButton createBucketButton;
+    private JButton saveProfileButton;
+    private JButton copyProfileButton;
+    private JButton deleteProfileButton;
+    private JButton newProfileButton;
+    private boolean loadingProfiles;
     private String selectedBucket;
 
     public MinioPanel() {
+        this(PluginStorage.noop());
+    }
+
+    public MinioPanel(PluginStorage storage) {
+        this.storage = storage == null ? PluginStorage.noop() : storage;
         setLayout(new BorderLayout());
         ToolWindowSurfaceStyle.applyCard(this);
         setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
@@ -62,11 +78,29 @@ public final class MinioPanel extends JPanel {
         JPanel footer = new JPanel(new BorderLayout()); footer.setOpaque(false); footer.setBorder(BorderFactory.createEmptyBorder(6, 0, 0, 0)); footer.add(status, BorderLayout.CENTER);
         add(footer, BorderLayout.SOUTH);
         updateConnectedState(false);
+        loadProfiles(null);
     }
 
     private JPanel createConnectionBar() {
-        JPanel panel = new JPanel(new MigLayout("insets 0, novisualpadding, fillx, wrap 8", "[][grow,fill][][grow,fill][][grow,fill][]", "[]6[]"));
+        JPanel panel = new JPanel(new MigLayout("insets 0, novisualpadding, fillx, wrap 8", "[][grow,fill][][grow,fill][][grow,fill][][]", "[]6[]"));
         panel.setOpaque(false);
+        profiles.setRenderer((list, value, index, selected, focus) ->
+                new javax.swing.DefaultListCellRenderer().getListCellRendererComponent(
+                        list, value == null ? "" : value.name(), index, selected, focus));
+        profiles.addActionListener(event -> {
+            if (!loadingProfiles && profiles.getSelectedItem() instanceof ConnectionProfile profile) applyProfile(profile);
+        });
+        newProfileButton = new JButton(MinioI18n.t("profile_new"));
+        saveProfileButton = new JButton(MinioI18n.t("profile_save"));
+        copyProfileButton = new JButton(MinioI18n.t("profile_copy"));
+        deleteProfileButton = new JButton(MinioI18n.t("profile_delete"));
+        newProfileButton.addActionListener(event -> clearProfileForm());
+        saveProfileButton.addActionListener(event -> saveProfile());
+        copyProfileButton.addActionListener(event -> copyProfile());
+        deleteProfileButton.addActionListener(event -> deleteProfile());
+        panel.add(new JLabel(MinioI18n.t("profile"))); panel.add(profiles, "span 3,growx,wmin 120");
+        panel.add(newProfileButton, "split 4"); panel.add(saveProfileButton); panel.add(copyProfileButton);
+        panel.add(deleteProfileButton, "wrap");
         endpoint.putClientProperty(FlatClientProperties.PLACEHOLDER_TEXT, MinioI18n.t("endpoint_hint"));
         accessKey.putClientProperty(FlatClientProperties.PLACEHOLDER_TEXT, MinioI18n.t("access_hint"));
         secretKey.putClientProperty(FlatClientProperties.PLACEHOLDER_TEXT, MinioI18n.t("secret_hint"));
@@ -217,8 +251,77 @@ public final class MinioPanel extends JPanel {
     private String safeMessage(Throwable ex){Throwable cause=ex.getCause()==null?ex:ex.getCause();String message=cause.getMessage();return message==null||message.isBlank()?cause.getClass().getSimpleName():message;}
     private String formatSize(long bytes){if(bytes<1024)return bytes+" B";if(bytes<1024*1024)return String.format("%.1f KB",bytes/1024.0);if(bytes<1024L*1024*1024)return String.format("%.1f MB",bytes/(1024.0*1024));return String.format("%.1f GB",bytes/(1024.0*1024*1024));}
     private void disconnect(){client=null;selectedBucket=null;objectModel.setRowCount(0);buckets.setModel(new DefaultTreeModel(new DefaultMutableTreeNode(MinioI18n.t("buckets"))));updateConnectedState(false);setStatus(MinioI18n.t("disconnected"));}
-    private void updateConnectedState(boolean connected){connectButton.setEnabled(!connected);disconnectButton.setEnabled(connected);endpoint.setEnabled(!connected);accessKey.setEnabled(!connected);secretKey.setEnabled(!connected);refreshButton.setEnabled(connected);createBucketButton.setEnabled(connected);uploadButton.setEnabled(connected);downloadButton.setEnabled(connected);deleteButton.setEnabled(connected);}
+    private void updateConnectedState(boolean connected){connectButton.setEnabled(!connected);disconnectButton.setEnabled(connected);endpoint.setEnabled(!connected);accessKey.setEnabled(!connected);secretKey.setEnabled(!connected);refreshButton.setEnabled(connected);createBucketButton.setEnabled(connected);uploadButton.setEnabled(connected);downloadButton.setEnabled(connected);deleteButton.setEnabled(connected);newProfileButton.setEnabled(!connected);saveProfileButton.setEnabled(!connected);copyProfileButton.setEnabled(!connected);deleteProfileButton.setEnabled(!connected&&profiles.getSelectedItem()!=null);profiles.setEnabled(!connected);}
     private void setStatus(String text){status.setText(text);status.setToolTipText(text);}
     private record ObjectRow(String name,long size,String modified){}
+    private ConnectionProfile currentProfile(String profileName) {
+        return new ConnectionProfile(profileName, endpoint.getText().trim(), accessKey.getText().trim(),
+                new String(secretKey.getPassword()));
+    }
+    private void applyProfile(ConnectionProfile profile) {
+        if (client != null) disconnect();
+        endpoint.setText(profile.endpoint()); accessKey.setText(profile.accessKey()); secretKey.setText(profile.secretKey());
+        try { storage.writeString(ACTIVE_PROFILE_FILE, encode(profile.name())); }
+        catch (Exception exception) { log.warn("Could not persist active MinIO profile", exception); }
+    }
+    private void clearProfileForm() {
+        if (client != null) disconnect();
+        profiles.setSelectedItem(null); endpoint.setText("http://localhost:9000"); accessKey.setText(""); secretKey.setText("");
+    }
+    private void saveProfile() {
+        ConnectionProfile selected = (ConnectionProfile) profiles.getSelectedItem();
+        String profileName = selected == null ? "" : selected.name();
+        if (profileName.isBlank()) {
+            profileName = JOptionPane.showInputDialog(this, MinioI18n.t("profile_name"), "MinIO - " + endpoint.getText().trim());
+            if (profileName == null || profileName.isBlank()) return;
+            profileName = profileName.trim();
+            if (findProfile(profileName) != null) { setStatus(MinioI18n.t("profile_exists", profileName)); return; }
+        }
+        List<ConnectionProfile> all = readProfiles();
+        ConnectionProfile updated = currentProfile(profileName);
+        int index = profileIndex(all, profileName);
+        if (index >= 0) all.set(index, updated); else all.add(updated);
+        writeProfiles(all); loadProfiles(profileName); setStatus(MinioI18n.t("profile_saved", profileName));
+    }
+    private void copyProfile() {
+        String base = profiles.getSelectedItem() instanceof ConnectionProfile selected ? selected.name() + " copy" : "MinIO profile copy";
+        String profileName = JOptionPane.showInputDialog(this, MinioI18n.t("profile_copy_prompt"), base);
+        if (profileName == null || profileName.isBlank()) return;
+        profileName = profileName.trim();
+        if (findProfile(profileName) != null) { setStatus(MinioI18n.t("profile_exists", profileName)); return; }
+        List<ConnectionProfile> all = readProfiles(); all.add(currentProfile(profileName));
+        writeProfiles(all); loadProfiles(profileName); setStatus(MinioI18n.t("profile_saved", profileName));
+    }
+    private void deleteProfile() {
+        if (!(profiles.getSelectedItem() instanceof ConnectionProfile selected)) return;
+        if (JOptionPane.showConfirmDialog(this, MinioI18n.t("profile_delete_confirm", selected.name()),
+                MinioI18n.t("profile_delete"), JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE) != JOptionPane.YES_OPTION) return;
+        List<ConnectionProfile> all = readProfiles(); all.removeIf(profile -> profile.name().equals(selected.name()));
+        writeProfiles(all); loadProfiles(all.isEmpty() ? null : all.get(0).name()); setStatus(MinioI18n.t("profile_deleted", selected.name()));
+    }
+    private ConnectionProfile findProfile(String profileName) { return readProfiles().stream().filter(p -> p.name().equalsIgnoreCase(profileName)).findFirst().orElse(null); }
+    private int profileIndex(List<ConnectionProfile> all, String profileName) { for (int i=0;i<all.size();i++) if (all.get(i).name().equalsIgnoreCase(profileName)) return i; return -1; }
+    private void loadProfiles(String preferredName) {
+        loadingProfiles = true; profiles.removeAllItems(); List<ConnectionProfile> all = readProfiles(); all.forEach(profiles::addItem);
+        String activeName = preferredName;
+        if (activeName == null) activeName = readActiveProfileName();
+        String selectedName = activeName;
+        ConnectionProfile selected = all.stream().filter(p -> p.name().equals(selectedName)).findFirst().orElse(all.isEmpty()?null:all.get(0));
+        profiles.setSelectedItem(selected); loadingProfiles = false;
+        if (selected != null) applyProfile(selected); else { deleteProfileButton.setEnabled(false); clearProfileForm(); }
+    }
+    private List<ConnectionProfile> readProfiles() {
+        List<ConnectionProfile> all=new ArrayList<>();
+        try { for(String line:storage.readString(PROFILE_FILE).orElse("").lines().toList()) { String[] f=line.split("\\t",-1); if(f.length==4) all.add(new ConnectionProfile(decode(f[0]),decode(f[1]),decode(f[2]),decode(f[3]))); } }
+        catch(Exception exception){log.warn("Could not read MinIO connection profiles",exception);} return all;
+    }
+    private void writeProfiles(List<ConnectionProfile> all) {
+        try { StringBuilder data=new StringBuilder(); for(ConnectionProfile p:all)data.append(encode(p.name())).append('\t').append(encode(p.endpoint())).append('\t').append(encode(p.accessKey())).append('\t').append(encode(p.secretKey())).append('\n'); storage.writeString(PROFILE_FILE,data.toString()); }
+        catch(Exception exception){log.warn("Could not save MinIO connection profiles",exception);}
+    }
+    private String readActiveProfileName(){try{return storage.readString(ACTIVE_PROFILE_FILE).map(MinioPanel::decode).orElse("");}catch(Exception exception){log.warn("Could not read active MinIO profile",exception);return "";}}
+    private static String encode(String value){return Base64.getUrlEncoder().withoutPadding().encodeToString(value.getBytes(java.nio.charset.StandardCharsets.UTF_8));}
+    private static String decode(String value){return new String(Base64.getUrlDecoder().decode(value),java.nio.charset.StandardCharsets.UTF_8);}
+    private record ConnectionProfile(String name,String endpoint,String accessKey,String secretKey){@Override public String toString(){return name;}}
     @FunctionalInterface private interface ThrowingSupplier<T>{T get()throws Exception;}
 }

@@ -2,6 +2,7 @@ package com.laker.postman.plugin.sql;
 
 import com.formdev.flatlaf.FlatClientProperties;
 import com.laker.postman.common.component.ToolWindowSurfaceStyle;
+import com.laker.postman.plugin.api.PluginStorage;
 import com.laker.postman.util.EditorThemeUtil;
 import com.laker.postman.util.FontsUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -15,6 +16,7 @@ import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JScrollPane;
@@ -41,6 +43,7 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLFeatureNotSupportedException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 import java.util.Properties;
 import java.util.ServiceLoader;
@@ -48,6 +51,8 @@ import java.util.ServiceLoader;
 /** JDBC workbench for connecting to databases, exploring metadata, and executing SQL. */
 @Slf4j
 public class SqlPanel extends JPanel {
+    private static final String PROFILE_FILE = "connection-profiles.txt";
+    private static final String ACTIVE_PROFILE_FILE = "active-profile.txt";
     private static final int QUERY_TIMEOUT_SECONDS = 30;
     private static final int MAX_RESULT_ROWS = 500;
     private static final List<String> SQL_SUGGESTIONS = List.of(
@@ -65,6 +70,7 @@ public class SqlPanel extends JPanel {
     private final JTree objectTree = new JTree(new DefaultMutableTreeNode("Database"));
     private final RSyntaxTextArea sqlEditor = new RSyntaxTextArea();
     private final JComboBox<String> suggestions = new JComboBox<>();
+    private final JComboBox<ConnectionProfile> profiles = new JComboBox<>();
     private final DefaultTableModel resultModel = new DefaultTableModel() {
         @Override public boolean isCellEditable(int row, int column) { return false; }
     };
@@ -74,13 +80,25 @@ public class SqlPanel extends JPanel {
     private JButton executeButton;
     private JButton refreshObjectsButton;
     private JButton browseDriverButton;
+    private JButton saveProfileButton;
+    private JButton copyProfileButton;
+    private JButton deleteProfileButton;
+    private JButton newProfileButton;
+    private final PluginStorage storage;
+    private boolean loadingProfiles;
     private Connection connection;
     private URLClassLoader driverClassLoader;
     private List<String> metadataSuggestions = new ArrayList<>();
     private DatabasePreset previousPreset = DatabasePreset.GENERIC;
 
     public SqlPanel() {
+        this(PluginStorage.noop());
+    }
+
+    public SqlPanel(PluginStorage storage) {
+        this.storage = storage == null ? PluginStorage.noop() : storage;
         initUI();
+        loadProfiles(null);
     }
 
     private void initUI() {
@@ -99,6 +117,27 @@ public class SqlPanel extends JPanel {
                 "[pref!][grow,fill][pref!][grow,fill][pref!][grow,fill][pref!][grow,fill]",
                 "[]4[]4[]4[]4[]"));
         panel.setOpaque(false);
+
+        profiles.setRenderer((list, value, index, selected, focus) ->
+                new javax.swing.DefaultListCellRenderer().getListCellRendererComponent(
+                        list, value == null ? "" : value.name(), index, selected, focus));
+        profiles.addActionListener(event -> {
+            if (!loadingProfiles && profiles.getSelectedItem() instanceof ConnectionProfile profile) applyProfile(profile);
+        });
+        newProfileButton = new JButton(SqlI18n.t("profile_new"));
+        saveProfileButton = new JButton(SqlI18n.t("profile_save"));
+        copyProfileButton = new JButton(SqlI18n.t("profile_copy"));
+        deleteProfileButton = new JButton(SqlI18n.t("profile_delete"));
+        newProfileButton.addActionListener(event -> clearProfileForm());
+        saveProfileButton.addActionListener(event -> saveProfile());
+        copyProfileButton.addActionListener(event -> copyProfile());
+        deleteProfileButton.addActionListener(event -> deleteProfile());
+        panel.add(label("profile"));
+        panel.add(profiles, "span 3,growx,wmin 120");
+        panel.add(newProfileButton, "split 4");
+        panel.add(saveProfileButton);
+        panel.add(copyProfileButton);
+        panel.add(deleteProfileButton, "wrap");
 
         connectButton = new JButton(SqlI18n.t("connect"));
         disconnectButton = new JButton(SqlI18n.t("disconnect"));
@@ -222,6 +261,155 @@ public class SqlPanel extends JPanel {
         previousPreset = preset;
     }
 
+    private ConnectionProfile currentProfile(String profileName) {
+        DatabasePreset preset = (DatabasePreset) databaseType.getSelectedItem();
+        return new ConnectionProfile(profileName, preset == null ? DatabasePreset.GENERIC.name() : preset.name(),
+                jdbcUrl.getText().trim(), driverClass.getText().trim(), driverJar.getText().trim(),
+                username.getText().trim(), new String(password.getPassword()));
+    }
+
+    private void applyProfile(ConnectionProfile profile) {
+        if (connection != null) disconnect();
+        DatabasePreset preset;
+        try { preset = DatabasePreset.valueOf(profile.databaseType()); }
+        catch (Exception ignored) { preset = DatabasePreset.GENERIC; }
+        databaseType.setSelectedItem(preset);
+        jdbcUrl.setText(profile.jdbcUrl());
+        driverClass.setText(profile.driverClass());
+        driverJar.setText(profile.driverJar());
+        username.setText(profile.username());
+        password.setText(profile.password());
+        try { storage.writeString(ACTIVE_PROFILE_FILE, encode(profile.name())); }
+        catch (Exception exception) { log.warn("Could not persist active SQL profile", exception); }
+    }
+
+    private void clearProfileForm() {
+        if (connection != null) disconnect();
+        profiles.setSelectedItem(null);
+        databaseType.setSelectedItem(DatabasePreset.GENERIC);
+        applyPreset();
+        jdbcUrl.setText(DatabasePreset.GENERIC.exampleUrl());
+        driverClass.setText("");
+        driverJar.setText("");
+        username.setText("");
+        password.setText("");
+    }
+
+    private void saveProfile() {
+        ConnectionProfile selected = (ConnectionProfile) profiles.getSelectedItem();
+        String profileName = selected == null ? "" : selected.name();
+        if (profileName.isBlank()) {
+            profileName = JOptionPane.showInputDialog(this, SqlI18n.t("profile_name"),
+                    "SQL - " + jdbcUrl.getText().trim());
+            if (profileName == null || profileName.isBlank()) return;
+            profileName = profileName.trim();
+            if (findProfile(profileName) != null) {
+                setStatus(SqlI18n.t("profile_exists", profileName));
+                return;
+            }
+        }
+        List<ConnectionProfile> all = readProfiles();
+        ConnectionProfile updated = currentProfile(profileName);
+        int index = indexOfProfile(all, profileName);
+        if (index >= 0) all.set(index, updated); else all.add(updated);
+        writeProfiles(all);
+        loadProfiles(profileName);
+        setStatus(SqlI18n.t("profile_saved", profileName));
+    }
+
+    private void copyProfile() {
+        String base = profiles.getSelectedItem() instanceof ConnectionProfile selected
+                ? selected.name() + " copy" : "SQL profile copy";
+        String profileName = JOptionPane.showInputDialog(this, SqlI18n.t("profile_copy_prompt"), base);
+        if (profileName == null || profileName.isBlank()) return;
+        profileName = profileName.trim();
+        if (findProfile(profileName) != null) {
+            setStatus(SqlI18n.t("profile_exists", profileName));
+            return;
+        }
+        List<ConnectionProfile> all = readProfiles();
+        all.add(currentProfile(profileName));
+        writeProfiles(all);
+        loadProfiles(profileName);
+        setStatus(SqlI18n.t("profile_saved", profileName));
+    }
+
+    private void deleteProfile() {
+        if (!(profiles.getSelectedItem() instanceof ConnectionProfile selected)) return;
+        if (JOptionPane.showConfirmDialog(this, SqlI18n.t("profile_delete_confirm", selected.name()),
+                SqlI18n.t("profile_delete"), JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE)
+                != JOptionPane.YES_OPTION) return;
+        List<ConnectionProfile> all = readProfiles();
+        all.removeIf(profile -> profile.name().equals(selected.name()));
+        writeProfiles(all);
+        loadProfiles(all.isEmpty() ? null : all.get(0).name());
+        setStatus(SqlI18n.t("profile_deleted", selected.name()));
+    }
+
+    private ConnectionProfile findProfile(String name) {
+        return readProfiles().stream().filter(profile -> profile.name().equalsIgnoreCase(name)).findFirst().orElse(null);
+    }
+
+    private int indexOfProfile(List<ConnectionProfile> all, String name) {
+        for (int i = 0; i < all.size(); i++) if (all.get(i).name().equalsIgnoreCase(name)) return i;
+        return -1;
+    }
+
+    private void loadProfiles(String preferredName) {
+        loadingProfiles = true;
+        profiles.removeAllItems();
+        List<ConnectionProfile> all = readProfiles();
+        all.forEach(profiles::addItem);
+        String activeName = preferredName;
+        if (activeName == null) activeName = readActiveProfileName();
+        String selectedName = activeName;
+        ConnectionProfile selected = all.stream().filter(profile -> profile.name().equals(selectedName)).findFirst()
+                .orElse(all.isEmpty() ? null : all.get(0));
+        profiles.setSelectedItem(selected);
+        loadingProfiles = false;
+        if (selected != null) applyProfile(selected);
+        deleteProfileButton.setEnabled(selected != null);
+        if (selected == null) clearProfileForm();
+    }
+
+    private List<ConnectionProfile> readProfiles() {
+        List<ConnectionProfile> all = new ArrayList<>();
+        try {
+            for (String line : storage.readString(PROFILE_FILE).orElse("").lines().toList()) {
+                String[] fields = line.split("\\t", -1);
+                if (fields.length != 7) continue;
+                all.add(new ConnectionProfile(decode(fields[0]), decode(fields[1]), decode(fields[2]),
+                        decode(fields[3]), decode(fields[4]), decode(fields[5]), decode(fields[6])));
+            }
+        } catch (Exception exception) { log.warn("Could not read SQL connection profiles", exception); }
+        return all;
+    }
+
+    private void writeProfiles(List<ConnectionProfile> all) {
+        try {
+            StringBuilder content = new StringBuilder();
+            for (ConnectionProfile profile : all) {
+                content.append(encode(profile.name())).append('\t').append(encode(profile.databaseType())).append('\t')
+                        .append(encode(profile.jdbcUrl())).append('\t').append(encode(profile.driverClass())).append('\t')
+                        .append(encode(profile.driverJar())).append('\t').append(encode(profile.username())).append('\t')
+                        .append(encode(profile.password())).append('\n');
+            }
+            storage.writeString(PROFILE_FILE, content.toString());
+        } catch (Exception exception) { log.warn("Could not save SQL connection profiles", exception); }
+    }
+
+    private String readActiveProfileName() {
+        try { return storage.readString(ACTIVE_PROFILE_FILE).map(SqlPanel::decode).orElse(""); }
+        catch (Exception exception) { log.warn("Could not read active SQL profile", exception); return ""; }
+    }
+
+    private static String encode(String value) { return Base64.getUrlEncoder().withoutPadding().encodeToString(value.getBytes(java.nio.charset.StandardCharsets.UTF_8)); }
+    private static String decode(String value) { return new String(Base64.getUrlDecoder().decode(value), java.nio.charset.StandardCharsets.UTF_8); }
+    private record ConnectionProfile(String name, String databaseType, String jdbcUrl, String driverClass,
+                                     String driverJar, String username, String password) {
+        @Override public String toString() { return name; }
+    }
+
     private void chooseDriverJar() {
         JFileChooser chooser = new JFileChooser();
         chooser.setMultiSelectionEnabled(true);
@@ -294,7 +482,6 @@ public class SqlPanel extends JPanel {
             @Override protected void done() {
                 try {
                     connection = get();
-                    password.setText("");
                     updateConnectionControls(true);
                     setStatus(SqlI18n.t("connected"));
                     loadMetadata();
@@ -535,6 +722,11 @@ public class SqlPanel extends JPanel {
         executeButton.setEnabled(connected);
         refreshObjectsButton.setEnabled(connected);
         setConnectionFieldsEnabled(!connected);
+        profiles.setEnabled(!connected);
+        newProfileButton.setEnabled(!connected);
+        saveProfileButton.setEnabled(!connected);
+        copyProfileButton.setEnabled(!connected);
+        deleteProfileButton.setEnabled(!connected && profiles.getSelectedItem() != null);
     }
 
     private void setConnectionFieldsEnabled(boolean enabled) {

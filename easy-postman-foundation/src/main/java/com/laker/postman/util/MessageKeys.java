@@ -203,7 +203,6 @@ public final class MessageKeys {
     public static final String PLUGIN_MANAGER_TAB_INSTALLED = "plugin.manager.tab.installed";
     public static final String PLUGIN_MANAGER_TAB_MARKET = "plugin.manager.tab.market";
     public static final String PLUGIN_MANAGER_MARKET_OFFICIAL_GITHUB = "plugin.manager.market.official_github";
-    public static final String PLUGIN_MANAGER_MARKET_OFFICIAL_GITEE = "plugin.manager.market.official_gitee";
     public static final String PLUGIN_MANAGER_MARKET_HINT = "plugin.manager.market.hint";
     public static final String PLUGIN_MANAGER_MARKET_EMPTY = "plugin.manager.market.empty";
     public static final String PLUGIN_MANAGER_MARKET_LOADING = "plugin.manager.market.loading";

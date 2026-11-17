@@ -45,73 +45,50 @@ public class PluginCatalogServiceTest {
                 "https://raw.githubusercontent.com/nvhuong/easy-postman/main/plugin-catalog/catalog-github.json"
         );
         assertEquals(
-                PluginCatalogService.getOfficialCatalogUrl("gitee"),
-                "https://gitee.com/lakernote/easy-postman/raw/master/plugin-catalog/catalog-gitee.json"
-        );
-        assertEquals(
                 PluginCatalogService.getOfficialCatalogUrl("auto"),
-                "https://gitee.com/lakernote/easy-postman/raw/master/plugin-catalog/catalog-gitee.json"
+                "https://raw.githubusercontent.com/nvhuong/easy-postman/main/plugin-catalog/catalog-github.json"
         );
         assertEquals(
                 PluginCatalogService.detectOfficialCatalogSource(PluginCatalogService.getOfficialCatalogUrl("github")),
                 "github"
         );
-        assertEquals(
-                PluginCatalogService.detectOfficialCatalogSource(PluginCatalogService.getOfficialCatalogUrl("gitee")),
-                "gitee"
-        );
+        assertEquals(PluginCatalogService.detectOfficialCatalogSource("https://gitee.com/old/catalog.json"), "");
     }
 
     @Test
     public void shouldLoadBundledOfficialCatalog() throws Exception {
         List<PluginCatalogEntry> githubEntries = PluginCatalogService.loadBundledOfficialCatalog("github");
-        List<PluginCatalogEntry> giteeEntries = PluginCatalogService.loadBundledOfficialCatalog("gitee");
         Set<String> requiredPluginIds = Set.of(
                 "plugin-capture",
                 "plugin-redis",
                 "plugin-kafka",
                 "plugin-decompiler",
-                "plugin-client-cert"
+                "plugin-client-cert",
+                "plugin-remote",
+                "plugin-sql",
+                "plugin-minio"
         );
         Set<String> githubIds = githubEntries.stream()
                 .map(PluginCatalogEntry::id)
                 .collect(java.util.stream.Collectors.toSet());
-        Set<String> giteeIds = giteeEntries.stream()
-                .map(PluginCatalogEntry::id)
-                .collect(java.util.stream.Collectors.toSet());
-
         assertTrue(githubIds.containsAll(requiredPluginIds));
-        assertTrue(giteeIds.containsAll(requiredPluginIds));
-        assertEquals(githubIds, giteeIds);
         assertTrue(githubEntries.stream().noneMatch(entry -> "plugin-git".equals(entry.id())));
-        assertTrue(giteeEntries.stream().noneMatch(entry -> "plugin-git".equals(entry.id())));
 
         PluginCatalogEntry githubKafka = githubEntries.stream()
                 .filter(entry -> "plugin-kafka".equals(entry.id()))
                 .findFirst()
                 .orElse(null);
-        PluginCatalogEntry giteeKafka = giteeEntries.stream()
-                .filter(entry -> "plugin-kafka".equals(entry.id()))
-                .findFirst()
-                .orElse(null);
         assertNotNull(githubKafka);
-        assertNotNull(giteeKafka);
         assertTrue(githubKafka.installUrl().startsWith("https://github.com/"));
         assertTrue(githubKafka.installUrl().contains("/releases/download/"));
-        assertTrue(giteeKafka.installUrl().startsWith("https://gitee.com/lakernote/easy-postman/"));
         assertNotNull(githubKafka.version());
         assertFalse(githubKafka.version().isBlank());
-        assertNotNull(giteeKafka.version());
-        assertFalse(giteeKafka.version().isBlank());
         assertFalse(githubKafka.minPlatformVersion().isBlank());
-        assertEquals(githubKafka.minPlatformVersion(), giteeKafka.minPlatformVersion());
-        assertEquals(githubKafka.maxPlatformVersion(), giteeKafka.maxPlatformVersion());
     }
 
     @Test
     public void shouldKeepPublicAndBundledOfficialCatalogsInSync() throws Exception {
         assertCatalogCopiesInSync("catalog-github.json");
-        assertCatalogCopiesInSync("catalog-gitee.json");
     }
 
     @Test

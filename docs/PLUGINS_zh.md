@@ -600,9 +600,7 @@ Hiện chỉ dành riêng cho người dùng 2 đường dẫn:
 Hiện tại chính thức catalog：
 
 - GitHub
-  - `https://raw.githubusercontent.com/lakernote/easy-postman/master/plugin-catalog/catalog-github.json`
-- Gitee
-  - `https://gitee.com/lakernote/easy-postman/raw/master/plugin-catalog/catalog-gitee.json`
+  - `https://raw.githubusercontent.com/nvhuong/easy-postman/main/plugin-catalog/catalog-github.json`
 
 ### 7.1 Tại sao cả địa phương và trực tuyến vẫn còn
 

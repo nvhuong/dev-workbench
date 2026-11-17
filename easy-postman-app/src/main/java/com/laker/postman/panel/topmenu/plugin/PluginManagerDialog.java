@@ -69,8 +69,6 @@ public class PluginManagerDialog extends JDialog {
             I18nUtil.getMessage(MessageKeys.PLUGIN_MANAGER_MARKET_ACTION_INSTALL), true);
     private final JToggleButton useOfficialGithubCatalogButton = ModernButtonFactory.createToggleButton(
             I18nUtil.getMessage(MessageKeys.PLUGIN_MANAGER_MARKET_OFFICIAL_GITHUB));
-    private final JToggleButton useOfficialGiteeCatalogButton = ModernButtonFactory.createToggleButton(
-            I18nUtil.getMessage(MessageKeys.PLUGIN_MANAGER_MARKET_OFFICIAL_GITEE));
 
     private final JLabel installedDetailTitleLabel = createDetailTitleLabel();
     private final JLabel installedDetailMetaLabel = createMutedLabel();
@@ -158,8 +156,6 @@ public class PluginManagerDialog extends JDialog {
         installMarketButton.addActionListener(e -> installSelectedCatalogPlugin());
         useOfficialGithubCatalogButton.addActionListener(e -> applyCatalogUrl(
                 PluginManagementService.getOfficialCatalogUrl("github"), true));
-        useOfficialGiteeCatalogButton.addActionListener(e -> applyCatalogUrl(
-                PluginManagementService.getOfficialCatalogUrl("gitee"), true));
 
         installedList.setCellRenderer(new InstalledPluginCellRenderer());
         installedList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -236,7 +232,7 @@ public class PluginManagerDialog extends JDialog {
     private JPanel createHeaderActionPanel() {
         JPanel panel = new JPanel(new MigLayout(
                 "insets 0, gap 8, novisualpadding",
-                "[][]",
+                "[]",
                 "[]"
         ));
         panel.setOpaque(false);
@@ -384,7 +380,6 @@ public class PluginManagerDialog extends JDialog {
                 "[]"
         ));
         panel.add(useOfficialGithubCatalogButton);
-        panel.add(useOfficialGiteeCatalogButton);
         return panel;
     }
 
@@ -818,7 +813,6 @@ public class PluginManagerDialog extends JDialog {
         installMarketButton.setEnabled(installEnabled);
         marketActionPanel.setVisible(showInstallAction);
         useOfficialGithubCatalogButton.setEnabled(!marketBusy);
-        useOfficialGiteeCatalogButton.setEnabled(!marketBusy);
         marketList.setEnabled(!marketBusy);
         refreshCatalogSourceButtons();
     }
@@ -932,7 +926,6 @@ public class PluginManagerDialog extends JDialog {
         String catalogUrl = PluginManagementService.getCatalogUrl();
         String source = PluginManagementService.detectOfficialCatalogSource(catalogUrl == null ? "" : catalogUrl);
         useOfficialGithubCatalogButton.setSelected("github".equalsIgnoreCase(source));
-        useOfficialGiteeCatalogButton.setSelected("gitee".equalsIgnoreCase(source));
     }
 
     private String getSelectedInstalledPluginId() {
