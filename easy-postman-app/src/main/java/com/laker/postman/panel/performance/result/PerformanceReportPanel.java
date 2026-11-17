@@ -791,9 +791,10 @@ public class PerformanceReportPanel extends JPanel {
         }
         List<PerformanceReportMarkdownBuilder.ReportTable> tables = reportTables();
         if (tables.stream().allMatch(table -> table.rows().isEmpty())) return;
+        List<PerformanceSampleResult> reportSamples = performanceResultSamples();
         var context = new PerformanceReportPdfExporter.ReportContext(
                 I18nUtil.getMessage(MessageKeys.PERFORMANCE_REPORT_MARKDOWN_TITLE), reportPlan,
-                reportEnvironment, List.copyOf(trendPoints.get()), sampleResults, reportError, serviceResources);
+                reportEnvironment, List.copyOf(trendPoints.get()), reportSamples, reportError, serviceResources);
         final String html;
         try {
             html = PerformanceHtmlReportExporter.renderHtml(context, tables);

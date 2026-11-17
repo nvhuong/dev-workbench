@@ -4,6 +4,8 @@ import com.laker.postman.panel.performance.result.PerformanceTrendView;
 import com.laker.postman.performance.core.model.PerformanceTrendSnapshot;
 import com.laker.postman.performance.core.run.PerformanceRunPlan;
 import com.laker.postman.performance.core.threadgroup.ThreadGroupData;
+import com.laker.postman.performance.model.PerformanceSampleResult;
+import com.laker.postman.script.model.TestResult;
 import com.laker.postman.util.I18nUtil;
 import com.laker.postman.util.MessageKeys;
 import com.openhtmltopdf.pdfboxout.PdfRendererBuilder;
@@ -20,8 +22,12 @@ import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
 
 /** Builds the browsable report and renders the same HTML document to PDF. */
 @UtilityClass
@@ -54,7 +60,7 @@ public class PerformanceHtmlReportExporter {
         html.append("<section><h2>2. Metrics for each request</h2>");
         for (var table : populated) appendTable(html, table);
         html.append("</section>");
-        appendErrors(html, safe.error(), populated);
+        appendErrors(html, safe.error(), populated, safe.samples());
         html.append("<footer>EasyPostman · Performance Test Report</footer></main></body></html>");
         return html.toString();
     }
@@ -253,19 +259,96 @@ public class PerformanceHtmlReportExporter {
     }
 
     private void appendErrors(StringBuilder html, String error,
-                              List<PerformanceReportMarkdownBuilder.ReportTable> tables) {
-        html.append("<section><h2>3. Errors</h2><div class=\"empty\">");
+                              List<PerformanceReportMarkdownBuilder.ReportTable> tables,
+                              List<PerformanceSampleResult> samples) {
+        html.append("<section><h2>3. Errors</h2>");
+        Map<ErrorGroupKey, ErrorGroup> groups = new LinkedHashMap<>();
+        if (samples != null) {
+            for (PerformanceSampleResult sample : samples) {
+                if (sample == null || sample.isSuccessful() && !sample.isExecutionFailed() && !sample.isInterrupted()) continue;
+                String api = firstNonBlank(sample.getApiName(), sample.getApiId(),
+                        message(MessageKeys.PERFORMANCE_REPORT_PDF_ERROR_UNKNOWN_API));
+                String code = errorCode(sample);
+                ErrorGroup group = groups.computeIfAbsent(new ErrorGroupKey(api, code), ignored -> new ErrorGroup());
+                group.occurrences++;
+                String detail = errorDetail(sample);
+                if (!detail.isBlank()) group.details.add(detail);
+            }
+        }
+        if (!groups.isEmpty()) {
+            html.append("<div class=\"table-wrap errors\"><table><thead><tr>")
+                    .append("<th>").append(escape(message(MessageKeys.PERFORMANCE_REPORT_PDF_ERROR_API))).append("</th>")
+                    .append("<th>").append(escape(message(MessageKeys.PERFORMANCE_REPORT_PDF_ERROR_CODE))).append("</th>")
+                    .append("<th>").append(escape(message(MessageKeys.PERFORMANCE_REPORT_PDF_ERROR_DETAILS))).append("</th>")
+                    .append("<th>").append(escape(message(MessageKeys.PERFORMANCE_REPORT_PDF_ERROR_OCCURRENCES))).append("</th>")
+                    .append("</tr></thead><tbody>");
+            for (Map.Entry<ErrorGroupKey, ErrorGroup> entry : groups.entrySet()) {
+                html.append("<tr><td>").append(escape(entry.getKey().api())).append("</td><td><code>")
+                        .append(escape(entry.getKey().code())).append("</code></td><td>")
+                        .append(escape(String.join("; ", entry.getValue().details))).append("</td><td>")
+                        .append(entry.getValue().occurrences).append("</td></tr>");
+            }
+            html.append("</tbody></table></div></section>");
+            return;
+        }
         double failures = tables.stream().filter(table -> !table.rows().isEmpty())
                 .mapToDouble(table -> parse(table.rows().getLast()[Math.min(3, table.rows().getLast().length - 1)]))
                 .sum();
+        html.append("<div class=\"empty\">");
         if (error != null && !error.isBlank()) {
-            html.append("<strong>Run error</strong><p>").append(escape(error)).append("</p>");
+            html.append("<strong>").append(escape(message(MessageKeys.PERFORMANCE_REPORT_PDF_ERROR_RUN)))
+                    .append("</strong><p>").append(escape(error)).append("</p>");
         } else if (failures > 0) {
-            html.append("<strong>This run reported failures</strong><p>")
-                    .append(String.format(Locale.ROOT, "%.0f failed requests were recorded; detailed error messages were not retained.", failures))
-                    .append("</p>");
-        } else html.append("<strong>This run has no errors</strong><p>All reported requests completed successfully.</p>");
+            html.append("<strong>").append(escape(message(MessageKeys.PERFORMANCE_REPORT_PDF_DATA_UNAVAILABLE)))
+                    .append("</strong><p>").append(escape(I18nUtil.getMessage(
+                            MessageKeys.PERFORMANCE_REPORT_PDF_ERROR_FAILURES_RECORDED,
+                            String.format(Locale.ROOT, "%.0f", failures)))).append("</p>");
+        } else html.append("<strong>").append(escape(message(MessageKeys.PERFORMANCE_REPORT_PDF_NO_ERRORS))).append("</strong>");
         html.append("</div></section>");
+    }
+
+    private String errorCode(PerformanceSampleResult sample) {
+        if (sample.getResponseCode() > 0) return Integer.toString(sample.getResponseCode());
+        if (sample.isInterrupted()) return message(MessageKeys.PERFORMANCE_REPORT_PDF_ERROR_INTERRUPTED);
+        if (sample.getTestResults() != null && sample.getTestResults().stream().anyMatch(test -> test != null && !test.passed)) {
+            return message(MessageKeys.PERFORMANCE_REPORT_PDF_ERROR_ASSERTION);
+        }
+        if (sample.isExecutionFailed() || sample.getErrorMsg() != null && !sample.getErrorMsg().isBlank()) {
+            return message(MessageKeys.PERFORMANCE_REPORT_PDF_ERROR_TRANSPORT);
+        }
+        return message(MessageKeys.PERFORMANCE_REPORT_PDF_ERROR_UNKNOWN_CODE);
+    }
+
+    private String errorDetail(PerformanceSampleResult sample) {
+        if (sample.getErrorMsg() != null && !sample.getErrorMsg().isBlank()) return sample.getErrorMsg();
+        List<String> failedAssertions = new ArrayList<>();
+        if (sample.getTestResults() != null) {
+            for (TestResult result : sample.getTestResults()) {
+                if (result == null || result.passed) continue;
+                failedAssertions.add(firstNonBlank(result.name, message(MessageKeys.PERFORMANCE_REPORT_PDF_ERROR_ASSERTION))
+                        + (result.message == null || result.message.isBlank() ? "" : ": " + result.message));
+            }
+        }
+        if (!failedAssertions.isEmpty()) return String.join("; ", failedAssertions);
+        if (sample.isInterrupted()) return message(MessageKeys.PERFORMANCE_REPORT_PDF_ERROR_INTERRUPTED);
+        return message(MessageKeys.PERFORMANCE_REPORT_PDF_ERROR_FAILED);
+    }
+
+    private String firstNonBlank(String first, String second, String fallback) {
+        return first != null && !first.isBlank() ? first : second != null && !second.isBlank() ? second : fallback;
+    }
+
+    private String firstNonBlank(String value, String fallback) {
+        return value != null && !value.isBlank() ? value : fallback;
+    }
+
+    private String message(String key) { return I18nUtil.getMessage(key); }
+
+    private record ErrorGroupKey(String api, String code) { }
+
+    private static final class ErrorGroup {
+        private int occurrences;
+        private final Set<String> details = new LinkedHashSet<>();
     }
 
     private void collectThreadGroups(com.laker.postman.performance.core.plan.PerformanceCorePlanNode node,

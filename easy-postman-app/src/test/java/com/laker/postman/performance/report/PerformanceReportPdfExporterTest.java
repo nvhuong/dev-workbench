@@ -3,6 +3,8 @@ package com.laker.postman.performance.report;
 import com.laker.postman.panel.performance.result.PerformanceTrendView;
 import com.laker.postman.performance.core.model.PerformanceTrendSnapshot;
 import com.laker.postman.performance.core.run.PerformanceServiceResource;
+import com.laker.postman.performance.model.PerformanceSampleResult;
+import com.laker.postman.script.model.TestResult;
 import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.text.PDFTextStripper;
@@ -20,7 +22,10 @@ public class PerformanceReportPdfExporterTest {
     @Test
     public void generatesAccessibleHtmlAndRendersTheSameReportToPdf() throws Exception {
         var tables = httpTable();
-        String html = PerformanceHtmlReportExporter.renderHtml(context(trendPoints()), tables);
+        String html = PerformanceHtmlReportExporter.renderHtml(context(trendPoints(), List.of(
+                failedSample("orders", 503, "upstream unavailable"),
+                failedSample("orders", 503, "gateway timeout"),
+                failedSample("inventory", 404, "item not found"))), tables);
         assertTrue(html.contains("<html xmlns=\"http://www.w3.org/1999/xhtml\""));
         assertTrue(html.contains("1. Summary"));
         assertTrue(html.contains("1.1 Response time"));
@@ -34,6 +39,16 @@ public class PerformanceReportPdfExporterTest {
         assertTrue(html.contains("Total CPU"));
         assertTrue(html.contains("6.0 cores"));
         assertTrue(html.contains("12.0 GB"));
+        assertTrue(html.contains("API / request"));
+        assertTrue(html.contains("Error code"));
+        assertTrue(html.contains("Occurrences"));
+        assertTrue(html.contains("orders"));
+        assertTrue(html.contains("503"));
+        assertTrue(html.contains("upstream unavailable"));
+        assertTrue(html.contains("gateway timeout"));
+        assertTrue(html.contains("<td>2</td>"));
+        assertTrue(html.contains("inventory"));
+        assertTrue(html.contains("404"));
 
         Path directory = Files.createTempDirectory("performance-html-report-");
         Path htmlFile = directory.resolve("index.html");
@@ -125,8 +140,18 @@ public class PerformanceReportPdfExporterTest {
     }
 
     private PerformanceReportPdfExporter.ReportContext context(List<PerformanceTrendView.TrendReportPoint> points) {
+        return context(points, List.of());
+    }
+
+    private PerformanceReportPdfExporter.ReportContext context(List<PerformanceTrendView.TrendReportPoint> points,
+                                                                 List<PerformanceSampleResult> samples) {
         return new PerformanceReportPdfExporter.ReportContext("Performance Test Report · Demo", null,
-                "Staging", points, List.of(), "", List.of(new PerformanceServiceResource("orders", 3, 2, 4)));
+                "Staging", points, samples, "", List.of(new PerformanceServiceResource("orders", 3, 2, 4)));
+    }
+
+    private PerformanceSampleResult failedSample(String api, int code, String detail) {
+        return PerformanceSampleResult.builder().apiId(api).apiName(api).responseCode(code)
+                .successful(false).errorMsg(detail).testResults(List.of(new TestResult("HTTP status", false, detail))).build();
     }
 
     private List<PerformanceTrendView.TrendReportPoint> trendPoints() {
