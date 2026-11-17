@@ -3,13 +3,13 @@ package com.laker.postman.util;
 import lombok.experimental.UtilityClass;
 
 /**
- * 国际化消息键常量类
- * 统一管理所有的国际化消息键，避免硬编码字符串
+ * Các hằng số khóa thông điệp đa ngôn ngữ.
+ * Tập trung quản lý khóa thông điệp để tránh ghi trực tiếp chuỗi trong mã nguồn.
  */
 @UtilityClass
 public final class MessageKeys {
 
-    // ============ 菜单相关 ============
+    // ============ Menu ============
     public static final String MENU_FILE = "menu.file";
     public static final String MENU_FILE_LOG = "menu.file.log";
     public static final String MENU_FILE_EXIT = "menu.file.exit";
@@ -39,14 +39,14 @@ public final class MessageKeys {
     public static final String MENU_PLUGINS_CENTER = "menu.plugins.center";
     public static final String MENU_PLUGINS_OPEN_DIR = "menu.plugins.open_dir";
 
-    // ============ 语言相关 ============
+    // ============ Ngôn ngữ ============
     public static final String LANGUAGE_CHANGED = "language.changed";
 
-    // ============ 主题相关 ============
+    // ============ Chủ đề ============
     public static final String THEME_SWITCHED_TO_LIGHT = "theme.switched.to.light";
     public static final String THEME_SWITCHED_TO_DARK = "theme.switched.to.dark";
 
-    // ============ 更新相关 ============
+    // ============ Cập nhật ============
     public static final String UPDATE_NEW_VERSION_AVAILABLE = "update.new_version_available";
     public static final String UPDATE_LATER = "update.later";
     public static final String UPDATE_NOW = "update.now";
@@ -71,10 +71,10 @@ public final class MessageKeys {
     public static final String UPDATE_DOWNLOADED = "update.downloaded";
     public static final String UPDATE_SPEED = "update.speed";
 
-    // ============ 全量静默更新相关 ============
+    // ============ Cập nhật im lặng toàn bộ ============
     public static final String UPDATE_INSTALLER_INSTALL_PROMPT = "update.installer.install.prompt";
 
-    // ============ 版本检查器相关 ============
+    // ============ Kiểm tra phiên bản ============
     public static final String UPDATE_FETCH_RELEASE_FAILED = "update.fetch_release_failed";
     public static final String UPDATE_NO_VERSION_INFO = "update.no_version_info";
     public static final String UPDATE_ALREADY_LATEST = "update.already_latest";
@@ -87,7 +87,7 @@ public final class MessageKeys {
     public static final String UPDATE_NOTIFICATION_NO_ASSET_DESCRIPTION = "update.notification.no_asset_description";
     public static final String UPDATE_NOTIFICATION_VIEW_DETAILS_DESCRIPTION = "update.notification.view_details_description";
     public static final String UPDATE_NOTIFICATION_DEFAULT_DESCRIPTION = "update.notification.default_description";
-    // ============ 更新日志相关 ============
+    // ============ Nhật ký cập nhật ============
     public static final String CHANGELOG_TITLE = "changelog.title";
     public static final String CHANGELOG_CURRENT_VERSION = "changelog.current_version";
     public static final String CHANGELOG_LOADING = "changelog.loading";
@@ -129,7 +129,7 @@ public final class MessageKeys {
     public static final String MEMORY_TUNING_XMX_NOTE = "memory_tuning.xmx.note";
 
 
-    // ============ 错误消息 ============
+    // ============ Thông báo lỗi ============
     public static final String ERROR_UPDATE_FAILED = "error.update_failed";
     public static final String ERROR_OPEN_LOG_MESSAGE = "error.open_log_message";
     public static final String ERROR_OPEN_LINK_FAILED = "error.open_link_failed";
@@ -140,7 +140,7 @@ public final class MessageKeys {
     public static final String ERROR_PERMISSION_DENIED = "error.permission_denied";
     public static final String ERROR_IO_EXCEPTION = "error.io_exception";
 
-    // ============ 关于对话框 ============
+    // ============ Hộp thoại giới thiệu ============
     public static final String ABOUT_VERSION = "about.version";
     public static final String ABOUT_AUTHOR = "about.author";
     public static final String ABOUT_LICENSE = "about.license";
@@ -149,11 +149,11 @@ public final class MessageKeys {
     public static final String ABOUT_GITHUB = "about.github";
     public static final String ABOUT_GITEE = "about.gitee";
 
-    // ============ 反馈 ============
+    // ============ Phản hồi ============
     public static final String FEEDBACK_MESSAGE = "feedback.message";
     public static final String FEEDBACK_TITLE = "feedback.title";
 
-    // ============ 通用 ============
+    // ============ Thông dụng ============
     public static final String GENERAL_ERROR = "general.error";
     public static final String GENERAL_ERROR_MESSAGE = "general.error.message";
     public static final String GENERAL_INFO = "general.info";
@@ -173,7 +173,7 @@ public final class MessageKeys {
     public static final String REQUEST_PATH_VARIABLE_TOOLTIP_TYPE = "request.path_variable.tooltip.type";
     public static final String REQUEST_PATH_VARIABLE_EMPTY_VALUE = "request.path_variable.empty_value";
 
-    // ============ 插件管理 ============
+    // ============ Quản lý plugin ============
     public static final String PLUGIN_MANAGER_TITLE = "plugin.manager.title";
     public static final String PLUGIN_MANAGER_INSTALL = "plugin.manager.install";
     public static final String PLUGIN_MANAGER_OPEN_FOLDER = "plugin.manager.open_folder";
@@ -258,7 +258,7 @@ public final class MessageKeys {
     public static final String PLUGIN_UPDATE_MANUAL_PROMPT_SINGLE = "plugin.update.manual.prompt.single";
     public static final String PLUGIN_UPDATE_MANUAL_PROMPT_MULTIPLE = "plugin.update.manual.prompt.multiple";
 
-    // ============ Markdown 编辑器 ============
+    // ============ Trình soạn thảo Markdown ============
     public static final String MARKDOWN_UNDO = "markdown.undo";
     public static final String MARKDOWN_REDO = "markdown.redo";
     public static final String MARKDOWN_HEADING1 = "markdown.heading1";
@@ -291,19 +291,19 @@ public final class MessageKeys {
     public static final String MARKDOWN_STATUS_WORDS = "markdown.status_words";
     public static final String MARKDOWN_STATUS_CHARS = "markdown.status_chars";
 
-    // ============ 工作区选择对话框 ============
+    // ============ Hộp thoại chọn workspace ============
     public static final String WORKSPACE_SELECT_HINT = "workspace.select.hint";
     public static final String WORKSPACE_SELECT_REQUIRED = "workspace.select.required";
     public static final String WORKSPACE_NO_OTHER_AVAILABLE = "workspace.no_other_available";
 
-    // ============ 工作区转移统一消息键 ============
+    // ============ Khóa thông điệp dùng chung khi chuyển workspace ============
     public static final String WORKSPACE_TRANSFER_MENU_ITEM = "workspace.transfer.menu_item";
     public static final String WORKSPACE_TRANSFER_SELECT_DIALOG_TITLE = "workspace.transfer.select_dialog_title";
     public static final String WORKSPACE_TRANSFER_CONFIRM_MESSAGE = "workspace.transfer.confirm_message";
     public static final String WORKSPACE_TRANSFER_CONFIRM_TITLE = "workspace.transfer.confirm_title";
     public static final String WORKSPACE_TRANSFER_FAIL = "workspace.transfer.fail";
 
-    // ============ 按钮 ============
+    // ============ Nút ============
     public static final String BUTTON_SEND = "button.send";
     public static final String BUTTON_SEND_TOOLTIP = "button.send.tooltip";
     public static final String BUTTON_SAVE = "button.save";
@@ -319,7 +319,7 @@ public final class MessageKeys {
     public static final String LAYOUT_VERTICAL_TOOLTIP = "layout.vertical.tooltip";
     public static final String LAYOUT_HORIZONTAL_TOOLTIP = "layout.horizontal.tooltip";
 
-    // ============ 请求相关 ============
+    // ============ Yêu cầu ============
     public static final String NEW_REQUEST = "new.request";
     public static final String CREATE_NEW_REQUEST = "create.new.request";
     public static final String SAVE_REQUEST = "save.request";
@@ -344,14 +344,14 @@ public final class MessageKeys {
     public static final String UPDATE_REQUEST_FAILED = "update.request.failed";
     public static final String ERROR = "error";
 
-    // ============ 剪贴板和cURL ============
+    // ============ Clipboard và cURL ============
     public static final String CLIPBOARD_CURL_DETECTED = "clipboard.curl.detected";
     public static final String IMPORT_CURL = "import.curl";
     public static final String PARSE_CURL_ERROR = "parse.curl.error";
     public static final String PARSE_CURL_SUCCESS = "parse.curl.success";
     public static final String TIP = "tip";
 
-    // ============ 标签页 ============
+    // ============ Tab ============
     public static final String TAB_PARAMS = "tab.params";
     public static final String TAB_HEADERS = "tab.headers";
     public static final String TAB_VARIABLES = "tab.variables";
@@ -477,7 +477,7 @@ public final class MessageKeys {
     public static final String NETWORK_LOG_PREPARED_TIMING_ORIGIN = "network_log.prepared.timing_origin";
 
 
-    // ============ Bulk Edit 相关 ============
+    // ============ Bulk Edit ============
     public static final String BULK_EDIT = "bulk.edit";
     public static final String BULK_EDIT_HEADERS = "bulk.edit.headers";
     public static final String BULK_EDIT_PARAMS = "bulk.edit.params";
@@ -486,7 +486,7 @@ public final class MessageKeys {
     public static final String BULK_EDIT_HINT = "bulk.edit.hint";
     public static final String BULK_EDIT_SUPPORTED_FORMATS = "bulk.edit.supported.formats";
 
-    // ============ Variable Type 变量类型 ============
+    // ============ Variable Type Kiểu biến ============
     public static final String VARIABLE_TYPE_VARIABLE = "variable.type.variable";
     public static final String VARIABLE_TYPE_ITERATION_DATA = "variable.type.iteration_data";
     public static final String VARIABLE_TYPE_GROUP = "variable.type.group";
@@ -517,7 +517,7 @@ public final class MessageKeys {
     public static final String REQUEST_ASSISTANT_UNDEFINED_VARIABLES = "request.assistant.variables.undefined";
     public static final String REQUEST_ASSISTANT_VARIABLE_UNRESOLVED = "request.assistant.variables.unresolved";
 
-    // ============ 快捷键设置 ============
+    // ============ Cài đặt phím tắt ============
     public static final String SHORTCUT_SETTINGS_TITLE = "shortcut.settings.title";
     public static final String SHORTCUT_ACTION = "shortcut.action";
     public static final String SHORTCUT_KEY = "shortcut.key";
@@ -539,15 +539,15 @@ public final class MessageKeys {
     public static final String SHORTCUT_LABEL_FORMAT = "shortcut.label.format";
     public static final String SHORTCUT_DOUBLE_CLICK_HINT = "shortcut.double_click_hint";
 
-    // ============ 状态相关 ============
+    // ============ Trạng thái ============
     public static final String STATUS_SENDING_REQUEST = "status.sending_request";
 
-    // ============ WebSocket相关 ============
+    // ============ WebSocket ============
     public static final String WEBSOCKET_FAILED = "websocket.failed";
     public static final String WEBSOCKET_ERROR = "websocket.error";
     public static final String WEBSOCKET_NOT_CONNECTED = "websocket.not_connected";
 
-    // ============ SSE相关 ============
+    // ============ SSE ============
     public static final String SSE_FAILED = "sse.failed";
     public static final String SSE_ERROR = "sse.error";
     public static final String SSE_COLUMN_EVENT_ID = "sse.column.event_id";
@@ -571,7 +571,7 @@ public final class MessageKeys {
     public static final String WEBSOCKET_STREAM_CLOSED = "websocket.stream.closed";
     public static final String STREAM_USER_CANCELED = "stream.user_canceled";
 
-    // ============ 脚本相关 ============
+    // ============ Script ============
     public static final String SCRIPT_BUTTON_SNIPPETS = "script.button.snippets";
     public static final String SCRIPT_HELP_TITLE = "script.help.title";
     public static final String SCRIPT_HELP_INTRO = "script.help.intro";
@@ -584,7 +584,7 @@ public final class MessageKeys {
     public static final String SCRIPT_POSTSCRIPT_EXECUTION_FAILED = "script.postscript.execution.failed";
     public static final String SCRIPT_POSTSCRIPT_ERROR_TITLE = "script.postscript.error.title";
 
-    // ============ 认证相关 ============
+    // ============ Xác thực ============
     public static final String AUTH_TYPE_LABEL = "auth.type.label";
     public static final String AUTH_TYPE_INHERIT = "auth.type.inherit";
     public static final String AUTH_TYPE_NONE = "auth.type.none";
@@ -610,7 +610,7 @@ public final class MessageKeys {
     public static final String AUTH_API_KEY_NAME_PLACEHOLDER = "auth.api_key.name.placeholder";
     public static final String AUTH_API_KEY_VALUE_PLACEHOLDER = "auth.api_key.value.placeholder";
 
-    // ============ Cookie相关 ============
+    // ============ Cookie ============
     public static final String COOKIES_TITLE = "cookies.title";
     public static final String COOKIES_MANAGER_TITLE = "cookies.manager_title";
     public static final String GLOBAL_VARIABLES_TITLE = "global.variables.title";
@@ -647,7 +647,7 @@ public final class MessageKeys {
     public static final String COOKIE_FIELD_SECURE = "cookie.field.secure";
     public static final String COOKIE_FIELD_HTTPONLY = "cookie.field.httponly";
 
-    // ============ 环境变量相关 ============
+    // ============ Biến môi trường ============
     public static final String ENV_BUTTON_ADD = "env.button.add";
     public static final String ENV_BUTTON_RENAME = "env.button.rename";
     public static final String ENV_BUTTON_DUPLICATE = "env.button.duplicate";
@@ -687,7 +687,7 @@ public final class MessageKeys {
     public static final String ENV_DIALOG_EXPORT_POSTMAN_SUCCESS = "env.dialog.export_postman.success";
     public static final String ENV_DIALOG_EXPORT_POSTMAN_FAIL = "env.dialog.export_postman.fail";
 
-    // ============ 功能测试相关 ============
+    // ============ Kiểm thử chức năng ============
     public static final String FUNCTIONAL_TAB_REQUEST_CONFIG = "functional.tab.request_config";
     public static final String FUNCTIONAL_TAB_EXECUTION_RESULTS = "functional.tab.execution_results";
     public static final String FUNCTIONAL_MSG_NO_RUNNABLE_REQUEST = "functional.msg.no_runnable_request";
@@ -695,7 +695,7 @@ public final class MessageKeys {
     public static final String FUNCTIONAL_MSG_CSV_TITLE = "functional.msg.csv_title";
     public static final String FUNCTIONAL_STATUS_SKIPPED = "functional.status.skipped";
 
-    // ============ 工作区相关 ============
+    // ============ Workspace ============
     public static final String WORKSPACE_CREATE = "workspace.create";
     public static final String WORKSPACE_NAME = "workspace.name";
     public static final String WORKSPACE_DEFAULT_NAME = "workspace.default.name";
@@ -718,7 +718,7 @@ public final class MessageKeys {
     public static final String WORKSPACE_GIT_AUTH_PASSWORD = "workspace.git.auth.password";
     public static final String WORKSPACE_GIT_AUTH_TOKEN = "workspace.git.auth.token";
     public static final String WORKSPACE_GIT_AUTH_SSH = "workspace.git.auth.ssh";
-    // 添加SSH认证相关的消息键
+    // Bổ sung khóa thông điệp xác thực SSH
     public static final String WORKSPACE_GIT_SSH_SELECT_KEY = "workspace.git.ssh.select_key";
     public static final String WORKSPACE_GIT_SSH_PASSPHRASE = "workspace.git.ssh.passphrase";
     public static final String WORKSPACE_GIT_SSH_KEY_PATH = "workspace.git.ssh.private_key";
@@ -877,7 +877,7 @@ public final class MessageKeys {
     public static final String PROGRESS_PANEL_READY = "progress.panel.ready";
     public static final String PROGRESS_PANEL_FILL_CONFIG = "progress.panel.fill_config";
 
-    // ============ 工作区详情面板相关 ============
+    // ============ Bảng thông tin workspace ============
     public static final String WORKSPACE_DETAIL_BASIC_INFO = "workspace.detail.basic_info";
     public static final String WORKSPACE_DETAIL_CREATED_TIME = "workspace.detail.created_time";
     public static final String WORKSPACE_DETAIL_GIT_INFO = "workspace.detail.git_info";
@@ -887,7 +887,7 @@ public final class MessageKeys {
     public static final String WORKSPACE_DETAIL_REMOTE_BRANCH = "workspace.detail.remote_branch";
     public static final String WORKSPACE_DETAIL_LAST_COMMIT = "workspace.detail.last_commit";
 
-    // ============ 性能测试相关 ============
+    // ============ Kiểm thử hiệu năng ============
     public static final String PERFORMANCE_TAB_TREND = "performance.tab.trend";
     public static final String PERFORMANCE_TAB_REPORT = "performance.tab.report";
     public static final String PERFORMANCE_TAB_RESULT_TREE = "performance.tab.result_tree";
@@ -1170,7 +1170,7 @@ public final class MessageKeys {
     public static final String PERFORMANCE_PROTOCOL_WEBSOCKET = "performance.protocol.websocket";
     public static final String PERFORMANCE_PROTOCOL_SSE = "performance.protocol.sse";
 
-    // ============ 性能报表列相关 ============
+    // ============ Cột báo cáo hiệu năng ============
     public static final String PERFORMANCE_REPORT_COLUMN_API_NAME = "performance.report.column.api_name";
     public static final String PERFORMANCE_REPORT_COLUMN_TOTAL = "performance.report.column.total";
     public static final String PERFORMANCE_REPORT_COLUMN_SUCCESS = "performance.report.column.success";
@@ -1210,7 +1210,7 @@ public final class MessageKeys {
     public static final String PERFORMANCE_REPORT_MARKDOWN_EMPTY = "performance.report.markdown.empty";
     public static final String PERFORMANCE_REPORT_MARKDOWN_COPIED = "performance.report.markdown.copied";
 
-    // ============ 性能趋势相关 ============
+    // ============ Xu hướng hiệu năng ============
     public static final String PERFORMANCE_TREND_THREADS = "performance.trend.threads";
     public static final String PERFORMANCE_TREND_VIRTUAL_USERS = "performance.trend.virtual_users";
     public static final String PERFORMANCE_TREND_RESPONSE_TIME_MS = "performance.trend.response_time_ms";
@@ -1240,7 +1240,7 @@ public final class MessageKeys {
     public static final String PERFORMANCE_TREND_STREAM_DURATION_MS = "performance.trend.stream_duration_ms";
     public static final String PERFORMANCE_TREND_MAX_RESPONSE_TIME_MS = "performance.trend.max_response_time_ms";
 
-    // ============ 性能结果树相关 ============
+    // ============ Cây kết quả hiệu năng ============
     public static final String PERFORMANCE_RESULT_TREE_COLUMN_PROTOCOL = "performance.result_tree.column.protocol";
     public static final String PERFORMANCE_RESULT_TREE_COLUMN_NAME = "performance.result_tree.column.name";
     public static final String PERFORMANCE_RESULT_TREE_COLUMN_STATUS = "performance.result_tree.column.status";
@@ -1256,7 +1256,7 @@ public final class MessageKeys {
     public static final String PERFORMANCE_RESULT_TREE_DETAIL_CLOSE = "performance.result_tree.detail.close";
     public static final String PERFORMANCE_RESULT_TREE_DETAIL_SUMMARY = "performance.result_tree.detail.summary";
 
-    // ============ 历史记录相关 ============
+    // ============ Lịch sử ============
     public static final String HISTORY_EMPTY_BODY = "history.empty_body";
     public static final String HISTORY_CLEAR = "history.clear";
     public static final String HISTORY_CLEAR_TITLE = "history.clear.title";
@@ -1288,13 +1288,13 @@ public final class MessageKeys {
     public static final String HISTORY_OVERVIEW_BODY_URLENCODED = "history.overview.body.urlencoded";
     public static final String HISTORY_OPEN_REQUEST_TAB_HIDDEN = "history.open_request_tab_hidden";
 
-    // ============ Tab标签页相关 ============
+    // ============ Tab ============
     public static final String TAB_REQUEST = "tab.request";
     public static final String TAB_RESPONSE = "tab.response";
     public static final String TAB_TIMING = "tab.timing";
     public static final String TAB_EVENTS = "tab.events";
 
-    // ============ 应用相关 ============
+    // ============ Ứng dụng ============
     public static final String APP_NAME = "app.name";
     public static final String SPLASH_STATUS_STARTING = "splash.status.starting";
     public static final String SPLASH_STATUS_LOADING_PLUGINS = "splash.status.loading_plugins";
@@ -1305,14 +1305,14 @@ public final class MessageKeys {
     public static final String STARTUP_SINGLE_INSTANCE_SETUP_FAILED = "startup.single_instance.setup_failed";
     public static final String STARTUP_SINGLE_INSTANCE_UNREACHABLE = "startup.single_instance.unreachable";
 
-    // ============ 退出相关 ============
+    // ============ Thoát ============
     public static final String EXIT_UNSAVED_CHANGES = "exit.unsaved_changes";
     public static final String EXIT_UNSAVED_CHANGES_TITLE = "exit.unsaved_changes.title";
     public static final String EXIT_SAVE_ALL = "exit.save_all";
     public static final String EXIT_DISCARD_ALL = "exit.discard_all";
     public static final String EXIT_CANCEL = "exit.cancel";
 
-    // ============ 集合相关 ============
+    // ============ Collection ============
     public static final String COLLECTIONS_NEW_COLLECTION = "collections.new_collection";
     public static final String COLLECTIONS_IMPORT_CURL_DETECTED = "collections.import.curl.detected";
     public static final String COLLECTIONS_IMPORT_CURL_TITLE = "collections.import.curl.title";
@@ -1325,7 +1325,7 @@ public final class MessageKeys {
     public static final String COLLECTIONS_IMPORT_HTTP = "collections.import.http";
     public static final String COLLECTIONS_IMPORT_APIPOST = "collections.import.apipost";
 
-    // ============ 集合菜单相关 ============
+    // ============ Menu collection ============
     public static final String COLLECTIONS_MENU_ADD_GROUP = "collections.menu.add_group";
     public static final String COLLECTIONS_MENU_ADD_REQUEST = "collections.menu.add_request";
     public static final String COLLECTIONS_MENU_DUPLICATE = "collections.menu.duplicate";
@@ -1364,7 +1364,7 @@ public final class MessageKeys {
     public static final String FUNCTIONAL_MSG_REFRESH_WARNING = "functional.msg.refresh_warning";
     public static final String FUNCTIONAL_MSG_DUPLICATE_SKIPPED = "functional.msg.duplicate_skipped";
 
-    // ============ 集合导出导入相关 ============
+    // ============ Nhập/xuất collection ============
     public static final String COLLECTIONS_EXPORT_DIALOG_TITLE = "collections.export.dialog_title";
     public static final String COLLECTIONS_EXPORT_SUCCESS = "collections.export.success";
     public static final String COLLECTIONS_EXPORT_FAIL = "collections.export.fail";
@@ -1390,7 +1390,7 @@ public final class MessageKeys {
     public static final String COLLECTIONS_IMPORT_APIPOST_DIALOG_TITLE = "collections.import.apipost.dialog_title";
     public static final String COLLECTIONS_IMPORT_APIPOST_INVALID = "collections.import.apipost.invalid";
 
-    // ============ 集合对话框相关 ============
+    // ============ Hộp thoại collection ============
     public static final String COLLECTIONS_DIALOG_ADD_GROUP_TITLE = "collections.dialog.add_group.title";
     public static final String COLLECTIONS_DIALOG_RENAME_GROUP_TITLE = "collections.dialog.rename_group.title";
     public static final String COLLECTIONS_DIALOG_ADD_REQUEST_TITLE = "collections.dialog.add_request.title";
@@ -1408,7 +1408,7 @@ public final class MessageKeys {
     public static final String COLLECTIONS_DELETE_BATCH_CONFIRM = "collections.delete.batch_confirm";
     public static final String COLLECTIONS_DELETE_CONFIRM_TITLE = "collections.delete.confirm_title";
 
-    // ============ Group Edit Panel 相关 ============
+    // ============ Bảng chỉnh sửa nhóm ============
     public static final String GROUP_EDIT_TITLE = "group.edit.title";
     public static final String GROUP_EDIT_TAB_GENERAL = "group.edit.tab.general";
     public static final String GROUP_EDIT_NAME_LABEL = "group.edit.name.label";
@@ -1420,7 +1420,7 @@ public final class MessageKeys {
     public static final String GROUP_EDIT_VARIABLES_INFO = "group.edit.variables.info";
     public static final String GROUP_EDIT_VALIDATION_ERROR = "group.edit.validation.error";
 
-    // ============ Request Docs Tab 相关 ============
+    // ============ Tab tài liệu yêu cầu ============
     public static final String REQUEST_DOCS_TAB_TITLE = "request.docs.tab.title";
     public static final String REQUEST_SETTINGS_FOLLOW_REDIRECTS_LABEL = "request.settings.follow_redirects.label";
     public static final String REQUEST_SETTINGS_FOLLOW_REDIRECTS_DESC = "request.settings.follow_redirects.desc";
@@ -1455,7 +1455,7 @@ public final class MessageKeys {
     public static final String REQUEST_SETTINGS_BOOLEAN_ENABLED = "request.settings.boolean.enabled";
     public static final String REQUEST_SETTINGS_BOOLEAN_DISABLED = "request.settings.boolean.disabled";
 
-    // ============ 功能测试执行结果相关 ============
+    // ============ Kết quả chạy kiểm thử chức năng ============
     public static final String FUNCTIONAL_EXECUTION_RESULTS = "functional.execution.results";
     public static final String FUNCTIONAL_EXECUTION_HISTORY = "functional.execution.history";
     public static final String FUNCTIONAL_EXECUTION_RESULTS_NO_DATA = "functional.execution.results.no_data";
@@ -1465,7 +1465,7 @@ public final class MessageKeys {
     public static final String FUNCTIONAL_TOOLTIP_REFRESH = "functional.tooltip.refresh";
     public static final String FUNCTIONAL_TAB_OVERVIEW = "functional.tab.overview";
 
-    // ============ 功能测试详情页面相关 ============
+    // ============ Trang chi tiết kiểm thử chức năng ============
     public static final String FUNCTIONAL_DETAIL_OVERVIEW = "functional.detail.overview";
     public static final String FUNCTIONAL_DETAIL_ITERATION = "functional.detail.iteration";
     public static final String FUNCTIONAL_DETAIL_EXECUTION_STATS = "functional.detail.execution_stats";
@@ -1474,7 +1474,7 @@ public final class MessageKeys {
     public static final String FUNCTIONAL_DETAIL_WELCOME_MESSAGE = "functional.detail.welcome_message";
     public static final String FUNCTIONAL_DETAIL_WELCOME_SUBTITLE = "functional.detail.welcome_subtitle";
 
-    // ============ 功能测试统计相关 ============
+    // ============ Thống kê kiểm thử chức năng ============
     public static final String FUNCTIONAL_STATS_TOTAL_ITERATIONS = "functional.stats.total_iterations";
     public static final String FUNCTIONAL_STATS_TOTAL_REQUESTS = "functional.stats.total_requests";
     public static final String FUNCTIONAL_STATS_TOTAL_TIME = "functional.stats.total_time";
@@ -1485,7 +1485,7 @@ public final class MessageKeys {
     public static final String FUNCTIONAL_STATS_STATUS = "functional.stats.status";
     public static final String FUNCTIONAL_STATS_STATUS_COMPLETED = "functional.stats.status_completed";
 
-    // ============ 功能测试表格相关 ============
+    // ============ Bảng kiểm thử chức năng ============
     public static final String FUNCTIONAL_TABLE_ITERATION = "functional.table.iteration";
     public static final String FUNCTIONAL_TABLE_REQUEST_NAME = "functional.table.request_name";
     public static final String FUNCTIONAL_TABLE_METHOD = "functional.table.method";
@@ -1493,7 +1493,7 @@ public final class MessageKeys {
     public static final String FUNCTIONAL_TABLE_TIME = "functional.table.time";
     public static final String FUNCTIONAL_TABLE_ASSERTION = "functional.table.assertion";
 
-    // ============ 功能测试迭代相关 ============
+    // ============ Vòng lặp kiểm thử chức năng ============
     public static final String FUNCTIONAL_ITERATION_ROUND = "functional.iteration.round";
     public static final String FUNCTIONAL_ITERATION_ROUND_FORMAT = "functional.iteration.round.format";
     public static final String FUNCTIONAL_ITERATION_START_TIME = "functional.iteration.start_time";
@@ -1501,18 +1501,18 @@ public final class MessageKeys {
     public static final String FUNCTIONAL_ITERATION_REQUEST_COUNT = "functional.iteration.request_count";
     public static final String FUNCTIONAL_ITERATION_PASSED_FORMAT = "functional.iteration.passed_format";
 
-    // ============ 线程组相关 ============
-    // 线程组模式
+    // ============ Nhóm luồng ============
+    // Chế độ nhóm luồng
     public static final String THREADGROUP_MODE_FIXED = "threadgroup.mode.fixed";
     public static final String THREADGROUP_MODE_RAMP_UP = "threadgroup.mode.ramp_up";
     public static final String THREADGROUP_MODE_SPIKE = "threadgroup.mode.spike";
     public static final String THREADGROUP_MODE_STAIRS = "threadgroup.mode.stairs";
 
-    // 线程组界面标签
+    // Nhãn giao diện nhóm luồng
     public static final String THREADGROUP_MODE_LABEL = "threadgroup.mode.label";
     public static final String THREADGROUP_PREVIEW_TITLE = "threadgroup.preview.title";
 
-    // 固定模式标签
+    // Nhãn chế độ cố định
     public static final String THREADGROUP_FIXED_USERS = "threadgroup.fixed.users";
     public static final String THREADGROUP_FIXED_EXECUTION_MODE = "threadgroup.fixed.execution_mode";
     public static final String THREADGROUP_FIXED_EXECUTION_COUNT = "threadgroup.fixed.execution_count";
@@ -1523,13 +1523,13 @@ public final class MessageKeys {
     public static final String THREADGROUP_MAX_IN_FLIGHT_WAIT = "threadgroup.max_in_flight_wait";
     public static final String THREADGROUP_MAX_IN_FLIGHT_WAIT_TOOLTIP = "threadgroup.max_in_flight_wait.tooltip";
 
-    // 递增模式标签
+    // Nhãn chế độ tăng dần
     public static final String THREADGROUP_RAMPUP_START_USERS = "threadgroup.rampup.start_users";
     public static final String THREADGROUP_RAMPUP_END_USERS = "threadgroup.rampup.end_users";
     public static final String THREADGROUP_RAMPUP_RAMP_TIME = "threadgroup.rampup.ramp_time";
     public static final String THREADGROUP_RAMPUP_TEST_DURATION = "threadgroup.rampup.test_duration";
 
-    // 尖刺模式标签
+    // Nhãn chế độ đột biến
     public static final String THREADGROUP_SPIKE_MIN_USERS = "threadgroup.spike.min_users";
     public static final String THREADGROUP_SPIKE_MAX_USERS = "threadgroup.spike.max_users";
     public static final String THREADGROUP_SPIKE_RAMP_UP_TIME = "threadgroup.spike.ramp_up_time";
@@ -1537,14 +1537,14 @@ public final class MessageKeys {
     public static final String THREADGROUP_SPIKE_RAMP_DOWN_TIME = "threadgroup.spike.ramp_down_time";
     public static final String THREADGROUP_SPIKE_TEST_DURATION = "threadgroup.spike.test_duration";
 
-    // 阶梯模式标签
+    // Nhãn chế độ bậc thang
     public static final String THREADGROUP_STAIRS_START_USERS = "threadgroup.stairs.start_users";
     public static final String THREADGROUP_STAIRS_END_USERS = "threadgroup.stairs.end_users";
     public static final String THREADGROUP_STAIRS_STEP_SIZE = "threadgroup.stairs.step_size";
     public static final String THREADGROUP_STAIRS_HOLD_TIME = "threadgroup.stairs.hold_time";
     public static final String THREADGROUP_STAIRS_TEST_DURATION = "threadgroup.stairs.test_duration";
 
-    // 预览面板标签
+    // Nhãn bảng xem trước
     public static final String THREADGROUP_PREVIEW_TIME_SECONDS = "threadgroup.preview.time_seconds";
     public static final String THREADGROUP_PREVIEW_MODE_PREFIX = "threadgroup.preview.mode_prefix";
 
@@ -1718,7 +1718,7 @@ public final class MessageKeys {
     // Error messages
     public static final String SETTINGS_SAVE_ERROR_MESSAGE = "settings.save.error.message";
 
-    // ============ 请求Body相关 ============
+    // ============ Request body ============
     public static final String REQUEST_BODY_NONE = "request.body.none";
     public static final String REQUEST_BODY_BINARY_FILE = "request.body.binary.file";
     public static final String REQUEST_BODY_BINARY_BROWSE = "request.body.binary.browse";
@@ -1736,7 +1736,7 @@ public final class MessageKeys {
     public static final String REQUEST_BODY_COMPRESS_EMPTY = "request.body.compress.empty";
     public static final String REQUEST_BODY_COMPRESS_INVALID = "request.body.compress.invalid";
 
-    // ============ 响应头面板相关 ============
+    // ============ Bảng header phản hồi ============
     public static final String RESPONSE_HEADERS_COLUMN_NAME = "response.headers.column.name";
     public static final String RESPONSE_HEADERS_COLUMN_VALUE = "response.headers.column.value";
     public static final String RESPONSE_HEADERS_COPY_SELECTED = "response.headers.copy_selected";
@@ -1921,14 +1921,14 @@ public final class MessageKeys {
     public static final String PERFORMANCE_MSG_RESPONSE_BODY_TOO_LARGE_TO_EVALUATE =
             "performance.msg.response_body_too_large_to_evaluate";
 
-    // ============ ResponseAssertion 国际化 ============
+    // ============ Đa ngôn ngữ cho ResponseAssertion ============
     public static final String RESPONSE_ASSERTION_STATUS_FAILED = "response.assertion.status_failed";
     public static final String RESPONSE_ASSERTION_HEADER_NOT_FOUND = "response.assertion.header_not_found";
     public static final String RESPONSE_ASSERTION_HEADER_NOT_FOUND_WITH_NAME = "response.assertion.header_not_found_with_name";
     public static final String RESPONSE_ASSERTION_BELOW_FAILED = "response.assertion.below_failed";
     public static final String RESPONSE_ASSERTION_INVALID_JSON = "response.assertion.invalid_json";
 
-    // ============ Expectation 国际化 ============
+    // ============ Đa ngôn ngữ cho Expectation ============
     public static final String EXPECTATION_INCLUDE_FAILED = "expectation.include_failed";
     public static final String EXPECTATION_NOT_INCLUDE_FAILED = "expectation.not_include_failed";
     public static final String EXPECTATION_EQL_FAILED = "expectation.eql_failed";
@@ -1972,30 +1972,30 @@ public final class MessageKeys {
     public static final String EXPECTATION_NAN_FAILED = "expectation.nan_failed";
     public static final String EXPECTATION_NOT_NAN_FAILED = "expectation.not_nan_failed";
 
-    // ============ ScriptPanel AutoCompletion 国际化 ============
+    // ============ Đa ngôn ngữ cho tự hoàn thành ScriptPanel ============
     public static final String AUTOCOMPLETE_PM = "autocomplete.pm";
 
-    // ========== pm 对象方法自动补全 ==========
+    // ========== Tự hoàn thành phương thức đối tượng pm ==========
     public static final String AUTOCOMPLETE_PM_TEST = "autocomplete.pm.test";
     public static final String AUTOCOMPLETE_PM_EXPECT = "autocomplete.pm.expect";
     public static final String AUTOCOMPLETE_PM_GET_TIMESTAMP = "autocomplete.pm.getTimestamp";
     public static final String AUTOCOMPLETE_PM_GET_RESPONSE_COOKIE = "autocomplete.pm.getResponseCookie";
 
-    // ========== pm.environment 方法 ==========
+    // ========== Phương thức pm.environment ==========
     public static final String AUTOCOMPLETE_PM_ENV_SET = "autocomplete.pm.environment.set";
     public static final String AUTOCOMPLETE_PM_ENV_GET = "autocomplete.pm.environment.get";
     public static final String AUTOCOMPLETE_PM_ENV_HAS = "autocomplete.pm.environment.has";
     public static final String AUTOCOMPLETE_PM_ENV_UNSET = "autocomplete.pm.environment.unset";
     public static final String AUTOCOMPLETE_PM_ENV_CLEAR = "autocomplete.pm.environment.clear";
 
-    // ========== pm.variables 方法 ==========
+    // ========== Phương thức pm.variables ==========
     public static final String AUTOCOMPLETE_PM_VAR_SET = "autocomplete.pm.variables.set";
     public static final String AUTOCOMPLETE_PM_VAR_GET = "autocomplete.pm.variables.get";
     public static final String AUTOCOMPLETE_PM_VAR_HAS = "autocomplete.pm.variables.has";
     public static final String AUTOCOMPLETE_PM_VAR_UNSET = "autocomplete.pm.variables.unset";
     public static final String AUTOCOMPLETE_PM_VAR_CLEAR = "autocomplete.pm.variables.clear";
 
-    // ========== pm.request 方法 ==========
+    // ========== Phương thức pm.request ==========
     public static final String AUTOCOMPLETE_PM_REQUEST_URL = "autocomplete.pm.request.url";
     public static final String AUTOCOMPLETE_PM_REQUEST_METHOD = "autocomplete.pm.request.method";
     public static final String AUTOCOMPLETE_PM_REQUEST_HEADERS = "autocomplete.pm.request.headers";
@@ -2022,7 +2022,7 @@ public final class MessageKeys {
     public static final String AUTOCOMPLETE_PM_REQUEST_BODY_TO_JSON = "autocomplete.pm.request.body.toJSON";
     public static final String AUTOCOMPLETE_PM_REQUEST_BODY_IS_EMPTY = "autocomplete.pm.request.body.isEmpty";
 
-    // ========== pm.response 方法 ==========
+    // ========== Phương thức pm.response ==========
     public static final String AUTOCOMPLETE_PM_RESPONSE_CODE = "autocomplete.pm.response.code";
     public static final String AUTOCOMPLETE_PM_RESPONSE_STATUS = "autocomplete.pm.response.status";
     public static final String AUTOCOMPLETE_PM_RESPONSE_HEADERS = "autocomplete.pm.response.headers";
@@ -2032,7 +2032,7 @@ public final class MessageKeys {
     public static final String AUTOCOMPLETE_PM_RESPONSE_TO_HAVE_STATUS = "autocomplete.pm.response.to.have.status";
     public static final String AUTOCOMPLETE_PM_RESPONSE_TO_HAVE_HEADER = "autocomplete.pm.response.to.have.header";
 
-    // ========== pm.cookies 方法 ==========
+    // ========== Phương thức pm.cookies ==========
     public static final String AUTOCOMPLETE_PM_COOKIES = "autocomplete.pm.cookies";
     public static final String AUTOCOMPLETE_PM_COOKIES_GET = "autocomplete.pm.cookies.get";
     public static final String AUTOCOMPLETE_PM_COOKIES_HAS = "autocomplete.pm.cookies.has";
@@ -2040,26 +2040,26 @@ public final class MessageKeys {
     public static final String AUTOCOMPLETE_PM_COOKIES_JAR = "autocomplete.pm.cookies.jar";
     public static final String AUTOCOMPLETE_PM_COOKIES_TO_OBJECT = "autocomplete.pm.cookies.toObject";
 
-    // ========== Console 对象 ==========
+    // ========== Đối tượng Console ==========
     public static final String AUTOCOMPLETE_CONSOLE = "autocomplete.console";
     public static final String AUTOCOMPLETE_CONSOLE_LOG = "autocomplete.console.log";
 
-    // ========== pm 对象核心方法 ==========
+    // ========== Phương thức cốt lõi của đối tượng pm ==========
     public static final String AUTOCOMPLETE_PM_UUID = "autocomplete.pm.uuid";
 
-    // ========== pm 子对象 ==========
+    // ========== Đối tượng con của pm ==========
     public static final String AUTOCOMPLETE_PM_ENVIRONMENT = "autocomplete.pm.environment";
     public static final String AUTOCOMPLETE_PM_VARIABLES = "autocomplete.pm.variables";
     public static final String AUTOCOMPLETE_PM_REQUEST = "autocomplete.pm.request";
     public static final String AUTOCOMPLETE_PM_RESPONSE = "autocomplete.pm.response";
 
-    // ========== pm.variables 扩展 ==========
+    // ========== Mở rộng pm.variables ==========
     public static final String AUTOCOMPLETE_PM_VAR_TO_OBJECT = "autocomplete.pm.variables.toObject";
 
-    // ========== pm.response 扩展 ==========
+    // ========== Mở rộng pm.response ==========
     public static final String AUTOCOMPLETE_PM_RESPONSE_SIZE = "autocomplete.pm.response.size";
 
-    // ========== pm.expect 断言方法 ==========
+    // ========== Phương thức xác nhận pm.expect ==========
     public static final String AUTOCOMPLETE_PM_EXPECT_TO_EQUAL = "autocomplete.pm.expect.to.equal";
     public static final String AUTOCOMPLETE_PM_EXPECT_TO_EQL = "autocomplete.pm.expect.to.eql";
     public static final String AUTOCOMPLETE_PM_EXPECT_TO_INCLUDE = "autocomplete.pm.expect.to.include";
@@ -2083,7 +2083,7 @@ public final class MessageKeys {
     public static final String AUTOCOMPLETE_PM_EXPECT_TO_BE_NAN = "autocomplete.pm.expect.to.be.NaN";
     public static final String AUTOCOMPLETE_PM_EXPECT_NOT = "autocomplete.pm.expect.not";
 
-    // ========== 内置库 - CryptoJS ==========
+    // ========== Thư viện tích hợp - CryptoJS ==========
     public static final String AUTOCOMPLETE_CRYPTOJS = "autocomplete.cryptojs";
     public static final String AUTOCOMPLETE_CRYPTOJS_AES = "autocomplete.cryptojs.aes";
     public static final String AUTOCOMPLETE_CRYPTOJS_DES = "autocomplete.cryptojs.des";
@@ -2094,7 +2094,7 @@ public final class MessageKeys {
     public static final String AUTOCOMPLETE_CRYPTOJS_ENC = "autocomplete.cryptojs.enc";
     public static final String AUTOCOMPLETE_CRYPTOJS_WORD_ARRAY = "autocomplete.cryptojs.wordarray";
 
-    // ========== 内置库 - Lodash ==========
+    // ========== Thư viện tích hợp - Lodash ==========
     public static final String AUTOCOMPLETE_LODASH = "autocomplete.lodash";
     public static final String AUTOCOMPLETE_LODASH_MAP = "autocomplete.lodash.map";
     public static final String AUTOCOMPLETE_LODASH_FILTER = "autocomplete.lodash.filter";
@@ -2113,7 +2113,7 @@ public final class MessageKeys {
     public static final String AUTOCOMPLETE_LODASH_CLONE_DEEP = "autocomplete.lodash.cloneDeep";
     public static final String AUTOCOMPLETE_LODASH_MERGE = "autocomplete.lodash.merge";
 
-    // ========== 内置库 - Moment ==========
+    // ========== Thư viện tích hợp - Moment ==========
     public static final String AUTOCOMPLETE_MOMENT = "autocomplete.moment";
     public static final String AUTOCOMPLETE_MOMENT_CALL = "autocomplete.moment.call";
     public static final String AUTOCOMPLETE_MOMENT_FORMAT = "autocomplete.moment.format";
@@ -2129,11 +2129,11 @@ public final class MessageKeys {
     public static final String AUTOCOMPLETE_MOMENT_START_OF = "autocomplete.moment.startOf";
     public static final String AUTOCOMPLETE_MOMENT_END_OF = "autocomplete.moment.endOf";
 
-    // ========== JavaScript 内置对象 ==========
+    // ========== Đối tượng tích hợp JavaScript ==========
     public static final String AUTOCOMPLETE_JSON_PARSE = "autocomplete.json.parse";
     public static final String AUTOCOMPLETE_JSON_STRINGIFY = "autocomplete.json.stringify";
 
-    // ========== 编码/解码函数 ==========
+    // ========== Hàm mã hóa/giải mã ==========
     public static final String AUTOCOMPLETE_BTOA = "autocomplete.btoa";
     public static final String AUTOCOMPLETE_ATOB = "autocomplete.atob";
     public static final String AUTOCOMPLETE_ENCODE_URI = "autocomplete.encodeURIComponent";
@@ -2141,7 +2141,7 @@ public final class MessageKeys {
     public static final String AUTOCOMPLETE_ENCODE_URI_FULL = "autocomplete.encodeURI";
     public static final String AUTOCOMPLETE_DECODE_URI_FULL = "autocomplete.decodeURI";
 
-    // ============ 工作区远程配置相关 ============
+    // ============ Cấu hình remote workspace ============
     public static final String WORKSPACE_REMOTE_CONFIG_TITLE = "workspace.remote.config.title";
     public static final String WORKSPACE_CONFIG_PROGRESS_START = "workspace.config.progress.start";
     public static final String WORKSPACE_CONFIG_PROGRESS_VALIDATING = "workspace.config.progress.validating";
@@ -2153,7 +2153,7 @@ public final class MessageKeys {
     public static final String WORKSPACE_CONFIG_TEST_CONNECTION_SUCCESS = "workspace.config.test.connection.success";
     public static final String WORKSPACE_VALIDATION_GIT_URL_INVALID = "workspace.validation.git.url.invalid";
 
-    // ============ 自动更新设置相关 ============
+    // ============ Cài đặt tự động cập nhật ============
     public static final String SETTINGS_AUTO_UPDATE_TITLE = "settings.auto_update.title";
     public static final String SETTINGS_AUTO_UPDATE_DESCRIPTION = "settings.auto_update.description";
     public static final String SETTINGS_AUTO_UPDATE_ENABLED_TOOLTIP = "settings.auto_update.enabled.tooltip";
@@ -2179,7 +2179,7 @@ public final class MessageKeys {
     public static final String SETTINGS_UPDATE_SOURCE_GITHUB = "settings.update_source.github";
     public static final String SETTINGS_UPDATE_SOURCE_GITEE = "settings.update_source.gitee";
 
-    // ============ UI设置相关 ============
+    // ============ Cài đặt UI ============
     public static final String SETTINGS_UI_TITLE = "settings.ui.title";
     public static final String SETTINGS_UI_FONT_NAME = "settings.ui.font_name";
     public static final String SETTINGS_UI_FONT_NAME_TOOLTIP = "settings.ui.font_name.tooltip";
@@ -2211,14 +2211,14 @@ public final class MessageKeys {
     public static final String SETTINGS_EDITOR_FONT_PREVIEW_TOOLTIP_WITH_FALLBACK = "settings.editor.font.preview.tooltip.with_fallback";
     public static final String SETTINGS_VALIDATION_EDITOR_FONT_SIZE_ERROR = "settings.validation.editor_font_size_error";
 
-    // WebSocket面板相关
+    // Bảng WebSocket
     public static final String WEBSOCKET_PANEL_LABEL_SEND_MESSAGE = "websocket.panel.label.send_message";
     public static final String WEBSOCKET_PANEL_CHECKBOX_CLEAR = "websocket.panel.checkbox.clear";
     public static final String WEBSOCKET_PANEL_LABEL_TIMEOUT = "websocket.panel.label.timeout";
     public static final String WEBSOCKET_PANEL_BUTTON_START = "websocket.panel.button.start";
     public static final String WEBSOCKET_PANEL_BUTTON_STOP = "websocket.panel.button.stop";
 
-    // ============ WebSocket面板相关 ============
+    // ============ Bảng WebSocket ============
     public static final String WEBSOCKET_COLUMN_TYPE = "websocket.column.type";
     public static final String WEBSOCKET_COLUMN_TIME = "websocket.column.time";
     public static final String STREAM_COLUMN_INTERVAL = "stream.column.interval";
@@ -2251,7 +2251,7 @@ public final class MessageKeys {
 
     public static final String REQUEST_EDITOR_EMPTY_STATE_HINT = "request.editor.empty_state.hint";
 
-    // ============ 代码片段弹窗（SnippetDialog）相关 ============
+    // ============ Hộp thoại đoạn mã (SnippetDialog) ============
     public static final String SNIPPET_DIALOG_TITLE = "snippet.dialog.title";
     public static final String SNIPPET_DIALOG_PREVIEW_TITLE = "snippet.dialog.preview.title";
     public static final String SNIPPET_DIALOG_INSERT = "snippet.dialog.insert";
@@ -2276,21 +2276,21 @@ public final class MessageKeys {
     public static final String SNIPPET_DIALOG_CATEGORY_TOKEN = "snippet.dialog.category.token";
     public static final String SNIPPET_DIALOG_CATEGORY_COOKIES = "snippet.dialog.category.cookies";
     public static final String SNIPPET_DIALOG_CATEGORY_OTHER = "snippet.dialog.category.other";
-    // 高级场景分类
+    // Danh mục tình huống nâng cao
     public static final String SNIPPET_DIALOG_CATEGORY_AUTHENTICATION = "snippet.dialog.category.authentication";
     public static final String SNIPPET_DIALOG_CATEGORY_PERFORMANCE = "snippet.dialog.category.performance";
     public static final String SNIPPET_DIALOG_CATEGORY_VALIDATION = "snippet.dialog.category.validation";
     public static final String SNIPPET_DIALOG_CATEGORY_DATA_PROCESSING = "snippet.dialog.category.data_processing";
     public static final String SNIPPET_DIALOG_CATEGORY_REQUEST_MODIFICATION = "snippet.dialog.category.request_modification";
-    // 内置库分类
+    // Danh mục thư viện tích hợp
     public static final String SNIPPET_DIALOG_CATEGORY_CRYPTOJS = "snippet.dialog.category.cryptojs";
     public static final String SNIPPET_DIALOG_CATEGORY_LODASH = "snippet.dialog.category.lodash";
     public static final String SNIPPET_DIALOG_CATEGORY_MOMENT = "snippet.dialog.category.moment";
-    // 完整示例
+    // Ví dụ đầy đủ
     public static final String SNIPPET_DIALOG_CATEGORY_EXAMPLES = "snippet.dialog.category.examples";
     public static final String SNIPPET_DIALOG_NOT_FOUND = "snippet.dialog.not_found";
 
-    // ============ WaterfallChartPanel 国际化 ============
+    // ============ Đa ngôn ngữ cho WaterfallChartPanel ============
     public static final String WATERFALL_HTTP_VERSION = "waterfall.http_version";
     public static final String WATERFALL_LOCAL_ADDRESS = "waterfall.local_address";
     public static final String WATERFALL_REMOTE_ADDRESS = "waterfall.remote_address";
@@ -2319,14 +2319,14 @@ public final class MessageKeys {
     public static final String WATERFALL_STAGE_DESC_WAITING = "waterfall.stage.desc.waiting";
     public static final String WATERFALL_STAGE_DESC_CONTENT_DOWNLOAD = "waterfall.stage.desc.content_download";
 
-    // ============ 操作相关 ============
+    // ============ Thao tác ============
     public static final String WORKSPACE_OPERATION_SUCCESS = "workspace.operation.success";
     public static final String WORKSPACE_OPERATION_COMPLETED_CLOSING = "workspace.operation.completed_closing";
     public static final String WORKSPACE_OPERATION_FAILED = "workspace.operation.failed";
     public static final String WORKSPACE_OPERATION_FAILED_TIP = "workspace.operation.failed_tip";
     public static final String WORKSPACE_OPERATION_FAILED_DETAIL = "workspace.operation.failed_detail";
 
-    // ============ GitOperationDialog 国际化 ============
+    // ============ Đa ngôn ngữ cho GitOperationDialog ============
     public static final String GIT_DIALOG_WORKSPACE = "git.dialog.workspace";
     public static final String GIT_DIALOG_CURRENT_BRANCH = "git.dialog.currentBranch";
     public static final String GIT_DIALOG_UNKNOWN = "git.dialog.unknown";
@@ -2365,12 +2365,12 @@ public final class MessageKeys {
     public static final String GIT_DIALOG_YES = "git.dialog.yes";
     public static final String GIT_DIALOG_NO = "git.dialog.no";
 
-    // ============ GitOperation 名称国际化 ============
+    // ============ Đa ngôn ngữ tên GitOperation ============
     public static final String GIT_OPERATION_COMMIT = "git.operation.commit";
     public static final String GIT_OPERATION_PUSH = "git.operation.push";
     public static final String GIT_OPERATION_PULL = "git.operation.pull";
 
-    // ============ GitOperationDialog 选项相关国际化 ============
+    // ============ Đa ngôn ngữ tùy chọn GitOperationDialog ============
     public static final String GIT_DIALOG_OPTION_COMMIT_TITLE = "git.dialog.option.commit.title";
     public static final String GIT_DIALOG_OPTION_COMMIT_FIRST = "git.dialog.option.commit_first";
     public static final String GIT_DIALOG_OPTION_COMMIT_FIRST_DESC = "git.dialog.option.commit_first.desc";
@@ -2381,13 +2381,13 @@ public final class MessageKeys {
     public static final String GIT_DIALOG_OPTION_CANCEL_DESC = "git.dialog.option.cancel.desc";
     public static final String GIT_DIALOG_OPTION_FORCE_PULL = "git.dialog.option.force_pull";
     public static final String GIT_DIALOG_OPTION_FORCE_PULL_DESC = "git.dialog.option.force_pull.desc";
-    // 步骤指示器相关
+    // Chỉ báo bước
     public static final String STEP_CHECK_STATUS = "step.checkStatus";
     public static final String STEP_CONFIRM_CHANGE = "step.confirmChange";
     public static final String STEP_EXECUTE_OPERATION = "step.executeOperation";
 
-    // ============ GitOperationDialog 缺失的国际化键 ============
-    // Pull 操作相关选项
+    // ============ Khóa đa ngôn ngữ còn thiếu của GitOperationDialog ============
+    // Tùy chọn thao tác Pull
     public static final String GIT_DIALOG_OPTION_PULL_UNCOMMITTED_AUTO_MERGE_TITLE = "git.dialog.option.pull.uncommittedAutoMerge.title";
     public static final String GIT_DIALOG_OPTION_PULL_UNCOMMITTED_CHOOSE_TITLE = "git.dialog.option.pull.uncommittedChoose.title";
     public static final String GIT_DIALOG_OPTION_COMMIT_FIRST_PULL = "git.dialog.option.commitFirstPull";
@@ -2399,7 +2399,7 @@ public final class MessageKeys {
     public static final String GIT_DIALOG_OPTION_STASH_PULL_DESC = "git.dialog.option.stashPull.desc";
     public static final String GIT_DIALOG_OPTION_FORCE_PULL_LOSE_DESC = "git.dialog.option.forcePull.loseDesc";
 
-    // Push 操作相关选项
+    // Tùy chọn thao tác Push
     public static final String GIT_DIALOG_OPTION_PUSH_CONFLICT_TITLE = "git.dialog.option.push.conflictTitle";
     public static final String GIT_DIALOG_OPTION_CANCEL_EXTERNAL_TOOL = "git.dialog.option.cancelExternalTool";
     public static final String GIT_DIALOG_OPTION_CANCEL_EXTERNAL_TOOL_DESC = "git.dialog.option.cancelExternalTool.desc";
@@ -2411,7 +2411,7 @@ public final class MessageKeys {
     public static final String GIT_DIALOG_OPTION_FORCE_PUSH_OVERWRITE_REMOTE_DESC = "git.dialog.option.forcePushOverwrite.remoteDesc";
     public static final String GIT_DIALOG_OPTION_PUSH_REMOTE_CHOOSE_TITLE = "git.dialog.option.push.remoteChoose.title";
 
-    // 文件变更相关
+    // Thay đổi tệp
     public static final String GIT_DIALOG_FILE_CHANGES_NOT_AVAILABLE = "git.dialog.fileChanges.notAvailable";
     public static final String GIT_DIALOG_LOCAL_CHANGES_TITLE = "git.dialog.localChanges.title";
     public static final String GIT_DIALOG_REMOTE_CHANGES_TITLE = "git.dialog.remoteChanges.title";
@@ -2430,7 +2430,7 @@ public final class MessageKeys {
     public static final String GIT_DIALOG_REMOTE_COPIED_FILES = "git.dialog.remoteCopiedFiles";
     public static final String GIT_DIALOG_NO_REMOTE_CHANGES = "git.dialog.noRemoteChanges";
 
-    // 冲突详情相关
+    // Chi tiết xung đột
     public static final String GIT_DIALOG_CONFLICT_DETAILS_TITLE = "git.dialog.conflictDetails.title";
     public static final String GIT_DIALOG_CONFLICT_FILE = "git.dialog.conflictFile";
     public static final String GIT_DIALOG_CONFLICT_BLOCK = "git.dialog.conflictBlock";
@@ -2441,7 +2441,7 @@ public final class MessageKeys {
     public static final String GIT_DIALOG_NO_CONFLICT_DETAILS = "git.dialog.noConflictDetails";
     public static final String GIT_DIALOG_NO_FILE_CONFLICTS = "git.dialog.noFileConflicts";
 
-    // 操作执行相关
+    // Thực thi thao tác
     public static final String GIT_DIALOG_OPERATION_COMPLETED = "git.dialog.operation.completed";
     public static final String GIT_DIALOG_OPERATION_SUCCESS_MESSAGE = "git.dialog.operation.successMessage";
     public static final String GIT_DIALOG_OPERATION_FAILED = "git.dialog.operation.failed";
@@ -2449,7 +2449,7 @@ public final class MessageKeys {
     public static final String GIT_DIALOG_OPERATION_EXECUTING = "git.dialog.operation.executing";
     public static final String GIT_DIALOG_OPERATION_EXECUTING_PROGRESS = "git.dialog.operation.executingProgress";
 
-    // 各种操作进度消息
+    // Thông báo tiến độ thao tác
     public static final String GIT_DIALOG_PROGRESS_COMMITTING = "git.dialog.progress.committing";
     public static final String GIT_DIALOG_PROGRESS_REMOTE_COMMITS_PULL_FIRST = "git.dialog.progress.remoteCommitsPullFirst";
     public static final String GIT_DIALOG_PROGRESS_COMMIT_DONE_PUSHING = "git.dialog.progress.commitDonePushing";
@@ -2466,11 +2466,11 @@ public final class MessageKeys {
     public static final String GIT_DIALOG_PROGRESS_PULLING_FROM_REMOTE = "git.dialog.progress.pullingFromRemote";
     public static final String GIT_DIALOG_USER_CANCELLED = "git.dialog.userCancelled";
 
-    // 验证相关
+    // Xác thực
     public static final String GIT_DIALOG_VALIDATION_COMMIT_MESSAGE_EMPTY = "git.dialog.validation.commitMessage.empty";
 
-    // ============ GitConflictDetector 国际化 ============
-    // 基本检查错误消息
+    // ============ Đa ngôn ngữ cho GitConflictDetector ============
+    // Thông báo lỗi kiểm tra cơ bản
     public static final String GIT_CONFLICT_DETECTOR_CHECK_FAILED = "git.conflictDetector.checkFailed";
     public static final String GIT_CONFLICT_DETECTOR_NO_REMOTE_REPO = "git.conflictDetector.noRemoteRepo";
     public static final String GIT_CONFLICT_DETECTOR_NO_UPSTREAM_BRANCH = "git.conflictDetector.noUpstreamBranch";
@@ -2479,27 +2479,27 @@ public final class MessageKeys {
     public static final String GIT_CONFLICT_DETECTOR_CANNOT_CHECK_REMOTE = "git.conflictDetector.cannotCheckRemote";
     public static final String GIT_CONFLICT_DETECTOR_CANNOT_COUNT_COMMITS = "git.conflictDetector.cannotCountCommits";
 
-    // 远程仓库状态建议
+    // Gợi ý trạng thái kho mã từ xa
     public static final String GIT_CONFLICT_DETECTOR_REMOTE_REPO_EMPTY = "git.conflictDetector.remoteRepoEmpty";
     public static final String GIT_CONFLICT_DETECTOR_REMOTE_NO_SAME_BRANCH = "git.conflictDetector.remoteNoSameBranch";
     public static final String GIT_CONFLICT_DETECTOR_WAITING_FIRST_PUSH = "git.conflictDetector.waitingFirstPush";
     public static final String GIT_CONFLICT_DETECTOR_REMOTE_HAS_NEW_COMMITS = "git.conflictDetector.remoteHasNewCommits";
 
-    // Init 类型工作区检测
+    // Kiểm tra workspace kiểu Init
     public static final String GIT_CONFLICT_DETECTOR_INIT_REMOTE_BRANCH_EXISTS = "git.conflictDetector.initRemoteBranchExists";
     public static final String GIT_CONFLICT_DETECTOR_INIT_BACKUP_SUGGESTION = "git.conflictDetector.initBackupSuggestion";
     public static final String GIT_CONFLICT_DETECTOR_INIT_SAFE_FIRST_PUSH = "git.conflictDetector.initSafeFirstPush";
     public static final String GIT_CONFLICT_DETECTOR_INIT_CANNOT_GET_REMOTE_INFO = "git.conflictDetector.initCannotGetRemoteInfo";
     public static final String GIT_CONFLICT_DETECTOR_INIT_CHECK_NETWORK_AUTH = "git.conflictDetector.initCheckNetworkAuth";
 
-    // 文件冲突检查相关
+    // Kiểm tra xung đột tệp
     public static final String GIT_CONFLICT_DETECTOR_CHECK_INIT_CONFLICTS_FAILED = "git.conflictDetector.checkInitConflictsFailed";
     public static final String GIT_CONFLICT_DETECTOR_FILE_CONFLICTS_DETECTED = "git.conflictDetector.fileConflictsDetected";
     public static final String GIT_CONFLICT_DETECTOR_CONFLICT_FILES = "git.conflictDetector.conflictFiles";
     public static final String GIT_CONFLICT_DETECTOR_MORE_FILES_CONFLICT = "git.conflictDetector.moreFilesConflict";
     public static final String GIT_CONFLICT_DETECTOR_GIT_MERGE_SUGGESTION = "git.conflictDetector.gitMergeSuggestion";
 
-    // 建议生成相关
+    // Tạo gợi ý
     public static final String GIT_CONFLICT_DETECTOR_UNKNOWN_OPERATION_TYPE = "git.conflictDetector.unknownOperationType";
     public static final String GIT_CONFLICT_DETECTOR_CAN_COMMIT_CHANGES = "git.conflictDetector.canCommitChanges";
     public static final String GIT_CONFLICT_DETECTOR_MODIFIED_FILES_WILL_BE_COMMITTED = "git.conflictDetector.modifiedFilesWillBeCommitted";
@@ -2508,7 +2508,7 @@ public final class MessageKeys {
     public static final String GIT_CONFLICT_DETECTOR_UNCOMMITTED_CHANGES_CANNOT_PUSH = "git.conflictDetector.uncommittedChangesCannotPush";
     public static final String GIT_CONFLICT_DETECTOR_COMMIT_FIRST_THEN_PUSH = "git.conflictDetector.commitFirstThenPush";
 
-    // Push 建议相关
+    // Gợi ý Push
     public static final String GIT_CONFLICT_DETECTOR_DIVERGED_HISTORY = "git.conflictDetector.divergedHistory";
     public static final String GIT_CONFLICT_DETECTOR_LOCAL_AHEAD_COMMITS = "git.conflictDetector.localAheadCommits";
     public static final String GIT_CONFLICT_DETECTOR_REMOTE_AHEAD_COMMITS = "git.conflictDetector.remoteAheadCommits";
@@ -2521,7 +2521,7 @@ public final class MessageKeys {
     public static final String GIT_CONFLICT_DETECTOR_SAFE_PUSH_LOCAL_COMMITS = "git.conflictDetector.safePushLocalCommits";
     public static final String GIT_CONFLICT_DETECTOR_REMOTE_SYNC_AFTER_PUSH = "git.conflictDetector.remoteSyncAfterPush";
 
-    // 首次推送建议相关
+    // Gợi ý lần Push đầu tiên
     public static final String GIT_CONFLICT_DETECTOR_FIRST_PUSH_OVERWRITE_WARNING = "git.conflictDetector.firstPushOverwriteWarning";
     public static final String GIT_CONFLICT_DETECTOR_FILES_MAY_CONFLICT = "git.conflictDetector.filesMayConflict";
     public static final String GIT_CONFLICT_DETECTOR_USE_FORCE_WITH_LEASE = "git.conflictDetector.useForceWithLease";
@@ -2534,7 +2534,7 @@ public final class MessageKeys {
     public static final String GIT_CONFLICT_DETECTOR_PUSH_COMMITS_COUNT = "git.conflictDetector.pushCommitsCount";
     public static final String GIT_CONFLICT_DETECTOR_SET_UPSTREAM_TRACKING = "git.conflictDetector.setUpstreamTracking";
 
-    // Pull 建议相关
+    // Gợi ý Pull
     public static final String GIT_CONFLICT_DETECTOR_CANNOT_PULL_FILE_CONFLICTS = "git.conflictDetector.cannotPullFileConflicts";
     public static final String GIT_CONFLICT_DETECTOR_MANUAL_HANDLE_CONFLICTS = "git.conflictDetector.manualHandleConflicts";
     public static final String GIT_CONFLICT_DETECTOR_BACKUP_LOCAL_FILES = "git.conflictDetector.backupLocalFiles";
@@ -2553,7 +2553,7 @@ public final class MessageKeys {
     public static final String GIT_CONFLICT_DETECTOR_LOCAL_IS_UP_TO_DATE = "git.conflictDetector.localIsUpToDate";
     public static final String GIT_CONFLICT_DETECTOR_SAFE_PULL_REMOTE_COMMITS = "git.conflictDetector.safePullRemoteCommits";
 
-    // 冲突检测相关
+    // Kiểm tra xung đột
     public static final String GIT_CONFLICT_DETECTOR_NO_COMMON_HISTORY = "git.conflictDetector.noCommonHistory";
     public static final String GIT_CONFLICT_DETECTOR_ACTUAL_FILE_CONFLICTS = "git.conflictDetector.actualFileConflicts";
     public static final String GIT_CONFLICT_DETECTOR_CONFLICT_FILES_LIST = "git.conflictDetector.conflictFilesList";
@@ -2561,7 +2561,7 @@ public final class MessageKeys {
     public static final String GIT_CONFLICT_DETECTOR_NON_OVERLAPPING_CHANGES = "git.conflictDetector.nonOverlappingChanges";
     public static final String GIT_CONFLICT_DETECTOR_ONLY_NEW_FILES_SAFE = "git.conflictDetector.onlyNewFilesSafe";
 
-    // 网络代理设置
+    // Cài đặt proxy mạng
     public static final String SETTINGS_PROXY_TITLE = "settings.proxy.title";
     public static final String SETTINGS_PROXY_DESCRIPTION = "settings.proxy.description";
     public static final String SETTINGS_PROXY_ENABLED_TOOLTIP = "settings.proxy.enabled.tooltip";
@@ -2615,7 +2615,7 @@ public final class MessageKeys {
     public static final String NETWORK_ERROR_PROXY_SOCKS_MALFORMED = "network.error.proxy.socks.malformed";
     public static final String NETWORK_ERROR_UNKNOWN_HOST = "network.error.unknown_host";
 
-    // WebDAV 同步设置
+    // Cài đặt đồng bộ WebDAV
     public static final String SETTINGS_WEBDAV_SYNC_TITLE = "settings.webdav_sync.title";
     public static final String SETTINGS_WEBDAV_SYNC_DESCRIPTION = "settings.webdav_sync.description";
     public static final String SETTINGS_WEBDAV_SYNC_ENABLED_CHECKBOX = "settings.webdav_sync.enabled.checkbox";
@@ -2676,7 +2676,7 @@ public final class MessageKeys {
     public static final String SETTINGS_WEBDAV_SYNC_RESTORE_CONFIRM_TITLE = "settings.webdav_sync.restore.confirm.title";
     public static final String SETTINGS_WEBDAV_SYNC_RESTORE_CONFIRM_MESSAGE = "settings.webdav_sync.restore.confirm.message";
 
-    // ============ 工具箱相关 ============
+    // ============ Toolbox ============
     public static final String TOOLBOX_ENCODER = "toolbox.encoder";
     public static final String TOOLBOX_ENCODER_TITLE = "toolbox.encoder.title";
     public static final String TOOLBOX_ENCODER_INPUT = "toolbox.encoder.input";
@@ -2721,7 +2721,7 @@ public final class MessageKeys {
     public static final String TOOLBOX_HASH_UPPERCASE = "toolbox.hash.uppercase";
     public static final String TOOLBOX_HASH_UPPERCASE_TOOLTIP = "toolbox.hash.uppercase.tooltip";
 
-    // ============ JSON 工具相关 ============
+    // ============ Công cụ JSON ============
     public static final String TOOLBOX_JSON = "toolbox.json";
     public static final String TOOLBOX_JSON_FORMAT = "toolbox.json.format";
     public static final String TOOLBOX_JSON_COMPRESS = "toolbox.json.compress";
@@ -2735,7 +2735,7 @@ public final class MessageKeys {
     public static final String TOOLBOX_JSON_OUTPUT = "toolbox.json.output";
     public static final String TOOLBOX_JSON_ERROR = "toolbox.json.error";
 
-    // JSON 工具状态消息
+    // Thông báo trạng thái công cụ JSON
     public static final String TOOLBOX_JSON_STATUS_EMPTY = "toolbox.json.status.empty";
     public static final String TOOLBOX_JSON_STATUS_FORMATTED = "toolbox.json.status.formatted";
     public static final String TOOLBOX_JSON_STATUS_COMPRESSED = "toolbox.json.status.compressed";
@@ -2751,7 +2751,7 @@ public final class MessageKeys {
     public static final String TOOLBOX_JSON_STATUS_OUTPUT_EMPTY = "toolbox.json.status.output_empty";
     public static final String TOOLBOX_JSON_STATUS_NOT_OBJECT = "toolbox.json.status.not_object";
 
-    // JSON 验证相关
+    // JSON Xác thực
     public static final String TOOLBOX_JSON_VALIDATION_EMPTY = "toolbox.json.validation.empty";
     public static final String TOOLBOX_JSON_VALIDATION_VALID = "toolbox.json.validation.valid";
     public static final String TOOLBOX_JSON_VALIDATION_TYPE = "toolbox.json.validation.type";
@@ -2760,7 +2760,7 @@ public final class MessageKeys {
     public static final String TOOLBOX_JSON_VALIDATION_KEYS = "toolbox.json.validation.keys";
     public static final String TOOLBOX_JSON_VALIDATION_ARRAY_LENGTH = "toolbox.json.validation.array_length";
 
-    // JSON 工具提示
+    // Gợi ý công cụ JSON
     public static final String TOOLBOX_JSON_TOOLTIP_FORMAT = "toolbox.json.tooltip.format";
     public static final String TOOLBOX_JSON_TOOLTIP_COMPRESS = "toolbox.json.tooltip.compress";
     public static final String TOOLBOX_JSON_TOOLTIP_VALIDATE = "toolbox.json.tooltip.validate";
@@ -2772,7 +2772,7 @@ public final class MessageKeys {
     public static final String TOOLBOX_JSON_TOOLTIP_CLEAR = "toolbox.json.tooltip.clear";
     public static final String TOOLBOX_JSON_TOOLTIP_SWAP = "toolbox.json.tooltip.swap";
 
-    // ============ YAML / XML 工具相关 ============
+    // ============ Công cụ YAML/XML ============
     public static final String TOOLBOX_YAML = "toolbox.yaml";
     public static final String TOOLBOX_XML = "toolbox.xml";
     public static final String TOOLBOX_QR_CODE = "toolbox.qrcode";
@@ -2811,7 +2811,7 @@ public final class MessageKeys {
     public static final String TOOLBOX_STRUCTURED_CLEARED = "toolbox.structured.status.cleared";
     public static final String TOOLBOX_STRUCTURED_SWAPPED = "toolbox.structured.status.swapped";
 
-    // ============ SQL 工具相关 ============
+    // ============ Công cụ SQL ============
     public static final String TOOLBOX_SQL = "toolbox.sql";
     public static final String TOOLBOX_SQL_FORMAT = "toolbox.sql.format";
     public static final String TOOLBOX_SQL_COMPRESS = "toolbox.sql.compress";
@@ -2834,7 +2834,7 @@ public final class MessageKeys {
     public static final String TOOLBOX_SQL_LINE_BREAK_AND_OR = "toolbox.sql.line_break_and_or";
     public static final String TOOLBOX_SQL_LINE_BREAK_COMMA = "toolbox.sql.line_break_comma";
 
-    // SQL 工具状态消息
+    // Thông báo trạng thái công cụ SQL
     public static final String TOOLBOX_SQL_STATUS_EMPTY = "toolbox.sql.status.empty";
     public static final String TOOLBOX_SQL_STATUS_FORMATTED = "toolbox.sql.status.formatted";
     public static final String TOOLBOX_SQL_STATUS_COMPRESSED = "toolbox.sql.status.compressed";
@@ -2846,7 +2846,7 @@ public final class MessageKeys {
     public static final String TOOLBOX_SQL_STATUS_CLEARED = "toolbox.sql.status.cleared";
     public static final String TOOLBOX_SQL_STATUS_OUTPUT_EMPTY = "toolbox.sql.status.output_empty";
 
-    // SQL 验证相关
+    // SQL Xác thực
     public static final String TOOLBOX_SQL_VALIDATION_EMPTY = "toolbox.sql.validation.empty";
     public static final String TOOLBOX_SQL_VALIDATION_VALID = "toolbox.sql.validation.valid";
     public static final String TOOLBOX_SQL_VALIDATION_ISSUES = "toolbox.sql.validation.issues";
@@ -2864,7 +2864,7 @@ public final class MessageKeys {
     public static final String TOOLBOX_SQL_VALIDATION_EXPECTED_KEYWORD_AFTER = "toolbox.sql.validation.expected_keyword_after";
     public static final String TOOLBOX_SQL_VALIDATION_MISSING_KEYWORD = "toolbox.sql.validation.missing_keyword";
 
-    // SQL 工具提示
+    // Gợi ý công cụ SQL
     public static final String TOOLBOX_SQL_TOOLTIP_FORMAT = "toolbox.sql.tooltip.format";
     public static final String TOOLBOX_SQL_TOOLTIP_COMPRESS = "toolbox.sql.tooltip.compress";
     public static final String TOOLBOX_SQL_TOOLTIP_VALIDATE = "toolbox.sql.tooltip.validate";
@@ -2874,12 +2874,12 @@ public final class MessageKeys {
     public static final String TOOLBOX_SQL_TOOLTIP_SWAP = "toolbox.sql.tooltip.swap";
     public static final String TOOLBOX_SQL_TOOLTIP_SAMPLE = "toolbox.sql.tooltip.sample";
 
-    // SQL 工具按钮文本
+    // Nhãn nút công cụ SQL
     public static final String TOOLBOX_SQL_SAMPLE = "toolbox.sql.sample";
     public static final String TOOLBOX_SQL_STATUS_SAMPLE_LOADED = "toolbox.sql.status.sample_loaded";
     public static final String TOOLBOX_SQL_OUTPUT_INFO_FORMAT = "toolbox.sql.output.info.format";
 
-    // ============ 时间戳工具相关 ============
+    // ============ Công cụ timestamp ============
     public static final String TOOLBOX_TIMESTAMP = "toolbox.timestamp";
     public static final String TOOLBOX_TIMESTAMP_CURRENT = "toolbox.timestamp.current";
     public static final String TOOLBOX_TIMESTAMP_INPUT = "toolbox.timestamp.input";
@@ -2951,44 +2951,10 @@ public final class MessageKeys {
     public static final String TOOLBOX_DIFF_SWAP = "toolbox.diff.swap";
     public static final String TOOLBOX_DIFF_RESULT = "toolbox.diff.result";
 
-    // ============ Elasticsearch 工具相关 ============
+    // ============ Công cụ Elasticsearch ============
     public static final String TOOLBOX_ELASTICSEARCH = "toolbox.elasticsearch";
-    public static final String TOOLBOX_DBPORTAL = "toolbox.dbportal";
-    public static final String TOOLBOX_DBPORTAL_TYPE = "toolbox.dbportal.type";
-    public static final String TOOLBOX_DBPORTAL_URL = "toolbox.dbportal.url";
-    public static final String TOOLBOX_DBPORTAL_DRIVER_CLASS = "toolbox.dbportal.driver_class";
-    public static final String TOOLBOX_DBPORTAL_DRIVER_JAR = "toolbox.dbportal.driver_jar";
-    public static final String TOOLBOX_DBPORTAL_USERNAME = "toolbox.dbportal.username";
-    public static final String TOOLBOX_DBPORTAL_PASSWORD = "toolbox.dbportal.password";
-    public static final String TOOLBOX_DBPORTAL_BROWSE = "toolbox.dbportal.browse";
-    public static final String TOOLBOX_DBPORTAL_CONNECT = "toolbox.dbportal.connect";
-    public static final String TOOLBOX_DBPORTAL_DISCONNECT = "toolbox.dbportal.disconnect";
-    public static final String TOOLBOX_DBPORTAL_OBJECTS = "toolbox.dbportal.objects";
-    public static final String TOOLBOX_DBPORTAL_SUGGESTIONS = "toolbox.dbportal.suggestions";
-    public static final String TOOLBOX_DBPORTAL_INSERT = "toolbox.dbportal.insert";
-    public static final String TOOLBOX_DBPORTAL_EXECUTE = "toolbox.dbportal.execute";
-    public static final String TOOLBOX_DBPORTAL_SQL = "toolbox.dbportal.sql";
-    public static final String TOOLBOX_DBPORTAL_RESULTS = "toolbox.dbportal.results";
-    public static final String TOOLBOX_DBPORTAL_URL_HINT = "toolbox.dbportal.url_hint";
-    public static final String TOOLBOX_DBPORTAL_DRIVER_HINT = "toolbox.dbportal.driver_hint";
-    public static final String TOOLBOX_DBPORTAL_DRIVER_JAR_HINT = "toolbox.dbportal.driver_jar_hint";
-    public static final String TOOLBOX_DBPORTAL_INVALID_URL = "toolbox.dbportal.invalid_url";
-    public static final String TOOLBOX_DBPORTAL_DRIVER_JAR_MISSING = "toolbox.dbportal.driver_jar_missing";
-    public static final String TOOLBOX_DBPORTAL_DRIVER_JAR_INVALID = "toolbox.dbportal.driver_jar_invalid";
-    public static final String TOOLBOX_DBPORTAL_DRIVER_REJECTED_URL = "toolbox.dbportal.driver_rejected_url";
-    public static final String TOOLBOX_DBPORTAL_CONNECTING = "toolbox.dbportal.connecting";
-    public static final String TOOLBOX_DBPORTAL_CONNECTED = "toolbox.dbportal.connected";
-    public static final String TOOLBOX_DBPORTAL_DISCONNECTED = "toolbox.dbportal.disconnected";
-    public static final String TOOLBOX_DBPORTAL_LOADING_OBJECTS = "toolbox.dbportal.loading_objects";
-    public static final String TOOLBOX_DBPORTAL_OBJECTS_LOADED = "toolbox.dbportal.objects_loaded";
-    public static final String TOOLBOX_DBPORTAL_EXECUTING = "toolbox.dbportal.executing";
-    public static final String TOOLBOX_DBPORTAL_QUERY_COMPLETE = "toolbox.dbportal.query_complete";
-    public static final String TOOLBOX_DBPORTAL_UPDATE_COMPLETE = "toolbox.dbportal.update_complete";
-    public static final String TOOLBOX_DBPORTAL_STATEMENT_COMPLETE = "toolbox.dbportal.statement_complete";
-    public static final String TOOLBOX_DBPORTAL_ERROR = "toolbox.dbportal.error";
-    public static final String TOOLBOX_DBPORTAL_AUTOCOMMIT_HINT = "toolbox.dbportal.autocommit_hint";
 
-    // 连接面板
+    // Bảng kết nối
     public static final String TOOLBOX_ES_HOST = "toolbox.es.host";
     public static final String TOOLBOX_ES_HOST_PLACEHOLDER = "toolbox.es.host.placeholder";
     public static final String TOOLBOX_ES_USER = "toolbox.es.user";
@@ -3022,7 +2988,7 @@ public final class MessageKeys {
     public static final String TOOLBOX_ES_STATUS_ERROR = "toolbox.es.status.error";
     public static final String TOOLBOX_ES_RESULT_COPIED = "toolbox.es.result.copied";
     public static final String TOOLBOX_ES_INDEX_LIST_EMPTY = "toolbox.es.index.list_empty";
-    // 索引管理
+    // Quản lý chỉ mục
     public static final String TOOLBOX_ES_INDEX_MANAGEMENT = "toolbox.es.index.management";
     public static final String TOOLBOX_ES_INDEX_TAB = "toolbox.es.index.tab";
     public static final String TOOLBOX_ES_INDEX_DELETE = "toolbox.es.index.delete";
@@ -3050,7 +3016,7 @@ public final class MessageKeys {
     public static final String TOOLBOX_ES_INDEX_VIEW_MAPPING = "toolbox.es.index.view_mapping";
     public static final String TOOLBOX_ES_INDEX_VIEW_SETTINGS = "toolbox.es.index.view_settings";
 
-    // DSL 编辑器
+    // Trình soạn thảo DSL
     public static final String TOOLBOX_ES_LOAD_TEMPLATE = "toolbox.es.load_template";
     public static final String TOOLBOX_ES_FORMAT_JSON = "toolbox.es.format_json";
     public static final String TOOLBOX_ES_COPY_RESULT = "toolbox.es.copy_result";
@@ -3089,7 +3055,7 @@ public final class MessageKeys {
     public static final String TOOLBOX_ES_INDEX_TOOLTIP = "toolbox.es.index.tooltip";
     public static final String TOOLBOX_ES_INDEX_LIST_HINT = "toolbox.es.index.list.hint";
 
-    // ============ InfluxDB 工具相关 ============
+    // ============ Công cụ InfluxDB ============
     public static final String TOOLBOX_INFLUXDB = "toolbox.influxdb";
     public static final String TOOLBOX_INFLUX_PROFILE = "toolbox.influx.profile";
     public static final String TOOLBOX_INFLUX_PROFILE_NEW = "toolbox.influx.profile.new";
@@ -3290,7 +3256,7 @@ public final class MessageKeys {
             "toolbox.cron.desc.week.sat"
     };
 
-    // ============ 本地 Mock Server ============
+    // ============ Mock Server cục bộ ============
     public static final String MOCK_SERVER_TITLE = "mock.server.title";
     public static final String MOCK_SERVER_LIST_TITLE = "mock.server.list.title";
     public static final String MOCK_SERVER_EMPTY_TITLE = "mock.server.empty.title";
@@ -3397,7 +3363,7 @@ public final class MessageKeys {
     public static final String MOCK_SERVER_ROUTE_EDIT_STANDALONE = "mock.server.route.edit_standalone";
     public static final String MOCK_SERVER_ROUTE_DELETE_STANDALONE = "mock.server.route.delete_standalone";
 
-    // ============ 客户端证书相关 ============
+    // ============ Chứng chỉ máy khách ============
     public static final String CERT_TITLE = "cert.title";
     public static final String CERT_ADD = "cert.add";
     public static final String CERT_EDIT = "cert.edit";

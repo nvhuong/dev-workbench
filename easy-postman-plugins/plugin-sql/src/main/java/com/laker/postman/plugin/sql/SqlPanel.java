@@ -1,11 +1,9 @@
-package com.laker.postman.panel.toolbox;
+package com.laker.postman.plugin.sql;
 
 import com.formdev.flatlaf.FlatClientProperties;
 import com.laker.postman.common.component.ToolWindowSurfaceStyle;
 import com.laker.postman.util.EditorThemeUtil;
 import com.laker.postman.util.FontsUtil;
-import com.laker.postman.util.I18nUtil;
-import com.laker.postman.util.MessageKeys;
 import lombok.extern.slf4j.Slf4j;
 import net.miginfocom.swing.MigLayout;
 import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
@@ -49,7 +47,7 @@ import java.util.ServiceLoader;
 
 /** JDBC workbench for connecting to databases, exploring metadata, and executing SQL. */
 @Slf4j
-public class DbPortalPanel extends JPanel {
+public class SqlPanel extends JPanel {
     private static final int QUERY_TIMEOUT_SECONDS = 30;
     private static final int MAX_RESULT_ROWS = 500;
     private static final List<String> SQL_SUGGESTIONS = List.of(
@@ -81,16 +79,16 @@ public class DbPortalPanel extends JPanel {
     private List<String> metadataSuggestions = new ArrayList<>();
     private DatabasePreset previousPreset = DatabasePreset.GENERIC;
 
-    public DbPortalPanel() {
+    public SqlPanel() {
         initUI();
     }
 
     private void initUI() {
-        ToolboxWorkbench.applyRoot(this);
+        SqlWorkbench.applyRoot(this);
         add(createConnectionPanel(), BorderLayout.NORTH);
         add(createWorkbench(), BorderLayout.CENTER);
         status.setFont(FontsUtil.getDefaultFontWithOffset(Font.PLAIN, -2));
-        add(ToolboxWorkbench.statusBar(status), BorderLayout.SOUTH);
+        add(SqlWorkbench.statusBar(status), BorderLayout.SOUTH);
         updateConnectionControls(false);
         databaseType.addActionListener(event -> applyPreset());
         applyPreset();
@@ -102,35 +100,35 @@ public class DbPortalPanel extends JPanel {
                 "[]4[]4[]4[]4[]"));
         panel.setOpaque(false);
 
-        connectButton = new JButton(I18nUtil.getMessage(MessageKeys.TOOLBOX_DBPORTAL_CONNECT));
-        disconnectButton = new JButton(I18nUtil.getMessage(MessageKeys.TOOLBOX_DBPORTAL_DISCONNECT));
-        browseDriverButton = new JButton(I18nUtil.getMessage(MessageKeys.TOOLBOX_DBPORTAL_BROWSE));
+        connectButton = new JButton(SqlI18n.t("connect"));
+        disconnectButton = new JButton(SqlI18n.t("disconnect"));
+        browseDriverButton = new JButton(SqlI18n.t("browse"));
         connectButton.addActionListener(event -> connect());
         disconnectButton.addActionListener(event -> disconnect());
         browseDriverButton.addActionListener(event -> chooseDriverJar());
         jdbcUrl.putClientProperty(FlatClientProperties.PLACEHOLDER_TEXT,
-                I18nUtil.getMessage(MessageKeys.TOOLBOX_DBPORTAL_URL_HINT));
+                SqlI18n.t("url_hint"));
         driverClass.putClientProperty(FlatClientProperties.PLACEHOLDER_TEXT,
-                I18nUtil.getMessage(MessageKeys.TOOLBOX_DBPORTAL_DRIVER_HINT));
+                SqlI18n.t("driver_hint"));
         driverJar.putClientProperty(FlatClientProperties.PLACEHOLDER_TEXT,
-                I18nUtil.getMessage(MessageKeys.TOOLBOX_DBPORTAL_DRIVER_JAR_HINT));
+                SqlI18n.t("driver_jar_hint"));
 
-        panel.add(label(MessageKeys.TOOLBOX_DBPORTAL_TYPE));
+        panel.add(label("type"));
         panel.add(databaseType, "wmin 120");
-        panel.add(label(MessageKeys.TOOLBOX_DBPORTAL_URL));
+        panel.add(label("url"));
         panel.add(jdbcUrl, "span 5, growx, wmin 240, wrap");
-        panel.add(label(MessageKeys.TOOLBOX_DBPORTAL_DRIVER_CLASS));
+        panel.add(label("driver_class"));
         panel.add(driverClass, "span 7, growx, wrap");
-        panel.add(label(MessageKeys.TOOLBOX_DBPORTAL_DRIVER_JAR));
+        panel.add(label("driver_jar"));
         panel.add(driverJar, "span 5, growx");
         panel.add(browseDriverButton, "span 2, wrap");
-        panel.add(label(MessageKeys.TOOLBOX_DBPORTAL_USERNAME));
+        panel.add(label("username"));
         panel.add(username, "wmin 100");
-        panel.add(label(MessageKeys.TOOLBOX_DBPORTAL_PASSWORD));
+        panel.add(label("password"));
         panel.add(password, "wmin 100");
         panel.add(connectButton, "split 2");
         panel.add(disconnectButton, "wrap");
-        JLabel autocommitHint = new JLabel(I18nUtil.getMessage(MessageKeys.TOOLBOX_DBPORTAL_AUTOCOMMIT_HINT));
+        JLabel autocommitHint = new JLabel(SqlI18n.t("autocommit_hint"));
         autocommitHint.setFont(FontsUtil.getDefaultFontWithOffset(Font.PLAIN, -2));
         panel.add(autocommitHint, "span 8, wrap");
         return panel;
@@ -141,9 +139,9 @@ public class DbPortalPanel extends JPanel {
         browser.setOpaque(false);
         JPanel browserHeader = new JPanel(new BorderLayout(4, 0));
         browserHeader.setOpaque(false);
-        browserHeader.add(ToolboxWorkbench.sectionTitle(
-                I18nUtil.getMessage(MessageKeys.TOOLBOX_DBPORTAL_OBJECTS)), BorderLayout.CENTER);
-        refreshObjectsButton = new JButton(I18nUtil.getMessage(MessageKeys.BUTTON_REFRESH));
+        browserHeader.add(SqlWorkbench.sectionTitle(
+                SqlI18n.t("objects")), BorderLayout.CENTER);
+        refreshObjectsButton = new JButton(SqlI18n.t("refresh"));
         refreshObjectsButton.addActionListener(event -> loadMetadata());
         browserHeader.add(refreshObjectsButton, BorderLayout.EAST);
         browser.add(browserHeader, BorderLayout.NORTH);
@@ -169,12 +167,12 @@ public class DbPortalPanel extends JPanel {
         editor.setOpaque(false);
         JPanel editorToolbar = new JPanel(new MigLayout("insets 0, novisualpadding, gapx 6", "[][grow,fill][]", "[]"));
         editorToolbar.setOpaque(false);
-        editorToolbar.add(label(MessageKeys.TOOLBOX_DBPORTAL_SUGGESTIONS));
+        editorToolbar.add(label("suggestions"));
         suggestions.setEditable(false);
         editorToolbar.add(suggestions, "wmin 100");
-        JButton insertSuggestion = new JButton(I18nUtil.getMessage(MessageKeys.TOOLBOX_DBPORTAL_INSERT));
+        JButton insertSuggestion = new JButton(SqlI18n.t("insert"));
         insertSuggestion.addActionListener(event -> insertSelectedSuggestion());
-        executeButton = new JButton(I18nUtil.getMessage(MessageKeys.TOOLBOX_DBPORTAL_EXECUTE));
+        executeButton = new JButton(SqlI18n.t("execute"));
         executeButton.addActionListener(event -> executeSql());
         editorToolbar.add(insertSuggestion, "split 2");
         editorToolbar.add(executeButton);
@@ -187,19 +185,19 @@ public class DbPortalPanel extends JPanel {
         EditorThemeUtil.loadTheme(sqlEditor);
         JScrollPane sqlScroll = new JScrollPane(sqlEditor);
         ToolWindowSurfaceStyle.applyFramedScrollPaneCard(sqlScroll);
-        JPanel sqlSection = ToolboxWorkbench.editorSection(I18nUtil.getMessage(MessageKeys.TOOLBOX_DBPORTAL_SQL), sqlScroll);
+        JPanel sqlSection = SqlWorkbench.editorSection(SqlI18n.t("sql"), sqlScroll);
         JScrollPane resultScroll = new JScrollPane(resultTable);
         ToolWindowSurfaceStyle.applyFramedScrollPaneCard(resultScroll);
-        JPanel resultSection = ToolboxWorkbench.editorSection(
-                I18nUtil.getMessage(MessageKeys.TOOLBOX_DBPORTAL_RESULTS), resultScroll);
+        JPanel resultSection = SqlWorkbench.editorSection(
+                SqlI18n.t("results"), resultScroll);
         resultTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
         resultTable.setFillsViewportHeight(true);
-        JSplitPane verticalSplit = ToolboxWorkbench.editorSplit(sqlSection, resultSection, 180);
+        JSplitPane verticalSplit = SqlWorkbench.editorSplit(sqlSection, resultSection, 180);
         verticalSplit.setOrientation(JSplitPane.VERTICAL_SPLIT);
         verticalSplit.setResizeWeight(0.45);
         editor.add(verticalSplit, BorderLayout.CENTER);
 
-        JSplitPane split = ToolboxWorkbench.horizontalSplit(browser, editor, 220);
+        JSplitPane split = SqlWorkbench.horizontalSplit(browser, editor, 220);
         split.setResizeWeight(0.23);
         JPanel host = new JPanel(new BorderLayout());
         host.setOpaque(false);
@@ -209,7 +207,7 @@ public class DbPortalPanel extends JPanel {
     }
 
     private JLabel label(String key) {
-        return new JLabel(I18nUtil.getMessage(key) + ":");
+        return new JLabel(SqlI18n.t(key) + ":");
     }
 
     private void applyPreset() {
@@ -228,7 +226,7 @@ public class DbPortalPanel extends JPanel {
         JFileChooser chooser = new JFileChooser();
         chooser.setMultiSelectionEnabled(true);
         chooser.setFileFilter(new javax.swing.filechooser.FileNameExtensionFilter(
-                I18nUtil.getMessage(MessageKeys.TOOLBOX_DBPORTAL_DRIVER_JAR), "jar"));
+                SqlI18n.t("driver_jar"), "jar"));
         if (chooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
             java.io.File[] selectedFiles = chooser.getSelectedFiles();
             if (selectedFiles.length == 0 && chooser.getSelectedFile() != null) {
@@ -243,10 +241,10 @@ public class DbPortalPanel extends JPanel {
     private void connect() {
         String url = jdbcUrl.getText().trim();
         if (url.isBlank() || !url.startsWith("jdbc:")) {
-            setStatus(I18nUtil.getMessage(MessageKeys.TOOLBOX_DBPORTAL_INVALID_URL));
+            setStatus(SqlI18n.t("invalid_url"));
             return;
         }
-        setStatus(I18nUtil.getMessage(MessageKeys.TOOLBOX_DBPORTAL_CONNECTING));
+        setStatus(SqlI18n.t("connecting"));
         connectButton.setEnabled(false);
         setConnectionFieldsEnabled(false);
         new SwingWorker<Connection, Void>() {
@@ -260,19 +258,17 @@ public class DbPortalPanel extends JPanel {
                             .map(Path::of)
                             .peek(path -> {
                                 if (!path.toFile().isFile()) {
-                                    throw new IllegalArgumentException(I18nUtil.getMessage(
-                                            MessageKeys.TOOLBOX_DBPORTAL_DRIVER_JAR_MISSING, path.getFileName()));
+                                    throw new IllegalArgumentException(SqlI18n.t("driver_jar_missing", path.getFileName()));
                                 }
                             })
                             .map(path -> {
                                 try { return path.toUri().toURL(); }
                                 catch (Exception exception) {
-                                    throw new IllegalArgumentException(I18nUtil.getMessage(
-                                            MessageKeys.TOOLBOX_DBPORTAL_DRIVER_JAR_INVALID));
+                                    throw new IllegalArgumentException(SqlI18n.t("driver_jar_invalid"));
                                 }
                             })
                             .toArray(URL[]::new);
-                    loader = new URLClassLoader(jars, DbPortalPanel.class.getClassLoader());
+                    loader = new URLClassLoader(jars, SqlPanel.class.getClassLoader());
                 }
                 try {
                     Driver driver = loadDriver(loader, driverClass.getText().trim(), url);
@@ -283,9 +279,8 @@ public class DbPortalPanel extends JPanel {
                     Connection opened = driver == null
                             ? DriverManager.getConnection(url, properties)
                             : driver.connect(url, properties);
-                    if (opened == null) throw new IllegalArgumentException(I18nUtil.getMessage(
-                            MessageKeys.TOOLBOX_DBPORTAL_DRIVER_REJECTED_URL));
-                    synchronized (DbPortalPanel.this) {
+                    if (opened == null) throw new IllegalArgumentException(SqlI18n.t("driver_rejected_url"));
+                    synchronized (SqlPanel.this) {
                         closeResources();
                         driverClassLoader = loader;
                         loader = null;
@@ -301,13 +296,13 @@ public class DbPortalPanel extends JPanel {
                     connection = get();
                     password.setText("");
                     updateConnectionControls(true);
-                    setStatus(I18nUtil.getMessage(MessageKeys.TOOLBOX_DBPORTAL_CONNECTED));
+                    setStatus(SqlI18n.t("connected"));
                     loadMetadata();
                 } catch (Exception exception) {
                     updateConnectionControls(false);
                     Throwable cause = exception.getCause() == null ? exception : exception.getCause();
                     log.warn("JDBC connection failed: {}", cause.getClass().getSimpleName());
-                    setStatus(I18nUtil.getMessage(MessageKeys.TOOLBOX_DBPORTAL_ERROR, safeMessage(cause)));
+                    setStatus(SqlI18n.t("error", safeMessage(cause)));
                 }
             }
         }.execute();
@@ -315,7 +310,7 @@ public class DbPortalPanel extends JPanel {
 
     private Driver loadDriver(ClassLoader loader, String className, String url) throws Exception {
         if (!className.isBlank()) {
-            ClassLoader effectiveLoader = loader == null ? DbPortalPanel.class.getClassLoader() : loader;
+            ClassLoader effectiveLoader = loader == null ? SqlPanel.class.getClassLoader() : loader;
             return (Driver) Class.forName(className, true, effectiveLoader).getDeclaredConstructor().newInstance();
         }
         if (loader != null) {
@@ -331,7 +326,7 @@ public class DbPortalPanel extends JPanel {
         if (active == null) return;
         executeButton.setEnabled(false);
         refreshObjectsButton.setEnabled(false);
-        setStatus(I18nUtil.getMessage(MessageKeys.TOOLBOX_DBPORTAL_LOADING_OBJECTS));
+        setStatus(SqlI18n.t("loading_objects"));
         new SwingWorker<MetadataSnapshot, Void>() {
             @Override protected MetadataSnapshot doInBackground() throws Exception {
                 return readMetadata(active);
@@ -350,13 +345,12 @@ public class DbPortalPanel extends JPanel {
                     }
                     metadataSuggestions = snapshot.suggestions();
                     refreshSuggestions();
-                    setStatus(I18nUtil.getMessage(MessageKeys.TOOLBOX_DBPORTAL_OBJECTS_LOADED,
-                            snapshot.tableCount(), snapshot.schemaCount()));
+                    setStatus(SqlI18n.t("objects_loaded", snapshot.tableCount(), snapshot.schemaCount()));
                 } catch (Exception exception) {
                     executeButton.setEnabled(true);
                     refreshObjectsButton.setEnabled(true);
                     Throwable cause = exception.getCause() == null ? exception : exception.getCause();
-                    setStatus(I18nUtil.getMessage(MessageKeys.TOOLBOX_DBPORTAL_ERROR, safeMessage(cause)));
+                    setStatus(SqlI18n.t("error", safeMessage(cause)));
                 }
             }
         }.execute();
@@ -459,7 +453,7 @@ public class DbPortalPanel extends JPanel {
         String sql = sqlEditor.getText().trim();
         if (active == null || sql.isBlank()) return;
         executeButton.setEnabled(false);
-        setStatus(I18nUtil.getMessage(MessageKeys.TOOLBOX_DBPORTAL_EXECUTING));
+        setStatus(SqlI18n.t("executing"));
         new SwingWorker<QueryResult, Void>() {
             @Override protected QueryResult doInBackground() throws Exception {
                 try (Statement statement = active.createStatement()) {
@@ -493,16 +487,15 @@ public class DbPortalPanel extends JPanel {
                     resultModel.setColumnIdentifiers(result.columns().toArray());
                     for (Object[] row : result.rows()) resultModel.addRow(row);
                     if (result.hasRows()) {
-                        setStatus(I18nUtil.getMessage(MessageKeys.TOOLBOX_DBPORTAL_QUERY_COMPLETE,
-                                result.count(), MAX_RESULT_ROWS));
+                        setStatus(SqlI18n.t("query_complete", result.count(), MAX_RESULT_ROWS));
                     } else if (result.count() < 0) {
-                        setStatus(I18nUtil.getMessage(MessageKeys.TOOLBOX_DBPORTAL_STATEMENT_COMPLETE));
+                        setStatus(SqlI18n.t("statement_complete"));
                     } else {
-                        setStatus(I18nUtil.getMessage(MessageKeys.TOOLBOX_DBPORTAL_UPDATE_COMPLETE, result.count()));
+                        setStatus(SqlI18n.t("update_complete", result.count()));
                     }
                 } catch (Exception exception) {
                     Throwable cause = exception.getCause() == null ? exception : exception.getCause();
-                    setStatus(I18nUtil.getMessage(MessageKeys.TOOLBOX_DBPORTAL_ERROR, safeMessage(cause)));
+                    setStatus(SqlI18n.t("error", safeMessage(cause)));
                 }
             }
         }.execute();
@@ -523,9 +516,9 @@ public class DbPortalPanel extends JPanel {
             metadataSuggestions = new ArrayList<>();
             refreshSuggestions();
             updateConnectionControls(false);
-            setStatus(I18nUtil.getMessage(MessageKeys.TOOLBOX_DBPORTAL_DISCONNECTED));
+            setStatus(SqlI18n.t("disconnected"));
         } catch (Exception exception) {
-            setStatus(I18nUtil.getMessage(MessageKeys.TOOLBOX_DBPORTAL_ERROR, safeMessage(exception)));
+            setStatus(SqlI18n.t("error", safeMessage(exception)));
         }
     }
 

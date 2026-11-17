@@ -28,13 +28,13 @@ import java.util.Map;
 import java.util.function.Supplier;
 
 /**
- * 工具箱面板 - 左侧导航栏 + 右侧内容区（CardLayout）
+ * Bảng công cụ với thanh điều hướng bên trái và vùng nội dung CardLayout bên phải.
  * <p>
- * 交互设计：
- * - 左侧导航支持分组展示、搜索过滤（复用 SearchTextField 组件）
- * - 左右宽度可拖动调整
- * - 选中项高亮使用项目主色 ModernColors.getPrimary()
- * - 图标统一使用 IconUtil 管理
+ * Thiết kế tương tác:
+ * - Điều hướng bên trái hỗ trợ nhóm và lọc tìm kiếm bằng SearchTextField.
+ * - Có thể kéo để điều chỉnh độ rộng hai bên.
+ * - Mục được chọn dùng màu chính ModernColors.getPrimary() để làm nổi bật.
+ * - Icon được quản lý thống nhất bằng IconUtil.
  */
 @Slf4j
 public class ToolboxPanel extends UiSingletonPanel {
@@ -137,7 +137,7 @@ public class ToolboxPanel extends UiSingletonPanel {
         ToolWindowSurfaceStyle.applyBackground(this);
         registerAllTools();
 
-        // ---- 左侧：搜索框 + 导航列表 ----
+        // ---- Bên trái: ô tìm kiếm và danh sách điều hướng ----
         navPanel = new JPanel();
         ToolWindowSurfaceStyle.applyCard(navPanel);
         navPanel.setLayout(new BoxLayout(navPanel, BoxLayout.Y_AXIS));
@@ -148,8 +148,8 @@ public class ToolboxPanel extends UiSingletonPanel {
         ToolWindowSurfaceStyle.applyScrollPaneCard(navScroll);
         navScroll.getVerticalScrollBar().setUnitIncrement(16);
 
-        // 复用项目 SearchTextField（带搜索图标、清除按钮、无结果红框）
-        // 工具箱搜索不需要大小写/整词按钮，移除 trailing 组件使其更简洁
+        // Dùng lại SearchTextField của ứng dụng (có icon tìm kiếm, nút xóa và viền đỏ khi không có kết quả).
+        // Tìm kiếm trong toolbox không cần nút phân biệt hoa thường/toàn từ; bỏ các thành phần phụ để giao diện gọn hơn.
         searchField = new SearchTextField();
         searchField.putClientProperty(FlatClientProperties.TEXT_FIELD_TRAILING_COMPONENT, null);
         searchField.getDocument().addDocumentListener(new javax.swing.event.DocumentListener() {
@@ -173,13 +173,13 @@ public class ToolboxPanel extends UiSingletonPanel {
         leftPanel.add(new ToolWindowSidebarToolbar(null, searchField), BorderLayout.NORTH);
         leftPanel.add(navScroll, BorderLayout.CENTER);
 
-        // ---- 右侧：CardLayout 内容区 ----
+        // ---- Bên phải: vùng nội dung CardLayout ----
         cardLayout = new CardLayout();
         contentArea = new JPanel(cardLayout);
         ToolWindowSurfaceStyle.applyCard(contentArea);
         contentArea.setMinimumSize(new Dimension(200, 0));
 
-        // 可拖动分割线，左右两侧使用独立圆角卡片，和主请求区保持一致。
+        // Thanh chia có thể kéo; hai bên dùng thẻ bo góc riêng, đồng nhất với vùng yêu cầu chính.
         JSplitPane split = AppToolWindowChrome.createHorizontalCardSplitPane(
                 leftPanel,
                 contentArea,
@@ -187,31 +187,30 @@ public class ToolboxPanel extends UiSingletonPanel {
         );
         add(split, BorderLayout.CENTER);
 
-        applyFilter(); // 初始渲染并选中第一个
+        applyFilter(); // Hiển thị ban đầu và chọn công cụ đầu tiên
     }
 
-    // ===== 注册所有工具 =====
+    // ===== Đăng ký các công cụ =====
     private void registerAllTools() {
-        // 格式化
+        // Định dạng
         regBuiltIn("json", MessageKeys.TOOLBOX_JSON, "icons/json-file.svg", GRP_FORMAT, JsonToolPanel::new);
         regBuiltIn("yaml", MessageKeys.TOOLBOX_YAML, "icons/yaml-file.svg", GRP_FORMAT, YamlToolPanel::new);
         regBuiltIn("xml", MessageKeys.TOOLBOX_XML, "icons/xml-file.svg", GRP_FORMAT, XmlToolPanel::new);
-        regBuiltIn("sql", MessageKeys.TOOLBOX_SQL, "icons/database.svg", GRP_FORMAT, SqlToolPanel::new);
+        regBuiltIn("sql-format", MessageKeys.TOOLBOX_SQL, "icons/database.svg", GRP_FORMAT, SqlToolPanel::new);
         regBuiltIn("markdown", "toolbox.markdown", "icons/edit.svg", GRP_FORMAT, MarkdownToolPanel::new);
-        // 转换
+        // Chuyển đổi
         regBuiltIn("encoder", MessageKeys.TOOLBOX_ENCODER, "icons/code.svg", GRP_CONVERT, EncoderPanel::new);
         regBuiltIn("timestamp", MessageKeys.TOOLBOX_TIMESTAMP, "icons/time.svg", GRP_CONVERT, TimestampPanel::new);
         regBuiltIn("crypto", MessageKeys.TOOLBOX_CRYPTO, "icons/security.svg", GRP_CONVERT, CryptoPanel::new);
-        // 生成
+        // Tạo dữ liệu
         regBuiltIn("uuid", MessageKeys.TOOLBOX_UUID, "icons/plus.svg", GRP_GEN, UuidPanel::new);
         regBuiltIn("qrcode", MessageKeys.TOOLBOX_QR_CODE, "icons/qrcode.svg", GRP_GEN, QrCodePanel::new);
         regBuiltIn("hash", MessageKeys.TOOLBOX_HASH, "icons/hash.svg", GRP_GEN, HashPanel::new);
         regBuiltIn("cron", MessageKeys.TOOLBOX_CRON, "icons/time.svg", GRP_GEN, CronPanel::new);
-        // 数据库
+        // Cơ sở dữ liệu
         regBuiltIn("es", MessageKeys.TOOLBOX_ELASTICSEARCH, "icons/elasticsearch.svg", GRP_DB, ElasticsearchPanel::new);
         regBuiltIn("influxdb", MessageKeys.TOOLBOX_INFLUXDB, "icons/influxdb.svg", GRP_DB, InfluxDbPanel::new);
-        regBuiltIn("dbportal", MessageKeys.TOOLBOX_DBPORTAL, "icons/database.svg", GRP_DB, DbPortalPanel::new);
-        // 开发
+        // Công cụ phát triển
         regBuiltIn("diff", MessageKeys.TOOLBOX_DIFF, "icons/file.svg", GRP_DEV, DiffPanel::new);
         registerPluginTools();
     }
@@ -257,7 +256,7 @@ public class ToolboxPanel extends UiSingletonPanel {
         };
     }
 
-    // ===== 搜索过滤 =====
+    // ===== Lọc tìm kiếm =====
     private void applyFilter() {
         String kw = searchField.getText().trim().toLowerCase();
         filtered.clear();
@@ -267,7 +266,7 @@ public class ToolboxPanel extends UiSingletonPanel {
                 filtered.add(t);
             }
         }
-        // 无匹配时红框提示（SearchTextField 已有此能力）
+        // Hiện viền đỏ khi không có kết quả (SearchTextField đã hỗ trợ).
         searchField.setNoResult(!kw.isEmpty() && filtered.isEmpty());
         rebuildNav();
         boolean selVisible = filtered.stream().anyMatch(t -> t.id().equals(selectedId));
@@ -277,7 +276,7 @@ public class ToolboxPanel extends UiSingletonPanel {
         }
     }
 
-    // ===== 重建左侧导航 =====
+    // ===== Dựng lại thanh điều hướng bên trái =====
     private void rebuildNav() {
         navPanel.removeAll();
         navPanel.add(Box.createVerticalStrut(4));
@@ -317,7 +316,7 @@ public class ToolboxPanel extends UiSingletonPanel {
         navPanel.repaint();
     }
 
-    // ===== 构建单个导航项 =====
+    // ===== Tạo một mục điều hướng =====
     private JPanel buildNavItem(ToolEntry t) {
         boolean sel = t.id().equals(selectedId);
 
@@ -340,7 +339,7 @@ public class ToolboxPanel extends UiSingletonPanel {
         item.setAlignmentX(Component.LEFT_ALIGNMENT);
         item.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 
-        // 选中：PRIMARY 色图标；未选中：主题色图标（IconUtil 统一管理）
+        // Mục được chọn dùng icon màu PRIMARY; mục khác dùng màu theo chủ đề (IconUtil quản lý thống nhất).
         FlatSVGIcon icon = sel
                 ? IconUtil.createPrimary(t.iconPath(), IconUtil.SIZE_SMALL, IconUtil.SIZE_SMALL, t.iconClassLoader())
                 : IconUtil.createThemed(t.iconPath(), IconUtil.SIZE_SMALL, IconUtil.SIZE_SMALL, t.iconClassLoader());
@@ -377,7 +376,7 @@ public class ToolboxPanel extends UiSingletonPanel {
         return item;
     }
 
-    // ===== 选中工具 =====
+    // ===== Chọn công cụ =====
     private void selectTool(String id) {
         showTool(id);
     }
@@ -413,7 +412,7 @@ public class ToolboxPanel extends UiSingletonPanel {
 
     @Override
     protected void registerListeners() {
-        // 主题切换时刷新导航颜色（图标色、高亮色跟随主题）
+        // Cập nhật màu điều hướng khi đổi chủ đề để icon và màu nhấn đi theo chủ đề.
         UIManager.addPropertyChangeListener(e -> {
             if ("lookAndFeel".equals(e.getPropertyName())) {
                 SwingUtilities.invokeLater(this::rebuildNav);
