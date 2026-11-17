@@ -194,6 +194,8 @@ public class ToolboxPanel extends UiSingletonPanel {
     private void registerAllTools() {
         // 格式化
         regBuiltIn("json", MessageKeys.TOOLBOX_JSON, "icons/format.svg", GRP_FORMAT, JsonToolPanel::new);
+        regBuiltIn("yaml", MessageKeys.TOOLBOX_YAML, "icons/format.svg", GRP_FORMAT, YamlToolPanel::new);
+        regBuiltIn("xml", MessageKeys.TOOLBOX_XML, "icons/format.svg", GRP_FORMAT, XmlToolPanel::new);
         regBuiltIn("sql", MessageKeys.TOOLBOX_SQL, "icons/database.svg", GRP_FORMAT, SqlToolPanel::new);
         regBuiltIn("markdown", "toolbox.markdown", "icons/edit.svg", GRP_FORMAT, MarkdownToolPanel::new);
         // 转换

@@ -2768,6 +2768,28 @@ public final class MessageKeys {
     public static final String TOOLBOX_JSON_TOOLTIP_CLEAR = "toolbox.json.tooltip.clear";
     public static final String TOOLBOX_JSON_TOOLTIP_SWAP = "toolbox.json.tooltip.swap";
 
+    // ============ YAML / XML 工具相关 ============
+    public static final String TOOLBOX_YAML = "toolbox.yaml";
+    public static final String TOOLBOX_XML = "toolbox.xml";
+    public static final String TOOLBOX_YAML_INPUT = "toolbox.yaml.input";
+    public static final String TOOLBOX_XML_INPUT = "toolbox.xml.input";
+    public static final String TOOLBOX_STRUCTURED_OUTPUT = "toolbox.structured.output";
+    public static final String TOOLBOX_STRUCTURED_ERROR = "toolbox.structured.error";
+    public static final String TOOLBOX_STRUCTURED_EMPTY = "toolbox.structured.empty";
+    public static final String TOOLBOX_STRUCTURED_OUTPUT_EMPTY = "toolbox.structured.output.empty";
+    public static final String TOOLBOX_YAML_VALID = "toolbox.yaml.valid";
+    public static final String TOOLBOX_XML_VALID = "toolbox.xml.valid";
+    public static final String TOOLBOX_YAML_INVALID = "toolbox.yaml.invalid";
+    public static final String TOOLBOX_XML_INVALID = "toolbox.xml.invalid";
+    public static final String TOOLBOX_STRUCTURED_FORMATTED = "toolbox.structured.status.formatted";
+    public static final String TOOLBOX_STRUCTURED_COMPRESSED = "toolbox.structured.status.compressed";
+    public static final String TOOLBOX_STRUCTURED_STATUS_VALID = "toolbox.structured.status.valid";
+    public static final String TOOLBOX_STRUCTURED_STATUS_INVALID = "toolbox.structured.status.invalid";
+    public static final String TOOLBOX_STRUCTURED_COPIED = "toolbox.structured.status.copied";
+    public static final String TOOLBOX_STRUCTURED_PASTED = "toolbox.structured.status.pasted";
+    public static final String TOOLBOX_STRUCTURED_CLEARED = "toolbox.structured.status.cleared";
+    public static final String TOOLBOX_STRUCTURED_SWAPPED = "toolbox.structured.status.swapped";
+
     // ============ SQL 工具相关 ============
     public static final String TOOLBOX_SQL = "toolbox.sql";
     public static final String TOOLBOX_SQL_FORMAT = "toolbox.sql.format";
