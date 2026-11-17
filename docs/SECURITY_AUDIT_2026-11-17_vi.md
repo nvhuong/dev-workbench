@@ -5,15 +5,16 @@ Phạm vi: source và artifact Maven/JAR hiện có trong workspace EasyPostman.
 
 ## Kết luận
 
-Rà soát tĩnh hiện tại **chưa phát hiện dấu hiệu rõ ràng** về mã độc hoặc hành vi âm thầm gửi dữ liệu người dùng tới máy chủ không liên quan. Đây không phải chứng nhận an toàn tuyệt đối: rà soát tĩnh không thể chứng minh một chương trình không có mã độc, và một số class thư viện chưa được decompile thủ công từng file.
+Sau khi decompile toàn bộ class trong 7 artifact đóng gói và rà thủ công các đường thực thi nhạy cảm, **chưa thấy bằng chứng đánh cắp dữ liệu hoặc kết nối bí mật tới máy chủ không liên quan**. Đây là kết luận dựa trên rà soát tĩnh; không thể chứng minh tuyệt đối rằng phần mềm không có mã độc, và báo cáo nêu rõ phần nào đã đọc theo luồng hành vi thay vì đọc từng dòng của hàng chục nghìn file thư viện.
 
 ## Phạm vi đã kiểm tra
 
 - Source Java của app và plugin: khoảng 863 file (773 trong app và 90 trong plugin source), rà các điểm dùng mạng, socket, tiến trình, class loading, file và cập nhật.
-- Artifact JAR hiện diện: 18 file JAR, tổng cộng khoảng 51.622 class; gồm app uber-JAR, các module, plugin manager và 5 plugin đóng gói.
-- App uber-JAR có 27.098 class, trong đó 2.273 class của EasyPostman và khoảng 24.825 class thư viện bên thứ ba.
-- Đã tạo inventory dependency Maven cho host app, dò URL/hằng chuỗi trong class, và decompile bằng CFR 0.152. Tại thời điểm ghi báo cáo, CFR đã xuất 1.913 class thư viện từ app uber-JAR; decompile toàn bộ 24.825 class thư viện app chưa hoàn tất. Source của EasyPostman đã được rà bằng API/hành vi nhạy cảm; class thư viện có API mạng/file/process được tính là khả năng chức năng, không coi marker đơn lẻ là kết luận malware.
-- Artifact JAR SHA-256 được ghi ở phần cuối để đối chiếu đúng file đã rà.
+- Decompile Vineflower toàn bộ 7 JAR đóng gói (app uber-JAR và 6 plugin): 50.921 class đầu vào, 25.848 file Java đầu ra trong 33 archive theo shard. Tất cả 33 archive kiểm tra được và không có lỗi ZIP. Các 701 class từ module JAR được so SHA-256 với class tương ứng trong app uber-JAR và trùng byte-for-byte; do đó đã được bao phủ qua app uber-JAR.
+- App uber-JAR có 27.098 class. Các class thư viện đã decompile được ra source; class lồng nhau thường được hợp nhất vào file Java của class ngoài nên số file source ít hơn số class đầu vào.
+- Vineflower ghi nhận 29 cảnh báo method: 26 trong OkHttp/Okio, 2 trong Netty/Bouncy Castle, và 1 mục `Statement cannot be decomposed` gắn với Netty executor. Đã chạy CFR 0.152 bổ sung cho các cụm OkHttp/Okio, Netty và toàn package HAETAE; đọc thủ công các luồng kết nối, TLS/hostname verification, interceptor request, WebSocket, HTTP/2, DiskLruCache, thao tác file/ZIP và Netty executor. 6 cảnh báo `could not be written` nằm ở table model/source app hoặc plugin client-cert, không phải thư viện runtime; mã nguồn gốc tương ứng hiện diện trong repository.
+- Module JAR trùng class nên không đếm trùng trong tổng 50.921 class. Artifact `original-*.jar` là bản lặp theo cấu hình build và không bổ sung class khác; không được tính là binary khác trong corpus decompile.
+- Artifact JAR SHA-256 được ghi ở phần cuối để đối chiếu đúng file đã rà. Bản `plugin-redis` shaded JAR được dùng trong shard là `36044c7f8c3ed43016a52b12aa909e93c87f7ddcd82fecb588b4b5f7d11791ab`; file `original-*.jar` có hash cũ do khác lần build và không được tính là cùng binary.
 
 ## Hành vi mạng hợp lệ quan sát được
 
@@ -24,13 +25,18 @@ Rà soát tĩnh hiện tại **chưa phát hiện dấu hiệu rõ ràng** về 
 - Plugin Kafka/Redis/Capture và client certificate kết nối tới broker, cache, proxy hoặc endpoint cấu hình bởi người dùng.
 - Thư viện MCP/Reactor/Jackson có URL tài liệu/specification trong constant pool; đây không phải bằng chứng về kết nối mạng.
 
-Trong source tìm thấy `ProcessBuilder` trong `UpdateDownloader`, dùng để khởi chạy installer sau thao tác cập nhật. Những API mạng/socket khác thuộc HTTP runtime, kiểm tra update, plugin, Git, proxy và protocol mà ứng dụng công bố.
+Trong source app có `ProcessBuilder` trong `UpdateDownloader`, dùng để khởi chạy installer sau thao tác cập nhật. MCP SDK có khả năng client transport khởi chạy process, nhưng host app khởi tạo MCP server qua stdin/stdout; không thấy luồng gọi MCP client đó trong app composition. Các API mạng/socket khác thuộc HTTP runtime, kiểm tra update, plugin, Git, proxy và protocol mà ứng dụng công bố.
+
+## Lưu ý an ninh tìm thấy
+
+- Có dữ liệu nhạy cảm có thể xuất hiện trong log cục bộ: `SseStreamEventListener` log toàn bộ response headers khi lỗi/hủy (có thể chứa `Set-Cookie`); `HttpRequestExecutor` log URL đầy đủ trong một số nhánh hủy/gián đoạn (có thể chứa token trong query string). Đây là rủi ro lộ dữ liệu trên máy nếu người khác đọc được log, **không phải bằng chứng gửi dữ liệu ra ngoài**. Cần tránh chia sẻ file log thô và nên redaction các trường này trong bản vá riêng.
+- `logback.xml` cấu hình appender console/file tại máy, không thấy network appender. Thư mục log có giới hạn luân chuyển/kích thước. `PostmanApiContext` có log cookie ở DEBUG; không phải mức mặc định INFO.
 
 ## Dependency/artifact chính
 
 Host app dùng các thư viện như PDFBox, FlatLaf, Jackson, GraalJS, OkHttp, JGit, MCP SDK, JFreeChart và logging. Plugin đóng gói thêm Kafka client, Netty/BouncyCastle, Ayza/BouncyCastle, CFR và Jedis. Inventory đầy đủ theo Maven nằm tại `/tmp/easy-postman-dependency-tree.txt` trong môi trường kiểm tra.
 
-Rà soát này tập trung vào hành vi đánh cắp dữ liệu/mã độc. Nó không thay cho quét CVE/SCA phiên bản dependency, kiểm thử hành vi runtime trong sandbox, kiểm tra nguồn upstream/chữ ký nhà phát hành, hay review thủ công toàn bộ bytecode thư viện.
+Mức độ review thủ công: đọc các điểm kích hoạt nhạy cảm trong source ứng dụng; quét source decompile của toàn bộ corpus để định vị process launch, nạp mã, truy cập mạng và file; đọc thủ công các đường thư viện có khả năng gửi/nhận dữ liệu hoặc ghi cache, cùng các method Vineflower báo lỗi bằng source CFR. Không đọc tuần tự từng dòng của toàn bộ 25.848 file vendor — điều đó sẽ không khả thi và cũng không phải phương pháp tốt để tìm hành vi; vì vậy không gọi đây là kiểm toán chứng minh an toàn tuyệt đối. Báo cáo không thay cho quét CVE/SCA theo phiên bản, kiểm thử runtime trong sandbox, xác minh nguồn upstream/chữ ký, hoặc rà soát release artifact được tải từ nguồn độc lập.
 
 ## SHA-256 JAR
 
