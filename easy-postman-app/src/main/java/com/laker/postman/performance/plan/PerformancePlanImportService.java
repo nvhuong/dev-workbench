@@ -95,6 +95,7 @@ public class PerformancePlanImportService {
         PerformancePlanConfiguration configuration = PerformancePlanConfiguration.builder()
                 .planDocument(document)
                 .efficientMode(settings.isEfficientMode())
+                .serviceResources(runPlan.getServiceResources())
                 .build();
         return new PerformancePlanImportResult(List.of(
                 new PerformancePlanImportCandidate(planName(document, fallbackPlanName), configuration)

@@ -14,6 +14,7 @@ import com.laker.postman.performance.model.PerformanceProtocolLabels;
 import com.laker.postman.performance.report.PerformanceProtocolReportData;
 import com.laker.postman.performance.report.PerformanceReportMarkdownBuilder;
 import com.laker.postman.performance.report.PerformanceReportPdfExporter;
+import com.laker.postman.performance.report.PerformanceHtmlReportExporter;
 import com.laker.postman.util.FileChooserUtil;
 import com.formdev.flatlaf.util.SystemFileChooser;
 import java.nio.file.Path;
@@ -24,6 +25,7 @@ import com.laker.postman.performance.report.PerformanceReportTableSchema;
 import com.laker.postman.util.I18nUtil;
 import com.laker.postman.util.FontsUtil;
 import com.laker.postman.util.MessageKeys;
+import com.laker.postman.util.SystemUtil;
 import com.laker.postman.common.component.notification.NotificationCenter;
 
 import javax.swing.*;
@@ -34,6 +36,7 @@ import javax.swing.table.TableColumnModel;
 import java.awt.*;
 import java.awt.datatransfer.StringSelection;
 import java.awt.event.MouseEvent;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.EnumSet;
@@ -42,14 +45,24 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Map;
 import java.util.LinkedHashMap;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 import com.laker.postman.performance.core.model.PerformanceTrendSnapshot;
 import com.laker.postman.performance.core.run.PerformanceRunPlan;
+import com.laker.postman.performance.core.run.PerformanceServiceResource;
 import com.laker.postman.performance.model.PerformanceSampleResult;
 import com.laker.postman.panel.performance.PerformancePanel;
 
 @lombok.extern.slf4j.Slf4j
 public class PerformanceReportPanel extends JPanel {
+    private static final ScheduledExecutorService HTML_REPORT_WRITER = Executors.newSingleThreadScheduledExecutor(task -> {
+        Thread thread = new Thread(task, "performance-html-report-writer");
+        thread.setDaemon(true);
+        return thread;
+    });
 
     // 成功率阈值
     private static final double SUCCESS_RATE_EXCELLENT = 99.0;
@@ -78,6 +91,9 @@ public class PerformanceReportPanel extends JPanel {
     private List<PerformanceSampleResult> sampleResults = List.of();
     private String reportEnvironment = "";
     private String reportError = "";
+    private List<PerformanceServiceResource> serviceResources = List.of();
+    private Path htmlReportPath;
+    private ScheduledFuture<?> pendingHtmlWrite;
 
     public PerformanceReportPanel() {
         // Initialize internationalized column names
@@ -133,7 +149,10 @@ public class PerformanceReportPanel extends JPanel {
         JButton pdfButton = ModernButtonFactory.createButton(
                 I18nUtil.getMessage(MessageKeys.PERFORMANCE_REPORT_PDF_EXPORT), false);
         pdfButton.addActionListener(e -> exportPdfReport(pdfButton));
-        toolbar.add(ToolWindowActionToolbar.inlineRight(copyReportButton, pdfButton), BorderLayout.EAST);
+        JButton htmlButton = ModernButtonFactory.createButton(
+                I18nUtil.getMessage(MessageKeys.PERFORMANCE_REPORT_HTML_OPEN), false);
+        htmlButton.addActionListener(e -> openHtmlReport());
+        toolbar.add(ToolWindowActionToolbar.inlineRight(copyReportButton, htmlButton, pdfButton), BorderLayout.EAST);
         return toolbar;
     }
 
@@ -578,6 +597,12 @@ public class PerformanceReportPanel extends JPanel {
 
 
     public void clearReport() {
+        clearReportData();
+        htmlReportPath = Path.of(SystemUtil.getEasyPostmanPath(), "performance-reports", "latest", "index.html");
+        scheduleHtmlReportWrite();
+    }
+
+    private void clearReportData() {
         reportTableModel.setRowCount(0);
         webSocketReportTableModel.setRowCount(0);
         sseReportTableModel.setRowCount(0);
@@ -589,15 +614,26 @@ public class PerformanceReportPanel extends JPanel {
 
     public void setReportContext(PerformanceRunPlan plan, String environment) {
         reportPlan = plan;
+        if (plan != null && !plan.getServiceResources().isEmpty()) {
+            serviceResources = plan.getServiceResources();
+        }
         reportEnvironment = environment == null ? "" : environment;
+        scheduleHtmlReportWrite();
+    }
+
+    public void setServiceResources(List<PerformanceServiceResource> resources) {
+        serviceResources = PerformanceServiceResource.sanitize(resources);
+        scheduleHtmlReportWrite();
     }
 
     public void setTrendReportPoints(List<PerformanceTrendView.TrendReportPoint> points) {
         trendPoints.set(points == null ? List.of() : List.copyOf(points));
+        scheduleHtmlReportWrite();
     }
 
     public void setSampleResults(List<PerformanceSampleResult> results) {
         sampleResults = results == null ? List.of() : List.copyOf(results);
+        scheduleHtmlReportWrite();
     }
 
     public List<PerformanceSampleResult> getSampleResults() {
@@ -633,7 +669,7 @@ public class PerformanceReportPanel extends JPanel {
     }
 
     private void updateReport(PerformanceProtocolReportData reportData) {
-        clearReport();
+        clearReportData();
 
         for (PerformanceProtocolReportData.HttpReportRow row : reportData.httpRows()) {
             addReportRow(reportTableModel, toHttpRowData(row));
@@ -644,6 +680,7 @@ public class PerformanceReportPanel extends JPanel {
         for (PerformanceProtocolReportData.StreamReportRow row : reportData.sseRows()) {
             addReportRow(sseReportTableModel, toSseRowData(row));
         }
+        scheduleHtmlReportWrite();
     }
 
     private Object[] toHttpRowData(PerformanceProtocolReportData.HttpReportRow row) {
@@ -708,11 +745,14 @@ public class PerformanceReportPanel extends JPanel {
                 JOptionPane.YES_NO_OPTION) != JOptionPane.YES_OPTION) return;
         String title = I18nUtil.getMessage(MessageKeys.PERFORMANCE_REPORT_MARKDOWN_TITLE);
         PerformanceReportPdfExporter.ReportContext context = new PerformanceReportPdfExporter.ReportContext(
-                title, reportPlan, reportEnvironment, List.copyOf(trendPoints.get()), exportSamples, reportError);
+                title, reportPlan, reportEnvironment, List.copyOf(trendPoints.get()), exportSamples, reportError,
+                serviceResources);
+        String html = PerformanceHtmlReportExporter.renderHtml(context, tables);
+        writeHtmlSnapshot(html);
         button.setEnabled(false);
         new SwingWorker<Void, Void>() {
             @Override protected Void doInBackground() throws Exception {
-                PerformanceReportPdfExporter.export(destination, context, tables);
+                PerformanceHtmlReportExporter.exportPdf(destination, html);
                 return null;
             }
             @Override protected void done() {
@@ -726,6 +766,56 @@ public class PerformanceReportPanel extends JPanel {
                 }
             }
         }.execute();
+    }
+
+    private void openHtmlReport() {
+        if (htmlReportPath == null || !Files.isRegularFile(htmlReportPath)) {
+            NotificationCenter.showWarning(I18nUtil.getMessage(MessageKeys.PERFORMANCE_REPORT_HTML_NOT_READY));
+            return;
+        }
+        try {
+            if (!Desktop.isDesktopSupported()) throw new IOException("Desktop browser integration is unavailable");
+            Desktop.getDesktop().browse(htmlReportPath.toUri());
+        } catch (Exception ex) {
+            log.error("Failed to open performance HTML report at {}", htmlReportPath, ex);
+            NotificationCenter.showError(I18nUtil.getMessage(MessageKeys.PERFORMANCE_REPORT_HTML_OPEN_FAILED)
+                    + " " + htmlReportPath);
+        }
+    }
+
+    private void scheduleHtmlReportWrite() {
+        if (htmlReportPath == null || reportTableModel == null) return;
+        if (!SwingUtilities.isEventDispatchThread()) {
+            SwingUtilities.invokeLater(this::scheduleHtmlReportWrite);
+            return;
+        }
+        List<PerformanceReportMarkdownBuilder.ReportTable> tables = reportTables();
+        if (tables.stream().allMatch(table -> table.rows().isEmpty())) return;
+        var context = new PerformanceReportPdfExporter.ReportContext(
+                I18nUtil.getMessage(MessageKeys.PERFORMANCE_REPORT_MARKDOWN_TITLE), reportPlan,
+                reportEnvironment, List.copyOf(trendPoints.get()), sampleResults, reportError, serviceResources);
+        final String html;
+        try {
+            html = PerformanceHtmlReportExporter.renderHtml(context, tables);
+        } catch (RuntimeException e) {
+            log.debug("Performance HTML report is not ready yet", e);
+            return;
+        }
+        if (pendingHtmlWrite != null) pendingHtmlWrite.cancel(false);
+        Path output = htmlReportPath;
+        pendingHtmlWrite = HTML_REPORT_WRITER.schedule(() -> writeHtmlSnapshot(output, html), 500, TimeUnit.MILLISECONDS);
+    }
+
+    private void writeHtmlSnapshot(String html) {
+        if (htmlReportPath != null) writeHtmlSnapshot(htmlReportPath, html);
+    }
+
+    private void writeHtmlSnapshot(Path output, String html) {
+        try {
+            PerformanceHtmlReportExporter.exportHtml(output, html);
+        } catch (IOException e) {
+            log.warn("Could not persist performance HTML report at {}", output, e);
+        }
     }
 
     private List<PerformanceSampleResult> performanceResultSamples() {

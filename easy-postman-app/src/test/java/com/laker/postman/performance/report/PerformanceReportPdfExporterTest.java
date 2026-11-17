@@ -1,12 +1,13 @@
 package com.laker.postman.performance.report;
 
+import com.laker.postman.panel.performance.result.PerformanceTrendView;
+import com.laker.postman.performance.core.model.PerformanceTrendSnapshot;
+import com.laker.postman.performance.core.run.PerformanceServiceResource;
 import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.pdmodel.PDDocument;
-import org.apache.pdfbox.rendering.PDFRenderer;
 import org.apache.pdfbox.text.PDFTextStripper;
 import org.testng.annotations.Test;
 
-import javax.imageio.ImageIO;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -17,43 +18,57 @@ import static org.testng.Assert.*;
 
 public class PerformanceReportPdfExporterTest {
     @Test
-    public void exportsUnicodeMetricsAndPaginatedTables() throws Exception {
-        Path destination = Path.of("target/performance-report-demo.pdf");
-        Files.createDirectories(destination.toAbsolutePath().getParent());
-        List<Object[]> rows = new ArrayList<>();
-        for (int i = 0; i < 8; i++) {
-            int avg = 80 + i * 37;
-            rows.add(new Object[]{"GET /api/orders/" + i + " · Kiểm thử 性能测试", 128, 126, 2,
-                    "98.44%", "0.71", "12.5", "48.0", avg + " ms", (avg - 35) + " ms",
-                    (avg + 190) + " ms", (avg + 45) + " ms", (avg + 85) + " ms", (avg + 165) + " ms"});
-        }
-        rows.add(new Object[]{"Total", 1024, 1008, 16, "98.44%", "5.69", "100.0", "384.0",
-                "218 ms", "42 ms", "986 ms", "415 ms", "532 ms", "781 ms"});
-        var table = new PerformanceReportMarkdownBuilder.ReportTable("HTTP",
-                Arrays.asList(PerformanceReportTableSchema.httpColumns()), rows);
-        PerformanceReportPdfExporter.exportDemo(destination);
-        try (PDDocument document = Loader.loadPDF(destination.toFile())) {
-            assertTrue(document.getNumberOfPages() >= 3);
-            String text = new PDFTextStripper().getText(document);
-            assertTrue(text.indexOf("Test setup") < text.indexOf("1. Summary"), text);
-            assertTrue(text.indexOf("1. Summary") < text.indexOf("1.1 Response time"), text);
-            assertTrue(text.contains("Response time"), text);
-            assertTrue(text.contains("266.2 ms"), text);
-            assertTrue(text.contains("req/s"), text);
-            assertTrue(text.contains("Throughput"), text);
-            assertTrue(text.contains("Requests with slowest response times"), text);
-            assertTrue(text.contains("Metrics for each request"), text);
-            assertTrue(text.contains("Errors"), text);
-            assertFalse(text.contains("Endpoint success rate"), text);
-            assertTrue(text.contains("GET /api/orders/7"));
-            assertEquals(document.getDocumentInformation().getTitle(), "Performance Test Report · Demo");
-            ImageIO.write(new PDFRenderer(document).renderImageWithDPI(0, 110), "png",
-                    Path.of("target/performance-report-preview.png").toFile());
+    public void generatesAccessibleHtmlAndRendersTheSameReportToPdf() throws Exception {
+        var tables = httpTable();
+        String html = PerformanceHtmlReportExporter.renderHtml(context(trendPoints()), tables);
+        assertTrue(html.contains("<html xmlns=\"http://www.w3.org/1999/xhtml\""));
+        assertTrue(html.contains("1. Summary"));
+        assertTrue(html.contains("1.1 Response time"));
+        assertTrue(html.contains("1.2 Throughput"));
+        assertTrue(html.contains("2. Metrics for each request"));
+        assertTrue(html.contains("3. Errors"));
+        assertTrue(html.contains("<svg"));
+        assertTrue(html.contains("req/s"));
+        assertTrue(html.matches("(?s).*<text[^>]*>[0-9.]+ req/s</text>.*"));
+        assertTrue(html.contains("GET /api/orders/7"));
+        assertTrue(html.contains("Total CPU"));
+        assertTrue(html.contains("6.0 cores"));
+        assertTrue(html.contains("12.0 GB"));
+
+        Path directory = Files.createTempDirectory("performance-html-report-");
+        Path htmlFile = directory.resolve("index.html");
+        Path pdfFile = directory.resolve("performance-report.pdf");
+        try {
+            PerformanceHtmlReportExporter.exportHtml(htmlFile, html);
+            PerformanceHtmlReportExporter.exportPdf(pdfFile, html);
+            assertEquals(Files.readString(htmlFile), html);
+            assertTrue(Files.size(pdfFile) > 5_000);
+            try (PDDocument document = Loader.loadPDF(pdfFile.toFile())) {
+                assertTrue(document.getNumberOfPages() >= 2);
+                String text = new PDFTextStripper().getText(document);
+                assertTrue(text.indexOf("Test setup") < text.indexOf("1. Summary"), text);
+                assertTrue(text.indexOf("1. Summary") < text.indexOf("1.1 Response time"), text);
+                assertTrue(text.contains("266.2 ms"), text);
+                assertTrue(text.contains("Requests/s"), text);
+                assertTrue(text.contains("Requests with slowest response times"), text);
+                assertTrue(text.contains("Metrics for each request"), text);
+                assertTrue(text.contains("Errors"), text);
+                assertTrue(text.contains("GET /api/orders/7"), text);
+                assertTrue(text.contains("orders"), text);
+                assertTrue(text.contains("Total CPU"), text);
+            }
+        } finally {
+            try (var files = Files.list(directory)) {
+                files.forEach(file -> {
+                    try { Files.deleteIfExists(file); } catch (Exception ignored) { }
+                });
+            }
+            Files.deleteIfExists(directory);
         }
     }
 
     @Test
-    public void exportsEveryProtocolAndSplitsVeryLongEndpointRows() throws Exception {
+    public void includesWebSocketAndSseMetricsAndWrapsLongEndpoints() throws Exception {
         Path destination = Files.createTempFile("protocol-report-", ".pdf");
         try {
             List<PerformanceReportMarkdownBuilder.ReportTable> tables = new ArrayList<>();
@@ -66,8 +81,8 @@ public class PerformanceReportPdfExporterTest {
                 endpoint[4] = "100.00%";
                 Object[] total = endpoint.clone();
                 total[0] = "Total";
-                tables.add(new PerformanceReportMarkdownBuilder.ReportTable(protocols[i],
-                        Arrays.asList(schemas[i]), List.of(endpoint, total)));
+                tables.add(new PerformanceReportMarkdownBuilder.ReportTable(protocols[i], Arrays.asList(schemas[i]),
+                        List.of(endpoint, total)));
             }
             PerformanceReportPdfExporter.export(destination, "Performance test report", tables);
             try (PDDocument document = Loader.loadPDF(destination.toFile())) {
@@ -75,7 +90,7 @@ public class PerformanceReportPdfExporterTest {
                 assertTrue(text.contains("WebSocket"));
                 assertTrue(text.contains("SSE"));
                 assertTrue(text.replaceAll("\\s", "").contains("END-OF-PATH"));
-                assertTrue(document.getNumberOfPages() > 8);
+                assertTrue(document.getNumberOfPages() >= 2);
             }
         } finally {
             Files.deleteIfExists(destination);
@@ -93,5 +108,38 @@ public class PerformanceReportPdfExporterTest {
         } finally {
             Files.deleteIfExists(destination);
         }
+    }
+
+    private List<PerformanceReportMarkdownBuilder.ReportTable> httpTable() {
+        List<Object[]> rows = new ArrayList<>();
+        for (int i = 0; i < 8; i++) {
+            int average = 80 + i * 37;
+            rows.add(new Object[]{"GET /api/orders/" + i + " · Kiểm thử 性能测试", 128, 126, 2,
+                    "98.44%", "0.71", "12.5", "48.0", average + " ms", (average - 35) + " ms",
+                    (average + 190) + " ms", (average + 45) + " ms", (average + 85) + " ms", (average + 165) + " ms"});
+        }
+        rows.add(new Object[]{"Total", 1024, 1008, 16, "98.44%", "5.69", "100.0", "384.0",
+                "266.2 ms", "42 ms", "986 ms", "415 ms", "532 ms", "781 ms"});
+        return List.of(new PerformanceReportMarkdownBuilder.ReportTable("HTTP",
+                Arrays.asList(PerformanceReportTableSchema.httpColumns()), rows));
+    }
+
+    private PerformanceReportPdfExporter.ReportContext context(List<PerformanceTrendView.TrendReportPoint> points) {
+        return new PerformanceReportPdfExporter.ReportContext("Performance Test Report · Demo", null,
+                "Staging", points, List.of(), "", List.of(new PerformanceServiceResource("orders", 3, 2, 4)));
+    }
+
+    private List<PerformanceTrendView.TrendReportPoint> trendPoints() {
+        List<PerformanceTrendView.TrendReportPoint> points = new ArrayList<>();
+        long now = System.currentTimeMillis() - 120_000;
+        for (int i = 0; i < 20; i++) {
+            double average = 110 + i * 8;
+            var metrics = new PerformanceTrendSnapshot.ProtocolWindowMetrics(100, 2, 2.0, 5.5,
+                    average, 0, 0, 0, Double.NaN, Double.NaN, Double.NaN, Double.NaN, average * 1.6);
+            points.add(new PerformanceTrendView.TrendReportPoint(now + i * 6_000,
+                    new PerformanceTrendSnapshot(10, 0, 0, metrics, metrics,
+                            PerformanceTrendSnapshot.terminalIdle().webSocket(), PerformanceTrendSnapshot.terminalIdle().sse())));
+        }
+        return List.copyOf(points);
     }
 }

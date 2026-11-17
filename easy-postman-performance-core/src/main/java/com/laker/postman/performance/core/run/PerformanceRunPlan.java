@@ -22,6 +22,7 @@ public class PerformanceRunPlan {
     PerformanceRunSettings settings;
     PerformanceCorePlanDocument testPlan;
     List<PerformanceRunAsset> assets;
+    List<PerformanceServiceResource> serviceResources;
 
     @Builder
     public PerformanceRunPlan(String schemaVersion,
@@ -31,7 +32,8 @@ public class PerformanceRunPlan {
                               PerformanceRunVariableSet globals,
                               PerformanceRunSettings settings,
                               PerformanceCorePlanDocument testPlan,
-                              List<PerformanceRunAsset> assets) {
+                              List<PerformanceRunAsset> assets,
+                              List<PerformanceServiceResource> serviceResources) {
         this.schemaVersion = schemaVersion == null || schemaVersion.isBlank()
                 ? PerformanceRunPlanJsonStorage.FORMAT_VERSION
                 : schemaVersion;
@@ -45,6 +47,7 @@ public class PerformanceRunPlan {
         this.settings = settings == null ? PerformanceRunSettings.defaults() : settings;
         this.testPlan = executableTestPlan;
         this.assets = sanitizeAssets(assets, executableTestPlan);
+        this.serviceResources = PerformanceServiceResource.sanitize(serviceResources);
     }
 
     private static PerformanceRunEnvironment sanitizeEnvironment(PerformanceRunEnvironment environment) {

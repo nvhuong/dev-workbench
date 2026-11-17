@@ -48,6 +48,7 @@ import com.laker.postman.performance.plan.PerformancePlanWorkspace;
 import com.laker.postman.performance.plan.PerformanceRemoteWorkerSettings;
 import com.laker.postman.performance.plan.PerformanceRunPlanFactory;
 import com.laker.postman.performance.plan.PerformanceSavedPlan;
+import com.laker.postman.performance.core.run.PerformanceServiceResource;
 import com.laker.postman.performance.result.PerformanceResultCollector;
 import com.laker.postman.performance.runtime.PerformanceExecutionEngine;
 import com.laker.postman.performance.runtime.PerformanceRunSession;
@@ -77,6 +78,7 @@ import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
+import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.io.File;
 import java.util.ArrayList;
@@ -161,6 +163,7 @@ public class PerformancePanel extends UiSingletonPanel {
     private boolean reportRealtimeEnabled = false;
     private boolean remoteExecutionEnabled = false;
     private String remoteWorkerEndpoints = "";
+    private List<PerformanceServiceResource> serviceResources = new ArrayList<>();
     private List<PerformanceSavedPlan> savedPlans = new ArrayList<>();
     private String activePlanId;
     private boolean updatingPlanSelector;
@@ -292,6 +295,9 @@ public class PerformancePanel extends UiSingletonPanel {
         performanceResultTablePanel = resultSection.performanceResultTablePanel();
         performanceTrendPanel = resultSection.performanceTrendPanel();
         performanceReportPanel = resultSection.performanceReportPanel();
+        serviceResources = persistedConfiguration == null ? new ArrayList<>()
+                : new ArrayList<>(persistedConfiguration.getServiceResources());
+        performanceReportPanel.setServiceResources(serviceResources);
         efficientCheckBox = resultSection.efficientCheckBox();
         trendCheckBox = resultSection.trendCheckBox();
         reportRefreshModeBox = resultSection.reportRefreshModeBox();
@@ -327,6 +333,9 @@ public class PerformancePanel extends UiSingletonPanel {
                 this::setRemoteWorkerEndpoints
         );
         topPanel = toolbarSection.topPanel();
+        JButton serviceResourcesButton = new JButton(I18nUtil.getMessage(MessageKeys.PERFORMANCE_SERVICE_RESOURCES));
+        serviceResourcesButton.addActionListener(e -> editServiceResources());
+        topPanel.add(serviceResourcesButton, "span 2, left, wrap");
         runBtn = toolbarSection.runBtn();
         stopBtn = toolbarSection.stopBtn();
         importBtn = toolbarSection.importBtn();
@@ -583,6 +592,8 @@ public class PerformancePanel extends UiSingletonPanel {
                 : configuration.getRemoteWorkerSettings();
         remoteExecutionEnabled = remoteSettings.isEnabled();
         remoteWorkerEndpoints = remoteSettings.getWorkerEndpoints();
+        serviceResources = new ArrayList<>(configuration == null ? List.of() : configuration.getServiceResources());
+        if (performanceReportPanel != null) performanceReportPanel.setServiceResources(serviceResources);
         applyTrendEnabled(trendEnabled);
         applyReportRealtimeEnabled(reportRealtimeEnabled);
     }
@@ -684,6 +695,7 @@ public class PerformancePanel extends UiSingletonPanel {
                 .trendEnabled(trendEnabled)
                 .reportRealtimeEnabled(reportRealtimeEnabled)
                 .remoteWorkerSettings(currentRemoteWorkerSettings())
+                .serviceResources(serviceResources)
                 .build();
         savedPlans.add(copiedPlan);
         activePlanId = copiedPlan.getId();
@@ -809,6 +821,7 @@ public class PerformancePanel extends UiSingletonPanel {
                         .trendEnabled(trendEnabled)
                         .reportRealtimeEnabled(reportRealtimeEnabled)
                         .remoteWorkerSettings(currentRemoteWorkerSettings())
+                        .serviceResources(serviceResources)
                         .build()
         );
     }
@@ -819,6 +832,52 @@ public class PerformancePanel extends UiSingletonPanel {
                 .activePlanId(activePlanId)
                 .plans(savedPlans)
                 .build();
+    }
+
+    private void editServiceResources() {
+        DefaultTableModel model = new DefaultTableModel(new Object[][]{}, new Object[]{
+                I18nUtil.getMessage(MessageKeys.PERFORMANCE_SERVICE_NAME),
+                I18nUtil.getMessage(MessageKeys.PERFORMANCE_SERVICE_INSTANCES),
+                I18nUtil.getMessage(MessageKeys.PERFORMANCE_SERVICE_CPU),
+                I18nUtil.getMessage(MessageKeys.PERFORMANCE_SERVICE_RAM)}) {
+            @Override public boolean isCellEditable(int row, int column) { return true; }
+        };
+        for (PerformanceServiceResource resource : serviceResources) {
+            model.addRow(new Object[]{resource.getServiceName(), resource.getInstances(),
+                    resource.getCpuCores(), resource.getMemoryGb()});
+        }
+        JTable table = new JTable(model);
+        table.putClientProperty("terminateEditOnFocusLost", Boolean.TRUE);
+        JPanel editor = new JPanel(new BorderLayout(0, 8));
+        editor.add(new JScrollPane(table), BorderLayout.CENTER);
+        JButton add = new JButton(I18nUtil.getMessage(MessageKeys.PERFORMANCE_SERVICE_ADD));
+        JButton remove = new JButton(I18nUtil.getMessage(MessageKeys.PERFORMANCE_SERVICE_REMOVE));
+        add.addActionListener(e -> model.addRow(new Object[]{"", 1, 1, 1}));
+        remove.addActionListener(e -> { int row = table.getSelectedRow(); if (row >= 0) model.removeRow(row); });
+        editor.add(com.laker.postman.common.component.ToolWindowActionToolbar.inlineLeft(add, remove), BorderLayout.SOUTH);
+        if (JOptionPane.showConfirmDialog(this, editor,
+                I18nUtil.getMessage(MessageKeys.PERFORMANCE_SERVICE_RESOURCES),
+                JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE) != JOptionPane.OK_OPTION) return;
+        if (table.isEditing()) table.getCellEditor().stopCellEditing();
+        List<PerformanceServiceResource> updated = new ArrayList<>();
+        try {
+            for (int row = 0; row < model.getRowCount(); row++) {
+                String name = String.valueOf(model.getValueAt(row, 0)).trim();
+                if (!name.isBlank()) {
+                    updated.add(new PerformanceServiceResource(name,
+                            Integer.parseInt(String.valueOf(model.getValueAt(row, 1))),
+                            Double.parseDouble(String.valueOf(model.getValueAt(row, 2))),
+                            Double.parseDouble(String.valueOf(model.getValueAt(row, 3)))));
+                }
+            }
+        } catch (RuntimeException ex) {
+            JOptionPane.showMessageDialog(this, I18nUtil.getMessage(MessageKeys.PERFORMANCE_SERVICE_INVALID),
+                    I18nUtil.getMessage(MessageKeys.PERFORMANCE_SERVICE_RESOURCES), JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        serviceResources = updated;
+        performanceReportPanel.setServiceResources(serviceResources);
+        saveConfig();
     }
 
     private void persistCurrentWorkspaceSync() {
@@ -1117,6 +1176,7 @@ public class PerformancePanel extends UiSingletonPanel {
                             .trendEnabled(trendEnabled)
                             .reportRealtimeEnabled(reportRealtimeEnabled)
                             .remoteWorkerSettings(currentRemoteWorkerSettings())
+                            .serviceResources(serviceResources)
                             .build(),
                     EnvironmentService.getActiveEnvironment(),
                     GlobalVariablesService.getInstance().getGlobalVariables(),
@@ -1171,6 +1231,22 @@ public class PerformancePanel extends UiSingletonPanel {
             startRemoteRun(progressLabel, limitLabel);
             return;
         }
+        propertyPanelSupport.forceCommitAllSpinners();
+        saveAllPropertyPanelData();
+        DefaultMutableTreeNode localRoot = PerformanceTreeSnapshot.copy((DefaultMutableTreeNode) treeModel.getRoot());
+        PerformanceRunPlan reportPlan = PerformanceRunPlanFactory.create(
+                PerformancePlanConfiguration.builder()
+                        .planDocument(PerformanceSwingTreePlanAdapter.toDocument(localRoot))
+                        .efficientMode(efficientMode)
+                        .trendEnabled(trendEnabled)
+                        .reportRealtimeEnabled(reportRealtimeEnabled)
+                        .remoteWorkerSettings(currentRemoteWorkerSettings())
+                        .serviceResources(serviceResources)
+                        .build(),
+                EnvironmentService.getActiveEnvironment(),
+                GlobalVariablesService.getInstance().getGlobalVariables(),
+                AppConstants.APP_NAME + " " + SystemUtil.getCurrentVersion()
+        );
         runThread = runControlSupport.startRun(
                 (DefaultMutableTreeNode) treeModel.getRoot(),
                 progressLabel,
@@ -1179,7 +1255,7 @@ public class PerformancePanel extends UiSingletonPanel {
                 value -> efficientMode = value
         );
         Environment activeEnvironment = EnvironmentService.getActiveEnvironment();
-        performanceReportPanel.setReportContext(null,
+        performanceReportPanel.setReportContext(reportPlan,
                 activeEnvironment == null ? "" : activeEnvironment.getName());
     }
 

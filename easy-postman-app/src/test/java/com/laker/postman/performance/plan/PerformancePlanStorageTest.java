@@ -2,6 +2,7 @@ package com.laker.postman.performance.plan;
 
 import com.laker.postman.request.model.RequestItemProtocolEnum;
 import com.laker.postman.request.model.HttpRequestItem;
+import com.laker.postman.performance.core.run.PerformanceServiceResource;
 
 
 import com.laker.postman.performance.core.model.NodeType;
@@ -64,6 +65,7 @@ public class PerformancePlanStorageTest {
                 .efficientMode(false)
                 .trendEnabled(false)
                 .reportRealtimeEnabled(true)
+                .serviceResources(List.of(new PerformanceServiceResource("orders", 3, 2.5, 4)))
                 .build());
         String savedJson = Files.readString(configPath, StandardCharsets.UTF_8);
 
@@ -73,6 +75,7 @@ public class PerformancePlanStorageTest {
         assertFalse(loaded.isEfficientMode());
         assertFalse(loaded.isTrendEnabled());
         assertTrue(loaded.isReportRealtimeEnabled());
+        assertEquals(loaded.getServiceResources(), List.of(new PerformanceServiceResource("orders", 3, 2.5, 4)));
         assertTrue(savedJson.contains("\"requestSnapshot\""));
         assertFalse(savedJson.contains("\"requestItem\""));
         assertFalse(savedJson.contains("\"requestItemId\""));

@@ -42,6 +42,7 @@ public class PerformanceRunPlanFactory {
                         .build())
                 .testPlan(coreDocument)
                 .assets(PerformanceRunPlanAssetScanner.scan(coreDocument))
+                .serviceResources(safeConfiguration.getServiceResources())
                 .build();
     }
 

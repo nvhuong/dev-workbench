@@ -3,6 +3,7 @@ package com.laker.postman.performance.plan;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import com.laker.postman.performance.core.model.NodeType;
+import com.laker.postman.performance.core.run.PerformanceServiceResource;
 import com.laker.postman.performance.core.plan.PerformanceCorePlanDocument;
 import com.laker.postman.performance.core.plan.PerformanceCorePlanJsonStorage;
 import com.laker.postman.performance.core.plan.PerformanceCorePlanNode;
@@ -183,6 +184,7 @@ public class PerformancePlanStorage {
                         .enabled(requiredBoolean(jsonRoot, "remoteExecutionEnabled"))
                         .workerEndpoints(requiredString(jsonRoot, "remoteWorkers"))
                         .build())
+                .serviceResources(readServiceResources(jsonRoot.getJSONArray("serviceResources")))
                 .build();
         return PerformanceSavedPlan.fromConfiguration(
                 requiredString(jsonRoot, "id"),
@@ -210,12 +212,35 @@ public class PerformancePlanStorage {
         PerformanceRemoteWorkerSettings remoteWorkerSettings = safeConfiguration.getRemoteWorkerSettings();
         json.set("remoteExecutionEnabled", remoteWorkerSettings.isEnabled());
         json.set("remoteWorkers", remoteWorkerSettings.getWorkerEndpoints());
+        List<JSONObject> serviceJson = new ArrayList<>();
+        for (PerformanceServiceResource resource : safeConfiguration.getServiceResources()) {
+            JSONObject item = new JSONObject();
+            item.set("serviceName", resource.getServiceName());
+            item.set("instances", resource.getInstances());
+            item.set("cpuCores", resource.getCpuCores());
+            item.set("memoryGb", resource.getMemoryGb());
+            serviceJson.add(item);
+        }
+        json.set("serviceResources", serviceJson);
         PerformancePlanDocument document = safeConfiguration.getPlanDocument();
         if (document == null) {
             document = defaultDocument();
         }
         PerformanceCorePlanDocument coreDocument = PerformanceCorePlanAdapter.toCoreDocument(document);
         json.set("tree", corePlanJsonStorage.toTreeMap(coreDocument == null ? null : coreDocument.getRoot()));
+    }
+
+    private List<PerformanceServiceResource> readServiceResources(Iterable<?> values) {
+        List<PerformanceServiceResource> result = new ArrayList<>();
+        if (values == null) return result;
+        for (Object value : values) {
+            JSONObject item = value instanceof JSONObject object ? object
+                    : value instanceof Map<?, ?> map ? new JSONObject(map) : null;
+            if (item == null) continue;
+            result.add(new PerformanceServiceResource(item.getStr("serviceName"),
+                    item.getInt("instances", 1), item.getDouble("cpuCores", 0d), item.getDouble("memoryGb", 0d)));
+        }
+        return result;
     }
 
     private PerformancePlanWorkspace normalizeWorkspace(PerformancePlanWorkspace workspace) {

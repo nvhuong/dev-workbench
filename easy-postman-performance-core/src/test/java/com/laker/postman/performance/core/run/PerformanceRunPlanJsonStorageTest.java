@@ -43,6 +43,7 @@ public class PerformanceRunPlanJsonStorageTest {
                         .build())
                 .testPlan(document)
                 .assets(PerformanceRunPlanAssetScanner.scan(document))
+                .serviceResources(List.of(new PerformanceServiceResource("orders", 3, 2, 4)))
                 .build();
         PerformanceRunPlanJsonStorage storage = new PerformanceRunPlanJsonStorage();
 
@@ -75,6 +76,7 @@ public class PerformanceRunPlanJsonStorageTest {
         assertEquals(loaded.getSettings().getHttpMaxRequests(), 123);
         assertEquals(loaded.getSettings().getHttpMaxRequestsPerHost(), 45);
         assertEquals(loaded.getAssets().size(), 2);
+        assertEquals(loaded.getServiceResources(), List.of(new PerformanceServiceResource("orders", 3, 2, 4)));
 
         PerformanceCorePlanNode loadedGroup = loaded.getTestPlan().getRoot().getChildren().get(0);
         CsvDataSetData loadedCsv = loadedGroup.getChildren().get(0).getCsvDataSetData();

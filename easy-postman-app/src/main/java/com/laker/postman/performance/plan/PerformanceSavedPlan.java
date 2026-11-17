@@ -2,8 +2,10 @@ package com.laker.postman.performance.plan;
 
 import lombok.Builder;
 import lombok.Value;
+import com.laker.postman.performance.core.run.PerformanceServiceResource;
 
 import java.util.UUID;
+import java.util.List;
 
 @Value
 public class PerformanceSavedPlan {
@@ -16,6 +18,7 @@ public class PerformanceSavedPlan {
     boolean trendEnabled;
     boolean reportRealtimeEnabled;
     PerformanceRemoteWorkerSettings remoteWorkerSettings;
+    List<PerformanceServiceResource> serviceResources;
 
     @Builder
     public PerformanceSavedPlan(String id,
@@ -24,7 +27,8 @@ public class PerformanceSavedPlan {
                                 Boolean efficientMode,
                                 Boolean trendEnabled,
                                 Boolean reportRealtimeEnabled,
-                                PerformanceRemoteWorkerSettings remoteWorkerSettings) {
+                                PerformanceRemoteWorkerSettings remoteWorkerSettings,
+                                List<PerformanceServiceResource> serviceResources) {
         this.id = hasText(id) ? id.trim() : UUID.randomUUID().toString();
         this.name = hasText(name) ? name.trim() : DEFAULT_NAME;
         this.planDocument = planDocument;
@@ -34,6 +38,7 @@ public class PerformanceSavedPlan {
         this.remoteWorkerSettings = remoteWorkerSettings == null
                 ? PerformanceRemoteWorkerSettings.disabled()
                 : remoteWorkerSettings;
+        this.serviceResources = PerformanceServiceResource.sanitize(serviceResources);
     }
 
     public static PerformanceSavedPlan fromConfiguration(String id,
@@ -50,6 +55,7 @@ public class PerformanceSavedPlan {
                 .trendEnabled(safeConfiguration.isTrendEnabled())
                 .reportRealtimeEnabled(safeConfiguration.isReportRealtimeEnabled())
                 .remoteWorkerSettings(safeConfiguration.getRemoteWorkerSettings())
+                .serviceResources(safeConfiguration.getServiceResources())
                 .build();
     }
 
@@ -60,6 +66,7 @@ public class PerformanceSavedPlan {
                 .trendEnabled(trendEnabled)
                 .reportRealtimeEnabled(reportRealtimeEnabled)
                 .remoteWorkerSettings(remoteWorkerSettings)
+                .serviceResources(serviceResources)
                 .build();
     }
 
@@ -76,6 +83,7 @@ public class PerformanceSavedPlan {
                 .trendEnabled(trendEnabled)
                 .reportRealtimeEnabled(reportRealtimeEnabled)
                 .remoteWorkerSettings(remoteWorkerSettings)
+                .serviceResources(serviceResources)
                 .build();
     }
 

@@ -3365,6 +3365,18 @@ public final class MessageKeys {
     public static final String CERT_CONSOLE_LOAD_FAILED = "cert.console.load_failed";
 
     public static final String PERFORMANCE_REPORT_PDF_EXPORT = "performance.report.pdf.export";
+    public static final String PERFORMANCE_REPORT_PDF_GENERATED = "performance.report.pdf.generated";
+    public static final String PERFORMANCE_REPORT_HTML_OPEN = "performance.report.html.open";
+    public static final String PERFORMANCE_REPORT_HTML_NOT_READY = "performance.report.html.notReady";
+    public static final String PERFORMANCE_REPORT_HTML_OPEN_FAILED = "performance.report.html.openFailed";
+    public static final String PERFORMANCE_SERVICE_RESOURCES = "performance.service.resources";
+    public static final String PERFORMANCE_SERVICE_NAME = "performance.service.name";
+    public static final String PERFORMANCE_SERVICE_INSTANCES = "performance.service.instances";
+    public static final String PERFORMANCE_SERVICE_CPU = "performance.service.cpu";
+    public static final String PERFORMANCE_SERVICE_RAM = "performance.service.ram";
+    public static final String PERFORMANCE_SERVICE_ADD = "performance.service.add";
+    public static final String PERFORMANCE_SERVICE_REMOVE = "performance.service.remove";
+    public static final String PERFORMANCE_SERVICE_INVALID = "performance.service.invalid";
     public static final String PERFORMANCE_REPORT_PDF_OVERWRITE = "performance.report.pdf.overwrite";
     public static final String PERFORMANCE_REPORT_PDF_SAVED = "performance.report.pdf.saved";
     public static final String PERFORMANCE_REPORT_PDF_FAILED = "performance.report.pdf.failed";

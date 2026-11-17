@@ -2,6 +2,9 @@ package com.laker.postman.performance.plan;
 
 import lombok.Builder;
 import lombok.Value;
+import com.laker.postman.performance.core.run.PerformanceServiceResource;
+
+import java.util.List;
 
 @Value
 public class PerformancePlanConfiguration {
@@ -10,13 +13,15 @@ public class PerformancePlanConfiguration {
     boolean trendEnabled;
     boolean reportRealtimeEnabled;
     PerformanceRemoteWorkerSettings remoteWorkerSettings;
+    List<PerformanceServiceResource> serviceResources;
 
     @Builder
     public PerformancePlanConfiguration(PerformancePlanDocument planDocument,
                                         Boolean efficientMode,
                                         Boolean trendEnabled,
                                         Boolean reportRealtimeEnabled,
-                                        PerformanceRemoteWorkerSettings remoteWorkerSettings) {
+                                        PerformanceRemoteWorkerSettings remoteWorkerSettings,
+                                        List<PerformanceServiceResource> serviceResources) {
         this.planDocument = planDocument;
         this.efficientMode = efficientMode == null || efficientMode;
         this.trendEnabled = trendEnabled == null || trendEnabled;
@@ -24,5 +29,6 @@ public class PerformancePlanConfiguration {
         this.remoteWorkerSettings = remoteWorkerSettings == null
                 ? PerformanceRemoteWorkerSettings.disabled()
                 : remoteWorkerSettings;
+        this.serviceResources = PerformanceServiceResource.sanitize(serviceResources);
     }
 }

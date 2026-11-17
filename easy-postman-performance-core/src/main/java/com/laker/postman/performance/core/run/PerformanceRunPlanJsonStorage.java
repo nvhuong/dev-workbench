@@ -54,6 +54,7 @@ public class PerformanceRunPlanJsonStorage {
                 .settings(readSettings(objectMap(root.get("settings"))))
                 .testPlan(readTestPlan(objectMap(root.get("testPlan"))))
                 .assets(readAssets(listValue(root.get("assets"))))
+                .serviceResources(readServiceResources(listValue(root.get("serviceResources"))))
                 .build();
     }
 
@@ -68,7 +69,41 @@ public class PerformanceRunPlanJsonStorage {
         root.put("settings", settingsToMap(safePlan.getSettings()));
         root.put("testPlan", planJsonStorage.toDocumentMap(safePlan.getTestPlan()));
         root.put("assets", assetsToList(safePlan.getAssets()));
+        root.put("serviceResources", serviceResourcesToList(safePlan.getServiceResources()));
         return root;
+    }
+
+    private List<Map<String, Object>> serviceResourcesToList(List<PerformanceServiceResource> resources) {
+        List<Map<String, Object>> array = new ArrayList<>();
+        for (PerformanceServiceResource resource : PerformanceServiceResource.sanitize(resources)) {
+            Map<String, Object> json = new LinkedHashMap<>();
+            json.put("serviceName", resource.getServiceName());
+            json.put("instances", resource.getInstances());
+            json.put("cpuCores", resource.getCpuCores());
+            json.put("memoryGb", resource.getMemoryGb());
+            array.add(json);
+        }
+        return array;
+    }
+
+    private List<PerformanceServiceResource> readServiceResources(List<Object> values) {
+        List<PerformanceServiceResource> result = new ArrayList<>();
+        for (Object value : values) {
+            Map<String, Object> item = objectMap(value);
+            if (item.isEmpty()) continue;
+            result.add(new PerformanceServiceResource(
+                    stringValue(item, "serviceName", ""),
+                    numberValue(item, "instances", 1).intValue(),
+                    numberValue(item, "cpuCores", 0).doubleValue(),
+                    numberValue(item, "memoryGb", 0).doubleValue()
+            ));
+        }
+        return result;
+    }
+
+    private Number numberValue(Map<String, Object> map, String key, Number fallback) {
+        Object value = map.get(key);
+        return value instanceof Number number ? number : fallback;
     }
 
     private Map<String, Object> environmentToMap(PerformanceRunEnvironment environment) {
