@@ -8,7 +8,6 @@ import net.schmizz.sshj.SSHClient;
 import net.schmizz.sshj.common.KeyType;
 import net.schmizz.sshj.connection.channel.direct.Session;
 import net.schmizz.sshj.transport.verification.OpenSSHKnownHosts;
-import net.schmizz.sshj.userauth.keyprovider.KeyProvider;
 import net.miginfocom.swing.MigLayout;
 
 import javax.swing.BorderFactory;
@@ -143,44 +142,63 @@ final class RemotePanel extends JPanel {
         sessions.setSelectedComponent(terminal);
         addClosableTab(title, terminal);
 
+        SSHClient client = new SSHClient();
+        SshAuthenticator.configure(client);
+        clients.put(terminal, client);
         Thread worker = new Thread(() -> {
-            SSHClient client = new SSHClient();
-            clients.put(terminal, client);
             try {
                 OpenSSHKnownHosts knownHosts = createKnownHostsVerifier(profile);
                 client.addHostKeyVerifier(knownHosts);
                 client.connect(profile.host(), profile.port());
-                String secret = profile.password();
-                if (!profile.keyFile().isBlank()) {
-                    KeyProvider provider = secret.isBlank()
-                            ? client.loadKeys(profile.keyFile())
-                            : client.loadKeys(profile.keyFile(), secret);
-                    client.authPublickey(profile.user(), provider);
-                } else if (!secret.isBlank()) {
-                    client.authPassword(profile.user(), secret);
-                } else {
-                    client.authPublickey(profile.user());
-                }
+                SshAuthenticator.authenticate(client, profile.user(), profile.password(), profile.keyFile());
 
                 Session session = client.startSession();
                 session.allocatePTY("xterm-256color", 120, 40, 0, 0, java.util.Map.of());
                 Session.Shell shell = session.startShell();
                 SwingUtilities.invokeLater(() -> {
+                    if (clients.get(terminal) != client) {
+                        // The tab was closed while the connection was being established.
+                        disconnectQuietly(client);
+                        return;
+                    }
                     connectionState.setText(RemoteI18n.t("connected", profile.user(), profile.host()));
                     terminalWidget.setTtyConnector(new SshTtyConnector(shell, title));
                     terminalWidget.start();
                     terminalWidget.requestFocusInWindow();
                 });
+                watchSessionEnd(terminal, client, shell, connectionState, profile);
             } catch (Exception exception) {
+                boolean closedByUser = clients.get(terminal) != client;
+                disconnectQuietly(client);
+                clients.remove(terminal, client);
+                if (closedByUser) return;
                 LOG.log(Level.WARNING, "SSH session failed for " + profile.host(), exception);
                 SwingUtilities.invokeLater(() -> connectionState.setText(
-                        RemoteI18n.t("connection_error", exception.getMessage())));
-                try { client.disconnect(); } catch (Exception ignored) { }
-                clients.remove(terminal);
+                        RemoteI18n.t("connection_error", SshAuthenticator.describe(exception))));
             }
         }, "ssh-session-" + profile.host());
         worker.setDaemon(true);
         worker.start();
+    }
+
+    /** Releases the SSH connection and tells the user when the remote shell exits (e.g. after {@code exit}). */
+    private void watchSessionEnd(Component terminal, SSHClient client, Session.Shell shell, JLabel connectionState,
+                                 Profile profile) {
+        try {
+            shell.join();
+        } catch (Exception exception) {
+            LOG.log(Level.FINE, "SSH shell wait ended", exception);
+        }
+        if (!clients.remove(terminal, client)) return;
+        disconnectQuietly(client);
+        SwingUtilities.invokeLater(() -> connectionState.setText(
+                RemoteI18n.t("disconnected", profile.user(), profile.host())));
+    }
+
+    private static void disconnectQuietly(SSHClient client) {
+        try { client.disconnect(); } catch (Exception exception) {
+            LOG.log(Level.FINE, "SSH session close failed", exception);
+        }
     }
 
     private OpenSSHKnownHosts createKnownHostsVerifier(Profile profile) throws Exception {
@@ -241,11 +259,7 @@ final class RemotePanel extends JPanel {
             Component terminalView = ((JPanel) session).getComponent(1);
             if (terminalView instanceof JediTermWidget widget) widget.close();
             SSHClient client = clients.remove(session);
-            if (client != null) {
-                try { client.disconnect(); } catch (Exception exception) {
-                    LOG.log(Level.FINE, "SSH session close failed", exception);
-                }
-            }
+            if (client != null) disconnectQuietly(client);
             sessions.remove(session);
         });
         tab.add(close);
