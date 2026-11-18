@@ -6,6 +6,7 @@
   <properties><host.version>${revision}</host.version><plugin.id>plugin-sql</plugin.id><plugin.name>SQL Plugin</plugin.name><plugin.entryClass>com.nvhuong.devworkbench.plugin.sql.SqlPlugin</plugin.entryClass><plugin.description>JDBC database explorer and SQL workbench.</plugin.description><plugin.minAppVersion>6.0.14</plugin.minAppVersion><plugin.minPlatformVersion>${plugin.platform.version}</plugin.minPlatformVersion><plugin.maxPlatformVersion>${plugin.platform.version}</plugin.maxPlatformVersion></properties>
   <dependencies>
     <dependency><groupId>org.testng</groupId><artifactId>testng</artifactId><scope>test</scope></dependency>
+    <dependency><groupId>com.h2database</groupId><artifactId>h2</artifactId><version>2.2.224</version><scope>test</scope></dependency>
     <dependency><groupId>com.nvhuong.tools</groupId><artifactId>dev-workbench-plugin-api</artifactId><version>${host.version}</version><scope>provided</scope></dependency>
     <dependency><groupId>com.nvhuong.tools</groupId><artifactId>dev-workbench-foundation</artifactId><version>${host.version}</version><scope>provided</scope></dependency>
     <dependency><groupId>com.nvhuong.tools</groupId><artifactId>dev-workbench-ui</artifactId><version>${host.version}</version><scope>provided</scope></dependency>

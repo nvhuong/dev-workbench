@@ -560,10 +560,13 @@ public class SqlPanel extends JPanel {
         setStatus(SqlI18n.t("connecting"));
         connectButton.setEnabled(false);
         setConnectionFieldsEnabled(false);
+        String jar = driverJar.getText().trim();
+        String driverClassName = driverClass.getText().trim();
+        String user = username.getText().trim();
+        char[] secret = password.getPassword();
         new SwingWorker<Connection, Void>() {
             @Override protected Connection doInBackground() throws Exception {
                 URLClassLoader loader = null;
-                String jar = driverJar.getText().trim();
                 if (!jar.isBlank()) {
                     URL[] jars = java.util.Arrays.stream(jar.split(";"))
                             .map(String::trim)
@@ -584,10 +587,9 @@ public class SqlPanel extends JPanel {
                     loader = new URLClassLoader(jars, SqlPanel.class.getClassLoader());
                 }
                 try {
-                    Driver driver = loadDriver(loader, driverClass.getText().trim(), url);
+                    Driver driver = loadDriver(loader, driverClassName, url);
                     Properties properties = new Properties();
-                    if (!username.getText().isBlank()) properties.setProperty("user", username.getText().trim());
-                    char[] secret = password.getPassword();
+                    if (!user.isBlank()) properties.setProperty("user", user);
                     if (secret.length > 0) properties.setProperty("password", new String(secret));
                     Connection opened = driver == null
                             ? DriverManager.getConnection(url, properties)
@@ -661,7 +663,7 @@ public class SqlPanel extends JPanel {
                     executeButton.setEnabled(true);
                     refreshObjectsButton.setEnabled(true);
                     objectTree.setModel(new DefaultTreeModel(snapshot.root()));
-                    metadataSuggestions = snapshot.suggestions();
+                    metadataSuggestions = new ArrayList<>(snapshot.suggestions());
                     refreshSuggestions();
                     setStatus(SqlI18n.t("scopes_loaded", snapshot.schemaCount()));
                 } catch (Exception exception) {
@@ -933,11 +935,29 @@ public class SqlPanel extends JPanel {
     private String currentSqlStatement(RSyntaxTextArea editor) {
         String selected = editor.getSelectedText();
         if (selected != null && !selected.isBlank()) return selected.trim();
-        String text = editor.getText();
-        if (text.isBlank()) return "";
-        int caret = Math.min(editor.getCaretPosition(), text.length());
-        int start = text.lastIndexOf(';', Math.max(0, caret - 1));
-        int end = text.indexOf(';', caret);
+        return statementAt(editor.getText(), editor.getCaretPosition());
+    }
+
+    /**
+     * Returns the semicolon-delimited statement around {@code caret}. When the caret sits after a statement's
+     * terminating semicolon (optionally followed by whitespace) and nothing else follows, that statement is used.
+     */
+    static String statementAt(String text, int caret) {
+        if (text == null || text.isBlank()) return "";
+        int position = Math.max(0, Math.min(caret, text.length()));
+        int anchor = position;
+        while (anchor > 0 && (text.charAt(anchor - 1) == ' ' || text.charAt(anchor - 1) == '\t')) anchor--;
+        if (anchor > 0 && text.charAt(anchor - 1) == ';') return segmentAt(text, anchor - 1);
+        String statement = segmentAt(text, position);
+        if (!statement.isBlank()) return statement;
+        while (anchor > 0 && Character.isWhitespace(text.charAt(anchor - 1))) anchor--;
+        if (anchor > 0 && text.charAt(anchor - 1) == ';') anchor--;
+        return anchor == position ? statement : segmentAt(text, anchor);
+    }
+
+    private static String segmentAt(String text, int position) {
+        int start = position == 0 ? -1 : text.lastIndexOf(';', position - 1);
+        int end = text.indexOf(';', position);
         start = start < 0 ? 0 : start + 1;
         end = end < 0 ? text.length() : end + 1;
         return text.substring(start, end).trim();
