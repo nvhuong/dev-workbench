@@ -155,7 +155,7 @@ public class KafkaConnectionPanelLayoutTest {
     public void securityLabelsShouldUseShortTextWithFullTooltipsAcrossLocales() {
         Locale originalLocale = I18nUtil.currentLocale();
         try {
-            assertSecurityLabelsUseShortTextWithFullTooltips(Locale.forLanguageTag("vi"), "thỏa thuận:", "SASL:");
+            assertSecurityLabelsUseShortTextWithFullTooltips(Locale.forLanguageTag("vi"), "giao thức:", "SASL:");
             assertSecurityLabelsUseShortTextWithFullTooltips(Locale.ENGLISH, "Proto:", "SASL:");
         } finally {
             I18nUtil.setLocale(originalLocale);
