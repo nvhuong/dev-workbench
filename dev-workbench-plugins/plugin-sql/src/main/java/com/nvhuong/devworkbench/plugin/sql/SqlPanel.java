@@ -23,17 +23,27 @@ import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.JTextArea;
+import javax.swing.JTabbedPane;
+import javax.swing.JPopupMenu;
+import javax.swing.JMenuItem;
+import javax.swing.JToolBar;
 import javax.swing.JTree;
 import javax.swing.SwingWorker;
 import javax.swing.Timer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.TreePath;
 import javax.swing.event.TreeExpansionEvent;
 import javax.swing.event.TreeWillExpandListener;
 import javax.swing.tree.ExpandVetoException;
 import java.awt.BorderLayout;
 import java.awt.Font;
+import java.awt.Toolkit;
+import java.awt.datatransfer.StringSelection;
+import java.awt.event.InputEvent;
+import java.awt.event.KeyEvent;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.file.Path;
@@ -51,6 +61,8 @@ import java.util.List;
 import java.util.Properties;
 import java.util.ServiceLoader;
 import java.util.concurrent.ForkJoinPool;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 
 /** JDBC workbench for connecting to databases, exploring metadata, and executing SQL. */
 @Slf4j
@@ -74,7 +86,10 @@ public class SqlPanel extends JPanel {
     private final JPasswordField password = new JPasswordField();
     private final JLabel status = new JLabel(" ");
     private final JTree objectTree = new JTree(new DefaultMutableTreeNode("Database"));
-    private final RSyntaxTextArea sqlEditor = new RSyntaxTextArea();
+    private final JTabbedPane sqlTabs = new JTabbedPane();
+    private final JTabbedPane resultTabs = new JTabbedPane();
+    private final JTextArea outputLog = new JTextArea();
+    private int sqlTabSequence = 1;
     private final JComboBox<String> suggestions = new JComboBox<>();
     private final JComboBox<ConnectionProfile> profiles = new JComboBox<>();
     private final DefaultTableModel resultModel = new DefaultTableModel() {
@@ -208,11 +223,16 @@ public class SqlPanel extends JPanel {
         objectTree.addMouseListener(new java.awt.event.MouseAdapter() {
             @Override
             public void mouseClicked(java.awt.event.MouseEvent event) {
+                if (javax.swing.SwingUtilities.isRightMouseButton(event)) {
+                    int row = objectTree.getClosestRowForLocation(event.getX(), event.getY());
+                    objectTree.setSelectionRow(row);
+                    showNavigatorMenu(event.getX(), event.getY());
+                    return;
+                }
                 if (event.getClickCount() == 2) {
                     Object selected = objectTree.getLastSelectedPathComponent();
                     if (selected instanceof DefaultMutableTreeNode node && node.getUserObject() instanceof TableRef table) {
-                        sqlEditor.setText("SELECT * FROM " + table.qualifiedName() + ";");
-                        sqlEditor.setCaretPosition(0);
+                        openTableQuery(table);
                     }
                 }
             }
@@ -221,35 +241,44 @@ public class SqlPanel extends JPanel {
         ToolWindowSurfaceStyle.applyFramedScrollPaneCard(treeScroll);
         browser.add(treeScroll, BorderLayout.CENTER);
 
-        JPanel editor = new JPanel(new BorderLayout(0, 6));
+        JPanel editor = new JPanel(new BorderLayout(0, 4));
         editor.setOpaque(false);
-        JPanel editorToolbar = new JPanel(new MigLayout("insets 0, novisualpadding, gapx 6", "[][grow,fill][]", "[]"));
-        editorToolbar.setOpaque(false);
-        editorToolbar.add(label("suggestions"));
+        JToolBar editorToolbar = new JToolBar();
+        editorToolbar.setFloatable(false);
+        editorToolbar.setBorder(BorderFactory.createEmptyBorder(0, 0, 4, 0));
+        JButton newSqlTab = new JButton(SqlI18n.t("new_sql_tab"));
+        newSqlTab.addActionListener(event -> addSqlTab(null, true));
+        JButton closeSqlTab = new JButton(SqlI18n.t("close_sql_tab"));
+        closeSqlTab.addActionListener(event -> closeCurrentSqlTab());
+        editorToolbar.add(newSqlTab);
+        editorToolbar.add(closeSqlTab);
+        editorToolbar.addSeparator();
         suggestions.setEditable(false);
-        editorToolbar.add(suggestions, "wmin 100");
+        suggestions.setMaximumSize(new java.awt.Dimension(260, 30));
+        editorToolbar.add(suggestions);
         JButton insertSuggestion = new JButton(SqlI18n.t("insert"));
         insertSuggestion.addActionListener(event -> insertSelectedSuggestion());
         executeButton = new JButton(SqlI18n.t("execute"));
         executeButton.addActionListener(event -> executeSql());
-        editorToolbar.add(insertSuggestion, "split 2");
+        editorToolbar.add(insertSuggestion);
+        editorToolbar.addSeparator();
         editorToolbar.add(executeButton);
         editor.add(editorToolbar, BorderLayout.NORTH);
 
-        sqlEditor.setSyntaxEditingStyle(SyntaxConstants.SYNTAX_STYLE_SQL);
-        sqlEditor.setCodeFoldingEnabled(true);
-        sqlEditor.setTabSize(4);
-        sqlEditor.setFont(FontsUtil.getDefaultFont(Font.PLAIN));
-        EditorThemeUtil.loadTheme(sqlEditor);
-        JScrollPane sqlScroll = new JScrollPane(sqlEditor);
-        ToolWindowSurfaceStyle.applyFramedScrollPaneCard(sqlScroll);
-        JPanel sqlSection = SqlWorkbench.editorSection(SqlI18n.t("sql"), sqlScroll);
+        addSqlTab(null, false);
+        JPanel sqlSection = SqlWorkbench.editorSection(SqlI18n.t("sql"), sqlTabs);
         JScrollPane resultScroll = new JScrollPane(resultTable);
         ToolWindowSurfaceStyle.applyFramedScrollPaneCard(resultScroll);
-        JPanel resultSection = SqlWorkbench.editorSection(
-                SqlI18n.t("results"), resultScroll);
+        outputLog.setEditable(false);
+        outputLog.setFont(FontsUtil.getDefaultFont(Font.PLAIN));
+        outputLog.setRows(4);
+        resultTabs.addTab(SqlI18n.t("data"), resultScroll);
+        resultTabs.addTab(SqlI18n.t("output"), new JScrollPane(outputLog));
+        JPanel resultSection = SqlWorkbench.editorSection(SqlI18n.t("results"), resultTabs);
         resultTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
         resultTable.setFillsViewportHeight(true);
+        resultTable.setAutoCreateRowSorter(true);
+        resultTable.setCellSelectionEnabled(true);
         JSplitPane verticalSplit = SqlWorkbench.editorSplit(sqlSection, resultSection, 180);
         verticalSplit.setOrientation(JSplitPane.VERTICAL_SPLIT);
         verticalSplit.setResizeWeight(0.45);
@@ -262,6 +291,83 @@ public class SqlPanel extends JPanel {
         host.setBorder(BorderFactory.createEmptyBorder(8, 0, 0, 0));
         host.add(split, BorderLayout.CENTER);
         return host;
+    }
+
+    private RSyntaxTextArea createSqlEditor() {
+        RSyntaxTextArea editor = new RSyntaxTextArea();
+        editor.setSyntaxEditingStyle(SyntaxConstants.SYNTAX_STYLE_SQL);
+        editor.setCodeFoldingEnabled(true);
+        editor.setTabSize(4);
+        editor.setFont(FontsUtil.getDefaultFont(Font.PLAIN));
+        EditorThemeUtil.loadTheme(editor);
+        javax.swing.KeyStroke runKey = javax.swing.KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, InputEvent.CTRL_DOWN_MASK);
+        editor.getInputMap().put(runKey, "run-current-sql");
+        editor.getActionMap().put("run-current-sql", new javax.swing.AbstractAction() {
+            @Override public void actionPerformed(java.awt.event.ActionEvent event) { executeSql(); }
+        });
+        return editor;
+    }
+
+    private void addSqlTab(String sql, boolean focus) {
+        RSyntaxTextArea editor = createSqlEditor();
+        if (sql != null) editor.setText(sql);
+        JScrollPane scroll = new JScrollPane(editor);
+        ToolWindowSurfaceStyle.applyFramedScrollPaneCard(scroll);
+        String title = SqlI18n.t("sql_console", sqlTabSequence++);
+        sqlTabs.addTab(title, scroll);
+        sqlTabs.setSelectedComponent(scroll);
+        if (focus) editor.requestFocusInWindow();
+    }
+
+    private void closeCurrentSqlTab() {
+        if (sqlTabs.getTabCount() <= 1) {
+            activeSqlEditor().setText("");
+            return;
+        }
+        sqlTabs.removeTabAt(sqlTabs.getSelectedIndex());
+    }
+
+    private RSyntaxTextArea activeSqlEditor() {
+        JScrollPane scroll = (JScrollPane) sqlTabs.getSelectedComponent();
+        return (RSyntaxTextArea) scroll.getViewport().getView();
+    }
+
+    private void openTableQuery(TableRef table) {
+        addSqlTab("SELECT * FROM " + table.qualifiedName() + ";", true);
+    }
+
+    private void showNavigatorMenu(int x, int y) {
+        Object selected = objectTree.getLastSelectedPathComponent();
+        if (!(selected instanceof DefaultMutableTreeNode node)) return;
+        JPopupMenu menu = new JPopupMenu();
+        if (node.getUserObject() instanceof MetadataScope) {
+            JMenuItem refresh = new JMenuItem(SqlI18n.t("refresh"));
+            refresh.addActionListener(event -> {
+                restorePendingNode(node);
+                objectTree.expandPath(new TreePath(node.getPath()));
+            });
+            menu.add(refresh);
+        }
+        if (node.getUserObject() instanceof TableRef table) {
+            JMenuItem viewData = new JMenuItem(SqlI18n.t("view_data"));
+            viewData.addActionListener(event -> openTableQuery(table));
+            menu.add(viewData);
+            JMenuItem copyName = new JMenuItem(SqlI18n.t("copy_qualified_name"));
+            copyName.addActionListener(event -> copyText(table.qualifiedName()));
+            menu.add(copyName);
+        }
+        if (menu.getComponentCount() > 0) menu.show(objectTree, x, y);
+    }
+
+    private void restorePendingNode(DefaultMutableTreeNode node) {
+        node.removeAllChildren();
+        node.add(new DefaultMutableTreeNode(SqlI18n.t("expand_to_load")));
+        ((DefaultTreeModel) objectTree.getModel()).reload(node);
+    }
+
+    private void copyText(String text) {
+        Toolkit.getDefaultToolkit().getSystemClipboard().setContents(new StringSelection(text), null);
+        setStatus(SqlI18n.t("copied", text));
     }
 
     private JLabel label(String key) {
@@ -759,16 +865,18 @@ public class SqlPanel extends JPanel {
     private void insertSelectedSuggestion() {
         Object selected = suggestions.getSelectedItem();
         if (selected == null) return;
-        sqlEditor.insert(selected.toString(), sqlEditor.getCaretPosition());
-        sqlEditor.requestFocusInWindow();
+        RSyntaxTextArea editor = activeSqlEditor();
+        editor.insert(selected.toString(), editor.getCaretPosition());
+        editor.requestFocusInWindow();
     }
 
     private void executeSql() {
         Connection active = connection;
-        String sql = sqlEditor.getText().trim();
+        String sql = currentSqlStatement(activeSqlEditor());
         if (active == null || sql.isBlank()) return;
         executeButton.setEnabled(false);
         setStatus(SqlI18n.t("executing"));
+        appendOutput(SqlI18n.t("output_running", compactSql(sql)));
         new SwingWorker<QueryResult, Void>() {
             @Override protected QueryResult doInBackground() throws Exception {
                 try (Statement statement = active.createStatement()) {
@@ -802,18 +910,48 @@ public class SqlPanel extends JPanel {
                     resultModel.setColumnIdentifiers(result.columns().toArray());
                     for (Object[] row : result.rows()) resultModel.addRow(row);
                     if (result.hasRows()) {
+                        resultTabs.setSelectedIndex(0);
                         setStatus(SqlI18n.t("query_complete", result.count(), MAX_RESULT_ROWS));
+                        appendOutput(SqlI18n.t("output_rows", result.count()));
                     } else if (result.count() < 0) {
                         setStatus(SqlI18n.t("statement_complete"));
+                        appendOutput(SqlI18n.t("statement_complete"));
                     } else {
                         setStatus(SqlI18n.t("update_complete", result.count()));
+                        appendOutput(SqlI18n.t("output_updated", result.count()));
                     }
                 } catch (Exception exception) {
                     Throwable cause = exception.getCause() == null ? exception : exception.getCause();
                     setStatus(SqlI18n.t("error", safeMessage(cause)));
+                    appendOutput(SqlI18n.t("error", safeMessage(cause)));
+                    resultTabs.setSelectedIndex(1);
                 }
             }
         }.execute();
+    }
+
+    private String currentSqlStatement(RSyntaxTextArea editor) {
+        String selected = editor.getSelectedText();
+        if (selected != null && !selected.isBlank()) return selected.trim();
+        String text = editor.getText();
+        if (text.isBlank()) return "";
+        int caret = Math.min(editor.getCaretPosition(), text.length());
+        int start = text.lastIndexOf(';', Math.max(0, caret - 1));
+        int end = text.indexOf(';', caret);
+        start = start < 0 ? 0 : start + 1;
+        end = end < 0 ? text.length() : end + 1;
+        return text.substring(start, end).trim();
+    }
+
+    private String compactSql(String sql) {
+        String compact = sql.replaceAll("\\s+", " ").trim();
+        return compact.length() <= 120 ? compact : compact.substring(0, 117) + "…";
+    }
+
+    private void appendOutput(String message) {
+        String time = LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss"));
+        outputLog.append("[" + time + "] " + message + System.lineSeparator());
+        outputLog.setCaretPosition(outputLog.getDocument().getLength());
     }
 
     private String safeMessage(Throwable throwable) {
