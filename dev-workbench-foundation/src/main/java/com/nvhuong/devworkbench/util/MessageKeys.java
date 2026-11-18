@@ -2950,6 +2950,7 @@ public final class MessageKeys {
     public static final String TOOLBOX_DIFF_SOURCE_A = "toolbox.diff.source_a";
     public static final String TOOLBOX_DIFF_SOURCE_B = "toolbox.diff.source_b";
     public static final String TOOLBOX_DIFF_BROWSE = "toolbox.diff.browse";
+    public static final String TOOLBOX_DIFF_PATH_PLACEHOLDER = "toolbox.diff.path_placeholder";
     public static final String TOOLBOX_DIFF_SELECT_BOTH = "toolbox.diff.select_both";
     public static final String TOOLBOX_DIFF_INVALID_SELECTION = "toolbox.diff.invalid_selection";
     public static final String TOOLBOX_DIFF_READ_FAILED = "toolbox.diff.read_failed";

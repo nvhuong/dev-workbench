@@ -1,6 +1,7 @@
 package com.nvhuong.devworkbench.panel.toolbox;
 
 import com.nvhuong.devworkbench.common.component.ToolWindowSurfaceStyle;
+import com.nvhuong.devworkbench.common.component.button.ModernButtonFactory;
 import com.nvhuong.devworkbench.common.constants.ModernColors;
 import com.nvhuong.devworkbench.util.FontsUtil;
 import com.nvhuong.devworkbench.util.I18nUtil;
@@ -53,21 +54,29 @@ public class DiffPanel extends JPanel {
     private void initUI() {
         ToolboxWorkbench.applyRoot(this);
 
-        JButton compareBtn = new JButton(I18nUtil.getMessage(MessageKeys.TOOLBOX_DIFF_COMPARE));
-        JButton copyBtn = new JButton(I18nUtil.getMessage(MessageKeys.BUTTON_COPY));
-        JButton clearBtn = new JButton(I18nUtil.getMessage(MessageKeys.BUTTON_CLEAR));
-        JButton swapBtn = new JButton(I18nUtil.getMessage(MessageKeys.TOOLBOX_DIFF_SWAP));
+        JButton compareBtn = ModernButtonFactory.createButton(
+                I18nUtil.getMessage(MessageKeys.TOOLBOX_DIFF_COMPARE), true, "icons/check.svg", 14);
+        JButton copyBtn = ModernButtonFactory.createButton(
+                I18nUtil.getMessage(MessageKeys.BUTTON_COPY), false, "icons/copy.svg", 14);
+        JButton clearBtn = ModernButtonFactory.createButton(
+                I18nUtil.getMessage(MessageKeys.BUTTON_CLEAR), false, "icons/delete.svg", 14);
+        JButton swapBtn = ModernButtonFactory.createButton(
+                I18nUtil.getMessage(MessageKeys.TOOLBOX_DIFF_SWAP), false);
         modeSelector = new JComboBox<>(new String[]{
                 I18nUtil.getMessage(MessageKeys.TOOLBOX_DIFF_MODE_TEXT),
                 I18nUtil.getMessage(MessageKeys.TOOLBOX_DIFF_MODE_FILE),
                 I18nUtil.getMessage(MessageKeys.TOOLBOX_DIFF_MODE_FOLDER)
         });
-        JPanel modeControl = ToolboxWorkbench.optionsRow();
-        modeControl.add(new JLabel(I18nUtil.getMessage(MessageKeys.TOOLBOX_DIFF_MODE)));
+        modeSelector.setPreferredSize(new Dimension(132, 30));
+        JPanel modeControl = new JPanel(new FlowLayout(FlowLayout.RIGHT, 8, 0));
+        modeControl.setOpaque(false);
+        JLabel modeLabel = new JLabel(I18nUtil.getMessage(MessageKeys.TOOLBOX_DIFF_MODE));
+        modeLabel.setForeground(ModernColors.getTextSecondary());
+        modeControl.add(modeLabel);
         modeControl.add(modeSelector);
 
-        JPanel topPanel = ToolboxWorkbench.leftToolbar(compareBtn, copyBtn, swapBtn, clearBtn);
-        add(ToolboxWorkbench.stackedTop(ToolboxWorkbench.toolbar(topPanel, null), modeControl), BorderLayout.NORTH);
+        JPanel actions = ToolboxWorkbench.leftToolbar(compareBtn, copyBtn, swapBtn, clearBtn);
+        add(ToolboxWorkbench.toolbar(actions, modeControl), BorderLayout.NORTH);
 
         inputCards = new JPanel();
         inputCardLayout = new CardLayout();
@@ -87,10 +96,15 @@ public class DiffPanel extends JPanel {
                 I18nUtil.getMessage(MessageKeys.TOOLBOX_DIFF_RESULT), resultScrollPane);
 
         JSplitPane mainSplitPane = ToolboxWorkbench.editorSplit(inputCards, resultPanel, 250);
+        mainSplitPane.setDividerSize(7);
         mainSplitPane.setResizeWeight(0.45);
         add(mainSplitPane, BorderLayout.CENTER);
 
-        modeSelector.addActionListener(e -> updateInputMode());
+        modeSelector.addActionListener(e -> {
+            updateInputMode();
+            SwingUtilities.invokeLater(() -> mainSplitPane.setDividerLocation(
+                    modeSelector.getSelectedIndex() == 0 ? 250 : 150));
+        });
         compareBtn.addActionListener(e -> compareDiff());
         copyBtn.addActionListener(e -> copyToClipboard());
         clearBtn.addActionListener(e -> clearInputs());
@@ -127,9 +141,15 @@ public class DiffPanel extends JPanel {
     private JComponent createPathInputPanel() {
         JPanel sourceA = createPathSource(true);
         JPanel sourceB = createPathSource(false);
-        JSplitPane split = ToolboxWorkbench.horizontalSplit(sourceA, sourceB, 360);
-        SwingUtilities.invokeLater(() -> split.setDividerLocation(0.5));
-        return split;
+        JPanel sources = new JPanel(new GridLayout(1, 2, 12, 0));
+        sources.setOpaque(false);
+        sources.add(sourceA);
+        sources.add(sourceB);
+        JPanel panel = new JPanel(new BorderLayout());
+        panel.setOpaque(false);
+        panel.setBorder(BorderFactory.createEmptyBorder(4, 4, 4, 4));
+        panel.add(sources, BorderLayout.NORTH);
+        return panel;
     }
 
     private JPanel createPathSource(boolean isSourceA) {
@@ -138,13 +158,38 @@ public class DiffPanel extends JPanel {
         JTextField pathField = new JTextField();
         pathField.setEditable(false);
         pathField.setToolTipText(title);
-        JButton browseButton = new JButton(I18nUtil.getMessage(MessageKeys.TOOLBOX_DIFF_BROWSE));
+        pathField.putClientProperty("JTextField.placeholderText",
+                I18nUtil.getMessage(MessageKeys.TOOLBOX_DIFF_PATH_PLACEHOLDER));
+        pathField.setPreferredSize(new Dimension(160, 34));
+        pathField.setCaretPosition(0);
+        ToolWindowSurfaceStyle.applyTextComponentInput(pathField);
+        JButton browseButton = ModernButtonFactory.createButton(
+                I18nUtil.getMessage(MessageKeys.TOOLBOX_DIFF_BROWSE), false);
+        browseButton.setPreferredSize(new Dimension(104, 34));
         browseButton.addActionListener(e -> choosePath(isSourceA));
+        JLabel badge = new JLabel(isSourceA ? "A" : "B", SwingConstants.CENTER);
+        badge.setOpaque(true);
+        badge.setBackground(ModernColors.withAlpha(ModernColors.getPrimary(), ModernColors.isDarkTheme() ? 72 : 32));
+        badge.setForeground(ModernColors.getPrimary());
+        badge.setFont(FontsUtil.getDefaultFontWithOffset(Font.BOLD, 0));
+        badge.setPreferredSize(new Dimension(28, 28));
+        badge.setBorder(BorderFactory.createLineBorder(
+                ModernColors.withAlpha(ModernColors.getPrimary(), 96), 1, true));
+        JLabel sourceTitle = ToolboxWorkbench.sectionTitle(title);
+        sourceTitle.setForeground(ModernColors.getTextPrimary());
+        JPanel heading = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 0));
+        heading.setOpaque(false);
+        heading.add(badge);
+        heading.add(sourceTitle);
+
         JPanel row = new JPanel(new BorderLayout(8, 0));
         row.setOpaque(false);
         row.add(pathField, BorderLayout.CENTER);
         row.add(browseButton, BorderLayout.EAST);
-        JPanel panel = ToolboxWorkbench.formSection(title);
+        JPanel panel = new JPanel(new BorderLayout(0, 12));
+        ToolWindowSurfaceStyle.applySectionCard(panel);
+        panel.setBorder(BorderFactory.createEmptyBorder(14, 14, 14, 14));
+        panel.add(heading, BorderLayout.NORTH);
         panel.add(row, BorderLayout.CENTER);
         if (isSourceA) {
             sourceAPath = pathField;
