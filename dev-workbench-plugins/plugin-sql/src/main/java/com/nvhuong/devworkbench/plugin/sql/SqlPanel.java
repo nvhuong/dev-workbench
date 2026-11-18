@@ -29,7 +29,9 @@ import javax.swing.Timer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
-import javax.swing.tree.TreePath;
+import javax.swing.event.TreeExpansionEvent;
+import javax.swing.event.TreeWillExpandListener;
+import javax.swing.tree.ExpandVetoException;
 import java.awt.BorderLayout;
 import java.awt.Font;
 import java.net.URL;
@@ -194,6 +196,15 @@ public class SqlPanel extends JPanel {
         browser.add(browserHeader, BorderLayout.NORTH);
         objectTree.setRootVisible(false);
         objectTree.setShowsRootHandles(true);
+        objectTree.addTreeWillExpandListener(new TreeWillExpandListener() {
+            @Override public void treeWillExpand(TreeExpansionEvent event) throws ExpandVetoException {
+                Object value = ((DefaultMutableTreeNode) event.getPath().getLastPathComponent()).getUserObject();
+                if (value instanceof MetadataScope) loadTables((DefaultMutableTreeNode) event.getPath().getLastPathComponent());
+                if (value instanceof TableRef) loadColumns((DefaultMutableTreeNode) event.getPath().getLastPathComponent());
+            }
+
+            @Override public void treeWillCollapse(TreeExpansionEvent event) { }
+        });
         objectTree.addMouseListener(new java.awt.event.MouseAdapter() {
             @Override
             public void mouseClicked(java.awt.event.MouseEvent event) {
@@ -544,13 +555,9 @@ public class SqlPanel extends JPanel {
                     executeButton.setEnabled(true);
                     refreshObjectsButton.setEnabled(true);
                     objectTree.setModel(new DefaultTreeModel(snapshot.root()));
-                    for (int row = 0; row < objectTree.getRowCount(); row++) {
-                        TreePath path = objectTree.getPathForRow(row);
-                        if (path != null && path.getPathCount() == 2) objectTree.expandRow(row);
-                    }
                     metadataSuggestions = snapshot.suggestions();
                     refreshSuggestions();
-                    setStatus(SqlI18n.t("objects_loaded", snapshot.tableCount(), snapshot.schemaCount()));
+                    setStatus(SqlI18n.t("scopes_loaded", snapshot.schemaCount()));
                 } catch (Exception exception) {
                     executeButton.setEnabled(true);
                     refreshObjectsButton.setEnabled(true);
@@ -594,77 +601,152 @@ public class SqlPanel extends JPanel {
         DefaultMutableTreeNode root = new DefaultMutableTreeNode(metadata.getDatabaseProductName());
         List<String> completion = new ArrayList<>(SQL_SUGGESTIONS);
         int schemaCount = 0;
-        int tableCount = 0;
         List<String[]> schemas = new ArrayList<>();
         try (ResultSet result = metadata.getSchemas()) {
-            while (result.next()) schemas.add(new String[]{result.getString("TABLE_CATALOG"), result.getString("TABLE_SCHEM")});
+            while (result.next()) {
+                String catalog;
+                try { catalog = result.getString("TABLE_CATALOG"); }
+                catch (Exception ignored) { catalog = null; }
+                schemas.add(new String[]{catalog, result.getString("TABLE_SCHEM")});
+            }
         } catch (Exception ignored) { }
         if (schemas.isEmpty()) {
             try (ResultSet catalogs = metadata.getCatalogs()) {
                 while (catalogs.next()) {
                     String catalog = catalogs.getString("TABLE_CAT");
-                    DefaultMutableTreeNode catalogNode = new DefaultMutableTreeNode(catalog);
-                    int count = addTables(metadata, catalog, null, catalogNode, completion);
-                    root.add(catalogNode);
-                    tableCount += count;
+                    root.add(lazyNode(new MetadataScope(catalog, null, catalog)));
+                    schemaCount++;
                 }
             } catch (Exception ignored) { }
-            if (root.getChildCount() == 0) tableCount = addTables(metadata, null, null, root, completion);
+            if (root.getChildCount() == 0) {
+                root.add(lazyNode(new MetadataScope(null, null, SqlI18n.t("default_scope"))));
+                schemaCount = 1;
+            }
         } else {
             for (String[] schema : schemas) {
                 String catalog = schema[0];
                 String schemaName = schema[1];
-                DefaultMutableTreeNode schemaNode = new DefaultMutableTreeNode(schemaName);
-                int count = addTables(metadata, catalog, schemaName, schemaNode, completion);
-                if (catalog != null && !catalog.isBlank()) {
-                    DefaultMutableTreeNode catalogNode = findOrAdd(root, catalog);
-                    catalogNode.add(schemaNode);
-                } else root.add(schemaNode);
+                String displayName = catalog == null || catalog.isBlank() ? schemaName : catalog + "." + schemaName;
+                root.add(lazyNode(new MetadataScope(catalog, schemaName, displayName)));
                 schemaCount++;
-                tableCount += count;
             }
         }
-        return new MetadataSnapshot(root, completion.stream().distinct().toList(), tableCount, schemaCount);
+        return new MetadataSnapshot(root, completion.stream().distinct().toList(), schemaCount);
     }
 
-    private DefaultMutableTreeNode findOrAdd(DefaultMutableTreeNode root, String name) {
-        for (int i = 0; i < root.getChildCount(); i++) {
-            DefaultMutableTreeNode node = (DefaultMutableTreeNode) root.getChildAt(i);
-            if (name.equals(node.getUserObject())) return node;
-        }
-        DefaultMutableTreeNode created = new DefaultMutableTreeNode(name);
-        root.add(created);
-        return created;
+    private DefaultMutableTreeNode lazyNode(Object value) {
+        DefaultMutableTreeNode node = new DefaultMutableTreeNode(value);
+        node.add(new DefaultMutableTreeNode(SqlI18n.t("expand_to_load")));
+        return node;
     }
 
-    private int addTables(DatabaseMetaData metadata, String catalog, String schema,
-                          DefaultMutableTreeNode parent, List<String> completion) throws Exception {
-        int count = 0;
+    private void loadTables(DefaultMutableTreeNode scopeNode) {
+        if (!isPendingNode(scopeNode) || connection == null) return;
+        MetadataScope scope = (MetadataScope) scopeNode.getUserObject();
+        markLoading(scopeNode);
+        Connection active = connection;
+        setStatus(SqlI18n.t("loading_tables", scope.displayName()));
+        new SwingWorker<List<DefaultMutableTreeNode>, Void>() {
+            @Override protected List<DefaultMutableTreeNode> doInBackground() throws Exception {
+                return readTables(active.getMetaData(), scope);
+            }
+
+            @Override protected void done() {
+                if (connection != active) return;
+                try {
+                    List<DefaultMutableTreeNode> tables = get();
+                    scopeNode.removeAllChildren();
+                    tables.forEach(scopeNode::add);
+                    tables.stream()
+                            .map(DefaultMutableTreeNode::getUserObject)
+                            .filter(TableRef.class::isInstance)
+                            .map(TableRef.class::cast)
+                            .map(TableRef::qualifiedName)
+                            .forEach(metadataSuggestions::add);
+                    ((DefaultTreeModel) objectTree.getModel()).reload(scopeNode);
+                    setStatus(SqlI18n.t("tables_loaded", tables.size(), scope.displayName()));
+                    refreshSuggestions();
+                } catch (Exception exception) {
+                    restorePending(scopeNode);
+                    Throwable cause = exception.getCause() == null ? exception : exception.getCause();
+                    setStatus(SqlI18n.t("error", safeMessage(cause)));
+                }
+            }
+        }.execute();
+    }
+
+    private List<DefaultMutableTreeNode> readTables(DatabaseMetaData metadata, MetadataScope scope) throws Exception {
+        List<DefaultMutableTreeNode> nodes = new ArrayList<>();
         String identifierQuote;
         try {
             identifierQuote = metadata.getIdentifierQuoteString();
         } catch (Exception ignored) {
             identifierQuote = "";
         }
-        try (ResultSet tables = metadata.getTables(catalog, schema, null, new String[]{"TABLE", "VIEW"})) {
+        try (ResultSet tables = metadata.getTables(scope.catalog(), scope.schema(), null, new String[]{"TABLE", "VIEW"})) {
             while (tables.next()) {
                 String table = tables.getString("TABLE_NAME");
-                TableRef ref = new TableRef(catalog, schema, table, identifierQuote);
-                DefaultMutableTreeNode tableNode = new DefaultMutableTreeNode(ref);
-                parent.add(tableNode);
-                completion.add(ref.qualifiedName());
-                try (ResultSet columns = metadata.getColumns(catalog, schema, table, null)) {
-                    while (columns.next()) {
-                        String column = columns.getString("COLUMN_NAME");
-                        String dataType = columns.getString("TYPE_NAME");
-                        tableNode.add(new DefaultMutableTreeNode(column + "  ·  " + dataType));
-                        completion.add(column);
-                    }
-                } catch (Exception ignored) { }
-                count++;
+                TableRef ref = new TableRef(scope.catalog(), scope.schema(), table, identifierQuote);
+                nodes.add(lazyNode(ref));
             }
-        } catch (Exception ignored) { }
-        return count;
+        }
+        return nodes;
+    }
+
+    private void loadColumns(DefaultMutableTreeNode tableNode) {
+        if (!isPendingNode(tableNode) || connection == null) return;
+        TableRef table = (TableRef) tableNode.getUserObject();
+        markLoading(tableNode);
+        Connection active = connection;
+        setStatus(SqlI18n.t("loading_columns", table.table()));
+        new SwingWorker<List<ColumnInfo>, Void>() {
+            @Override protected List<ColumnInfo> doInBackground() throws Exception {
+                List<ColumnInfo> columns = new ArrayList<>();
+                try (ResultSet result = active.getMetaData().getColumns(table.catalog(), table.schema(), table.table(), null)) {
+                    while (result.next()) {
+                        String column = result.getString("COLUMN_NAME");
+                        columns.add(new ColumnInfo(column, column + "  ·  " + result.getString("TYPE_NAME")));
+                    }
+                }
+                return columns;
+            }
+
+            @Override protected void done() {
+                if (connection != active) return;
+                try {
+                    List<ColumnInfo> columns = get();
+                    tableNode.removeAllChildren();
+                    columns.forEach(column -> {
+                        tableNode.add(new DefaultMutableTreeNode(column.displayName()));
+                        metadataSuggestions.add(column.name());
+                    });
+                    ((DefaultTreeModel) objectTree.getModel()).reload(tableNode);
+                    setStatus(SqlI18n.t("columns_loaded", columns.size(), table.table()));
+                    refreshSuggestions();
+                } catch (Exception exception) {
+                    restorePending(tableNode);
+                    Throwable cause = exception.getCause() == null ? exception : exception.getCause();
+                    setStatus(SqlI18n.t("error", safeMessage(cause)));
+                }
+            }
+        }.execute();
+    }
+
+    private boolean isPendingNode(DefaultMutableTreeNode node) {
+        return node.getChildCount() == 1 && SqlI18n.t("expand_to_load").equals(
+                ((DefaultMutableTreeNode) node.getChildAt(0)).getUserObject());
+    }
+
+    private void markLoading(DefaultMutableTreeNode node) {
+        DefaultMutableTreeNode child = (DefaultMutableTreeNode) node.getChildAt(0);
+        child.setUserObject(SqlI18n.t("loading"));
+        ((DefaultTreeModel) objectTree.getModel()).nodeChanged(child);
+    }
+
+    private void restorePending(DefaultMutableTreeNode node) {
+        DefaultMutableTreeNode child = (DefaultMutableTreeNode) node.getChildAt(0);
+        child.setUserObject(SqlI18n.t("expand_to_load"));
+        ((DefaultTreeModel) objectTree.getModel()).nodeChanged(child);
     }
 
     private void refreshSuggestions() {
@@ -792,8 +874,11 @@ public class SqlPanel extends JPanel {
         status.setToolTipText(text);
     }
 
-    private record MetadataSnapshot(DefaultMutableTreeNode root, List<String> suggestions,
-                                    int tableCount, int schemaCount) { }
+    private record MetadataSnapshot(DefaultMutableTreeNode root, List<String> suggestions, int schemaCount) { }
+    private record MetadataScope(String catalog, String schema, String displayName) {
+        @Override public String toString() { return displayName; }
+    }
+    private record ColumnInfo(String name, String displayName) { }
     private record QueryResult(List<String> columns, List<Object[]> rows, int count, boolean hasRows) { }
     private record TableRef(String catalog, String schema, String table, String identifierQuote) {
         String qualifiedName() {
