@@ -1,6 +1,6 @@
 ---
 name: fontsutil-font-usage
-description: Use when modifying EasyPostman Swing UI fonts, especially when dialogs, labels, tables, tabs, or renderers look too large or too small, or when a change needs to stay consistent with the user's configured UI font size.
+description: Use when modifying DevWorkbench Swing UI fonts, especially when dialogs, labels, tables, tabs, or renderers look too large or too small, or when a change needs to stay consistent with the user's configured UI font size.
 ---
 
 # FontsUtil Font Usage
@@ -30,9 +30,9 @@ Use this skill when changing Swing font sizes in this repo. The goal is to keep 
 
 ## Repo-specific guidance
 
-- For module placement, `FontsUtil` and reusable typography helpers belong in `easy-postman-ui`; startup-time application of font settings is app/platform orchestration. See `docs/ARCHITECTURE_MODULES_zh.md`.
+- For module placement, `FontsUtil` and reusable typography helpers belong in `dev-workbench-ui`; startup-time application of font settings is app/platform orchestration. See `docs/ARCHITECTURE_MODULES_zh.md`.
 - `FontsUtil` lives at:
-  `easy-postman-ui/src/main/java/com/laker/postman/util/FontsUtil.java`
+  `dev-workbench-ui/src/main/java/com/nvhuong/devworkbench/util/FontsUtil.java`
 - `FontsUtil` reads the configured `ui_font_size`, clamps it, and derives from UI defaults.
 - For this repo, using `FontsUtil` is the correct way to respect user-configured font size and keep fallback chains intact.
 
@@ -47,4 +47,4 @@ Use this skill when changing Swing font sizes in this repo. The goal is to keep 
 
 1. Check the changed view with the user's current UI font size.
 2. Confirm titles, meta text, and body text still have a clear visual hierarchy.
-3. If the change is in app code, rebuild with `mvn -q -pl easy-postman-app -am -DskipTests compile`.
+3. If the change is in app code, rebuild with `mvn -q -pl dev-workbench-app -am -DskipTests compile`.

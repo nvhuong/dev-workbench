@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>com.nvhuong.tools</groupId>
+        <artifactId>dev-workbench-parent</artifactId>
+        <version>${revision}</version>
+        <relativePath>../../pom.xml</relativePath>
+    </parent>
+
+    <!--
+        Các phiên bản plug-in được duy trì riêng biệt.
+        Bản phát hành độc lập ban đầu từ 5.3.16 Ban đầu, nó sẽ chỉ được tăng riêng khi có thay đổi đối với plugin.
+     -->
+    <version>6.0.11</version>
+    <artifactId>dev-workbench-plugin-kafka</artifactId>
+    <packaging>jar</packaging>
+
+    <properties>
+        <!--
+            Phiên bản của gói nền tảng máy chủ được dựa vào trong quá trình biên dịch.
+            Plug-in chính thức có ở đây monorepo Theo mặc định ${revision}，Điều này sẽ căn chỉnh dòng điện trực tiếp api / foundation / ui đầu vào biên dịch.
+            Nó chỉ quyết định“Quá trình biên dịch phụ thuộc vào phiên bản nào của gói nền tảng?”，Không biểu cảm“Thời gian chạy tương thích với thế hệ nền tảng plug-in nào?”。
+         -->
+        <host.version>${revision}</host.version>
+        <!--
+            Một nguồn sự thật duy nhất cho siêu dữ liệu plugin pom.xml。
+            descriptor Mẫu và xuất bản catalog Tất cả chúng đều được tạo gián tiếp từ đây để tránh nhiều lần trôi dạt bằng tay.
+         -->
+        <plugin.id>plugin-kafka</plugin.id>
+        <plugin.name>Kafka Plugin</plugin.name>
+        <plugin.entryClass>com.nvhuong.devworkbench.plugin.kafka.KafkaPlugin</plugin.entryClass>
+        <plugin.description>Kafka toolbox panel, pm.plugin("kafka") script API, completions and snippets.</plugin.description>
+        <plugin.minAppVersion>6.0.14</plugin.minAppVersion>
+        <!--
+            Phạm vi tương thích nền tảng plug-in thời gian chạy, phù hợp là runtime/SPI Ranh giới hội, không phải bản phát hành máy chủ revision。
+            Đừng theo dõi trực tiếp ở đây ${revision}：
+            1. revision Đó là do Host phát hành phiên bản bình thường.bugfix、Những thay đổi không phải plugin tiếp tục thay đổi
+            2. Những thay đổi này thường không đại diện cho plugin SPI Đã xảy ra sự không tương thích
+            3. Nếu nó bị trói ở đây revision，Nhiều plug-in tương thích ban đầu sẽ bị đánh giá sai“Không tương thích”
+            Chỉ khi có những thay đổi mang tính phá hủy đối với chính cơ chế plug-in thì root mới được thăng cấp trước tiên pom của plugin.platform.version，
+            Sau đó điều chỉnh điều này theo phạm vi tương thích thực tế; các lần lặp lại chức năng plug-in thông thường thường không cần phải thay đổi.
+         -->
+        <plugin.minPlatformVersion>${plugin.platform.version}</plugin.minPlatformVersion>
+        <plugin.maxPlatformVersion>${plugin.platform.version}</plugin.maxPlatformVersion>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.nvhuong.tools</groupId>
+            <artifactId>dev-workbench-plugin-api</artifactId>
+            <version>${host.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.nvhuong.tools</groupId>
+            <artifactId>dev-workbench-foundation</artifactId>
+            <version>${host.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.nvhuong.tools</groupId>
+            <artifactId>dev-workbench-ui</artifactId>
+            <version>${host.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.kafka</groupId>
+            <artifactId>kafka-clients</artifactId>
+            <version>${kafka.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.testng</groupId>
+            <artifactId>testng</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <finalName>dev-workbench-${project.version}-plugin-kafka</finalName>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <!-- Chỉ lọc các plugin descriptor，Hãy để phiên bản và siêu dữ liệu đọc trong thời gian chạy được lấy trực tiếp từ đó pom。 -->
+                <filtering>true</filtering>
+                <includes>
+                    <include>META-INF/dev-workbench/plugin-kafka.properties</include>
+                </includes>
+            </resource>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>false</filtering>
+                <excludes>
+                    <exclude>META-INF/dev-workbench/plugin-kafka.properties</exclude>
+                </excludes>
+            </resource>
+        </resources>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <configuration>
+                    <archive>
+                        <manifestEntries>
+                            <Implementation-Version>${project.version}</Implementation-Version>
+                        </manifestEntries>
+                    </archive>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>shade-plugin</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                        <configuration>
+                            <finalName>${project.build.finalName}</finalName>
+                            <artifactSet>
+                                <includes>
+                                    <include>org.apache.kafka:kafka-clients</include>
+                                    <include>com.github.luben:zstd-jni</include>
+                                    <include>at.yawk.lz4:lz4-java</include>
+                                    <include>org.xerial.snappy:snappy-java</include>
+                                </includes>
+                            </artifactSet>
+                            <filters>
+                                <filter>
+                                    <artifact>*:*</artifact>
+                                    <excludes>
+                                        <exclude>META-INF/*.SF</exclude>
+                                        <exclude>META-INF/*.DSA</exclude>
+                                        <exclude>META-INF/*.RSA</exclude>
+                                        <exclude>META-INF/maven/**</exclude>
+                                        <exclude>META-INF/LICENSE*</exclude>
+                                        <exclude>META-INF/NOTICE*</exclude>
+                                        <exclude>META-INF/DEPENDENCIES</exclude>
+                                        <exclude>**/*.md</exclude>
+                                        <exclude>**/*.txt</exclude>
+                                        <exclude>**/module-info.class</exclude>
+                                        <exclude>**/*.kotlin_module</exclude>
+                                        <exclude>**/*.kotlin_builtins</exclude>
+                                    </excludes>
+                                </filter>
+                            </filters>
+                            <createDependencyReducedPom>false</createDependencyReducedPom>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+</project>

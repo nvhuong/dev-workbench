@@ -1,12 +1,12 @@
 blank_issues_enabled: false
 contact_links:
   - name: 💬 Ban thảo luận cộng đồng | Community Discussions
-    url: https://github.com/lakernote/easy-postman/discussions
+    url: https://github.com/nvhuong/dev-workbench/discussions
     about: Sử dụng phần Hỏi đáp, thảo luận các đề xuất về tính năng và chia sẻ kinh nghiệm | Q&A, feature discussions, and sharing experiences
   - name: 📖 Tài liệu tiếng Trung | Chinese Documentation
-    url: https://github.com/lakernote/easy-postman/blob/master/README_zh.md
+    url: https://github.com/nvhuong/dev-workbench/blob/master/README_zh.md
     about: Xem tài liệu tiếng Trung | View Chinese documentation
   - name: 📖 English Documentation
-    url: https://github.com/lakernote/easy-postman/blob/master/README.md
+    url: https://github.com/nvhuong/dev-workbench/blob/master/README.md
     about: View English documentation
 

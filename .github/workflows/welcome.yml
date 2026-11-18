@@ -39,8 +39,8 @@ jobs:
               Chúng tôi sẽ kiểm tra và liên hệ lại với bạn trong thời gian sớm nhất. Trong khi chờ đợi, bạn có thể:
               We'll review and respond as soon as possible. While waiting, you can:
 
-              - 📖 Xem [Tài liệu](https://github.com/lakernote/easy-postman#readme) | Check the [documentation](https://github.com/lakernote/easy-postman#readme)
-              - 💬 Tham gia [Bảng thảo luận](https://github.com/lakernote/easy-postman/discussions) | Join the [Discussions](https://github.com/lakernote/easy-postman/discussions)
+              - 📖 Xem [Tài liệu](https://github.com/nvhuong/dev-workbench#readme) | Check the [documentation](https://github.com/nvhuong/dev-workbench#readme)
+              - 💬 Tham gia [Bảng thảo luận](https://github.com/nvhuong/dev-workbench/discussions) | Join the [Discussions](https://github.com/nvhuong/dev-workbench/discussions)
               - ⭐ Hãy ủng hộ dự án Star！| Give the project a Star!
 
               Nếu bạn muốn giúp giải quyết vấn đề này, vui lòng gửi PR！
@@ -75,7 +75,7 @@ jobs:
 
               - ✅ Mã biên dịch thành công | Code compiles successfully
               - ✅ Tất cả các bài kiểm tra đã vượt qua | All tests pass
-              - ✅ Theo dõi [Nguyên tắc đóng góp](https://github.com/lakernote/easy-postman/blob/master/.github/CONTRIBUTING.md) | Follow the [Contributing Guide](https://github.com/lakernote/easy-postman/blob/master/.github/CONTRIBUTING.md)
+              - ✅ Theo dõi [Nguyên tắc đóng góp](https://github.com/nvhuong/dev-workbench/blob/master/.github/CONTRIBUTING.md) | Follow the [Contributing Guide](https://github.com/nvhuong/dev-workbench/blob/master/.github/CONTRIBUTING.md)
               - ✅ PR Mô tả rõ ràng và đầy đủ | PR description is clear and complete
 
               Cảm ơn một lần nữa vì sự đóng góp của bạn! .🙏

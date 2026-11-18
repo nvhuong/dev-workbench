@@ -1,12 +1,12 @@
 # Script API Hướng dẫn tham khảo
 
-Tài liệu này được cung cấp EasyPostman Chức năng tập lệnh đã hoàn tất API Tham khảo. Tất cả API Tất cả đều được biên dịch dựa trên mã thực tế để đảm bảo tính chính xác và khả năng sử dụng.
+Tài liệu này được cung cấp DevWorkbench Chức năng tập lệnh đã hoàn tất API Tham khảo. Tất cả API Tất cả đều được biên dịch dựa trên mã thực tế để đảm bảo tính chính xác và khả năng sử dụng.
 
 ## Thư mục
 
 - [Đối tượng toàn cầu](#Đối tượng toàn cầu)
 - [pm đối tượng](#pm-đối tượng)
-- [Postman Cơ sở tương thích](#postman-Cơ sở tương thích)
+- [DevWorkbench Cơ sở tương thích](#devworkbench-Cơ sở tương thích)
 - [pm.environment - các biến môi trường](#pmenvironment---các biến môi trường)
 - [Các biến toàn cục (Global Variables）](#Các biến toàn cầuglobal-variables)
 - [pm.variables - Các biến tạm thời](#pmvariables---Các biến tạm thời)
@@ -29,7 +29,7 @@ Tài liệu này được cung cấp EasyPostman Chức năng tập lệnh đã 
 
 ### pm
 
-Chủ yếu Postman API Đối tượng cung cấp quyền truy cập vào tất cả các chức năng của tập lệnh.
+Chủ yếu DevWorkbench API Đối tượng cung cấp quyền truy cập vào tất cả các chức năng của tập lệnh.
 
 ---
 
@@ -74,7 +74,7 @@ Ví dụ:
 
 ```javascript
 pm.sendRequest({
-    url: 'https://httpbin.org/get?source=easy-postman&from=pre-script',
+    url: 'https://httpbin.org/get?source=dev-workbench&from=pre-script',
     method: 'GET',
     header: {
         'X-Debug-Token': pm.environment.get('debugToken') || 'demo-token'
@@ -94,15 +94,15 @@ pm.sendRequest({
 
 ---
 
-## Postman Cơ sở tương thích
+## DevWorkbench Cơ sở tương thích
 
-Trình tự thực hiện sau đây“Postman Cùng tên API Ngữ nghĩa đầu tiên,EasyPostman Các phần mở rộng không xung đột”nguyên tắc.
-trong bảng dưới đây“Tương thích cốt lõi”Chỉ đề cập đến các đường dẫn được liệt kê và có các bài kiểm tra tự động chứ không phải toàn bộ đường dẫn Postman Các đối tượng được thực hiện từng mục một.
+Trình tự thực hiện sau đây“DevWorkbench Cùng tên API Ngữ nghĩa đầu tiên,DevWorkbench Các phần mở rộng không xung đột”nguyên tắc.
+trong bảng dưới đây“Tương thích cốt lõi”Chỉ đề cập đến các đường dẫn được liệt kê và có các bài kiểm tra tự động chứ không phải toàn bộ đường dẫn DevWorkbench Các đối tượng được thực hiện từng mục một.
 
 | phạm vi | trạng thái | Mô tả |
 |---|---|---|
 | `pm.environment`、`pm.globals`、`pm.variables`、`pm.iterationData` | Những đường dẫn thường dùng | Hỗ trợ áp dụng trong từng phạm vi `get/set/has/unset/clear/toObject/replaceIn` |
-| `pm.info` | Những đường dẫn thường dùng | Request, iteration and event information;WebSocket Lĩnh vực này là EasyPostman Sự mở rộng |
+| `pm.info` | Những đường dẫn thường dùng | Request, iteration and event information;WebSocket Lĩnh vực này là DevWorkbench Sự mở rộng |
 | `pm.request.method` / `headers` | Tương thích cốt lõi | Sửa đổi vô hướng so với HeaderList Các sửa đổi sẽ được áp dụng cho lần gửi hiện tại |
 | `pm.request.url` | Tương thích một phần | `query` PropertyList Có thể đọc và ghi được;`request.update` Hỗ trợ chuỗi và phổ biến Url definition |
 | `pm.request.body` | Cấu trúc đối tượng tương thích; được viết dưới dạng phần mở rộng | `raw`、`urlencoded`、`formdata` Đọc,`toString/toJSON/isEmpty` Căn chỉnh Collection SDK；body mutation Là một phần mở rộng tương thích di chuyển |
@@ -110,17 +110,17 @@ trong bảng dưới đây“Tương thích cốt lõi”Chỉ đề cập đế
 | `pm.sendRequest(options, callback)` | Hình thức gọi lại được hỗ trợ | Promise Hình thức trả lại vẫn chưa được thực hiện |
 | `pm.cookies` / `pm.cookies.jar()` | Được hỗ trợ một phần | Có sẵn các biểu mẫu đọc, viết và gọi lại thường được sử dụng;Promise và hoàn thành Cookie Store Các tùy chọn không được căn chỉnh đầy đủ |
 | `pm.collectionVariables` | Để được thực hiện | bộ sưu tập hiện tại/Nhóm các biến có thể tham gia `pm.variables` và `{{...}}` được phân tích cú pháp, nhưng chưa độc lập API đối tượng |
-| `pm.execution`、`pm.visualizer`、`pm.vault`、`pm.require` | Để được thực hiện | Bức tranh lớn `require()` Vâng EasyPostman Đã được mở rộng, không tương đương với `pm.require()` |
+| `pm.execution`、`pm.visualizer`、`pm.vault`、`pm.require` | Để được thực hiện | Bức tranh lớn `require()` Vâng DevWorkbench Đã được mở rộng, không tương đương với `pm.require()` |
 | `pm.request.auth` mutation | Để được cải thiện | Header Việc xác thực phương thức có thể được thông qua `pm.request.headers` Ôn lại |
 
 Việc xác định khả năng tương thích được thực hiện theo mức độ ưu tiên sau:
 
-1. hiện tại Postman chính thức Sandbox Tài liệu quyết định công khai kịch bản API hành vi tiêu chuẩn;
+1. hiện tại DevWorkbench chính thức Sandbox Tài liệu quyết định công khai kịch bản API hành vi tiêu chuẩn;
 2. Collection SDK / Runtime Mã nguồn xác định cấu trúc đối tượng, tuần tự hóa và ngữ nghĩa thời gian chạy lịch sử;
-3. Ngoài quan chức hiện tại Sandbox Các khả năng phải được đánh dấu rõ ràng“EasyPostman Sự mở rộng”hoặc“Tương thích di chuyển”，Không thể kết hợp các kết luận tương thích cốt lõi.
+3. Ngoài quan chức hiện tại Sandbox Các khả năng phải được đánh dấu rõ ràng“DevWorkbench Sự mở rộng”hoặc“Tương thích di chuyển”，Không thể kết hợp các kết luận tương thích cốt lõi.
 
-Tự động hoàn thành các mục và EasyPostman Bí danh lịch sử không làm gì cả“Đã tương thích rồi”chứng cớ. Phiên bản mã nguồn chính thức cho vòng so sánh này là
-Postman Collection SDK `5.3.1`、Runtime `7.56.1`，Và kiểm tra hiện tại cùng một lúc Postman v12 Sandbox Tài liệu.
+Tự động hoàn thành các mục và DevWorkbench Bí danh lịch sử không làm gì cả“Đã tương thích rồi”chứng cớ. Phiên bản mã nguồn chính thức cho vòng so sánh này là
+DevWorkbench Collection SDK `5.3.1`、Runtime `7.56.1`，Và kiểm tra hiện tại cùng một lúc DevWorkbench v12 Sandbox Tài liệu.
 
 ---
 
@@ -201,15 +201,15 @@ Truy cập và vận hành hiện tại HTTP Thông tin được yêu cầu (ch�
 | `method`          | String        | hiện đang được thực thi HTTP Phương pháp (có thể sửa đổi)      | `pm.request.method`          |
 | `headers`         | HeaderList    | Danh sách các tiêu đề yêu cầu hiện tại                  | `pm.request.headers`         |
 | `body`            | RequestBody   | Đối tượng nội dung yêu cầu hiện tại; trống nếu không có nội dung yêu cầu          | `pm.request.body`            |
-| `formData`        | JsListWrapper | EasyPostman Các tập lệnh cũ tương thích với bí danh       | `pm.request.formData`        |
-| `urlencoded`      | JsListWrapper | EasyPostman Các tập lệnh cũ tương thích với bí danh       | `pm.request.urlencoded`      |
-| `params`          | JsListWrapper | EasyPostman Các tập lệnh cũ tương thích với bí danh       | `pm.request.params`          |
-| `isMultipart`     | Boolean       | EasyPostman Gia hạn thời gian thực hiện          | `pm.request.isMultipart`     |
-| `followRedirects` | Boolean       | EasyPostman Gia hạn thời gian thực hiện          | `pm.request.followRedirects` |
+| `formData`        | JsListWrapper | DevWorkbench Các tập lệnh cũ tương thích với bí danh       | `pm.request.formData`        |
+| `urlencoded`      | JsListWrapper | DevWorkbench Các tập lệnh cũ tương thích với bí danh       | `pm.request.urlencoded`      |
+| `params`          | JsListWrapper | DevWorkbench Các tập lệnh cũ tương thích với bí danh       | `pm.request.params`          |
+| `isMultipart`     | Boolean       | DevWorkbench Gia hạn thời gian thực hiện          | `pm.request.isMultipart`     |
+| `followRedirects` | Boolean       | DevWorkbench Gia hạn thời gian thực hiện          | `pm.request.followRedirects` |
 
 `pm.request.update(options)`、`pm.request.body`、`pm.request.url.query` và
-`pm.request.headers` Theo dõi đầu tiên Postman Collection SDK cấu trúc đối tượng.EasyPostman Phần mở rộng chỉ mang tính bổ sung.
-Đừng thay đổi tên Postman API ý nghĩa. Các sửa đổi tập lệnh chỉ ảnh hưởng đến việc thực thi hiện tại và sẽ không ghi đè lên định nghĩa yêu cầu được lưu trong trình chỉnh sửa.
+`pm.request.headers` Theo dõi đầu tiên DevWorkbench Collection SDK cấu trúc đối tượng.DevWorkbench Phần mở rộng chỉ mang tính bổ sung.
+Đừng thay đổi tên DevWorkbench API ý nghĩa. Các sửa đổi tập lệnh chỉ ảnh hưởng đến việc thực thi hiện tại và sẽ không ghi đè lên định nghĩa yêu cầu được lưu trong trình chỉnh sửa.
 
 ### RequestBody
 
@@ -219,26 +219,26 @@ Truy cập và vận hành hiện tại HTTP Thông tin được yêu cầu (ch�
 | `raw`               | raw Thân hình mẫu                                |
 | `urlencoded`        | URL Danh sách tham số mã hóa                              |
 | `formdata`          | multipart Danh sách tham số                           |
-| `update(definition)` | Nhấn Postman RequestBody Các quy tắc được cập nhật; chuỗi được chuyển sang raw người mẫu |
-| `toString()`        | raw/urlencoded Biểu diễn chuỗi của văn bản;urlencoded Nhấn Postman QueryParam Dấu phân cách chuẩn hóa quy tắc |
-| `toJSON()`          | Postman Collection body definition      |
+| `update(definition)` | Nhấn DevWorkbench RequestBody Các quy tắc được cập nhật; chuỗi được chuyển sang raw người mẫu |
+| `toString()`        | raw/urlencoded Biểu diễn chuỗi của văn bản;urlencoded Nhấn DevWorkbench QueryParam Dấu phân cách chuẩn hóa quy tắc |
+| `toJSON()`          | DevWorkbench Collection body definition      |
 | `isEmpty()`         | hiện tại body Cho dù nó trống rỗng                            |
 
-Cần phải phân biệt“hiện tại Postman Hợp đồng sản phẩm”và“lịch sử Runtime / Collection SDK Khả năng”：
+Cần phải phân biệt“hiện tại DevWorkbench Hợp đồng sản phẩm”và“lịch sử Runtime / Collection SDK Khả năng”：
 
-- hiện tại Postman v12 Sandbox Xử lý tài liệu `pm.request.body` Đánh dấu nó là không thể sửa đổi và nêu rõ điều này `pm` Yêu cầu không được hỗ trợ mutation；
-- Collection SDK `RequestBody` Vẫn có sẵn `update()`，Postman Runtime `7.27.0`（2021-03）Tôi cũng đã nuôi nó
+- hiện tại DevWorkbench v12 Sandbox Xử lý tài liệu `pm.request.body` Đánh dấu nó là không thể sửa đổi và nêu rõ điều này `pm` Yêu cầu không được hỗ trợ mutation；
+- Collection SDK `RequestBody` Vẫn có sẵn `update()`，DevWorkbench Runtime `7.27.0`（2021-03）Tôi cũng đã nuôi nó
   pre-request trong body Những thay đổi được áp dụng cho yêu cầu thực tế;`7.26.x` và các phiên bản trước đó sẽ không được gửi sửa đổi body；
-- EasyPostman Tiếp tục hỗ trợ di chuyển các bộ sưu tập cũ và tập lệnh hiện có `body.update(text)`、Ôn lại `.raw`，cũng như
-  `pm.request.body = 'text'`。Các khả năng ghi này rõ ràng tương thích với tiện ích mở rộng và không được cho là hiện hành Postman v12 Sandbox tiêu chuẩn.
+- DevWorkbench Tiếp tục hỗ trợ di chuyển các bộ sưu tập cũ và tập lệnh hiện có `body.update(text)`、Ôn lại `.raw`，cũng như
+  `pm.request.body = 'text'`。Các khả năng ghi này rõ ràng tương thích với tiện ích mở rộng và không được cho là hiện hành DevWorkbench v12 Sandbox tiêu chuẩn.
 
-Vì vậy, nó có thể được thực hiện ở thời điểm hiện tại Postman Và EasyPostman Một tập lệnh mới thay thế trực tiếp giữa . và không nên dựa vào body mutation；
+Vì vậy, nó có thể được thực hiện ở thời điểm hiện tại DevWorkbench Và DevWorkbench Một tập lệnh mới thay thế trực tiếp giữa . và không nên dựa vào body mutation；
 Nếu bạn đang di chuyển các tập lệnh lịch sử, hãy sử dụng chúng trước tiên SDK hình thái `update(text)` hoặc sửa đổi `.raw`，Việc gán một chuỗi trực tiếp chỉ hoạt động như
-EasyPostman Khả năng di chuyển thoải mái được giữ lại.
+DevWorkbench Khả năng di chuyển thoải mái được giữ lại.
 
 Ranh giới hiện tại: .
 
-- `file` Chế độ chỉ được bảo lưu EasyPostman đường đi cục bộ `src` Khả năng, chưa phù hợp Postman Runtime Sau khi phân tích tập tin `content`。
+- `file` Chế độ chỉ được bảo lưu DevWorkbench đường đi cục bộ `src` Khả năng, chưa phù hợp DevWorkbench Runtime Sau khi phân tích tập tin `content`。
 - GraphQL Việc nhập vẫn sử dụng cái hiện có raw JSON Chuyển đổi, không có tập lệnh nào được khai báo mutation Tương thích.
 - `pm.request.update(options)` Chuỗi đã được xác minh URL、Thường được sử dụng Url definition（`protocol/auth/host/port/path/query/hash`）、method、header và body，Nó không có nghĩa là nó đã được thực hiện Request SDK tất cả các lĩnh vực.
 
@@ -318,7 +318,7 @@ pm.request.headers.add({
     value: "Bearer " + pm.environment.get("token")
 });
 
-// Thêm tham số truy vấn (Postman đường dẫn tiêu chuẩn)
+// Thêm tham số truy vấn (DevWorkbench đường dẫn tiêu chuẩn)
 pm.request.url.query.add({
     key: "timestamp",
     value: Date.now().toString()
@@ -809,7 +809,7 @@ Thông tin gỡ lỗi đầu ra.
 
 ## Tích hợp sẵn JavaScript thư viện
 
-EasyPostman Ba cái thường được sử dụng được tích hợp sẵn JavaScript thư viện, những thư viện này**Được tải sẵn vào phạm vi toàn cầu**，Có thể sử dụng trực tiếp, không cần thiết `require()`。
+DevWorkbench Ba cái thường được sử dụng được tích hợp sẵn JavaScript thư viện, những thư viện này**Được tải sẵn vào phạm vi toàn cầu**，Có thể sử dụng trực tiếp, không cần thiết `require()`。
 
 ### Danh sách các thư viện được hỗ trợ
 
@@ -856,7 +856,7 @@ Các ví dụ làm sẵn có thể được kiểm tra trực tiếp :
 // Kho lưu trữ có các ví dụ cục bộ tích hợp.local-parent.js Nó sẽ tiếp tục trong nội bộ require('./local-child.js')
 // Nó có thể được thực thi trực tiếp khi không gian làm việc hiện tại trỏ đến thư mục gốc của kho
 var localDemo = require('./docs/examples/js-require/local-parent.js');
-console.log(localDemo.describe('easy-postman'));
+console.log(localDemo.describe('dev-workbench'));
 console.log(localDemo.marker());
 ```
 
@@ -3019,8 +3019,8 @@ pm.environment.set('performanceStats', JSON.stringify(stats));
 ## Những điều cần lưu ý
 
 1. **Hạn chế phạm vi**
-    - Postman ở giữa `pm.response` Chủ yếu được sử dụng cho Post-response kịch bản
-    - EasyPostman Vào Pre-request Các đối tượng phản hồi trống được cung cấp dưới dạng tiện ích mở rộng tương thích ngược và không nên dựa vào dữ liệu bên trong chúng
+    - DevWorkbench ở giữa `pm.response` Chủ yếu được sử dụng cho Post-response kịch bản
+    - DevWorkbench Vào Pre-request Các đối tượng phản hồi trống được cung cấp dưới dạng tiện ích mở rộng tương thích ngược và không nên dựa vào dữ liệu bên trong chúng
 
 2. **Loại biến**
     - `pm.environment` Được sử dụng để lưu trữ biến liên tục
@@ -3134,8 +3134,8 @@ var moment = require('moment')
 
 ## Tài nguyên tham khảo
 
-- [Postman Tài liệu chính thức](https://learning.postman.com/docs/writing-scripts/intro-to-scripts/)
-- [Postman Runtime yêu cầu mutation Kiểm tra tích hợp](https://github.com/postmanlabs/postman-runtime/blob/develop/test/integration/mutations/request.test.js)
-- [Postman Runtime 7.27.0 body mutation thay đổi](https://github.com/postmanlabs/postman-runtime/commit/3b998e4471919df458e09651de00d4a45e6f3bb2)
-- [Postman Collection SDK RequestBody hoàn thành](https://github.com/postmanlabs/postman-collection/blob/develop/lib/collection/request-body.js)
+- [DevWorkbench Tài liệu chính thức](https://learning.devworkbench.com/docs/writing-scripts/intro-to-scripts/)
+- [DevWorkbench Runtime yêu cầu mutation Kiểm tra tích hợp](https://github.com/devworkbenchlabs/devworkbench-runtime/blob/develop/test/integration/mutations/request.test.js)
+- [DevWorkbench Runtime 7.27.0 body mutation thay đổi](https://github.com/devworkbenchlabs/devworkbench-runtime/commit/3b998e4471919df458e09651de00d4a45e6f3bb2)
+- [DevWorkbench Collection SDK RequestBody hoàn thành](https://github.com/devworkbenchlabs/devworkbench-collection/blob/develop/lib/collection/request-body.js)
 - [ChaiJS Thư viện khẳng định](https://www.chaijs.com/api/bdd/)

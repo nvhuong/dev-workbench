@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE RSyntaxTheme SYSTEM "theme.dtd">
+
+<!--
+	DevWorkbench Dark Theme
+	Optimized dark theme for DevWorkbench application
+	Based on modern dark color schemes with improved readability
+-->
+<RSyntaxTheme version="1.0">
+
+	<!-- Omitting baseFont will use a system-appropriate monospaced. -->
+	<!--<baseFont family="..." size="13"/>-->
+
+	<!-- General editor colors - IDEA-like dark editor surface -->
+	<background color="1E1F22" />
+	<caret color="CED0D6" />
+	<selection useFG="false" bg="214283" roundedEdges="true" />  <!-- Nền được chọn màu xanh, các góc được bo tròn -->
+	<currentLineHighlight color="25282D" fade="true" />  <!-- Dòng hiện tại được đánh dấu -->
+	<marginLine fg="2B2D30" />  <!-- Đường lề, tránh độ sáng quá mức ở màu tối -->
+	<markAllHighlight color="364235" />  <!-- Đánh dấu tất cả các trận đấu -->
+	<markOccurrencesHighlight color="34475C" />  <!-- Số lần xuất hiện của nhãn hiệu -->
+	<matchedBracket fg="D6D8DE" bg="2E4A45" highlightBoth="true" animate="true" />  <!-- Dấu ngoặc đơn phù hợp -->
+	<hyperlinks fg="589DF6" />  <!-- Siêu liên kết - màu xanh -->
+
+	<!-- Hỗ trợ đa ngôn ngữ -->
+	<secondaryLanguages>
+		<language index="1" bg="1F2023" />
+		<language index="2" bg="212327" />
+		<language index="3" bg="23262A" />
+	</secondaryLanguages>
+
+	<!-- Gutter styling - Kiểu vùng số dòng -->
+	<gutterBackground color="1C1D20" />
+	<gutterBorder color="2B2D30" />
+	<lineNumbers fg="6F737A" currentFG="AEB6C2"/>  <!-- Số dòng hiện tại sáng hơn -->
+	<foldIndicator fg="6F737A" armedFg="AEB6C2" iconBg="1C1D20" iconArmedBg="2B2D30" />
+	<iconRowHeader activeLineRange="3592C4" />
+
+	<!-- Syntax tokens - Syntax highlighting color -->
+	<tokenStyles>
+		<!-- NULL - Dấu kết thúc dòng -->
+		<style token="NULL" fg="C9CCD3" />
+
+		<!-- Lưu ý - Màu xanh xám -->
+		<style token="COMMENT_EOL" fg="7A7F87" italic="true" />
+		<style token="COMMENT_MULTILINE" fg="7A7F87" italic="true" />
+		<style token="COMMENT_DOCUMENTATION" fg="629755" italic="true" />
+		<style token="COMMENT_KEYWORD" fg="629755" bold="true" italic="true" />
+		<style token="COMMENT_MARKUP" fg="629755" italic="true" />
+
+		<!-- Từ khóa - Màu cam (JavaScript: function, var, const, let, if, else Chờ đợi)-->
+		<style token="RESERVED_WORD" fg="B392F0" />
+		<style token="RESERVED_WORD_2" fg="B392F0" />
+
+		<!-- chức năng/phương pháp - Màu vàng sáng (JavaScript: console.log, Array.map Chờ đợi)-->
+		<style token="FUNCTION" fg="56A8F5" />
+
+		<!-- Nghĩa đen - Giá trị Boolean (true, false) -->
+		<style token="LITERAL_BOOLEAN" fg="CF8E6D" />
+
+		<!-- Nghĩa đen - Số (tất cả các cơ sở)-->
+		<style token="LITERAL_NUMBER_DECIMAL_INT" fg="2AACB8" />
+		<style token="LITERAL_NUMBER_FLOAT" fg="2AACB8" />
+		<style token="LITERAL_NUMBER_HEXADECIMAL" fg="2AACB8" />
+
+		<!-- chuỗi - Màu xanh lá cây(JavaScript Hỗ trợ nhiều loại chuỗi)-->
+		<style token="LITERAL_STRING_DOUBLE_QUOTE" fg="6AAB73" />
+		<style token="LITERAL_CHAR" fg="6AAB73" />
+		<style token="LITERAL_BACKQUOTE" fg="6AAB73" />  <!-- ES6 Chuỗi mẫu -->
+
+		<!-- Kiểu dữ liệu - Xanh lam (Java: int, String, void Chờ đợi)-->
+		<style token="DATA_TYPE" fg="56A8F5" bold="true" />
+
+		<!-- các biến - Màu tím (Java: @Autowired, @Override vân vân.)-->
+		<style token="VARIABLE" fg="C77DBB" />
+
+		<!-- Biểu thức chính quy - Màu đỏ cam -->
+		<style token="REGEX" fg="D5B778" />
+
+		<!-- Lưu ý - Vàng vàng (Java: @Override, @Deprecated v.v., cho request、response Đợi đã DevWorkbench thuộc tính)-->
+		<style token="ANNOTATION" fg="B3AE60" />
+
+		<!-- định danh - Văn bản mặc định (tên biến, tên hàm, v.v.)-->
+		<style token="IDENTIFIER" fg="C9CCD3" />
+
+		<!-- trống -->
+		<style token="WHITESPACE" fg="C9CCD3" />
+
+		<!-- dải phân cách - Màu cam (dấu ngoặc đơn, dấu ngoặc nhọn, dấu ngoặc vuông, v.v.:{}[]()）-->
+		<style token="SEPARATOR" fg="BCBEC4" />
+
+		<!-- nhà điều hành - Màu xám nhạt (+, -, *, /, =, ==, ===, !=, !==, &&, ||, !, ?, : Chờ đợi)-->
+		<style token="OPERATOR" fg="BCBEC4" />
+
+		<!-- bộ tiền xử lý - Màu tím (C/C++: #include, #define Chờ đợi)-->
+		<style token="PREPROCESSOR" fg="C77DBB" />
+
+		<!-- HTML/XML Nhãn -->
+		<style token="MARKUP_TAG_DELIMITER" fg="CF8E6D" />
+		<style token="MARKUP_TAG_NAME" fg="CF8E6D" bold="true" />
+		<style token="MARKUP_TAG_ATTRIBUTE" fg="BCBEC4" />
+		<style token="MARKUP_TAG_ATTRIBUTE_VALUE" fg="6AAB73" />
+		<style token="MARKUP_COMMENT" fg="7A7F87" italic="true" />
+		<style token="MARKUP_DTD" fg="C77DBB" />
+		<style token="MARKUP_PROCESSING_INSTRUCTION" fg="C77DBB" />
+		<style token="MARKUP_CDATA_DELIMITER" fg="C77DBB" />
+		<style token="MARKUP_CDATA" fg="BCBEC4" />
+		<style token="MARKUP_ENTITY_REFERENCE" fg="2AACB8" />
+
+		<!-- Cờ lỗi - nền màu đỏ -->
+		<style token="ERROR_IDENTIFIER" fg="DB5860" bg="3A2628" />
+		<style token="ERROR_NUMBER_FORMAT" fg="DB5860" bg="3A2628" />
+		<style token="ERROR_STRING_DOUBLE" fg="DB5860" bg="3A2628" />
+		<style token="ERROR_CHAR" fg="DB5860" bg="3A2628" />
+	</tokenStyles>
+
+</RSyntaxTheme>

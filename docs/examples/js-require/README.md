@@ -1,6 +1,6 @@
 # JS require() local examples
 
-These files are used by EasyPostman request-script snippets and docs to verify:
+These files are used by DevWorkbench request-script snippets and docs to verify:
 
 - loading a local absolute-path script
 - nested relative `require('./local-child.js')`

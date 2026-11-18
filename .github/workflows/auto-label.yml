@@ -60,7 +60,7 @@ jobs:
               'environment': ['environment', 'variable', 'môi trường', 'các biến'],  // các biến môi trường
               'script': ['script', 'javascript', 'kịch bản'],  // Chức năng kịch bản
               'network': ['network', 'websocket', 'sse', 'mạng'],  // Kết nối mạng
-              'import-export': ['import', 'export', 'postman', 'curl', 'Nhập khẩu', 'Xuất khẩu']  // Chức năng xuất nhập khẩu
+              'import-export': ['import', 'export', 'devworkbench', 'curl', 'Nhập khẩu', 'Xuất khẩu']  // Chức năng xuất nhập khẩu
             };
 
             // Duyệt qua các từ khóa thành phần và thêm các thẻ tương ứng nếu chúng khớp

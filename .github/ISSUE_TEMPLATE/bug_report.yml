@@ -15,16 +15,16 @@ body:
       label: Kiểm tra trước | Pre-check
       description: Vui lòng xác nhận những điều sau trước khi gửi | Please confirm the following before submitting
       options:
-        - label: Tôi đã tìm kiếm [Issues](https://github.com/lakernote/easy-postman/issues) và [Discussions](https://github.com/lakernote/easy-postman/discussions)，Không tìm thấy câu hỏi tương tự | I have searched Issues and Discussions and found no similar issues
+        - label: Tôi đã tìm kiếm [Issues](https://github.com/nvhuong/dev-workbench/issues) và [Discussions](https://github.com/nvhuong/dev-workbench/discussions)，Không tìm thấy câu hỏi tương tự | I have searched Issues and Discussions and found no similar issues
           required: true
-        - label: Tôi đã đọc nó [FAQ Tài liệu](https://github.com/lakernote/easy-postman#-faq) | I have read the FAQ documentation
+        - label: Tôi đã đọc nó [FAQ Tài liệu](https://github.com/nvhuong/dev-workbench#-faq) | I have read the FAQ documentation
           required: true
 
   - type: input
     id: version
     attributes:
-      label: EasyPostman Phiên bản | Version
-      description: bạn sử dụng EasyPostman phiên bản (xem trên trang Giới thiệu)| Your EasyPostman version (check in About page)
+      label: DevWorkbench Phiên bản | Version
+      description: bạn sử dụng DevWorkbench phiên bản (xem trên trang Giới thiệu)| Your DevWorkbench version (check in About page)
       placeholder: Ví dụ | e.g. 3.1.5
     validations:
       required: true

@@ -3,7 +3,7 @@
 ## Architecture Overview
 
 ```
-EasyPostman
+DevWorkbench
 ├── 🎨 UI Layer
 │   ├── Workspace management
 │   ├── Collections management
@@ -155,7 +155,7 @@ EasyPostman
    ```
    mvn clean package
    ```
-   - Produces `easy-postman-{version}.jar`
+   - Produces `dev-workbench-{version}.jar`
    - Requires Java 21+ runtime
    - Smallest distribution size
 
@@ -188,9 +188,9 @@ EasyPostman
 ### Project Structure
 
 ```
-easy-postman/
+dev-workbench/
 ├── src/main/java/          # Java source code
-│   └── com/laker/postman/
+│   └── com/nvhuong/devworkbench/
 │       ├── ui/             # UI components
 │       ├── service/        # Business logic
 │       ├── model/          # Data models

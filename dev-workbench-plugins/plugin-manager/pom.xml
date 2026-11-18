@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>com.nvhuong.tools</groupId>
+        <artifactId>dev-workbench-parent</artifactId>
+        <version>${revision}</version>
+        <relativePath>../../pom.xml</relativePath>
+    </parent>
+
+    <!--
+        Quản lý plugin:
+        Đối với UI Cung cấp mặt tiền và đóng gói cấp cao hơn catalog、trực tuyến/Cài đặt, gỡ cài đặt ngoại tuyến và các hoạt động khác.
+        Vì thế app Các lớp không yêu cầu phụ thuộc trực tiếp runtime các chi tiết cơ bản.
+     -->
+    <artifactId>dev-workbench-plugin-manager</artifactId>
+    <packaging>jar</packaging>
+
+    <dependencies>
+        <!-- manager dựa trên runtime Quét được cung cấp/Khả năng trạng thái hoạt động -->
+        <dependency>
+            <groupId>com.nvhuong.tools</groupId>
+            <artifactId>dev-workbench-plugin-runtime</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>tools.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.testng</groupId>
+            <artifactId>testng</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+</project>

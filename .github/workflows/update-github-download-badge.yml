@@ -22,7 +22,7 @@ concurrency:
 jobs:
   update-badge:
     name: Update Badge（Cập nhật huy hiệu)
-    if: github.repository == 'lakernote/easy-postman'
+    if: github.repository == 'nvhuong/dev-workbench'
     runs-on: ubuntu-latest
     steps:
       - name: Calculate all release downloads（Thống kê hết Release lượt tải xuống)

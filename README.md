@@ -1,33 +1,33 @@
 <div align="center">
 
-<img src="docs/icon.png" alt="EasyPostman Logo" width="100" />
+<img src="docs/icon.png" alt="DevWorkbench Logo" width="100" />
 
-# EasyPostman
+# DevWorkbench
 
-**An open-source Postman-style API client + JMeter-style load testing desktop app**<br>
+**An open-source DevWorkbench-style API client + JMeter-style load testing desktop app**<br>
 *Local-first · Git workspaces · Headless CLI · Built-in MCP Server*
 
-[![GitHub license](https://img.shields.io/github/license/lakernote/easy-postman?style=flat-square)](https://github.com/lakernote/easy-postman/blob/master/LICENSE)
-[![GitHub release](https://img.shields.io/github/v/release/lakernote/easy-postman?style=flat-square&color=brightgreen)](https://github.com/lakernote/easy-postman/releases)
-[![GitHub downloads](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Flakernote%2Feasy-postman%2Fbadges%2Fgithub-downloads.json&style=flat-square&cacheSeconds=3600)](https://github.com/lakernote/easy-postman/releases)
-[![GitHub stars](https://img.shields.io/github/stars/lakernote/easy-postman?style=flat-square&color=yellow)](https://github.com/lakernote/easy-postman/stargazers)
+[![GitHub license](https://img.shields.io/github/license/nvhuong/dev-workbench?style=flat-square)](https://github.com/nvhuong/dev-workbench/blob/master/LICENSE)
+[![GitHub release](https://img.shields.io/github/v/release/nvhuong/dev-workbench?style=flat-square&color=brightgreen)](https://github.com/nvhuong/dev-workbench/releases)
+[![GitHub downloads](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fnvhuong%2Fdev-workbench%2Fbadges%2Fgithub-downloads.json&style=flat-square&cacheSeconds=3600)](https://github.com/nvhuong/dev-workbench/releases)
+[![GitHub stars](https://img.shields.io/github/stars/nvhuong/dev-workbench?style=flat-square&color=yellow)](https://github.com/nvhuong/dev-workbench/stargazers)
 [![Java](https://img.shields.io/badge/Java-21+-ED8B00?style=flat-square&logo=openjdk&logoColor=white)](https://openjdk.org/)
-[![Platform](https://img.shields.io/badge/Platform-Windows%20%7C%20macOS%20%7C%20Linux-0078D4?style=flat-square)](https://github.com/lakernote/easy-postman/releases)
+[![Platform](https://img.shields.io/badge/Platform-Windows%20%7C%20macOS%20%7C%20Linux-0078D4?style=flat-square)](https://github.com/nvhuong/dev-workbench/releases)
 
-[Tiếng Trung giản thể](README_zh.md) · [📦 Download](#-download-and-install) · [🤖 Install MCP](#-mcp-server) · [📖 Docs](#-documentation) · [💬 Discuss](https://github.com/lakernote/easy-postman/discussions) · WeChat: `lakernote`
+[Tiếng Trung giản thể](README_zh.md) · [📦 Download](#-download-and-install) · [🤖 Install MCP](#-mcp-server) · [📖 Docs](#-documentation) · [💬 Discuss](https://github.com/nvhuong/dev-workbench/discussions) · WeChat: `nvhuong`
 
 </div>
 
 ---
 
-## What is EasyPostman?
+## What is DevWorkbench?
 
-EasyPostman combines **Postman-style API debugging** and **JMeter-style performance testing** in one Java 21 desktop application. Collections, environments, and test data stay local by default, while Git workspaces support team collaboration. The same workspace can also run in CI through the headless CLI or be exposed to AI clients such as Codex, Claude Desktop, and Cursor through MCP.
+DevWorkbench combines **DevWorkbench-style API debugging** and **JMeter-style performance testing** in one Java 21 desktop application. Collections, environments, and test data stay local by default, while Git workspaces support team collaboration. The same workspace can also run in CI through the headless CLI or be exposed to AI clients such as Codex, Claude Desktop, and Cursor through MCP.
 
 | Core capability | What it provides |
 |---|---|
 | 🔌 API debugging | HTTP/HTTPS, SSE, WebSocket, auth, cookies, multiple body types, response inspection, and network logs |
-| 🧩 Collections and scripts | Postman v2.1 / cURL import, environments, pre/post scripts, assertions, and request chaining |
+| 🧩 Collections and scripts | DevWorkbench v2.1 / cURL import, environments, pre/post scripts, assertions, and request chaining |
 | ⚡ Performance testing | Thread groups, timers, extractors, live metrics, PDF reports, and distributed master/worker runs |
 | 🏢 Local and Git workspaces | Isolated collections, environments, and settings with user-controlled storage |
 | 🤖 MCP and headless CLI | Let AI run saved APIs; run collections, functional tests, and load plans in CI |
@@ -38,7 +38,7 @@ EasyPostman combines **Postman-style API debugging** and **JMeter-style performa
 
 <table>
   <tr>
-    <th width="50%">Postman-style API debugging</th>
+    <th width="50%">DevWorkbench-style API debugging</th>
     <th width="50%">JMeter-style performance testing</th>
   </tr>
   <tr>
@@ -59,55 +59,55 @@ EasyPostman combines **Postman-style API debugging** and **JMeter-style performa
 
 ## 📦 Download and install
 
-Download the latest release from **[GitHub Releases](https://github.com/lakernote/easy-postman/releases)**. A **[Gitee mirror](https://gitee.com/lakernote/easy-postman/releases)** is also available. Native installers and the Windows portable package include a runtime, so neither the desktop app nor MCP needs a separate Java installation. Only the cross-platform JAR requires Java 21+.
+Download the latest release from **[GitHub Releases](https://github.com/nvhuong/dev-workbench/releases)**. A **[Gitee mirror](https://gitee.com/nvhuong/dev-workbench/releases)** is also available. Native installers and the Windows portable package include a runtime, so neither the desktop app nor MCP needs a separate Java installation. Only the cross-platform JAR requires Java 21+.
 
 ### Windows WinGet
 
 ```powershell
-winget install --id Laker.EasyPostman --exact
+winget install --id Nvhuong.DevWorkbench --exact
 ```
 
 Upgrade later with:
 
 ```powershell
-winget upgrade --id Laker.EasyPostman --exact
+winget upgrade --id Nvhuong.DevWorkbench --exact
 ```
 
 ### Choose a package
 
 | Platform | File |
 |---|---|
-| macOS Apple Silicon | `EasyPostman-{version}-macos-arm64.dmg` |
-| macOS Intel | `EasyPostman-{version}-macos-x86_64.dmg` |
-| Windows installer / portable | `EasyPostman-{version}-windows-x64.exe` / `-portable.zip` |
-| Debian / Ubuntu x64 | `EasyPostman-{version}-linux-amd64.deb` |
-| Debian / Ubuntu ARM64 | `EasyPostman-{version}-linux-arm64.deb`; use `-compat.deb` only for older incompatible `dpkg` versions |
-| RHEL / Rocky / CentOS / Fedora | `EasyPostman-{version}-1.x86_64.rpm` or `-1.aarch64.rpm` |
-| Cross-platform JAR | `easy-postman-{version}.jar`, requires Java 21+ |
+| macOS Apple Silicon | `DevWorkbench-{version}-macos-arm64.dmg` |
+| macOS Intel | `DevWorkbench-{version}-macos-x86_64.dmg` |
+| Windows installer / portable | `DevWorkbench-{version}-windows-x64.exe` / `-portable.zip` |
+| Debian / Ubuntu x64 | `DevWorkbench-{version}-linux-amd64.deb` |
+| Debian / Ubuntu ARM64 | `DevWorkbench-{version}-linux-arm64.deb`; use `-compat.deb` only for older incompatible `dpkg` versions |
+| RHEL / Rocky / CentOS / Fedora | `DevWorkbench-{version}-1.x86_64.rpm` or `-1.aarch64.rpm` |
+| Cross-platform JAR | `dev-workbench-{version}.jar`, requires Java 21+ |
 
 Windows SmartScreen or macOS Gatekeeper may show a warning on first launch. Choose “Run anyway,” or right-click the macOS app and choose “Open.” The project does not currently use a commercial code-signing certificate, and all source code is available for review.
 
 ## 🤖 MCP Server
 
-The MCP Server is included in every EasyPostman release package, so there is **no separate MCP download or server to start manually**. The recommended native installers and Windows portable package bundle both `EasyPostmanMCP` and a JRE, so users do not need to install Java.
+The MCP Server is included in every DevWorkbench release package, so there is **no separate MCP download or server to start manually**. The recommended native installers and Windows portable package bundle both `DevWorkbenchMCP` and a JRE, so users do not need to install Java.
 
 ### Recommended setup
 
-1. Install a native package from [Releases](https://github.com/lakernote/easy-postman/releases), or extract the Windows portable ZIP.
+1. Install a native package from [Releases](https://github.com/nvhuong/dev-workbench/releases), or extract the Windows portable ZIP.
 2. Add a local STDIO MCP Server in Codex, Claude Desktop, or Cursor and use the platform launcher as `command`:
 
 | Platform | `command` |
 |---|---|
-| macOS | `/Applications/EasyPostman.app/Contents/MacOS/EasyPostmanMCP` |
-| Windows installer | `C:\Program Files\EasyPostman\EasyPostmanMCP.exe` |
-| Windows portable | `EasyPostmanMCP.exe` in the extracted directory, for example `D:\Tools\EasyPostman\EasyPostmanMCP.exe` |
-| Linux DEB / RPM | `/opt/easypostman/bin/EasyPostmanMCP` |
+| macOS | `/Applications/DevWorkbench.app/Contents/MacOS/DevWorkbenchMCP` |
+| Windows installer | `C:\Program Files\DevWorkbench\DevWorkbenchMCP.exe` |
+| Windows portable | `DevWorkbenchMCP.exe` in the extracted directory, for example `D:\Tools\DevWorkbench\DevWorkbenchMCP.exe` |
+| Linux DEB / RPM | `/opt/devworkbench/bin/DevWorkbenchMCP` |
 
 The core macOS configuration is shown below; on another platform, replace only `command`:
 
 ```json
 {
-  "command": "/Applications/EasyPostman.app/Contents/MacOS/EasyPostmanMCP",
+  "command": "/Applications/DevWorkbench.app/Contents/MacOS/DevWorkbenchMCP",
   "args": []
 }
 ```
@@ -115,27 +115,27 @@ The core macOS configuration is shown below; on another platform, replace only `
 With Codex CLI:
 
 ```bash
-codex mcp add easy-postman -- /Applications/EasyPostman.app/Contents/MacOS/EasyPostmanMCP
+codex mcp add dev-workbench -- /Applications/DevWorkbench.app/Contents/MacOS/DevWorkbenchMCP
 ```
 
-3. Save the configuration, restart the MCP client, and open a new conversation. A safe first test is: `Use EasyPostman MCP to list all workspaces. Do not run any request.`
+3. Save the configuration, restart the MCP client, and open a new conversation. A safe first test is: `Use DevWorkbench MCP to list all workspaces. Do not run any request.`
 
-Keep `args` empty for the default setup; no workspace path is required. The client starts one process per MCP connection and reuses it across tool calls—it does not restart EasyPostman for every API call. Keep the entire Windows portable directory together; `EasyPostmanMCP.exe` cannot be copied out by itself.
+Keep `args` empty for the default setup; no workspace path is required. The client starts one process per MCP connection and reuses it across tool calls—it does not restart DevWorkbench for every API call. Keep the entire Windows portable directory together; `DevWorkbenchMCP.exe` cannot be copied out by itself.
 
 If you download only the cross-platform JAR, use this fallback and make sure Java 21+ is available:
 
 ```json
 {
   "command": "java",
-  "args": ["-jar", "/absolute/path/to/easy-postman-{version}.jar", "mcp", "serve"]
+  "args": ["-jar", "/absolute/path/to/dev-workbench-{version}.jar", "mcp", "serve"]
 }
 ```
 
-By default, MCP loads workspaces registered in EasyPostman. AI can call `list_workspaces`, then select a workspace and environment per tool call. The desktop app and MCP run as separate processes and can be used at the same time; MCP does not switch the desktop UI or change its current selection.
+By default, MCP loads workspaces registered in DevWorkbench. AI can call `list_workspaces`, then select a workspace and environment per tool call. The desktop app and MCP run as separate processes and can be used at the same time; MCP does not switch the desktop UI or change its current selection.
 
 To authorize only one workspace, pass its absolute path in the native launcher's `args`; with the JAR fallback, append it after `"serve"`. The directory must contain `collections.json`; `environments.json` is optional.
 
-JSON-based clients such as Claude Desktop and Cursor normally place the object above under `mcpServers.easy-postman`. Codex can also use MCP Server settings or `config.toml`. See the [official Codex MCP documentation](https://developers.openai.com/codex/mcp/).
+JSON-based clients such as Claude Desktop and Cursor normally place the object above under `mcpServers.dev-workbench`. Codex can also use MCP Server settings or `config.toml`. See the [official Codex MCP documentation](https://developers.openai.com/codex/mcp/).
 
 ### What AI can do
 
@@ -157,21 +157,21 @@ The basic desktop workflow:
 Build and run from source:
 
 ```bash
-git clone https://github.com/lakernote/easy-postman.git
-cd easy-postman
-mvn -pl easy-postman-app -am -DskipTests clean package
-java -jar easy-postman-app/target/easy-postman-*.jar
+git clone https://github.com/nvhuong/dev-workbench.git
+cd dev-workbench
+mvn -pl dev-workbench-app -am -DskipTests clean package
+java -jar dev-workbench-app/target/dev-workbench-*.jar
 ```
 
 📖 [Full build guide (Chinese)](docs/BUILD_zh.md)
 
 ## 🧪 Headless CLI
 
-The same JAR can run a native EasyPostman workspace without exporting collections or environments:
+The same JAR can run a native DevWorkbench workspace without exporting collections or environments:
 
 ```bash
-java -jar easy-postman.jar collection run /srv/api-workspace -c "Basic HTTP Examples" -e "Dev Env"
-java -jar easy-postman.jar functional run /srv/api-workspace --bail --out target/result.json
+java -jar dev-workbench.jar collection run /srv/api-workspace -c "Basic HTTP Examples" -e "Dev Env"
+java -jar dev-workbench.jar functional run /srv/api-workspace --bail --out target/result.json
 ```
 
 - [Collection CLI guide (Chinese)](docs/COLLECTION_CLI_zh.md)
@@ -195,24 +195,24 @@ java -jar easy-postman.jar functional run /srv/api-workspace --bail --out target
 
 ```bash
 # Fast compile
-mvn -q -pl easy-postman-app -am -DskipTests compile
+mvn -q -pl dev-workbench-app -am -DskipTests compile
 
 # Full build and tests
 mvn clean package
 ```
 
-Bug reports, ideas, documentation, and code contributions are welcome: [create an issue](https://github.com/lakernote/easy-postman/issues/new/choose) · [contribution guide](.github/CONTRIBUTING.md)
+Bug reports, ideas, documentation, and code contributions are welcome: [create an issue](https://github.com/nvhuong/dev-workbench/issues/new/choose) · [contribution guide](.github/CONTRIBUTING.md)
 
 ## 🙏 Credits and support
 
-EasyPostman builds on excellent open-source projects including [FlatLaf](https://github.com/JFormDesigner/FlatLaf), [RSyntaxTextArea](https://github.com/bobbylight/RSyntaxTextArea), and [OkHttp](https://github.com/square/okhttp).
+DevWorkbench builds on excellent open-source projects including [FlatLaf](https://github.com/JFormDesigner/FlatLaf), [RSyntaxTextArea](https://github.com/bobbylight/RSyntaxTextArea), and [OkHttp](https://github.com/square/okhttp).
 
-If EasyPostman helps you, consider giving it a [Star](https://github.com/lakernote/easy-postman), joining the [discussions](https://github.com/lakernote/easy-postman/discussions), or contacting `lakernote` on WeChat.
+If DevWorkbench helps you, consider giving it a [Star](https://github.com/nvhuong/dev-workbench), joining the [discussions](https://github.com/nvhuong/dev-workbench/discussions), or contacting `nvhuong` on WeChat.
 
 <div align="center">
 
-**Postman-style API debugging, JMeter-style performance testing**
+**DevWorkbench-style API debugging, JMeter-style performance testing**
 
-Made with ❤️ by [laker](https://github.com/lakernote)
+Made with ❤️ by [nvhuong](https://github.com/nvhuong)
 
 </div>

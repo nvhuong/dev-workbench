@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <!-- Phiên bản di động được ghi vào thư mục gốc của ứng dụng/logs，Phiên bản cài đặt được ghi vào thư mục chính của người dùng/DevWorkbench/logs -->
+    <define name="LOG_HOME" class="com.nvhuong.devworkbench.logging.LogHomePropertyDefiner"/>
+    <!-- Hỗ trợ ghi đè cấp độ nhật ký thông qua các thuộc tính hệ thống, mặc định là  INFO -->
+    <property name="LOG_LEVEL" value="${LOG_LEVEL:-INFO}"/>
+    <!-- MCP Chế độ sẽ mặc định các mức này trước khi khởi tạo nhật ký OFF；Có sẵn -D Tham số để kích hoạt chẩn đoán một cách rõ ràng. -->
+    <property name="CONSOLE_LOG_LEVEL" value="${CONSOLE_LOG_LEVEL:-INFO}"/>
+    <property name="HTTP_LOG_LEVEL" value="${HTTP_LOG_LEVEL:-DEBUG}"/>
+
+    <!-- Nhật ký bảng điều khiển được viết thống nhất stderr，Tránh ô nhiễm CLI/MCP Vào stdout Đầu ra có cấu trúc bật. -->
+    <appender name="console" class="ch.qos.logback.core.ConsoleAppender">
+        <target>System.err</target>
+        <!-- Làm mới ngay lập tức đầu ra để đảm bảo hiển thị thời gian thực -->
+        <immediateFlush>true</immediateFlush>
+        <!-- Bộ mã hóa định dạng đầu ra nhật ký -->
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <!-- Định dạng đầu ra: thời gian(HH:mm:ss.SSS) [Tên chủ đề] Cấp độ nhật ký Tên lớp:Số dòng - Nội dung tin nhắn -->
+            <!-- sử dụng ANSI Định dạng nhật ký được mã hóa màu -->
+            <pattern>%cyan(%d{HH:mm:ss.SSS}) %white([%thread]) %highlight(%-5level) %magenta(%logger{36}) %white(:%line) %msg%n
+            </pattern>
+        </encoder>
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>${CONSOLE_LOG_LEVEL}</level>
+        </filter>
+    </appender>
+
+    <!-- Cấu hình đầu ra tập tin - Ghi lại tất cả các cấp độ vào một tập tin -->
+    <appender name="allFile" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <!-- Đường dẫn tệp nhật ký hiện đang hoạt động -->
+        <file>${LOG_HOME}/all.log</file>
+        <!-- Chính sách cuộn tệp nhật ký: Cuộn dựa trên kích thước và thời gian của tệp -->
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <!-- Mẫu đặt tên tệp lưu trữ: bao gồm ngày tháng và số sê-ri -->
+            <fileNamePattern>${LOG_HOME}/all.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <!-- Kích thước tối đa của một tệp nhật ký:10MB -->
+            <maxFileSize>10MB</maxFileSize>
+            <!-- Số ngày tối đa lưu giữ file lịch sử: .15bầu trời -->
+            <maxHistory>15</maxHistory>
+            <!-- Tổng kích thước tối đa của tất cả các tệp lưu trữ: .200MB -->
+            <totalSizeCap>200MB</totalSizeCap>
+            <!-- Làm sạch các tệp lịch sử vượt quá chính sách lưu giữ khi ứng dụng khởi động -->
+            <!-- Chức năng: Xóa phần thừa maxHistory(15bầu trời) hoặc totalSizeCap(200MB) Các tập tin bị hạn chế -->
+            <!-- Lợi ích: Ngăn không cho dung lượng ổ đĩa bị cạn kiệt bởi các tệp nhật ký cũ và giữ cho thư mục nhật ký luôn gọn gàng -->
+            <cleanHistoryOnStart>true</cleanHistoryOnStart>
+        </rollingPolicy>
+        <!-- Bộ mã hóa định dạng đầu ra nhật ký -->
+        <encoder>
+            <!-- Định dạng đầu ra: ngày giờ đầy đủ [Tên chủ đề] Cấp độ nhật ký Tên lớp:Số dòng - Nội dung tin nhắn -->
+            <pattern>%date{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} :%line - %msg%n</pattern>
+            <!-- Đặt mã hóa ký tự -->
+            <charset>UTF-8</charset>
+        </encoder>
+    </appender>
+
+    <!-- Cấu hình đầu ra tệp nhật ký lỗi - Đặc biệt ghi lại ERROR nhật ký cấp độ -->
+    <appender name="errorFile" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <!-- Đường dẫn tệp nhật ký lỗi -->
+        <file>${LOG_HOME}/error.log</file>
+        <!-- Lỗi chính sách cuộn tệp nhật ký: Cuộn dựa trên kích thước và thời gian tệp -->
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <!-- Mẫu đặt tên tệp lưu trữ nhật ký lỗi -->
+            <fileNamePattern>${LOG_HOME}/error.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <!-- Kích thước tối đa của một tệp nhật ký lỗi: .10MB -->
+            <maxFileSize>10MB</maxFileSize>
+            <!-- Số ngày tối đa để giữ lại file lịch sử nhật ký lỗi: .30bầu trời -->
+            <maxHistory>30</maxHistory>
+            <!-- Tổng kích thước tối đa của tất cả các tệp lưu trữ nhật ký lỗi: .100MB -->
+            <totalSizeCap>100MB</totalSizeCap>
+        </rollingPolicy>
+        <!-- Bộ mã hóa định dạng đầu ra nhật ký lỗi -->
+        <encoder>
+            <!-- Định dạng đầu ra: ngày giờ đầy đủ [Tên chủ đề] Cấp độ nhật ký Tên lớp:Số dòng - Nội dung tin nhắn -->
+            <pattern>%date{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} :%line - %msg%n</pattern>
+        </encoder>
+        <!-- Bộ lọc chính xác cấp nhật ký: Chỉ chấp nhận ERROR mức độ ghi nhật ký, từ chối các mức độ khác -->
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <!-- Cấp độ nhật ký mục tiêu: .ERROR -->
+            <level>ERROR</level>
+            <!-- Hành vi trong trận đấu: Chấp nhận -->
+            <onMatch>ACCEPT</onMatch>
+            <!-- Hành vi không phù hợp: từ chối -->
+            <onMismatch>DENY</onMismatch>
+        </filter>
+    </appender>
+
+    <!-- Ghi nhật ký không đồng bộ appender - Cải thiện hiệu suất ghi nhật ký và tránh chặn luồng chính -->
+    <appender name="asyncAllFile" class="ch.qos.logback.classic.AsyncAppender">
+        <!-- Trích dẫn được xác định ở trên allFile appender -->
+        <appender-ref ref="allFile"/>
+        <!-- Tăng kích thước hàng đợi để tăng thông lượng -->
+        <queueSize>512</queueSize>
+        <!-- Điều chỉnh ngưỡng loại bỏ để giữ lại các nhật ký quan trọng hơn -->
+        <discardingThreshold>0</discardingThreshold>
+        <!-- Thời gian tối đa tính bằng mili giây để chờ quá trình ghi nhật ký hoàn tất khi đóng ứng dụng -->
+        <maxFlushTime>5000</maxFlushTime>
+        <!-- Không có nhật ký nào bị mất khi chặn -->
+        <neverBlock>false</neverBlock>
+        <!-- Thống nhất với số dòng ở từng định dạng đầu ra, thu thập thông tin người gọi trước khi xếp hàng. -->
+        <includeCallerData>true</includeCallerData>
+    </appender>
+
+    <!-- HTTP Nhật ký yêu cầu appender - Ghi nhật ký cụ thể các yêu cầu mạng -->
+    <appender name="httpFile" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_HOME}/http.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_HOME}/http.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <maxFileSize>10MB</maxFileSize>
+            <maxHistory>7</maxHistory>
+            <totalSizeCap>50MB</totalSizeCap>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%date{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- Ghi nhật ký cấu hình cho một gói cụ thể - HTTP Nhật ký khách hàng -->
+    <!-- Được cấu hình đặc biệt okhttp3 Hành vi ghi nhật ký của thư viện mạng -->
+    <logger name="okhttp3" level="${HTTP_LOG_LEVEL}" additivity="false">
+        <!-- name: được chỉ định logger tên, trùng khớp okhttp3.* Tất cả các lớp trong gói -->
+        <!-- level: Đặt thành  DEBUG Cấp độ, ghi lại chi tiếtHTTPyêu cầu/Thông tin phản hồi -->
+        <!-- additivity: Đặt thành false，Chặn đăng nhập vào cha mẹ logger Tuyên truyền để tránh hồ sơ trùng lặp -->
+
+        <!-- Đầu ra chuyên ngành HTTP Các tập tin nhật ký -->
+        <appender-ref ref="httpFile"/>
+        <!-- Đồng thời, nó được xuất ra bảng điều khiển để thuận tiện cho việc gỡ lỗi trong quá trình phát triển -->
+        <appender-ref ref="console"/>
+
+        <!-- Chức năng: xóa tất cả HTTP yêu cầu/Nhật ký phản hồi được tách thành các tệp độc lập để hỗ trợ việc gỡ lỗi các sự cố mạng -->
+        <!-- Lợi ích: Tránh được HTTP Ghi nhật ký tệp nhật ký ô nhiễm chính, cung cấp chế độ xem gỡ lỗi mạng chuyên dụng -->
+    </logger>
+
+    <!-- Cấu hình nhật ký cụ thể của ứng dụng -->
+    <!-- Định cấu hình chính sách ghi nhật ký cho mã riêng của dự án -->
+    <logger name="com.nvhuong.devworkbench" level="${LOG_LEVEL}" additivity="false">
+        <!-- name: Khớp với tên gói dự án com.nvhuong.devworkbench.* Tất cả các danh mục dưới đây -->
+        <!-- level: Mặc định INFO，Có thể vượt qua -DLOG_LEVEL=DEBUG Tạm thời kích hoạt ghi nhật ký chẩn đoán ứng dụng -->
+        <!-- additivity: false Chặn gốc logger Trải rộng, tránh rễ logger Bản ghi trùng lặp trong -->
+
+        <!-- Xuất ra bảng điều khiển và xem trong thời gian thực trong quá trình phát triển -->
+        <appender-ref ref="console"/>
+        <!-- Xuất ra tệp nhật ký đầy đủ không đồng bộ để ghi lại hoàn toàn hành vi của ứng dụng -->
+        <appender-ref ref="asyncAllFile"/>
+        <!-- Xuất ra tệp nhật ký lỗi, đặc biệt để thu thập lỗi ứng dụng -->
+        <appender-ref ref="errorFile"/>
+
+        <!-- Chức năng: Cung cấp phạm vi ghi nhật ký hoàn chỉnh cho mã lõi ứng dụng -->
+        <!-- Lợi ích: Đảm bảo tất cả nhật ký logic ứng dụng được phân loại và lưu trữ chính xác -->
+    </logger>
+
+    <!-- Cấu hình nhật ký gốc - Áp dụng cho tất cả không được cấu hình rõ ràng logger -->
+    <!-- Đây là cấu hình mặc định của hệ thống ghi nhật ký, xử lý mọi thứ không được chỉ định logger Nhật ký đã được ghi lại -->
+    <root level="${LOG_LEVEL}">
+        <!-- level: Sử dụng các biến môi trường LOG_LEVEL，Mặc định là  INFO，Có thể điều chỉnh linh hoạt -->
+        <!-- Phạm vi: Nhật ký của tất cả các thư viện, khung và gói chưa được định cấu hình của bên thứ ba -->
+
+        <!-- Liên kết đầu ra của bảng điều khiển appender -->
+        <!-- Chức năng: Tất cả nhật ký được hiển thị trên bảng điều khiển để tạo điều kiện phát triển và gỡ lỗi -->
+        <appender-ref ref="console"/>
+
+        <!-- Ràng buộc đầu ra tập tin không đồng bộ appender（Chứa tất cả nhật ký) -->
+        <!-- Chức năng: Ghi lại đầy đủ trạng thái hoạt động của hệ thống để theo dõi và phân tích sự cố -->
+        <appender-ref ref="asyncAllFile"/>
+
+        <!-- Liên kết đầu ra tệp nhật ký lỗi appender -->
+        <!-- Chức năng: Tập trung mọi thứ trong hệ thốngERRORNhật ký cấp độ giúp bạn dễ dàng nhanh chóng xác định được vấn đề -->
+        <appender-ref ref="errorFile"/>
+
+        <!-- Vai trò tổng thể: Cung cấp cơ chế ghi nhật ký toàn diện cho toàn bộ ứng dụng -->
+        <!-- Độ che phủ:SpringKhung, nhóm kết nối cơ sở dữ liệu,JSONCác thành phần của bên thứ ba như thư viện phân tích cú pháp -->
+    </root>
+</configuration>

@@ -1,0 +1,79 @@
+package com.nvhuong.devworkbench.plugin.runtime;
+
+import lombok.experimental.UtilityClass;
+
+import java.util.LinkedHashSet;
+import java.util.Set;
+
+/**
+ * Lưu trữ trạng thái thời gian chạy plug-in.
+ * <p>
+ * Quản lý đặc biệt ở đây“Tàn tật”và“Sẽ được gỡ cài đặt”Hai loại trạng thái liên tục,
+ * tránh PluginRuntime Ông cũng chịu trách nhiệm điều phối và đọc và viết trạng thái.
+ * </p>
+ */
+@UtilityClass
+class PluginStateStore {
+
+    private static final String DISABLED_PLUGIN_IDS_KEY = "plugin.disabledIds";
+    private static final String PENDING_UNINSTALL_PLUGIN_IDS_KEY = "plugin.pendingUninstallIds";
+
+    static Set<String> getDisabledPluginIds() {
+        return PluginPlatformSettingsStore.getStringSet(DISABLED_PLUGIN_IDS_KEY);
+    }
+
+    static Set<String> getPendingUninstallPluginIds() {
+        return PluginPlatformSettingsStore.getStringSet(PENDING_UNINSTALL_PLUGIN_IDS_KEY);
+    }
+
+    static boolean isPluginEnabled(String pluginId) {
+        return pluginId != null
+                && !getDisabledPluginIds().contains(pluginId)
+                && !getPendingUninstallPluginIds().contains(pluginId);
+    }
+
+    static boolean isPluginPendingUninstall(String pluginId) {
+        return pluginId != null && getPendingUninstallPluginIds().contains(pluginId);
+    }
+
+    static void setPluginEnabled(String pluginId, boolean enabled) {
+        if (pluginId == null || pluginId.isBlank()) {
+            return;
+        }
+        Set<String> disabledIds = new LinkedHashSet<>(getDisabledPluginIds());
+        if (enabled) {
+            disabledIds.remove(pluginId);
+            clearPendingUninstall(pluginId);
+        } else {
+            disabledIds.add(pluginId);
+        }
+        PluginPlatformSettingsStore.putStringSet(DISABLED_PLUGIN_IDS_KEY, disabledIds);
+    }
+
+    static void markPluginPendingUninstall(String pluginId) {
+        if (pluginId == null || pluginId.isBlank()) {
+            return;
+        }
+        Set<String> pendingIds = new LinkedHashSet<>(getPendingUninstallPluginIds());
+        pendingIds.add(pluginId);
+        PluginPlatformSettingsStore.putStringSet(PENDING_UNINSTALL_PLUGIN_IDS_KEY, pendingIds);
+
+        Set<String> disabledIds = new LinkedHashSet<>(getDisabledPluginIds());
+        disabledIds.add(pluginId);
+        PluginPlatformSettingsStore.putStringSet(DISABLED_PLUGIN_IDS_KEY, disabledIds);
+    }
+
+    static void clearPendingUninstall(String pluginId) {
+        if (pluginId == null || pluginId.isBlank()) {
+            return;
+        }
+        Set<String> pendingIds = new LinkedHashSet<>(getPendingUninstallPluginIds());
+        if (pendingIds.remove(pluginId)) {
+            PluginPlatformSettingsStore.putStringSet(PENDING_UNINSTALL_PLUGIN_IDS_KEY, pendingIds);
+        }
+    }
+
+    static void replacePendingUninstallPluginIds(Set<String> pluginIds) {
+        PluginPlatformSettingsStore.putStringSet(PENDING_UNINSTALL_PLUGIN_IDS_KEY, pluginIds);
+    }
+}

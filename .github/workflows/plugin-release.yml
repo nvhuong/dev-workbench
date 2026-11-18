@@ -101,7 +101,7 @@ jobs:
           set -euo pipefail
 
           PLUGIN="${{ inputs.plugin }}"
-          MODULE_PATH="easy-postman-plugins/plugin-${PLUGIN}"
+          MODULE_PATH="dev-workbench-plugins/plugin-${PLUGIN}"
           PLUGIN_POM="${MODULE_PATH}/pom.xml"
 
           if [ ! -f "$PLUGIN_POM" ]; then
@@ -122,7 +122,7 @@ jobs:
           fi
 
           TAG_NAME="plugin-${PLUGIN}-v${PLUGIN_VERSION}"
-          JAR_NAME="easy-postman-${PLUGIN_VERSION}-plugin-${PLUGIN}.jar"
+          JAR_NAME="dev-workbench-${PLUGIN_VERSION}-plugin-${PLUGIN}.jar"
           RELEASE_TITLE="Plugin ${PLUGIN} ${PLUGIN_VERSION}"
 
           echo "plugin=${PLUGIN}" >> "$GITHUB_OUTPUT"
@@ -218,7 +218,7 @@ jobs:
           with zipfile.ZipFile(jar_file) as zf:
               descriptor_names = [
                   name for name in zf.namelist()
-                  if name.startswith("META-INF/easy-postman/") and name.endswith(".properties")
+                  if name.startswith("META-INF/dev-workbench/") and name.endswith(".properties")
               ]
               if len(descriptor_names) != 1:
                   raise SystemExit(f"Expected exactly one plugin descriptor, got {descriptor_names}")
@@ -363,7 +363,7 @@ jobs:
 
           set +e
           HTTP_CODE="$(curl -sS -o "$RESPONSE_FILE" -w "%{http_code}" \
-            -X POST "https://gitee.com/api/v5/repos/lakernote/easy-postman/releases" \
+            -X POST "https://gitee.com/api/v5/repos/nvhuong/dev-workbench/releases" \
             -F "access_token=${GITEE_TOKEN}" \
             -F "tag_name=${TAG_NAME}" \
             -F "name=${TITLE}" \
@@ -376,7 +376,7 @@ jobs:
           if [ $CURL_EXIT_CODE -eq 0 ] && [ "$HTTP_CODE" -ge 200 ] && [ "$HTTP_CODE" -lt 300 ]; then
             RELEASE_ID="$(python3 -c "import json; import sys; print(json.load(open('${RESPONSE_FILE}')).get('id',''))")"
           else
-            curl -sS "https://gitee.com/api/v5/repos/lakernote/easy-postman/releases?access_token=${GITEE_TOKEN}&page=1&per_page=100" -o "$RESPONSE_FILE"
+            curl -sS "https://gitee.com/api/v5/repos/nvhuong/dev-workbench/releases?access_token=${GITEE_TOKEN}&page=1&per_page=100" -o "$RESPONSE_FILE"
             RELEASE_ID="$(python3 -c "import json; from pathlib import Path; data=json.loads(Path('${RESPONSE_FILE}').read_text()); tag='${TAG_NAME}'; print(next((str(item.get('id','')) for item in data if item.get('tag_name') == tag), ''))")"
           fi
 
@@ -404,7 +404,7 @@ jobs:
               --retry 5 \
               --retry-delay 2 \
               --retry-all-errors \
-              -X POST "https://gitee.com/api/v5/repos/lakernote/easy-postman/releases/${RELEASE_ID}/attach_files" \
+              -X POST "https://gitee.com/api/v5/repos/nvhuong/dev-workbench/releases/${RELEASE_ID}/attach_files" \
               -F "access_token=${GITEE_TOKEN}" \
               -F "file=@${file}")"
             UPLOAD_EXIT_CODE=$?
@@ -416,7 +416,7 @@ jobs:
             fi
           done
 
-          echo "gitee_release_url=https://gitee.com/lakernote/easy-postman/releases/${TAG_NAME}" >> "$GITHUB_OUTPUT"
+          echo "gitee_release_url=https://gitee.com/nvhuong/dev-workbench/releases/${TAG_NAME}" >> "$GITHUB_OUTPUT"
 
   update-catalogs:
     name: Update Catalogs（Cập nhật danh mục chính thức)
@@ -450,7 +450,7 @@ jobs:
           set -euo pipefail
 
           GITHUB_DOWNLOAD_URL="https://github.com/${{ github.repository }}/releases/download/${TAG_NAME}/${JAR_NAME}"
-          GITEE_DOWNLOAD_URL="https://gitee.com/lakernote/easy-postman/releases/download/${TAG_NAME}/${JAR_NAME}"
+          GITEE_DOWNLOAD_URL="https://gitee.com/nvhuong/dev-workbench/releases/download/${TAG_NAME}/${JAR_NAME}"
           GENERATED_AT="$(date -u +"%Y-%m-%dT%H:%M:%SZ")"
           export PLUGIN_NAME PLUGIN_DESCRIPTION GITHUB_DOWNLOAD_URL GITEE_DOWNLOAD_URL GENERATED_AT
           export MIN_APP_VERSION MAX_APP_VERSION MIN_PLATFORM_VERSION MAX_PLATFORM_VERSION
@@ -495,7 +495,7 @@ jobs:
                       f"https://github.com/{os.environ['GITHUB_REPOSITORY']}",
                   ),
                   (
-                      Path("easy-postman-plugins/plugin-manager/src/main/resources/plugin-catalog/catalog-github.json"),
+                      Path("dev-workbench-plugins/plugin-manager/src/main/resources/plugin-catalog/catalog-github.json"),
                       os.environ["GITHUB_DOWNLOAD_URL"],
                       f"https://github.com/{os.environ['GITHUB_REPOSITORY']}",
                   ),
@@ -505,12 +505,12 @@ jobs:
                   (
                       Path("plugin-catalog/catalog-gitee.json"),
                       os.environ["GITEE_DOWNLOAD_URL"],
-                      "https://gitee.com/lakernote/easy-postman",
+                      "https://gitee.com/nvhuong/dev-workbench",
                   ),
                   (
-                      Path("easy-postman-plugins/plugin-manager/src/main/resources/plugin-catalog/catalog-gitee.json"),
+                      Path("dev-workbench-plugins/plugin-manager/src/main/resources/plugin-catalog/catalog-gitee.json"),
                       os.environ["GITEE_DOWNLOAD_URL"],
-                      "https://gitee.com/lakernote/easy-postman",
+                      "https://gitee.com/nvhuong/dev-workbench",
                   ),
               ])
 
@@ -594,8 +594,8 @@ jobs:
           if git diff --quiet -- \
             plugin-catalog/catalog-github.json \
             plugin-catalog/catalog-gitee.json \
-            easy-postman-plugins/plugin-manager/src/main/resources/plugin-catalog/catalog-github.json \
-            easy-postman-plugins/plugin-manager/src/main/resources/plugin-catalog/catalog-gitee.json; then
+            dev-workbench-plugins/plugin-manager/src/main/resources/plugin-catalog/catalog-github.json \
+            dev-workbench-plugins/plugin-manager/src/main/resources/plugin-catalog/catalog-gitee.json; then
             echo "No catalog changes to commit."
             exit 0
           fi
@@ -605,7 +605,7 @@ jobs:
           git add \
             plugin-catalog/catalog-github.json \
             plugin-catalog/catalog-gitee.json \
-            easy-postman-plugins/plugin-manager/src/main/resources/plugin-catalog/catalog-github.json \
-            easy-postman-plugins/plugin-manager/src/main/resources/plugin-catalog/catalog-gitee.json
+            dev-workbench-plugins/plugin-manager/src/main/resources/plugin-catalog/catalog-github.json \
+            dev-workbench-plugins/plugin-manager/src/main/resources/plugin-catalog/catalog-gitee.json
           git commit -m "chore(plugin-catalog): release ${{ needs.prepare-context.outputs.plugin_id }} ${{ needs.prepare-context.outputs.plugin_version }}"
           git push origin "HEAD:${{ github.event.repository.default_branch }}"

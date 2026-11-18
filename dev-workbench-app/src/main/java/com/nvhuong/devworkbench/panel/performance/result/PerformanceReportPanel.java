@@ -1,0 +1,856 @@
+package com.nvhuong.devworkbench.panel.performance.result;
+
+import com.nvhuong.devworkbench.performance.core.model.PerformanceProtocol;
+import com.nvhuong.devworkbench.performance.core.model.PerformanceReportSnapshot;
+import com.nvhuong.devworkbench.performance.core.model.PerformanceStatsSnapshot;
+import com.nvhuong.devworkbench.performance.core.report.PerformanceJsonReport;
+
+
+import com.nvhuong.devworkbench.common.component.ToolWindowActionToolbar;
+import com.nvhuong.devworkbench.common.component.button.ModernButtonFactory;
+import com.nvhuong.devworkbench.common.component.button.SegmentedButtonBar;
+import com.nvhuong.devworkbench.common.component.ToolWindowSurfaceStyle;
+import com.nvhuong.devworkbench.performance.model.PerformanceProtocolLabels;
+import com.nvhuong.devworkbench.performance.report.PerformanceProtocolReportData;
+import com.nvhuong.devworkbench.performance.report.PerformanceReportMarkdownBuilder;
+import com.nvhuong.devworkbench.performance.report.PerformanceReportPdfExporter;
+import com.nvhuong.devworkbench.performance.report.PerformanceHtmlReportExporter;
+import com.nvhuong.devworkbench.util.FileChooserUtil;
+import com.formdev.flatlaf.util.SystemFileChooser;
+import java.nio.file.Path;
+import java.nio.file.Files;
+import java.util.Locale;
+import com.nvhuong.devworkbench.performance.report.PerformanceReportRowMapper;
+import com.nvhuong.devworkbench.performance.report.PerformanceReportTableSchema;
+import com.nvhuong.devworkbench.util.I18nUtil;
+import com.nvhuong.devworkbench.util.FontsUtil;
+import com.nvhuong.devworkbench.util.MessageKeys;
+import com.nvhuong.devworkbench.util.SystemUtil;
+import com.nvhuong.devworkbench.common.component.notification.NotificationCenter;
+
+import javax.swing.*;
+import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.JTableHeader;
+import javax.swing.table.TableColumnModel;
+import java.awt.*;
+import java.awt.datatransfer.StringSelection;
+import java.awt.event.MouseEvent;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.EnumMap;
+import java.util.EnumSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.Map;
+import java.util.LinkedHashMap;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
+import com.nvhuong.devworkbench.performance.core.model.PerformanceTrendSnapshot;
+import com.nvhuong.devworkbench.performance.core.run.PerformanceRunPlan;
+import com.nvhuong.devworkbench.performance.core.run.PerformanceServiceResource;
+import com.nvhuong.devworkbench.performance.model.PerformanceSampleResult;
+import com.nvhuong.devworkbench.panel.performance.PerformancePanel;
+
+@lombok.extern.slf4j.Slf4j
+public class PerformanceReportPanel extends JPanel {
+    private static final ScheduledExecutorService HTML_REPORT_WRITER = Executors.newSingleThreadScheduledExecutor(task -> {
+        Thread thread = new Thread(task, "performance-html-report-writer");
+        thread.setDaemon(true);
+        return thread;
+    });
+
+    // Ngưỡng tỷ lệ thành công
+    private static final double SUCCESS_RATE_EXCELLENT = 99.0;
+    private static final double SUCCESS_RATE_GOOD = 90.0;
+
+    private final DefaultTableModel reportTableModel;
+    private final DefaultTableModel webSocketReportTableModel;
+    private final DefaultTableModel sseReportTableModel;
+    private final String[] columns;
+    private final String[] webSocketColumns;
+    private final String[] sseColumns;
+    private final String totalRowName;
+
+    // Trình kết xuất Singleton để tránh việc tạo lặp lại
+    private final DefaultTableCellRenderer failRenderer;
+    private final DefaultTableCellRenderer rateRenderer;
+    private final DefaultTableCellRenderer generalRenderer;
+    private final Map<PerformanceProtocol, JToggleButton> protocolButtons = new EnumMap<>(PerformanceProtocol.class);
+    private JPanel protocolSwitcherRow;
+    private JPanel reportCards;
+    private PerformanceProtocol selectedProtocol = PerformanceProtocol.HTTP;
+    private Set<PerformanceProtocol> availableProtocols = EnumSet.of(PerformanceProtocol.HTTP);
+    private final AtomicReference<List<PerformanceTrendView.TrendReportPoint>> trendPoints =
+            new AtomicReference<>(List.of());
+    private PerformanceRunPlan reportPlan;
+    private List<PerformanceSampleResult> sampleResults = List.of();
+    private String reportEnvironment = "";
+    private String reportError = "";
+    private List<PerformanceServiceResource> serviceResources = List.of();
+    private Path htmlReportPath;
+    private ScheduledFuture<?> pendingHtmlWrite;
+
+    public PerformanceReportPanel() {
+        // Initialize internationalized column names
+        this.columns = PerformanceReportTableSchema.httpColumns();
+        this.webSocketColumns = PerformanceReportTableSchema.webSocketColumns();
+        this.sseColumns = PerformanceReportTableSchema.sseColumns();
+        this.totalRowName = I18nUtil.getMessage(MessageKeys.PERFORMANCE_REPORT_TOTAL_ROW);
+
+        // Tạo một trình kết xuất đơn lẻ
+        this.failRenderer = createFailRenderer();
+        this.rateRenderer = createRateRenderer();
+        this.generalRenderer = createGeneralRenderer();
+
+        setLayout(new BorderLayout());
+        ToolWindowSurfaceStyle.applyCard(this);
+        setBorder(BorderFactory.createEmptyBorder(0, 10, 10, 10));
+
+        reportTableModel = createTableModel(columns);
+        webSocketReportTableModel = createTableModel(webSocketColumns);
+        sseReportTableModel = createTableModel(sseColumns);
+        JTable reportTable = createReportTable();
+        JTable webSocketReportTable = createGenericReportTable(webSocketReportTableModel);
+        JTable sseReportTable = createGenericReportTable(sseReportTableModel);
+
+        reportCards = new JPanel(new CardLayout());
+        ToolWindowSurfaceStyle.applyCard(reportCards);
+        reportCards.add(createReportScrollPane(reportTable), PerformanceProtocol.HTTP.name());
+        reportCards.add(createReportScrollPane(webSocketReportTable), PerformanceProtocol.WEBSOCKET.name());
+        reportCards.add(createReportScrollPane(sseReportTable), PerformanceProtocol.SSE.name());
+        add(createToolbar(reportCards), BorderLayout.NORTH);
+        add(reportCards, BorderLayout.CENTER);
+        applyAvailableProtocols();
+    }
+
+    public void setAvailableProtocols(Set<PerformanceProtocol> protocols) {
+        availableProtocols = normalizeProtocols(protocols);
+        applyAvailableProtocols();
+    }
+
+    private JPanel createToolbar(JPanel reportCards) {
+        JPanel toolbar = new JPanel(new BorderLayout(8, 0));
+        ToolWindowSurfaceStyle.applyCard(toolbar);
+        toolbar.setBorder(BorderFactory.createEmptyBorder(8, 0, 8, 0));
+
+        protocolSwitcherRow = ToolWindowActionToolbar.inlineLeft(createProtocolSwitcher(reportCards));
+        toolbar.add(protocolSwitcherRow, BorderLayout.WEST);
+
+        JButton copyReportButton = ModernButtonFactory.createButton(
+                I18nUtil.getMessage(MessageKeys.PERFORMANCE_REPORT_COPY_MARKDOWN_BUTTON),
+                false
+        );
+        copyReportButton.addActionListener(e -> copyMarkdownReport());
+        JButton pdfButton = ModernButtonFactory.createButton(
+                I18nUtil.getMessage(MessageKeys.PERFORMANCE_REPORT_PDF_EXPORT), false);
+        pdfButton.addActionListener(e -> exportPdfReport(pdfButton));
+        JButton htmlButton = ModernButtonFactory.createButton(
+                I18nUtil.getMessage(MessageKeys.PERFORMANCE_REPORT_HTML_OPEN), false);
+        htmlButton.addActionListener(e -> openHtmlReport());
+        toolbar.add(ToolWindowActionToolbar.inlineRight(copyReportButton, htmlButton, pdfButton), BorderLayout.EAST);
+        return toolbar;
+    }
+
+    private JPanel createProtocolSwitcher(JPanel reportCards) {
+        SegmentedButtonBar<PerformanceProtocol> switcher = new SegmentedButtonBar<>(FlowLayout.LEFT);
+        for (PerformanceProtocol protocol : PerformanceProtocol.values()) {
+            JToggleButton button = switcher.addOption(
+                    protocol,
+                    PerformanceProtocolLabels.displayName(protocol),
+                    protocol == PerformanceProtocol.HTTP
+            );
+            button.addActionListener(e -> {
+                if (button.isSelected()) {
+                    showProtocol(protocol);
+                }
+            });
+            protocolButtons.put(protocol, button);
+        }
+        return switcher;
+    }
+
+    private void applyAvailableProtocols() {
+        if (reportCards == null || protocolSwitcherRow == null) {
+            return;
+        }
+        for (Map.Entry<PerformanceProtocol, JToggleButton> entry : protocolButtons.entrySet()) {
+            entry.getValue().setVisible(availableProtocols.contains(entry.getKey()));
+        }
+        if (!availableProtocols.contains(selectedProtocol)) {
+            selectedProtocol = firstAvailableProtocol();
+        }
+        protocolSwitcherRow.setVisible(availableProtocols.size() > 1);
+        showProtocol(selectedProtocol);
+        revalidate();
+        repaint();
+    }
+
+    private PerformanceProtocol firstAvailableProtocol() {
+        if (availableProtocols.contains(PerformanceProtocol.HTTP)) {
+            return PerformanceProtocol.HTTP;
+        }
+        for (PerformanceProtocol protocol : PerformanceProtocol.values()) {
+            if (availableProtocols.contains(protocol)) {
+                return protocol;
+            }
+        }
+        return PerformanceProtocol.HTTP;
+    }
+
+    private void showProtocol(PerformanceProtocol protocol) {
+        selectedProtocol = protocol;
+        JToggleButton button = protocolButtons.get(protocol);
+        if (button != null && !button.isSelected()) {
+            button.setSelected(true);
+        }
+        CardLayout layout = (CardLayout) reportCards.getLayout();
+        layout.show(reportCards, protocol.name());
+    }
+
+    private static Set<PerformanceProtocol> normalizeProtocols(Set<PerformanceProtocol> protocols) {
+        EnumSet<PerformanceProtocol> normalized = EnumSet.noneOf(PerformanceProtocol.class);
+        if (protocols != null) {
+            normalized.addAll(protocols);
+        }
+        if (normalized.isEmpty()) {
+            normalized.add(PerformanceProtocol.HTTP);
+        }
+        return normalized;
+    }
+
+    private DefaultTableModel createTableModel(String[] tableColumns) {
+        return new DefaultTableModel(tableColumns, 0) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false;
+            }
+        };
+    }
+
+    private JTable createReportTable() {
+        JTable table = createTableWithHeaderTooltips(reportTableModel);
+        table.setFocusable(false);
+        table.setFillsViewportHeight(true);
+        configureResizableColumns(table, false);
+
+        configureColumnRenderers(table);
+        configureColumnWidths(table);
+        table.getTableHeader().setFont(FontsUtil.getDefaultFont(Font.BOLD));
+
+        return table;
+    }
+
+    private JTable createGenericReportTable(DefaultTableModel model) {
+        JTable table = createTableWithHeaderTooltips(model);
+        table.setFocusable(false);
+        table.setFillsViewportHeight(true);
+        configureResizableColumns(table, true);
+        table.getTableHeader().setFont(FontsUtil.getDefaultFont(Font.BOLD));
+        DefaultTableCellRenderer centerRenderer = createCenteredRenderer(model);
+        DefaultTableCellRenderer nameRenderer = createNameRenderer(model);
+        DefaultTableCellRenderer streamFailRenderer = createFailRenderer(model);
+        DefaultTableCellRenderer streamRateRenderer = createRateRenderer(model);
+        table.getColumnModel().getColumn(0).setCellRenderer(nameRenderer);
+        for (int col = 1; col < model.getColumnCount(); col++) {
+            if (col == PerformanceReportTableSchema.FAIL_COLUMN_INDEX) {
+                table.getColumnModel().getColumn(col).setCellRenderer(streamFailRenderer);
+            } else if (col == PerformanceReportTableSchema.SUCCESS_RATE_COLUMN_INDEX) {
+                table.getColumnModel().getColumn(col).setCellRenderer(streamRateRenderer);
+            } else {
+                table.getColumnModel().getColumn(col).setCellRenderer(centerRenderer);
+            }
+        }
+        configureStreamReportColumnWidths(table);
+        return table;
+    }
+
+    private JTable createTableWithHeaderTooltips(DefaultTableModel model) {
+        return new JTable(model) {
+            @Override
+            protected JTableHeader createDefaultTableHeader() {
+                return new ReportTableHeader(columnModel);
+            }
+        };
+    }
+
+    private JScrollPane createReportScrollPane(JTable table) {
+        JScrollPane scrollPane = new JScrollPane(table);
+        scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
+        ToolWindowSurfaceStyle.applyTableScrollPaneCard(scrollPane, table);
+        return scrollPane;
+    }
+
+    private void configureResizableColumns(JTable table, boolean denseColumns) {
+        // Fill the viewport so wide report panels do not leave a blank strip on the right.
+        table.setAutoResizeMode(JTable.AUTO_RESIZE_SUBSEQUENT_COLUMNS);
+        table.getTableHeader().setResizingAllowed(true);
+        table.getTableHeader().setReorderingAllowed(false);
+    }
+
+    private void configureStreamReportColumnWidths(JTable table) {
+        if (table.getColumnModel().getColumnCount() == 0) {
+            return;
+        }
+        int[] widths = table.getColumnCount() == webSocketColumns.length
+                ? PerformanceReportTableSchema.webSocketColumnWidths()
+                : PerformanceReportTableSchema.sseColumnWidths();
+        for (int col = 0; col < table.getColumnModel().getColumnCount() && col < widths.length; col++) {
+            int width = widths[col];
+            table.getColumnModel().getColumn(col).setMinWidth(
+                    col == 0 ? PerformanceReportTableSchema.API_NAME_MIN_WIDTH : 56
+            );
+            table.getColumnModel().getColumn(col).setPreferredWidth(width);
+        }
+    }
+
+    private DefaultTableCellRenderer createCenteredRenderer(DefaultTableModel model) {
+        return new DefaultTableCellRenderer() {
+            @Override
+            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
+                                                           boolean hasFocus, int row, int column) {
+                Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+                int modelRow = table.convertRowIndexToModel(row);
+                if (isTotalRow(model, modelRow)) {
+                    applyTotalRowStyle(c);
+                } else {
+                    applyDefaultCellStyle(c);
+                }
+                setHorizontalAlignment(SwingConstants.CENTER);
+                return c;
+            }
+        };
+    }
+
+    private DefaultTableCellRenderer createNameRenderer(DefaultTableModel model) {
+        return new DefaultTableCellRenderer() {
+            @Override
+            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
+                                                           boolean hasFocus, int row, int column) {
+                Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+                int modelRow = table.convertRowIndexToModel(row);
+                if (isTotalRow(model, modelRow)) {
+                    applyTotalRowStyle(c);
+                } else {
+                    applyDefaultCellStyle(c);
+                }
+                setHorizontalAlignment(SwingConstants.LEFT);
+                return c;
+            }
+        };
+    }
+
+    private void configureColumnWidths(JTable table) {
+        if (table.getColumnModel().getColumnCount() > 0) {
+            // API Name cột
+            table.getColumnModel().getColumn(0).setMinWidth(PerformanceReportTableSchema.API_NAME_MIN_WIDTH);
+            table.getColumnModel().getColumn(0).setPreferredWidth(PerformanceReportTableSchema.API_NAME_PREFERRED_WIDTH);
+
+            // Total cột - trình diễn "Total"（5ký tự)+ con số
+            table.getColumnModel().getColumn(1).setMinWidth(65);
+            table.getColumnModel().getColumn(1).setPreferredWidth(75);
+
+            // Success cột - trình diễn "Success"（7ký tự)+ con số
+            table.getColumnModel().getColumn(2).setMinWidth(75);
+            table.getColumnModel().getColumn(2).setPreferredWidth(85);
+
+            // Fail cột - trình diễn "Fail"（4ký tự)+ con số
+            table.getColumnModel().getColumn(3).setMinWidth(60);
+            table.getColumnModel().getColumn(3).setPreferredWidth(65);
+
+            // Success Rate cột - trình diễn "Success Rate"（12ký tự)+ Tỷ lệ phần trăm
+            table.getColumnModel().getColumn(4).setMinWidth(110);
+            table.getColumnModel().getColumn(4).setPreferredWidth(120);
+
+            // QPS cột - trình diễn "QPS"（3ký tự)+ con số
+            table.getColumnModel().getColumn(5).setMinWidth(60);
+            table.getColumnModel().getColumn(5).setPreferredWidth(70);
+
+            // Sent KB/s cột - Gửi tốc độ byte
+            table.getColumnModel().getColumn(6).setMinWidth(85);
+            table.getColumnModel().getColumn(6).setPreferredWidth(95);
+
+            // Received KB/s cột - Nhận tốc độ byte
+            table.getColumnModel().getColumn(7).setMinWidth(90);
+            table.getColumnModel().getColumn(7).setPreferredWidth(105);
+
+            // Avg cột - trình diễn "Avg"（3ký tự)+ thời gian
+            table.getColumnModel().getColumn(8).setMinWidth(65);
+            table.getColumnModel().getColumn(8).setPreferredWidth(75);
+
+            // Min cột - trình diễn "Min"（3ký tự)+ thời gian
+            table.getColumnModel().getColumn(9).setMinWidth(65);
+            table.getColumnModel().getColumn(9).setPreferredWidth(75);
+
+            // Max cột - trình diễn "Max"（3ký tự)+ thời gian
+            table.getColumnModel().getColumn(10).setMinWidth(65);
+            table.getColumnModel().getColumn(10).setPreferredWidth(75);
+
+            // P90 cột - trình diễn "P90"（3ký tự)+ thời gian
+            table.getColumnModel().getColumn(11).setMinWidth(65);
+            table.getColumnModel().getColumn(11).setPreferredWidth(75);
+
+            // P95 cột - trình diễn "P95"（3ký tự)+ thời gian
+            table.getColumnModel().getColumn(12).setMinWidth(65);
+            table.getColumnModel().getColumn(12).setPreferredWidth(75);
+
+            // P99 cột - trình diễn "P99"（3ký tự)+ thời gian
+            table.getColumnModel().getColumn(13).setMinWidth(65);
+            table.getColumnModel().getColumn(13).setPreferredWidth(75);
+        }
+    }
+
+    private void configureColumnRenderers(JTable table) {
+        // Sử dụng trình kết xuất đơn lẻ để tránh việc tạo lặp lại
+        // Chỉ mục cột cần được căn giữa (từ 2đến cột cuối cùng)
+        for (int col = 1; col < columns.length; col++) {
+            if (col == PerformanceReportTableSchema.FAIL_COLUMN_INDEX) {
+                table.getColumnModel().getColumn(col).setCellRenderer(failRenderer);
+            } else if (col == PerformanceReportTableSchema.SUCCESS_RATE_COLUMN_INDEX) {
+                table.getColumnModel().getColumn(col).setCellRenderer(rateRenderer);
+            } else {
+                table.getColumnModel().getColumn(col).setCellRenderer(generalRenderer);
+            }
+        }
+    }
+
+    private DefaultTableCellRenderer createFailRenderer() {
+        return new DefaultTableCellRenderer() {
+            @Override
+            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
+                                                           boolean hasFocus, int row, int column) {
+                Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+                int modelRow = table.convertRowIndexToModel(row);
+                boolean isTotal = isTotalRow(modelRow);
+
+                if (isTotal) {
+                    applyTotalRowStyle(c);
+                    applyTotalFailForeground(c, value);
+                } else {
+                    applyFailCellStyle(c, value);
+                }
+
+                setHorizontalAlignment(SwingConstants.CENTER);
+                return c;
+            }
+        };
+    }
+
+    private DefaultTableCellRenderer createRateRenderer() {
+        return new DefaultTableCellRenderer() {
+            @Override
+            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
+                                                           boolean hasFocus, int row, int column) {
+                Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+                int modelRow = table.convertRowIndexToModel(row);
+                boolean isTotal = isTotalRow(modelRow);
+
+                if (isTotal) {
+                    applyTotalRowStyle(c);
+                    applyRateForeground(c, value);
+                } else {
+                    applyRateCellStyle(c, value);
+                }
+
+                setHorizontalAlignment(SwingConstants.CENTER);
+                return c;
+            }
+        };
+    }
+
+    private DefaultTableCellRenderer createGeneralRenderer() {
+        return new DefaultTableCellRenderer() {
+            @Override
+            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
+                                                           boolean hasFocus, int row, int column) {
+                Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+                int modelRow = table.convertRowIndexToModel(row);
+                boolean isTotal = isTotalRow(modelRow);
+
+                if (isTotal) {
+                    applyTotalRowStyle(c);
+                } else {
+                    applyDefaultCellStyle(c);
+                }
+
+                setHorizontalAlignment(SwingConstants.CENTER);
+                return c;
+            }
+        };
+    }
+
+    private DefaultTableCellRenderer createFailRenderer(DefaultTableModel model) {
+        return new DefaultTableCellRenderer() {
+            @Override
+            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
+                                                           boolean hasFocus, int row, int column) {
+                Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+                int modelRow = table.convertRowIndexToModel(row);
+                if (isTotalRow(model, modelRow)) {
+                    applyTotalRowStyle(c);
+                    applyTotalFailForeground(c, value);
+                } else {
+                    applyFailCellStyle(c, value);
+                }
+                setHorizontalAlignment(SwingConstants.CENTER);
+                return c;
+            }
+        };
+    }
+
+    private DefaultTableCellRenderer createRateRenderer(DefaultTableModel model) {
+        return new DefaultTableCellRenderer() {
+            @Override
+            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
+                                                           boolean hasFocus, int row, int column) {
+                Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+                int modelRow = table.convertRowIndexToModel(row);
+                if (isTotalRow(model, modelRow)) {
+                    applyTotalRowStyle(c);
+                    applyRateForeground(c, value);
+                } else {
+                    applyRateCellStyle(c, value);
+                }
+                setHorizontalAlignment(SwingConstants.CENTER);
+                return c;
+            }
+        };
+    }
+
+    private boolean isTotalRow(int modelRow) {
+        return isTotalRow(reportTableModel, modelRow);
+    }
+
+    private boolean isTotalRow(DefaultTableModel model, int modelRow) {
+        Object firstColumnValue = model.getValueAt(modelRow, 0);
+        return totalRowName.equals(firstColumnValue);
+    }
+
+    private void applyTotalRowStyle(Component c) {
+        c.setFont(c.getFont().deriveFont(Font.BOLD));
+        c.setForeground(PerformanceTheme.reportTotalForeground());
+        c.setBackground(PerformanceTheme.reportTotalBackground());
+    }
+
+    private void applyFailCellStyle(Component c, Object value) {
+        applyFailForeground(c, value);
+        c.setBackground(PerformanceTheme.tableBackground());
+    }
+
+    private void applyFailForeground(Component c, Object value) {
+        try {
+            int failCount = Integer.parseInt(value == null ? "0" : value.toString());
+            c.setForeground(failCount > 0 ? PerformanceTheme.reportErrorForeground() : tableForeground());
+        } catch (Exception e) {
+            c.setForeground(tableForeground());
+        }
+    }
+
+    private void applyTotalFailForeground(Component c, Object value) {
+        try {
+            int failCount = Integer.parseInt(value == null ? "0" : value.toString());
+            if (failCount > 0) {
+                c.setForeground(PerformanceTheme.reportErrorForeground());
+            }
+        } catch (Exception ignored) {
+        }
+    }
+
+    private void applyRateCellStyle(Component c, Object value) {
+        applyRateForeground(c, value);
+        c.setBackground(PerformanceTheme.tableBackground());
+    }
+
+    private void applyRateForeground(Component c, Object value) {
+        String rateStr = value != null ? value.toString() : "";
+        if (rateStr.endsWith("%")) {
+            try {
+                double rate = Double.parseDouble(rateStr.replace("%", ""));
+                if (rate >= SUCCESS_RATE_EXCELLENT) {
+                    c.setForeground(PerformanceTheme.reportSuccessForeground());
+                } else if (rate >= SUCCESS_RATE_GOOD) {
+                    c.setForeground(PerformanceTheme.reportWarningForeground());
+                } else {
+                    c.setForeground(PerformanceTheme.reportErrorForeground());
+                }
+            } catch (Exception e) {
+                c.setForeground(tableForeground());
+            }
+        } else {
+            c.setForeground(tableForeground());
+        }
+    }
+
+    private void applyDefaultCellStyle(Component c) {
+        c.setForeground(tableForeground());
+        c.setBackground(PerformanceTheme.tableBackground());
+    }
+
+    private static Color tableForeground() {
+        return PerformanceTheme.tableForeground();
+    }
+
+
+    public void clearReport() {
+        clearReportTables();
+        trendPoints.set(List.of());
+        sampleResults = List.of();
+        reportError = "";
+        htmlReportPath = Path.of(SystemUtil.getDevWorkbenchPath(), "performance-reports", "latest", "index.html");
+        scheduleHtmlReportWrite();
+    }
+
+    private void clearReportTables() {
+        reportTableModel.setRowCount(0);
+        webSocketReportTableModel.setRowCount(0);
+        sseReportTableModel.setRowCount(0);
+    }
+
+    public void setReportContext(PerformanceRunPlan plan, String environment) {
+        reportPlan = plan;
+        if (plan != null && !plan.getServiceResources().isEmpty()) {
+            serviceResources = plan.getServiceResources();
+        }
+        reportEnvironment = environment == null ? "" : environment;
+        scheduleHtmlReportWrite();
+    }
+
+    public void setServiceResources(List<PerformanceServiceResource> resources) {
+        serviceResources = PerformanceServiceResource.sanitize(resources);
+        scheduleHtmlReportWrite();
+    }
+
+    public void setTrendReportPoints(List<PerformanceTrendView.TrendReportPoint> points) {
+        trendPoints.set(points == null ? List.of() : List.copyOf(points));
+        scheduleHtmlReportWrite();
+    }
+
+    public void setSampleResults(List<PerformanceSampleResult> results) {
+        sampleResults = results == null ? List.of() : List.copyOf(results);
+        scheduleHtmlReportWrite();
+    }
+
+    public List<PerformanceSampleResult> getSampleResults() {
+        return sampleResults;
+    }
+
+    private void addReportRow(DefaultTableModel model, Object[] rowData) {
+        if (rowData == null) {
+            throw new IllegalArgumentException("Row data cannot be null");
+        }
+        if (rowData.length != model.getColumnCount()) {
+            throw new IllegalArgumentException(
+                    String.format("Row data must match the number of columns. Expected: %d, Actual: %d",
+                            model.getColumnCount(), rowData.length));
+        }
+        model.addRow(rowData);
+    }
+
+    public void updateReport(PerformanceStatsSnapshot statsSnapshot) {
+        updateReport(PerformanceProtocolReportData.fromStatsSnapshot(statsSnapshot, totalRowName));
+    }
+
+    public void updateReport(PerformanceReportSnapshot reportSnapshot) {
+        updateReport(PerformanceProtocolReportData.fromReportSnapshot(reportSnapshot, totalRowName));
+    }
+
+    public void updateReport(PerformanceJsonReport jsonReport) {
+        if (jsonReport != null && jsonReport.getMetadata() != null
+                && !jsonReport.getMetadata().getError().isBlank()) {
+            reportError = jsonReport.getMetadata().getError();
+        }
+        updateReport(PerformanceProtocolReportData.fromJsonReport(jsonReport, totalRowName));
+    }
+
+    private void updateReport(PerformanceProtocolReportData reportData) {
+        // Updating the final summary must not erase trend samples collected during the run.
+        clearReportTables();
+
+        for (PerformanceProtocolReportData.HttpReportRow row : reportData.httpRows()) {
+            addReportRow(reportTableModel, toHttpRowData(row));
+        }
+        for (PerformanceProtocolReportData.StreamReportRow row : reportData.webSocketRows()) {
+            addReportRow(webSocketReportTableModel, toWebSocketRowData(row));
+        }
+        for (PerformanceProtocolReportData.StreamReportRow row : reportData.sseRows()) {
+            addReportRow(sseReportTableModel, toSseRowData(row));
+        }
+        scheduleHtmlReportWrite();
+    }
+
+    private Object[] toHttpRowData(PerformanceProtocolReportData.HttpReportRow row) {
+        return PerformanceReportRowMapper.toHttpRowData(row);
+    }
+
+    private Object[] toWebSocketRowData(PerformanceProtocolReportData.StreamReportRow row) {
+        return PerformanceReportRowMapper.toWebSocketRowData(row);
+    }
+
+    private Object[] toSseRowData(PerformanceProtocolReportData.StreamReportRow row) {
+        return PerformanceReportRowMapper.toSseRowData(row);
+    }
+
+    private static final class ReportTableHeader extends JTableHeader {
+        private ReportTableHeader(TableColumnModel columnModel) {
+            super(columnModel);
+        }
+
+        @Override
+        public String getToolTipText(MouseEvent event) {
+            int column = columnAtPoint(event.getPoint());
+            if (column < 0) {
+                return null;
+            }
+            Object headerValue = getColumnModel().getColumn(column).getHeaderValue();
+            return headerValue == null ? null : headerValue.toString();
+        }
+    }
+
+    void copyMarkdownReport() {
+        Toolkit.getDefaultToolkit().getSystemClipboard().setContents(new StringSelection(buildMarkdownReport()), null);
+        NotificationCenter.showSuccess(I18nUtil.getMessage(MessageKeys.PERFORMANCE_REPORT_MARKDOWN_COPIED));
+    }
+
+    private List<PerformanceReportMarkdownBuilder.ReportTable> reportTables() {
+        return List.of(
+                reportTable(PerformanceProtocolLabels.displayName(PerformanceProtocol.HTTP), reportTableModel),
+                reportTable(PerformanceProtocolLabels.displayName(PerformanceProtocol.WEBSOCKET), webSocketReportTableModel),
+                reportTable(PerformanceProtocolLabels.displayName(PerformanceProtocol.SSE), sseReportTableModel));
+    }
+
+    private void exportPdfReport(JButton button) {
+        // Capture every table on the EDT; the running test may update it during PDF generation.
+        var tables = reportTables();
+        if (tables.stream().allMatch(table -> table.rows().isEmpty())) {
+            NotificationCenter.showWarning(I18nUtil.getMessage(MessageKeys.PERFORMANCE_REPORT_MARKDOWN_EMPTY));
+            return;
+        }
+        SystemFileChooser chooser = FileChooserUtil.createSaveFileChooser(
+                "performance.report.pdf", I18nUtil.getMessage(MessageKeys.PERFORMANCE_REPORT_PDF_EXPORT));
+        chooser.setFileFilter(FileChooserUtil.extensionFilter(I18nUtil.getMessage(MessageKeys.PERFORMANCE_REPORT_PDF_EXPORT) + " (*.pdf)", "pdf"));
+        chooser.setSelectedFile(new java.io.File("performance-report.pdf"));
+        if (chooser.showSaveDialog(this) != SystemFileChooser.APPROVE_OPTION) return;
+        List<PerformanceSampleResult> exportSamples = performanceResultSamples();
+        Path selected = chooser.getSelectedFile().toPath();
+        Path destination = selected.toString().toLowerCase(Locale.ROOT).endsWith(".pdf")
+                ? selected : Path.of(selected + ".pdf");
+        if (Files.exists(destination) && JOptionPane.showConfirmDialog(this,
+                I18nUtil.getMessage(MessageKeys.PERFORMANCE_REPORT_PDF_OVERWRITE),
+                I18nUtil.getMessage(MessageKeys.PERFORMANCE_REPORT_PDF_EXPORT),
+                JOptionPane.YES_NO_OPTION) != JOptionPane.YES_OPTION) return;
+        String title = I18nUtil.getMessage(MessageKeys.PERFORMANCE_REPORT_MARKDOWN_TITLE);
+        PerformanceReportPdfExporter.ReportContext context = new PerformanceReportPdfExporter.ReportContext(
+                title, reportPlan, reportEnvironment, List.copyOf(trendPoints.get()), exportSamples, reportError,
+                serviceResources);
+        String html = PerformanceHtmlReportExporter.renderHtml(context, tables);
+        writeHtmlSnapshot(html);
+        button.setEnabled(false);
+        new SwingWorker<Void, Void>() {
+            @Override protected Void doInBackground() throws Exception {
+                PerformanceHtmlReportExporter.exportPdf(destination, html);
+                return null;
+            }
+            @Override protected void done() {
+                button.setEnabled(true);
+                try {
+                    get();
+                    NotificationCenter.showSuccess(I18nUtil.getMessage(MessageKeys.PERFORMANCE_REPORT_PDF_SAVED) + " " + destination);
+                } catch (Exception ex) {
+                    log.error("Failed to export performance PDF to {}", destination, ex);
+                    NotificationCenter.showError(I18nUtil.getMessage(MessageKeys.PERFORMANCE_REPORT_PDF_FAILED));
+                }
+            }
+        }.execute();
+    }
+
+    private void openHtmlReport() {
+        if (htmlReportPath == null || !Files.isRegularFile(htmlReportPath)) {
+            NotificationCenter.showWarning(I18nUtil.getMessage(MessageKeys.PERFORMANCE_REPORT_HTML_NOT_READY));
+            return;
+        }
+        try {
+            if (!Desktop.isDesktopSupported()) throw new IOException("Desktop browser integration is unavailable");
+            Desktop.getDesktop().browse(htmlReportPath.toUri());
+        } catch (Exception ex) {
+            log.error("Failed to open performance HTML report at {}", htmlReportPath, ex);
+            NotificationCenter.showError(I18nUtil.getMessage(MessageKeys.PERFORMANCE_REPORT_HTML_OPEN_FAILED)
+                    + " " + htmlReportPath);
+        }
+    }
+
+    private void scheduleHtmlReportWrite() {
+        if (htmlReportPath == null || reportTableModel == null) return;
+        if (!SwingUtilities.isEventDispatchThread()) {
+            SwingUtilities.invokeLater(this::scheduleHtmlReportWrite);
+            return;
+        }
+        List<PerformanceReportMarkdownBuilder.ReportTable> tables = reportTables();
+        if (tables.stream().allMatch(table -> table.rows().isEmpty())) return;
+        List<PerformanceSampleResult> reportSamples = performanceResultSamples();
+        var context = new PerformanceReportPdfExporter.ReportContext(
+                I18nUtil.getMessage(MessageKeys.PERFORMANCE_REPORT_MARKDOWN_TITLE), reportPlan,
+                reportEnvironment, List.copyOf(trendPoints.get()), reportSamples, reportError, serviceResources);
+        final String html;
+        try {
+            html = PerformanceHtmlReportExporter.renderHtml(context, tables);
+        } catch (RuntimeException e) {
+            log.debug("Performance HTML report is not ready yet", e);
+            return;
+        }
+        if (pendingHtmlWrite != null) pendingHtmlWrite.cancel(false);
+        Path output = htmlReportPath;
+        pendingHtmlWrite = HTML_REPORT_WRITER.schedule(() -> writeHtmlSnapshot(output, html), 500, TimeUnit.MILLISECONDS);
+    }
+
+    private void writeHtmlSnapshot(String html) {
+        if (htmlReportPath != null) writeHtmlSnapshot(htmlReportPath, html);
+    }
+
+    private void writeHtmlSnapshot(Path output, String html) {
+        try {
+            PerformanceHtmlReportExporter.exportHtml(output, html);
+        } catch (IOException e) {
+            log.warn("Could not persist performance HTML report at {}", output, e);
+        }
+    }
+
+    private List<PerformanceSampleResult> performanceResultSamples() {
+        java.awt.Container parent = getParent();
+        while (parent != null) {
+            if (parent instanceof PerformancePanel performancePanel) {
+                return performancePanel.getPerformanceResultTablePanel().reportSamples();
+            }
+            parent = parent.getParent();
+        }
+        return sampleResults;
+    }
+
+    String buildMarkdownReport() {
+        return PerformanceReportMarkdownBuilder.build(
+                I18nUtil.getMessage(MessageKeys.PERFORMANCE_REPORT_MARKDOWN_TITLE),
+                I18nUtil.getMessage(MessageKeys.PERFORMANCE_REPORT_MARKDOWN_EMPTY),
+                reportTables()
+        );
+    }
+
+    private PerformanceReportMarkdownBuilder.ReportTable reportTable(String title, DefaultTableModel model) {
+        List<String> tableColumns = new ArrayList<>(model.getColumnCount());
+        for (int col = 0; col < model.getColumnCount(); col++) {
+            tableColumns.add(model.getColumnName(col));
+        }
+        List<Object[]> rows = new ArrayList<>(model.getRowCount());
+        for (int row = 0; row < model.getRowCount(); row++) {
+            Object[] rowData = new Object[model.getColumnCount()];
+            for (int col = 0; col < model.getColumnCount(); col++) {
+                rowData[col] = model.getValueAt(row, col);
+            }
+            rows.add(rowData);
+        }
+        return new PerformanceReportMarkdownBuilder.ReportTable(title, tableColumns, rows);
+    }
+}

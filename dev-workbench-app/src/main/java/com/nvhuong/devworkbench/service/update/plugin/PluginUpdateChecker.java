@@ -1,0 +1,98 @@
+package com.nvhuong.devworkbench.service.update.plugin;
+
+import com.nvhuong.devworkbench.ioc.Component;
+import com.nvhuong.devworkbench.plugin.manager.PluginManagementService;
+import com.nvhuong.devworkbench.plugin.manager.market.PluginCatalogEntry;
+import com.nvhuong.devworkbench.plugin.runtime.PluginCompatibility;
+import com.nvhuong.devworkbench.plugin.runtime.PluginFileInfo;
+import com.nvhuong.devworkbench.platform.update.version.VersionComparator;
+
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
+/**
+ * Trình kiểm tra cập nhật plugin.
+ */
+@Component
+public final class PluginUpdateChecker {
+
+    public List<PluginUpdateCandidate> checkForUpdates() throws Exception {
+        String catalogUrl = resolveCatalogUrl();
+        List<PluginCatalogEntry> catalogEntries = loadCatalogWithFallback(catalogUrl);
+        return findUpdateCandidates(
+                PluginManagementService.getInstalledPlugins(),
+                PluginUpdateMetadataResolver.mergeWithContributedMetadata(catalogEntries)
+        );
+    }
+
+    String resolveCatalogUrl() {
+        return PluginCatalogPreferenceResolver.resolveEffectiveCatalogUrl();
+    }
+
+    List<PluginCatalogEntry> loadCatalogWithFallback(String catalogUrl) throws Exception {
+        try {
+            return PluginManagementService.loadCatalog(catalogUrl);
+        } catch (Exception remoteError) {
+            String source = PluginManagementService.detectOfficialCatalogSource(catalogUrl);
+            if (source.isBlank()) {
+                throw remoteError;
+            }
+            return PluginManagementService.loadBundledOfficialCatalog(source);
+        }
+    }
+
+    static List<PluginUpdateCandidate> findUpdateCandidates(List<PluginFileInfo> installedPlugins,
+                                                            List<PluginCatalogEntry> catalogEntries) {
+        if (installedPlugins == null || installedPlugins.isEmpty() || catalogEntries == null || catalogEntries.isEmpty()) {
+            return List.of();
+        }
+
+        List<PluginCatalogEntry> selectedCatalogEntries =
+                PluginManagementService.selectCatalogEntriesForCurrentHost(catalogEntries);
+        Map<String, PluginFileInfo> installedMap = buildInstalledPluginMap(installedPlugins);
+        List<PluginUpdateCandidate> candidates = new ArrayList<>();
+        for (PluginCatalogEntry entry : selectedCatalogEntries) {
+            PluginFileInfo installed = installedMap.get(entry.id());
+            if (installed == null || PluginManagementService.isPluginPendingUninstall(installed.descriptor().id())) {
+                continue;
+            }
+            PluginCompatibility compatibility = PluginManagementService.evaluateCompatibility(entry);
+            if (!compatibility.compatible()) {
+                continue;
+            }
+            if (VersionComparator.compare(entry.version(), installed.descriptor().version()) > 0) {
+                candidates.add(new PluginUpdateCandidate(
+                        entry.id(),
+                        entry.name(),
+                        installed.descriptor().version(),
+                        entry.version()
+                ));
+            }
+        }
+
+        candidates.sort(Comparator.comparing(PluginUpdateCandidate::pluginName, String.CASE_INSENSITIVE_ORDER)
+                .thenComparing(PluginUpdateCandidate::pluginId, String.CASE_INSENSITIVE_ORDER));
+        return candidates;
+    }
+
+    private static Map<String, PluginFileInfo> buildInstalledPluginMap(List<PluginFileInfo> plugins) {
+        Map<String, PluginFileInfo> map = new LinkedHashMap<>();
+        for (PluginFileInfo info : plugins) {
+            if (info == null || info.descriptor() == null || info.descriptor().id() == null
+                    || info.descriptor().id().isBlank()) {
+                continue;
+            }
+            PluginFileInfo existing = map.get(info.descriptor().id());
+            if (existing == null || VersionComparator.compare(
+                    info.descriptor().version(),
+                    existing.descriptor().version()
+            ) > 0) {
+                map.put(info.descriptor().id(), info);
+            }
+        }
+        return map;
+    }
+}

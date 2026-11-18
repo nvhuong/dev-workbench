@@ -37,14 +37,14 @@ PROJECT_ROOT=$(cd "$(dirname "$0")/.."; pwd)
 cd "$PROJECT_ROOT" || exit 1
 # Trực tiếp từ pom.xml phân tích revision
 VERSION=$(grep -m 1 '<revision>' pom.xml | sed 's/.*<revision>\(.*\)<\/revision>.*/\1/')
-echo "🔧 Bắt đầu đóng gói EasyPostman RPM Gói, phiên bản: $VERSION"
-APP_NAME="EasyPostman"
-JAR_NAME_WITH_VERSION="easy-postman-$VERSION.jar"
-JAR_NAME="easy-postman.jar"  # Đã sửa tên không có số phiên bản
-MAIN_CLASS="com.laker.postman.App"
-ICON_DIR="assets/linux/EasyPostman.png"
+echo "🔧 Bắt đầu đóng gói DevWorkbench RPM Gói, phiên bản: $VERSION"
+APP_NAME="DevWorkbench"
+JAR_NAME_WITH_VERSION="dev-workbench-$VERSION.jar"
+JAR_NAME="dev-workbench.jar"  # Đã sửa tên không có số phiên bản
+MAIN_CLASS="com.nvhuong.devworkbench.App"
+ICON_DIR="assets/linux/DevWorkbench.png"
 OUTPUT_DIR="dist"
-APP_TARGET_DIR="easy-postman-app/target"
+APP_TARGET_DIR="dev-workbench-app/target"
 
 # nghiên cứu JDK phiên bản hay không >= 21
 JAVA_VERSION=$(java -version 2>&1 | grep version | awk '{print substr($3, 2, 3)}' | tr -d '"')
@@ -101,15 +101,15 @@ jpackage \
     --input ${DIST_INPUT_DIR} \
     --main-jar ${JAR_NAME} \
     --main-class ${MAIN_CLASS} \
-    --add-launcher EasyPostmanMCP=build/easy-postman-mcp-launcher.properties \
+    --add-launcher DevWorkbenchMCP=build/dev-workbench-mcp-launcher.properties \
     --runtime-image target/runtime \
     --type rpm \
     --name "${APP_NAME}" \
     --app-version "${VERSION}" \
     --dest "${OUTPUT_DIR}" \
-    --vendor "Laker" \
-    --copyright "© 2025 Laker" \
-    --description "A modern API testing tool similar to Postman" \
+    --vendor "Nvhuong" \
+    --copyright "© 2025 Nvhuong" \
+    --description "A modern API testing tool similar to DevWorkbench" \
     --linux-shortcut \
     --linux-menu-group "Development" \
     --linux-app-category "Development" \
@@ -149,4 +149,4 @@ else
     echo "📝 Lệnh cài đặt: sudo rpm -ivh ${OUTPUT_DIR}/<generated-package>.rpm"
     echo "📝 hoặc sử dụng: sudo yum install ${OUTPUT_DIR}/<generated-package>.rpm"
 fi
-echo "📝 Lệnh gỡ cài đặt: sudo rpm -e EasyPostman"
+echo "📝 Lệnh gỡ cài đặt: sudo rpm -e DevWorkbench"

@@ -1,4 +1,4 @@
-# EasyPostman Hướng dẫn phát triển, cập nhật và xuất bản plug-in
+# DevWorkbench Hướng dẫn phát triển, cập nhật và xuất bản plug-in
 
 Tài liệu này dành cho hai loại người:
 
@@ -21,14 +21,14 @@ Nếu bạn muốn xem nó bây giờ runtime Triển khai hạt nhân chứ kh�
 Hệ thống plug-in hiện tại được chia thành 7 lớp:
 
 ```text
-easy-postman-parent
-├── easy-postman-plugin-api
-├── easy-postman-foundation
-├── easy-postman-platform
-├── easy-postman-ui
-├── easy-postman-plugin-runtime
-├── easy-postman-app
-└── easy-postman-plugins
+dev-workbench-parent
+├── dev-workbench-plugin-api
+├── dev-workbench-foundation
+├── dev-workbench-platform
+├── dev-workbench-ui
+├── dev-workbench-plugin-runtime
+├── dev-workbench-app
+└── dev-workbench-plugins
     ├── plugin-manager
     ├── plugin-client-cert
     ├── plugin-capture
@@ -39,27 +39,27 @@ easy-postman-parent
 
 ### 1.1 Mỗi lớp chịu trách nhiệm gì?
 
-- `easy-postman-plugin-api`
+- `dev-workbench-plugin-api`
   - Tính ổn định của plugin tiếp xúc với máy chủ SPI
-  - Chứa `EasyPostmanPlugin`、`PluginContext`、`PluginDescriptor`
+  - Chứa `DevWorkbenchPlugin`、`PluginContext`、`PluginDescriptor`
   - Hợp đồng dịch vụ plugin cũng được đặt ở đây chẳng hạn `GitPluginService`、`ClientCertificatePluginService`、`RequestCollectionImportService`
   - Lớp đầu vào của plug-in mới phải triển khai giao diện ở đây
-- `easy-postman-foundation`
+- `dev-workbench-foundation`
   - Các công cụ và thông báo cơ bản được chia sẻ bởi máy chủ và trình cắm key、Mô hình đại chúng
   - Plug-in cần được chia sẻ với máy chủ UI DTO、enum、Các hằng số, đường dẫn,JSON、Hệ thống, công cụ thiết lập hoặc phân tích cú pháp chung/Khi định dạng các công cụ, hãy đặt chúng ở đây trước tiên
-- `easy-postman-platform`
+- `dev-workbench-platform`
   - Khả năng của khung nền tảng máy chủ, ví dụ: IOC và cập nhật lõi khám phá
-  - Không phải là một plug-in thông thường SPI；Các plugin vẫn phải ưu tiên cho các phần phụ thuộc khi chúng cần mở rộng máy chủ `easy-postman-plugin-api`
-- `easy-postman-ui`
+  - Không phải là một plug-in thông thường SPI；Các plugin vẫn phải ưu tiên cho các phần phụ thuộc khi chúng cần mở rộng máy chủ `dev-workbench-plugin-api`
+- `dev-workbench-ui`
   - Phổ biến cho các plug-in và máy chủ UI Các thành phần cơ bản và hằng số trực quan
   - Bảng plug-in có thể được tái sử dụng và thống nhất nếu cần UI Kiểu, nút, hộp tìm kiếm, bảng hoặc điều khiển nhập cơ bản trước tiên dựa vào lớp này
-- `easy-postman-plugin-runtime`
+- `dev-workbench-plugin-runtime`
   - Chịu trách nhiệm quét và đọc descriptor、Xác minh tính tương thích của phiên bản, tải lớp, gọi vòng đời, đăng ký điểm mở rộng và registry
   - Nó có thể được hiểu là kernel thời gian chạy plug-in
-- `easy-postman-app`
+- `dev-workbench-app`
   - Bản thân ứng dụng máy chủ
   - Từ runtime và registry Khả năng đăng ký plug-in tiêu dùng
-- `easy-postman-plugins`
+- `dev-workbench-plugins`
   - Thông thường các plugin chính thức JAR tập trung
   - `plugin-client-cert`、`plugin-capture`、`plugin-redis`、`plugin-kafka`、`plugin-decompiler` Loại điều này `plugin-*` Nó là một plug-in thời gian chạy phổ biến
   - `plugin-manager` Ngoại lệ là: đó là máy chủ app Chịu trách nhiệm về mô-đun phụ trợ quản lý plug-in phía máy chủ phụ thuộc trực tiếp catalog Phân tích, trực tuyến/Không có mặt tiền cài đặt ngoại tuyến và bản ghi nguồn cài đặt runtime Quét các plugin phổ biến đã tải
@@ -74,7 +74,7 @@ Liên kết chạy thực tế là khoảng:
   -> Phiên bản đã cài đặt của plug-in JAR Nhập thư mục dữ liệu plugins/installed và plugins/packages
   -> Phiên bản di động được ghi vào thư mục gốc của chương trình theo mặc định plugins và plugins/packages，Thuận tiện cho việc sao chép ngoại tuyến
   -> runtime Quét thư mục plugin
-  -> Đọc META-INF/easy-postman/*.properties
+  -> Đọc META-INF/dev-workbench/*.properties
   -> phân tích PluginDescriptor
   -> Kiểm tra app Phiên bản + platform Khả năng tương thích của phiên bản
   -> Tạo các plugin riêng biệt cho từng plugin URLClassLoader
@@ -88,8 +88,8 @@ Những điểm chính:
 
 - Các plug-in không phụ thuộc trực tiếp vào việc triển khai nội bộ của máy chủ mà thông qua `PluginContext` Khai báo khả năng
 - Các trình nạp lớp không được chia sẻ giữa các plug-in để tránh xung đột phụ thuộc làm ảnh hưởng đến máy chủ
-- `easy-postman-plugin-runtime` Chịu trách nhiệm quét, tải plugin, vòng đời và registry；`plugin-manager` Chỉ chịu trách nhiệm cài đặt/catalog Khả năng phụ trợ của chủ nhà bên
-- Không được dựa vào các plug-in thông thường `easy-postman-app`；chủ nhà app Có thể dựa vào `easy-postman-plugins/plugin-manager` Thư mục này là một trường hợp đặc biệt
+- `dev-workbench-plugin-runtime` Chịu trách nhiệm quét, tải plugin, vòng đời và registry；`plugin-manager` Chỉ chịu trách nhiệm cài đặt/catalog Khả năng phụ trợ của chủ nhà bên
+- Không được dựa vào các plug-in thông thường `dev-workbench-app`；chủ nhà app Có thể dựa vào `dev-workbench-plugins/plugin-manager` Thư mục này là một trường hợp đặc biệt
 - Giống nhau `plugin.id` Khi có nhiều phiên bản, chỉ phiên bản cao nhất mới được chọn để tải khi chạy
 - Việc chặn khả năng tương thích sẽ được thực hiện trong giai đoạn cài đặt để tránh điều đó“Cài đặt thành công nhưng thời gian chạy bị bỏ qua”trạng thái thành công sai
 
@@ -124,7 +124,7 @@ Nói cách khác, đó không phải là trách nhiệm của lớp đầu vào 
 Có hai ranh giới phiên bản trong hệ thống hiện tại: .
 
 - `app version`
-  - chủ nhà EasyPostman phiên bản phát hành
+  - chủ nhà DevWorkbench phiên bản phát hành
   - Ví dụ `5.3.16`
 - `plugin platform version`
   - plugin SPI / Các phiên bản ranh giới được tập hợp trong thời gian chạy
@@ -161,7 +161,7 @@ Chỉ có các ranh giới tập hợp trình cắm thêm hoặc các nền tả
 - `PluginDescriptor` Semantics undergo disruptive changes
 - runtime Phương pháp lắp ráp đã thay đổi và trình cắm cũ sẽ không hợp lệ
 - Một số loại hợp đồng điểm gia hạn được thay thế
-- Trình cắm bắt đầu bằng  `provided` Các mô-đun nền tảng phụ thuộc vào chế độ (ví dụ: `easy-postman-plugin-api`、`easy-postman-foundation`、`easy-postman-ui`）Xóa hoặc đổi tên lớp công khai/phương pháp này, plugin cũ sẽ xuất hiện `NoClassDefFoundError`、`NoSuchMethodError` hoặc khác linkage sai lầm
+- Trình cắm bắt đầu bằng  `provided` Các mô-đun nền tảng phụ thuộc vào chế độ (ví dụ: `dev-workbench-plugin-api`、`dev-workbench-foundation`、`dev-workbench-ui`）Xóa hoặc đổi tên lớp công khai/phương pháp này, plugin cũ sẽ xuất hiện `NoClassDefFoundError`、`NoSuchMethodError` hoặc khác linkage sai lầm
 
 Nếu chỉ:
 
@@ -186,7 +186,7 @@ Chỉ khi plug-in thực sự phụ thuộc vào khả năng nhất định củ
 Các quy định hiện hành là:
 
 - Hãy tự mình cắm vào `pom.xml` Duy trì siêu dữ liệu
-- Maven Tạo bộ lọc `META-INF/easy-postman/*.properties`
+- Maven Tạo bộ lọc `META-INF/dev-workbench/*.properties`
 - GitHub Actions Từ xây dựng đến tốt JAR Đọc bên trong descriptor
 - workflow Lại descriptor Nội dung được đồng bộ trở lại `catalog.json`
 
@@ -210,38 +210,38 @@ Con đường ngắn nhất được đưa ra dưới đây dựa trên thực t
 
 ### 3.1 Tạo một mô-đun mới
 
-Các plug-in chính thức chung được khuyến nghị `easy-postman-plugins/` Tạo mới dưới:
+Các plug-in chính thức chung được khuyến nghị `dev-workbench-plugins/` Tạo mới dưới:
 
 ```text
-easy-postman-plugins/plugin-xxx
+dev-workbench-plugins/plugin-xxx
 ├── pom.xml
 ├── src/main/java
-└── src/main/resources/META-INF/easy-postman/plugin-xxx.properties
+└── src/main/resources/META-INF/dev-workbench/plugin-xxx.properties
 ```
 
 Sau đó thêm mô-đun vào bản dựng tổng hợp.
 
-Đừng đặt nó `easy-postman-plugins/plugin-manager` Hãy coi nó như một mẫu plug-in bình thường. Nó ở lại `easy-postman-plugins` Sau đây là lộ trình lịch sử và lựa chọn tổ chức phát hành; thư viện quản lý plug-in phía máy chủ mới không nên tiếp tục được đặt theo mặc định `easy-postman-plugins/*`，Bạn có thể chuyển sang tên mô-đun hoặc thư mục rõ ràng hơn sau này.
+Đừng đặt nó `dev-workbench-plugins/plugin-manager` Hãy coi nó như một mẫu plug-in bình thường. Nó ở lại `dev-workbench-plugins` Sau đây là lộ trình lịch sử và lựa chọn tổ chức phát hành; thư viện quản lý plug-in phía máy chủ mới không nên tiếp tục được đặt theo mặc định `dev-workbench-plugins/*`，Bạn có thể chuyển sang tên mô-đun hoặc thư mục rõ ràng hơn sau này.
 
 ### 3.2 Viết một trình cắm thêm `pom.xml`
 
 Bạn nên tham khảo trực tiếp các plugin chính thức hiện có, chẳng hạn như: .
 
-- `easy-postman-plugins/plugin-capture/pom.xml`
-- `easy-postman-plugins/plugin-kafka/pom.xml`
-- `easy-postman-plugins/plugin-redis/pom.xml`
+- `dev-workbench-plugins/plugin-capture/pom.xml`
+- `dev-workbench-plugins/plugin-kafka/pom.xml`
+- `dev-workbench-plugins/plugin-redis/pom.xml`
 
 Ít nhất các trường này là bắt buộc: .
 
 ```xml
 <version>5.3.16</version>
-<artifactId>easy-postman-plugin-xxx</artifactId>
+<artifactId>dev-workbench-plugin-xxx</artifactId>
 
 <properties>
     <host.version>${revision}</host.version>
     <plugin.id>plugin-xxx</plugin.id>
     <plugin.name>XXX Plugin</plugin.name>
-    <plugin.entryClass>com.laker.postman.plugin.xxx.XxxPlugin</plugin.entryClass>
+    <plugin.entryClass>com.nvhuong.devworkbench.plugin.xxx.XxxPlugin</plugin.entryClass>
     <plugin.description>...</plugin.description>
     <plugin.minPlatformVersion>${plugin.platform.version}</plugin.minPlatformVersion>
     <plugin.maxPlatformVersion>${plugin.platform.version}</plugin.maxPlatformVersion>
@@ -310,10 +310,10 @@ Nguyên tắc thiết kế hiện nay là:
 
 ### 3.4 Viết lớp đầu vào
 
-Lớp đầu vào phải được thực hiện `EasyPostmanPlugin`：
+Lớp đầu vào phải được thực hiện `DevWorkbenchPlugin`：
 
 ```java
-public class XxxPlugin implements EasyPostmanPlugin {
+public class XxxPlugin implements DevWorkbenchPlugin {
 
     @Override
     public void onLoad(PluginContext context) {
@@ -344,10 +344,10 @@ Khuyến nghị:
 
 Quy định ưu tiên:
 
-- Phụ thuộc hợp đồng plug-in `easy-postman-plugin-api`
-- Chia sẻ không UI Các loại cơ sở và phụ thuộc công cụ `easy-postman-foundation`
-- Chia sẻ Swing Thành phần, phông chữ, biểu tượng, màu sắc và thông báo UI phụ thuộc `easy-postman-ui`
-- Đừng dựa trực tiếp vào sự phụ thuộc ngược lại `easy-postman-app` Lớp bên trong
+- Phụ thuộc hợp đồng plug-in `dev-workbench-plugin-api`
+- Chia sẻ không UI Các loại cơ sở và phụ thuộc công cụ `dev-workbench-foundation`
+- Chia sẻ Swing Thành phần, phông chữ, biểu tượng, màu sắc và thông báo UI phụ thuộc `dev-workbench-ui`
+- Đừng dựa trực tiếp vào sự phụ thuộc ngược lại `dev-workbench-app` Lớp bên trong
 - Nếu chính plugin đó cần thư viện của bên thứ ba thì thư viện đó sẽ được bao gồm trong plugin cùng với plugin JAR
 - Các phần phụ thuộc đã được máy chủ cung cấp và phần bổ trợ chỉ cần được tham chiếu trong quá trình biên dịch sẽ được sử dụng trước tiên `provided`
 
@@ -358,7 +358,7 @@ Nên làm theo danh sách này:
 1. Mới `plugin-xxx` mô-đun
 2. Kết hợp tốt `pom.xml`
 3. Viết descriptor bản mẫu
-4. Viết lớp đầu vào và thực hiện nó `EasyPostmanPlugin`
+4. Viết lớp đầu vào và thực hiện nó `DevWorkbenchPlugin`
 5. Đăng ký các điểm mở rộng cần thiết
 6. Được đóng gói và tạo ra tại địa phương JAR
 7. Xác minh cài đặt cục bộ
@@ -510,13 +510,13 @@ Xác minh địa phương được khuyến khích 4 Lớp, không chỉ biên d
 Xây dựng một plugin duy nhất: .
 
 ```bash
-mvn -pl easy-postman-plugins/plugin-kafka -am clean package -DskipTests
+mvn -pl dev-workbench-plugins/plugin-kafka -am clean package -DskipTests
 ```
 
 Xây dựng nhiều plugin:
 
 ```bash
-mvn -pl easy-postman-plugins/plugin-kafka,easy-postman-plugins/plugin-redis -am clean package -DskipTests
+mvn -pl dev-workbench-plugins/plugin-kafka,dev-workbench-plugins/plugin-redis -am clean package -DskipTests
 ```
 
 ### 6.2 Cấp độ 2: Kiểm tra descriptor Có đúng không?
@@ -526,7 +526,7 @@ Kiểm tra ít nhất hai nơi:
 1. Xây dựng thư mục đầu ra
 
 ```text
-easy-postman-plugins/plugin-kafka/target/classes/META-INF/easy-postman/plugin-kafka.properties
+dev-workbench-plugins/plugin-kafka/target/classes/META-INF/dev-workbench/plugin-kafka.properties
 ```
 
 2. cuối cùng JAR bên trong descriptor
@@ -549,7 +549,7 @@ Mục tiêu của lớp này là xác định:
 
 Phương thức xác thực cục bộ được khuyên dùng nhất:
 
-1. Mở EasyPostman
+1. Mở DevWorkbench
 2. Nhập quản lý plug-in
 3. Chọn“Cài đặt cục bộ JAR”
 4. Chọn plug-in bạn vừa gõ JAR
@@ -577,7 +577,7 @@ Nếu thay đổi này liên quan đến phạm vi tương thích, bạn nên x�
 
 Một thư mục quét giai đoạn phát triển bổ sung hiện được hỗ trợ: .
 
-- `-DeasyPostman.plugins.dir=/your/path`
+- `-DdevWorkbench.plugins.dir=/your/path`
 
 Nó phù hợp cho:
 
@@ -600,7 +600,7 @@ Hiện chỉ dành riêng cho người dùng 2 đường dẫn:
 Hiện tại chính thức catalog：
 
 - GitHub
-  - `https://raw.githubusercontent.com/nvhuong/easy-postman/main/plugin-catalog/catalog-github.json`
+  - `https://raw.githubusercontent.com/nvhuong/dev-workbench/main/plugin-catalog/catalog-github.json`
 
 ### 7.1 Tại sao cả địa phương và trực tuyến vẫn còn
 
@@ -615,8 +615,8 @@ Bởi vì cả hai giải quyết các vấn đề khác nhau:
 
 Theo mặc định, bạn sẽ thấy hai thư mục trên máy của người dùng: .
 
-- `EasyPostman/plugins/installed/`
-- `EasyPostman/plugins/packages/`
+- `DevWorkbench/plugins/installed/`
+- `DevWorkbench/plugins/packages/`
 
 Ý nghĩa:
 
@@ -634,7 +634,7 @@ Theo mặc định, bạn sẽ thấy hai thư mục trên máy của người d
 
 1. `plugin-xxx/pom.xml`
 2. `src/main/java/.../XxxPlugin.java`
-3. `src/main/resources/META-INF/easy-postman/plugin-xxx.properties`
+3. `src/main/resources/META-INF/dev-workbench/plugin-xxx.properties`
 
 Nếu plugin có nó UI hoặc kịch bản API，Thêm các danh mục tương ứng.
 
@@ -677,4 +677,4 @@ Vì đường dẫn quản lý plug-in sẽ được xác minh bằng cách:
 
 Lời đề nghị được thống nhất thành một câu:
 
-> EasyPostman Plug-in này là duy nhất JAR Đối với các đơn vị giao hàng, thông qua các plugin ổn định API、Thời gian chạy plugin độc lập và từ xa catalog cơ chế để đạt được sự phát triển độc lập, nâng cấp độc lập và phát hành độc lập.
+> DevWorkbench Plug-in này là duy nhất JAR Đối với các đơn vị giao hàng, thông qua các plugin ổn định API、Thời gian chạy plugin độc lập và từ xa catalog cơ chế để đạt được sự phát triển độc lập, nâng cấp độc lập và phát hành độc lập.

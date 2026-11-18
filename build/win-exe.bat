@@ -2,13 +2,13 @@
 SETLOCAL ENABLEEXTENSIONS
 
 :: ====================================================================
-:: EasyPostman Windows EXE Cài đặt tập lệnh xây dựng gói
+:: DevWorkbench Windows EXE Cài đặt tập lệnh xây dựng gói
 :: sử dụng jpackage + Inno Setup Tạo EXE Trình cài đặt
 :: ====================================================================
 
 echo.
 echo ========================================
-echo   EasyPostman EXE Installer Builder
+echo   DevWorkbench EXE Installer Builder
 echo ========================================
 echo.
 
@@ -39,15 +39,15 @@ if not defined VERSION (
 echo         Version: %VERSION%
 
 :: Đặt biến
-set APP_NAME=EasyPostman
-set JAR_NAME_WITH_VERSION=easy-postman-%VERSION%.jar
-set JAR_NAME=easy-postman.jar
-set MAIN_CLASS=com.laker.postman.App
-set ICON_FILE=assets\win\EasyPostman.ico
-set ISS_SCRIPT=build\easy-postman.iss
+set APP_NAME=DevWorkbench
+set JAR_NAME_WITH_VERSION=dev-workbench-%VERSION%.jar
+set JAR_NAME=dev-workbench.jar
+set MAIN_CLASS=com.nvhuong.devworkbench.App
+set ICON_FILE=assets\win\DevWorkbench.ico
+set ISS_SCRIPT=build\dev-workbench.iss
 set OUTPUT_DIR=dist
 set ARCH=x64
-set APP_TARGET_DIR=easy-postman-app\target
+set APP_TARGET_DIR=dev-workbench-app\target
 
 :: Step 3: nghiên cứu Java Phiên bản
 echo [3/9] nghiên cứu Java Phiên bản...
@@ -132,14 +132,14 @@ jpackage ^
     --input %DIST_INPUT_DIR% ^
     --main-jar %JAR_NAME% ^
     --main-class %MAIN_CLASS% ^
-    --add-launcher EasyPostmanMCP=build\easy-postman-mcp-launcher.properties ^
+    --add-launcher DevWorkbenchMCP=build\dev-workbench-mcp-launcher.properties ^
     --runtime-image target\runtime ^
     --dest target ^
     --icon %ICON_FILE% ^
     --name %APP_NAME% ^
     --app-version %VERSION% ^
-    --vendor "Laker" ^
-    --copyright "© 2025 Laker" ^
+    --vendor "Nvhuong" ^
+    --copyright "© 2025 Nvhuong" ^
     --java-options "-Xms256m" ^
     --java-options "-Xmx1g" ^
     --java-options "-XX:MaxMetaspaceSize=256m" ^
@@ -167,7 +167,7 @@ if not exist "target\%APP_NAME%\%APP_NAME%.exe" (
     pause
     exit /b 1
 )
-if not exist "target\%APP_NAME%\EasyPostmanMCP.exe" (
+if not exist "target\%APP_NAME%\DevWorkbenchMCP.exe" (
     echo ERROR: MCP launcher was not created
     pause
     exit /b 1

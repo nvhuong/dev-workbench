@@ -6,14 +6,14 @@
 
 ## Tiếng Trung Quốc
 
-Cảm ơn bạn vì điều đó EasyPostman sự chú ý! Chúng tôi hoan nghênh sự đóng góp dưới mọi hình thức.
+Cảm ơn bạn vì điều đó DevWorkbench sự chú ý! Chúng tôi hoan nghênh sự đóng góp dưới mọi hình thức.
 
 ### 🚀 trước khi bắt đầu
 
 Trước khi gửi đóng góp của bạn, vui lòng đảm bảo:
 
 1. Đọc [README](../README_zh.md) Tìm hiểu về dự án
-2. Đã tìm kiếm [Issues](https://github.com/lakernote/easy-postman/issues) Xác nhận rằng vấn đề chưa được báo cáo
+2. Đã tìm kiếm [Issues](https://github.com/nvhuong/dev-workbench/issues) Xác nhận rằng vấn đề chưa được báo cáo
 3. Đã đọc hướng dẫn đóng góp này
 
 ### 📋 Những cách đóng góp
@@ -22,7 +22,7 @@ Trước khi gửi đóng góp của bạn, vui lòng đảm bảo:
 
 Nếu bạn tìm ra Bug，Xin vui lòng:
 
-1. Vào [Issues](https://github.com/lakernote/easy-postman/issues) Hãy tìm kiếm xem bạn đã gặp vấn đề tương tự chưa
+1. Vào [Issues](https://github.com/nvhuong/dev-workbench/issues) Hãy tìm kiếm xem bạn đã gặp vấn đề tương tự chưa
 2. Nếu không, hãy tạo một cái mới Issue，Chọn "🐛 Bug Báo cáo" bản mẫu
 3. Điền đầy đủ thông tin bao gồm:
    - Các bước để tái tạo
@@ -34,7 +34,7 @@ Nếu bạn tìm ra Bug，Xin vui lòng:
 
 Nếu bạn có ý tưởng về các tính năng mới: .
 
-1. Đầu tiên vào [Discussions](https://github.com/lakernote/easy-postman/discussions) được thảo luận ở
+1. Đầu tiên vào [Discussions](https://github.com/nvhuong/dev-workbench/discussions) được thảo luận ở
 2. Nếu được chấp thuận, hãy tạo Issue，Chọn "✨ Yêu cầu tính năng" bản mẫu
 3. Mô tả chi tiết:
    - Kịch bản sử dụng
@@ -52,11 +52,11 @@ Nếu bạn có ý tưởng về các tính năng mới: .
 # 1. Fork dự án của bạn GitHub Số tài khoản
 
 # 2. Nhân bản của bạn Fork
-git clone https://github.com/YOUR_USERNAME/easy-postman.git
-cd easy-postman
+git clone https://github.com/YOUR_USERNAME/dev-workbench.git
+cd dev-workbench
 
 # 3. Thêm kho lưu trữ ngược dòng
-git remote add upstream https://github.com/lakernote/easy-postman.git
+git remote add upstream https://github.com/nvhuong/dev-workbench.git
 
 # 4. Cài đặt phụ thuộc
 # Hãy chắc chắn rằng nó đã được cài đặt Java 21+
@@ -135,8 +135,8 @@ Giấy tờ cũng quan trọng không kém! Bạn có thể:
 #### Cấu trúc dự án
 
 ```
-src/main/java/com/laker/
-├── postman/           # ứng dụng chính
+src/main/java/com/nvhuong/
+├── devworkbench/           # ứng dụng chính
 │   ├── ui/           # UI thành phần
 │   ├── service/      # logic kinh doanh
 │   ├── model/        # Mô hình dữ liệu
@@ -157,7 +157,7 @@ src/main/java/com/laker/
 
 ```bash
 # Chạy ở chế độ phát triển
-mvn clean compile exec:java -Dexec.mainClass="com.laker.postman.App"
+mvn clean compile exec:java -Dexec.mainClass="com.nvhuong.devworkbench.App"
 
 # Bật tính năng ghi nhật ký gỡ lỗi
 # Ôn lại src/main/resources/logback.xml Cấp độ nhật ký trong
@@ -172,26 +172,26 @@ mvn clean compile exec:java -Dexec.mainClass="com.laker.postman.App"
 
 ### 📞 Chi tiết liên lạc
 
-- **GitHub Issues**: [nộp Issue](https://github.com/lakernote/easy-postman/issues)
-- **Discussions**: [Tham gia vào các cuộc thảo luận](https://github.com/lakernote/easy-postman/discussions)
-- **WeChat**: lakernote
+- **GitHub Issues**: [nộp Issue](https://github.com/nvhuong/dev-workbench/issues)
+- **Discussions**: [Tham gia vào các cuộc thảo luận](https://github.com/nvhuong/dev-workbench/discussions)
+- **WeChat**: nvhuong
 
 ### 🙏 tri ân
 
-Cảm ơn vì tất cả EasyPostman Đóng góp của các nhà phát triển! .
+Cảm ơn vì tất cả DevWorkbench Đóng góp của các nhà phát triển! .
 
 ---
 
 ## English
 
-Thank you for your interest in EasyPostman! We welcome all forms of contributions.
+Thank you for your interest in DevWorkbench! We welcome all forms of contributions.
 
 ### 🚀 Before You Start
 
 Before contributing, please ensure:
 
 1. You've read the [README](../README.md) to understand the project
-2. You've searched [Issues](https://github.com/lakernote/easy-postman/issues) to confirm the issue hasn't been reported
+2. You've searched [Issues](https://github.com/nvhuong/dev-workbench/issues) to confirm the issue hasn't been reported
 3. You've read this contributing guide
 
 ### 📋 Ways to Contribute
@@ -200,7 +200,7 @@ Before contributing, please ensure:
 
 If you find a bug:
 
-1. Search [Issues](https://github.com/lakernote/easy-postman/issues) for existing reports
+1. Search [Issues](https://github.com/nvhuong/dev-workbench/issues) for existing reports
 2. If none exist, create a new Issue using the "🐛 Bug Report" template
 3. Fill in complete information including:
    - Reproduction steps
@@ -212,7 +212,7 @@ If you find a bug:
 
 If you have a feature idea:
 
-1. Discuss it in [Discussions](https://github.com/lakernote/easy-postman/discussions) first
+1. Discuss it in [Discussions](https://github.com/nvhuong/dev-workbench/discussions) first
 2. If approved, create an Issue using the "✨ Feature Request" template
 3. Describe in detail:
    - Use cases
@@ -230,11 +230,11 @@ We welcome code contributions!
 # 1. Fork the project to your GitHub account
 
 # 2. Clone your fork
-git clone https://github.com/YOUR_USERNAME/easy-postman.git
-cd easy-postman
+git clone https://github.com/YOUR_USERNAME/dev-workbench.git
+cd dev-workbench
 
 # 3. Add upstream remote
-git remote add upstream https://github.com/lakernote/easy-postman.git
+git remote add upstream https://github.com/nvhuong/dev-workbench.git
 
 # 4. Install dependencies
 # Ensure Java 21+ is installed
@@ -314,8 +314,8 @@ Documentation is equally important! You can:
 #### Project Structure
 
 ```
-src/main/java/com/laker/
-├── postman/           # Main application
+src/main/java/com/nvhuong/
+├── devworkbench/           # Main application
 │   ├── ui/           # UI components
 │   ├── service/      # Business logic
 │   ├── model/        # Data models
@@ -336,7 +336,7 @@ src/main/java/com/laker/
 
 ```bash
 # Run in development mode
-mvn clean compile exec:java -Dexec.mainClass="com.laker.postman.App"
+mvn clean compile exec:java -Dexec.mainClass="com.nvhuong.devworkbench.App"
 
 # Enable debug logging
 # Modify log level in src/main/resources/logback.xml
@@ -351,10 +351,10 @@ mvn clean compile exec:java -Dexec.mainClass="com.laker.postman.App"
 
 ### 📞 Contact
 
-- **GitHub Issues**: [Submit Issue](https://github.com/lakernote/easy-postman/issues)
-- **Discussions**: [Join Discussion](https://github.com/lakernote/easy-postman/discussions)
-- **WeChat**: lakernote
+- **GitHub Issues**: [Submit Issue](https://github.com/nvhuong/dev-workbench/issues)
+- **Discussions**: [Join Discussion](https://github.com/nvhuong/dev-workbench/discussions)
+- **WeChat**: nvhuong
 
 ### 🙏 Acknowledgments
 
-Thanks to all developers who have contributed to EasyPostman!
+Thanks to all developers who have contributed to DevWorkbench!

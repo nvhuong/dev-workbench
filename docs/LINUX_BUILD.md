@@ -47,8 +47,8 @@ jpackage --version
 
 1. **Sao chép mã dự án**
    ```bash
-   git clone https://gitee.com/lakernote/easy-postman.git
-   cd easy-postman
+   git clone https://gitee.com/nvhuong/dev-workbench.git
+   cd dev-workbench
    ```
 
 2. **Chạy tập lệnh đóng gói**
@@ -71,15 +71,15 @@ jpackage --version
    sudo apt-get install -f
 
    # gỡ cài đặt
-   sudo dpkg -r easypostman
+   sudo dpkg -r devworkbench
    ```
 
 ### CentOS/RedHat hệ thống - Đóng gói RPM
 
 1. **Sao chép mã dự án**
    ```bash
-   git clone https://gitee.com/lakernote/easy-postman.git
-   cd easy-postman
+   git clone https://gitee.com/nvhuong/dev-workbench.git
+   cd dev-workbench
    ```
 
 2. **Chạy tập lệnh đóng gói**
@@ -103,9 +103,9 @@ jpackage --version
    sudo dnf install dist/<generated-package>.rpm
 
    # gỡ cài đặt
-   sudo rpm -e EasyPostMan
+   sudo rpm -e DevWorkbench
    # hoặc
-   sudo yum remove EasyPostMan
+   sudo yum remove DevWorkbench
    ```
 
 ## Hướng dẫn quy trình đóng gói
@@ -141,20 +141,20 @@ Cả hai tập lệnh đều thực hiện các bước sau:
 
 1. **Thông qua menu ứng dụng**
    - Tìm thấy trong menu hệ thống "Development" hoặc "công cụ phát triển" phân loại
-   - Bấm vào "EasyPostman" biểu tượng để bắt đầu
+   - Bấm vào "DevWorkbench" biểu tượng để bắt đầu
 
 2. **Thông qua dòng lệnh**
    ```bash
-   easypostman
+   devworkbench
    ```
 
 3. **Kiểm tra vị trí cài đặt**
    ```bash
    # DEB gói
-   dpkg -L easypostman
+   dpkg -L devworkbench
 
    # RPM gói
-   rpm -ql easypostman
+   rpm -ql devworkbench
    ```
 
 ## Câu hỏi thường gặp
@@ -183,7 +183,7 @@ sudo yum install java-21-openjdk-devel
 journalctl --user -f
 
 # Hoặc chạy trực tiếp từ terminal để xem lỗi
-/opt/easypostman/bin/EasyPostMan
+/opt/devworkbench/bin/DevWorkbench
 ```
 
 ### 3. Vấn đề về quyền
@@ -229,7 +229,7 @@ objcopy --version
 
 ### 6. DEB Cài đặt gói không thành công: thiếu xdg-utils
 
-**câu hỏi**: `easypostman depends on xdg-utils; however: Package xdg-utils is not installed.`
+**câu hỏi**: `devworkbench depends on xdg-utils; however: Package xdg-utils is not installed.`
 
 **lý do**: DEB Phụ thuộc gói `xdg-utils` để xử lý việc tích hợp máy tính để bàn (phím tắt, liên kết tệp, v.v.)
 
@@ -241,7 +241,7 @@ sudo dpkg -i dist/<generated-package>.deb
 
 # cách 2：sử dụng apt-get Tự động xử lý các phần phụ thuộc (được khuyến nghị)
 sudo apt-get install -f
-# Điều này sẽ tự động cài đặt các phần phụ thuộc còn thiếu và hoàn tất easypostman cấu hình
+# Điều này sẽ tự động cài đặt các phần phụ thuộc còn thiếu và hoàn tất devworkbench cấu hình
 
 # cách 3：sử dụng apt Cài đặt trực tiếp (các phần phụ thuộc sẽ được xử lý tự động)
 sudo apt install ./dist/<generated-package>.deb

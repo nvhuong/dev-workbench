@@ -1,0 +1,30 @@
+package com.nvhuong.devworkbench.startup;
+
+import com.nvhuong.devworkbench.ioc.BeanFactory;
+import com.nvhuong.devworkbench.service.UpdateService;
+import lombok.experimental.UtilityClass;
+import lombok.extern.slf4j.Slf4j;
+
+import javax.swing.Timer;
+
+/**
+ * Bắt đầu lịch kiểm tra cập nhật sau khi cửa sổ chính hiển thị.
+ */
+@Slf4j
+@UtilityClass
+class StartupUpdateScheduler {
+    private static final int UPDATE_CHECK_DELAY_MS = 2000;
+
+    void scheduleBackgroundUpdateCheck() {
+        Timer delayTimer = new Timer(UPDATE_CHECK_DELAY_MS, e -> {
+            try {
+                BeanFactory.getBean(UpdateService.class).checkUpdateOnStartup();
+                log.debug("Background update check scheduled after main window became visible");
+            } catch (Exception ex) {
+                log.warn("Failed to start background update check", ex);
+            }
+        });
+        delayTimer.setRepeats(false);
+        delayTimer.start();
+    }
+}

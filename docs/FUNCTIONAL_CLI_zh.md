@@ -1,25 +1,25 @@
-# EasyPostman Functional CLI
+# DevWorkbench Functional CLI
 
-`functional run` Được sử dụng trên các máy phát triển.CI Runner Hoặc trên một máy chủ độc lập, không có giao diện nào có thể được sao chép EasyPostman GUI“Kiểm tra chức năng”Bảng lưu lựa chọn yêu cầu, thứ tự thực hiện và CSV Nhiều vòng dữ liệu.
+`functional run` Được sử dụng trên các máy phát triển.CI Runner Hoặc trên một máy chủ độc lập, không có giao diện nào có thể được sao chép DevWorkbench GUI“Kiểm tra chức năng”Bảng lưu lựa chọn yêu cầu, thứ tự thực hiện và CSV Nhiều vòng dữ liệu.
 
 CLI để hoàn thành workspace Thư mục là đơn vị đang chạy. Bình thường workspace Toàn bộ thư mục phải được sao chép vào  CI；Git workspace Đáng lẽ phải ở đó CI checkout Sau đó chạy trực tiếp thư mục kho, đừng chỉ sao chép nó `functional_config.json`。
 
 ```bash
-java -jar easy-postman.jar functional run <workspace-directory> [options]
+java -jar dev-workbench.jar functional run <workspace-directory> [options]
 ```
 
 `<workspace-directory>` Chỉ định trực tiếp workspace thư mục, ví dụ: .
 
 ```bash
-java -jar easy-postman.jar functional run /srv/api-workspace
+java -jar dev-workbench.jar functional run /srv/api-workspace
 ```
 
 ## Tải về mới nhất JAR
 
-Mở bất kỳ trang phát hành nào, mới nhất `v*` phiên bản Assets Tải về `easy-postman-{Số phiên bản}.jar`：
+Mở bất kỳ trang phát hành nào, mới nhất `v*` phiên bản Assets Tải về `dev-workbench-{Số phiên bản}.jar`：
 
-- [GitHub cập nhật Release](https://github.com/lakernote/easy-postman/releases/latest)
-- [Gitee Releases（Phản ánh trong nước)](https://gitee.com/lakernote/easy-postman/releases)
+- [GitHub cập nhật Release](https://github.com/nvhuong/dev-workbench/releases/latest)
+- [Gitee Releases（Phản ánh trong nước)](https://gitee.com/nvhuong/dev-workbench/releases)
 
 Gitee Đồng bộ hóa tệp đính kèm có thể bị trì hoãn; nếu bản gốc tạm thời không có sẵn trong phiên bản mới nhất JAR，Hãy sử dụng GitHub Địa chỉ tải về. chạy CLI Cần thiết Java 21 hoặc cao hơn.
 
@@ -44,19 +44,19 @@ Trách nhiệm về hồ sơ:
 - `requestItemId` Đã sử dụng từ mới nhất `collections.json` Tìm yêu cầu.
 - `environments.json` Cung cấp các biến môi trường.
 - `performance_config.json` Thuộc tiêu chuẩn workspace，Nhưng đừng tham gia `functional run`。
-- Cấp độ ứng dụng `global_variables.json` Từ EasyPostman Đọc thư mục dữ liệu.
+- Cấp độ ứng dụng `global_variables.json` Từ DevWorkbench Đọc thư mục dữ liệu.
 - CLI Chỉ đọc workspace，Sẽ không viết lại GUI cấu hình.
 
 ## 2. Thời gian sử dụng ngắn nhất
 
 ```bash
-java -jar easy-postman.jar functional run /srv/api-workspace
+java -jar dev-workbench.jar functional run /srv/api-workspace
 ```
 
 Chọn CI môi trường và tạo báo cáo:
 
 ```bash
-java -jar easy-postman.jar functional run /srv/api-workspace \
+java -jar dev-workbench.jar functional run /srv/api-workspace \
   -e "CI" \
   --bail \
   --out target/functional-result.json
@@ -65,7 +65,7 @@ java -jar easy-postman.jar functional run /srv/api-workspace \
 Vào Git workspace Thư mục gốc: .
 
 ```bash
-java -jar /opt/easy-postman/easy-postman.jar functional run .
+java -jar /opt/dev-workbench/dev-workbench.jar functional run .
 ```
 
 ## 3. `functional_config.json`
@@ -108,7 +108,7 @@ GUI Làm mới bảng kiểm tra chức năng và lưu nó để đồng bộ h�
 nếu `csvState.rows` Có hai dòng: .
 
 ```bash
-java -jar easy-postman.jar functional run "$WORKSPACE_DIR"
+java -jar dev-workbench.jar functional run "$WORKSPACE_DIR"
 ```
 
 Theo mặc định, hai vòng được thực hiện và không cần truyền thêm `-d`。
@@ -129,8 +129,8 @@ Sẽ `functional_config.json` Gửi tới Git Nó tương đương với việc 
 CI Đã đặt trước GUI Yêu cầu lựa chọn, nhưng sử dụng CI Dữ liệu riêng tư:
 
 ```bash
-java -jar easy-postman.jar functional run "$WORKSPACE_DIR" \
-  -d /opt/easy-postman-data/ci-users.csv
+java -jar dev-workbench.jar functional run "$WORKSPACE_DIR" \
+  -d /opt/dev-workbench-data/ci-users.csv
 ```
 
 Tại thời điểm này danh sách yêu cầu vẫn đến từ `functional_config.json`，Dữ liệu lặp lại hoàn toàn đến từ các tệp bên ngoài. Tương đối `-d` đường dẫn từ workspace Độ phân giải thư mục gốc .
@@ -161,7 +161,7 @@ GUI Sau khi máy được lưu, nó sẽ được sao chép hoàn toàn workspac
 Phát triển máy đóng gói:
 
 ```bash
-tar -C /Users/me/EasyPostman/workspaces \
+tar -C /Users/me/DevWorkbench/workspaces \
   -czf order-api-workspace.tar.gz \
   order-api
 ```
@@ -174,7 +174,7 @@ tar -xzf order-api-workspace.tar.gz \
   -C "$CI_PROJECT_DIR/api-workspace" \
   --strip-components=1
 
-java -jar "$CI_PROJECT_DIR/tools/easy-postman.jar" \
+java -jar "$CI_PROJECT_DIR/tools/dev-workbench.jar" \
   functional run "$CI_PROJECT_DIR/api-workspace" \
   -e "CI" \
   --bail \
@@ -184,7 +184,7 @@ java -jar "$CI_PROJECT_DIR/tools/easy-postman.jar" \
 nếu CI Để sử dụng dữ liệu riêng tư, hãy thay đổi lệnh chạy thành:
 
 ```bash
-java -jar "$CI_PROJECT_DIR/tools/easy-postman.jar" \
+java -jar "$CI_PROJECT_DIR/tools/dev-workbench.jar" \
   functional run "$CI_PROJECT_DIR/api-workspace" \
   -e "CI" \
   -d "$CI_PROJECT_DIR/test-data/ci-users.csv" \
@@ -199,7 +199,7 @@ workspace Nó cũng có thể được thông qua CI Artifact、SCP、rsync、Do
 Quy trình bảo trì đề xuất:
 
 1. Máy phát triển clone API workspace nhà kho.
-2. EasyPostman Tay cầm giữa Git workspace Đường dẫn trỏ đến thư mục này.
+2. DevWorkbench Tay cầm giữa Git workspace Đường dẫn trỏ đến thư mục này.
 3. GUI Duy trì Bộ sưu tập, Môi trường, Kiểm tra chức năng và Dấu kiểm trong Bảo trì CSV。
 4. Lưu để xem xét và gửi workspace của 4 cá nhân JSON tập tin.
 5. commit Và push。
@@ -222,7 +222,7 @@ performance_config.json
 ### GitHub Actions
 
 ```yaml
-name: EasyPostman Functional Test
+name: DevWorkbench Functional Test
 
 on:
   push:
@@ -242,7 +242,7 @@ jobs:
       - name: Run functional tests
         run: |
           mkdir -p target
-          java -jar tools/easy-postman.jar \
+          java -jar tools/dev-workbench.jar \
             functional run . \
             -e "CI" \
             --bail \
@@ -260,7 +260,7 @@ mã doanh nghiệp và API workspace Kho phụ:
 ```bash
 git clone "$API_WORKSPACE_REPOSITORY" "$CI_PROJECT_DIR/api-workspace"
 
-java -jar "$CI_PROJECT_DIR/tools/easy-postman.jar" \
+java -jar "$CI_PROJECT_DIR/tools/dev-workbench.jar" \
   functional run "$CI_PROJECT_DIR/api-workspace" \
   -e "CI"
 ```
@@ -272,8 +272,8 @@ Không được truyền lại `-e` ưu tiên khi sử dụng `active: true` mô
 Cô lập thư mục biến toàn cục cấp ứng dụng: .
 
 ```bash
-java -DeasyPostman.data.dir="$RUNNER_TEMP/easy-postman-data" \
-  -jar tools/easy-postman.jar \
+java -DdevWorkbench.data.dir="$RUNNER_TEMP/dev-workbench-data" \
+  -jar tools/dev-workbench.jar \
   functional run . \
   -e "CI"
 ```
@@ -294,14 +294,14 @@ jq --arg token "$API_TOKEN" '
 mv environments.json.tmp environments.json
 ```
 
-CLI Sẽ không tự động đặt tùy ý shell Các biến môi trường được ánh xạ tới  EasyPostman các biến.
+CLI Sẽ không tự động đặt tùy ý shell Các biến môi trường được ánh xạ tới  DevWorkbench các biến.
 
 ## 8. Tải lên tập tin
 
 Tải lên tệp đính kèm không chuẩn workspace tập tin. Đính kèm bởi CI Khi gắn một mình:
 
 ```bash
-java -jar easy-postman.jar functional run "$WORKSPACE_DIR" \
+java -jar dev-workbench.jar functional run "$WORKSPACE_DIR" \
   --working-dir "$CI_PROJECT_DIR/test-assets"
 ```
 
@@ -336,7 +336,7 @@ Báo cáo schema vì `2.1`，TRONG:
 Ví dụ workspace：[`docs/examples/functional-cli`](examples/functional-cli/)
 
 ```bash
-java -jar easy-postman-app/target/easy-postman-*.jar \
+java -jar dev-workbench-app/target/dev-workbench-*.jar \
   functional run docs/examples/functional-cli \
   --bail \
   --out target/functional-run-result.json

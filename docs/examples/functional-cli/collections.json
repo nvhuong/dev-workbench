@@ -2,8 +2,8 @@
     {
         "type": "group",
         "id": "functional-cli-example",
-        "name": "EasyPostman Functional CLI Example",
-        "description": "Standard EasyPostman workspace example for functional run.",
+        "name": "DevWorkbench Functional CLI Example",
+        "description": "Standard DevWorkbench workspace example for functional run.",
         "children": [
             {
                 "type": "group",

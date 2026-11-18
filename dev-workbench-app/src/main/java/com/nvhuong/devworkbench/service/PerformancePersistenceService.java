@@ -1,0 +1,128 @@
+package com.nvhuong.devworkbench.service;
+
+import com.nvhuong.devworkbench.common.constants.ConfigPathConstants;
+import com.nvhuong.devworkbench.ioc.Component;
+import com.nvhuong.devworkbench.ioc.PostConstruct;
+import com.nvhuong.devworkbench.ioc.PreDestroy;
+import com.nvhuong.devworkbench.model.Workspace;
+import com.nvhuong.devworkbench.performance.plan.PerformancePlanConfiguration;
+import com.nvhuong.devworkbench.performance.plan.PerformancePlanStorage;
+import com.nvhuong.devworkbench.performance.plan.PerformancePlanWorkspace;
+import lombok.extern.slf4j.Slf4j;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+
+/**
+ * Kiểm tra hiệu suất sẽ định cấu hình dịch vụ lưu trữ lâu dài
+ * Được sử dụng để lưu và tải các cấu hình kế hoạch kiểm tra trong bảng kiểm tra hiệu suất
+ */
+@Slf4j
+@Component
+public class PerformancePersistenceService {
+    private final PerformancePlanStorage planStorage = new PerformancePlanStorage();
+    private final ExecutorService saveExecutor = Executors.newSingleThreadExecutor(runnable -> {
+        Thread thread = new Thread(runnable, "performance-config-save");
+        thread.setDaemon(true);
+        return thread;
+    });
+
+    @PostConstruct
+    public void init() {
+        ensureDirExists();
+    }
+
+    private void ensureDirExists() {
+        ensureDirExists(getConfigFilePath());
+    }
+
+    private void ensureDirExists(Path configPath) {
+        try {
+            Path configDir = configPath.getParent();
+            if (configDir != null && !Files.exists(configDir)) {
+                Files.createDirectories(configDir);
+            }
+        } catch (IOException e) {
+            log.error("Failed to create config directory: {}", e.getMessage());
+        }
+    }
+
+    public void saveConfiguration(PerformancePlanConfiguration configuration) {
+        Path configPath = getConfigFilePath();
+        writeAndWait(() -> planStorage.saveConfiguration(configPath, configuration));
+    }
+
+    public void saveWorkspace(PerformancePlanWorkspace workspace) {
+        Path configPath = getConfigFilePath();
+        writeAndWait(() -> planStorage.saveWorkspace(configPath, workspace));
+    }
+
+    public void saveWorkspaceAsync(PerformancePlanWorkspace workspace) {
+        Path configPath = getConfigFilePath();
+        saveExecutor.execute(() -> planStorage.saveWorkspace(configPath, workspace));
+    }
+
+    public PerformancePlanConfiguration loadConfiguration() {
+        return planStorage.loadConfiguration(getConfigFilePath());
+    }
+
+    public PerformancePlanWorkspace loadWorkspace() {
+        return planStorage.loadWorkspace(getConfigFilePath());
+    }
+
+    /**
+     * Cấu hình rõ ràng
+     */
+    public void clear() {
+        Path configPath = getConfigFilePath();
+        writeAndWait(() -> planStorage.clear(configPath));
+    }
+
+    private void writeAndWait(Runnable writeAction) {
+        // Tất cả các thao tác ghi đều có chung một hàng đợi và lần lưu cuối cùng khi thoát phải được xếp hàng sau lần lưu tự động cũ.
+        Future<?> write = saveExecutor.submit(writeAction);
+        try {
+            write.get();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new IllegalStateException("Interrupted while saving performance config", e);
+        } catch (ExecutionException e) {
+            throw new IllegalStateException("Failed to save performance config", e.getCause());
+        }
+    }
+
+    protected Path getConfigFilePath() {
+        Workspace workspace = getCurrentWorkspace();
+        return Paths.get(ConfigPathConstants.getPerformanceConfigPath(workspace));
+    }
+
+    protected Workspace getCurrentWorkspace() {
+        try {
+            return WorkspaceService.getInstance().getCurrentWorkspace();
+        } catch (Exception e) {
+            log.debug("Failed to resolve current workspace for performance config path", e);
+            return null;
+        }
+    }
+
+    @PreDestroy
+    public void shutdown() {
+        saveExecutor.shutdown();
+        try {
+            if (!saveExecutor.awaitTermination(2, TimeUnit.SECONDS)) {
+                saveExecutor.shutdownNow();
+            }
+        } catch (InterruptedException e) {
+            saveExecutor.shutdownNow();
+            Thread.currentThread().interrupt();
+        }
+    }
+
+}

@@ -1,0 +1,848 @@
+package com.nvhuong.devworkbench.performance.core.runtime;
+
+import com.nvhuong.devworkbench.performance.core.plan.PerformanceTestPlan;
+import com.nvhuong.devworkbench.performance.core.plan.PerformanceThreadGroupPlan;
+import com.nvhuong.devworkbench.performance.core.threadgroup.ThreadGroupData;
+import lombok.extern.slf4j.Slf4j;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
+import java.util.function.BiConsumer;
+import java.util.function.BooleanSupplier;
+import java.util.function.IntFunction;
+import java.util.function.LongSupplier;
+import java.util.function.Supplier;
+
+@Slf4j
+public final class PerformanceCoreThreadGroupRunner<C> {
+
+    private static final long SPIKE_ADJUST_INTERVAL_MS = 1_000L;
+    private static final long ITERATION_FAILURE_BACKOFF_MS = 100L;
+    private static final long ITERATION_FAILURE_LOG_INTERVAL_MS = 5_000L;
+
+    @FunctionalInterface
+    public interface IterationContextFactory<C> {
+        C create(PerformanceThreadGroupPlan groupPlan, int iterationCount);
+    }
+
+    @FunctionalInterface
+    public interface IterationExecutor<C> {
+        void executeIteration(PerformanceThreadGroupPlan groupPlan, C iterationContext);
+    }
+
+    private final BooleanSupplier runningSupplier;
+    private final LongSupplier startTimeSupplier;
+    private final Runnable cancellationAction;
+    private final PerformanceVirtualUserCoordinator virtualUsers;
+    private final IterationContextFactory<C> iterationContextFactory;
+    private final IterationExecutor<C> iterationExecutor;
+    private final Supplier<PerformanceCoreResultSink> resultSinkSupplier;
+    private final AtomicLong progressSequence = new AtomicLong(0L);
+    private final AtomicBoolean drainTimedOut = new AtomicBoolean(false);
+    private final AtomicLong lastIterationFailureLogTime = new AtomicLong(0L);
+    private final AtomicLong suppressedIterationFailures = new AtomicLong(0L);
+    private final AtomicBoolean iterationFailureReported = new AtomicBoolean(false);
+
+    public PerformanceCoreThreadGroupRunner(BooleanSupplier runningSupplier,
+                                            LongSupplier startTimeSupplier,
+                                            Runnable cancellationAction,
+                                            PerformanceVirtualUserCoordinator virtualUsers,
+                                            IterationContextFactory<C> iterationContextFactory,
+                                            IterationExecutor<C> iterationExecutor,
+                                            Supplier<PerformanceCoreResultSink> resultSinkSupplier) {
+        BooleanSupplier resolvedRunningSupplier = runningSupplier == null ? () -> false : runningSupplier;
+        this.runningSupplier = () -> resolvedRunningSupplier.getAsBoolean() && !drainTimedOut.get();
+        this.startTimeSupplier = startTimeSupplier == null ? System::currentTimeMillis : startTimeSupplier;
+        this.cancellationAction = cancellationAction == null ? () -> {
+        } : cancellationAction;
+        this.virtualUsers = virtualUsers == null ? new PerformanceVirtualUserCoordinator() : virtualUsers;
+        this.iterationContextFactory = iterationContextFactory == null ? (groupPlan, iterationCount) -> null : iterationContextFactory;
+        this.iterationExecutor = iterationExecutor == null ? (groupPlan, iterationContext) -> {
+        } : iterationExecutor;
+        this.resultSinkSupplier = resultSinkSupplier == null ? () -> PerformanceCoreResultSink.NOOP : resultSinkSupplier;
+    }
+
+    public void run(PerformanceTestPlan plan, int totalThreads) {
+        drainTimedOut.set(false);
+        resetIterationFailureState();
+        virtualUsers.startAcceptingSamples();
+        if (!runningSupplier.getAsBoolean() || plan == null) {
+            return;
+        }
+        progressSequence.set(0L);
+
+        List<Thread> threadGroupThreads = new ArrayList<>();
+        for (PerformanceThreadGroupPlan threadGroup : plan.getThreadGroups()) {
+            Thread thread = PerformanceThreadFactory.newDaemonThread(
+                    "PerformanceThreadGroup",
+                    () -> runThreadGroup(threadGroup, totalThreads)
+            );
+            threadGroupThreads.add(thread);
+            thread.start();
+        }
+        joinThreadGroupThreads(threadGroupThreads, cancellationAction);
+    }
+
+    private void runThreadGroup(PerformanceThreadGroupPlan groupPlan, int totalThreads) {
+        if (groupPlan == null) {
+            return;
+        }
+        ThreadGroupData threadGroupData = groupPlan.getThreadGroupData();
+        if (threadGroupData == null) {
+            threadGroupData = new ThreadGroupData();
+        }
+        threadGroupData.normalize();
+        AtomicInteger groupVirtualUserCounter = new AtomicInteger(0);
+        BiConsumer<Integer, Integer> progressUpdater = this::publishProgress;
+        switch (threadGroupData.threadMode) {
+            case FIXED -> runFixedThreads(groupPlan, threadGroupData, progressUpdater, totalThreads, groupVirtualUserCounter);
+            case RAMP_UP -> runRampUpThreads(groupPlan, threadGroupData, progressUpdater, totalThreads, groupVirtualUserCounter);
+            case SPIKE -> runSpikeThreads(groupPlan, threadGroupData, progressUpdater, totalThreads, groupVirtualUserCounter);
+            case STAIRS -> runStairsThreads(groupPlan, threadGroupData, progressUpdater, totalThreads, groupVirtualUserCounter);
+        }
+    }
+
+    private void runFixedThreads(PerformanceThreadGroupPlan groupPlan,
+                                 ThreadGroupData tg,
+                                 BiConsumer<Integer, Integer> progressUpdater,
+                                 int totalThreads,
+                                 AtomicInteger groupVirtualUserCounter) {
+        int numThreads = tg.numThreads;
+        int loops = tg.loops;
+        boolean useTime = tg.useTime;
+        int durationSeconds = tg.duration;
+
+        ExecutorService executor = Executors.newFixedThreadPool(
+                numThreads,
+                PerformanceThreadFactory.daemonFactory("PerformanceFixedWorker")
+        );
+        long threadGroupStartTime = System.currentTimeMillis();
+        long endTime = useTime ? (threadGroupStartTime + (durationSeconds * 1000L)) : Long.MAX_VALUE;
+
+        for (int i = 0; i < numThreads; i++) {
+            if (!runningSupplier.getAsBoolean()) {
+                executor.shutdownNow();
+                return;
+            }
+            virtualUsers.submit(executor, progressUpdater, totalThreads, groupVirtualUserCounter::getAndIncrement,
+                    virtualUserScopeFactory(groupPlan), () -> virtualUsers.runWithinLoadWindow(endTime, () -> {
+                        if (useTime) {
+                            while (System.currentTimeMillis() < endTime && runningSupplier.getAsBoolean()) {
+                                runTaskIteration(groupPlan, 0);
+                            }
+                        } else {
+                            runTask(groupPlan, loops);
+                        }
+                    }));
+        }
+        executor.shutdown();
+        try {
+            boolean terminated;
+            if (useTime) {
+                terminated = executor.awaitTermination(
+                        (long) durationSeconds + tg.maxInFlightWaitSeconds,
+                        TimeUnit.SECONDS
+                );
+            } else {
+                terminated = awaitFixedLoopWorkers(executor);
+            }
+
+            if (!terminated || !runningSupplier.getAsBoolean()) {
+                log.warn("Nhóm luồng không thể hoàn thành trong thời gian dự kiến, buộc các luồng còn lại phải tắt");
+                markDrainTimedOut(terminated);
+                List<Runnable> pendingTasks = executor.shutdownNow();
+                log.debug("Đã hủy {} các nhiệm vụ cần thực hiện", pendingTasks.size());
+                if (!executor.awaitTermination(3, TimeUnit.SECONDS)) {
+                    log.warn("Một số chủ đề không bị chấm dứt sau khi buộc phải tắt máy. Điều này là bình thường. Các chủ đề sẽ tự động thoát sau khi hoạt động mạng hoàn tất");
+                } else {
+                    log.info("Tất cả các chủ đề đã kết thúc thành công");
+                }
+            }
+        } catch (InterruptedException exception) {
+            Thread.currentThread().interrupt();
+            executor.shutdownNow();
+            if (runningSupplier.getAsBoolean()) {
+                publishError(PerformanceRunError.builder()
+                        .message(exception.getMessage())
+                        .cause(exception)
+                        .build());
+                log.error(exception.getMessage(), exception);
+            } else {
+                log.debug("Chế độ chủ đề cố định đã dừng");
+            }
+        }
+    }
+
+    private boolean awaitFixedLoopWorkers(ExecutorService executor) throws InterruptedException {
+        while (runningSupplier.getAsBoolean()) {
+            if (executor.awaitTermination(250, TimeUnit.MILLISECONDS)) {
+                return true;
+            }
+        }
+        return executor.isTerminated();
+    }
+
+    private void runRampUpThreads(PerformanceThreadGroupPlan groupPlan,
+                                  ThreadGroupData tg,
+                                  BiConsumer<Integer, Integer> progressUpdater,
+                                  int totalThreads,
+                                  AtomicInteger groupVirtualUserCounter) {
+        int startThreads = tg.rampUpStartThreads;
+        int endThreads = tg.rampUpEndThreads;
+        int rampUpTime = tg.rampUpTime;
+        int totalDuration = tg.rampUpDuration;
+        double threadsPerSecond = (double) (endThreads - startThreads) / rampUpTime;
+
+        ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(
+                1,
+                PerformanceThreadFactory.daemonFactory("PerformanceRampScheduler")
+        );
+        ExecutorService executor = Executors.newCachedThreadPool(
+                PerformanceThreadFactory.daemonFactory("PerformanceRampWorker")
+        );
+        AtomicInteger activeWorkerThreads = new AtomicInteger(0);
+
+        scheduler.scheduleAtFixedRate(() -> {
+            if (!runningSupplier.getAsBoolean()) {
+                scheduler.shutdownNow();
+                executor.shutdownNow();
+                return;
+            }
+
+            int currentSecond = (int) (System.currentTimeMillis() - startTimeSupplier.getAsLong()) / 1000;
+            if (currentSecond > totalDuration) {
+                scheduler.shutdown();
+                return;
+            }
+
+            if (currentSecond <= rampUpTime) {
+                int targetThreads = startThreads + (int) (threadsPerSecond * currentSecond);
+                targetThreads = Math.min(targetThreads, endThreads);
+
+                while (runningSupplier.getAsBoolean()) {
+                    int current = activeWorkerThreads.get();
+                    if (current >= targetThreads) {
+                        break;
+                    }
+                    if (!activeWorkerThreads.compareAndSet(current, current + 1)) {
+                        continue;
+                    }
+                    virtualUsers.submit(executor, progressUpdater, totalThreads, groupVirtualUserCounter::getAndIncrement,
+                            virtualUserScopeFactory(groupPlan), () -> virtualUsers.runWithinLoadWindow(
+                                    startTimeSupplier.getAsLong() + totalDuration * 1000L,
+                                    () -> {
+                                        try {
+                                            while (runningSupplier.getAsBoolean()
+                                                    && System.currentTimeMillis() - startTimeSupplier.getAsLong()
+                                                    < totalDuration * 1000L) {
+                                                runTaskIteration(groupPlan, 0);
+                                            }
+                                        } finally {
+                                            activeWorkerThreads.decrementAndGet();
+                                        }
+                                    }));
+                }
+            }
+        }, 0, 1, TimeUnit.SECONDS);
+
+        try {
+            boolean schedulerTerminated = scheduler.awaitTermination(totalDuration + 10L, TimeUnit.SECONDS);
+            if (!schedulerTerminated || !runningSupplier.getAsBoolean()) {
+                log.warn("Bộ lập lịch chế độ tăng dần không kết thúc bình thường và buộc phải đóng");
+                scheduler.shutdownNow();
+            }
+
+            executor.shutdown();
+            boolean executorTerminated = executor.awaitTermination(tg.maxInFlightWaitSeconds, TimeUnit.SECONDS);
+            if (!executorTerminated || !runningSupplier.getAsBoolean()) {
+                log.warn("Trình thực thi chế độ tăng dần không kết thúc bình thường và buộc phải tắt");
+                markDrainTimedOut(executorTerminated);
+                executor.shutdownNow();
+                if (!executor.awaitTermination(3, TimeUnit.SECONDS)) {
+                    log.warn("Một số luồng ở chế độ tăng dần không bị chấm dứt sau khi buộc phải tắt máy");
+                }
+            }
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            scheduler.shutdownNow();
+            executor.shutdownNow();
+            log.error("Tăng số lần ngắt thực thi luồng", e);
+        }
+    }
+
+    private void runSpikeThreads(PerformanceThreadGroupPlan groupPlan,
+                                 ThreadGroupData tg,
+                                 BiConsumer<Integer, Integer> progressUpdater,
+                                 int totalThreads,
+                                 AtomicInteger groupVirtualUserCounter) {
+        int minThreads = tg.spikeMinThreads;
+        int maxThreads = tg.spikeMaxThreads;
+        int rampUpTime = tg.spikeRampUpTime;
+        int holdTime = tg.spikeHoldTime;
+        int rampDownTime = tg.spikeRampDownTime;
+        int totalTime = tg.spikeDuration;
+
+        ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(
+                1,
+                PerformanceThreadFactory.daemonFactory("PerformanceSpikeScheduler")
+        );
+        AtomicInteger activeWorkerThreads = new AtomicInteger(0);
+        ConcurrentHashMap<Thread, Long> threadEndTimes = new ConcurrentHashMap<>();
+
+        SpikePhaseDurations phases = calculateSpikePhaseDurations(rampUpTime, holdTime, rampDownTime, totalTime);
+        int adjustedRampUpTime = phases.rampUpSeconds();
+        int adjustedHoldTime = phases.holdSeconds();
+        int adjustedRampDownTime = phases.rampDownSeconds();
+
+        for (int i = 0; i < minThreads; i++) {
+            if (!runningSupplier.getAsBoolean()) {
+                return;
+            }
+            activeWorkerThreads.incrementAndGet();
+            startWindowedVirtualUser(
+                    "PerformanceSpikeWorker",
+                    groupPlan,
+                    activeWorkerThreads,
+                    totalTime,
+                    progressUpdater,
+                    totalThreads,
+                    groupVirtualUserCounter,
+                    threadEndTimes
+            );
+        }
+
+        scheduler.scheduleAtFixedRate(() -> {
+            if (!runningSupplier.getAsBoolean()) {
+                scheduler.shutdownNow();
+                return;
+            }
+
+            long elapsedSeconds = (System.currentTimeMillis() - startTimeSupplier.getAsLong()) / 1000;
+            if (elapsedSeconds >= totalTime) {
+                scheduler.shutdown();
+                return;
+            }
+
+            int targetThreads;
+
+            if (adjustedRampUpTime > 0 && elapsedSeconds < adjustedRampUpTime) {
+                double progress = (double) elapsedSeconds / adjustedRampUpTime;
+                targetThreads = minThreads + (int) (progress * (maxThreads - minThreads));
+                adjustSpikeThreadCount(groupPlan, tg, activeWorkerThreads, targetThreads, totalTime, progressUpdater, totalThreads,
+                        groupVirtualUserCounter, threadEndTimes);
+            } else if (adjustedHoldTime > 0 && elapsedSeconds < adjustedRampUpTime + adjustedHoldTime) {
+                targetThreads = maxThreads;
+                adjustSpikeThreadCount(groupPlan, tg, activeWorkerThreads, targetThreads, totalTime, progressUpdater, totalThreads,
+                        groupVirtualUserCounter, threadEndTimes);
+            } else {
+                double progress = adjustedRampDownTime <= 0
+                        ? 1.0
+                        : (double) (elapsedSeconds - adjustedRampUpTime - adjustedHoldTime) / adjustedRampDownTime;
+                targetThreads = maxThreads - (int) (progress * (maxThreads - minThreads));
+                targetThreads = Math.max(targetThreads, minThreads);
+                adjustSpikeThreadCount(groupPlan, tg, activeWorkerThreads, targetThreads, totalTime, progressUpdater, totalThreads,
+                        groupVirtualUserCounter, threadEndTimes);
+            }
+
+            updateProgress(progressUpdater, totalThreads);
+        }, 1, 1, TimeUnit.SECONDS);
+
+        try {
+            boolean schedulerTerminated = scheduler.awaitTermination(totalTime + 10L, TimeUnit.SECONDS);
+            if (!schedulerTerminated || !runningSupplier.getAsBoolean()) {
+                log.warn("Bộ lập lịch chế độ tăng đột biến không kết thúc bình thường và buộc phải đóng");
+                scheduler.shutdownNow();
+            }
+
+            awaitWindowedWorkers("Chế độ đột biến", threadEndTimes.keySet(), tg.maxInFlightWaitSeconds);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            scheduler.shutdownNow();
+            for (Thread thread : threadEndTimes.keySet()) {
+                if (thread.isAlive()) {
+                    thread.interrupt();
+                }
+            }
+            log.error("Việc thực thi chế độ Spike bị gián đoạn", e);
+        }
+    }
+
+    private void runStairsThreads(PerformanceThreadGroupPlan groupPlan,
+                                  ThreadGroupData tg,
+                                  BiConsumer<Integer, Integer> progressUpdater,
+                                  int totalThreads,
+                                  AtomicInteger groupVirtualUserCounter) {
+        int startThreads = tg.stairsStartThreads;
+        int endThreads = tg.stairsEndThreads;
+        int step = tg.stairsStep;
+        int holdTime = tg.stairsHoldTime;
+        int totalTime = tg.stairsDuration;
+
+        ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(
+                1,
+                PerformanceThreadFactory.daemonFactory("PerformanceStairsScheduler")
+        );
+        AtomicInteger activeWorkerThreads = new AtomicInteger(0);
+        ConcurrentHashMap<Thread, Long> threadEndTimes = new ConcurrentHashMap<>();
+        int totalSteps = calculateStairsTotalSteps(startThreads, endThreads, step);
+        AtomicInteger currentStair = new AtomicInteger(0);
+        AtomicLong lastStairChangeTime = new AtomicLong(System.currentTimeMillis());
+
+        for (int i = 0; i < startThreads; i++) {
+            if (!runningSupplier.getAsBoolean()) {
+                return;
+            }
+            activeWorkerThreads.incrementAndGet();
+            startWindowedVirtualUser(
+                    "PerformanceStairsWorker",
+                    groupPlan,
+                    activeWorkerThreads,
+                    totalTime,
+                    progressUpdater,
+                    totalThreads,
+                    groupVirtualUserCounter,
+                    threadEndTimes
+            );
+        }
+
+        scheduler.scheduleAtFixedRate(() -> {
+            if (!runningSupplier.getAsBoolean()) {
+                scheduler.shutdownNow();
+                return;
+            }
+
+            long elapsedSeconds = (System.currentTimeMillis() - startTimeSupplier.getAsLong()) / 1000;
+            if (elapsedSeconds >= totalTime) {
+                scheduler.shutdown();
+                return;
+            }
+
+            long now = System.currentTimeMillis();
+            long timeSinceLastChange = now - lastStairChangeTime.get();
+            int stair = currentStair.get();
+
+            if (timeSinceLastChange >= holdTime * 1000L && stair < totalSteps) {
+                stair = currentStair.incrementAndGet();
+                lastStairChangeTime.set(now);
+            }
+
+            int targetThreads = startThreads;
+            if (stair > 0 && stair <= totalSteps) {
+                targetThreads = startThreads + stair * step;
+                targetThreads = Math.min(targetThreads, endThreads);
+            }
+
+            adjustStairsThreadCount(groupPlan, activeWorkerThreads, targetThreads, totalTime, progressUpdater, totalThreads,
+                    groupVirtualUserCounter, threadEndTimes);
+            updateProgress(progressUpdater, totalThreads);
+        }, 1, 1, TimeUnit.SECONDS);
+
+        try {
+            boolean schedulerTerminated = scheduler.awaitTermination(totalTime + 10L, TimeUnit.SECONDS);
+            if (!schedulerTerminated || !runningSupplier.getAsBoolean()) {
+                log.warn("Bộ lập lịch chế độ bậc thang không kết thúc bình thường và buộc phải đóng");
+                scheduler.shutdownNow();
+            }
+
+            awaitWindowedWorkers("Chế độ thang", threadEndTimes.keySet(), tg.maxInFlightWaitSeconds);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            scheduler.shutdownNow();
+            for (Thread thread : threadEndTimes.keySet()) {
+                if (thread.isAlive()) {
+                    thread.interrupt();
+                }
+            }
+            log.error("Việc thực thi chế độ Ladder bị gián đoạn", e);
+        }
+    }
+
+    public void adjustSpikeThreadCount(PerformanceThreadGroupPlan groupPlan,
+                                       ThreadGroupData tg,
+                                       AtomicInteger activeWorkerThreads,
+                                       int targetThreads,
+                                       int totalTime,
+                                       BiConsumer<Integer, Integer> progressUpdater,
+                                       int totalThreads,
+                                       ConcurrentHashMap<Thread, Long> threadEndTimes) {
+        adjustSpikeThreadCount(groupPlan, tg, activeWorkerThreads, targetThreads, totalTime, progressUpdater, totalThreads,
+                new AtomicInteger(0), threadEndTimes);
+    }
+
+    public void adjustSpikeThreadCount(PerformanceThreadGroupPlan groupPlan,
+                                       ThreadGroupData tg,
+                                       AtomicInteger activeWorkerThreads,
+                                       int targetThreads,
+                                       int totalTime,
+                                       BiConsumer<Integer, Integer> progressUpdater,
+                                       int totalThreads,
+                                       AtomicInteger groupVirtualUserCounter,
+                                       ConcurrentHashMap<Thread, Long> threadEndTimes) {
+        // Workers already scheduled to stop are still alive until their current iteration ends; counting them
+        // would make every scheduler tick retire another batch and undershoot the target concurrency.
+        List<Thread> openEndedWorkers = threadEndTimes.keySet().stream()
+                .filter(t -> t.isAlive() && isOpenEndedWorker(threadEndTimes, t))
+                .toList();
+        int current = openEndedWorkers.size();
+
+        if (current < targetThreads) {
+            int threadsToAdd = targetThreads - current;
+            for (int i = 0; i < threadsToAdd; i++) {
+                if (!runningSupplier.getAsBoolean()) {
+                    return;
+                }
+
+                activeWorkerThreads.incrementAndGet();
+                startWindowedVirtualUser(
+                        "PerformanceSpikeWorker",
+                        groupPlan,
+                        activeWorkerThreads,
+                        totalTime,
+                        progressUpdater,
+                        totalThreads,
+                        groupVirtualUserCounter,
+                        threadEndTimes
+                );
+            }
+        } else if (current > targetThreads) {
+            int threadsToRemove = current - targetThreads;
+            long now = System.currentTimeMillis();
+            // The target is recomputed every second, so retire this tick's surplus within the next second.
+            for (int i = 0; i < threadsToRemove; i++) {
+                long endTime = now + (long) (i + 1) * SPIKE_ADJUST_INTERVAL_MS / (threadsToRemove + 1);
+                threadEndTimes.put(openEndedWorkers.get(i), endTime);
+            }
+        }
+    }
+
+    private void adjustStairsThreadCount(PerformanceThreadGroupPlan groupPlan,
+                                         AtomicInteger activeWorkerThreads,
+                                         int targetThreads,
+                                         int totalTime,
+                                         BiConsumer<Integer, Integer> progressUpdater,
+                                         int totalThreads,
+                                         AtomicInteger groupVirtualUserCounter,
+                                         ConcurrentHashMap<Thread, Long> threadEndTimes) {
+        int current = activeWorkerThreads.get();
+        if (current >= targetThreads) {
+            return;
+        }
+
+        int threadsToAdd = targetThreads - current;
+        for (int i = 0; i < threadsToAdd; i++) {
+            if (!runningSupplier.getAsBoolean()) {
+                return;
+            }
+
+            activeWorkerThreads.incrementAndGet();
+            startWindowedVirtualUser(
+                    "PerformanceStairsWorker",
+                    groupPlan,
+                    activeWorkerThreads,
+                    totalTime,
+                    progressUpdater,
+                    totalThreads,
+                    groupVirtualUserCounter,
+                    threadEndTimes
+            );
+        }
+    }
+
+    private void startWindowedVirtualUser(String threadNamePrefix,
+                                          PerformanceThreadGroupPlan groupPlan,
+                                          AtomicInteger activeWorkerThreads,
+                                          int totalTime,
+                                          BiConsumer<Integer, Integer> progressUpdater,
+                                          int totalThreads,
+                                          AtomicInteger groupVirtualUserCounter,
+                                          ConcurrentHashMap<Thread, Long> threadEndTimes) {
+        Thread thread = virtualUsers.newThread(threadNamePrefix, progressUpdater, totalThreads,
+                groupVirtualUserCounter::getAndIncrement, virtualUserScopeFactory(groupPlan), () ->
+                        virtualUsers.runWithinLoadWindow(
+                                startTimeSupplier.getAsLong() + totalTime * 1000L,
+                                () -> {
+                                    try {
+                                        Thread currentThread = Thread.currentThread();
+                                        while (runningSupplier.getAsBoolean()
+                                                && System.currentTimeMillis() - startTimeSupplier.getAsLong()
+                                                < totalTime * 1000L
+                                                && System.currentTimeMillis()
+                                                < threadEndTimes.getOrDefault(currentThread, Long.MAX_VALUE)) {
+                                            runTaskIteration(groupPlan, 0);
+                                        }
+                                    } finally {
+                                        activeWorkerThreads.decrementAndGet();
+                                        threadEndTimes.remove(Thread.currentThread());
+                                    }
+                                }));
+        threadEndTimes.put(thread, Long.MAX_VALUE);
+        thread.start();
+    }
+
+    private static IntFunction<String> virtualUserScopeFactory(PerformanceThreadGroupPlan groupPlan) {
+        int groupIdentity = groupPlan == null ? 0 : System.identityHashCode(groupPlan);
+        int offset = groupPlan == null ? 0 : groupPlan.getVirtualUserIndexOffset();
+        return virtualUserIndex -> "tg:" + groupIdentity + ":offset:" + offset + ":vu:" + virtualUserIndex;
+    }
+
+    public static int calculateStairsTotalSteps(int startThreads, int endThreads, int step) {
+        int threadRange = Math.max(0, endThreads - startThreads);
+        int safeStep = Math.max(1, step);
+        return Math.max(1, (threadRange + safeStep - 1) / safeStep);
+    }
+
+    record SpikePhaseDurations(int rampUpSeconds, int holdSeconds, int rampDownSeconds) {
+    }
+
+    static SpikePhaseDurations calculateSpikePhaseDurations(int rampUpTime,
+                                                            int holdTime,
+                                                            int rampDownTime,
+                                                            int totalTime) {
+        int safeTotalTime = Math.max(1, totalTime);
+        int[] weights = {
+                Math.max(0, rampUpTime),
+                Math.max(0, holdTime),
+                Math.max(0, rampDownTime)
+        };
+        int positivePhaseCount = 0;
+        long totalWeight = 0L;
+        for (int weight : weights) {
+            if (weight > 0) {
+                positivePhaseCount++;
+                totalWeight += weight;
+            }
+        }
+        if (positivePhaseCount == 0) {
+            return new SpikePhaseDurations(0, 0, safeTotalTime);
+        }
+
+        int[] seconds = new int[weights.length];
+        if (safeTotalTime < positivePhaseCount) {
+            for (int i = 0; i < safeTotalTime; i++) {
+                seconds[largestUnassignedWeightIndex(weights, seconds)] = 1;
+            }
+            return new SpikePhaseDurations(seconds[0], seconds[1], seconds[2]);
+        }
+
+        int remainingSeconds = safeTotalTime;
+        for (int i = 0; i < weights.length; i++) {
+            if (weights[i] > 0) {
+                seconds[i] = 1;
+                remainingSeconds--;
+            }
+        }
+        if (remainingSeconds <= 0) {
+            return new SpikePhaseDurations(seconds[0], seconds[1], seconds[2]);
+        }
+
+        long[] remainders = new long[weights.length];
+        int assignedSeconds = 0;
+        for (int i = 0; i < weights.length; i++) {
+            if (weights[i] <= 0) {
+                continue;
+            }
+            long scaledSeconds = (long) remainingSeconds * weights[i];
+            int wholeSeconds = (int) (scaledSeconds / totalWeight);
+            seconds[i] += wholeSeconds;
+            assignedSeconds += wholeSeconds;
+            remainders[i] = scaledSeconds % totalWeight;
+        }
+        while (assignedSeconds < remainingSeconds) {
+            int index = largestRemainderIndex(remainders, weights);
+            seconds[index]++;
+            remainders[index] = -1L;
+            assignedSeconds++;
+        }
+        return new SpikePhaseDurations(seconds[0], seconds[1], seconds[2]);
+    }
+
+    private static int largestUnassignedWeightIndex(int[] weights, int[] seconds) {
+        int selectedIndex = 0;
+        int selectedWeight = Integer.MIN_VALUE;
+        for (int i = 0; i < weights.length; i++) {
+            if (seconds[i] == 0 && weights[i] > selectedWeight) {
+                selectedIndex = i;
+                selectedWeight = weights[i];
+            }
+        }
+        return selectedIndex;
+    }
+
+    private static int largestRemainderIndex(long[] remainders, int[] weights) {
+        int selectedIndex = 0;
+        long selectedRemainder = Long.MIN_VALUE;
+        int selectedWeight = Integer.MIN_VALUE;
+        for (int i = 0; i < remainders.length; i++) {
+            if (weights[i] <= 0) {
+                continue;
+            }
+            if (remainders[i] > selectedRemainder
+                    || remainders[i] == selectedRemainder && weights[i] > selectedWeight) {
+                selectedIndex = i;
+                selectedRemainder = remainders[i];
+                selectedWeight = weights[i];
+            }
+        }
+        return selectedIndex;
+    }
+
+    private static boolean isOpenEndedWorker(ConcurrentHashMap<Thread, Long> threadEndTimes, Thread thread) {
+        return Long.valueOf(Long.MAX_VALUE).equals(threadEndTimes.get(thread));
+    }
+
+    private void awaitWindowedWorkers(String modeName,
+                                      Iterable<Thread> workers,
+                                      int maxWaitSeconds) throws InterruptedException {
+        List<Thread> snapshot = new ArrayList<>();
+        workers.forEach(snapshot::add);
+        long deadlineNanos = System.nanoTime() + TimeUnit.SECONDS.toNanos(maxWaitSeconds);
+
+        for (Thread worker : snapshot) {
+            while (worker.isAlive() && runningSupplier.getAsBoolean()) {
+                long remainingNanos = deadlineNanos - System.nanoTime();
+                if (remainingNanos <= 0L) {
+                    break;
+                }
+                worker.join(Math.max(1L, TimeUnit.NANOSECONDS.toMillis(remainingNanos)));
+            }
+        }
+
+        List<Thread> unfinished = snapshot.stream().filter(Thread::isAlive).toList();
+        if (unfinished.isEmpty()) {
+            return;
+        }
+
+        log.warn("{}Vẫn còn đó {} yêu cầu không có sẵn {} Hoàn thành trong vòng vài giây, nó sẽ bị buộc phải hủy bỏ", modeName, unfinished.size(), maxWaitSeconds);
+        markDrainTimedOut(false);
+        unfinished.forEach(Thread::interrupt);
+        long cleanupDeadlineNanos = System.nanoTime() + TimeUnit.SECONDS.toNanos(3L);
+        for (Thread worker : unfinished) {
+            long remainingNanos = cleanupDeadlineNanos - System.nanoTime();
+            if (worker.isAlive() && remainingNanos > 0L) {
+                worker.join(Math.max(1L, TimeUnit.NANOSECONDS.toMillis(remainingNanos)));
+            }
+        }
+    }
+
+    private void markDrainTimedOut(boolean terminated) {
+        boolean timedOut = !terminated && runningSupplier.getAsBoolean();
+        if (timedOut && drainTimedOut.compareAndSet(false, true)) {
+            virtualUsers.stopAcceptingSamples();
+            cancellationAction.run();
+        }
+    }
+
+    private void runTaskIteration(PerformanceThreadGroupPlan groupPlan, int iterationCount) {
+        try {
+            C iterationContext = iterationContextFactory.create(groupPlan, iterationCount);
+            iterationExecutor.executeIteration(groupPlan, iterationContext);
+        } catch (RuntimeException exception) {
+            // One broken iteration must not silently retire the virtual user and shrink the configured load.
+            handleIterationFailure(exception);
+        }
+    }
+
+    private void resetIterationFailureState() {
+        lastIterationFailureLogTime.set(0L);
+        suppressedIterationFailures.set(0L);
+        iterationFailureReported.set(false);
+    }
+
+    private void handleIterationFailure(RuntimeException exception) {
+        if (runningSupplier.getAsBoolean() && iterationFailureReported.compareAndSet(false, true)) {
+            // Sampler failures are already recorded as failed samples by the host; anything reaching here means the
+            // iteration could not run at all, so surface it once per run instead of letting the run end as SUCCESS.
+            publishError(PerformanceRunError.builder()
+                    .message(exception.getMessage() == null ? exception.getClass().getName() : exception.getMessage())
+                    .cause(exception)
+                    .recoverable(true)
+                    .build());
+        }
+        long now = System.currentTimeMillis();
+        long lastLogTime = lastIterationFailureLogTime.get();
+        if (now - lastLogTime >= ITERATION_FAILURE_LOG_INTERVAL_MS
+                && lastIterationFailureLogTime.compareAndSet(lastLogTime, now)) {
+            log.warn("Quá trình thực hiện lặp lại kiểm tra căng thẳng là bất thường và người dùng ảo sẽ tiếp tục thực thi (nếu không thì trong khoảng thời gian đó {} ngoại lệ bị loại bỏ)",
+                    suppressedIterationFailures.getAndSet(0L), exception);
+        } else {
+            suppressedIterationFailures.incrementAndGet();
+        }
+        if (!runningSupplier.getAsBoolean() || Thread.currentThread().isInterrupted()) {
+            return;
+        }
+        try {
+            // Back off so an iteration that fails immediately does not spin a CPU core.
+            TimeUnit.MILLISECONDS.sleep(ITERATION_FAILURE_BACKOFF_MS);
+        } catch (InterruptedException interrupted) {
+            Thread.currentThread().interrupt();
+        }
+    }
+
+    private void runTask(PerformanceThreadGroupPlan groupPlan, int loops) {
+        for (int l = 0; l < loops && runningSupplier.getAsBoolean(); l++) {
+            runTaskIteration(groupPlan, loops);
+        }
+    }
+
+    private void updateProgress(BiConsumer<Integer, Integer> progressUpdater, int totalThreads) {
+        progressUpdater.accept(virtualUsers.getActiveThreads(), totalThreads);
+    }
+
+    private void publishProgress(int activeThreads, int totalThreads) {
+        try {
+            currentResultSink().onProgress(PerformanceRunProgress.sequenced(
+                    activeThreads,
+                    totalThreads,
+                    progressSequence.incrementAndGet()
+            ));
+        } catch (Exception e) {
+            log.warn("Trình xử lý sự kiện tiến trình kiểm tra căng thẳng không thể thực thi được", e);
+        }
+    }
+
+    private void publishError(PerformanceRunError error) {
+        try {
+            currentResultSink().onError(error);
+        } catch (Exception e) {
+            log.warn("Trình xử lý sự kiện lỗi kiểm tra căng thẳng không thể thực thi được", e);
+        }
+    }
+
+    private PerformanceCoreResultSink currentResultSink() {
+        PerformanceCoreResultSink sink = resultSinkSupplier.get();
+        return sink == null ? PerformanceCoreResultSink.NOOP : sink;
+    }
+
+    public static void joinThreadGroupThreads(List<Thread> threadGroupThreads, Runnable cancellationAction) {
+        boolean interrupted = false;
+        for (Thread thread : threadGroupThreads) {
+            while (thread.isAlive()) {
+                try {
+                    thread.join();
+                    break;
+                } catch (InterruptedException ignored) {
+                    interrupted = true;
+                    if (cancellationAction != null) {
+                        cancellationAction.run();
+                    }
+                    for (Thread candidate : threadGroupThreads) {
+                        if (candidate.isAlive()) {
+                            candidate.interrupt();
+                        }
+                    }
+                }
+            }
+        }
+        if (interrupted) {
+            Thread.currentThread().interrupt();
+        }
+    }
+}

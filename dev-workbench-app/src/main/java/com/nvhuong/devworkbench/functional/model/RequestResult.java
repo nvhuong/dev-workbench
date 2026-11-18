@@ -1,0 +1,43 @@
+package com.nvhuong.devworkbench.functional.model;
+
+import com.nvhuong.devworkbench.http.runtime.model.HttpResponse;
+import com.nvhuong.devworkbench.http.runtime.model.PreparedRequest;
+import com.nvhuong.devworkbench.script.model.TestResult;
+import lombok.Data;
+
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * Kết quả thực hiện của một yêu cầu
+ */
+@Data
+public class RequestResult {
+    private final String requestName;
+    private final String method;
+    private final String url;
+    private final PreparedRequest req;
+    private final HttpResponse response;
+    private final long cost;
+    private final String status;
+    private final AssertionResult assertion;
+    private final List<TestResult> testResults;
+    private final long timestamp;
+    private final String errorMessage;
+
+    public RequestResult(String requestName, String method, String url,
+                         PreparedRequest req, HttpResponse response, long cost, String status,
+                         AssertionResult assertion, List<TestResult> testResults, String errorMessage) {
+        this.errorMessage = errorMessage;
+        this.requestName = requestName;
+        this.method = method;
+        this.url = url;
+        this.req = req;
+        this.response = response;
+        this.cost = cost;
+        this.status = status;
+        this.assertion = assertion;
+        this.testResults = testResults != null ? new ArrayList<>(testResults) : new ArrayList<>();
+        this.timestamp = System.currentTimeMillis();
+    }
+}

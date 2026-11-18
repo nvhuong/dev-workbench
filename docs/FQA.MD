@@ -1,6 +1,6 @@
 ## OkHttpClient Nhóm kết nối và mô tả tham số đồng thời
 
-Vào Easy Postman của OkHttpClientManager , hãy sử dụng phương pháp sau cho mỗi trường hợp baseUri Định cấu hình kết nối tổng hợp và Dispatcher：
+Vào DevWorkbench DevWorkbench của OkHttpClientManager , hãy sử dụng phương pháp sau cho mỗi trường hợp baseUri Định cấu hình kết nối tổng hợp và Dispatcher：
 
 ```java
 // Cấu hình nhóm kết nối
@@ -43,7 +43,7 @@ Stalled: 75621 ms ← Đây là thời gian xếp hàng yêu cầu
 - **Số lượng yêu cầu đồng thời tối đa**：Nên đặt nó theo số lượng người dùng đồng thời2-4lần (ví dụ:100Người dùng đồng thời → Đặt thành  200-400）
 - **Số lượng đồng thời tối đa trên một máy chủ**：Nên đặt nó theo số lượng người dùng đồng thời (ví dụ:100Người dùng đồng thời → Đặt thành  100-200）
 
-Vào Easy Postman Vào, vào **cài đặt → Kiểm tra căng thẳng**，Điều chỉnh:
+Vào DevWorkbench DevWorkbench Vào, vào **cài đặt → Kiểm tra căng thẳng**，Điều chỉnh:
 - Số lượng yêu cầu đồng thời tối đa (Max Concurrent Requests)
 - Số lượng đồng thời tối đa trên một máy chủ (Max Concurrent Requests Per Host)
 
@@ -67,7 +67,7 @@ Giả định maxIdleConnections Đặt thành  6，keepAliveDuration Đặt th�
 #### Đồng loạt khởi xướng 10 toàn bộ quá trình của một yêu cầu
 
 1. **Yêu cầu giai đoạn bắt đầu**
-   khách hàng (ví dụ: Easy Postman）Đồng thời đến cùng một máy chủ (ví dụ https://api.example.com）Đồng loạt khởi xướng 10 cá nhân HTTP yêu cầu.
+   khách hàng (ví dụ: DevWorkbench DevWorkbench）Đồng thời đến cùng một máy chủ (ví dụ https://api.example.com）Đồng loạt khởi xướng 10 cá nhân HTTP yêu cầu.
    OkHttp Một kết nối sẽ được phân bổ cho mỗi yêu cầu (nếu có một kết nối nhàn rỗi trong nhóm kết nối, nó sẽ được sử dụng lại, nếu không một kết nối mới sẽ được tạo).
 
 2. **Yêu cầu xử lý và trả lại kết nối**
@@ -103,4 +103,4 @@ Giả định maxIdleConnections Đặt thành  6，keepAliveDuration Đặt th�
 
 ### Tham khảo
 - OkHttp Tài liệu chính thức: .[ConnectionPool](https://square.github.io/okhttp/4.x/okhttp/okhttp3/-connection-pool/)
-- Chrome Mặc định của trình duyệt cho mỗi host 6 kết nối,Easy Postman Mặc định là chính sách tương tự.
+- Chrome Mặc định của trình duyệt cho mỗi host 6 kết nối,DevWorkbench DevWorkbench Mặc định là chính sách tương tự.

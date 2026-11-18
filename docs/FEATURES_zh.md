@@ -81,13 +81,13 @@
 - ✅ `mock_servers.json` Và `collections.json` Lưu cùng nhau trong không gian làm việc hiện tại.Git Không gian làm việc sẽ được phiên bản cùng nhau
 - ✅ Hỗ trợ `mock run` Chạy không có giao diện, không gian làm việc có thể được sao chép vào máy chủ hoặc CI Tự lưu trữ
 - ✅ Trang quản lý có thể sao chép trực tiếp các lệnh khởi động tự lưu trữ cho các không gian làm việc và dịch vụ tương ứng
-- ✅ Không bao gồm EasyPostman Lưu trữ đám mây, quyền nhóm, bên ngoài npm gói hoặc AI phát ra
+- ✅ Không bao gồm DevWorkbench Lưu trữ đám mây, quyền nhóm, bên ngoài npm gói hoặc AI phát ra
 
 Ví dụ khởi động máy chủ: .
 
 ```bash
-EASY_POSTMAN_MOCK_API_KEY=change-me \
-java -jar easy-postman.jar mock run /path/to/workspace \
+DEV_WORKBENCH_MOCK_API_KEY=change-me \
+java -jar dev-workbench.jar mock run /path/to/workspace \
   --server "Payments Mock" --host 0.0.0.0 --port 3001
 ```
 
@@ -113,7 +113,7 @@ if (Number(input.amount) === 0.5) {
 ## 🤖 MCP Và AI khách hàng
 
 - ✅ Tiêu chuẩn tích hợp MCP stdio Server，Có thể kết nối Codex、Claude Desktop、Claude Code、Cursor Đợi khách hàng địa phương
-- ✅ Gói cài đặt gốc và Windows Phiên bản di động tích hợp `EasyPostmanMCP` Và JRE，Không cần cài đặt thêm Java Hoặc tải xuống riêng biệt MCP
+- ✅ Gói cài đặt gốc và Windows Phiên bản di động tích hợp `DevWorkbenchMCP` Và JRE，Không cần cài đặt thêm Java Hoặc tải xuống riêng biệt MCP
 - ✅ Liệt kê các không gian làm việc, bộ sưu tập, môi trường và yêu cầu đã lưu được ủy quyền; danh sách môi trường không trả về giá trị biến
 - ✅ Nhấn mỗi lần Tool Lựa chọn cuộc gọi `workspaceId` và `environmentId`，Không sửa đổi lựa chọn hiện tại trên màn hình nền
 - ✅ Thực hiện một lưu duy nhất HTTP Yêu cầu hoặc toàn bộ bộ sưu tập cấp cao nhất, sử dụng lại tính kế thừa biến, tập lệnh trước và sau cũng như xác nhận.Cookie、TLS và HTTP chuỗi thực thi
@@ -219,13 +219,13 @@ Xem cài đặt với đường viền hoàn chỉnh [MCP Server Tài liệu](MC
 ## 🔄 Quản lý dữ liệu
 
 ### Hỗ trợ nhập khẩu
-- ✅ **Postman Collection v2.1**：Hỗ trợ xuất nhập khẩu
+- ✅ **DevWorkbench Collection v2.1**：Hỗ trợ xuất nhập khẩu
 - ✅ **cURL Đặt hàng**：Chuyển đổi thành yêu cầu
 - 🚧 **HAR tập tin**：Đang được phát triển
 - 🚧 **OpenAPI/Swagger**：Đang được phát triển
 
 ### Hỗ trợ xuất khẩu
-- ✅ Postman Collection định dạng
+- ✅ DevWorkbench Collection định dạng
 - ✅ cURL Đặt hàng
 - ✅ các biến môi trường
 - ✅ Kết quả kiểm tra

@@ -1,6 +1,6 @@
 # GitHub Tóm tắt cấu hình
 
-Tài liệu này giải thích EasyPostman Đã thêm dự án GitHub tập tin cấu hình.
+Tài liệu này giải thích DevWorkbench Đã thêm dự án GitHub tập tin cấu hình.
 
 ---
 
@@ -144,24 +144,24 @@ Tài liệu này giải thích EasyPostman Đã thêm dự án GitHub tập tin 
 - Có thể tắt được `submit` Chỉ có bản xem trước của danh sách được tạo chứ không được gửi PR
 
 **Chức năng**:
-- Đợi đã GitHub Release trong `EasyPostman-{version}-windows-x64.exe` Tải lên đã hoàn tất
+- Đợi đã GitHub Release trong `DevWorkbench-{version}-windows-x64.exe` Tải lên đã hoàn tất
 - `initial` Chế độ sẽ tải gói cài đặt về và tính toán SHA256、Tạo phiên bản đầu tiên của ba tệp manifest
 - `initial` Các mô hình sẽ manifest Đẩy tới `fork_owner/winget-pkgs` chi nhánh, và tới `microsoft/winget-pkgs` Tạo PR
-- `update` Chế độ sẽ tải về chính thức `wingetcreate`，gọi `wingetcreate update Laker.EasyPostman`，và đồng bộ hóa một cách rõ ràng package version Và Apps & Features display version
+- `update` Chế độ sẽ tải về chính thức `wingetcreate`，gọi `wingetcreate update Nvhuong.DevWorkbench`，và đồng bộ hóa một cách rõ ràng package version Và Apps & Features display version
 
 **Điều kiện tiên quyết**:
 - nhà kho Secrets cấu hình `WINGET_CREATE_GITHUB_TOKEN`
 - Cái token sử dụng GitHub classic PAT，Ít nhất là cần thiết `public_repo` Quyền, được sử dụng để `fork_owner/winget-pkgs` Đẩy cành về phía  `microsoft/winget-pkgs` Mở PR
-- `initial` Yêu cầu mẫu rồi fork `microsoft/winget-pkgs`，Mặc định fork owner vì `lakernote`
-- `update` Yêu cầu về chế độ `Laker.EasyPostman` Phiên bản đầu tiên của danh sách đã được xuất bản `microsoft/winget-pkgs` hợp nhất
+- `initial` Yêu cầu mẫu rồi fork `microsoft/winget-pkgs`，Mặc định fork owner vì `nvhuong`
+- `update` Yêu cầu về chế độ `Nvhuong.DevWorkbench` Phiên bản đầu tiên của danh sách đã được xuất bản `microsoft/winget-pkgs` hợp nhất
 
 **Ví dụ gửi đầu tiên**:
-Vào Actions Trang chạy `Publish WinGet Manifest`，Chọn `mode=initial`，Điền vào `version=6.0.11`，`fork_owner=lakernote`，`submit=true`。
+Vào Actions Trang chạy `Publish WinGet Manifest`，Chọn `mode=initial`，Điền vào `version=6.0.11`，`fork_owner=nvhuong`，`submit=true`。
 
 **Ví dụ sẽ được cập nhật sau**:
 Vào Actions Trang chạy `Publish WinGet Manifest`，Chọn `mode=update`，Điền số phiên bản ổn định để đồng bộ.`submit=true`。
 
-**tác dụng**: Khi cần thiết Windows Phiên bản ổn định được đồng bộ hóa với WinGet Kho, người dùng có thể đi qua `winget install --id Laker.EasyPostman -e` Cài đặt hoặc nâng cấp.
+**tác dụng**: Khi cần thiết Windows Phiên bản ổn định được đồng bộ hóa với WinGet Kho, người dùng có thể đi qua `winget install --id Nvhuong.DevWorkbench -e` Cài đặt hoặc nâng cấp.
 
 ---
 
@@ -347,12 +347,12 @@ Vào Actions Trang chạy `Publish WinGet Manifest`，Chọn `mode=update`，Đi
 ### Dành cho những người đóng góp
 
 1. **Báo cáo Bug**:
-   - thăm [Issues](https://github.com/lakernote/easy-postman/issues/new/choose)
+   - thăm [Issues](https://github.com/nvhuong/dev-workbench/issues/new/choose)
    - Chọn "🐛 Bug Báo cáo" bản mẫu
    - Điền đầy đủ thông tin và gửi
 
 2. **Các tính năng được đề xuất**:
-   - thăm [Issues](https://github.com/lakernote/easy-postman/issues/new/choose)
+   - thăm [Issues](https://github.com/nvhuong/dev-workbench/issues/new/choose)
    - Chọn "✨ Yêu cầu tính năng" bản mẫu
    - Mô tả các kịch bản sử dụng và các kịch bản dự kiến
 
@@ -411,9 +411,9 @@ Vào Actions Trang chạy `Publish WinGet Manifest`，Chọn `mode=update`，Đi
 
 Mọi thắc mắc vui lòng:
 - 📖 Xem [Nguyên tắc đóng góp](.github/CONTRIBUTING.md)
-- 💬 thăm [Bảng thảo luận](https://github.com/lakernote/easy-postman/discussions)
+- 💬 thăm [Bảng thảo luận](https://github.com/nvhuong/dev-workbench/discussions)
 - 📧 Liên hệ với người bảo trì
 
 ---
 
-**Cảm ơn bạn vì điều đó EasyPostman Hãy đóng góp! .** 🎉
+**Cảm ơn bạn vì điều đó DevWorkbench Hãy đóng góp! .** 🎉

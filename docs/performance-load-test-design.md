@@ -1,6 +1,6 @@
 # Thiết kế mô-đun kiểm tra căng thẳng hiệu suất
 
-Tài liệu này giải thích `com.laker.postman.panel.performance` Hiểu ranh giới thiết kế hiện tại của chức năng kiểm tra áp suất, tập trung vào phạm vi bao phủ UI、Mô hình thực thi, mô hình nhóm luồng, lấy mẫu số liệu và làm mới kết quả.
+Tài liệu này giải thích `com.nvhuong.devworkbench.panel.performance` Hiểu ranh giới thiết kế hiện tại của chức năng kiểm tra áp suất, tập trung vào phạm vi bao phủ UI、Mô hình thực thi, mô hình nhóm luồng, lấy mẫu số liệu và làm mới kết quả.
 
 ## mục tiêu thiết kế
 
@@ -42,10 +42,10 @@ Ranh giới hiện tại: .
 ### Mô hình thực hiện
 
 - `PerformanceTestPlanCompiler`：Sẽ thực hiện ảnh chụp nhanh từ Swing `DefaultMutableTreeNode` Được tổng hợp thành các kế hoạch thực hiện hiệu suất bất biến. Được quy hoạch bởi `PerformanceTestPlan`、`PerformanceThreadGroupPlan`、`PerformanceLoopController`、`PerformanceTimerElement`、`PerformanceRequestSampler`、Nó bao gồm các phần tử xác nhận và các phần tử pha giao thức.
-- `com.laker.postman.panel.performance.plan`：Chỉ lưu các bất biến cần thiết để thực thi plan dữ liệu. Ngoại trừ trình biên dịch chịu trách nhiệm đọc Swing tree ngoài,plan Các phần tử không còn cung cấp khả năng tái thiết ngược Swing tree của API。
-- `easy-postman-performance-core` của `PerformanceRunPlan`：Trạng thái đang chạy envelope，cứu `environment`、`globals`、`settings`、`testPlan`、`assets`。Nó không lưu Swing tree hoặc `HttpRequestItem`，Thay vào đó, hãy lưu khoảng thời gian GUI/CLI/worker Ảnh chụp nhanh yêu cầu tiêu thụ;`settings` Chỉ cần đặt ngữ nghĩa thực thi, ví dụ efficientMode và HTTP runtime Các tham số đồng thời, chuyển đổi xu hướng, làm mới báo cáo theo thời gian thực, v.v GUI Hiển thị trạng thái.
+- `com.nvhuong.devworkbench.panel.performance.plan`：Chỉ lưu các bất biến cần thiết để thực thi plan dữ liệu. Ngoại trừ trình biên dịch chịu trách nhiệm đọc Swing tree ngoài,plan Các phần tử không còn cung cấp khả năng tái thiết ngược Swing tree của API。
+- `dev-workbench-performance-core` của `PerformanceRunPlan`：Trạng thái đang chạy envelope，cứu `environment`、`globals`、`settings`、`testPlan`、`assets`。Nó không lưu Swing tree hoặc `HttpRequestItem`，Thay vào đó, hãy lưu khoảng thời gian GUI/CLI/worker Ảnh chụp nhanh yêu cầu tiêu thụ;`settings` Chỉ cần đặt ngữ nghĩa thực thi, ví dụ efficientMode và HTTP runtime Các tham số đồng thời, chuyển đổi xu hướng, làm mới báo cáo theo thời gian thực, v.v GUI Hiển thị trạng thái.
 - `PerformanceRunPlanFactory`：GUI Xuất khẩu `plan.json` Cấu hình stress test hiện tại, môi trường hoạt động, các biến toàn cục và asset Tham chiếu được cố định vào một kế hoạch đang chạy.
-- `com.laker.postman.performance.runtime.PerformanceRunPlanExecutor`：headless CLI và worker Đã chia sẻ app Bộ chuyển đổi chạy bên, đã tải `plan.json`，Sẽ core plan Đã vượt qua sau khi biên soạn `PerformanceCorePlanAdapter.toExecutablePlan(...)` Chuyển đổi sang app Chuỗi thực thi hiện tại có thể được sử dụng plan，và tái sử dụng `PerformanceExecutionEngine` thực hiện.CLI Gói này chỉ chịu trách nhiệm phân tích tham số và đưa ra kết quả.
+- `com.nvhuong.devworkbench.performance.runtime.PerformanceRunPlanExecutor`：headless CLI và worker Đã chia sẻ app Bộ chuyển đổi chạy bên, đã tải `plan.json`，Sẽ core plan Đã vượt qua sau khi biên soạn `PerformanceCorePlanAdapter.toExecutablePlan(...)` Chuyển đổi sang app Chuỗi thực thi hiện tại có thể được sử dụng plan，và tái sử dụng `PerformanceExecutionEngine` thực hiện.CLI Gói này chỉ chịu trách nhiệm phân tích tham số và đưa ra kết quả.
 - `PerformanceExecutionEngine`：Mặt tiền thực thi, chịu trách nhiệm chạy vòng đời, chỉ báo thời gian thực, tài nguyên hủy mạng và cây đến plan chuyển đổi lối vào. Nó không còn đi qua trực tiếp nữa Swing tree。
 - `PerformanceThreadGroupRunner`：Thực thi nhóm luồng được kích hoạt và dựa trên FIXED、RAMP_UP、SPIKE、STAIRS Lên lịch cho người dùng ảo worker。
 - `PerformancePlanExecutor`：Các mô hình bộ điều khiển trong nhóm luồng thực thi được xử lý tuần tự Loop、Timer và Request Sampler。
@@ -56,7 +56,7 @@ Ranh giới hiện tại: .
 
 ### Headless CLI Và Worker biên giới
 
-- Độc lập headless Sử dụng chính app jar，Không được xuất bản riêng lẻ CLI jar：`java -jar easy-postman.jar performance run --plan plan.json [--out result.json]`。
+- Độc lập headless Sử dụng chính app jar，Không được xuất bản riêng lẻ CLI jar：`java -jar dev-workbench.jar performance run --plan plan.json [--out result.json]`。
 - `App.main(args)` Đầu tiên bởi `AppCommandRouter` Xác định chế độ dòng lệnh; đánh `performance run`、`performance worker` hoặc `performance master run` tự động thiết lập `java.awt.headless=true`，Và đừng vào Swing EDT。
 - `performance run` và `performance worker` khởi tạo IOC、Dịch vụ cầu nối trình cắm thêm máy chủ không được tạo khi trình cắm này chạy `MainFrame`、Chủ đề, phông chữ hoặc Splash；`performance master run` Hiện tại chỉ đọc plan、phát ra assignment và đã vượt qua HTTP Lập kế hoạch worker。
 - headless Lệnh giữ lại bàn điều khiển theo mặc định INFO Nhật ký để hỗ trợ khắc phục sự cố khi quét phần bổ trợ và nhóm tập lệnh trực tiếp trên máy chủ.workspace Đang tải và các vấn đề khác; nếu bạn cần hội tụ tạm thời đầu ra, bạn có thể thêm nó theo cách thủ công `-DCONSOLE_LOG_LEVEL=ERROR`。
@@ -76,22 +76,22 @@ Ranh giới hiện tại: .
 Từ GUI Xuất khẩu `plan.json` mặt sau,headless Xác minh độc lập sử dụng bản gốc app jar：
 
 ```bash
-mvn -q -pl easy-postman-app -am -DskipTests package
-java -jar easy-postman-app/target/easy-postman-5.5.28.jar \
+mvn -q -pl dev-workbench-app -am -DskipTests package
+java -jar dev-workbench-app/target/dev-workbench-5.5.28.jar \
   performance run \
   --plan "$HOME/Downloads/plan.json" \
-  --out /tmp/easy-postman-headless-result.json
-jq . /tmp/easy-postman-headless-result.json
+  --out /tmp/dev-workbench-headless-result.json
+jq . /tmp/dev-workbench-headless-result.json
 ```
 
 macOS Máy này có thể được sử dụng nếu bạn cần thêm tính năng bảo vệ thời gian chạy tối đa cho lệnh kiểm tra sức chịu đựng `perl` của alarm Bọc một lớp:
 
 ```bash
 perl -e 'alarm shift; exec @ARGV' 90 \
-  java -jar easy-postman-app/target/easy-postman-5.5.28.jar \
+  java -jar dev-workbench-app/target/dev-workbench-5.5.28.jar \
   performance run \
   --plan "$HOME/Downloads/plan.json" \
-  --out /tmp/easy-postman-headless-result.json
+  --out /tmp/dev-workbench-headless-result.json
 ```
 
 Bản ghi xác thực cục bộ: use GUI Đã xuất khẩu `$HOME/Downloads/plan.json`，Các nhóm chủ đề được cố định 20 Chủ đề, chạy theo thời gian 60 Thứ hai,CLI Hoàn thành thành công và ghi kết quả. Đây rồi `result.json` Đoạn trích, tên trường phù hợp với đầu ra thực tế :
@@ -141,12 +141,12 @@ Bản ghi xác thực cục bộ: use GUI Đã xuất khẩu `$HOME/Downloads/pl
 Bắt đầu hai cái trước worker Quá trình:
 
 ```bash
-java -jar easy-postman-app/target/easy-postman-5.5.28.jar \
+java -jar dev-workbench-app/target/dev-workbench-5.5.28.jar \
   performance worker \
   --host 127.0.0.1 \
   --port 19090
 
-java -jar easy-postman-app/target/easy-postman-5.5.28.jar \
+java -jar dev-workbench-app/target/dev-workbench-5.5.28.jar \
   performance worker \
   --host 127.0.0.1 \
   --port 19091
@@ -155,12 +155,12 @@ java -jar easy-postman-app/target/easy-postman-5.5.28.jar \
 Lại master Phân phối cùng một bản sao `plan.json`：
 
 ```bash
-java -jar easy-postman-app/target/easy-postman-5.5.28.jar \
+java -jar dev-workbench-app/target/dev-workbench-5.5.28.jar \
   performance master run \
   --plan "$HOME/Downloads/plan.json" \
   --workers 127.0.0.1:19090,127.0.0.1:19091 \
-  --out /tmp/easy-postman-master-result.json
-jq . /tmp/easy-postman-master-result.json
+  --out /tmp/dev-workbench-master-result.json
+jq . /tmp/dev-workbench-master-result.json
 ```
 
 Hồ sơ xác minh địa phương: bản sao tương tự `$HOME/Downloads/plan.json` thông qua hai máy cục bộ worker Thực thi phân đoạn,master Tổng hợp thành công. Đây rồi `master-result.json` Trích đoạn:
@@ -263,7 +263,7 @@ Tầm cỡ thời gian:
 
 ### GUI Phương pháp điều khiển từ xa
 
-1. Bắt đầu trên mỗi máy kiểm tra sức chịu đựng worker：`java -jar easy-postman.jar performance worker --host 0.0.0.0 --port 19090`。worker Mặc định là in một lần mỗi giây `users/requests/QPS` Tiến độ, có sẵn `--progress-interval <seconds>` Điều chỉnh hoặc `--no-progress` Đóng lại.
+1. Bắt đầu trên mỗi máy kiểm tra sức chịu đựng worker：`java -jar dev-workbench.jar performance worker --host 0.0.0.0 --port 19090`。worker Mặc định là in một lần mỗi giây `users/requests/QPS` Tiến độ, có sẵn `--progress-interval <seconds>` Điều chỉnh hoặc `--no-progress` Đóng lại.
 2. GUI Được nhập hoặc tạo thủ công CSV Hàng được bao gồm `plan.json` Ở trong; nếu được tham chiếu bởi kế hoạch kiểm tra căng thẳng file-source CSV hoặc multipart Tập tin, nhấn `plan.assets` Đặt tập tin vào đường dẫn trong mỗi trạm worker cùng một con đường.
 3. Vào GUI Đã kiểm tra thanh công cụ trên cùng `Remote`，Vào `Workers` Điền vào hộp đầu vào `host:port` Danh sách, hỗ trợ phân tách bằng dấu phẩy hoặc khoảng trắng, vd `10.0.0.11:19090,10.0.0.12:19090`。
 4. Bấm vào `Start` mặt sau GUI như master Phân phối kế hoạch hiện tại; bấm vào `Stop` Ngược lại tất cả worker gửi `/stop`。Trạng thái hàng đầu vẫn được hiển thị“Người dùng ảo đang hoạt động/Tổng số người dùng ảo”，`Kích hoạt xu hướng` và `Phương pháp cập nhật báo cáo` Sử dụng các công tắc tương tự như cách triển khai gốc. Nếu báo cáo thời gian thực bị tắt và xu hướng bị tắt trong quá trình hoạt động.GUI Chỉ để worker Kéo trạng thái nhẹ; tổng hợp sẽ được kéo khi xu hướng được bật report Được sử dụng cho các chỉ báo giao thức nhưng không làm mới trang báo cáo. Sau khi cuộc chạy kết thúc GUI Hiển thị trang báo cáo master Sau khi tổng hợp JSON report dữ liệu.

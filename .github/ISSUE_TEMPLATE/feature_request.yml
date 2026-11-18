@@ -15,9 +15,9 @@ body:
       label: Kiểm tra trước | Pre-check
       description: Vui lòng xác nhận những điều sau trước khi gửi | Please confirm the following before submitting
       options:
-        - label: Tôi đã tìm kiếm [Issues](https://github.com/lakernote/easy-postman/issues) và [Discussions](https://github.com/lakernote/easy-postman/discussions)，Không tìm thấy yêu cầu tính năng tương tự | I have searched Issues and Discussions and found no similar feature requests
+        - label: Tôi đã tìm kiếm [Issues](https://github.com/nvhuong/dev-workbench/issues) và [Discussions](https://github.com/nvhuong/dev-workbench/discussions)，Không tìm thấy yêu cầu tính năng tương tự | I have searched Issues and Discussions and found no similar feature requests
           required: true
-        - label: Tôi đã đọc nó [Mô tả chức năng](https://github.com/lakernote/easy-postman#-features)，Xác nhận đây là một tính năng mới | I have read the feature list and confirmed this is a new feature
+        - label: Tôi đã đọc nó [Mô tả chức năng](https://github.com/nvhuong/dev-workbench#-features)，Xác nhận đây là một tính năng mới | I have read the feature list and confirmed this is a new feature
           required: true
 
   - type: dropdown
@@ -47,8 +47,8 @@ body:
       label: Mô tả vấn đề | Problem Description
       description: Bạn đã gặp phải vấn đề gì? Tính năng này có thể giải quyết những điểm yếu nào? . | What problem are you facing? What pain point would this feature solve?
       placeholder: |
-        Tôi đang sử dụng EasyPostman , thường xuyên gặp phải... Điều này khiến tôi cảm thấy rất bất tiện...
-        When using EasyPostman, I often encounter... which is inconvenient...
+        Tôi đang sử dụng DevWorkbench , thường xuyên gặp phải... Điều này khiến tôi cảm thấy rất bất tiện...
+        When using DevWorkbench, I often encounter... which is inconvenient...
     validations:
       required: true
 
@@ -58,8 +58,8 @@ body:
       label: giải pháp mong muốn | Desired Solution
       description: Bạn hy vọng giải quyết được vấn đề này như thế nào? Mô tả chi tiết chức năng mong muốn của bạn | How would you like to solve this? Describe your desired feature in detail
       placeholder: |
-        Tôi hy vọng EasyPostman Có thể...
-        I would like EasyPostman to be able to...
+        Tôi hy vọng DevWorkbench Có thể...
+        I would like DevWorkbench to be able to...
     validations:
       required: true
 
@@ -99,10 +99,10 @@ body:
       label: Thực hiện tham khảo | Reference Implementation
       description: Có cách triển khai tương tự trong các công cụ khác không? . | Are there similar implementations in other tools?
       placeholder: |
-        Postman của XXX Chức năng...
+        DevWorkbench của XXX Chức năng...
         JMeter của XXX Đặc điểm...
 
-        Postman's XXX feature...
+        DevWorkbench's XXX feature...
         JMeter's XXX feature...
 
   - type: dropdown

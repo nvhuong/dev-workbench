@@ -1,6 +1,6 @@
 ---
 name: swing-flatlaf-miglayout-principles
-description: Use when modifying EasyPostman Swing forms, tool-window panels, localized English/Chinese text layouts, or FlatLaf/MigLayout layouts, especially when refactors introduce clipped focus rings, truncated text, clipped status badges, dense spacing, border conflicts, rounded-card corner leaks, or inconsistent form structure.
+description: Use when modifying DevWorkbench Swing forms, tool-window panels, localized English/Chinese text layouts, or FlatLaf/MigLayout layouts, especially when refactors introduce clipped focus rings, truncated text, clipped status badges, dense spacing, border conflicts, rounded-card corner leaks, or inconsistent form structure.
 ---
 
 # Swing FlatLaf MigLayout Principles
@@ -15,7 +15,7 @@ Use this skill when editing Swing form layouts in this repo. The goal is not jus
 - A refactor added borders, cards, sections, or sub-panels and spacing became unstable
 - A rounded tool-window card or panel corner looks square because an opaque child paints over the chrome
 - A dense toolbar/form row in MigLayout starts to look cramped or visually inconsistent
-- A Swing form in EasyPostman needs to be reorganized without regressing FlatLaf behavior
+- A Swing form in DevWorkbench needs to be reorganized without regressing FlatLaf behavior
 
 ## Core principles
 
@@ -113,16 +113,16 @@ Use this skill when editing Swing form layouts in this repo. The goal is not jus
 
 ## Repo-specific guidance
 
-- For module placement before changing shared UI, read `docs/ARCHITECTURE_MODULES_zh.md` and keep reusable Swing components, colors, fonts, icons, notifications, and editor theme helpers in `easy-postman-ui`.
+- For module placement before changing shared UI, read `docs/ARCHITECTURE_MODULES_zh.md` and keep reusable Swing components, colors, fonts, icons, notifications, and editor theme helpers in `dev-workbench-ui`.
 - Kafka top connection form is the known reference case:
-  `easy-postman-plugins/plugin-kafka/src/main/java/com/laker/postman/plugin/kafka/connection/ui/KafkaConnectionPanel.java`
+  `dev-workbench-plugins/plugin-kafka/src/main/java/com/nvhuong/devworkbench/plugin/kafka/connection/ui/KafkaConnectionPanel.java`
 - The correct direction there was:
   - keep the layout in MigLayout
   - add `novisualpadding`
   - avoid titled section borders
   - reintroduce only plain borders after focus behavior is stable
 - If the user says "it is probably MigLayout", take that seriously and verify MigLayout constraints before touching theme or component code.
-- In dense connection toolbars, `JSpinner`/`EasyJSpinner` can make MigLayout's baseline calculation inflate a row even when the spinner preferred height was manually compacted. If a row mixes text fields, combo boxes, buttons, and spinners, constrain the row height explicitly, for example `[" + ConnectionToolbarUi.FORM_CONTROL_HEIGHT + "!]`, then verify with the real FlatLaf theme and saved UI font size.
+- In dense connection toolbars, `JSpinner`/`DevWorkbenchJSpinner` can make MigLayout's baseline calculation inflate a row even when the spinner preferred height was manually compacted. If a row mixes text fields, combo boxes, buttons, and spinners, constrain the row height explicitly, for example `[" + ConnectionToolbarUi.FORM_CONTROL_HEIGHT + "!]`, then verify with the real FlatLaf theme and saved UI font size.
 - For multi-row connection forms, reuse the same column specification across rows when fields are expected to line up. Do not switch from the first row's custom columns, such as narrow `port`/`DB` label widths, to generic `connectionFieldColumns(...)` on the second row; labels like username/password will visibly drift.
 
 ## Theme entry points in this repo
@@ -130,30 +130,30 @@ Use this skill when editing Swing form layouts in this repo. The goal is not jus
 When the task is about light/dark theme colors instead of layout, start from these files instead of scattering hard-coded colors in panel code:
 
 - Shared semantic colors for both themes:
-  `easy-postman-ui/src/main/java/com/laker/postman/common/constants/ModernColors.java`
+  `dev-workbench-ui/src/main/java/com/nvhuong/devworkbench/common/constants/ModernColors.java`
 - FlatLaf light theme tokens and component defaults:
-  `easy-postman-app/src/main/resources/com/laker/postman/common/themes/EasyLightLaf.properties`
+  `dev-workbench-app/src/main/resources/com/nvhuong/devworkbench/common/themes/DevWorkbenchLightLaf.properties`
 - FlatLaf dark theme tokens and component defaults:
-  `easy-postman-app/src/main/resources/com/laker/postman/common/themes/EasyDarkLaf.properties`
+  `dev-workbench-app/src/main/resources/com/nvhuong/devworkbench/common/themes/DevWorkbenchDarkLaf.properties`
 - RSyntaxTextArea editor theme for light mode:
-  `easy-postman-app/src/main/resources/themes/easypostman-light.xml`
+  `dev-workbench-app/src/main/resources/themes/devworkbench-light.xml`
 - RSyntaxTextArea editor theme for dark mode:
-  `easy-postman-app/src/main/resources/themes/easypostman-dark.xml`
+  `dev-workbench-app/src/main/resources/themes/devworkbench-dark.xml`
 
 Use the files with this intent:
 
 1. `ModernColors.java`
    Use for shared semantic brand colors such as primary blue, hover blue, status colors, and colors referenced directly by custom Swing painting or custom components.
-2. `EasyLightLaf.properties` / `EasyDarkLaf.properties`
+2. `DevWorkbenchLightLaf.properties` / `DevWorkbenchDarkLaf.properties`
    Use for FlatLaf UI defaults such as `Component.accentColor`, `Table.selectionBackground`, `Tree.selectionBackground`, `TabbedPane.*`, borders, backgrounds, and hover states.
-3. `easypostman-light.xml` / `easypostman-dark.xml`
+3. `devworkbench-light.xml` / `devworkbench-dark.xml`
    Use only for editor syntax colors inside `RSyntaxTextArea`. These files are loaded by `EditorThemeUtil`, not by FlatLaf itself.
 
 Preferred order when adjusting theme:
 
 1. If the change is a shared accent or semantic status color, start with `ModernColors.java`.
-2. If the change is a standard Swing/FlatLaf control state, start with `EasyLightLaf.properties` or `EasyDarkLaf.properties`.
-3. If the change is only about code editor token colors, caret, selection, or current-line styling, change the `easypostman-*.xml` files.
+2. If the change is a standard Swing/FlatLaf control state, start with `DevWorkbenchLightLaf.properties` or `DevWorkbenchDarkLaf.properties`.
+3. If the change is only about code editor token colors, caret, selection, or current-line styling, change the `devworkbench-*.xml` files.
 4. Do not hard-code new colors directly in panels before checking whether one of the files above is the right source of truth.
 
 ## Design heuristics for this repo

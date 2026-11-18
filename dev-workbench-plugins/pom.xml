@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>com.nvhuong.tools</groupId>
+        <artifactId>dev-workbench-parent</artifactId>
+        <version>${revision}</version>
+        <relativePath>../pom.xml</relativePath>
+    </parent>
+
+    <!-- Dự án tổng hợp plugin chính thức, chỉ tổ chức các module plugin-* và không tạo JAR nghiệp vụ. -->
+    <artifactId>dev-workbench-plugins</artifactId>
+    <packaging>pom</packaging>
+
+    <!--
+        Nơi đặt các JAR plugin chính thức; plugin-manager là trường hợp đặc biệt do lịch sử:
+        app phụ thuộc trực tiếp vào thư viện hỗ trợ quản lý plugin này, runtime không quét nạp nó như plugin thông thường.
+        - plugin-manager: cài đặt/gỡ cài đặt, thư mục plugin và giao diện chợ plugin
+        - plugin-client-cert: hỗ trợ chứng chỉ phía máy khách
+        - plugin-capture: bắt lưu lượng HTTP
+        - plugin-redis / plugin-kafka: tích hợp middleware bên ngoài
+        - plugin-decompiler: plugin tùy chọn có nhiều chức năng
+     -->
+    <modules>
+        <module>plugin-manager</module>
+        <module>plugin-client-cert</module>
+        <module>plugin-capture</module>
+        <module>plugin-redis</module>
+        <module>plugin-kafka</module>
+        <module>plugin-decompiler</module>
+        <module>plugin-sql</module>
+        <module>plugin-remote</module>
+        <module>plugin-minio</module>
+    </modules>
+</project>

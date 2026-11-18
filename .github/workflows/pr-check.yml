@@ -88,7 +88,7 @@ jobs:
         if: success()
         with:
           name: app-jar
-          path: easy-postman-app/target/easy-postman-${{ needs.get-version.outputs.version }}.jar
+          path: dev-workbench-app/target/dev-workbench-${{ needs.get-version.outputs.version }}.jar
           retention-days: 1
 
   # Job 2: Windows Đóng gói và xác minh
@@ -153,8 +153,8 @@ jobs:
         shell: pwsh
         run: |
           $version = "${{ needs.get-version.outputs.version }}"
-          $jarNameWithVersion = "easy-postman-$version.jar"
-          $jarName = "easy-postman.jar"
+          $jarNameWithVersion = "dev-workbench-$version.jar"
+          $jarName = "dev-workbench.jar"
 
           $distInputDir = "target\dist-input"
           if (Test-Path $distInputDir) { Remove-Item -Recurse -Force $distInputDir }
@@ -169,7 +169,7 @@ jobs:
         run: |
           Write-Host "📦 Creating app-image for Inno Setup..."
           $version = "${{ needs.get-version.outputs.version }}"
-          $jarName = "easy-postman.jar"
+          $jarName = "dev-workbench.jar"
 
           # phân tích Java tùy chọn
           $javaOpts = $env:JAVA_OPTIONS -split '\|'
@@ -179,28 +179,28 @@ jobs:
             --type app-image `
             --input target\dist-input `
             --main-jar $jarName `
-            --main-class com.laker.postman.App `
-            --add-launcher EasyPostmanMCP=build\easy-postman-mcp-launcher.properties `
+            --main-class com.nvhuong.devworkbench.App `
+            --add-launcher DevWorkbenchMCP=build\dev-workbench-mcp-launcher.properties `
             --runtime-image target\runtime `
             --dest target `
-            --icon assets\win\EasyPostman.ico `
-            --name EasyPostman `
+            --icon assets\win\DevWorkbench.ico `
+            --name DevWorkbench `
             --app-version $version `
-            --vendor "Laker" `
-            --copyright "© 2025 Laker" `
+            --vendor "Nvhuong" `
+            --copyright "© 2025 Nvhuong" `
             --java-options $javaOpts[0] `
             --java-options $javaOpts[1] `
             --java-options $javaOpts[2] `
             --java-options "-Djavax.accessibility.assistive_technologies="
 
-          Write-Host "✅ App image created at: target\EasyPostman"
+          Write-Host "✅ App image created at: target\DevWorkbench"
 
       - name: Create EXE with Inno Setup
         shell: pwsh
         run: |
           Write-Host "🔨 Creating EXE installer with Inno Setup..."
           $version = "${{ needs.get-version.outputs.version }}"
-          $issScript = "build\easy-postman.iss"
+          $issScript = "build\dev-workbench.iss"
           $arch = "x64"
 
           # Hãy chắc chắn rằng thư mục đầu ra tồn tại
@@ -209,15 +209,15 @@ jobs:
           }
 
           # Xác minh rằng thư mục nguồn tồn tại
-          if (-not (Test-Path "target\EasyPostman")) {
-            Write-Error "❌ Source directory not found: target\EasyPostMan"
+          if (-not (Test-Path "target\DevWorkbench")) {
+            Write-Error "❌ Source directory not found: target\DevWorkbench"
             exit 1
           }
 
           # chạy Inno Setup trình biên dịch
           & iscc `
             "/DMyAppVersion=$version" `
-            "/DMyAppSourceDir=..\target\EasyPostman" `
+            "/DMyAppSourceDir=..\target\DevWorkbench" `
             "/DMyOutputDir=..\dist" `
             "/DMyArch=$arch" `
             $issScript
@@ -234,7 +234,7 @@ jobs:
         run: |
           Write-Host "🔍 Verifying EXE installer..."
           $version = "${{ needs.get-version.outputs.version }}"
-          $exeFile = "dist\EasyPostman-$version-windows-x64.exe"
+          $exeFile = "dist\DevWorkbench-$version-windows-x64.exe"
 
           if (-not (Test-Path $exeFile)) {
             Write-Host "❌ EXE file not found: $exeFile"
@@ -252,7 +252,7 @@ jobs:
         shell: pwsh
         run: |
           Write-Host "📦 Marking as portable version..."
-          $appDir = "target\EasyPostman"
+          $appDir = "target\DevWorkbench"
 
           # Tạo .portable Tệp nhận dạng (app-image Đã ở đây rồi Inno Setup được tạo ở bước)
           "This is a portable version" | Out-File -FilePath "$appDir\.portable" -Encoding UTF8
@@ -262,9 +262,9 @@ jobs:
         shell: pwsh
         run: |
           Write-Host "🔍 Verifying Windows package..."
-          $appDir = "target\EasyPostman"
-          $exeFile = "$appDir\EasyPostman.exe"
-          $mcpExeFile = "$appDir\EasyPostmanMCP.exe"
+          $appDir = "target\DevWorkbench"
+          $exeFile = "$appDir\DevWorkbench.exe"
+          $mcpExeFile = "$appDir\DevWorkbenchMCP.exe"
 
           if (-not (Test-Path $exeFile)) {
             Write-Host "❌ Executable not found: $exeFile"
@@ -300,7 +300,7 @@ jobs:
         timeout-minutes: 2
         run: |
           .\build\verify-windows-single-instance.ps1 `
-            -AppExe "target\EasyPostman\EasyPostman.exe"
+            -AppExe "target\DevWorkbench\DevWorkbench.exe"
 
   # Job 3: macOS Đóng gói và xác minh
   test-macos-package:
@@ -343,8 +343,8 @@ jobs:
       - name: Prepare dist-input
         run: |
           VERSION="${{ needs.get-version.outputs.version }}"
-          JAR_NAME_WITH_VERSION="easy-postman-${VERSION}.jar"
-          JAR_NAME="easy-postman.jar"
+          JAR_NAME_WITH_VERSION="dev-workbench-${VERSION}.jar"
+          JAR_NAME="dev-workbench.jar"
 
           rm -rf target/dist-input
           mkdir -p target/dist-input
@@ -357,7 +357,7 @@ jobs:
         run: |
           echo "📦 Creating macOS app bundle..."
           VERSION="${{ needs.get-version.outputs.version }}"
-          JAR_NAME="easy-postman.jar"
+          JAR_NAME="dev-workbench.jar"
 
           IFS='|' read -ra JAVA_OPTS <<< "${{ env.JAVA_OPTIONS }}"
 
@@ -365,15 +365,15 @@ jobs:
             --type app-image \
             --input target/dist-input \
             --main-jar "${JAR_NAME}" \
-            --main-class com.laker.postman.App \
-            --add-launcher EasyPostmanMCP=build/easy-postman-mcp-launcher.properties \
+            --main-class com.nvhuong.devworkbench.App \
+            --add-launcher DevWorkbenchMCP=build/dev-workbench-mcp-launcher.properties \
             --runtime-image target/runtime \
             --dest target \
-            --icon assets/mac/EasyPostman.icns \
-            --name EasyPostman \
+            --icon assets/mac/DevWorkbench.icns \
+            --name DevWorkbench \
             --app-version "${VERSION}" \
-            --vendor "Laker" \
-            --copyright "© 2025 Laker" \
+            --vendor "Nvhuong" \
+            --copyright "© 2025 Nvhuong" \
             --java-options "${JAVA_OPTS[0]}" \
             --java-options "${JAVA_OPTS[1]}" \
             --java-options "${JAVA_OPTS[2]}" \
@@ -384,7 +384,7 @@ jobs:
       - name: Verify macOS package
         run: |
           echo "🔍 Verifying macOS package..."
-          APP_PATH="target/EasyPostman.app"
+          APP_PATH="target/DevWorkbench.app"
 
           if [ ! -d "$APP_PATH" ]; then
             echo "❌ App bundle not found: $APP_PATH"
@@ -394,7 +394,7 @@ jobs:
           echo "✅ App bundle exists: $APP_PATH"
 
           # Kiểm tra tập tin thực thi
-          EXE_PATH="$APP_PATH/Contents/MacOS/EasyPostman"
+          EXE_PATH="$APP_PATH/Contents/MacOS/DevWorkbench"
           if [ -f "$EXE_PATH" ]; then
             echo "✅ Executable exists: $EXE_PATH"
             ls -lh "$EXE_PATH"
@@ -403,7 +403,7 @@ jobs:
             exit 1
           fi
 
-          MCP_EXE_PATH="$APP_PATH/Contents/MacOS/EasyPostmanMCP"
+          MCP_EXE_PATH="$APP_PATH/Contents/MacOS/DevWorkbenchMCP"
           if [ ! -x "$MCP_EXE_PATH" ]; then
             echo "❌ MCP executable not found: $MCP_EXE_PATH"
             exit 1
@@ -429,8 +429,8 @@ jobs:
         timeout-minutes: 2
         run: |
           echo "🧪 Running macOS smoke test..."
-          APP_PATH="target/EasyPostman.app"
-          EXE_PATH="$APP_PATH/Contents/MacOS/EasyPostman"
+          APP_PATH="target/DevWorkbench.app"
+          EXE_PATH="$APP_PATH/Contents/MacOS/DevWorkbench"
 
           # Khởi động ứng dụng (chạy ở chế độ nền)
           "$EXE_PATH" > stdout.log 2> stderr.log &

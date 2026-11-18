@@ -19,7 +19,7 @@ $primaryProcess = $null
 $secondaryProcess = $null
 $recoveredProcess = $null
 
-function Start-EasyPostmanProcess {
+function Start-DevWorkbenchProcess {
     param([string]$Name)
 
     $stdoutPath = Join-Path $logRoot "$Name-stdout.log"
@@ -70,15 +70,15 @@ function Write-SmokeLogs {
 try {
     New-Item -ItemType Directory -Path $dataRoot -Force | Out-Null
     New-Item -ItemType Directory -Path $logRoot -Force | Out-Null
-    $env:JAVA_TOOL_OPTIONS = "-Djava.awt.headless=false -DeasyPostman.data.dir=`"$normalizedDataRoot`""
+    $env:JAVA_TOOL_OPTIONS = "-Djava.awt.headless=false -DdevWorkbench.data.dir=`"$normalizedDataRoot`""
 
-    Write-Host "Starting primary EasyPostman instance..."
-    $primaryProcess = Start-EasyPostmanProcess -Name 'primary'
+    Write-Host "Starting primary DevWorkbench instance..."
+    $primaryProcess = Start-DevWorkbenchProcess -Name 'primary'
     Start-Sleep -Seconds $StartupWaitSeconds
     Assert-ProcessStillRunning -Process $primaryProcess -Description 'Primary instance'
 
-    Write-Host "Starting secondary EasyPostman instance..."
-    $secondaryProcess = Start-EasyPostmanProcess -Name 'secondary'
+    Write-Host "Starting secondary DevWorkbench instance..."
+    $secondaryProcess = Start-DevWorkbenchProcess -Name 'secondary'
     if (-not $secondaryProcess.WaitForExit($SecondaryExitTimeoutSeconds * 1000)) {
         throw 'Secondary instance did not exit after notifying the primary instance'
     }
@@ -92,7 +92,7 @@ try {
     Stop-ProcessIfRunning -Process $primaryProcess
     $primaryProcess = $null
 
-    $recoveredProcess = Start-EasyPostmanProcess -Name 'recovered'
+    $recoveredProcess = Start-DevWorkbenchProcess -Name 'recovered'
     Start-Sleep -Seconds $StartupWaitSeconds
     Assert-ProcessStillRunning -Process $recoveredProcess -Description 'Recovered instance'
     Write-Host "Crash recovery passed: a new instance started after forced termination."

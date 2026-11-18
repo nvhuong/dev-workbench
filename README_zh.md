@@ -1,33 +1,33 @@
 <div align="center">
 
-<img src="docs/icon.png" alt="EasyPostman Logo" width="100" />
+<img src="docs/icon.png" alt="DevWorkbench Logo" width="100" />
 
-# EasyPostman
+# DevWorkbench
 
-**Nguồn mở Postman Gỡ lỗi giao diện kiểu + JMeter Công cụ máy tính để bàn kiểm tra hiệu suất phong cách**<br>
+**Nguồn mở DevWorkbench Gỡ lỗi giao diện kiểu + JMeter Công cụ máy tính để bàn kiểm tra hiệu suất phong cách**<br>
 *Ưu tiên địa phương · Git khu vực làm việc · Không đầu CLI · Tích hợp sẵn MCP Server*
 
-[![GitHub license](https://img.shields.io/github/license/lakernote/easy-postman?style=flat-square)](https://github.com/lakernote/easy-postman/blob/master/LICENSE)
-[![GitHub release](https://img.shields.io/github/v/release/lakernote/easy-postman?style=flat-square&color=brightgreen)](https://github.com/lakernote/easy-postman/releases)
-[![GitHub downloads](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Flakernote%2Feasy-postman%2Fbadges%2Fgithub-downloads.json&style=flat-square&cacheSeconds=3600)](https://github.com/lakernote/easy-postman/releases)
-[![GitHub stars](https://img.shields.io/github/stars/lakernote/easy-postman?style=flat-square&color=yellow)](https://github.com/lakernote/easy-postman/stargazers)
+[![GitHub license](https://img.shields.io/github/license/nvhuong/dev-workbench?style=flat-square)](https://github.com/nvhuong/dev-workbench/blob/master/LICENSE)
+[![GitHub release](https://img.shields.io/github/v/release/nvhuong/dev-workbench?style=flat-square&color=brightgreen)](https://github.com/nvhuong/dev-workbench/releases)
+[![GitHub downloads](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fnvhuong%2Fdev-workbench%2Fbadges%2Fgithub-downloads.json&style=flat-square&cacheSeconds=3600)](https://github.com/nvhuong/dev-workbench/releases)
+[![GitHub stars](https://img.shields.io/github/stars/nvhuong/dev-workbench?style=flat-square&color=yellow)](https://github.com/nvhuong/dev-workbench/stargazers)
 [![Java](https://img.shields.io/badge/Java-21+-ED8B00?style=flat-square&logo=openjdk&logoColor=white)](https://openjdk.org/)
-[![Platform](https://img.shields.io/badge/Platform-Windows%20%7C%20macOS%20%7C%20Linux-0078D4?style=flat-square)](https://github.com/lakernote/easy-postman/releases)
+[![Platform](https://img.shields.io/badge/Platform-Windows%20%7C%20macOS%20%7C%20Linux-0078D4?style=flat-square)](https://github.com/nvhuong/dev-workbench/releases)
 
-[English](README.md) · [📦 tải về](#-Tải xuống và cài đặt) · [🤖 Cài đặt MCP](#-mcp-server) · [📖 Tài liệu](#-Tài liệu) · [💬 Bảng thảo luận](https://github.com/lakernote/easy-postman/discussions) · Wechat: .`lakernote`
+[English](README.md) · [📦 tải về](#-Tải xuống và cài đặt) · [🤖 Cài đặt MCP](#-mcp-server) · [📖 Tài liệu](#-Tài liệu) · [💬 Bảng thảo luận](https://github.com/nvhuong/dev-workbench/discussions) · Wechat: .`nvhuong`
 
 </div>
 
 ---
 
-## EasyPostman Nó là gì vậy?
+## DevWorkbench Nó là gì vậy?
 
-EasyPostman Bó **Postman gỡ lỗi giao diện phong cách**và **JMeter thử nghiệm hiệu suất phong cách**Đặt trong cùng một Java 21 Ứng dụng máy tính để bàn. Dữ liệu thu thập, môi trường và thử nghiệm được lưu cục bộ theo mặc định và có sẵn Git Cộng tác không gian làm việc; cùng một không gian làm việc vẫn có thể đi qua CLI Vào CI Chạy vào hoặc vượt qua MCP Đưa nó cho Codex、Claude Desktop、Cursor Đợi đã AI Cuộc gọi của khách hàng.
+DevWorkbench Bó **DevWorkbench gỡ lỗi giao diện phong cách**và **JMeter thử nghiệm hiệu suất phong cách**Đặt trong cùng một Java 21 Ứng dụng máy tính để bàn. Dữ liệu thu thập, môi trường và thử nghiệm được lưu cục bộ theo mặc định và có sẵn Git Cộng tác không gian làm việc; cùng một không gian làm việc vẫn có thể đi qua CLI Vào CI Chạy vào hoặc vượt qua MCP Đưa nó cho Codex、Claude Desktop、Cursor Đợi đã AI Cuộc gọi của khách hàng.
 
 | năng lực cốt lõi | Mô tả |
 |---|---|
 | 🔌 API gỡ lỗi | HTTP/HTTPS、SSE、WebSocket、Chứng nhận,Cookie、Khác nhau Body、Xem phản hồi và nhật ký web |
-| 🧩 Bộ sưu tập và kịch bản | Postman v2.1 / cURL Nhập khẩu, biến môi trường, tập lệnh trước và sau, xác nhận, liên kết yêu cầu |
+| 🧩 Bộ sưu tập và kịch bản | DevWorkbench v2.1 / cURL Nhập khẩu, biến môi trường, tập lệnh trước và sau, xác nhận, liên kết yêu cầu |
 | ⚡ Kiểm tra hiệu suất | Nhóm chủ đề, bộ tính giờ, bộ trích xuất, số liệu thời gian thực,PDF Báo cáo và master/worker Thực thi phân tán |
 | 🏢 Địa phương so với Git khu vực làm việc | Mỗi không gian làm việc chứa các bộ sưu tập, môi trường và cài đặt độc lập, để lại dữ liệu dưới sự kiểm soát của người dùng |
 | 🤖 MCP Không có đầu CLI | AI Nhớ lại đã lưu API；CI Chạy các bộ sưu tập, kiểm tra chức năng và kế hoạch kiểm tra căng thẳng |
@@ -38,7 +38,7 @@ EasyPostman Bó **Postman gỡ lỗi giao diện phong cách**và **JMeter thử
 
 <table>
   <tr>
-    <th width="50%">Postman Gỡ lỗi giao diện kiểu</th>
+    <th width="50%">DevWorkbench Gỡ lỗi giao diện kiểu</th>
     <th width="50%">JMeter Kiểm tra hiệu suất phong cách</th>
   </tr>
   <tr>
@@ -59,55 +59,55 @@ EasyPostman Bó **Postman gỡ lỗi giao diện phong cách**và **JMeter thử
 
 ## 📦 Tải xuống và cài đặt
 
-Từ **[GitHub Releases](https://github.com/lakernote/easy-postman/releases)** Tải xuống phiên bản mới nhất; người dùng trong nước cũng có thể sử dụng nó **[Gitee Releases](https://gitee.com/lakernote/easy-postman/releases)**。Gói cài đặt gốc và Windows Phiên bản di động đã bao gồm thời gian chạy, máy tính để bàn và MCP Không cần phải cài đặt bất cứ điều gì khác Java；Chỉ đa nền tảng JAR Cần thiết Java 21+。
+Từ **[GitHub Releases](https://github.com/nvhuong/dev-workbench/releases)** Tải xuống phiên bản mới nhất; người dùng trong nước cũng có thể sử dụng nó **[Gitee Releases](https://gitee.com/nvhuong/dev-workbench/releases)**。Gói cài đặt gốc và Windows Phiên bản di động đã bao gồm thời gian chạy, máy tính để bàn và MCP Không cần phải cài đặt bất cứ điều gì khác Java；Chỉ đa nền tảng JAR Cần thiết Java 21+。
 
 ### Windows WinGet
 
 ```powershell
-winget install --id Laker.EasyPostman --exact
+winget install --id Nvhuong.DevWorkbench --exact
 ```
 
 Nâng cấp:
 
 ```powershell
-winget upgrade --id Laker.EasyPostman --exact
+winget upgrade --id Nvhuong.DevWorkbench --exact
 ```
 
 ### Cách chọn gói cài đặt
 
 | nền tảng | tập tin |
 |---|---|
-| macOS Apple Silicon | `EasyPostman-{Số phiên bản}-macos-arm64.dmg` |
-| macOS Intel | `EasyPostman-{Số phiên bản}-macos-x86_64.dmg` |
-| Windows Phiên bản cài đặt / Phiên bản di động | `EasyPostman-{Số phiên bản}-windows-x64.exe` / `-portable.zip` |
-| Debian / Ubuntu x64 | `EasyPostman-{Số phiên bản}-linux-amd64.deb` |
-| Debian / Ubuntu ARM64 | `EasyPostman-{Số phiên bản}-linux-arm64.deb`；Phiên bản cũ `dpkg` Được sử dụng khi không tương thích `-compat.deb` |
-| RHEL / Rocky / CentOS / Fedora | `EasyPostman-{Số phiên bản}-1.x86_64.rpm` hoặc `-1.aarch64.rpm` |
-| Đa nền tảng JAR | `easy-postman-{Số phiên bản}.jar`，Cần thiết Java 21+ |
+| macOS Apple Silicon | `DevWorkbench-{Số phiên bản}-macos-arm64.dmg` |
+| macOS Intel | `DevWorkbench-{Số phiên bản}-macos-x86_64.dmg` |
+| Windows Phiên bản cài đặt / Phiên bản di động | `DevWorkbench-{Số phiên bản}-windows-x64.exe` / `-portable.zip` |
+| Debian / Ubuntu x64 | `DevWorkbench-{Số phiên bản}-linux-amd64.deb` |
+| Debian / Ubuntu ARM64 | `DevWorkbench-{Số phiên bản}-linux-arm64.deb`；Phiên bản cũ `dpkg` Được sử dụng khi không tương thích `-compat.deb` |
+| RHEL / Rocky / CentOS / Fedora | `DevWorkbench-{Số phiên bản}-1.x86_64.rpm` hoặc `-1.aarch64.rpm` |
+| Đa nền tảng JAR | `dev-workbench-{Số phiên bản}.jar`，Cần thiết Java 21+ |
 
 Nếu gặp phải khi bắt đầu lần đầu tiên Windows SmartScreen hoặc macOS Gatekeeper Nhắc nhở, vui lòng chọn“Vẫn phải chạy”Hoặc nhấn chuột phải để áp dụng và chọn“Mở”。Dự án không mua chứng chỉ ký mã thương mại và tất cả mã nguồn đều có thể được xem xét công khai.
 
 ## 🤖 MCP Server
 
-EasyPostman của MCP Bao gồm trong tất cả các gói phát hành.**Không cần phải tải xuống riêng biệt MCP，Không cần phải khởi động dịch vụ theo cách thủ công**。Nên sử dụng gói cài đặt gốc hoặc Windows Phiên bản di động: đã được bao gồm `EasyPostmanMCP` và JRE，Người dùng không cần phải cài đặt riêng Java。
+DevWorkbench của MCP Bao gồm trong tất cả các gói phát hành.**Không cần phải tải xuống riêng biệt MCP，Không cần phải khởi động dịch vụ theo cách thủ công**。Nên sử dụng gói cài đặt gốc hoặc Windows Phiên bản di động: đã được bao gồm `DevWorkbenchMCP` và JRE，Người dùng không cần phải cài đặt riêng Java。
 
 ### Phương pháp cài đặt được đề xuất
 
-1. Từ [Releases](https://github.com/lakernote/easy-postman/releases) Cài đặt gói gốc hoặc giải nén nó Windows Phiên bản di động.
+1. Từ [Releases](https://github.com/nvhuong/dev-workbench/releases) Cài đặt gói gốc hoặc giải nén nó Windows Phiên bản di động.
 2. Vào Codex、Claude Desktop hoặc Cursor Thêm địa phương STDIO MCP Server，`command` Sử dụng trình khởi chạy tương ứng: .
 
 | nền tảng | `command` |
 |---|---|
-| macOS | `/Applications/EasyPostman.app/Contents/MacOS/EasyPostmanMCP` |
-| Windows Phiên bản cài đặt | `C:\Program Files\EasyPostman\EasyPostmanMCP.exe` |
-| Windows Phiên bản di động | Giải nén thư mục `EasyPostmanMCP.exe`，Ví dụ `D:\Tools\EasyPostman\EasyPostmanMCP.exe` |
-| Linux DEB / RPM | `/opt/easypostman/bin/EasyPostmanMCP` |
+| macOS | `/Applications/DevWorkbench.app/Contents/MacOS/DevWorkbenchMCP` |
+| Windows Phiên bản cài đặt | `C:\Program Files\DevWorkbench\DevWorkbenchMCP.exe` |
+| Windows Phiên bản di động | Giải nén thư mục `DevWorkbenchMCP.exe`，Ví dụ `D:\Tools\DevWorkbench\DevWorkbenchMCP.exe` |
+| Linux DEB / RPM | `/opt/devworkbench/bin/DevWorkbenchMCP` |
 
 macOS Cấu hình cốt lõi như sau, các nền tảng khác chỉ cần thay thế `command`：
 
 ```json
 {
-  "command": "/Applications/EasyPostman.app/Contents/MacOS/EasyPostmanMCP",
+  "command": "/Applications/DevWorkbench.app/Contents/MacOS/DevWorkbenchMCP",
   "args": []
 }
 ```
@@ -115,27 +115,27 @@ macOS Cấu hình cốt lõi như sau, các nền tảng khác chỉ cần thay 
 Codex CLI Có thể thực hiện trực tiếp:
 
 ```bash
-codex mcp add easy-postman -- /Applications/EasyPostman.app/Contents/MacOS/EasyPostmanMCP
+codex mcp add dev-workbench -- /Applications/DevWorkbench.app/Contents/MacOS/DevWorkbenchMCP
 ```
 
-3. Lưu và sau đó khởi động lại MCP Client và tạo một cuộc trò chuyện mới, bạn có thể sử dụng câu này để xác minh:`Hãy sử dụng EasyPostman MCP Liệt kê tất cả các không gian làm việc mà không thực hiện bất kỳ giao diện nào.`
+3. Lưu và sau đó khởi động lại MCP Client và tạo một cuộc trò chuyện mới, bạn có thể sử dụng câu này để xác minh:`Hãy sử dụng DevWorkbench MCP Liệt kê tất cả các không gian làm việc mà không thực hiện bất kỳ giao diện nào.`
 
-Mặc định `args` Nếu nó trống thì không cần cấu hình thư mục không gian làm việc. Khách hàng một lần MCP Kết nối bắt đầu một quá trình và chạy nhiều lần Tool Tái sử dụng nó giữa các cuộc gọi; không phải một cuộc gọi API Chỉ cần khởi động lại một lần.Windows Phiên bản di động phải giữ lại toàn bộ thư mục đã giải nén chứ không chỉ sao chép `EasyPostmanMCP.exe`。
+Mặc định `args` Nếu nó trống thì không cần cấu hình thư mục không gian làm việc. Khách hàng một lần MCP Kết nối bắt đầu một quá trình và chạy nhiều lần Tool Tái sử dụng nó giữa các cuộc gọi; không phải một cuộc gọi API Chỉ cần khởi động lại một lần.Windows Phiên bản di động phải giữ lại toàn bộ thư mục đã giải nén chứ không chỉ sao chép `DevWorkbenchMCP.exe`。
 
 Nếu bạn chỉ tải xuống đa nền tảng JAR，Sau đó sử dụng cấu hình thay thế bên dưới và đảm bảo Java 21+ Có sẵn:
 
 ```json
 {
   "command": "java",
-  "args": ["-jar", "/absolute/path/to/easy-postman-{version}.jar", "mcp", "serve"]
+  "args": ["-jar", "/absolute/path/to/dev-workbench-{version}.jar", "mcp", "serve"]
 }
 ```
 
-MCP Đọc mặc định EasyPostman Đã đăng ký không gian làm việc;AI Có thể vượt qua `list_workspaces` Lấy `workspaceId`，Sau đó chọn không gian làm việc và môi trường cho mỗi cuộc gọi. Máy tính để bàn và  MCP Đây là một quá trình độc lập và có thể chạy cùng lúc;MCP Nó sẽ không chuyển trang màn hình nền hoặc sửa đổi lựa chọn hiện tại trên màn hình nền.
+MCP Đọc mặc định DevWorkbench Đã đăng ký không gian làm việc;AI Có thể vượt qua `list_workspaces` Lấy `workspaceId`，Sau đó chọn không gian làm việc và môi trường cho mỗi cuộc gọi. Máy tính để bàn và  MCP Đây là một quá trình độc lập và có thể chạy cùng lúc;MCP Nó sẽ không chuyển trang màn hình nền hoặc sửa đổi lựa chọn hiện tại trên màn hình nền.
 
 Để chỉ ủy quyền cho một không gian làm việc, trình khởi chạy gốc có sẵn ở định dạng  `args` Vượt qua đường dẫn tuyệt đối của không gian làm việc;JAR Phương pháp là `"serve"` được bổ sung sau. Thư mục này nên chứa `collections.json`，`environments.json` Không bắt buộc.
 
-Claude Desktop、Cursor Đợi đã JSON Việc cấu hình máy khách thường đặt các đối tượng trên vào `mcpServers.easy-postman` Xuống.Codex Cũng có sẵn MCP Server Đặt hoặc `config.toml`。Tham khảo [Codex MCP Tài liệu chính thức](https://developers.openai.com/codex/mcp/)。
+Claude Desktop、Cursor Đợi đã JSON Việc cấu hình máy khách thường đặt các đối tượng trên vào `mcpServers.dev-workbench` Xuống.Codex Cũng có sẵn MCP Server Đặt hoặc `config.toml`。Tham khảo [Codex MCP Tài liệu chính thức](https://developers.openai.com/codex/mcp/)。
 
 ### AI Có thể làm được gì
 
@@ -157,21 +157,21 @@ Quy trình cơ bản trên máy tính để bàn:
 Chạy từ nguồn: .
 
 ```bash
-git clone https://github.com/lakernote/easy-postman.git
-cd easy-postman
-mvn -pl easy-postman-app -am -DskipTests clean package
-java -jar easy-postman-app/target/easy-postman-*.jar
+git clone https://github.com/nvhuong/dev-workbench.git
+cd dev-workbench
+mvn -pl dev-workbench-app -am -DskipTests clean package
+java -jar dev-workbench-app/target/dev-workbench-*.jar
 ```
 
 📖 [Hướng dẫn xây dựng hoàn chỉnh](docs/BUILD_zh.md)
 
 ## 🧪 Không đầu CLI
 
-Cùng một JAR Có thể chạy trực tiếp EasyPostman Không gian làm việc gốc, không cần xuất bộ sưu tập hoặc môi trường:
+Cùng một JAR Có thể chạy trực tiếp DevWorkbench Không gian làm việc gốc, không cần xuất bộ sưu tập hoặc môi trường:
 
 ```bash
-java -jar easy-postman.jar collection run /srv/api-workspace -c "Basic HTTP Examples" -e "Dev Env"
-java -jar easy-postman.jar functional run /srv/api-workspace --bail --out target/result.json
+java -jar dev-workbench.jar collection run /srv/api-workspace -c "Basic HTTP Examples" -e "Dev Env"
+java -jar dev-workbench.jar functional run /srv/api-workspace --bail --out target/result.json
 ```
 
 - [Collection CLI Hướng dẫn đầy đủ](docs/COLLECTION_CLI_zh.md)
@@ -195,24 +195,24 @@ java -jar easy-postman.jar functional run /srv/api-workspace --bail --out target
 
 ```bash
 # Biên soạn nhanh
-mvn -q -pl easy-postman-app -am -DskipTests compile
+mvn -q -pl dev-workbench-app -am -DskipTests compile
 
 # Được xây dựng và thử nghiệm đầy đủ
 mvn clean package
 ```
 
-Đệ trình đều được chào đón Bug、Gợi ý, tài liệu và mã: .[Tạo Issue](https://github.com/lakernote/easy-postman/issues/new/choose) · [Nguyên tắc đóng góp](.github/CONTRIBUTING.md)
+Đệ trình đều được chào đón Bug、Gợi ý, tài liệu và mã: .[Tạo Issue](https://github.com/nvhuong/dev-workbench/issues/new/choose) · [Nguyên tắc đóng góp](.github/CONTRIBUTING.md)
 
 ## 🙏 Cảm ơn và hỗ trợ
 
-EasyPostman đã sử dụng [FlatLaf](https://github.com/JFormDesigner/FlatLaf)、[RSyntaxTextArea](https://github.com/bobbylight/RSyntaxTextArea)、[OkHttp](https://github.com/square/okhttp) và các dự án nguồn mở xuất sắc khác.
+DevWorkbench đã sử dụng [FlatLaf](https://github.com/JFormDesigner/FlatLaf)、[RSyntaxTextArea](https://github.com/bobbylight/RSyntaxTextArea)、[OkHttp](https://github.com/square/okhttp) và các dự án nguồn mở xuất sắc khác.
 
-Nếu dự án hữu ích cho bạn, xin chào mừng bạn [Star](https://github.com/lakernote/easy-postman)、[Tham gia vào các cuộc thảo luận](https://github.com/lakernote/easy-postman/discussions) Hoặc thêm WeChat `lakernote` giao tiếp.
+Nếu dự án hữu ích cho bạn, xin chào mừng bạn [Star](https://github.com/nvhuong/dev-workbench)、[Tham gia vào các cuộc thảo luận](https://github.com/nvhuong/dev-workbench/discussions) Hoặc thêm WeChat `nvhuong` giao tiếp.
 
 <div align="center">
 
-**Hãy để giao diện gỡ lỗi như thế nào Postman Cũng dễ sử dụng như kiểm tra hiệu suất JMeter Cũng như đầy đủ**
+**Hãy để giao diện gỡ lỗi như thế nào DevWorkbench Cũng dễ sử dụng như kiểm tra hiệu suất JMeter Cũng như đầy đủ**
 
-Made with ❤️ by [laker](https://github.com/lakernote)
+Made with ❤️ by [nvhuong](https://github.com/nvhuong)
 
 </div>

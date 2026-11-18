@@ -4,7 +4,7 @@ set -euo pipefail
 
 RELEASE_ID="${1:-}"
 FILE="${2:-}"
-GITEE_REPOSITORY="${GITEE_REPOSITORY:-lakernote/easy-postman}"
+GITEE_REPOSITORY="${GITEE_REPOSITORY:-nvhuong/dev-workbench}"
 MAX_ATTEMPTS="${GITEE_UPLOAD_MAX_ATTEMPTS:-4}"
 RETRY_DELAY_SECONDS="${GITEE_UPLOAD_RETRY_DELAY_SECONDS:-10}"
 API_BASE_URL="https://gitee.com/api/v5/repos/${GITEE_REPOSITORY}/releases"

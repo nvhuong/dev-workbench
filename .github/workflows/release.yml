@@ -109,7 +109,7 @@ jobs:
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: app-jar
-          path: easy-postman-app/target/easy-postman-${{ needs.get-version.outputs.version }}.jar
+          path: dev-workbench-app/target/dev-workbench-${{ needs.get-version.outputs.version }}.jar
           retention-days: 1
 
 
@@ -163,8 +163,8 @@ jobs:
         shell: pwsh
         run: |
           $version = "${{ needs.get-version.outputs.version }}"
-          $jarNameWithVersion = "easy-postman-$version.jar"
-          $jarName = "easy-postman.jar"
+          $jarNameWithVersion = "dev-workbench-$version.jar"
+          $jarName = "dev-workbench.jar"
 
           $distInputDir = "target\dist-input"
           if (Test-Path $distInputDir) { Remove-Item -Recurse -Force $distInputDir }
@@ -175,7 +175,7 @@ jobs:
         shell: pwsh
         run: |
           $version = "${{ needs.get-version.outputs.version }}"
-          $jarName = "easy-postman.jar"
+          $jarName = "dev-workbench.jar"
           $appImageDir = "target\app-image"
 
           if (Test-Path $appImageDir) { Remove-Item -Recurse -Force $appImageDir }
@@ -190,15 +190,15 @@ jobs:
             '--type', 'app-image',
             '--input', 'target\dist-input',
             '--main-jar', $jarName,
-            '--main-class', 'com.laker.postman.App',
-            '--add-launcher', 'EasyPostmanMCP=build\easy-postman-mcp-launcher.properties',
+            '--main-class', 'com.nvhuong.devworkbench.App',
+            '--add-launcher', 'DevWorkbenchMCP=build\dev-workbench-mcp-launcher.properties',
             '--runtime-image', 'target\runtime',
             '--dest', 'target',
-            '--icon', 'assets\win\EasyPostman.ico',
-            '--name', 'EasyPostman',
+            '--icon', 'assets\win\DevWorkbench.ico',
+            '--name', 'DevWorkbench',
             '--app-version', $version,
-            '--vendor', 'Laker',
-            '--copyright', '© 2025 Laker'
+            '--vendor', 'Nvhuong',
+            '--copyright', '© 2025 Nvhuong'
           )
 
           # Đã thêm phổ quát Java tùy chọn
@@ -218,7 +218,7 @@ jobs:
           # thực hiện jpackage
           & jpackage @jpackageArgs
 
-          if (-not (Test-Path "target\EasyPostman\EasyPostmanMCP.exe")) {
+          if (-not (Test-Path "target\DevWorkbench\DevWorkbenchMCP.exe")) {
             throw "MCP launcher was not created"
           }
 
@@ -226,8 +226,8 @@ jobs:
         shell: pwsh
         run: |
           $version = "${{ needs.get-version.outputs.version }}"
-          $appImageDir = "target\EasyPostman"
-          $zipName = "EasyPostman-$version-windows-x64-portable.zip"
+          $appImageDir = "target\DevWorkbench"
+          $zipName = "DevWorkbench-$version-windows-x64-portable.zip"
 
           if (-not (Test-Path "dist")) { New-Item -ItemType Directory -Path "dist" | Out-Null }
 
@@ -244,7 +244,7 @@ jobs:
       - name: Upload as Artifact（Tải lên dưới dạng sản phẩm xây dựng)
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
-          name: EasyPostman-Windows-Portable
+          name: DevWorkbench-Windows-Portable
           path: dist/*-portable.zip
           retention-days: 7
 
@@ -319,8 +319,8 @@ jobs:
         shell: pwsh
         run: |
           $version = "${{ needs.get-version.outputs.version }}"
-          $jarNameWithVersion = "easy-postman-$version.jar"
-          $jarName = "easy-postman.jar"
+          $jarNameWithVersion = "dev-workbench-$version.jar"
+          $jarName = "dev-workbench.jar"
 
           $distInputDir = "target\dist-input"
           if (Test-Path $distInputDir) { Remove-Item -Recurse -Force $distInputDir }
@@ -331,7 +331,7 @@ jobs:
         shell: pwsh
         run: |
           $version = "${{ needs.get-version.outputs.version }}"
-          $jarName = "easy-postman.jar"
+          $jarName = "dev-workbench.jar"
 
           # Phân tích chung Java tùy chọn
           $javaOptsCommon = $env:JAVA_OPTIONS_COMMON -split '\|'
@@ -343,15 +343,15 @@ jobs:
             '--type', 'app-image',
             '--input', 'target\dist-input',
             '--main-jar', $jarName,
-            '--main-class', 'com.laker.postman.App',
-            '--add-launcher', 'EasyPostmanMCP=build\easy-postman-mcp-launcher.properties',
+            '--main-class', 'com.nvhuong.devworkbench.App',
+            '--add-launcher', 'DevWorkbenchMCP=build\dev-workbench-mcp-launcher.properties',
             '--runtime-image', 'target\runtime',
             '--dest', 'target',
-            '--icon', 'assets\win\EasyPostman.ico',
-            '--name', 'EasyPostman',
+            '--icon', 'assets\win\DevWorkbench.ico',
+            '--name', 'DevWorkbench',
             '--app-version', $version,
-            '--vendor', 'Laker',
-            '--copyright', '© 2025 Laker'
+            '--vendor', 'Nvhuong',
+            '--copyright', '© 2025 Nvhuong'
           )
 
           # Đã thêm phổ quát Java tùy chọn
@@ -371,24 +371,24 @@ jobs:
           # thực hiện jpackage
           & jpackage @jpackageArgs
 
-          if (-not (Test-Path "target\EasyPostman\EasyPostmanMCP.exe")) {
+          if (-not (Test-Path "target\DevWorkbench\DevWorkbenchMCP.exe")) {
             throw "MCP launcher was not created"
           }
 
-          Write-Host "✅ App image created at: target\EasyPostman"
+          Write-Host "✅ App image created at: target\DevWorkbench"
 
       - name: Verify Windows single-instance behavior（Xác minh Windows Trường hợp đơn lẻ và phục hồi bắt buộc)
         shell: pwsh
         timeout-minutes: 2
         run: |
           .\build\verify-windows-single-instance.ps1 `
-            -AppExe "target\EasyPostman\EasyPostman.exe"
+            -AppExe "target\DevWorkbench\DevWorkbench.exe"
 
       - name: Create EXE with Inno Setup（sử dụng Inno Setup Tạo EXE trình cài đặt)
         shell: pwsh
         run: |
           $version = "${{ needs.get-version.outputs.version }}"
-          $issScript = "build\easy-postman.iss"
+          $issScript = "build\dev-workbench.iss"
           $arch = "x64"  # Hiện nay được xây dựng như x64，Nó có thể được mở rộng trong tương lai arm64
 
           # Hãy chắc chắn rằng thư mục đầu ra tồn tại
@@ -400,11 +400,11 @@ jobs:
           Write-Host "   Version: $version"
           Write-Host "   Architecture: $arch"
           Write-Host "   Script: $issScript"
-          Write-Host "   Source: target\EasyPostman"
+          Write-Host "   Source: target\DevWorkbench"
 
           # Xác minh rằng thư mục nguồn tồn tại
-          if (-not (Test-Path "target\EasyPostman")) {
-            Write-Error "❌ Source directory not found: target\EasyPostman"
+          if (-not (Test-Path "target\DevWorkbench")) {
+            Write-Error "❌ Source directory not found: target\DevWorkbench"
             exit 1
           }
 
@@ -412,7 +412,7 @@ jobs:
           # LƯU Ý: Đường dẫn có liên quan đến  ISS vị trí tập lệnh (build thư mục), vì vậy cần thiết ..\
           & iscc `
             "/DMyAppVersion=$version" `
-            "/DMyAppSourceDir=..\target\EasyPostman" `
+            "/DMyAppSourceDir=..\target\DevWorkbench" `
             "/DMyOutputDir=..\dist" `
             "/DMyArch=$arch" `
             $issScript
@@ -423,7 +423,7 @@ jobs:
           }
 
           # Xác minh EXE tập tin
-          $expectedExeName = "EasyPostman-$version-windows-$arch.exe"
+          $expectedExeName = "DevWorkbench-$version-windows-$arch.exe"
           $exeFile = Get-Item "dist\$expectedExeName" -ErrorAction SilentlyContinue
 
           if ($exeFile) {
@@ -441,7 +441,7 @@ jobs:
       - name: Upload as Artifact（Tải lên dưới dạng sản phẩm xây dựng)
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
-          name: EasyPostman-Windows-EXE
+          name: DevWorkbench-Windows-EXE
           path: dist/*.exe
           retention-days: 7
 
@@ -493,7 +493,7 @@ jobs:
           VERSION="${{ needs.get-version.outputs.version }}"
           rm -rf target/dist-input
           mkdir -p target/dist-input
-          cp target/easy-postman-$VERSION.jar target/dist-input/easy-postman.jar
+          cp target/dev-workbench-$VERSION.jar target/dist-input/dev-workbench.jar
 
       - name: Create DMG with jpackage（sử dụng jpackage Tạo DMG gương)
         run: |
@@ -508,17 +508,17 @@ jobs:
           # Xây dựng jpackage Mảng tham số
           JPACKAGE_ARGS=(
             --input target/dist-input
-            --main-jar "easy-postman.jar"
-            --main-class com.laker.postman.App
-            --add-launcher EasyPostmanMCP=build/easy-postman-mcp-launcher.properties
+            --main-jar "dev-workbench.jar"
+            --main-class com.nvhuong.devworkbench.App
+            --add-launcher DevWorkbenchMCP=build/dev-workbench-mcp-launcher.properties
             --runtime-image target/runtime
             --type dmg
-            --name "EasyPostman"
+            --name "DevWorkbench"
             --app-version "$VERSION"
             --dest dist
-            --icon assets/mac/EasyPostman.icns
-            --vendor "Laker"
-            --copyright "© 2025 Laker"
+            --icon assets/mac/DevWorkbench.icns
+            --vendor "Nvhuong"
+            --copyright "© 2025 Nvhuong"
           )
 
           # Đã thêm phổ quát Java tùy chọn
@@ -537,13 +537,13 @@ jobs:
           jpackage "${JPACKAGE_ARGS[@]}"
 
           # Đổi tên thành  Intel Phiên bản (sử dụng nhận dạng lược đồ tiêu chuẩn)
-          mv dist/EasyPostman-$VERSION.dmg dist/EasyPostman-$VERSION-macos-x86_64.dmg
-          echo "✅ Created: EasyPostman-$VERSION-macos-x86_64.dmg"
+          mv dist/DevWorkbench-$VERSION.dmg dist/DevWorkbench-$VERSION-macos-x86_64.dmg
+          echo "✅ Created: DevWorkbench-$VERSION-macos-x86_64.dmg"
 
       - name: Upload as Artifact（Tải lên dưới dạng sản phẩm xây dựng)
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
-          name: EasyPostman-macOS-Intel-DMG
+          name: DevWorkbench-macOS-Intel-DMG
           path: dist/*-macos-x86_64.dmg
           retention-days: 7
 
@@ -595,7 +595,7 @@ jobs:
           VERSION="${{ needs.get-version.outputs.version }}"
           rm -rf target/dist-input
           mkdir -p target/dist-input
-          cp target/easy-postman-$VERSION.jar target/dist-input/easy-postman.jar
+          cp target/dev-workbench-$VERSION.jar target/dist-input/dev-workbench.jar
 
       - name: Create DMG with jpackage（sử dụng jpackage Tạo DMG gương)
         run: |
@@ -610,17 +610,17 @@ jobs:
           # Xây dựng jpackage Mảng tham số
           JPACKAGE_ARGS=(
             --input target/dist-input
-            --main-jar "easy-postman.jar"
-            --main-class com.laker.postman.App
-            --add-launcher EasyPostmanMCP=build/easy-postman-mcp-launcher.properties
+            --main-jar "dev-workbench.jar"
+            --main-class com.nvhuong.devworkbench.App
+            --add-launcher DevWorkbenchMCP=build/dev-workbench-mcp-launcher.properties
             --runtime-image target/runtime
             --type dmg
-            --name "EasyPostman"
+            --name "DevWorkbench"
             --app-version "$VERSION"
             --dest dist
-            --icon assets/mac/EasyPostman.icns
-            --vendor "Laker"
-            --copyright "© 2025 Laker"
+            --icon assets/mac/DevWorkbench.icns
+            --vendor "Nvhuong"
+            --copyright "© 2025 Nvhuong"
           )
 
           # Đã thêm phổ quát Java tùy chọn
@@ -639,13 +639,13 @@ jobs:
           jpackage "${JPACKAGE_ARGS[@]}"
 
           # Đổi tên thành  ARM Phiên bản (sử dụng nhận dạng lược đồ tiêu chuẩn)
-          mv dist/EasyPostman-$VERSION.dmg dist/EasyPostman-$VERSION-macos-arm64.dmg
-          echo "✅ Created: EasyPostman-$VERSION-macos-arm64.dmg"
+          mv dist/DevWorkbench-$VERSION.dmg dist/DevWorkbench-$VERSION-macos-arm64.dmg
+          echo "✅ Created: DevWorkbench-$VERSION-macos-arm64.dmg"
 
       - name: Upload as Artifact（Tải lên dưới dạng sản phẩm xây dựng)
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
-          name: EasyPostman-macOS-ARM-DMG
+          name: DevWorkbench-macOS-ARM-DMG
           path: dist/*-macos-arm64.dmg
           retention-days: 7
 
@@ -665,7 +665,7 @@ jobs:
       - name: Upload as Artifact（Tải lên dưới dạng sản phẩm xây dựng)
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
-          name: EasyPostman-Standalone-JAR
+          name: DevWorkbench-Standalone-JAR
           path: dist/*.jar
           retention-days: 7
 
@@ -717,7 +717,7 @@ jobs:
           VERSION="${{ needs.get-version.outputs.version }}"
           rm -rf target/dist-input
           mkdir -p target/dist-input
-          cp target/easy-postman-$VERSION.jar target/dist-input/easy-postman.jar
+          cp target/dev-workbench-$VERSION.jar target/dist-input/dev-workbench.jar
 
       - name: Create DEB with jpackage（sử dụng jpackage Tạo DEB gói cài đặt)
         run: |
@@ -732,17 +732,17 @@ jobs:
           # Xây dựng jpackage Mảng tham số
           JPACKAGE_ARGS=(
             --input target/dist-input
-            --main-jar "easy-postman.jar"
-            --main-class com.laker.postman.App
-            --add-launcher EasyPostmanMCP=build/easy-postman-mcp-launcher.properties
+            --main-jar "dev-workbench.jar"
+            --main-class com.nvhuong.devworkbench.App
+            --add-launcher DevWorkbenchMCP=build/dev-workbench-mcp-launcher.properties
             --runtime-image target/runtime
             --type deb
-            --name "EasyPostman"
+            --name "DevWorkbench"
             --app-version "$VERSION"
             --dest dist
-            --vendor "Laker"
-            --copyright "© 2025 Laker"
-            --description "A modern API testing tool similar to Postman"
+            --vendor "Nvhuong"
+            --copyright "© 2025 Nvhuong"
+            --description "A modern API testing tool similar to DevWorkbench"
             --linux-shortcut
             --linux-menu-group "Development"
             --linux-app-category "Development"
@@ -772,7 +772,7 @@ jobs:
             exit 1
           fi
 
-          TARGET_DEB="dist/EasyPostman-${VERSION}-linux-amd64.deb"
+          TARGET_DEB="dist/DevWorkbench-${VERSION}-linux-amd64.deb"
           mv "$ORIGINAL_DEB" "$TARGET_DEB"
 
           echo "Generated amd64 DEB:"
@@ -781,7 +781,7 @@ jobs:
       - name: Upload as Artifact（Tải lên dưới dạng sản phẩm xây dựng)
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
-          name: EasyPostman-Ubuntu-DEB-amd64
+          name: DevWorkbench-Ubuntu-DEB-amd64
           path: dist/*-linux-amd64.deb
           retention-days: 7
 
@@ -833,7 +833,7 @@ jobs:
           VERSION="${{ needs.get-version.outputs.version }}"
           rm -rf target/dist-input
           mkdir -p target/dist-input
-          cp target/easy-postman-$VERSION.jar target/dist-input/easy-postman.jar
+          cp target/dev-workbench-$VERSION.jar target/dist-input/dev-workbench.jar
 
       - name: Create DEB with jpackage（sử dụng jpackage Tạo DEB gói cài đặt)
         run: |
@@ -848,17 +848,17 @@ jobs:
           # Xây dựng jpackage Mảng tham số
           JPACKAGE_ARGS=(
             --input target/dist-input
-            --main-jar "easy-postman.jar"
-            --main-class com.laker.postman.App
-            --add-launcher EasyPostmanMCP=build/easy-postman-mcp-launcher.properties
+            --main-jar "dev-workbench.jar"
+            --main-class com.nvhuong.devworkbench.App
+            --add-launcher DevWorkbenchMCP=build/dev-workbench-mcp-launcher.properties
             --runtime-image target/runtime
             --type deb
-            --name "EasyPostman"
+            --name "DevWorkbench"
             --app-version "$VERSION"
             --dest dist
-            --vendor "Laker"
-            --copyright "© 2025 Laker"
-            --description "A modern API testing tool similar to Postman"
+            --vendor "Nvhuong"
+            --copyright "© 2025 Nvhuong"
+            --description "A modern API testing tool similar to DevWorkbench"
             --linux-shortcut
             --linux-menu-group "Development"
             --linux-app-category "Development"
@@ -888,8 +888,8 @@ jobs:
             exit 1
           fi
 
-          GENERIC_DEB="dist/EasyPostman-${VERSION}-linux-arm64.deb"
-          COMPAT_DEB="dist/EasyPostman-${VERSION}-linux-arm64-compat.deb"
+          GENERIC_DEB="dist/DevWorkbench-${VERSION}-linux-arm64.deb"
+          COMPAT_DEB="dist/DevWorkbench-${VERSION}-linux-arm64-compat.deb"
 
           mv "$ORIGINAL_DEB" "$GENERIC_DEB"
           cp "$GENERIC_DEB" "$COMPAT_DEB"
@@ -904,7 +904,7 @@ jobs:
       - name: Upload as Artifact（Tải lên dưới dạng sản phẩm xây dựng)
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
-          name: EasyPostman-Ubuntu-DEB-arm64
+          name: DevWorkbench-Ubuntu-DEB-arm64
           path: |
             dist/*-linux-arm64.deb
             dist/*-linux-arm64-compat.deb
@@ -956,7 +956,7 @@ jobs:
           VERSION="${{ needs.get-version.outputs.version }}"
           rm -rf target/dist-input
           mkdir -p target/dist-input
-          cp target/easy-postman-$VERSION.jar target/dist-input/easy-postman.jar
+          cp target/dev-workbench-$VERSION.jar target/dist-input/dev-workbench.jar
 
       - name: Create RPM with jpackage（sử dụng jpackage Tạo RPM gói cài đặt)
         run: |
@@ -968,17 +968,17 @@ jobs:
 
           JPACKAGE_ARGS=(
             --input target/dist-input
-            --main-jar "easy-postman.jar"
-            --main-class com.laker.postman.App
-            --add-launcher EasyPostmanMCP=build/easy-postman-mcp-launcher.properties
+            --main-jar "dev-workbench.jar"
+            --main-class com.nvhuong.devworkbench.App
+            --add-launcher DevWorkbenchMCP=build/dev-workbench-mcp-launcher.properties
             --runtime-image target/runtime
             --type rpm
-            --name "EasyPostman"
+            --name "DevWorkbench"
             --app-version "$VERSION"
             --dest dist
-            --vendor "Laker"
-            --copyright "© 2025 Laker"
-            --description "A modern API testing tool similar to Postman"
+            --vendor "Nvhuong"
+            --copyright "© 2025 Nvhuong"
+            --description "A modern API testing tool similar to DevWorkbench"
             --linux-shortcut
             --linux-menu-group "Development"
             --linux-app-category "Development"
@@ -1000,7 +1000,7 @@ jobs:
       - name: Upload as Artifact（Tải lên dưới dạng sản phẩm xây dựng)
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
-          name: EasyPostman-RPM-amd64
+          name: DevWorkbench-RPM-amd64
           path: dist/*.rpm
           retention-days: 7
 
@@ -1050,7 +1050,7 @@ jobs:
           VERSION="${{ needs.get-version.outputs.version }}"
           rm -rf target/dist-input
           mkdir -p target/dist-input
-          cp target/easy-postman-$VERSION.jar target/dist-input/easy-postman.jar
+          cp target/dev-workbench-$VERSION.jar target/dist-input/dev-workbench.jar
 
       - name: Create RPM with jpackage（sử dụng jpackage Tạo RPM gói cài đặt)
         run: |
@@ -1062,17 +1062,17 @@ jobs:
 
           JPACKAGE_ARGS=(
             --input target/dist-input
-            --main-jar "easy-postman.jar"
-            --main-class com.laker.postman.App
-            --add-launcher EasyPostmanMCP=build/easy-postman-mcp-launcher.properties
+            --main-jar "dev-workbench.jar"
+            --main-class com.nvhuong.devworkbench.App
+            --add-launcher DevWorkbenchMCP=build/dev-workbench-mcp-launcher.properties
             --runtime-image target/runtime
             --type rpm
-            --name "EasyPostman"
+            --name "DevWorkbench"
             --app-version "$VERSION"
             --dest dist
-            --vendor "Laker"
-            --copyright "© 2025 Laker"
-            --description "A modern API testing tool similar to Postman"
+            --vendor "Nvhuong"
+            --copyright "© 2025 Nvhuong"
+            --description "A modern API testing tool similar to DevWorkbench"
             --linux-shortcut
             --linux-menu-group "Development"
             --linux-app-category "Development"
@@ -1094,7 +1094,7 @@ jobs:
       - name: Upload as Artifact（Tải lên dưới dạng sản phẩm xây dựng)
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
-          name: EasyPostman-RPM-arm64
+          name: DevWorkbench-RPM-arm64
           path: dist/*.rpm
           retention-days: 7
 
@@ -1113,7 +1113,7 @@ jobs:
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
           path: all-artifacts
-          pattern: EasyPostman-*
+          pattern: DevWorkbench-*
           merge-multiple: true
 
       - name: List downloaded files（Liệt kê tất cả các tập tin đã tải xuống)
@@ -1189,28 +1189,28 @@ jobs:
         if: needs.build-jar.result == 'success'
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
-          name: EasyPostman-Standalone-JAR
+          name: DevWorkbench-Standalone-JAR
           path: verify/jar
 
       - name: Download Windows Portable artifact（tải về Windows Sản phẩm phiên bản xanh)
         if: needs.build-windows-portable.result == 'success'
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
-          name: EasyPostman-Windows-Portable
+          name: DevWorkbench-Windows-Portable
           path: verify/windows-portable
 
       - name: Download Windows EXE artifact（tải về Windows EXE sản phẩm)
         if: needs.build-windows-exe.result == 'success'
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
-          name: EasyPostman-Windows-EXE
+          name: DevWorkbench-Windows-EXE
           path: verify/windows-exe
 
       - name: Download macOS ARM artifact（tải về macOS ARM sản phẩm)
         if: needs.build-macos-arm.result == 'success'
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
-          name: EasyPostman-macOS-ARM-DMG
+          name: DevWorkbench-macOS-ARM-DMG
           path: verify/macos-arm
 
       - name: Validate asset size（Xác minh kích thước tệp đính kèm)
@@ -1280,7 +1280,7 @@ jobs:
           RELEASE_BODY="${{ github.event.release.body }}"
 
           if [ -z "$RELEASE_BODY" ]; then
-            RELEASE_BODY="EasyPostman ${VERSION} Phiên bản phát hành, được hỗ trợ Windows、macOS và Linux。"
+            RELEASE_BODY="DevWorkbench ${VERSION} Phiên bản phát hành, được hỗ trợ Windows、macOS và Linux。"
           fi
 
           # Bó body Ghi vào một tập tin tạm thời để thuận tiện cho việc xử lý các ký tự đặc biệt
@@ -1295,7 +1295,7 @@ jobs:
           fi
 
           RESPONSE_FILE="/tmp/release.json"
-          GITEE_RELEASES_API="https://gitee.com/api/v5/repos/lakernote/easy-postman/releases"
+          GITEE_RELEASES_API="https://gitee.com/api/v5/repos/nvhuong/dev-workbench/releases"
           RELEASE_ID=""
 
           resolve_existing_release() {
@@ -1382,7 +1382,7 @@ jobs:
       - name: Download standalone JAR artifact（Tải xuống độc lập JAR sản phẩm)
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
-          name: EasyPostman-Standalone-JAR
+          name: DevWorkbench-Standalone-JAR
           path: artifacts
 
       - name: Upload standalone JAR to Gitee（Tải lên độc lập JAR Đến Gitee）
@@ -1408,7 +1408,7 @@ jobs:
       - name: Download Windows Portable artifact（tải về Windows Sản phẩm phiên bản xanh)
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
-          name: EasyPostman-Windows-Portable
+          name: DevWorkbench-Windows-Portable
           path: artifacts
 
       - name: Upload Windows Portable to Gitee（Tải lên Windows Phiên bản xanh đã về Gitee）
@@ -1434,7 +1434,7 @@ jobs:
       - name: Download Windows EXE artifact（tải về Windows EXE sản phẩm)
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
-          name: EasyPostman-Windows-EXE
+          name: DevWorkbench-Windows-EXE
           path: artifacts
 
       - name: Upload Windows EXE to Gitee（Tải lên Windows EXE Đến Gitee）
@@ -1460,7 +1460,7 @@ jobs:
       - name: Download macOS ARM artifact（tải về macOS ARM sản phẩm)
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
-          name: EasyPostman-macOS-ARM-DMG
+          name: DevWorkbench-macOS-ARM-DMG
           path: artifacts
 
       - name: Upload macOS ARM to Gitee（Tải lên macOS ARM Đến Gitee）
@@ -1500,7 +1500,7 @@ jobs:
           echo "📝 Gitee Release Tạo: $RELEASE_STATUS"
 
           if [ "$RELEASE_STATUS" == "success" ]; then
-            echo "📍 Release URL: https://gitee.com/lakernote/easy-postman/releases/${{ needs.create-gitee-release.outputs.tag_name }}"
+            echo "📍 Release URL: https://gitee.com/nvhuong/dev-workbench/releases/${{ needs.create-gitee-release.outputs.tag_name }}"
           fi
 
           echo ""

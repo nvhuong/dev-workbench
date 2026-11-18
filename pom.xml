@@ -4,41 +4,41 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.laker.tools</groupId>
-    <artifactId>easy-postman-parent</artifactId>
+    <groupId>com.nvhuong.tools</groupId>
+    <artifactId>dev-workbench-parent</artifactId>
     <version>${revision}</version>
     <packaging>pom</packaging>
 
     <!--
         Mô tả phân chia mô-đun cấp cao nhất:
-        1. easy-postman-foundation：Các khả năng cơ bản thấp nhất chỉ bao gồm các mô hình, hằng số và đường dẫn được chia sẻ.JSON、Hệ thống, cài đặt và cơ chế quốc tế hóa
-        2. easy-postman-request-core：Yêu cầu mô hình lõi đặc tả, chỉ đặt cấu hình yêu cầu,header/body/auth/protocol Chờ gì cả UI/Không có loại thực hiện vận chuyển
-        3. easy-postman-http-runtime：HTTP Chỉ cần đặt trong khi quá trình chuyển đang chạy PreparedRequest/HttpResponse、OkHttp/SSL/SSE/Cookie/redirect và các cổng trung tính
-        4. easy-postman-collection-core：Mô hình miền bộ sưu tập và Postman collection Để phân tích cú pháp, chỉ cần không đặt gì cả UI/Khả năng cốt lõi tổng hợp mà không cần chuỗi thực thi
-        5. easy-postman-mock-core：địa phương Mock Server Tuyến đường phù hợp,JDK HTTP Thời gian chạy, trạng thái phiên và nhật ký cuộc gọi
-        6. easy-postman-plugin-api：Giao diện tiện ích mở rộng ổn định, chỉ đặt những thứ công khai mà plug-in có thể dựa vào SPI Hợp đồng với dịch vụ plug-in
-        7. easy-postman-platform：Khả năng khung nền tảng máy chủ, hiện đang chấp nhận tùy chỉnh IOC Các vùng chứa và lõi cập nhật được phát hiện và sau đó được khởi tạo/Chào mừng/Thiết lập sự sắp xếp
-        8. easy-postman-performance-core：Kế hoạch kiểm tra căng thẳng và trạng thái chạy plan.json、Điều phối hoạt động, thống kê, v.v. Không có UI/Năng lực cốt lõi được thực hiện mà không cần truyền tải
-        9. easy-postman-ui：Được chia sẻ bởi máy chủ và các plug-in UI Các thành phần, kiểu dáng và công cụ trực quan cơ bản
-        10. easy-postman-plugin-runtime：Quét plug-in, tải, khởi động và dừng cũng như duy trì trạng thái
-        11. easy-postman-mcp：MCP stdio Thỏa thuận,tool schema và chủ nhà backend hợp đồng
-        12. easy-postman-plugins：Thư mục tổng hợp plugin chính thức, mỗi thư mục plugin-* Đóng gói và phát hành độc lập
-        13. easy-postman-app：Ứng dụng máy chủ chỉ giữ lại lối vào kết hợp, các trang cụ thể và các điểm truy cập máy chủ plug-in
+        1. dev-workbench-foundation：Các khả năng cơ bản thấp nhất chỉ bao gồm các mô hình, hằng số và đường dẫn được chia sẻ.JSON、Hệ thống, cài đặt và cơ chế quốc tế hóa
+        2. dev-workbench-request-core：Yêu cầu mô hình lõi đặc tả, chỉ đặt cấu hình yêu cầu,header/body/auth/protocol Chờ gì cả UI/Không có loại thực hiện vận chuyển
+        3. dev-workbench-http-runtime：HTTP Chỉ cần đặt trong khi quá trình chuyển đang chạy PreparedRequest/HttpResponse、OkHttp/SSL/SSE/Cookie/redirect và các cổng trung tính
+        4. dev-workbench-collection-core：Mô hình miền bộ sưu tập và DevWorkbench collection Để phân tích cú pháp, chỉ cần không đặt gì cả UI/Khả năng cốt lõi tổng hợp mà không cần chuỗi thực thi
+        5. dev-workbench-mock-core：địa phương Mock Server Tuyến đường phù hợp,JDK HTTP Thời gian chạy, trạng thái phiên và nhật ký cuộc gọi
+        6. dev-workbench-plugin-api：Giao diện tiện ích mở rộng ổn định, chỉ đặt những thứ công khai mà plug-in có thể dựa vào SPI Hợp đồng với dịch vụ plug-in
+        7. dev-workbench-platform：Khả năng khung nền tảng máy chủ, hiện đang chấp nhận tùy chỉnh IOC Các vùng chứa và lõi cập nhật được phát hiện và sau đó được khởi tạo/Chào mừng/Thiết lập sự sắp xếp
+        8. dev-workbench-performance-core：Kế hoạch kiểm tra căng thẳng và trạng thái chạy plan.json、Điều phối hoạt động, thống kê, v.v. Không có UI/Năng lực cốt lõi được thực hiện mà không cần truyền tải
+        9. dev-workbench-ui：Được chia sẻ bởi máy chủ và các plug-in UI Các thành phần, kiểu dáng và công cụ trực quan cơ bản
+        10. dev-workbench-plugin-runtime：Quét plug-in, tải, khởi động và dừng cũng như duy trì trạng thái
+        11. dev-workbench-mcp：MCP stdio Thỏa thuận,tool schema và chủ nhà backend hợp đồng
+        12. dev-workbench-plugins：Thư mục tổng hợp plugin chính thức, mỗi thư mục plugin-* Đóng gói và phát hành độc lập
+        13. dev-workbench-app：Ứng dụng máy chủ chỉ giữ lại lối vào kết hợp, các trang cụ thể và các điểm truy cập máy chủ plug-in
      -->
     <modules>
-        <module>easy-postman-foundation</module>
-        <module>easy-postman-request-core</module>
-        <module>easy-postman-http-runtime</module>
-        <module>easy-postman-collection-core</module>
-        <module>easy-postman-mock-core</module>
-        <module>easy-postman-plugin-api</module>
-        <module>easy-postman-platform</module>
-        <module>easy-postman-performance-core</module>
-        <module>easy-postman-ui</module>
-        <module>easy-postman-plugin-runtime</module>
-        <module>easy-postman-mcp</module>
-        <module>easy-postman-plugins</module>
-        <module>easy-postman-app</module>
+        <module>dev-workbench-foundation</module>
+        <module>dev-workbench-request-core</module>
+        <module>dev-workbench-http-runtime</module>
+        <module>dev-workbench-collection-core</module>
+        <module>dev-workbench-mock-core</module>
+        <module>dev-workbench-plugin-api</module>
+        <module>dev-workbench-platform</module>
+        <module>dev-workbench-performance-core</module>
+        <module>dev-workbench-ui</module>
+        <module>dev-workbench-plugin-runtime</module>
+        <module>dev-workbench-mcp</module>
+        <module>dev-workbench-plugins</module>
+        <module>dev-workbench-app</module>
     </modules>
 
     <properties>
@@ -56,11 +56,11 @@
          -->
         <plugin.platform.version>4.0.0</plugin.platform.version>
         <!-- Trang chủ mặc định của plugin chính thức được cung cấp descriptor Các mẫu được tái sử dụng một cách thống nhất. -->
-        <plugin.homepage>https://github.com/nvhuong/easy-postman</plugin.homepage>
+        <plugin.homepage>https://github.com/nvhuong/dev-workbench</plugin.homepage>
         <maven.compiler.release>21</maven.compiler.release>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.build.timestamp.format>yyyy-MM-dd'T'HH:mm:ssXXX</maven.build.timestamp.format>
-        <mainClass>com.laker.postman.App</mainClass>
+        <mainClass>com.nvhuong.devworkbench.App</mainClass>
 
         <!-- UI / core Phiên bản phụ thuộc cơ bản -->
         <flatlaf.version>3.7.2</flatlaf.version>
@@ -253,7 +253,7 @@
                             <slf4j.internal.verbosity>ERROR</slf4j.internal.verbosity>
                             <!-- bình thường JDK chạy tiếp GraalJS Cảnh báo chế độ phiên dịch không được đưa ra trong quá trình thử nghiệm -->
                             <polyglot.engine.WarnInterpreterOnly>false</polyglot.engine.WarnInterpreterOnly>
-                            <!-- Dữ liệu thử nghiệm được cách ly target，Tránh viết lại những gì nhà phát triển thực sự đã nói ~/EasyPostman cấu hình -->
+                            <!-- Dữ liệu thử nghiệm được cách ly target，Tránh viết lại những gì nhà phát triển thực sự đã nói ~/DevWorkbench cấu hình -->
                             <user.home>${project.build.directory}/test-home</user.home>
                         </systemPropertyVariables>
                     </configuration>

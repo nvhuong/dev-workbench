@@ -23,18 +23,18 @@ PROJECT_ROOT=$(cd "$(dirname "$0")/.."; pwd)
 cd "$PROJECT_ROOT" || exit 1
 # Trực tiếp từ pom.xml phân tích revision
 VERSION=$(grep -m 1 '<revision>' pom.xml | sed 's/.*<revision>\(.*\)<\/revision>.*/\1/')
-echo "🔧 Bắt đầu đóng gói EasyPostman Phiên bản: $VERSION"
-APP_NAME="EasyPostman"
-JAR_NAME_WITH_VERSION="easy-postman-$VERSION.jar"
-JAR_NAME="easy-postman.jar"  # Đã sửa tên không có số phiên bản
-MAIN_CLASS="com.laker.postman.App"
-ICON_DIR="assets/mac/EasyPostman.icns"
+echo "🔧 Bắt đầu đóng gói DevWorkbench Phiên bản: $VERSION"
+APP_NAME="DevWorkbench"
+JAR_NAME_WITH_VERSION="dev-workbench-$VERSION.jar"
+JAR_NAME="dev-workbench.jar"  # Đã sửa tên không có số phiên bản
+MAIN_CLASS="com.nvhuong.devworkbench.App"
+ICON_DIR="assets/mac/DevWorkbench.icns"
 OUTPUT_DIR="dist"
-APP_TARGET_DIR="easy-postman-app/target"
+APP_TARGET_DIR="dev-workbench-app/target"
 
 # nghiên cứu icns Liệu tập tin biểu tượng có tồn tại hay không
 if [ ! -f "$ICON_DIR" ]; then
-    echo "❌ tập tin biểu tượng $ICON_DIR Không tồn tại, vui lòng kiểm tra assets/mac/EasyPostman.icns tồn tại."
+    echo "❌ tập tin biểu tượng $ICON_DIR Không tồn tại, vui lòng kiểm tra assets/mac/DevWorkbench.icns tồn tại."
     exit 1
 fi
 
@@ -95,15 +95,15 @@ jpackage \
     --input ${DIST_INPUT_DIR} \
     --main-jar ${JAR_NAME} \
     --main-class ${MAIN_CLASS} \
-    --add-launcher EasyPostmanMCP=build/easy-postman-mcp-launcher.properties \
+    --add-launcher DevWorkbenchMCP=build/dev-workbench-mcp-launcher.properties \
     --runtime-image target/runtime \
     --type dmg \
     --name "${APP_NAME}" \
     --app-version "${VERSION}" \
     --dest "${OUTPUT_DIR}" \
     --icon "${ICON_DIR}" \
-    --vendor "Laker" \
-    --copyright "© 2025 Laker" \
+    --vendor "Nvhuong" \
+    --copyright "© 2025 Nvhuong" \
     --java-options "-Xms256m" \
     --java-options "-Xmx1g" \
     --java-options "-XX:MaxMetaspaceSize=256m" \

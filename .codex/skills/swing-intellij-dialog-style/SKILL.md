@@ -1,17 +1,17 @@
 ---
 name: swing-intellij-dialog-style
-description: Use when modifying EasyPostman Swing dialogs, popups, wizards, or modal flows to better match IntelliJ IDEA or FlatLaf settings-style visual hierarchy, especially when read-only panels, editable inputs, steps, scroll panes, footers, or action choices are visually unclear.
+description: Use when modifying DevWorkbench Swing dialogs, popups, wizards, or modal flows to better match IntelliJ IDEA or FlatLaf settings-style visual hierarchy, especially when read-only panels, editable inputs, steps, scroll panes, footers, or action choices are visually unclear.
 ---
 
 # Swing IntelliJ Dialog Style
 
-Use this skill for EasyPostman Swing dialogs that should feel closer to IntelliJ IDEA: quiet, dense, readable, and clearly separated by behavior rather than decoration.
+Use this skill for DevWorkbench Swing dialogs that should feel closer to IntelliJ IDEA: quiet, dense, readable, and clearly separated by behavior rather than decoration.
 
 ## Use With
 
 - Read `swing-flatlaf-miglayout-principles` first when the change touches form layout, focus rings, clipping, nested panels, scroll panes, or section borders.
 - Read `fontsutil-font-usage` when changing any label, title, option, table, renderer, or dialog font size.
-- Keep reusable controls, icons, fonts, and colors in `easy-postman-ui`; keep host dialog composition in `easy-postman-app`.
+- Keep reusable controls, icons, fonts, and colors in `dev-workbench-ui`; keep host dialog composition in `dev-workbench-app`.
 
 ## Core Style
 
@@ -82,7 +82,7 @@ scrollPane.setBorder(BorderFactory.createCompoundBorder(
 
 - For radio-button strategy sections, use a light bordered section with compact title, radio label, and muted description.
 - Keep option descriptions smaller with `FontsUtil.getDefaultFontWithOffset(Font.ITALIC, -3)` or similar.
-- Dangerous options can use `ModernColors.getError()` for the radio label, but avoid large warning blocks unless the action is destructive and easy to trigger.
+- Dangerous options can use `ModernColors.getError()` for the radio label, but avoid large warning blocks unless the action is destructive and devWorkbench to trigger.
 
 ## I18n And Icons
 
@@ -92,7 +92,7 @@ scrollPane.setBorder(BorderFactory.createCompoundBorder(
 
 ## Verification
 
-- Compile the app module: `mvn -q -pl easy-postman-app -am -DskipTests compile`.
+- Compile the app module: `mvn -q -pl dev-workbench-app -am -DskipTests compile`.
 - Run focused existing tests when a component has one, for example `StepIndicatorTest`.
 - For editable fields, manually reason or visually verify that the default state, focused state, and disabled state are distinguishable.
 - Check Chinese and English labels for truncation and excessive fixed-width assumptions.

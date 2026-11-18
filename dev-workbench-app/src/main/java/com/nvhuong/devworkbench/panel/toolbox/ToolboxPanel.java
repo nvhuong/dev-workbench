@@ -1,0 +1,422 @@
+package com.nvhuong.devworkbench.panel.toolbox;
+
+import com.formdev.flatlaf.FlatClientProperties;
+import com.formdev.flatlaf.extras.FlatSVGIcon;
+import com.nvhuong.devworkbench.common.UiSingletonPanel;
+import com.nvhuong.devworkbench.common.component.SearchTextField;
+import com.nvhuong.devworkbench.common.component.AppToolWindowChrome;
+import com.nvhuong.devworkbench.common.component.ToolWindowSidebarToolbar;
+import com.nvhuong.devworkbench.common.component.ToolWindowSurfaceStyle;
+import com.nvhuong.devworkbench.common.constants.ModernColors;
+import com.nvhuong.devworkbench.plugin.api.ToolboxContribution;
+import com.nvhuong.devworkbench.plugin.host.PluginAccess;
+import com.nvhuong.devworkbench.util.FontsUtil;
+import com.nvhuong.devworkbench.util.I18nUtil;
+import com.nvhuong.devworkbench.util.IconUtil;
+import com.nvhuong.devworkbench.util.MessageKeys;
+import lombok.extern.slf4j.Slf4j;
+
+import javax.swing.*;
+import javax.swing.border.EmptyBorder;
+import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Supplier;
+
+/**
+ * Bảng công cụ với thanh điều hướng bên trái và vùng nội dung CardLayout bên phải.
+ * <p>
+ * Thiết kế tương tác:
+ * - Điều hướng bên trái hỗ trợ nhóm và lọc tìm kiếm bằng SearchTextField.
+ * - Có thể kéo để điều chỉnh độ rộng hai bên.
+ * - Mục được chọn dùng màu chính ModernColors.getPrimary() để làm nổi bật.
+ * - Icon được quản lý thống nhất bằng IconUtil.
+ */
+@Slf4j
+public class ToolboxPanel extends UiSingletonPanel {
+    private static final int COMPACT_NAV_WIDTH = 240;
+    private static final int DEFAULT_NAV_WIDTH = Math.min(COMPACT_NAV_WIDTH, AppToolWindowChrome.DEFAULT_SIDE_WIDTH);
+
+    private static final class ToolEntry {
+        private final String id;
+        private final String displayName;
+        private final String iconPath;
+        private final String groupId;
+        private final String groupDisplayName;
+        private final Supplier<JPanel> panelSupplier;
+        private final ClassLoader iconClassLoader;
+        private JPanel panel;
+        private boolean addedToContentArea;
+
+        private ToolEntry(String id, String displayName, String iconPath,
+                          String groupId, String groupDisplayName, Supplier<JPanel> panelSupplier,
+                          ClassLoader iconClassLoader) {
+            this.id = id;
+            this.displayName = displayName;
+            this.iconPath = iconPath;
+            this.groupId = groupId;
+            this.groupDisplayName = groupDisplayName;
+            this.panelSupplier = panelSupplier;
+            this.iconClassLoader = iconClassLoader;
+        }
+
+        private String id() {
+            return id;
+        }
+
+        private String displayName() {
+            return displayName;
+        }
+
+        private String iconPath() {
+            return iconPath;
+        }
+
+        private String groupId() {
+            return groupId;
+        }
+
+        private String groupDisplayName() {
+            return groupDisplayName;
+        }
+
+        private ClassLoader iconClassLoader() {
+            return iconClassLoader;
+        }
+
+        private JPanel getOrCreatePanel() {
+            if (panel == null) {
+                panel = panelSupplier.get();
+            }
+            return panel;
+        }
+    }
+
+    private static JPanel createLoadFailedPanel(String toolDisplayName, Throwable throwable) {
+        JPanel panel = new JPanel(new BorderLayout());
+        ToolWindowSurfaceStyle.applyCard(panel);
+        JTextArea errorArea = new JTextArea();
+        errorArea.setEditable(false);
+        errorArea.setLineWrap(true);
+        errorArea.setWrapStyleWord(true);
+        errorArea.setText(I18nUtil.getMessage(MessageKeys.ERROR) + ": " + toolDisplayName + "\n\n"
+                + throwable.getMessage());
+        errorArea.setCaretPosition(0);
+        errorArea.setBorder(new EmptyBorder(12, 12, 12, 12));
+        ToolWindowSurfaceStyle.applyTextComponentCard(errorArea);
+        JScrollPane scrollPane = new JScrollPane(errorArea);
+        ToolWindowSurfaceStyle.applyScrollPaneCard(scrollPane);
+        panel.add(scrollPane, BorderLayout.CENTER);
+        return panel;
+    }
+
+    private final List<ToolEntry> allTools = new ArrayList<>();
+    private final List<ToolEntry> filtered = new ArrayList<>();
+    private final Map<String, ToolEntry> toolsById = new LinkedHashMap<>();
+
+    private JPanel navPanel;
+    private JPanel contentArea;
+    private CardLayout cardLayout;
+    private SearchTextField searchField;
+    private String selectedId = null;
+
+    private static final String GRP_FORMAT = "toolbox.group.format";
+    private static final String GRP_CONVERT = "toolbox.group.convert";
+    private static final String GRP_GEN = "toolbox.group.generate";
+    private static final String GRP_DB = "toolbox.group.database";
+    private static final String GRP_DEV = "toolbox.group.dev";
+    private static final String GRP_PLUGIN = "plugin";
+
+    @Override
+    protected void initUI() {
+        setLayout(new BorderLayout());
+        ToolWindowSurfaceStyle.applyBackground(this);
+        registerAllTools();
+
+        // ---- Bên trái: ô tìm kiếm và danh sách điều hướng ----
+        navPanel = new JPanel();
+        ToolWindowSurfaceStyle.applyCard(navPanel);
+        navPanel.setLayout(new BoxLayout(navPanel, BoxLayout.Y_AXIS));
+
+        JScrollPane navScroll = new JScrollPane(navPanel,
+                ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
+                ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        ToolWindowSurfaceStyle.applyScrollPaneCard(navScroll);
+        navScroll.getVerticalScrollBar().setUnitIncrement(16);
+
+        // Dùng lại SearchTextField của ứng dụng (có icon tìm kiếm, nút xóa và viền đỏ khi không có kết quả).
+        // Tìm kiếm trong toolbox không cần nút phân biệt hoa thường/toàn từ; bỏ các thành phần phụ để giao diện gọn hơn.
+        searchField = new SearchTextField();
+        searchField.putClientProperty(FlatClientProperties.TEXT_FIELD_TRAILING_COMPONENT, null);
+        searchField.getDocument().addDocumentListener(new javax.swing.event.DocumentListener() {
+            public void insertUpdate(javax.swing.event.DocumentEvent e) {
+                applyFilter();
+            }
+
+            public void removeUpdate(javax.swing.event.DocumentEvent e) {
+                applyFilter();
+            }
+
+            public void changedUpdate(javax.swing.event.DocumentEvent e) {
+                applyFilter();
+            }
+        });
+
+        JPanel leftPanel = new JPanel(new BorderLayout());
+        ToolWindowSurfaceStyle.applyCard(leftPanel);
+        leftPanel.setBorder(BorderFactory.createEmptyBorder());
+        leftPanel.setMinimumSize(new Dimension(180, 0));
+        leftPanel.add(new ToolWindowSidebarToolbar(null, searchField), BorderLayout.NORTH);
+        leftPanel.add(navScroll, BorderLayout.CENTER);
+
+        // ---- Bên phải: vùng nội dung CardLayout ----
+        cardLayout = new CardLayout();
+        contentArea = new JPanel(cardLayout);
+        ToolWindowSurfaceStyle.applyCard(contentArea);
+        contentArea.setMinimumSize(new Dimension(200, 0));
+
+        // Thanh chia có thể kéo; hai bên dùng thẻ bo góc riêng, đồng nhất với vùng yêu cầu chính.
+        JSplitPane split = AppToolWindowChrome.createHorizontalCardSplitPane(
+                leftPanel,
+                contentArea,
+                DEFAULT_NAV_WIDTH
+        );
+        add(split, BorderLayout.CENTER);
+
+        applyFilter(); // Hiển thị ban đầu và chọn công cụ đầu tiên
+    }
+
+    // ===== Đăng ký các công cụ =====
+    private void registerAllTools() {
+        // Định dạng
+        regBuiltIn("json", MessageKeys.TOOLBOX_JSON, "icons/json-file.svg", GRP_FORMAT, JsonToolPanel::new);
+        regBuiltIn("yaml", MessageKeys.TOOLBOX_YAML, "icons/yaml-file.svg", GRP_FORMAT, YamlToolPanel::new);
+        regBuiltIn("xml", MessageKeys.TOOLBOX_XML, "icons/xml-file.svg", GRP_FORMAT, XmlToolPanel::new);
+        regBuiltIn("sql-format", MessageKeys.TOOLBOX_SQL, "icons/database.svg", GRP_FORMAT, SqlToolPanel::new);
+        regBuiltIn("markdown", "toolbox.markdown", "icons/edit.svg", GRP_FORMAT, MarkdownToolPanel::new);
+        // Chuyển đổi
+        regBuiltIn("encoder", MessageKeys.TOOLBOX_ENCODER, "icons/code.svg", GRP_CONVERT, EncoderPanel::new);
+        regBuiltIn("timestamp", MessageKeys.TOOLBOX_TIMESTAMP, "icons/time.svg", GRP_CONVERT, TimestampPanel::new);
+        regBuiltIn("crypto", MessageKeys.TOOLBOX_CRYPTO, "icons/security.svg", GRP_CONVERT, CryptoPanel::new);
+        // Tạo dữ liệu
+        regBuiltIn("uuid", MessageKeys.TOOLBOX_UUID, "icons/plus.svg", GRP_GEN, UuidPanel::new);
+        regBuiltIn("qrcode", MessageKeys.TOOLBOX_QR_CODE, "icons/qrcode.svg", GRP_GEN, QrCodePanel::new);
+        regBuiltIn("hash", MessageKeys.TOOLBOX_HASH, "icons/hash.svg", GRP_GEN, HashPanel::new);
+        regBuiltIn("cron", MessageKeys.TOOLBOX_CRON, "icons/time.svg", GRP_GEN, CronPanel::new);
+        // Cơ sở dữ liệu
+        regBuiltIn("es", MessageKeys.TOOLBOX_ELASTICSEARCH, "icons/elasticsearch.svg", GRP_DB, ElasticsearchPanel::new);
+        regBuiltIn("influxdb", MessageKeys.TOOLBOX_INFLUXDB, "icons/influxdb.svg", GRP_DB, InfluxDbPanel::new);
+        // Công cụ phát triển
+        regBuiltIn("diff", MessageKeys.TOOLBOX_DIFF, "icons/file.svg", GRP_DEV, DiffPanel::new);
+        registerPluginTools();
+    }
+
+    private void registerPluginTools() {
+        for (ToolboxContribution contribution : PluginAccess.getToolboxContributions()) {
+            try {
+                regPlugin(contribution.id(), contribution.displayName(), contribution.iconPath(),
+                        contribution.groupId(), contribution.groupDisplayName(),
+                        contribution.panelSupplier(), contribution.iconClassLoader());
+            } catch (Throwable t) {
+                log.error("Failed to register toolbox contribution: {}", contribution.id(), t);
+            }
+        }
+    }
+
+    private void regBuiltIn(String id, String nameKey, String iconPath, String groupId, Supplier<JPanel> panelSupplier) {
+        addTool(new ToolEntry(id, I18nUtil.getMessage(nameKey), iconPath,
+                groupId, resolveGroupDisplayName(groupId, null), panelSupplier, null));
+    }
+
+    private void regPlugin(String id, String displayName, String iconPath,
+                           String groupId, String groupDisplayName, Supplier<JPanel> panelSupplier,
+                           ClassLoader iconClassLoader) {
+        String normalizedGroupId = (groupId == null || groupId.isBlank()) ? GRP_PLUGIN : groupId;
+        addTool(new ToolEntry(id, displayName, iconPath,
+                normalizedGroupId, resolveGroupDisplayName(normalizedGroupId, groupDisplayName),
+                panelSupplier, iconClassLoader));
+    }
+
+    private void addTool(ToolEntry toolEntry) {
+        allTools.add(toolEntry);
+        toolsById.put(toolEntry.id(), toolEntry);
+    }
+
+    private String resolveGroupDisplayName(String groupId, String fallback) {
+        if (groupId == null || groupId.isBlank()) {
+            return fallback == null || fallback.isBlank() ? GRP_PLUGIN.toUpperCase() : fallback;
+        }
+        return switch (groupId) {
+            case GRP_FORMAT, GRP_CONVERT, GRP_GEN, GRP_DB, GRP_DEV -> I18nUtil.getMessage(groupId).toUpperCase();
+            default -> fallback == null || fallback.isBlank() ? groupId.toUpperCase() : fallback;
+        };
+    }
+
+    // ===== Lọc tìm kiếm =====
+    private void applyFilter() {
+        String kw = searchField.getText().trim().toLowerCase();
+        filtered.clear();
+        for (ToolEntry t : allTools) {
+            String name = t.displayName().toLowerCase();
+            if (kw.isEmpty() || name.contains(kw)) {
+                filtered.add(t);
+            }
+        }
+        // Hiện viền đỏ khi không có kết quả (SearchTextField đã hỗ trợ).
+        searchField.setNoResult(!kw.isEmpty() && filtered.isEmpty());
+        rebuildNav();
+        boolean selVisible = filtered.stream().anyMatch(t -> t.id().equals(selectedId));
+        if (!selVisible) {
+            if (!filtered.isEmpty()) selectTool(filtered.get(0).id());
+            else selectedId = null;
+        }
+    }
+
+    // ===== Dựng lại thanh điều hướng bên trái =====
+    private void rebuildNav() {
+        navPanel.removeAll();
+        navPanel.add(Box.createVerticalStrut(4));
+        Map<String, List<ToolEntry>> groupedTools = new LinkedHashMap<>();
+        for (ToolEntry tool : filtered) {
+            groupedTools.computeIfAbsent(tool.groupId(), ignored -> new ArrayList<>()).add(tool);
+        }
+
+        boolean firstGroup = true;
+        for (List<ToolEntry> groupTools : groupedTools.values()) {
+            if (groupTools.isEmpty()) {
+                continue;
+            }
+            if (!firstGroup) {
+                navPanel.add(Box.createVerticalStrut(2));
+                JSeparator sep = new JSeparator();
+                sep.setMaximumSize(new Dimension(Integer.MAX_VALUE, 1));
+                navPanel.add(sep);
+                navPanel.add(Box.createVerticalStrut(2));
+            }
+            firstGroup = false;
+
+            ToolEntry firstTool = groupTools.get(0);
+            JLabel grpLbl = new JLabel(firstTool.groupDisplayName());
+            grpLbl.setFont(FontsUtil.getDefaultFontWithOffset(Font.BOLD, -3));
+            grpLbl.setForeground(ModernColors.getTextSecondary());
+            grpLbl.setBorder(new EmptyBorder(4, 10, 2, 8));
+            grpLbl.setAlignmentX(Component.LEFT_ALIGNMENT);
+            navPanel.add(grpLbl);
+
+            for (ToolEntry tool : groupTools) {
+                navPanel.add(buildNavItem(tool));
+            }
+        }
+        navPanel.add(Box.createVerticalGlue());
+        navPanel.revalidate();
+        navPanel.repaint();
+    }
+
+    // ===== Tạo một mục điều hướng =====
+    private JPanel buildNavItem(ToolEntry t) {
+        boolean sel = t.id().equals(selectedId);
+
+        JPanel item = new JPanel(new BorderLayout(7, 0)) {
+            @Override
+            protected void paintComponent(Graphics g) {
+                if (t.id().equals(selectedId)) {
+                    Graphics2D g2 = (Graphics2D) g.create();
+                    g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                    g2.setColor(ToolboxTheme.selectedNavItemBackground());
+                    g2.fillRoundRect(4, 1, getWidth() - 8, getHeight() - 2, 8, 8);
+                    g2.dispose();
+                }
+                super.paintComponent(g);
+            }
+        };
+        item.setOpaque(false);
+        item.setBorder(new EmptyBorder(5, 10, 5, 8));
+        item.setMaximumSize(new Dimension(Integer.MAX_VALUE, 34));
+        item.setAlignmentX(Component.LEFT_ALIGNMENT);
+        item.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+
+        // Mục được chọn dùng icon màu PRIMARY; mục khác dùng màu theo chủ đề (IconUtil quản lý thống nhất).
+        FlatSVGIcon icon = sel
+                ? IconUtil.createPrimary(t.iconPath(), IconUtil.SIZE_SMALL, IconUtil.SIZE_SMALL, t.iconClassLoader())
+                : IconUtil.createThemed(t.iconPath(), IconUtil.SIZE_SMALL, IconUtil.SIZE_SMALL, t.iconClassLoader());
+
+        JLabel lblIcon = new JLabel(icon);
+        JLabel lblName = new JLabel(t.displayName());
+        lblName.setFont(FontsUtil.getDefaultFontWithOffset(sel ? Font.BOLD : Font.PLAIN, -1));
+        if (sel) lblName.setForeground(ToolboxTheme.selectedNavItemForeground());
+
+        item.add(lblIcon, BorderLayout.WEST);
+        item.add(lblName, BorderLayout.CENTER);
+
+        item.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                if (!t.id().equals(selectedId)) {
+                    item.setBackground(ModernColors.getHoverBackgroundColor());
+                    item.setOpaque(true);
+                    item.repaint();
+                }
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+                item.setOpaque(false);
+                item.repaint();
+            }
+
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                selectTool(t.id());
+            }
+        });
+        return item;
+    }
+
+    // ===== Chọn công cụ =====
+    private void selectTool(String id) {
+        showTool(id);
+    }
+
+    public boolean showTool(String id) {
+        if (!toolsById.containsKey(id)) {
+            return false;
+        }
+        ensureToolContentLoaded(id);
+        selectedId = id;
+        cardLayout.show(contentArea, id);
+        rebuildNav();
+        return true;
+    }
+
+    private void ensureToolContentLoaded(String id) {
+        ToolEntry toolEntry = toolsById.get(id);
+        if (toolEntry == null || toolEntry.addedToContentArea) {
+            return;
+        }
+        try {
+            JPanel toolPanel = toolEntry.getOrCreatePanel();
+            ToolWindowSurfaceStyle.applyPanelTreeCard(toolPanel);
+            contentArea.add(toolPanel, toolEntry.id());
+        } catch (Throwable t) {
+            log.error("Failed to initialize toolbox panel: {}", id, t);
+            contentArea.add(createLoadFailedPanel(toolEntry.displayName(), t), toolEntry.id());
+        }
+        toolEntry.addedToContentArea = true;
+        contentArea.revalidate();
+        contentArea.repaint();
+    }
+
+    @Override
+    protected void registerListeners() {
+        // Cập nhật màu điều hướng khi đổi chủ đề để icon và màu nhấn đi theo chủ đề.
+        UIManager.addPropertyChangeListener(e -> {
+            if ("lookAndFeel".equals(e.getPropertyName())) {
+                SwingUtilities.invokeLater(this::rebuildNav);
+            }
+        });
+    }
+}

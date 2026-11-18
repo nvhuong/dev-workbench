@@ -1,6 +1,6 @@
-# EasyPostman plugin Runtime Mô tả kiến ​​trúc
+# DevWorkbench plugin Runtime Mô tả kiến ​​trúc
 
-Tài liệu này tập trung vào `easy-postman-plugin-runtime` Cấu trúc triển khai sau khi tái cấu trúc hiện tại.
+Tài liệu này tập trung vào `dev-workbench-plugin-runtime` Cấu trúc triển khai sau khi tái cấu trúc hiện tại.
 
 Nó không lặp lại chính nó“Cách phát triển plug-in”hoặc“Cách xuất bản plugin”，Thay vào đó hãy trả lời những câu hỏi sau:
 
@@ -19,7 +19,7 @@ Nó không lặp lại chính nó“Cách phát triển plug-in”hoặc“Cách
 hiện tại runtime Các lớp chính có liên quan có thể được hiểu theo trách nhiệm của chúng:
 
 ```text
-easy-postman-plugin-runtime
+dev-workbench-plugin-runtime
 ├── PluginRuntime
 ├── PluginScanner
 ├── PluginCandidateResolver
@@ -88,10 +88,10 @@ PluginManager / Đặt tại địa phương jar
 Dưới đây là một số điểm thiết kế chính: .
 
 - Cài đặt và tải được tách biệt
-  - `easy-postman-plugin-runtime` Chỉ chịu trách nhiệm quét.descriptor Phân tích,classloader、registry、vòng đời và“Ai sẽ được tải bởi quy trình hiện tại”
-  - `easy-postman-plugins/*` Thông thường các plugin chính thức JAR，Bởi runtime Nhấn descriptor trọng tải
-  - `easy-postman-plugins/plugin-manager` Nó là một mô-đun phụ trợ quản lý plug-in ở phía máy chủ, máy chủ app Bạn có thể dựa vào nó trực tiếp catalog Phân tích, tải xuống, tải xuống, xác minh và cài đặt các bản ghi nguồn
-  - `plugin-manager` Không bằng runtime Không nên sử dụng plugin thông thường đã tải làm mẫu thư mục mặc định cho các plugin thông thường mới hoặc thư viện quản lý plugin phía máy chủ mới; nó vẫn còn ở trong `easy-postman-plugins` Sau đây chỉ là con đường lịch sử và lựa chọn tổ chức phát hành
+  - `dev-workbench-plugin-runtime` Chỉ chịu trách nhiệm quét.descriptor Phân tích,classloader、registry、vòng đời và“Ai sẽ được tải bởi quy trình hiện tại”
+  - `dev-workbench-plugins/*` Thông thường các plugin chính thức JAR，Bởi runtime Nhấn descriptor trọng tải
+  - `dev-workbench-plugins/plugin-manager` Nó là một mô-đun phụ trợ quản lý plug-in ở phía máy chủ, máy chủ app Bạn có thể dựa vào nó trực tiếp catalog Phân tích, tải xuống, tải xuống, xác minh và cài đặt các bản ghi nguồn
+  - `plugin-manager` Không bằng runtime Không nên sử dụng plugin thông thường đã tải làm mẫu thư mục mặc định cho các plugin thông thường mới hoặc thư viện quản lý plugin phía máy chủ mới; nó vẫn còn ở trong `dev-workbench-plugins` Sau đây chỉ là con đường lịch sử và lựa chọn tổ chức phát hành
 - Quá trình quét và lựa chọn được tách biệt
   - `PluginScanner` Chịu trách nhiệm“Xem cái gì đó”
   - `PluginCandidateResolver` Chịu trách nhiệm“Cuối cùng chọn ai”
@@ -103,14 +103,14 @@ Dưới đây là một số điểm thiết kế chính: .
 
 chủ nhà app Các lớp không còn được kết nối trực tiếp ở mọi nơi `PluginRuntime.getRegistry()`，Thay vào đó, tất cả đều kết thúc bằng:
 
-- [PluginAccess.java](../easy-postman-app/src/main/java/com/laker/postman/plugin/host/PluginAccess.java)
+- [PluginAccess.java](../dev-workbench-app/src/main/java/com/nvhuong/devworkbench/plugin/host/PluginAccess.java)
 
 Mối quan hệ tiêu dùng hiện nay đại khái là:
 
 ```text
 PluginRegistry
   -> PluginAccess
-    -> PostmanApiContext.createScriptApis()
+    -> DevWorkbenchApiContext.createScriptApis()
     -> ToolboxPanel.getToolboxContributions()
     -> ScriptSnippetManager.getScriptCompletionContributors()
     -> SnippetDialog.getSnippetDefinitions()
@@ -131,7 +131,7 @@ Các plug-in chính thức đã bắt đầu được thống nhất:
 - `PluginContributionSupport`
 - `RedisI18n` / `KafkaI18n`
 
-Tiêu thụ phía chủ nhà được thống nhất `com.laker.postman.plugin.host.PluginAccess`。
+Tiêu thụ phía chủ nhà được thống nhất `com.nvhuong.devworkbench.plugin.host.PluginAccess`。
 
 Ví dụ `KafkaPlugin` / `RedisPlugin` của `onLoad()` Bây giờ gần hơn:
 
@@ -180,8 +180,8 @@ Những việc này có thể được thực hiện sau.
 
 runtime Các bài kiểm tra hiện nay chủ yếu ở:
 
-- [PluginRuntimeTest.java](../easy-postman-plugin-runtime/src/test/java/com/laker/postman/plugin/runtime/PluginRuntimeTest.java)
-- [PluginRegistryTest.java](../easy-postman-plugin-runtime/src/test/java/com/laker/postman/plugin/runtime/PluginRegistryTest.java)
+- [PluginRuntimeTest.java](../dev-workbench-plugin-runtime/src/test/java/com/nvhuong/devworkbench/plugin/runtime/PluginRuntimeTest.java)
+- [PluginRegistryTest.java](../dev-workbench-plugin-runtime/src/test/java/com/nvhuong/devworkbench/plugin/runtime/PluginRegistryTest.java)
 
 Các hành vi chính đã được đề cập bao gồm:
 
@@ -226,10 +226,10 @@ Nếu quá trình phát triển tiếp tục, các ưu tiên được đề xu�
 
 Nếu bạn muốn làm theo mã để hiểu bộ hiện tại runtime，Thứ tự được đề xuất là:
 
-1. [PluginRuntime.java](../easy-postman-plugin-runtime/src/main/java/com/laker/postman/plugin/runtime/PluginRuntime.java)
-2. [PluginScanner.java](../easy-postman-plugin-runtime/src/main/java/com/laker/postman/plugin/runtime/PluginScanner.java)
-3. [PluginCandidateResolver.java](../easy-postman-plugin-runtime/src/main/java/com/laker/postman/plugin/runtime/PluginCandidateResolver.java)
-4. [PluginLoader.java](../easy-postman-plugin-runtime/src/main/java/com/laker/postman/plugin/runtime/PluginLoader.java)
-5. [PluginRegistry.java](../easy-postman-plugin-runtime/src/main/java/com/laker/postman/plugin/runtime/PluginRegistry.java)
-6. [PluginRuntimeTest.java](../easy-postman-plugin-runtime/src/test/java/com/laker/postman/plugin/runtime/PluginRuntimeTest.java)
-7. [PluginRegistryTest.java](../easy-postman-plugin-runtime/src/test/java/com/laker/postman/plugin/runtime/PluginRegistryTest.java)
+1. [PluginRuntime.java](../dev-workbench-plugin-runtime/src/main/java/com/nvhuong/devworkbench/plugin/runtime/PluginRuntime.java)
+2. [PluginScanner.java](../dev-workbench-plugin-runtime/src/main/java/com/nvhuong/devworkbench/plugin/runtime/PluginScanner.java)
+3. [PluginCandidateResolver.java](../dev-workbench-plugin-runtime/src/main/java/com/nvhuong/devworkbench/plugin/runtime/PluginCandidateResolver.java)
+4. [PluginLoader.java](../dev-workbench-plugin-runtime/src/main/java/com/nvhuong/devworkbench/plugin/runtime/PluginLoader.java)
+5. [PluginRegistry.java](../dev-workbench-plugin-runtime/src/main/java/com/nvhuong/devworkbench/plugin/runtime/PluginRegistry.java)
+6. [PluginRuntimeTest.java](../dev-workbench-plugin-runtime/src/test/java/com/nvhuong/devworkbench/plugin/runtime/PluginRuntimeTest.java)
+7. [PluginRegistryTest.java](../dev-workbench-plugin-runtime/src/test/java/com/nvhuong/devworkbench/plugin/runtime/PluginRegistryTest.java)

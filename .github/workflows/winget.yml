@@ -25,7 +25,7 @@ on:
       fork_owner:
         description: 'GitHub owner of the winget-pkgs fork used by initial mode.'
         required: true
-        default: lakernote
+        default: nvhuong
         type: string
       submit:
         description: 'Submit a PR. Disable for dry-run manifest generation.'
@@ -38,7 +38,7 @@ concurrency:
   cancel-in-progress: false
 
 env:
-  PACKAGE_IDENTIFIER: Laker.EasyPostman
+  PACKAGE_IDENTIFIER: Nvhuong.DevWorkbench
   WINGET_CREATE_URL: https://aka.ms/wingetcreate/latest
 
 jobs:
@@ -48,7 +48,7 @@ jobs:
     timeout-minutes: 120
 
     steps:
-      - name: Checkout EasyPostman（Kiểm tra EasyPostman）
+      - name: Checkout DevWorkbench（Kiểm tra DevWorkbench）
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Resolve release metadata（Phân tích siêu dữ liệu phát hành)
@@ -88,7 +88,7 @@ jobs:
           if ($manualInstallerUrl) {
             $installerUrl = $manualInstallerUrl
           } else {
-            $installerUrl = "https://github.com/$repository/releases/download/$tagName/EasyPostman-$version-windows-x64.exe"
+            $installerUrl = "https://github.com/$repository/releases/download/$tagName/DevWorkbench-$version-windows-x64.exe"
           }
 
           $releaseUrl = "https://github.com/$repository/releases/tag/$tagName"
@@ -102,7 +102,7 @@ jobs:
           } else {
             $releaseDate = ([DateTimeOffset]::Parse([string] $publishedAt)).UtcDateTime.ToString('yyyy-MM-dd')
           }
-          $branchName = "codex/add-laker-easypostman-$version"
+          $branchName = "codex/add-nvhuong-devworkbench-$version"
 
           "mode=$mode" >> $env:GITHUB_OUTPUT
           "version=$version" >> $env:GITHUB_OUTPUT
@@ -170,7 +170,7 @@ jobs:
         run: |
           $ErrorActionPreference = 'Stop'
           $installerUrl = '${{ steps.meta.outputs.installer_url }}'
-          $installerPath = Join-Path $env:RUNNER_TEMP 'EasyPostman-windows-x64.exe'
+          $installerPath = Join-Path $env:RUNNER_TEMP 'DevWorkbench-windows-x64.exe'
 
           Invoke-WebRequest -Uri $installerUrl -OutFile $installerPath -MaximumRedirection 5 -UseBasicParsing
           $sha256 = (Get-FileHash -Path $installerPath -Algorithm SHA256).Hash.ToUpperInvariant()
@@ -188,22 +188,22 @@ jobs:
           $releaseUrl = '${{ steps.meta.outputs.release_url }}'
           $releaseDate = '${{ steps.meta.outputs.release_date }}'
           $sha256 = '${{ steps.installer_hash.outputs.sha256 }}'
-          $manifestRoot = Join-Path 'winget-manifests' "manifests/l/Laker/EasyPostman/$version"
+          $manifestRoot = Join-Path 'winget-manifests' "manifests/l/Nvhuong/DevWorkbench/$version"
 
           New-Item -ItemType Directory -Path $manifestRoot -Force | Out-Null
 
           @(
             '# yaml-language-server: $schema=https://aka.ms/winget-manifest.version.1.10.0.schema.json'
-            'PackageIdentifier: Laker.EasyPostman'
+            'PackageIdentifier: Nvhuong.DevWorkbench'
             "PackageVersion: $version"
             'DefaultLocale: en-US'
             'ManifestType: version'
             'ManifestVersion: 1.10.0'
-          ) | Set-Content -Path (Join-Path $manifestRoot 'Laker.EasyPostman.yaml') -Encoding utf8
+          ) | Set-Content -Path (Join-Path $manifestRoot 'Nvhuong.DevWorkbench.yaml') -Encoding utf8
 
           @(
             '# yaml-language-server: $schema=https://aka.ms/winget-manifest.installer.1.10.0.schema.json'
-            'PackageIdentifier: Laker.EasyPostman'
+            'PackageIdentifier: Nvhuong.DevWorkbench'
             "PackageVersion: $version"
             'InstallerType: inno'
             'Scope: machine'
@@ -220,49 +220,49 @@ jobs:
             'ElevationRequirement: elevatesSelf'
             'AppsAndFeaturesEntries:'
             '- ProductCode: 8B9C5D6E-7F8A-9B0C-1D2E-3F4A5B6C7D8E_is1'
-            '  DisplayName: EasyPostman'
-            '  Publisher: Laker'
+            '  DisplayName: DevWorkbench'
+            '  Publisher: Nvhuong'
             "  DisplayVersion: $version"
             'InstallationMetadata:'
-            "  DefaultInstallLocation: '%ProgramFiles%\EasyPostman'"
+            "  DefaultInstallLocation: '%ProgramFiles%\DevWorkbench'"
             'Installers:'
             '- Architecture: x64'
             "  InstallerUrl: $installerUrl"
             "  InstallerSha256: $sha256"
             'ManifestType: installer'
             'ManifestVersion: 1.10.0'
-          ) | Set-Content -Path (Join-Path $manifestRoot 'Laker.EasyPostman.installer.yaml') -Encoding utf8
+          ) | Set-Content -Path (Join-Path $manifestRoot 'Nvhuong.DevWorkbench.installer.yaml') -Encoding utf8
 
           @(
             '# yaml-language-server: $schema=https://aka.ms/winget-manifest.defaultLocale.1.10.0.schema.json'
-            'PackageIdentifier: Laker.EasyPostman'
+            'PackageIdentifier: Nvhuong.DevWorkbench'
             "PackageVersion: $version"
             'PackageLocale: en-US'
-            'Publisher: Laker'
-            'PublisherUrl: https://github.com/lakernote'
-            'PublisherSupportUrl: https://github.com/lakernote/easy-postman/issues'
-            'PackageName: EasyPostman'
-            'PackageUrl: https://github.com/lakernote/easy-postman'
+            'Publisher: Nvhuong'
+            'PublisherUrl: https://github.com/nvhuong'
+            'PublisherSupportUrl: https://github.com/nvhuong/dev-workbench/issues'
+            'PackageName: DevWorkbench'
+            'PackageUrl: https://github.com/nvhuong/dev-workbench'
             'License: Apache-2.0'
-            'LicenseUrl: https://github.com/lakernote/easy-postman/blob/master/LICENSE'
-            'ShortDescription: An open-source Postman-style API client and JMeter-style load testing desktop app.'
-            'Description: EasyPostman combines a Postman-style API debugging workspace with JMeter-style performance testing in one local-first desktop app.'
-            'Moniker: easypostman'
+            'LicenseUrl: https://github.com/nvhuong/dev-workbench/blob/master/LICENSE'
+            'ShortDescription: An open-source DevWorkbench-style API client and JMeter-style load testing desktop app.'
+            'Description: DevWorkbench combines a DevWorkbench-style API debugging workspace with JMeter-style performance testing in one local-first desktop app.'
+            'Moniker: devworkbench'
             'Tags:'
             '- api'
             '- api-client'
             '- http'
             '- jmeter'
-            '- postman'
+            '- devworkbench'
             '- rest'
             '- testing'
             "ReleaseNotesUrl: $releaseUrl"
             'Documentations:'
             '- DocumentLabel: Documentation'
-            '  DocumentUrl: https://github.com/lakernote/easy-postman/blob/master/docs/FEATURES.md'
+            '  DocumentUrl: https://github.com/nvhuong/dev-workbench/blob/master/docs/FEATURES.md'
             'ManifestType: defaultLocale'
             'ManifestVersion: 1.10.0'
-          ) | Set-Content -Path (Join-Path $manifestRoot 'Laker.EasyPostman.locale.en-US.yaml') -Encoding utf8
+          ) | Set-Content -Path (Join-Path $manifestRoot 'Nvhuong.DevWorkbench.locale.en-US.yaml') -Encoding utf8
 
           Get-ChildItem -Path $manifestRoot -File | ForEach-Object { Write-Host "Generated $($_.FullName)" }
 
@@ -284,7 +284,7 @@ jobs:
           path: winget-pkgs
           filter: blob:none
           sparse-checkout: |
-            manifests/l/Laker/EasyPostman
+            manifests/l/Nvhuong/DevWorkbench
 
       - name: Commit and push initial manifest（Gửi và đẩy danh sách phiên bản đầu tiên)
         id: initial_commit
@@ -294,7 +294,7 @@ jobs:
           $ErrorActionPreference = 'Stop'
           $version = '${{ steps.meta.outputs.version }}'
           $branchName = '${{ steps.meta.outputs.branch_name }}'
-          $targetDir = "winget-pkgs/manifests/l/Laker/EasyPostman/$version"
+          $targetDir = "winget-pkgs/manifests/l/Nvhuong/DevWorkbench/$version"
 
           git -C winget-pkgs config user.name 'github-actions[bot]'
           git -C winget-pkgs config user.email '41898282+github-actions[bot]@users.noreply.github.com'
@@ -305,15 +305,15 @@ jobs:
           }
 
           New-Item -ItemType Directory -Path $targetDir -Force | Out-Null
-          Copy-Item -Path "winget-manifests/manifests/l/Laker/EasyPostman/$version/*" -Destination $targetDir
+          Copy-Item -Path "winget-manifests/manifests/l/Nvhuong/DevWorkbench/$version/*" -Destination $targetDir
 
-          git -C winget-pkgs add "manifests/l/Laker/EasyPostman/$version"
+          git -C winget-pkgs add "manifests/l/Nvhuong/DevWorkbench/$version"
 
           $changedFiles = @(git -C winget-pkgs diff --cached --name-only)
           if ($changedFiles.Count -gt 0) {
             Write-Host 'Changed manifest files:'
             $changedFiles | ForEach-Object { Write-Host "  $_" }
-            git -C winget-pkgs commit -m "Add Laker.EasyPostman version $version"
+            git -C winget-pkgs commit -m "Add Nvhuong.DevWorkbench version $version"
             git -C winget-pkgs push --force origin $branchName
             "changed=true" >> $env:GITHUB_OUTPUT
           } else {
@@ -350,7 +350,7 @@ jobs:
           @(
             '### What'
             ''
-            "Adds the initial WinGet manifest for EasyPostman version $version."
+            "Adds the initial WinGet manifest for DevWorkbench version $version."
             ''
             '### Installer'
             ''
@@ -362,14 +362,14 @@ jobs:
             ''
             '### Notes'
             ''
-            'The installer is produced by the upstream EasyPostman GitHub Release workflow and supports silent installation with Inno Setup switches.'
+            'The installer is produced by the upstream DevWorkbench GitHub Release workflow and supports silent installation with Inno Setup switches.'
           ) | Set-Content -Path $bodyPath -Encoding utf8
 
           $createOutput = gh pr create `
             --repo microsoft/winget-pkgs `
             --base master `
             --head $headRef `
-            --title "Add Laker.EasyPostman version $version" `
+            --title "Add Nvhuong.DevWorkbench version $version" `
             --body-file $bodyPath 2>&1
 
           $createText = ($createOutput | Out-String).Trim()

@@ -30,12 +30,12 @@
 
 ```bash
 # GitHub
-git clone https://github.com/lakernote/easy-postman.git
-cd easy-postman
+git clone https://github.com/nvhuong/dev-workbench.git
+cd dev-workbench
 
 # Or Gitee (China mirror)
-git clone https://gitee.com/lakernote/easy-postman.git
-cd easy-postman
+git clone https://gitee.com/nvhuong/dev-workbench.git
+cd dev-workbench
 ```
 
 ### 2. Build the Project
@@ -49,20 +49,20 @@ mvn clean package -DskipTests
 ```
 
 This will generate:
-- `easy-postman-app/target/easy-postman-{version}.jar` - Main executable JAR
-- `easy-postman-mcp/target/easy-postman-mcp-{version}.jar` - MCP protocol module; it is merged into the main release JAR and is not distributed separately
+- `dev-workbench-app/target/dev-workbench-{version}.jar` - Main executable JAR
+- `dev-workbench-mcp/target/dev-workbench-mcp-{version}.jar` - MCP protocol module; it is merged into the main release JAR and is not distributed separately
 
 ### 3. Run the Application
 
 ```bash
 # Run directly
-java -jar easy-postman-app/target/easy-postman-*.jar
+java -jar dev-workbench-app/target/dev-workbench-*.jar
 
 # Or with custom JVM options
-java -Xms256m -Xmx2g -jar easy-postman-app/target/easy-postman-*.jar
+java -Xms256m -Xmx2g -jar dev-workbench-app/target/dev-workbench-*.jar
 
 # Verify the MCP Server included in the main JAR
-java -jar easy-postman-app/target/easy-postman-*.jar mcp serve --help
+java -jar dev-workbench-app/target/dev-workbench-*.jar mcp serve --help
 ```
 
 ---
@@ -86,43 +86,43 @@ chmod +x build/mac.sh
 ./build/mac.sh
 ```
 
-**Output**: `dist/EasyPostman-{version}-macos-{arch}.dmg`
+**Output**: `dist/DevWorkbench-{version}-macos-{arch}.dmg`
 - For Apple Silicon (M1/M2/M3/M4): `macos-arm64.dmg`
 - For Intel: `macos-x86_64.dmg`
-- The installed app contains both `Contents/MacOS/EasyPostman` and `Contents/MacOS/EasyPostmanMCP`, sharing the main JAR and bundled JRE
+- The installed app contains both `Contents/MacOS/DevWorkbench` and `Contents/MacOS/DevWorkbenchMCP`, sharing the main JAR and bundled JRE
 
 #### Manual Build
 
 ```bash
 # Prepare jpackage input with the fixed JAR name used inside packages
 mkdir -p target/dist-input
-cp easy-postman-app/target/easy-postman-{version}.jar target/dist-input/easy-postman.jar
+cp dev-workbench-app/target/dev-workbench-{version}.jar target/dist-input/dev-workbench.jar
 
 # For Apple Silicon
 jpackage \
   --input target/dist-input \
-  --name EasyPostman \
-  --main-jar easy-postman.jar \
-  --main-class com.laker.postman.App \
-  --add-launcher EasyPostmanMCP=build/easy-postman-mcp-launcher.properties \
+  --name DevWorkbench \
+  --main-jar dev-workbench.jar \
+  --main-class com.nvhuong.devworkbench.App \
+  --add-launcher DevWorkbenchMCP=build/dev-workbench-mcp-launcher.properties \
   --type dmg \
-  --icon assets/mac/EasyPostman.icns \
+  --icon assets/mac/DevWorkbench.icns \
   --app-version {version} \
-  --vendor "laker" \
-  --mac-package-name "EasyPostman"
+  --vendor "nvhuong" \
+  --mac-package-name "DevWorkbench"
 
 # For Intel
 jpackage \
   --input target/dist-input \
-  --name EasyPostman \
-  --main-jar easy-postman.jar \
-  --main-class com.laker.postman.App \
-  --add-launcher EasyPostmanMCP=build/easy-postman-mcp-launcher.properties \
+  --name DevWorkbench \
+  --main-jar dev-workbench.jar \
+  --main-class com.nvhuong.devworkbench.App \
+  --add-launcher DevWorkbenchMCP=build/dev-workbench-mcp-launcher.properties \
   --type dmg \
-  --icon assets/mac/EasyPostman.icns \
+  --icon assets/mac/DevWorkbench.icns \
   --app-version {version} \
-  --vendor "laker" \
-  --mac-package-name "EasyPostman" \
+  --vendor "nvhuong" \
+  --mac-package-name "DevWorkbench" \
   --java-options "--add-opens java.base/java.lang=ALL-UNNAMED"
 ```
 
@@ -144,36 +144,36 @@ build\win-exe.bat
 ```
 
 **Output**:
-- `dist/EasyPostman-{version}-windows-x64.exe` - Installer
-- `dist/EasyPostman-{version}-windows-x64-portable.zip` - Portable version
-- Both contain `EasyPostman.exe`, `EasyPostmanMCP.exe`, `app/`, and `runtime/`; after extracting the portable ZIP, MCP works without a separate Java installation
+- `dist/DevWorkbench-{version}-windows-x64.exe` - Installer
+- `dist/DevWorkbench-{version}-windows-x64-portable.zip` - Portable version
+- Both contain `DevWorkbench.exe`, `DevWorkbenchMCP.exe`, `app/`, and `runtime/`; after extracting the portable ZIP, MCP works without a separate Java installation
 
 #### Manual Build
 
 ```batch
 rem Prepare jpackage input
 if not exist target\dist-input mkdir target\dist-input
-copy easy-postman-app\target\easy-postman-{version}.jar target\dist-input\easy-postman.jar
+copy dev-workbench-app\target\dev-workbench-{version}.jar target\dist-input\dev-workbench.jar
 
 rem Create an app image with both launchers and the bundled JRE
 jpackage ^
   --type app-image ^
   --input target\dist-input ^
-  --name EasyPostman ^
-  --main-jar easy-postman.jar ^
-  --main-class com.laker.postman.App ^
-  --add-launcher EasyPostmanMCP=build\easy-postman-mcp-launcher.properties ^
+  --name DevWorkbench ^
+  --main-jar dev-workbench.jar ^
+  --main-class com.nvhuong.devworkbench.App ^
+  --add-launcher DevWorkbenchMCP=build\dev-workbench-mcp-launcher.properties ^
   --dest target ^
-  --icon assets\win\EasyPostman.ico ^
+  --icon assets\win\DevWorkbench.ico ^
   --app-version {version} ^
-  --vendor "laker"
+  --vendor "nvhuong"
 
 rem Create a portable ZIP; run build\win-exe.bat for the production EXE installer
-echo This is a portable version>target\EasyPostman\.portable
+echo This is a portable version>target\DevWorkbench\.portable
 mkdir target\portable
-xcopy target\EasyPostman target\portable\EasyPostman\ /E /I
+xcopy target\DevWorkbench target\portable\DevWorkbench\ /E /I
 cd target\portable
-powershell Compress-Archive -Path EasyPostman -DestinationPath ..\EasyPostman-{version}-windows-x64-portable.zip
+powershell Compress-Archive -Path DevWorkbench -DestinationPath ..\DevWorkbench-{version}-windows-x64-portable.zip
 cd ..\..
 ```
 
@@ -198,25 +198,25 @@ chmod +x build/linux-deb.sh
 
 **Output**: a DEB file under `dist/` for the current build machine architecture, for example `dist/*.deb`
 
-After installation, `/opt/easypostman/bin/EasyPostman` and `/opt/easypostman/bin/EasyPostmanMCP` share the bundled JRE.
+After installation, `/opt/devworkbench/bin/DevWorkbench` and `/opt/devworkbench/bin/DevWorkbenchMCP` share the bundled JRE.
 
 #### Manual Build
 
 ```bash
 mkdir -p target/dist-input
-cp easy-postman-app/target/easy-postman-{version}.jar target/dist-input/easy-postman.jar
+cp dev-workbench-app/target/dev-workbench-{version}.jar target/dist-input/dev-workbench.jar
 
 jpackage \
   --input target/dist-input \
-  --name easypostman \
-  --main-jar easy-postman.jar \
-  --main-class com.laker.postman.App \
-  --add-launcher EasyPostmanMCP=build/easy-postman-mcp-launcher.properties \
+  --name devworkbench \
+  --main-jar dev-workbench.jar \
+  --main-class com.nvhuong.devworkbench.App \
+  --add-launcher DevWorkbenchMCP=build/dev-workbench-mcp-launcher.properties \
   --type deb \
-  --icon assets/linux/EasyPostman.png \
+  --icon assets/linux/DevWorkbench.png \
   --app-version {version} \
-  --vendor "laker" \
-  --linux-package-name "easypostman" \
+  --vendor "nvhuong" \
+  --linux-package-name "devworkbench" \
   --linux-menu-group "Development" \
   --linux-shortcut
 ```
@@ -273,7 +273,7 @@ Create a minimal JRE with only required modules:
 
 ```bash
 # List required modules
-jdeps --print-module-deps target/easy-postman-{version}.jar
+jdeps --print-module-deps target/dev-workbench-{version}.jar
 
 # Create custom runtime
 jlink \
@@ -298,7 +298,7 @@ jpackage \
 
 ```bash
 # Remove quarantine attribute
-sudo xattr -rd com.apple.quarantine /Applications/EasyPostman.app
+sudo xattr -rd com.apple.quarantine /Applications/DevWorkbench.app
 ```
 
 ### Windows: "Windows protected your PC"
@@ -342,6 +342,6 @@ $JAVA_HOME/bin/jpackage --version
 
 ## 💬 Need Help?
 
-- 💬 GitHub Discussions: [https://github.com/lakernote/easy-postman/discussions](https://github.com/lakernote/easy-postman/discussions)
-- 🐛 Report Issues: [https://github.com/lakernote/easy-postman/issues](https://github.com/lakernote/easy-postman/issues)
-- 👥 WeChat Group: Add **lakernote** to join
+- 💬 GitHub Discussions: [https://github.com/nvhuong/dev-workbench/discussions](https://github.com/nvhuong/dev-workbench/discussions)
+- 🐛 Report Issues: [https://github.com/nvhuong/dev-workbench/issues](https://github.com/nvhuong/dev-workbench/issues)
+- 👥 WeChat Group: Add **nvhuong** to join

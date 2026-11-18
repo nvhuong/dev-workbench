@@ -1,0 +1,17 @@
+package com.nvhuong.devworkbench.script.model;
+
+public class TestResult {
+    /**
+     * Kiểm tra mã định danh duy nhất
+     */
+    public String id;
+    public final String name;
+    public final boolean passed;
+    public final String message;
+
+    public TestResult(String name, boolean passed, String message) {
+        this.name = name;
+        this.passed = passed;
+        this.message = message;
+    }
+}

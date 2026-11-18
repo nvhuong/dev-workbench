@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>com.nvhuong.tools</groupId>
+        <artifactId>dev-workbench-parent</artifactId>
+        <version>${revision}</version>
+        <relativePath>../pom.xml</relativePath>
+    </parent>
+
+    <!--
+        Lớp thời gian chạy plug-in: .
+        Chịu trách nhiệm về các plug-in jar Quét, phân tích cú pháp mô tả, tải, duy trì trạng thái và quản lý sổ đăng ký.
+     -->
+    <artifactId>dev-workbench-plugin-runtime</artifactId>
+    <packaging>jar</packaging>
+
+    <build>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+                <includes>
+                    <include>META-INF/dev-workbench/runtime.properties</include>
+                </includes>
+            </resource>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>false</filtering>
+                <excludes>
+                    <exclude>META-INF/dev-workbench/runtime.properties</exclude>
+                </excludes>
+            </resource>
+        </resources>
+    </build>
+
+    <dependencies>
+        <!-- Thời gian chạy được xây dựng để ổn định SPI bên trên -->
+        <dependency>
+            <groupId>com.nvhuong.tools</groupId>
+            <artifactId>dev-workbench-plugin-api</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.nvhuong.tools</groupId>
+            <artifactId>dev-workbench-foundation</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <!-- Cấu hình người dùng plug-in (danh sách bị vô hiệu hóa, danh sách cần gỡ cài đặt, v.v.) JSON kho -->
+        <dependency>
+            <groupId>tools.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.testng</groupId>
+            <artifactId>testng</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+</project>

@@ -14,7 +14,7 @@ on:
       - '.github/workflows/release.yml'
       - 'build/**'
       - 'assets/win/**'
-      - 'easy-postman-plugins/plugin-capture/**'
+      - 'dev-workbench-plugins/plugin-capture/**'
 
 permissions:
   contents: read
@@ -44,7 +44,7 @@ jobs:
       - name: Run capture Windows unit tests
         shell: powershell
         run: |
-          mvn -B -q -pl easy-postman-plugins/plugin-capture -am `
+          mvn -B -q -pl dev-workbench-plugins/plugin-capture -am `
             "-Dtest=WindowsCertificateInstallServiceTest,SystemProxyServiceTest" `
             "-Dsurefire.failIfNoSpecifiedTests=false" `
             "-Djava.awt.headless=true" test
@@ -122,17 +122,17 @@ jobs:
         shell: powershell
         timeout-minutes: 2
         run: |
-          $keyStorePath = Join-Path $env:RUNNER_TEMP "easy-postman-ci-root.p12"
-          $certPath = Join-Path $env:RUNNER_TEMP "easy-postman-ci-root.cer"
+          $keyStorePath = Join-Path $env:RUNNER_TEMP "dev-workbench-ci-root.p12"
+          $certPath = Join-Path $env:RUNNER_TEMP "dev-workbench-ci-root.cer"
           $storePassword = "changeit"
-          $alias = "easy-postman-ci-root"
+          $alias = "dev-workbench-ci-root"
 
           Write-Host "Generating temporary test certificate with keytool..."
           keytool -genkeypair `
             -alias $alias `
             -keyalg RSA `
             -keysize 2048 `
-            -dname "CN=EasyPostman CI Root" `
+            -dname "CN=DevWorkbench CI Root" `
             -validity 1 `
             -storetype PKCS12 `
             -keystore $keyStorePath `
@@ -170,14 +170,14 @@ jobs:
       - name: Verify WinINet refresh API
         shell: powershell
         run: |
-          Add-Type -Namespace EasyPostman -Name WinInetSmoke -MemberDefinition @'
+          Add-Type -Namespace DevWorkbench -Name WinInetSmoke -MemberDefinition @'
           [System.Runtime.InteropServices.DllImport("wininet.dll", SetLastError=true)]
           public static extern bool InternetSetOption(System.IntPtr hInternet, int option, System.IntPtr buffer, int bufferLength);
           '@
 
           $options = @(39, 95, 37)
           foreach ($option in $options) {
-            $ok = [EasyPostman.WinInetSmoke]::InternetSetOption([System.IntPtr]::Zero, $option, [System.IntPtr]::Zero, 0)
+            $ok = [DevWorkbench.WinInetSmoke]::InternetSetOption([System.IntPtr]::Zero, $option, [System.IntPtr]::Zero, 0)
             if (-not $ok) {
               $errorCode = [System.Runtime.InteropServices.Marshal]::GetLastWin32Error()
               throw "InternetSetOption($option) failed with Win32 error $errorCode"

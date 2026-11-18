@@ -1,6 +1,6 @@
 # Official Plugin Catalog
 
-This directory stores the official online plugin catalogs consumed by EasyPostman.
+This directory stores the official online plugin catalogs consumed by DevWorkbench.
 
 - `catalog-github.json`: official GitHub source
 
@@ -13,7 +13,7 @@ Do not edit them casually by hand. The current primary update path is:
 That workflow can update:
 
 - public catalogs in `plugin-catalog/`
-- bundled fallback catalogs in `easy-postman-plugins/plugin-manager/src/main/resources/plugin-catalog/`
+- bundled fallback catalogs in `dev-workbench-plugins/plugin-manager/src/main/resources/plugin-catalog/`
 
 Current behavior:
 
@@ -26,4 +26,4 @@ Current behavior:
 If you need to adjust catalog structure manually, update both places together:
 
 - `plugin-catalog/`
-- `easy-postman-plugins/plugin-manager/src/main/resources/plugin-catalog/`
+- `dev-workbench-plugins/plugin-manager/src/main/resources/plugin-catalog/`

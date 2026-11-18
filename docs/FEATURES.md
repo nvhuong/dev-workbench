@@ -81,13 +81,13 @@
 - ✅ Store `mock_servers.json` beside `collections.json` in the current workspace so Git workspaces version them together
 - ✅ Run headlessly with `mock run` after copying the workspace to a server or CI runner
 - ✅ Copy the workspace-specific self-host command directly from the management page
-- ✅ No EasyPostman cloud hosting, team permissions, external npm packages, or AI generation
+- ✅ No DevWorkbench cloud hosting, team permissions, external npm packages, or AI generation
 
 Server example:
 
 ```bash
-EASY_POSTMAN_MOCK_API_KEY=change-me \
-java -jar easy-postman.jar mock run /path/to/workspace \
+DEV_WORKBENCH_MOCK_API_KEY=change-me \
+java -jar dev-workbench.jar mock run /path/to/workspace \
   --server "Payments Mock" --host 0.0.0.0 --port 3001
 ```
 
@@ -113,7 +113,7 @@ if (Number(input.amount) === 0.5) {
 ## 🤖 MCP and AI Clients
 
 - ✅ Built-in standard MCP stdio Server for local clients such as Codex, Claude Desktop, Claude Code, and Cursor
-- ✅ Native installers and the Windows portable package bundle `EasyPostmanMCP` with a JRE; no separate Java or MCP download is required
+- ✅ Native installers and the Windows portable package bundle `DevWorkbenchMCP` with a JRE; no separate Java or MCP download is required
 - ✅ List authorized workspaces, collections, environments, and saved requests without exposing environment values
 - ✅ Select `workspaceId` and `environmentId` per tool call without changing the desktop app's current selection
 - ✅ Run one saved HTTP request or a top-level collection through the existing inheritance, scripts, assertions, cookies, TLS, and HTTP execution pipeline
@@ -219,13 +219,13 @@ See the [MCP Server guide](MCP_SERVER_DESIGN_zh.md) for installation and complet
 ## 🔄 Data Migration
 
 ### Import Support
-- ✅ **Postman Collection v2.1**: Supported import/export
+- ✅ **DevWorkbench Collection v2.1**: Supported import/export
 - ✅ **cURL commands**: Convert to requests
 - 🚧 **HAR files**: In development
 - 🚧 **OpenAPI/Swagger**: In development
 
 ### Export Support
-- ✅ Postman Collection format
+- ✅ DevWorkbench Collection format
 - ✅ cURL commands
 - ✅ Environment variables
 - ✅ Test results

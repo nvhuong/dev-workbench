@@ -1,40 +1,40 @@
-# EasyPostman MCP Server
+# DevWorkbench MCP Server
 
-EasyPostman Tiêu chuẩn tích hợp MCP stdio Server，cho phép Codex、Claude Desktop、Cursor Đợi khách hàng khám phá không gian làm việc, chọn không gian làm việc và môi trường, đồng thời thực hiện lệnh đã lưu trên mỗi lệnh gọi công cụ HTTP yêu cầu.MCP Trực tiếp tái sử dụng chuỗi thực thi không đầu mà không cần thao tác từ xa Swing trang, nó cũng không sửa đổi lựa chọn hiện tại trên màn hình nền. Thực hiện trao đổi thư từ [Issue #169](https://github.com/lakernote/easy-postman/issues/169)。
+DevWorkbench Tiêu chuẩn tích hợp MCP stdio Server，cho phép Codex、Claude Desktop、Cursor Đợi khách hàng khám phá không gian làm việc, chọn không gian làm việc và môi trường, đồng thời thực hiện lệnh đã lưu trên mỗi lệnh gọi công cụ HTTP yêu cầu.MCP Trực tiếp tái sử dụng chuỗi thực thi không đầu mà không cần thao tác từ xa Swing trang, nó cũng không sửa đổi lựa chọn hiện tại trên màn hình nền. Thực hiện trao đổi thư từ [Issue #169](https://github.com/nvhuong/dev-workbench/issues/169)。
 
 ## Cài đặt và cấu hình
 
-### 1. Lấy EasyPostman
+### 1. Lấy DevWorkbench
 
 MCP Đã được đưa vào chương trình chính và không được phát hành riêng MCP Gói cài đặt:
 
 | Phương pháp tải xuống | MCP Cách sử dụng | Bạn có cần phải cài đặt nó một cách riêng biệt? Java |
 |---|---|---|
-| macOS / Windows / Linux Gói cài đặt gốc | Sử dụng những cái có trong gói `EasyPostmanMCP` launcher | Không, bao gồm JRE |
-| Windows Phiên bản di động ZIP | Sử dụng sau khi giải nén `EasyPostmanMCP.exe` | Không, bao gồm JRE |
+| macOS / Windows / Linux Gói cài đặt gốc | Sử dụng những cái có trong gói `DevWorkbenchMCP` launcher | Không, bao gồm JRE |
+| Windows Phiên bản di động ZIP | Sử dụng sau khi giải nén `DevWorkbenchMCP.exe` | Không, bao gồm JRE |
 | Đa nền tảng JAR | `java -jar ... mcp serve` | Có, bắt buộc Java 21+ |
 
-Được đề xuất từ [GitHub Releases](https://github.com/lakernote/easy-postman/releases) Tải xuống gói gốc.Windows Phiên bản di động không cần cài đặt và bạn có thể sử dụng phiên bản máy tính để bàn sau khi giải nén MCP。
+Được đề xuất từ [GitHub Releases](https://github.com/nvhuong/dev-workbench/releases) Tải xuống gói gốc.Windows Phiên bản di động không cần cài đặt và bạn có thể sử dụng phiên bản máy tính để bàn sau khi giải nén MCP。
 
 ### 2. Tìm trình khởi chạy gốc
 
 | Phương pháp cài đặt | `command` |
 |---|---|
-| macOS | `/Applications/EasyPostman.app/Contents/MacOS/EasyPostmanMCP` |
-| Windows Phiên bản cài đặt | `C:\Program Files\EasyPostman\EasyPostmanMCP.exe` |
-| Windows Phiên bản di động | Giải nén thư mục `EasyPostmanMCP.exe`，Ví dụ `D:\Tools\EasyPostman\EasyPostmanMCP.exe` |
-| Linux DEB / RPM | `/opt/easypostman/bin/EasyPostmanMCP` |
+| macOS | `/Applications/DevWorkbench.app/Contents/MacOS/DevWorkbenchMCP` |
+| Windows Phiên bản cài đặt | `C:\Program Files\DevWorkbench\DevWorkbenchMCP.exe` |
+| Windows Phiên bản di động | Giải nén thư mục `DevWorkbenchMCP.exe`，Ví dụ `D:\Tools\DevWorkbench\DevWorkbenchMCP.exe` |
+| Linux DEB / RPM | `/opt/devworkbench/bin/DevWorkbenchMCP` |
 
-Windows Phiên bản di động đại khái như sau sau khi giải nén. hai EXE chia sẻ cùng một JAR và thời gian chạy, vì vậy đừng chỉ đặt  `EasyPostmanMCP.exe` Sao chép nó một cách riêng biệt:
+Windows Phiên bản di động đại khái như sau sau khi giải nén. hai EXE chia sẻ cùng một JAR và thời gian chạy, vì vậy đừng chỉ đặt  `DevWorkbenchMCP.exe` Sao chép nó một cách riêng biệt:
 
 ```text
-EasyPostman/
-├── EasyPostman.exe          # Ứng dụng máy tính để bàn
-├── EasyPostmanMCP.exe       # MCP stdio launcher
+DevWorkbench/
+├── DevWorkbench.exe          # Ứng dụng máy tính để bàn
+├── DevWorkbenchMCP.exe       # MCP stdio launcher
 ├── app/
-│   ├── easy-postman.jar
-│   ├── EasyPostman.cfg
-│   └── EasyPostmanMCP.cfg
+│   ├── dev-workbench.jar
+│   ├── DevWorkbench.cfg
+│   └── DevWorkbenchMCP.cfg
 ├── runtime/                 # Tích hợp sẵn JRE
 └── .portable                # Chỉ có một phiên bản di động tồn tại
 ```
@@ -42,11 +42,11 @@ EasyPostman/
 macOS Gói cài đặt sử dụng cùng cấu trúc chia sẻ: .
 
 ```text
-EasyPostman.app/Contents/
-├── MacOS/EasyPostman
-├── MacOS/EasyPostmanMCP
-├── app/easy-postman.jar
-├── app/EasyPostmanMCP.cfg
+DevWorkbench.app/Contents/
+├── MacOS/DevWorkbench
+├── MacOS/DevWorkbenchMCP
+├── app/dev-workbench.jar
+├── app/DevWorkbenchMCP.cfg
 └── runtime/Contents/Home/
 ```
 
@@ -57,14 +57,14 @@ Trình khởi chạy gốc sẽ tự động điền nó vào `mcp serve`，Vì 
 Codex CLI：
 
 ```bash
-codex mcp add easy-postman -- /Applications/EasyPostman.app/Contents/MacOS/EasyPostmanMCP
+codex mcp add dev-workbench -- /Applications/DevWorkbench.app/Contents/MacOS/DevWorkbenchMCP
 ```
 
 Cũng có thể được viết Codex của `config.toml`：
 
 ```toml
-[mcp_servers.easy-postman]
-command = "/Applications/EasyPostman.app/Contents/MacOS/EasyPostmanMCP"
+[mcp_servers.dev-workbench]
+command = "/Applications/DevWorkbench.app/Contents/MacOS/DevWorkbenchMCP"
 args = []
 ```
 
@@ -73,23 +73,23 @@ Claude Desktop、Claude Code、Cursor Chờ sử dụng JSON Máy khách có th�
 ```json
 {
   "mcpServers": {
-    "easy-postman": {
-      "command": "/Applications/EasyPostman.app/Contents/MacOS/EasyPostmanMCP",
+    "dev-workbench": {
+      "command": "/Applications/DevWorkbench.app/Contents/MacOS/DevWorkbenchMCP",
       "args": []
     }
   }
 }
 ```
 
-Windows JSON Dấu gạch chéo ngược trong đường dẫn cần phải được viết dưới dạng dấu gạch chéo ngược kép, ví dụ: `"D:\\Tools\\EasyPostman\\EasyPostmanMCP.exe"`。
+Windows JSON Dấu gạch chéo ngược trong đường dẫn cần phải được viết dưới dạng dấu gạch chéo ngược kép, ví dụ: `"D:\\Tools\\DevWorkbench\\DevWorkbenchMCP.exe"`。
 
 Windows Phiên bản di động hoàn chỉnh JSON Ví dụ:
 
 ```json
 {
   "mcpServers": {
-    "easy-postman": {
-      "command": "D:\\Tools\\EasyPostman\\EasyPostmanMCP.exe",
+    "dev-workbench": {
+      "command": "D:\\Tools\\DevWorkbench\\DevWorkbenchMCP.exe",
       "args": []
     }
   }
@@ -99,16 +99,16 @@ Windows Phiên bản di động hoàn chỉnh JSON Ví dụ:
 Sau khi lưu, hãy khởi động lại máy khách và tạo cuộc trò chuyện mới. Trước tiên, bạn nên thực hiện xác minh chỉ đọc:
 
 ```text
-Hãy sử dụng EasyPostman MCP Liệt kê tất cả các không gian làm việc mà không thực hiện bất kỳ giao diện nào.
+Hãy sử dụng DevWorkbench MCP Liệt kê tất cả các không gian làm việc mà không thực hiện bất kỳ giao diện nào.
 ```
 
 Codex、Claude và Cursor Mục cấu hình cụ thể có thể thay đổi theo phiên bản máy khách, vui lòng tham khảo các tài liệu chính thức tương ứng:[Codex MCP](https://developers.openai.com/codex/mcp/)、[Claude MCP](https://docs.anthropic.com/en/docs/claude-code/mcp)、[Cursor MCP](https://docs.cursor.com/context/model-context-protocol)。
 
 ### 4. Mô hình quy trình và không gian làm việc mặc định
 
-Theo mặc định, không cần cấu hình thư mục không gian làm việc.MCP Quá trình này sẽ đọc EasyPostman Đối với không gian làm việc đã đăng ký, khách hàng sẽ gọi nó trước `list_workspaces`，Để theo dõi Tool đang đến `workspaceId` Bạn có thể chọn một không gian làm việc.
+Theo mặc định, không cần cấu hình thư mục không gian làm việc.MCP Quá trình này sẽ đọc DevWorkbench Đối với không gian làm việc đã đăng ký, khách hàng sẽ gọi nó trước `list_workspaces`，Để theo dõi Tool đang đến `workspaceId` Bạn có thể chọn một không gian làm việc.
 
-MCP Máy khách bắt đầu một cho mỗi kết nối `EasyPostmanMCP` quá trình và nhiều lần Tool Tái sử dụng giữa các cuộc gọi; không khởi động lại mỗi khi yêu cầu được thực hiện. Sau khi kết nối hoàn tất stdin đóng cửa,MCP Quá trình kết thúc và không có người dùng nào được yêu cầu duy trì dịch vụ thường trú.
+MCP Máy khách bắt đầu một cho mỗi kết nối `DevWorkbenchMCP` quá trình và nhiều lần Tool Tái sử dụng giữa các cuộc gọi; không khởi động lại mỗi khi yêu cầu được thực hiện. Sau khi kết nối hoàn tất stdin đóng cửa,MCP Quá trình kết thúc và không có người dùng nào được yêu cầu duy trì dịch vụ thường trú.
 
 ứng dụng máy tính để bàn và MCP là hai quy trình độc lập có thể chạy đồng thời và đọc cùng một loạt không gian làm việc.MCP Các lựa chọn không gian làm việc và môi trường chỉ ảnh hưởng đến thời điểm này Tool Việc gọi điện sẽ không mô phỏng việc nhấp vào trang cũng như không thay đổi lựa chọn hiện tại trên màn hình. Sau khi thêm hoặc xóa không gian làm việc trên màn hình nền, bạn cần khởi động lại MCP Máy khách kết nối để làm mới thư mục.
 
@@ -118,7 +118,7 @@ Nếu bạn cần thu hẹp phạm vi ủy quyền, hãy chuyển đến trình 
 
 ```json
 {
-  "command": "/Applications/EasyPostman.app/Contents/MacOS/EasyPostmanMCP",
+  "command": "/Applications/DevWorkbench.app/Contents/MacOS/DevWorkbenchMCP",
   "args": ["/absolute/path/to/my-api-workspace"]
 }
 ```
@@ -132,7 +132,7 @@ Chỉ tải xuống JAR Cấu hình bên dưới vẫn có thể được sử d
 ```json
 {
   "command": "java",
-  "args": ["-jar", "/absolute/path/to/easy-postman-{version}.jar", "mcp", "serve"]
+  "args": ["-jar", "/absolute/path/to/dev-workbench-{version}.jar", "mcp", "serve"]
 }
 ```
 
@@ -142,10 +142,10 @@ Các thông số tùy chọn `--max-response-bytes <n>` Hãy kiểm soát một 
 
 ### 7. Khắc phục sự cố cài đặt
 
-- Chạy trực tiếp trước `EasyPostmanMCP --help`；Có thể hiển thị thông tin trợ giúp cho trình khởi chạy và phần mềm tích hợp JRE trọn.
+- Chạy trực tiếp trước `DevWorkbenchMCP --help`；Có thể hiển thị thông tin trợ giúp cho trình khởi chạy và phần mềm tích hợp JRE trọn.
 - trong cấu hình `command` Nên sử dụng đường dẫn tuyệt đối.Windows JSON Các đường dẫn cần thoát khỏi dấu gạch chéo ngược và các đường dẫn có dấu cách trong dòng lệnh cần được trích dẫn.
 - Windows Phiên bản di động phải được giải nén hoàn toàn chứ không được chỉ sao chép EXE；Sau khi nâng cấp hoặc di chuyển thư mục giải nén phải cập nhật đồng thời MCP cấu hình.
-- Codex Có thể thực thi được `codex mcp get easy-postman --json` Kiểm tra lệnh đã lưu cuối cùng; các khách hàng khác sử dụng của riêng họ MCP Server Kiểm tra trang trạng thái.
+- Codex Có thể thực thi được `codex mcp get dev-workbench --json` Kiểm tra lệnh đã lưu cuối cùng; các khách hàng khác sử dụng của riêng họ MCP Server Kiểm tra trang trạng thái.
 - Sau khi sửa đổi cấu hình hoặc danh sách không gian làm việc trên màn hình, hãy khởi động lại MCP khách hàng hoặc xây dựng lại cuộc trò chuyện. trong quá trình hoạt động bình thường stdout Chỉ JSON-RPC，Nhật ký thông thường bị tắt theo mặc định; các lỗi cần thiết sẽ được giải mẫn cảm và ghi lại stderr。
 
 ## dụng cụ
@@ -164,8 +164,8 @@ Các thông số tùy chọn `--max-response-bytes <n>` Hãy kiểm soát một 
 ở đây“Chọn”Đây là định tuyến cấp độ cuộc gọi, không phải mô phỏng các thao tác nhấp chuột thủ công trên trang dành cho máy tính để bàn:
 
 - Khi bạn chuyển vào thư mục không gian làm việc khi khởi động, chỉ thư mục đó mới được ủy quyền, tất cả chúng Tool Tất cả đều có thể được bỏ qua `workspaceId`。
-- Khi thư mục khởi động bị bỏ qua, .MCP Quá trình này được đọc khi khởi động EasyPostman Không gian làm việc đã đăng ký. Khách hàng gọi trước `list_workspaces`，Sau đó trả lại nó `workspaceId` Đã chuyển sang theo dõi Tool，Bạn có thể thực hiện các yêu cầu giữa các không gian làm việc khác nhau.
-- Bị bỏ qua trong chế độ nhiều không gian làm việc `workspaceId`，Sẽ sử dụng MCP Được ghi lại khi quá trình bắt đầu EasyPostman Không gian làm việc hiện tại; nếu nó không thể được xác định duy nhất thì cần phải chuyển rõ ràng `workspaceId`。
+- Khi thư mục khởi động bị bỏ qua, .MCP Quá trình này được đọc khi khởi động DevWorkbench Không gian làm việc đã đăng ký. Khách hàng gọi trước `list_workspaces`，Sau đó trả lại nó `workspaceId` Đã chuyển sang theo dõi Tool，Bạn có thể thực hiện các yêu cầu giữa các không gian làm việc khác nhau.
+- Bị bỏ qua trong chế độ nhiều không gian làm việc `workspaceId`，Sẽ sử dụng MCP Được ghi lại khi quá trình bắt đầu DevWorkbench Không gian làm việc hiện tại; nếu nó không thể được xác định duy nhất thì cần phải chuyển rõ ràng `workspaceId`。
 - Chọn `workspaceId` Phiên bản dành cho máy tính để bàn sẽ không được gọi“Chuyển đổi không gian làm việc”，Không gian làm việc hiện tại mới sẽ không được lưu và những không gian làm việc đã mở cũng sẽ không được lưu Swing Trang chuyển đổi tương ứng. Sau khi thêm, bớt hoặc chuyển đổi không gian làm việc trên desktop, bạn nên khởi động lại MCP Quá trình khách hàng làm mới thư mục; luôn luôn được thông qua một cách rõ ràng `workspaceId` Ổn định nhất.
 - `list_environments` Được sử dụng để khám phá môi trường;`run_request` / `run_collection` của `environmentId` Bạn có thể vượt qua môi trường ID hoặc tên chính xác. Khi bị bỏ qua, không gian làm việc sẽ được đọc `environments.json` Trong môi trường kích hoạt, vật phẩm đầu tiên được sử dụng khi không có vật phẩm kích hoạt.
 - `environmentId` Nó chỉ xác định môi trường nào sẽ sử dụng cho việc thực thi này và không sửa đổi trạng thái kích hoạt hoặc lưu nó `environments.json`。
@@ -210,14 +210,14 @@ list_workspaces
 MCP Client
   │ stdio JSON-RPC
   ▼
-easy-postman-mcp
+dev-workbench-mcp
   ├─ official MCP Java SDK
   ├─ stdio lifecycle
   ├─ Sáu tool schema + annotations
-  └─ EasyPostmanMcpBackend
+  └─ DevWorkbenchMcpBackend
                 │
                 ▼
-easy-postman-app
+dev-workbench-app
   ├─ mcp serve CLI
   ├─ authorized workspace catalog
   ├─ collection/environment adapter
@@ -228,11 +228,11 @@ easy-postman-app
        └─ HTTP runtime
 ```
 
-`easy-postman-mcp` Chỉ có lớp giao thức, không có lớp phụ thuộc app、Swing、Lưu trữ không gian làm việc hoặc thực hiện các yêu cầu cụ thể.app hoàn thành backend Và tái sử dụng chuỗi thực thi không đầu hiện có nên không có bản sao nào được tạo ra EasyPostman các biến, tập lệnh,Cookie、TLS và HTTP Ngữ nghĩa. Không có plug-in nào được thay đổi lần này SPI，Cũng không cần khuyến mãi `plugin.platform.version`。
+`dev-workbench-mcp` Chỉ có lớp giao thức, không có lớp phụ thuộc app、Swing、Lưu trữ không gian làm việc hoặc thực hiện các yêu cầu cụ thể.app hoàn thành backend Và tái sử dụng chuỗi thực thi không đầu hiện có nên không có bản sao nào được tạo ra DevWorkbench các biến, tập lệnh,Cookie、TLS và HTTP Ngữ nghĩa. Không có plug-in nào được thay đổi lần này SPI，Cũng không cần khuyến mãi `plugin.platform.version`。
 
 ## Ranh giới an ninh
 
-- Chế độ không gian làm việc đơn chỉ cho phép các thư mục trong tham số khởi động; chế độ đa không gian làm việc chỉ cho phép EasyPostman Không gian làm việc trong sổ đăng ký.
+- Chế độ không gian làm việc đơn chỉ cho phép các thư mục trong tham số khởi động; chế độ đa không gian làm việc chỉ cho phép DevWorkbench Không gian làm việc trong sổ đăng ký.
 - MCP v1 Không có tệp bộ sưu tập hoặc môi trường nào được ghi và không có công cụ nhập, lưu và xóa nào được cung cấp.
 - Giá trị môi trường không được trả về thông qua công cụ liệt kê; ghi đè một lần sẽ không được ghi vào đĩa. Nhưng mục tiêu API Các giá trị đầu vào có thể được lặp lại trong nội dung phản hồi, nội dung này có thể chứa dữ liệu cá nhân hoặc doanh nghiệp, do đó chỉ có thể có các kết nối đáng tin cậy MCP khách hàng.
 - Tiêu đề phản hồi xác thực phổ biến, tùy chỉnh token/key/password/secret cái đầu,URL user-info、Các tham số truy vấn nhạy cảm và các giá trị khóa nhạy cảm phổ biến trong nội dung phản hồi sẽ được giải mẫn cảm; giải mẫn cảm chung không thể xác định tất cả các lĩnh vực kinh doanh và không thể thay thế việc phân loại dữ liệu và các quyền tối thiểu ở phía máy chủ.
@@ -246,15 +246,15 @@ easy-postman-app
 ## Xây dựng và xác minh
 
 ```bash
-mvn -pl easy-postman-app -am -DskipTests clean package
+mvn -pl dev-workbench-app -am -DskipTests clean package
 ```
 
-sản phẩm:`easy-postman-app/target/easy-postman-{version}.jar`。
+sản phẩm:`dev-workbench-app/target/dev-workbench-{version}.jar`。
 
 Các mô-đun giao thức có thể được kiểm tra độc lập:
 
 ```bash
-mvn -pl easy-postman-mcp -am test
+mvn -pl dev-workbench-mcp -am test
 ```
 
 tham khảo:[MCP đặc điểm kỹ thuật](https://modelcontextprotocol.io/specification/2026-07-28)、[chính thức Java SDK](https://github.com/modelcontextprotocol/java-sdk)。

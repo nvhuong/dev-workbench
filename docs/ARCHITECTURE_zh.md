@@ -3,7 +3,7 @@
 ## Tổng quan về kiến ​​trúc
 
 ```
-EasyPostman
+DevWorkbench
 ├── 🎨 Lớp giao diện người dùng (UI Layer)
 │   ├── Workspace Quản lý không gian làm việc
 │   ├── Collections Quản lý bộ sưu tập giao diện
@@ -155,7 +155,7 @@ EasyPostman
    ```
    mvn clean package
    ```
-   - phát ra `easy-postman-{Số phiên bản}.jar`
+   - phát ra `dev-workbench-{Số phiên bản}.jar`
    - Cần thiết Java 21+ thời gian chạy
    - Kích thước phân phối tối thiểu
 
@@ -188,9 +188,9 @@ EasyPostman
 ### Cấu trúc dự án
 
 ```
-easy-postman/
+dev-workbench/
 ├── src/main/java/          # Java mã nguồn
-│   └── com/laker/postman/
+│   └── com/nvhuong/devworkbench/
 │       ├── ui/             # UI thành phần
 │       ├── service/        # logic kinh doanh
 │       ├── model/          # Mô hình dữ liệu

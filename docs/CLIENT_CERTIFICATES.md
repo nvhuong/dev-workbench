@@ -2,7 +2,7 @@
 
 ## Tổng quan về chức năng
 
-EasyPostman Bây giờ được hỗ trợ SSL Chứng chỉ ứng dụng khách (mTLS - mutual TLS）Chứng nhận. Cần phải xác minh chứng chỉ ứng dụng khách khi truy cập API có thể dựa trên các tên máy chủ khác nhau hoặc  URL Cấu hình chứng chỉ ứng dụng khách thích hợp.
+DevWorkbench Bây giờ được hỗ trợ SSL Chứng chỉ ứng dụng khách (mTLS - mutual TLS）Chứng nhận. Cần phải xác minh chứng chỉ ứng dụng khách khi truy cập API có thể dựa trên các tên máy chủ khác nhau hoặc  URL Cấu hình chứng chỉ ứng dụng khách thích hợp.
 
 ## Các định dạng chứng chỉ được hỗ trợ
 
@@ -129,7 +129,7 @@ openssl rsa -in encrypted-key.pem -out unencrypted-key.pem
 - Không gửi tệp chứng chỉ tới hệ thống kiểm soát phiên bản
 
 ### 2. Lưu trữ mật khẩu
-- Mật khẩu chứng chỉ được lưu dưới dạng văn bản rõ ràng trong tệp cấu hình: .`~/.easypostman/client_certificates.json`
+- Mật khẩu chứng chỉ được lưu dưới dạng văn bản rõ ràng trong tệp cấu hình: .`~/.devworkbench/client_certificates.json`
 - Access to this file should be restricted to the current user
 - Hãy thận trọng khi sử dụng trên máy tính dùng chung
 
@@ -179,9 +179,9 @@ openssl rsa -in encrypted-key.pem -out unencrypted-key.pem
 
 ### Vị trí tập tin cấu hình
 
-- **macOS**: `~/.easypostman/client_certificates.json`
-- **Windows**: `%USERPROFILE%\.easypostman\client_certificates.json`
-- **Linux**: `~/.easypostman/client_certificates.json`
+- **macOS**: `~/.devworkbench/client_certificates.json`
+- **Windows**: `%USERPROFILE%\.devworkbench\client_certificates.json`
+- **Linux**: `~/.devworkbench/client_certificates.json`
 
 ### Các thuật toán được hỗ trợ
 
@@ -193,7 +193,7 @@ openssl rsa -in encrypted-key.pem -out unencrypted-key.pem
 
 1. Máy khách khởi tạo máy chủ HTTPS kết nối
 2. Máy chủ gửi chứng chỉ và yêu cầu chứng chỉ ứng dụng khách
-3. EasyPostman Tìm chứng chỉ ứng dụng khách phù hợp dựa trên tên máy chủ và cổng
+3. DevWorkbench Tìm chứng chỉ ứng dụng khách phù hợp dựa trên tên máy chủ và cổng
 4. Gửi chứng chỉ ứng dụng khách và khóa riêng đến máy chủ
 5. Máy chủ xác minh chứng chỉ ứng dụng khách và hoàn tất xác thực hai chiều
 
@@ -256,8 +256,8 @@ Kích hoạt:✓
 ## Certificate file storage location
 
 Cấu hình chứng chỉ ứng dụng khách được lưu trong: .
-- **Windows**: `C:\Users\{Tên người dùng}\.easy_postman\client_certificates.json`
-- **macOS/Linux**: `~/.easy_postman/client_certificates.json`
+- **Windows**: `C:\Users\{Tên người dùng}\.dev_workbench\client_certificates.json`
+- **macOS/Linux**: `~/.dev_workbench/client_certificates.json`
 
 > ⚠️ Lưu ý: Tệp cấu hình chứa đường dẫn chứng chỉ và mật khẩu (văn bản rõ ràng), vui lòng chú ý bảo vệ tính bảo mật của tệp này.
 
@@ -299,7 +299,7 @@ A: Sau khi gửi yêu cầu, thông tin tương tự như sau sẽ được hi�
 
 ## Tài liệu tham khảo
 
-- [Postman Tài liệu chứng nhận của khách hàng](https://learning.postman.com/docs/sending-requests/authorization/certificates/)
+- [DevWorkbench Tài liệu chứng nhận của khách hàng](https://learning.devworkbench.com/docs/sending-requests/authorization/certificates/)
 - [mTLS Giới thiệu](https://en.wikipedia.org/wiki/Mutual_authentication)
 - [OpenSSL Certificate management](https://www.openssl.org/docs/man1.1.1/man1/openssl.html)
 

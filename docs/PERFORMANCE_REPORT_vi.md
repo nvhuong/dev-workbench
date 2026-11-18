@@ -38,9 +38,9 @@ mvn -B -DskipTests clean package
 Kiểm tra báo cáo ở chế độ headless:
 
 ```sh
-mvn -pl easy-postman-app -am -Dtest=PerformanceReportPdfExporterTest,PerformanceReportMarkdownBuilderTest,PerformanceProtocolReportDataTest,PerformanceReportRowMapperTest,PerformanceReportTableSchemaTest -Dsurefire.failIfNoSpecifiedTests=false -Djava.awt.headless=true test
+mvn -pl dev-workbench-app -am -Dtest=PerformanceReportPdfExporterTest,PerformanceReportMarkdownBuilderTest,PerformanceProtocolReportDataTest,PerformanceReportRowMapperTest,PerformanceReportTableSchemaTest -Dsurefire.failIfNoSpecifiedTests=false -Djava.awt.headless=true test
 ```
 
-Test PDF tạo `easy-postman-app/target/performance-report-demo.pdf` và ảnh trang đầu `performance-report-preview.png` để kiểm tra trực quan.
+Test PDF tạo `dev-workbench-app/target/performance-report-demo.pdf` và ảnh trang đầu `performance-report-preview.png` để kiểm tra trực quan.
 
 PDF được tạo bằng [Apache PDFBox](https://pdfbox.apache.org/3.0/getting-started.html); font và giấy phép đi kèm trong thư mục resources/fonts.

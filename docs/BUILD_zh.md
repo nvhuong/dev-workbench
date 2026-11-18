@@ -2,7 +2,7 @@
 
 Tài liệu này chỉ nói về hai điều:
 
-- Xây dựng từ nguồn EasyPostman
+- Xây dựng từ nguồn DevWorkbench
 - Tạo các gói phân phối cho từng nền tảng
 
 Kiến trúc plug-in, phát triển plug-in cục bộ, trực tuyến/Để biết hướng dẫn cài đặt ngoại tuyến, hãy xem:
@@ -39,12 +39,12 @@ Kiến trúc plug-in, phát triển plug-in cục bộ, trực tuyến/Để bi�
 
 ```bash
 # GitHub
-git clone https://github.com/lakernote/easy-postman.git
-cd easy-postman
+git clone https://github.com/nvhuong/dev-workbench.git
+cd dev-workbench
 
 # hoặc Gitee（Phản ánh trong nước)
-git clone https://gitee.com/lakernote/easy-postman.git
-cd easy-postman
+git clone https://gitee.com/nvhuong/dev-workbench.git
+cd dev-workbench
 ```
 
 ### 2. Xây dựng dự án
@@ -58,21 +58,21 @@ mvn clean package -DskipTests
 ```
 
 Điều này sẽ tạo ra: .
-- `easy-postman-app/target/easy-postman-{Số phiên bản}.jar` - Chương trình chính có thể thực thi được JAR
-- `easy-postman-mcp/target/easy-postman-mcp-{Số phiên bản}.jar` - MCP Mô-đun giao thức; sẽ được sáp nhập vào chương trình chính khi phát hành JAR，Không cần phân phối riêng biệt
-- `easy-postman-plugins/plugin-*/target/easy-postman-{Số phiên bản}-plugin-*.jar` - plugin JAR
+- `dev-workbench-app/target/dev-workbench-{Số phiên bản}.jar` - Chương trình chính có thể thực thi được JAR
+- `dev-workbench-mcp/target/dev-workbench-mcp-{Số phiên bản}.jar` - MCP Mô-đun giao thức; sẽ được sáp nhập vào chương trình chính khi phát hành JAR，Không cần phân phối riêng biệt
+- `dev-workbench-plugins/plugin-*/target/dev-workbench-{Số phiên bản}-plugin-*.jar` - plugin JAR
 
 ### 3. Chạy ứng dụng
 
 ```bash
 # Chạy trực tiếp
-java -jar easy-postman-app/target/easy-postman-*.jar
+java -jar dev-workbench-app/target/dev-workbench-*.jar
 
 # Hoặc sử dụng tùy chỉnh JVM tùy chọn
-java -Xms256m -Xmx2g -jar easy-postman-app/target/easy-postman-*.jar
+java -Xms256m -Xmx2g -jar dev-workbench-app/target/dev-workbench-*.jar
 
 # Xác minh chủ JAR Tích hợp sẵn MCP Server
-java -jar easy-postman-app/target/easy-postman-*.jar mcp serve --help
+java -jar dev-workbench-app/target/dev-workbench-*.jar mcp serve --help
 ```
 
 ### Các plugin được xây dựng cục bộ
@@ -80,7 +80,7 @@ java -jar easy-postman-app/target/easy-postman-*.jar mcp serve --help
 Nếu bạn muốn xây dựng một trình cắm cục bộ, hãy sử dụng nó trực tiếp Maven Thế thôi:
 
 ```bash
-mvn -pl easy-postman-app,easy-postman-plugins/plugin-redis -am clean package -DskipTests
+mvn -pl dev-workbench-app,dev-workbench-plugins/plugin-redis -am clean package -DskipTests
 ```
 
 Nếu bạn muốn xây dựng tất cả các plugin cùng một lúc: .
@@ -112,43 +112,43 @@ chmod +x build/mac.sh
 ./build/mac.sh
 ```
 
-**đầu ra**: `dist/EasyPostman-{Số phiên bản}-macos-{ngành kiến ​​​​trúc}.dmg`
+**đầu ra**: `dist/DevWorkbench-{Số phiên bản}-macos-{ngành kiến ​​​​trúc}.dmg`
 - Apple Silicon (M1/M2/M3/M4): `macos-arm64.dmg`
 - Intel: `macos-x86_64.dmg`
-- sau khi cài đặt `.app` Chứa cả hai `Contents/MacOS/EasyPostman` và `Contents/MacOS/EasyPostmanMCP`，Cả hai đều chung một chủ JAR với tích hợp sẵn JRE
+- sau khi cài đặt `.app` Chứa cả hai `Contents/MacOS/DevWorkbench` và `Contents/MacOS/DevWorkbenchMCP`，Cả hai đều chung một chủ JAR với tích hợp sẵn JRE
 
 #### Xây dựng bằng tay
 
 ```bash
 # Chuẩn bị jpackage Đầu vào; đã sửa trong gói cài đặt JAR tên
 mkdir -p target/dist-input
-cp easy-postman-app/target/easy-postman-{Số phiên bản}.jar target/dist-input/easy-postman.jar
+cp dev-workbench-app/target/dev-workbench-{Số phiên bản}.jar target/dist-input/dev-workbench.jar
 
 # Apple Silicon
 jpackage \
   --input target/dist-input \
-  --name EasyPostman \
-  --main-jar easy-postman.jar \
-  --main-class com.laker.postman.App \
-  --add-launcher EasyPostmanMCP=build/easy-postman-mcp-launcher.properties \
+  --name DevWorkbench \
+  --main-jar dev-workbench.jar \
+  --main-class com.nvhuong.devworkbench.App \
+  --add-launcher DevWorkbenchMCP=build/dev-workbench-mcp-launcher.properties \
   --type dmg \
-  --icon assets/mac/EasyPostman.icns \
+  --icon assets/mac/DevWorkbench.icns \
   --app-version {Số phiên bản} \
-  --vendor "laker" \
-  --mac-package-name "EasyPostman"
+  --vendor "nvhuong" \
+  --mac-package-name "DevWorkbench"
 
 # Intel
 jpackage \
   --input target/dist-input \
-  --name EasyPostman \
-  --main-jar easy-postman.jar \
-  --main-class com.laker.postman.App \
-  --add-launcher EasyPostmanMCP=build/easy-postman-mcp-launcher.properties \
+  --name DevWorkbench \
+  --main-jar dev-workbench.jar \
+  --main-class com.nvhuong.devworkbench.App \
+  --add-launcher DevWorkbenchMCP=build/dev-workbench-mcp-launcher.properties \
   --type dmg \
-  --icon assets/mac/EasyPostman.icns \
+  --icon assets/mac/DevWorkbench.icns \
   --app-version {Số phiên bản} \
-  --vendor "laker" \
-  --mac-package-name "EasyPostman" \
+  --vendor "nvhuong" \
+  --mac-package-name "DevWorkbench" \
   --java-options "--add-opens java.base/java.lang=ALL-UNNAMED"
 ```
 
@@ -170,36 +170,36 @@ build\win-exe.bat
 ```
 
 **đầu ra**:
-- `dist/EasyPostman-{Số phiên bản}-windows-x64.exe` - Trình cài đặt
-- `dist/EasyPostman-{Số phiên bản}-windows-x64-portable.zip` - Phiên bản di động
-- Thư mục cài đặt và phiên bản di động ZIP Tất cả bao gồm `EasyPostman.exe`、`EasyPostmanMCP.exe`、`app/` Và `runtime/`；Phiên bản di động có thể được sử dụng sau khi giải nén hoàn toàn MCP，Không cần Java
+- `dist/DevWorkbench-{Số phiên bản}-windows-x64.exe` - Trình cài đặt
+- `dist/DevWorkbench-{Số phiên bản}-windows-x64-portable.zip` - Phiên bản di động
+- Thư mục cài đặt và phiên bản di động ZIP Tất cả bao gồm `DevWorkbench.exe`、`DevWorkbenchMCP.exe`、`app/` Và `runtime/`；Phiên bản di động có thể được sử dụng sau khi giải nén hoàn toàn MCP，Không cần Java
 
 #### Xây dựng bằng tay
 
 ```batch
 rem Chuẩn bị jpackage Nhập
 if not exist target\dist-input mkdir target\dist-input
-copy easy-postman-app\target\easy-postman-{Số phiên bản}.jar target\dist-input\easy-postman.jar
+copy dev-workbench-app\target\dev-workbench-{Số phiên bản}.jar target\dist-input\dev-workbench.jar
 
 rem Được tạo để chứa cả launcher và tích hợp sẵn JRE thư mục ứng dụng
 jpackage ^
   --type app-image ^
   --input target\dist-input ^
-  --name EasyPostman ^
-  --main-jar easy-postman.jar ^
-  --main-class com.laker.postman.App ^
-  --add-launcher EasyPostmanMCP=build\easy-postman-mcp-launcher.properties ^
+  --name DevWorkbench ^
+  --main-jar dev-workbench.jar ^
+  --main-class com.nvhuong.devworkbench.App ^
+  --add-launcher DevWorkbenchMCP=build\dev-workbench-mcp-launcher.properties ^
   --dest target ^
-  --icon assets\win\EasyPostman.ico ^
+  --icon assets\win\DevWorkbench.ico ^
   --app-version {Số phiên bản} ^
-  --vendor "laker"
+  --vendor "nvhuong"
 
 rem Tạo một phiên bản di động ZIP；Chính thức EXE Hãy chạy trình cài đặt trực tiếp build\win-exe.bat
-echo This is a portable version>target\EasyPostman\.portable
+echo This is a portable version>target\DevWorkbench\.portable
 mkdir target\portable
-xcopy target\EasyPostman target\portable\EasyPostman\ /E /I
+xcopy target\DevWorkbench target\portable\DevWorkbench\ /E /I
 cd target\portable
-powershell Compress-Archive -Path EasyPostman -DestinationPath ..\EasyPostman-{Số phiên bản}-windows-x64-portable.zip
+powershell Compress-Archive -Path DevWorkbench -DestinationPath ..\DevWorkbench-{Số phiên bản}-windows-x64-portable.zip
 cd ..\..
 ```
 
@@ -224,25 +224,25 @@ chmod +x build/linux-deb.sh
 
 **đầu ra**: `dist/` Thư mục tương ứng với kiến trúc máy đóng gói hiện tại được tạo ra DEB các tập tin chẳng hạn `dist/*.deb`
 
-Sau khi cài đặt trình khởi chạy máy tính để bàn và MCP Các bệ phóng được đặt tương ứng `/opt/easypostman/bin/EasyPostman` Và `/opt/easypostman/bin/EasyPostmanMCP`，Tích hợp sẵn JRE。
+Sau khi cài đặt trình khởi chạy máy tính để bàn và MCP Các bệ phóng được đặt tương ứng `/opt/devworkbench/bin/DevWorkbench` Và `/opt/devworkbench/bin/DevWorkbenchMCP`，Tích hợp sẵn JRE。
 
 #### Xây dựng bằng tay
 
 ```bash
 mkdir -p target/dist-input
-cp easy-postman-app/target/easy-postman-{Số phiên bản}.jar target/dist-input/easy-postman.jar
+cp dev-workbench-app/target/dev-workbench-{Số phiên bản}.jar target/dist-input/dev-workbench.jar
 
 jpackage \
   --input target/dist-input \
-  --name easypostman \
-  --main-jar easy-postman.jar \
-  --main-class com.laker.postman.App \
-  --add-launcher EasyPostmanMCP=build/easy-postman-mcp-launcher.properties \
+  --name devworkbench \
+  --main-jar dev-workbench.jar \
+  --main-class com.nvhuong.devworkbench.App \
+  --add-launcher DevWorkbenchMCP=build/dev-workbench-mcp-launcher.properties \
   --type deb \
-  --icon assets/linux/EasyPostman.png \
+  --icon assets/linux/DevWorkbench.png \
   --app-version {Số phiên bản} \
-  --vendor "laker" \
-  --linux-package-name "easypostman" \
+  --vendor "nvhuong" \
+  --linux-package-name "devworkbench" \
   --linux-menu-group "Development" \
   --linux-shortcut
 ```
@@ -299,7 +299,7 @@ Tạo một cái tối thiểu chỉ chứa các mô-đun cần thiết JRE：
 
 ```bash
 # Liệt kê các module cần thiết
-jdeps --print-module-deps target/easy-postman-{Số phiên bản}.jar
+jdeps --print-module-deps target/dev-workbench-{Số phiên bản}.jar
 
 # Tạo thời gian chạy tùy chỉnh
 jlink \
@@ -324,7 +324,7 @@ jpackage \
 
 ```bash
 # Xóa thuộc tính cách ly
-sudo xattr -rd com.apple.quarantine /Applications/EasyPostman.app
+sudo xattr -rd com.apple.quarantine /Applications/DevWorkbench.app
 ```
 
 ### Windows: "Windows Máy tính của bạn đã được bảo vệ"
@@ -368,6 +368,6 @@ $JAVA_HOME/bin/jpackage --version
 
 ## 💬 Cần giúp đỡ? .
 
-- 💬 GitHub Bảng thảo luận: [https://github.com/lakernote/easy-postman/discussions](https://github.com/lakernote/easy-postman/discussions)
-- 🐛 Báo cáo một vấn đề: [https://github.com/lakernote/easy-postman/issues](https://github.com/lakernote/easy-postman/issues)
-- 👥 Nhóm WeChat: Thêm vào **lakernote** Tham gia
+- 💬 GitHub Bảng thảo luận: [https://github.com/nvhuong/dev-workbench/discussions](https://github.com/nvhuong/dev-workbench/discussions)
+- 🐛 Báo cáo một vấn đề: [https://github.com/nvhuong/dev-workbench/issues](https://github.com/nvhuong/dev-workbench/issues)
+- 👥 Nhóm WeChat: Thêm vào **nvhuong** Tham gia

@@ -1,4 +1,4 @@
 module.exports = {
     suffix: "-child-ok",
-    marker: "easy-postman-local-demo"
+    marker: "dev-workbench-local-demo"
 };

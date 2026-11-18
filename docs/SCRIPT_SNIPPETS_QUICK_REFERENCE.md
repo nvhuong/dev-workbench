@@ -131,7 +131,7 @@ pm.request.params.add({
 ```javascript
 // Pre-request Script
 pm.sendRequest({
-    url: 'https://httpbin.org/get?source=easy-postman&from=pre-script',
+    url: 'https://httpbin.org/get?source=dev-workbench&from=pre-script',
     method: 'GET',
     header: {
         'X-Debug-Token': pm.environment.get('debugToken') || 'demo-token'

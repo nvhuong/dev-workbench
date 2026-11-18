@@ -25,7 +25,7 @@ Không phù hợp với:
 
 ## Sự chuẩn bị
 
-1. Tất cả các máy đều sử dụng cùng một phiên bản EasyPostman JAR hoặc cài đặt gói.
+1. Tất cả các máy đều sử dụng cùng một phiên bản DevWorkbench JAR hoặc cài đặt gói.
 2. mỗi đơn vị worker Máy có thể truy cập mục tiêu API。
 3. master Có thể truy cập mọi trạm worker cổng nghe.
 4. Nếu bạn định tham chiếu các tệp cục bộ, vd file-source CSV、multipart Các tập tin, vui lòng đặt các tập tin trên mỗi trạm trước worker cùng một con đường.GUI Các tập tin cục bộ sẽ không được tải lên tự động.
@@ -36,7 +36,7 @@ Không phù hợp với:
 Bắt đầu trên mỗi máy kiểm tra sức chịu đựng worker：
 
 ```bash
-java -jar easy-postman-5.5.28.jar \
+java -jar dev-workbench-5.5.28.jar \
   performance worker \
   --host 0.0.0.0 \
   --port 19090
@@ -47,7 +47,7 @@ java -jar easy-postman-5.5.28.jar \
 Tắt đầu ra tiến trình của bảng điều khiển: .
 
 ```bash
-java -jar easy-postman-5.5.28.jar \
+java -jar dev-workbench-5.5.28.jar \
   performance worker \
   --host 0.0.0.0 \
   --port 19090 \
@@ -57,8 +57,8 @@ java -jar easy-postman-5.5.28.jar \
 Máy này xác minh cả hai worker：
 
 ```bash
-java -jar easy-postman-5.5.28.jar performance worker --host 127.0.0.1 --port 19090
-java -jar easy-postman-5.5.28.jar performance worker --host 127.0.0.1 --port 19091
+java -jar dev-workbench-5.5.28.jar performance worker --host 127.0.0.1 --port 19090
+java -jar dev-workbench-5.5.28.jar performance worker --host 127.0.0.1 --port 19091
 ```
 
 ## GUI Thực hiện từ xa
@@ -80,20 +80,20 @@ java -jar easy-postman-5.5.28.jar performance worker --host 127.0.0.1 --port 190
 Bắt đầu với GUI Xuất khẩu `plan.json`，Chạy lại: .
 
 ```bash
-java -jar easy-postman-5.5.28.jar \
+java -jar dev-workbench-5.5.28.jar \
   performance master run \
   --plan /path/to/plan.json \
   --workers 10.0.0.11:19090,10.0.0.12:19090 \
-  --out /tmp/easy-postman-master-result.json
+  --out /tmp/dev-workbench-master-result.json
 ```
 
 Không có máy đơn lẻ GUI Thực hiện cùng một kế hoạch:
 
 ```bash
-java -jar easy-postman-5.5.28.jar \
+java -jar dev-workbench-5.5.28.jar \
   performance run \
   --plan /path/to/plan.json \
-  --out /tmp/easy-postman-result.json
+  --out /tmp/dev-workbench-result.json
 ```
 
 ## Cách hoạt động của tính năng làm mới theo thời gian thực

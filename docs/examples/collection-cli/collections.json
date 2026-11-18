@@ -2,8 +2,8 @@
     {
         "type": "group",
         "id": "collection-cli-example",
-        "name": "EasyPostman CLI Example",
-        "description": "Standard EasyPostman workspace example for collection run.",
+        "name": "DevWorkbench CLI Example",
+        "description": "Standard DevWorkbench workspace example for collection run.",
         "children": [
             {
                 "type": "group",
