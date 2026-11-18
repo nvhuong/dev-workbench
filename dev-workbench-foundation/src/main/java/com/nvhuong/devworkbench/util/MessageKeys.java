@@ -2943,6 +2943,24 @@ public final class MessageKeys {
     public static final String TOOLBOX_DIFF_COMPARE = "toolbox.diff.compare";
     public static final String TOOLBOX_DIFF_SWAP = "toolbox.diff.swap";
     public static final String TOOLBOX_DIFF_RESULT = "toolbox.diff.result";
+    public static final String TOOLBOX_DIFF_MODE = "toolbox.diff.mode";
+    public static final String TOOLBOX_DIFF_MODE_TEXT = "toolbox.diff.mode.text";
+    public static final String TOOLBOX_DIFF_MODE_FILE = "toolbox.diff.mode.file";
+    public static final String TOOLBOX_DIFF_MODE_FOLDER = "toolbox.diff.mode.folder";
+    public static final String TOOLBOX_DIFF_SOURCE_A = "toolbox.diff.source_a";
+    public static final String TOOLBOX_DIFF_SOURCE_B = "toolbox.diff.source_b";
+    public static final String TOOLBOX_DIFF_BROWSE = "toolbox.diff.browse";
+    public static final String TOOLBOX_DIFF_SELECT_BOTH = "toolbox.diff.select_both";
+    public static final String TOOLBOX_DIFF_INVALID_SELECTION = "toolbox.diff.invalid_selection";
+    public static final String TOOLBOX_DIFF_READ_FAILED = "toolbox.diff.read_failed";
+    public static final String TOOLBOX_DIFF_TOO_LARGE = "toolbox.diff.too_large";
+    public static final String TOOLBOX_DIFF_TOO_MANY_FILES = "toolbox.diff.too_many_files";
+    public static final String TOOLBOX_DIFF_FOLDER_SUMMARY = "toolbox.diff.folder_summary";
+    public static final String TOOLBOX_DIFF_FILE_ADDED = "toolbox.diff.file_added";
+    public static final String TOOLBOX_DIFF_FILE_REMOVED = "toolbox.diff.file_removed";
+    public static final String TOOLBOX_DIFF_FILE_MODIFIED = "toolbox.diff.file_modified";
+    public static final String TOOLBOX_DIFF_FILE_UNCHANGED = "toolbox.diff.file_unchanged";
+    public static final String TOOLBOX_DIFF_BINARY = "toolbox.diff.binary";
 
     // ============ Công cụ Elasticsearch ============
     public static final String TOOLBOX_ELASTICSEARCH = "toolbox.elasticsearch";
