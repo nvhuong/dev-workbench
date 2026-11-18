@@ -25,6 +25,7 @@ import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.JTree;
 import javax.swing.SwingWorker;
+import javax.swing.Timer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
@@ -47,6 +48,7 @@ import java.util.Base64;
 import java.util.List;
 import java.util.Properties;
 import java.util.ServiceLoader;
+import java.util.concurrent.ForkJoinPool;
 
 /** JDBC workbench for connecting to databases, exploring metadata, and executing SQL. */
 @Slf4j
@@ -54,6 +56,8 @@ public class SqlPanel extends JPanel {
     private static final String PROFILE_FILE = "connection-profiles.txt";
     private static final String ACTIVE_PROFILE_FILE = "active-profile.txt";
     private static final int QUERY_TIMEOUT_SECONDS = 30;
+    private static final int METADATA_TIMEOUT_SECONDS = 60;
+    private static final int METADATA_TIMEOUT_MILLIS = METADATA_TIMEOUT_SECONDS * 1000;
     private static final int MAX_RESULT_ROWS = 500;
     private static final List<String> SQL_SUGGESTIONS = List.of(
             "SELECT * FROM ", "INSERT INTO ", "UPDATE ", "DELETE FROM ", "CREATE TABLE ",
@@ -88,6 +92,10 @@ public class SqlPanel extends JPanel {
     private boolean loadingProfiles;
     private Connection connection;
     private URLClassLoader driverClassLoader;
+    private SwingWorker<MetadataSnapshot, Void> metadataWorker;
+    private Timer metadataTimeoutTimer;
+    private long metadataLoadSequence;
+    private long timedOutMetadataSequence = -1;
     private List<String> metadataSuggestions = new ArrayList<>();
     private DatabasePreset previousPreset = DatabasePreset.GENERIC;
 
@@ -468,6 +476,11 @@ public class SqlPanel extends JPanel {
                             ? DriverManager.getConnection(url, properties)
                             : driver.connect(url, properties);
                     if (opened == null) throw new IllegalArgumentException(SqlI18n.t("driver_rejected_url"));
+                    try {
+                        opened.setNetworkTimeout(ForkJoinPool.commonPool(), METADATA_TIMEOUT_MILLIS);
+                    } catch (Exception | AbstractMethodError unsupported) {
+                        log.debug("JDBC driver does not support connection network timeout", unsupported);
+                    }
                     synchronized (SqlPanel.this) {
                         closeResources();
                         driverClassLoader = loader;
@@ -511,16 +524,21 @@ public class SqlPanel extends JPanel {
     private void loadMetadata() {
         Connection active = connection;
         if (active == null) return;
+        cancelMetadataLoad();
+        long sequence = ++metadataLoadSequence;
         executeButton.setEnabled(false);
         refreshObjectsButton.setEnabled(false);
         setStatus(SqlI18n.t("loading_objects"));
-        new SwingWorker<MetadataSnapshot, Void>() {
+        SwingWorker<MetadataSnapshot, Void> worker = new SwingWorker<>() {
             @Override protected MetadataSnapshot doInBackground() throws Exception {
                 return readMetadata(active);
             }
 
             @Override protected void done() {
-                if (connection != active) return;
+                if (sequence != metadataLoadSequence || connection != active
+                        || timedOutMetadataSequence == sequence) return;
+                stopMetadataTimeout();
+                metadataWorker = null;
                 try {
                     MetadataSnapshot snapshot = get();
                     executeButton.setEnabled(true);
@@ -540,7 +558,35 @@ public class SqlPanel extends JPanel {
                     setStatus(SqlI18n.t("error", safeMessage(cause)));
                 }
             }
-        }.execute();
+        };
+        metadataWorker = worker;
+        metadataTimeoutTimer = new Timer(METADATA_TIMEOUT_MILLIS, event -> {
+            if (sequence != metadataLoadSequence || connection != active) return;
+            timedOutMetadataSequence = sequence;
+            worker.cancel(true);
+            metadataWorker = null;
+            executeButton.setEnabled(true);
+            refreshObjectsButton.setEnabled(true);
+            setStatus(SqlI18n.t("metadata_timeout", METADATA_TIMEOUT_SECONDS));
+        });
+        metadataTimeoutTimer.setRepeats(false);
+        metadataTimeoutTimer.start();
+        worker.execute();
+    }
+
+    private void cancelMetadataLoad() {
+        stopMetadataTimeout();
+        if (metadataWorker != null && !metadataWorker.isDone()) {
+            metadataWorker.cancel(true);
+        }
+        metadataWorker = null;
+    }
+
+    private void stopMetadataTimeout() {
+        if (metadataTimeoutTimer != null) {
+            metadataTimeoutTimer.stop();
+            metadataTimeoutTimer = null;
+        }
     }
 
     private MetadataSnapshot readMetadata(Connection active) throws Exception {
@@ -695,6 +741,8 @@ public class SqlPanel extends JPanel {
 
     private void disconnect() {
         try {
+            metadataLoadSequence++;
+            cancelMetadataLoad();
             closeResources();
             connection = null;
             objectTree.setModel(new DefaultTreeModel(new DefaultMutableTreeNode("Database")));
