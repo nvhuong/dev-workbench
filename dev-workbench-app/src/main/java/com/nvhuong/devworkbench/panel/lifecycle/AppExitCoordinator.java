@@ -7,9 +7,13 @@ import com.nvhuong.devworkbench.ioc.Component;
 import com.nvhuong.devworkbench.panel.collections.OpenedRequestTabSessionSaver;
 import com.nvhuong.devworkbench.panel.functional.FunctionalPanel;
 import com.nvhuong.devworkbench.panel.performance.PerformancePanel;
+import com.nvhuong.devworkbench.util.I18nUtil;
+import com.nvhuong.devworkbench.util.MessageKeys;
 import lombok.extern.slf4j.Slf4j;
 
+import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
+import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
 @Slf4j
@@ -22,8 +26,19 @@ public class AppExitCoordinator {
      * Hiển thị hộp thoại xác nhận thoát để xử lý nội dung chưa được lưu.
      */
     public void exitApplication() {
+        exitApplication(null);
+    }
+
+    public void restartApplication(ApplicationRestartSupport.RestartPlan restartPlan) {
+        if (restartPlan == null) {
+            throw new IllegalArgumentException("restartPlan must not be null");
+        }
+        exitApplication(restartPlan);
+    }
+
+    private void exitApplication(ApplicationRestartSupport.RestartPlan restartPlan) {
         if (!SwingUtilities.isEventDispatchThread()) {
-            SwingUtilities.invokeLater(this::exitApplication);
+            SwingUtilities.invokeLater(() -> exitApplication(restartPlan));
             return;
         }
         if (exitInProgress) {
@@ -58,6 +73,22 @@ public class AppExitCoordinator {
                     .ifPresent(PerformancePanel::save);
         } catch (Exception e) {
             log.error("Failed to save performance test config on exit", e);
+        }
+
+        if (restartPlan != null) {
+            try {
+                restartPlan.startAfterExit();
+            } catch (IOException e) {
+                exitInProgress = false;
+                log.error("Failed to prepare application restart", e);
+                JOptionPane.showMessageDialog(
+                        null,
+                        I18nUtil.getMessage(MessageKeys.APP_RESTART_FAILED, e.getMessage()),
+                        I18nUtil.getMessage(MessageKeys.GENERAL_ERROR),
+                        JOptionPane.ERROR_MESSAGE
+                );
+                return;
+            }
         }
 
         // Tất cả các mục sẽ được dọn sạch sau khi xác nhận lưu; việc hủy thoát sẽ không giải phóng các bảng vẫn đang được sử dụng.

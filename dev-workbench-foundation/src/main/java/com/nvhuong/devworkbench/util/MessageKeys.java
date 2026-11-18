@@ -21,7 +21,9 @@ public final class MessageKeys {
     public static final String MENU_THEME_DARK = "menu.theme.dark";
     public static final String MENU_SETTINGS = "menu.settings";
     public static final String MENU_HELP = "menu.help";
-    public static final String MENU_HELP_UPDATE = "menu.help.update";
+    public static final String MENU_HELP_RESTART = "menu.help.restart";
+    public static final String APP_RESTART_UNAVAILABLE = "app.restart.unavailable";
+    public static final String APP_RESTART_FAILED = "app.restart.failed";
     public static final String MENU_HELP_CHANGELOG = "menu.help.changelog";
     public static final String MENU_HELP_MEMORY_TUNING = "menu.help.memory_tuning";
     public static final String MENU_HELP_FEEDBACK = "menu.help.feedback";

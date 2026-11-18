@@ -3,7 +3,8 @@ package com.nvhuong.devworkbench.panel.topmenu;
 import com.nvhuong.devworkbench.ioc.BeanFactory;
 import com.nvhuong.devworkbench.panel.topmenu.help.ChangelogDialog;
 import com.nvhuong.devworkbench.panel.topmenu.help.MemoryTuningDialog;
-import com.nvhuong.devworkbench.service.UpdateService;
+import com.nvhuong.devworkbench.panel.lifecycle.AppExitCoordinator;
+import com.nvhuong.devworkbench.panel.lifecycle.ApplicationRestartSupport;
 import com.nvhuong.devworkbench.util.I18nUtil;
 import com.nvhuong.devworkbench.util.MessageKeys;
 import lombok.experimental.UtilityClass;
@@ -27,9 +28,9 @@ class TopMenuHelpMenu {
     JMenu create(Component parent) {
         JMenu helpMenu = new JMenu(I18nUtil.getMessage(MessageKeys.MENU_HELP));
 
-        JMenuItem updateMenuItem = new JMenuItem(I18nUtil.getMessage(MessageKeys.MENU_HELP_UPDATE));
-        updateMenuItem.addActionListener(e -> checkUpdate());
-        helpMenu.add(updateMenuItem);
+        JMenuItem restartMenuItem = new JMenuItem(I18nUtil.getMessage(MessageKeys.MENU_HELP_RESTART));
+        restartMenuItem.addActionListener(e -> restartApplication(parent));
+        helpMenu.add(restartMenuItem);
 
         JMenuItem changelogMenuItem = new JMenuItem(I18nUtil.getMessage(MessageKeys.MENU_HELP_CHANGELOG));
         changelogMenuItem.addActionListener(e -> showChangelogDialog(parent));
@@ -46,8 +47,18 @@ class TopMenuHelpMenu {
         return helpMenu;
     }
 
-    private void checkUpdate() {
-        BeanFactory.getBean(UpdateService.class).checkUpdateManually();
+    private void restartApplication(Component parent) {
+        ApplicationRestartSupport.RestartPlan restartPlan = ApplicationRestartSupport.prepare();
+        if (restartPlan == null) {
+            JOptionPane.showMessageDialog(
+                    TopMenuDialogOwner.resolve(parent),
+                    I18nUtil.getMessage(MessageKeys.APP_RESTART_UNAVAILABLE),
+                    I18nUtil.getMessage(MessageKeys.GENERAL_ERROR),
+                    JOptionPane.ERROR_MESSAGE
+            );
+            return;
+        }
+        BeanFactory.getBean(AppExitCoordinator.class).restartApplication(restartPlan);
     }
 
     private void showChangelogDialog(Component parent) {
