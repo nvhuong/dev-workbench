@@ -21,9 +21,7 @@ public class ChangelogDialogTextTest {
         ResourceBundle zh = ResourceBundle.getBundle("messages", Locale.forLanguageTag("vi"));
 
         assertEquals(en.getString(MessageKeys.CHANGELOG_VIEW_ON_GITHUB), "GitHub");
-        assertEquals(en.getString(MessageKeys.CHANGELOG_VIEW_ON_GITEE), "Gitee");
         assertEquals(zh.getString(MessageKeys.CHANGELOG_VIEW_ON_GITHUB), "GitHub");
-        assertEquals(zh.getString(MessageKeys.CHANGELOG_VIEW_ON_GITEE), "Gitee");
     }
 
     @Test

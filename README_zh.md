@@ -7,14 +7,13 @@
 **Nguồn mở DevWorkbench Gỡ lỗi giao diện kiểu + JMeter Công cụ máy tính để bàn kiểm tra hiệu suất phong cách**<br>
 *Ưu tiên địa phương · Git khu vực làm việc · Không đầu CLI · Tích hợp sẵn MCP Server*
 
-[![GitHub license](https://img.shields.io/github/license/nvhuong/dev-workbench?style=flat-square)](https://github.com/nvhuong/dev-workbench/blob/master/LICENSE)
 [![GitHub release](https://img.shields.io/github/v/release/nvhuong/dev-workbench?style=flat-square&color=brightgreen)](https://github.com/nvhuong/dev-workbench/releases)
 [![GitHub downloads](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fnvhuong%2Fdev-workbench%2Fbadges%2Fgithub-downloads.json&style=flat-square&cacheSeconds=3600)](https://github.com/nvhuong/dev-workbench/releases)
 [![GitHub stars](https://img.shields.io/github/stars/nvhuong/dev-workbench?style=flat-square&color=yellow)](https://github.com/nvhuong/dev-workbench/stargazers)
 [![Java](https://img.shields.io/badge/Java-21+-ED8B00?style=flat-square&logo=openjdk&logoColor=white)](https://openjdk.org/)
 [![Platform](https://img.shields.io/badge/Platform-Windows%20%7C%20macOS%20%7C%20Linux-0078D4?style=flat-square)](https://github.com/nvhuong/dev-workbench/releases)
 
-[English](README.md) · [📦 tải về](#-Tải xuống và cài đặt) · [🤖 Cài đặt MCP](#-mcp-server) · [📖 Tài liệu](#-Tài liệu) · [💬 Bảng thảo luận](https://github.com/nvhuong/dev-workbench/discussions) · Wechat: .`nvhuong`
+[English](README.md) · [📦 tải về](#-Tải xuống và cài đặt) · [🤖 Cài đặt MCP](#-mcp-server) · [📖 Tài liệu](#-Tài liệu) · [💬 Bảng thảo luận](https://github.com/nvhuong/dev-workbench/discussions)
 
 </div>
 
@@ -59,7 +58,7 @@ DevWorkbench Bó **DevWorkbench gỡ lỗi giao diện phong cách**và **JMeter
 
 ## 📦 Tải xuống và cài đặt
 
-Từ **[GitHub Releases](https://github.com/nvhuong/dev-workbench/releases)** Tải xuống phiên bản mới nhất; người dùng trong nước cũng có thể sử dụng nó **[Gitee Releases](https://gitee.com/nvhuong/dev-workbench/releases)**。Gói cài đặt gốc và Windows Phiên bản di động đã bao gồm thời gian chạy, máy tính để bàn và MCP Không cần phải cài đặt bất cứ điều gì khác Java；Chỉ đa nền tảng JAR Cần thiết Java 21+。
+Tải bản mới nhất từ **[GitHub Releases](https://github.com/nvhuong/dev-workbench/releases)**. Bộ cài đặt và gói portable Windows đã kèm runtime; chỉ JAR đa nền tảng cần Java 21+.
 
 ### Windows WinGet
 
@@ -207,7 +206,7 @@ mvn clean package
 
 DevWorkbench đã sử dụng [FlatLaf](https://github.com/JFormDesigner/FlatLaf)、[RSyntaxTextArea](https://github.com/bobbylight/RSyntaxTextArea)、[OkHttp](https://github.com/square/okhttp) và các dự án nguồn mở xuất sắc khác.
 
-Nếu dự án hữu ích cho bạn, xin chào mừng bạn [Star](https://github.com/nvhuong/dev-workbench)、[Tham gia vào các cuộc thảo luận](https://github.com/nvhuong/dev-workbench/discussions) Hoặc thêm WeChat `nvhuong` giao tiếp.
+Nếu dự án hữu ích cho bạn, xin chào mừng bạn [Star](https://github.com/nvhuong/dev-workbench)、[Tham gia vào các cuộc thảo luận](https://github.com/nvhuong/dev-workbench/discussions). Liên hệ: điện thoại 0964210295 · email [huong.nguyenvan.hd@gmail.com](mailto:huong.nguyenvan.hd@gmail.com).
 
 <div align="center">
 

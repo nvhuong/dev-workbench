@@ -19,8 +19,6 @@ Sau khi decompile toàn bộ class trong 7 artifact đóng gói và rà thủ c�
 ## Hành vi mạng hợp lệ quan sát được
 
 - App thực hiện request do người dùng cấu hình qua OkHttp, WebSocket/SSE và hỗ trợ performance test. Dữ liệu gửi tới endpoint trong request là chức năng chính của DevWorkbench client.
-- Có request kiểm tra/phát hành cập nhật tới GitHub hoặc Gitee (`nvhuong/dev-workbench`), cùng tải installer theo luồng cập nhật.
-- Plugin manager đọc catalog và tải plugin từ GitHub/Gitee.
 - Git workspace plugin có thể đồng bộ repository được người dùng cấu hình.
 - Plugin Kafka/Redis/Capture và client certificate kết nối tới broker, cache, proxy hoặc endpoint cấu hình bởi người dùng.
 - Thư viện MCP/Reactor/Jackson có URL tài liệu/specification trong constant pool; đây không phải bằng chứng về kết nối mạng.

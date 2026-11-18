@@ -52,7 +52,7 @@ public class PluginCatalogServiceTest {
                 PluginCatalogService.detectOfficialCatalogSource(PluginCatalogService.getOfficialCatalogUrl("github")),
                 "github"
         );
-        assertEquals(PluginCatalogService.detectOfficialCatalogSource("https://gitee.com/old/catalog.json"), "");
+        assertEquals(PluginCatalogService.detectOfficialCatalogSource("https://example.com/other/catalog.json"), "");
     }
 
     @Test

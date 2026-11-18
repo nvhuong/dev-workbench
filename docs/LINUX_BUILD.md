@@ -47,7 +47,6 @@ jpackage --version
 
 1. **Sao chép mã dự án**
    ```bash
-   git clone https://gitee.com/nvhuong/dev-workbench.git
    cd dev-workbench
    ```
 
@@ -78,7 +77,6 @@ jpackage --version
 
 1. **Sao chép mã dự án**
    ```bash
-   git clone https://gitee.com/nvhuong/dev-workbench.git
    cd dev-workbench
    ```
 
@@ -133,7 +131,6 @@ Cả hai tập lệnh đều thực hiện các bước sau:
 - ✅ Chứa hợp lý JRE Thời gian chạy (không cần cài đặt hệ thống Java）
 - ✅ Tự động cấu hình các tham số bộ nhớ (256MB-512MB）
 - ✅ UTF-8 Hỗ trợ mã hóa
-- ✅ MIT Tuyên bố giấy phép
 
 ## Sử dụng sau khi cài đặt
 

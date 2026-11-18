@@ -9,7 +9,7 @@ package com.nvhuong.devworkbench.platform.update;
 @FunctionalInterface
 public interface UpdateSettingsProvider {
 
-    String DEFAULT_SOURCE_PREFERENCE = "auto";
+    String DEFAULT_SOURCE_PREFERENCE = "github";
 
     String getUpdateSourcePreference();
 

@@ -21,9 +21,7 @@ java -jar dev-workbench.jar collection run /srv/api-workspace
 Mở bất kỳ trang phát hành nào, mới nhất `v*` phiên bản Assets Tải về `dev-workbench-{Số phiên bản}.jar`：
 
 - [GitHub cập nhật Release](https://github.com/nvhuong/dev-workbench/releases/latest)
-- [Gitee Releases（Phản ánh trong nước)](https://gitee.com/nvhuong/dev-workbench/releases)
 
-Gitee Đồng bộ hóa tệp đính kèm có thể bị trì hoãn; nếu bản gốc tạm thời không có sẵn trong phiên bản mới nhất JAR，Hãy sử dụng GitHub Địa chỉ tải về. chạy CLI Cần thiết Java 21 hoặc cao hơn.
 
 ## 1. Workspace tập tin
 

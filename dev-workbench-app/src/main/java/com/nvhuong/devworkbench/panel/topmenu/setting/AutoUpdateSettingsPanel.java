@@ -25,7 +25,6 @@ public class AutoUpdateSettingsPanel extends ModernSettingsPanel {
     private JComboBox<String> appUpdateFrequencyComboBox;
     private JCheckBox pluginUpdateCheckBox;
     private JComboBox<String> pluginUpdateFrequencyComboBox;
-    private JComboBox<String> updateSourceComboBox;
     private final UpdateCenter updateCenter = AppUpdateCenter.get();
 
     @Override
@@ -110,28 +109,6 @@ public class AutoUpdateSettingsPanel extends ModernSettingsPanel {
         autoUpdateSection.add(pluginLastCheckRow);
         autoUpdateSection.add(createVerticalSpace(FIELD_SPACING));
 
-        // Cập nhật lựa chọn nguồn
-        String[] sourceOptions = {
-                I18nUtil.getMessage(MessageKeys.SETTINGS_UPDATE_SOURCE_AUTO),
-                I18nUtil.getMessage(MessageKeys.SETTINGS_UPDATE_SOURCE_GITHUB),
-                I18nUtil.getMessage(MessageKeys.SETTINGS_UPDATE_SOURCE_GITEE)
-        };
-        updateSourceComboBox = new JComboBox<>(sourceOptions);
-
-        // Chọn tùy chọn tương ứng dựa trên cài đặt hiện tại
-        String currentPreference = SettingManager.getUpdateSourcePreference();
-        switch (currentPreference) {
-            case "github" -> updateSourceComboBox.setSelectedIndex(1);
-            case "gitee" -> updateSourceComboBox.setSelectedIndex(2);
-            default -> updateSourceComboBox.setSelectedIndex(0); // auto
-        }
-
-        JPanel sourceRow = createFieldRow(
-                I18nUtil.getMessage(MessageKeys.SETTINGS_UPDATE_SOURCE_PREFERENCE),
-                I18nUtil.getMessage(MessageKeys.SETTINGS_UPDATE_SOURCE_PREFERENCE_TOOLTIP),
-                updateSourceComboBox
-        );
-        autoUpdateSection.add(sourceRow);
 
         contentPanel.add(autoUpdateSection);
         contentPanel.add(createVerticalSpace(SECTION_SPACING));
@@ -141,7 +118,6 @@ public class AutoUpdateSettingsPanel extends ModernSettingsPanel {
         trackComponentValue(appUpdateFrequencyComboBox);
         trackComponentValue(pluginUpdateCheckBox);
         trackComponentValue(pluginUpdateFrequencyComboBox);
-        trackComponentValue(updateSourceComboBox);
     }
 
     @Override
@@ -169,13 +145,6 @@ public class AutoUpdateSettingsPanel extends ModernSettingsPanel {
             SettingManager.setPluginUpdateCheckEnabled(pluginUpdateCheckBox.isSelected());
             SettingManager.setPluginUpdateCheckFrequency(selectedFrequency(pluginUpdateFrequencyComboBox));
 
-            // Lưu cài đặt nguồn cập nhật
-            String selectedSource = switch (updateSourceComboBox.getSelectedIndex()) {
-                case 1 -> "github";
-                case 2 -> "gitee";
-                default -> "auto";
-            };
-            SettingManager.setUpdateSourcePreference(selectedSource);
 
             // Truy xuất giá trị hiện tại
             originalValues.clear();
@@ -183,7 +152,6 @@ public class AutoUpdateSettingsPanel extends ModernSettingsPanel {
             trackComponentValue(appUpdateFrequencyComboBox);
             trackComponentValue(pluginUpdateCheckBox);
             trackComponentValue(pluginUpdateFrequencyComboBox);
-            trackComponentValue(updateSourceComboBox);
             setHasUnsavedChanges(false);
 
             NotificationCenter.showSuccess(I18nUtil.getMessage(MessageKeys.SETTINGS_SAVE_SUCCESS_MESSAGE));

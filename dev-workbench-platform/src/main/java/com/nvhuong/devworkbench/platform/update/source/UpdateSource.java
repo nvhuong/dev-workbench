@@ -6,7 +6,7 @@ import cn.hutool.json.JSONObject;
 /**
  * Cập nhật giao diện nguồn - Xác định các thông số kỹ thuật thu thập thông tin phát hành và kiểm tra phiên bản thống nhất
  *
- * <p>Các nguồn cập nhật khác nhau (GitHub、Gitee v.v.) cần triển khai giao diện này để cung cấp phương thức truy cập thống nhất.</p>
+ * <p>Các nguồn cập nhật khác nhau (GitHub) cần triển khai giao diện này để cung cấp phương thức truy cập thống nhất.</p>
  */
 public interface UpdateSource {
 
@@ -16,7 +16,7 @@ public interface UpdateSource {
     /**
      * Lấy tên của nguồn cập nhật
      *
-     * @return Cập nhật tên nguồn (ví dụ "GitHub", "Gitee"）
+     * @return Cập nhật tên nguồn (ví dụ "GitHub"）
      */
     String getName();
 

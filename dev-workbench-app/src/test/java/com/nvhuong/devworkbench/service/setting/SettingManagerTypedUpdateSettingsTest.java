@@ -28,7 +28,7 @@ public class SettingManagerTypedUpdateSettingsTest {
             props.setProperty("last_update_check_time", "-100");
 
             assertEquals(SettingManager.getAutoUpdateCheckFrequency(), "daily");
-            assertEquals(SettingManager.getUpdateSourcePreference(), "auto");
+            assertEquals(SettingManager.getUpdateSourcePreference(), "github");
             assertEquals(SettingManager.getLastUpdateCheckTime(), 0L);
 
             SettingManager.setAutoUpdateCheckFrequency("weekly");

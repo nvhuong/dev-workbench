@@ -17,7 +17,7 @@ That workflow can update:
 
 Current behavior:
 
-- each plugin release may update the matching GitHub and Gitee catalog entry
+- each plugin release may update the matching GitHub catalog entry
 - bundled fallback catalogs are kept in sync with the public catalogs
 - `sha256` is supported by the installer and should be filled by the release pipeline when available
 - official plugin releases are expected to run from the default branch

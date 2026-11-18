@@ -276,7 +276,7 @@ class AppSettingKeys {
     );
     static final SettingKey<String> UPDATE_SOURCE_PREFERENCE = SettingKey.stringKey(
             "update_source_preference",
-            "auto"
+            "github"
     ).normalized(AppSettingKeys::normalizeUpdateSourcePreference);
     static final SettingKey<Boolean> PROXY_ENABLED = SettingKey.booleanKey(
             "proxy_enabled",
@@ -420,11 +420,11 @@ class AppSettingKeys {
 
     static String normalizeUpdateSourcePreference(String preference) {
         String normalized = normalizedLowerCode(preference);
-        return isSupportedUpdateSourcePreference(normalized) ? normalized : "auto";
+        return "github";
     }
 
     static boolean isSupportedUpdateSourcePreference(String preference) {
-        return preference.equals("auto") || preference.equals("github") || preference.equals("gitee");
+        return preference.equals("github");
     }
 
     static String normalizedLowerCode(String value) {

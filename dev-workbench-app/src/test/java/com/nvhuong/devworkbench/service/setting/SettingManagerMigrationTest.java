@@ -25,19 +25,19 @@ public class SettingManagerMigrationTest {
 
         try {
             Properties legacySettings = new Properties();
-            legacySettings.setProperty("update_source", "gitee");
+            legacySettings.setProperty("update_source", "github");
             PreferencesStore.storeProperties(legacySettings, configPath);
 
             props.clear();
             SettingManager.load();
 
-            assertEquals(props.getProperty("update_source_preference"), "gitee");
+            assertEquals(props.getProperty("update_source_preference"), "github");
             assertFalse(props.containsKey("update_source"));
             assertEquals(props.getProperty(PreferencesStore.DEFAULT_SCHEMA_VERSION_KEY),
                     String.valueOf(AppSettingsMigrations.LATEST_SCHEMA_VERSION));
 
             Properties reloaded = PreferencesStore.loadProperties(configPath);
-            assertEquals(reloaded.getProperty("update_source_preference"), "gitee");
+            assertEquals(reloaded.getProperty("update_source_preference"), "github");
             assertFalse(reloaded.containsKey("update_source"));
         } finally {
             props.clear();
@@ -58,13 +58,13 @@ public class SettingManagerMigrationTest {
         try {
             Properties mixedSettings = new Properties();
             mixedSettings.setProperty("update_source", "github");
-            mixedSettings.setProperty("update_source_preference", "gitee");
+            mixedSettings.setProperty("update_source_preference", "github");
             PreferencesStore.storeProperties(mixedSettings, configPath);
 
             props.clear();
             SettingManager.load();
 
-            assertEquals(props.getProperty("update_source_preference"), "gitee");
+            assertEquals(props.getProperty("update_source_preference"), "github");
             assertFalse(props.containsKey("update_source"));
             assertEquals(props.getProperty(PreferencesStore.DEFAULT_SCHEMA_VERSION_KEY),
                     String.valueOf(AppSettingsMigrations.LATEST_SCHEMA_VERSION));

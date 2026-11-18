@@ -33,8 +33,6 @@
 git clone https://github.com/nvhuong/dev-workbench.git
 cd dev-workbench
 
-# Or Gitee (China mirror)
-git clone https://gitee.com/nvhuong/dev-workbench.git
 cd dev-workbench
 ```
 
@@ -344,4 +342,5 @@ $JAVA_HOME/bin/jpackage --version
 
 - 💬 GitHub Discussions: [https://github.com/nvhuong/dev-workbench/discussions](https://github.com/nvhuong/dev-workbench/discussions)
 - 🐛 Report Issues: [https://github.com/nvhuong/dev-workbench/issues](https://github.com/nvhuong/dev-workbench/issues)
-- 👥 WeChat Group: Add **nvhuong** to join
+
+Contact: phone 0964210295 · email [huong.nguyenvan.hd@gmail.com](mailto:huong.nguyenvan.hd@gmail.com).

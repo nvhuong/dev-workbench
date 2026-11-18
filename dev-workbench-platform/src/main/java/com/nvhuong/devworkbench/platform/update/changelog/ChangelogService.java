@@ -52,13 +52,6 @@ public class ChangelogService {
         JSONArray releases = primarySource.fetchAllReleases(limit);
 
         if (releases == null) {
-            // Hãy thử một nguồn thay thế
-            UpdateSource fallbackSource = sourceSelector.getFallbackSource(primarySource);
-            log.info("Primary source failed, trying fallback source: {}", fallbackSource.getName());
-            releases = fallbackSource.fetchAllReleases(limit);
-        }
-
-        if (releases == null) {
             return null;
         }
 

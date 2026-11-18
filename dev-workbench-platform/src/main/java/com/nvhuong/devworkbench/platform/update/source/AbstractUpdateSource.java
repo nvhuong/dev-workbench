@@ -195,7 +195,7 @@ public abstract class AbstractUpdateSource implements UpdateSource {
     }
 
     /**
-     * Xây dựng truy vấn cho một ấn phẩm theo thẻ API địa chỉ.GitHub Và Gitee Tất cả đều được thông qua
+     * Xây dựng truy vấn cho một ấn phẩm theo thẻ API địa chỉ.GitHub sử dụng
      * {@code /releases/tags/{tag}} Con đường; các tham số truy vấn không thuộc đường dẫn cơ bản và cần được loại bỏ trước.
      */
     protected String buildReleaseByTagApiUrl(String tagName) {

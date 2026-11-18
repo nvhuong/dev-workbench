@@ -243,8 +243,6 @@ jobs:
             'PublisherSupportUrl: https://github.com/nvhuong/dev-workbench/issues'
             'PackageName: DevWorkbench'
             'PackageUrl: https://github.com/nvhuong/dev-workbench'
-            'License: Apache-2.0'
-            'LicenseUrl: https://github.com/nvhuong/dev-workbench/blob/master/LICENSE'
             'ShortDescription: An open-source DevWorkbench-style API client and JMeter-style load testing desktop app.'
             'Description: DevWorkbench combines a DevWorkbench-style API debugging workspace with JMeter-style performance testing in one local-first desktop app.'
             'Moniker: devworkbench'

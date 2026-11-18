@@ -11,7 +11,6 @@
 ### Git khu vực làm việc
 - ✅ Kiểm soát phiên bản được hỗ trợ
 - ✅ Hỗ trợ hợp tác nhóm
-- ✅ Sao chép từ kho lưu trữ từ xa (GitHub/Gitee/GitLab）
 - ✅ Khởi tạo cục bộ Git nhà kho
 - ✅ Cách ly dữ liệu cấp dự án
 - ✅ Chuyển đổi không gian làm việc nhanh chóng

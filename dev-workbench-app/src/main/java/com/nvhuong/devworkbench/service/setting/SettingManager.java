@@ -638,22 +638,14 @@ public class SettingManager {
     }
 
     /**
-     * Cập nhật tùy chọn nguồn
-     * Các giá trị được hỗ trợ: .
-     * - "auto": Tự động chọn nguồn nhanh nhất (mặc định)
-     * - "github": Luôn luôn sử dụng GitHub
-     * - "gitee": Luôn luôn sử dụng Gitee
+     * Lấy nguồn cập nhật GitHub duy nhất.
      */
     public static String getUpdateSourcePreference() {
         return get(AppSettingKeys.UPDATE_SOURCE_PREFERENCE);
     }
 
     public static void setUpdateSourcePreference(String preference) {
-        String normalized = AppSettingKeys.normalizedLowerCode(preference);
-        if (AppSettingKeys.isSupportedUpdateSourcePreference(normalized)) {
-            put(AppSettingKeys.UPDATE_SOURCE_PREFERENCE, normalized);
-            log.info("Update source preference saved: {}", normalized);
-        }
+        put(AppSettingKeys.UPDATE_SOURCE_PREFERENCE, "github");
     }
 
     // ===== Cài đặt proxy mạng =====

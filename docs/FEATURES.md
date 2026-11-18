@@ -11,7 +11,6 @@
 ### Git Workspace
 - ✅ Version control support
 - ✅ Team collaboration enabled
-- ✅ Clone from remote repositories (GitHub/Gitee/GitLab)
 - ✅ Initialize local Git repository
 - ✅ Project-level data isolation
 - ✅ Quick workspace switching

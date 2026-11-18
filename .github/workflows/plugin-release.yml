@@ -1,4 +1,4 @@
-name: Plugin Release（Plug-in được phát hành độc lập)
+name: Plugin Release
 run-name: >-
   Plugin Release / ${{ inputs.plugin }} / ${{ inputs.dry_run && 'dry-run' || 'release' }}
 
@@ -22,27 +22,17 @@ on:
           - remote
           - minio
       dry_run:
-        description: Chỉ xây dựng xác minh, không tạo Release，Đừng viết lại catalog
+        description: Build and verify without creating a release or updating catalogs
         required: true
         default: false
         type: boolean
-      publish_gitee_release:
-        description: Có nên tạo ra cùng một lúc hay không Gitee plugin Release và tải lên tệp đính kèm
-        required: true
-        default: true
-        type: boolean
       update_github_catalog:
-        description: Có nên viết lại cho quan chức hay không GitHub plugin catalog
-        required: true
-        default: true
-        type: boolean
-      update_gitee_catalog:
-        description: Có nên viết lại cho quan chức hay không Gitee plugin catalog
+        description: Update the official GitHub plugin catalog
         required: true
         default: true
         type: boolean
       release_notes:
-        description: Release Notes（không bắt buộc)
+        description: Release notes (optional)
         required: false
         type: string
 
@@ -52,7 +42,7 @@ env:
 
 jobs:
   prepare-context:
-    name: Prepare Context（Chuẩn bị cho bối cảnh phát hành)
+    name: Prepare release context
     runs-on: ubuntu-latest
     outputs:
       plugin: ${{ steps.meta.outputs.plugin }}
@@ -64,10 +54,10 @@ jobs:
       module_path: ${{ steps.meta.outputs.module_path }}
       release_title: ${{ steps.meta.outputs.release_title }}
     steps:
-      - name: Checkout（Kiểm tra mã)
+      - name: Checkout source
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
-      - name: Setup Java（cấu hình Java）
+      - name: Set up Java
         uses: actions/setup-java@de7274f081f381c8f8158605e0321c36c376e2e6 # v6.0.1
         with:
           distribution: ${{ env.JAVA_DISTRIBUTION }}
@@ -76,7 +66,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Validate release source（Xác minh nhánh mặc định)
+      - name: Validate release source
         shell: bash
         run: |
           set -euo pipefail
@@ -94,7 +84,7 @@ jobs:
             exit 1
           fi
 
-      - name: Compute metadata（Tính toán siêu dữ liệu)
+      - name: Compute metadata
         id: meta
         shell: bash
         run: |
@@ -135,7 +125,7 @@ jobs:
           echo "release_title=${RELEASE_TITLE}" >> "$GITHUB_OUTPUT"
 
   release-plugin:
-    name: Build And Release Plugin（Xây dựng và xuất bản plugin)
+    name: Build and release plugin
     runs-on: ubuntu-latest
     needs: [ prepare-context ]
     outputs:
@@ -149,12 +139,11 @@ jobs:
       descriptor_max_platform_version: ${{ steps.descriptor.outputs.max_platform_version }}
       jar_sha256: ${{ steps.package.outputs.jar_sha256 }}
       release_url: ${{ steps.release.outputs.release_url }}
-      gitee_release_url: ${{ steps.gitee_release.outputs.gitee_release_url }}
     steps:
-      - name: Checkout（Kiểm tra mã)
+      - name: Checkout source
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
-      - name: Setup Java（cấu hình Java）
+      - name: Set up Java
         uses: actions/setup-java@de7274f081f381c8f8158605e0321c36c376e2e6 # v6.0.1
         with:
           distribution: ${{ env.JAVA_DISTRIBUTION }}
@@ -163,7 +152,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build selected plugin（Chỉ xây dựng các plugin mục tiêu)
+      - name: Build selected plugin
         shell: bash
         run: |
           set -euo pipefail
@@ -173,7 +162,7 @@ jobs:
             clean package \
             -DskipTests
 
-      - name: Package release files（Tổ chức và xuất bản sản phẩm)
+      - name: Package release files
         id: package
         shell: bash
         run: |
@@ -198,7 +187,7 @@ jobs:
 
           echo "jar_sha256=${JAR_SHA256}" >> "$GITHUB_OUTPUT"
 
-      - name: Read descriptor metadata（Đọc từ gói plugin descriptor）
+      - name: Read plugin descriptor metadata
         id: descriptor
         shell: bash
         env:
@@ -206,8 +195,7 @@ jobs:
         run: |
           set -euo pipefail
 
-          # Liên kết phát hành chỉ đọc từ sản phẩm xây dựng descriptor，
-          # Không phải ở đây workflow Duy trì một nhóm trường tương thích plug-in riêng biệt để tránh điều này pom / jar / catalog trôi dạt.
+          # Read compatibility metadata from the built descriptor so the POM, JAR, and catalog stay aligned.
           python3 <<'PY'
           import os
           import zipfile
@@ -248,7 +236,7 @@ jobs:
                   fh.write(f"{key}={value}\n")
           PY
 
-      - name: Validate descriptor metadata（Kiểm tra tag/pom/descriptor tính nhất quán)
+      - name: Validate descriptor metadata
         shell: bash
         env:
           EXPECTED_PLUGIN_ID: ${{ needs.prepare-context.outputs.plugin_id }}
@@ -277,7 +265,7 @@ jobs:
               raise SystemExit(f"Tag mismatch: {expected_tag_name} != {expected_tag_from_version}")
           PY
 
-      - name: Upload dry-run artifacts（Tải lên các sản phẩm xác minh)
+      - name: Upload verification artifacts
         if: ${{ inputs.dry_run }}
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
@@ -285,7 +273,7 @@ jobs:
           path: dist/*
           retention-days: 7
 
-      - name: Publish GitHub Release（giải phóng GitHub Release）
+      - name: Publish GitHub release
         if: ${{ !inputs.dry_run }}
         id: release
         env:
@@ -327,112 +315,21 @@ jobs:
 
           echo "release_url=https://github.com/${{ github.repository }}/releases/tag/${TAG_NAME}" >> "$GITHUB_OUTPUT"
 
-      - name: Publish Gitee Release（giải phóng Gitee Release）
-        if: ${{ !inputs.dry_run && inputs.publish_gitee_release }}
-        id: gitee_release
-        shell: bash
-        env:
-          GITEE_TOKEN: ${{ secrets.GITEE_TOKEN }}
-        run: |
-          set -euo pipefail
-
-          if [ -z "${GITEE_TOKEN:-}" ]; then
-            echo "Missing GITEE_TOKEN secret" >&2
-            exit 1
-          fi
-
-          TAG_NAME="${{ needs.prepare-context.outputs.tag_name }}"
-          TITLE="${{ needs.prepare-context.outputs.release_title }}"
-          BODY_FILE="$(mktemp)"
-          RESPONSE_FILE="$(mktemp)"
-          UPLOAD_RESPONSE_FILE="$(mktemp)"
-          RELEASE_ID=""
-
-          if [ -n "${{ inputs.release_notes }}" ]; then
-            printf '%s\n' "${{ inputs.release_notes }}" > "$BODY_FILE"
-          else
-            cat > "$BODY_FILE" <<EOF
-          ${TITLE}
-
-          - Plugin version: ${{ steps.descriptor.outputs.plugin_version }}
-          - Minimum app version: ${{ steps.descriptor.outputs.min_app_version || 'unspecified' }}
-          - Plugin platform version: ${{ steps.descriptor.outputs.min_platform_version || 'unspecified' }}
-          - GitHub release: https://github.com/${{ github.repository }}/releases/tag/${TAG_NAME}
-          EOF
-          fi
-
-          set +e
-          HTTP_CODE="$(curl -sS -o "$RESPONSE_FILE" -w "%{http_code}" \
-            -X POST "https://gitee.com/api/v5/repos/nvhuong/dev-workbench/releases" \
-            -F "access_token=${GITEE_TOKEN}" \
-            -F "tag_name=${TAG_NAME}" \
-            -F "name=${TITLE}" \
-            -F "body=<${BODY_FILE}" \
-            -F "prerelease=false" \
-            -F "target_commitish=master")"
-          CURL_EXIT_CODE=$?
-          set -e
-
-          if [ $CURL_EXIT_CODE -eq 0 ] && [ "$HTTP_CODE" -ge 200 ] && [ "$HTTP_CODE" -lt 300 ]; then
-            RELEASE_ID="$(python3 -c "import json; import sys; print(json.load(open('${RESPONSE_FILE}')).get('id',''))")"
-          else
-            curl -sS "https://gitee.com/api/v5/repos/nvhuong/dev-workbench/releases?access_token=${GITEE_TOKEN}&page=1&per_page=100" -o "$RESPONSE_FILE"
-            RELEASE_ID="$(python3 -c "import json; from pathlib import Path; data=json.loads(Path('${RESPONSE_FILE}').read_text()); tag='${TAG_NAME}'; print(next((str(item.get('id','')) for item in data if item.get('tag_name') == tag), ''))")"
-          fi
-
-          if [ -z "$RELEASE_ID" ]; then
-            echo "Failed to create or resolve Gitee release id for ${TAG_NAME}" >&2
-            cat "$RESPONSE_FILE" >&2 || true
-            exit 1
-          fi
-
-          for file in \
-            "dist/${{ needs.prepare-context.outputs.jar_name }}" \
-            "dist/${{ needs.prepare-context.outputs.jar_name }}.sha256.txt"
-          do
-            if [ ! -f "$file" ]; then
-              echo "Missing release asset: $file" >&2
-              exit 1
-            fi
-            FILE_SIZE="$(stat -c%s "$file" 2>/dev/null || stat -f%z "$file")"
-            if [ "$FILE_SIZE" -gt 104857600 ]; then
-              echo "Skip oversized Gitee asset: $(basename "$file")" >&2
-              continue
-            fi
-            set +e
-            UPLOAD_HTTP_CODE="$(curl -sS -o "$UPLOAD_RESPONSE_FILE" -w "%{http_code}" \
-              --retry 5 \
-              --retry-delay 2 \
-              --retry-all-errors \
-              -X POST "https://gitee.com/api/v5/repos/nvhuong/dev-workbench/releases/${RELEASE_ID}/attach_files" \
-              -F "access_token=${GITEE_TOKEN}" \
-              -F "file=@${file}")"
-            UPLOAD_EXIT_CODE=$?
-            set -e
-            if [ $UPLOAD_EXIT_CODE -ne 0 ] || [ "$UPLOAD_HTTP_CODE" -lt 200 ] || [ "$UPLOAD_HTTP_CODE" -ge 300 ]; then
-              echo "Failed to upload Gitee asset: $(basename "$file"), curl_exit=${UPLOAD_EXIT_CODE}, http_code=${UPLOAD_HTTP_CODE}" >&2
-              cat "$UPLOAD_RESPONSE_FILE" >&2 || true
-              exit 1
-            fi
-          done
-
-          echo "gitee_release_url=https://gitee.com/nvhuong/dev-workbench/releases/${TAG_NAME}" >> "$GITHUB_OUTPUT"
-
   update-catalogs:
-    name: Update Catalogs（Cập nhật danh mục chính thức)
-    if: ${{ (inputs.update_github_catalog || inputs.update_gitee_catalog) && !inputs.dry_run }}
+    name: Update catalogs
+    if: ${{ inputs.update_github_catalog && !inputs.dry_run }}
     runs-on: ubuntu-latest
     needs: [ prepare-context, release-plugin ]
     steps:
-      - name: Checkout default branch（Kiểm tra nhánh mặc định)
+      - name: Checkout default branch
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           ref: ${{ github.event.repository.default_branch }}
 
-      - name: Update catalog json（đổi mới catalog tập tin)
+      - name: Update catalog JSON
         shell: bash
         env:
-          # catalog Siêu dữ liệu được hợp nhất từ release-plugin Phân tích theo từng giai đoạn descriptor đầu ra.
+          # Catalog metadata comes from the descriptor parsed by the release job.
           PLUGIN_ID: ${{ needs.release-plugin.outputs.descriptor_plugin_id }}
           PLUGIN_NAME: ${{ needs.release-plugin.outputs.descriptor_plugin_name }}
           PLUGIN_VERSION: ${{ needs.release-plugin.outputs.descriptor_plugin_version }}
@@ -445,14 +342,12 @@ jobs:
           JAR_NAME: ${{ needs.prepare-context.outputs.jar_name }}
           JAR_SHA256: ${{ needs.release-plugin.outputs.jar_sha256 }}
           UPDATE_GITHUB_CATALOG: ${{ inputs.update_github_catalog }}
-          UPDATE_GITEE_CATALOG: ${{ inputs.update_gitee_catalog && inputs.publish_gitee_release }}
         run: |
           set -euo pipefail
 
           GITHUB_DOWNLOAD_URL="https://github.com/${{ github.repository }}/releases/download/${TAG_NAME}/${JAR_NAME}"
-          GITEE_DOWNLOAD_URL="https://gitee.com/nvhuong/dev-workbench/releases/download/${TAG_NAME}/${JAR_NAME}"
           GENERATED_AT="$(date -u +"%Y-%m-%dT%H:%M:%SZ")"
-          export PLUGIN_NAME PLUGIN_DESCRIPTION GITHUB_DOWNLOAD_URL GITEE_DOWNLOAD_URL GENERATED_AT
+          export PLUGIN_NAME PLUGIN_DESCRIPTION GITHUB_DOWNLOAD_URL GENERATED_AT
           export MIN_APP_VERSION MAX_APP_VERSION MIN_PLATFORM_VERSION MAX_PLATFORM_VERSION
 
           python3 <<'PY'
@@ -500,20 +395,6 @@ jobs:
                       f"https://github.com/{os.environ['GITHUB_REPOSITORY']}",
                   ),
               ])
-          if os.environ["UPDATE_GITEE_CATALOG"].lower() == "true":
-              updates.extend([
-                  (
-                      Path("plugin-catalog/catalog-gitee.json"),
-                      os.environ["GITEE_DOWNLOAD_URL"],
-                      "https://gitee.com/nvhuong/dev-workbench",
-                  ),
-                  (
-                      Path("dev-workbench-plugins/plugin-manager/src/main/resources/plugin-catalog/catalog-gitee.json"),
-                      os.environ["GITEE_DOWNLOAD_URL"],
-                      "https://gitee.com/nvhuong/dev-workbench",
-                  ),
-              ])
-
           for path, download_url, homepage in updates:
               data = json.loads(path.read_text(encoding="utf-8"))
               plugins = data.setdefault("plugins", [])
@@ -593,9 +474,7 @@ jobs:
 
           if git diff --quiet -- \
             plugin-catalog/catalog-github.json \
-            plugin-catalog/catalog-gitee.json \
-            dev-workbench-plugins/plugin-manager/src/main/resources/plugin-catalog/catalog-github.json \
-            dev-workbench-plugins/plugin-manager/src/main/resources/plugin-catalog/catalog-gitee.json; then
+            dev-workbench-plugins/plugin-manager/src/main/resources/plugin-catalog/catalog-github.json; then
             echo "No catalog changes to commit."
             exit 0
           fi
@@ -604,8 +483,6 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add \
             plugin-catalog/catalog-github.json \
-            plugin-catalog/catalog-gitee.json \
-            dev-workbench-plugins/plugin-manager/src/main/resources/plugin-catalog/catalog-github.json \
-            dev-workbench-plugins/plugin-manager/src/main/resources/plugin-catalog/catalog-gitee.json
+            dev-workbench-plugins/plugin-manager/src/main/resources/plugin-catalog/catalog-github.json
           git commit -m "chore(plugin-catalog): release ${{ needs.prepare-context.outputs.plugin_id }} ${{ needs.prepare-context.outputs.plugin_version }}"
           git push origin "HEAD:${{ github.event.repository.default_branch }}"

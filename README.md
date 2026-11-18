@@ -7,14 +7,13 @@
 **An open-source DevWorkbench-style API client + JMeter-style load testing desktop app**<br>
 *Local-first · Git workspaces · Headless CLI · Built-in MCP Server*
 
-[![GitHub license](https://img.shields.io/github/license/nvhuong/dev-workbench?style=flat-square)](https://github.com/nvhuong/dev-workbench/blob/master/LICENSE)
 [![GitHub release](https://img.shields.io/github/v/release/nvhuong/dev-workbench?style=flat-square&color=brightgreen)](https://github.com/nvhuong/dev-workbench/releases)
 [![GitHub downloads](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fnvhuong%2Fdev-workbench%2Fbadges%2Fgithub-downloads.json&style=flat-square&cacheSeconds=3600)](https://github.com/nvhuong/dev-workbench/releases)
 [![GitHub stars](https://img.shields.io/github/stars/nvhuong/dev-workbench?style=flat-square&color=yellow)](https://github.com/nvhuong/dev-workbench/stargazers)
 [![Java](https://img.shields.io/badge/Java-21+-ED8B00?style=flat-square&logo=openjdk&logoColor=white)](https://openjdk.org/)
 [![Platform](https://img.shields.io/badge/Platform-Windows%20%7C%20macOS%20%7C%20Linux-0078D4?style=flat-square)](https://github.com/nvhuong/dev-workbench/releases)
 
-[Tiếng Trung giản thể](README_zh.md) · [📦 Download](#-download-and-install) · [🤖 Install MCP](#-mcp-server) · [📖 Docs](#-documentation) · [💬 Discuss](https://github.com/nvhuong/dev-workbench/discussions) · WeChat: `nvhuong`
+[Tiếng Trung giản thể](README_zh.md) · [📦 Download](#-download-and-install) · [🤖 Install MCP](#-mcp-server) · [📖 Docs](#-documentation) · [💬 Discuss](https://github.com/nvhuong/dev-workbench/discussions)
 
 </div>
 
@@ -59,7 +58,7 @@ DevWorkbench combines **DevWorkbench-style API debugging** and **JMeter-style pe
 
 ## 📦 Download and install
 
-Download the latest release from **[GitHub Releases](https://github.com/nvhuong/dev-workbench/releases)**. A **[Gitee mirror](https://gitee.com/nvhuong/dev-workbench/releases)** is also available. Native installers and the Windows portable package include a runtime, so neither the desktop app nor MCP needs a separate Java installation. Only the cross-platform JAR requires Java 21+.
+Download the latest release from **[GitHub Releases](https://github.com/nvhuong/dev-workbench/releases)**. Native installers and the Windows portable package include a runtime, so neither the desktop app nor MCP needs a separate Java installation. Only the cross-platform JAR requires Java 21+.
 
 ### Windows WinGet
 
@@ -207,7 +206,7 @@ Bug reports, ideas, documentation, and code contributions are welcome: [create a
 
 DevWorkbench builds on excellent open-source projects including [FlatLaf](https://github.com/JFormDesigner/FlatLaf), [RSyntaxTextArea](https://github.com/bobbylight/RSyntaxTextArea), and [OkHttp](https://github.com/square/okhttp).
 
-If DevWorkbench helps you, consider giving it a [Star](https://github.com/nvhuong/dev-workbench), joining the [discussions](https://github.com/nvhuong/dev-workbench/discussions), or contacting `nvhuong` on WeChat.
+If DevWorkbench helps you, consider giving it a [Star](https://github.com/nvhuong/dev-workbench), joining the [discussions](https://github.com/nvhuong/dev-workbench/discussions). Contact: phone 0964210295 · email [huong.nguyenvan.hd@gmail.com](mailto:huong.nguyenvan.hd@gmail.com).
 
 <div align="center">
 

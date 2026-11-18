@@ -452,8 +452,6 @@ Cái này workflow Hiện đang làm:
 4. Từ JAR bên trong descriptor Đọc siêu dữ liệu plugin
 5. Kiểm tra `plugin id / version / tag` tính nhất quán
 6. giải phóng GitHub Release
-7. Tùy chọn xuất bản Gitee Release
-8. Cập nhật tùy chọn GitHub / Gitee catalog
 
 ### 5.3 workflow những ràng buộc chính
 
@@ -482,12 +480,8 @@ Bạn thường chỉ cần quan tâm đến những đầu vào này: .
   - Chọn plugin để xuất bản, ví dụ `capture`、`kafka`
 - `dry_run`
   - Đề nghị đầu tiên `true`
-- `publish_gitee_release`
-  - Có đồng bộ hóa hay không Gitee Release
 - `update_github_catalog`
   - Có nên viết lại không GitHub catalog
-- `update_gitee_catalog`
-  - Có nên viết lại không Gitee catalog
 - `release_notes`
   - Không bắt buộc
 
@@ -499,7 +493,6 @@ Sau khi phát hành chính thức, bạn thường nhận được:
 - một `.sha256.txt` tập tin
 - Một miếng GitHub Release
 - Đã cập nhật `plugin-catalog/catalog-github.json`
-- Nếu bật Gitee，Đồng bộ hóa là tương ứng Gitee Release và catalog đổi mới
 
 ## 6. Cách xác minh cục bộ
 

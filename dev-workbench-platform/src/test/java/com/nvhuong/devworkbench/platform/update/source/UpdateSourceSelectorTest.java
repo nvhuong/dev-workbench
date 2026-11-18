@@ -6,31 +6,16 @@ import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNull;
 
 public class UpdateSourceSelectorTest {
-
     @Test
-    public void shouldUseInjectedGithubPreferenceWithoutAppSettings() {
+    public void shouldAlwaysSelectGithub() {
         UpdateSourceSelector selector = new UpdateSourceSelector(() -> "github");
-
-        UpdateSource source = selector.selectBestSource();
-
-        assertEquals(source.getName(), "GitHub");
+        assertEquals(selector.selectBestSource().getName(), "GitHub");
     }
 
     @Test
-    public void shouldUseInjectedGiteePreferenceWithoutAppSettings() {
-        UpdateSourceSelector selector = new UpdateSourceSelector(() -> "gitee");
-
-        UpdateSource source = selector.selectBestSource();
-
-        assertEquals(source.getName(), "Gitee");
-    }
-
-    @Test
-    public void shouldResolveFallbackSourceByMetadataName() {
-        UpdateSourceSelector selector = new UpdateSourceSelector(() -> "github");
-
-        assertEquals(selector.getFallbackSource("GitHub").getName(), "Gitee");
-        assertEquals(selector.getFallbackSource("Gitee").getName(), "GitHub");
+    public void shouldHaveNoFallbackProvider() {
+        UpdateSourceSelector selector = new UpdateSourceSelector();
+        assertNull(selector.getFallbackSource("GitHub"));
         assertNull(selector.getFallbackSource("unknown"));
     }
 }

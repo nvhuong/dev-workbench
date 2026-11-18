@@ -4,7 +4,6 @@ import com.nvhuong.devworkbench.common.component.ToolWindowSurfaceStyle;
 import com.nvhuong.devworkbench.common.component.button.ModernButtonFactory;
 import com.nvhuong.devworkbench.common.constants.ModernColors;
 import com.nvhuong.devworkbench.platform.update.changelog.ChangelogService;
-import com.nvhuong.devworkbench.platform.update.source.UpdateSource;
 import com.nvhuong.devworkbench.service.setting.SettingManager;
 import com.nvhuong.devworkbench.util.FontsUtil;
 import com.nvhuong.devworkbench.util.I18nUtil;
@@ -79,16 +78,11 @@ public class ChangelogDialog extends JDialog {
         githubButton.setToolTipText(I18nUtil.getMessage(MessageKeys.CHANGELOG_VIEW_ON_GITHUB_TOOLTIP));
         githubButton.addActionListener(e -> openGitHubWeb());
 
-        JButton giteeButton = ModernButtonFactory.createButton(I18nUtil.getMessage(MessageKeys.CHANGELOG_VIEW_ON_GITEE), false);
-        giteeButton.setToolTipText(I18nUtil.getMessage(MessageKeys.CHANGELOG_VIEW_ON_GITEE_TOOLTIP));
-        giteeButton.addActionListener(e -> openGiteeWeb());
-
         JButton closeButton = ModernButtonFactory.createButton(I18nUtil.getMessage(MessageKeys.CHANGELOG_CLOSE), true);
         closeButton.addActionListener(e -> dispose());
 
         buttonPanel.add(refreshButton);
         buttonPanel.add(githubButton);
-        buttonPanel.add(giteeButton);
         buttonPanel.add(closeButton);
 
         bottomPanel.add(buttonPanel, BorderLayout.EAST);
@@ -165,24 +159,7 @@ public class ChangelogDialog extends JDialog {
      * Mở GitHub Phiên bản web
      */
     private void openGitHubWeb() {
-        UpdateSource github = changelogService.getSourceSelector().selectBestSource();
-        // Nếu hiện tại không có GitHub，Lấy GitHub Ví dụ
-        if (!"GitHub".equals(github.getName())) {
-            github = changelogService.getSourceSelector().getFallbackSource(github);
-        }
-        openUrl(github.getWebUrl());
-    }
-
-    /**
-     * Mở Gitee Phiên bản web
-     */
-    private void openGiteeWeb() {
-        UpdateSource source = changelogService.getSourceSelector().selectBestSource();
-        // Nếu hiện tại không có Gitee，Lấy Gitee Ví dụ
-        if (!"Gitee".equals(source.getName())) {
-            source = changelogService.getSourceSelector().getFallbackSource(source);
-        }
-        openUrl(source.getWebUrl());
+        openUrl("https://github.com/nvhuong/dev-workbench/releases");
     }
 
     /**

@@ -115,7 +115,7 @@ public class EnvironmentService {
         Environment devEnv = new Environment("Dev Env");
         devEnv.setId("dev-" + System.currentTimeMillis());
         devEnv.setActive(true);
-        devEnv.addVariable("baseUrl", "https://so.gitee.com");
+        devEnv.addVariable("baseUrl", "https://api.github.com");
         devEnv.addVariable("apiKey", "dev-api-key-123");
 
         // Create Testing Environment

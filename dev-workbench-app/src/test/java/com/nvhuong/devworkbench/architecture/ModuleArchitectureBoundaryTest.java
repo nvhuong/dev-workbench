@@ -446,7 +446,6 @@ public class ModuleArchitectureBoundaryTest {
                 "source/AbstractUpdateSource.java",
                 "source/AppReleaseSelector.java",
                 "source/GitHubUpdateSource.java",
-                "source/GiteeUpdateSource.java",
                 "source/UpdateSource.java",
                 "source/UpdateSourceSelector.java",
                 "changelog/ChangelogFormatter.java",

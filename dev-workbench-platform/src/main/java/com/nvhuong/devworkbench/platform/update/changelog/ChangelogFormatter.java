@@ -62,10 +62,10 @@ public class ChangelogFormatter {
     }
 
     /**
-     * Nhận ngày phát hành (tương thích GitHub và Gitee）
+     * Nhận ngày phát hành (tương thích GitHub）
      */
     private String getPublishDate(JSONObject release) {
-        // GitHub sử dụng published_at，Gitee sử dụng created_at
+        // GitHub sử dụng published_at，các nguồn khác có thể dùng created_at
         String date = release.getStr("published_at");
         if (StrUtil.isBlank(date)) {
             date = release.getStr("created_at");

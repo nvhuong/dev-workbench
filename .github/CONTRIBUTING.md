@@ -174,7 +174,6 @@ mvn clean compile exec:java -Dexec.mainClass="com.nvhuong.devworkbench.App"
 
 - **GitHub Issues**: [nộp Issue](https://github.com/nvhuong/dev-workbench/issues)
 - **Discussions**: [Tham gia vào các cuộc thảo luận](https://github.com/nvhuong/dev-workbench/discussions)
-- **WeChat**: nvhuong
 
 ### 🙏 tri ân
 
@@ -353,8 +352,9 @@ mvn clean compile exec:java -Dexec.mainClass="com.nvhuong.devworkbench.App"
 
 - **GitHub Issues**: [Submit Issue](https://github.com/nvhuong/dev-workbench/issues)
 - **Discussions**: [Join Discussion](https://github.com/nvhuong/dev-workbench/discussions)
-- **WeChat**: nvhuong
 
 ### 🙏 Acknowledgments
 
 Thanks to all developers who have contributed to DevWorkbench!
+
+Contact: phone 0964210295 · email [huong.nguyenvan.hd@gmail.com](mailto:huong.nguyenvan.hd@gmail.com).

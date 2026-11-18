@@ -42,8 +42,6 @@ Kiến trúc plug-in, phát triển plug-in cục bộ, trực tuyến/Để bi�
 git clone https://github.com/nvhuong/dev-workbench.git
 cd dev-workbench
 
-# hoặc Gitee（Phản ánh trong nước)
-git clone https://gitee.com/nvhuong/dev-workbench.git
 cd dev-workbench
 ```
 
@@ -370,4 +368,5 @@ $JAVA_HOME/bin/jpackage --version
 
 - 💬 GitHub Bảng thảo luận: [https://github.com/nvhuong/dev-workbench/discussions](https://github.com/nvhuong/dev-workbench/discussions)
 - 🐛 Báo cáo một vấn đề: [https://github.com/nvhuong/dev-workbench/issues](https://github.com/nvhuong/dev-workbench/issues)
-- 👥 Nhóm WeChat: Thêm vào **nvhuong** Tham gia
+
+Contact: phone 0964210295 · email [huong.nguyenvan.hd@gmail.com](mailto:huong.nguyenvan.hd@gmail.com).

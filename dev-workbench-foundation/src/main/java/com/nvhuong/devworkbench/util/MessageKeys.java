@@ -94,11 +94,9 @@ public final class MessageKeys {
     public static final String CHANGELOG_LOAD_FAILED = "changelog.load_failed";
     public static final String CHANGELOG_NO_RELEASES = "changelog.no_releases";
     public static final String CHANGELOG_VIEW_ON_GITHUB = "changelog.view_on_github";
-    public static final String CHANGELOG_VIEW_ON_GITEE = "changelog.view_on_gitee";
     public static final String CHANGELOG_CLOSE = "changelog.close";
     public static final String CHANGELOG_REFRESH = "changelog.refresh";
     public static final String CHANGELOG_VIEW_ON_GITHUB_TOOLTIP = "changelog.view_on_github.tooltip";
-    public static final String CHANGELOG_VIEW_ON_GITEE_TOOLTIP = "changelog.view_on_gitee.tooltip";
     public static final String CHANGELOG_NO_NOTES = "changelog.no_notes";
     public static final String CHANGELOG_UNKNOWN_DATE = "changelog.unknown_date";
 
@@ -143,11 +141,10 @@ public final class MessageKeys {
     // ============ Hộp thoại giới thiệu ============
     public static final String ABOUT_VERSION = "about.version";
     public static final String ABOUT_AUTHOR = "about.author";
-    public static final String ABOUT_LICENSE = "about.license";
-    public static final String ABOUT_WECHAT = "about.wechat";
+    public static final String ABOUT_PHONE = "about.phone";
+    public static final String ABOUT_EMAIL = "about.email";
     public static final String ABOUT_BLOG = "about.blog";
     public static final String ABOUT_GITHUB = "about.github";
-    public static final String ABOUT_GITEE = "about.gitee";
 
     // ============ Phản hồi ============
     public static final String FEEDBACK_MESSAGE = "feedback.message";
@@ -2172,11 +2169,6 @@ public final class MessageKeys {
     public static final String SETTINGS_PLUGIN_UPDATE_FREQUENCY_TOOLTIP = "settings.plugin_update.frequency.tooltip";
     public static final String SETTINGS_PLUGIN_UPDATE_LAST_CHECK_TIME = "settings.plugin_update.last_check_time";
     public static final String SETTINGS_PLUGIN_UPDATE_LAST_CHECK_TIME_TOOLTIP = "settings.plugin_update.last_check_time.tooltip";
-    public static final String SETTINGS_UPDATE_SOURCE_PREFERENCE = "settings.update_source.preference";
-    public static final String SETTINGS_UPDATE_SOURCE_PREFERENCE_TOOLTIP = "settings.update_source.preference.tooltip";
-    public static final String SETTINGS_UPDATE_SOURCE_AUTO = "settings.update_source.auto";
-    public static final String SETTINGS_UPDATE_SOURCE_GITHUB = "settings.update_source.github";
-    public static final String SETTINGS_UPDATE_SOURCE_GITEE = "settings.update_source.gitee";
 
     // ============ Cài đặt UI ============
     public static final String SETTINGS_UI_TITLE = "settings.ui.title";

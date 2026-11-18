@@ -45,13 +45,6 @@ public class VersionChecker {
             JSONObject releaseInfo = primarySource.fetchLatestReleaseInfo();
 
             if (releaseInfo == null) {
-                // Hãy thử một nguồn thay thế
-                UpdateSource fallbackSource = sourceSelector.getFallbackSource(primarySource);
-                log.info("Primary source failed, trying fallback source: {}", fallbackSource.getName());
-                releaseInfo = fallbackSource.fetchLatestReleaseInfo();
-            }
-
-            if (releaseInfo == null) {
                 return UpdateInfo.noUpdateAvailable(I18nUtil.getMessage(MessageKeys.UPDATE_FETCH_RELEASE_FAILED));
             }
 

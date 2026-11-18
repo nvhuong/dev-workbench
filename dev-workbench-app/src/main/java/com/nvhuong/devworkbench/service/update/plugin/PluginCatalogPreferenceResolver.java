@@ -23,9 +23,6 @@ public class PluginCatalogPreferenceResolver {
         if (!officialSource.isBlank()) {
             return PluginManagementService.getOfficialCatalogUrl("github");
         }
-        if (savedCatalogUrl.toLowerCase(java.util.Locale.ROOT).contains("gitee.com")) {
-            return PluginManagementService.getOfficialCatalogUrl("github");
-        }
         return savedCatalogUrl.trim();
     }
 
