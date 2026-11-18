@@ -73,6 +73,8 @@ public class SqlPanel extends JPanel {
     private static final int METADATA_TIMEOUT_SECONDS = 60;
     private static final int METADATA_TIMEOUT_MILLIS = METADATA_TIMEOUT_SECONDS * 1000;
     private static final int MAX_RESULT_ROWS = 500;
+    private static final java.util.regex.Pattern PROCEDURAL_BLOCK_END =
+            java.util.regex.Pattern.compile("(?i)\\bEND\\s*;$");
     private static final List<String> SQL_SUGGESTIONS = List.of(
             "SELECT * FROM ", "INSERT INTO ", "UPDATE ", "DELETE FROM ", "CREATE TABLE ",
             "ALTER TABLE ", "DROP TABLE ", "JOIN ", "WHERE ", "GROUP BY ", "ORDER BY ", "LIMIT "
@@ -630,7 +632,13 @@ public class SqlPanel extends JPanel {
     private Driver loadDriver(ClassLoader loader, String className, String url) throws Exception {
         if (!className.isBlank()) {
             ClassLoader effectiveLoader = loader == null ? SqlPanel.class.getClassLoader() : loader;
-            return (Driver) Class.forName(className, true, effectiveLoader).getDeclaredConstructor().newInstance();
+            Class<?> driverType;
+            try {
+                driverType = Class.forName(className, true, effectiveLoader);
+            } catch (ClassNotFoundException missing) {
+                throw new IllegalArgumentException(SqlI18n.t("driver_class_not_found", className), missing);
+            }
+            return (Driver) driverType.getDeclaredConstructor().newInstance();
         }
         if (loader != null) {
             for (Driver driver : ServiceLoader.load(Driver.class, loader)) {
@@ -874,8 +882,10 @@ public class SqlPanel extends JPanel {
 
     private void executeSql() {
         Connection active = connection;
-        String sql = currentSqlStatement(activeSqlEditor());
-        if (active == null || sql.isBlank()) return;
+        // Ctrl+Enter bypasses the button, so honour its state to avoid concurrent use of one JDBC connection.
+        if (active == null || !executeButton.isEnabled()) return;
+        String sql = executableSql(currentSqlStatement(activeSqlEditor()));
+        if (sql.isBlank()) return;
         executeButton.setEnabled(false);
         setStatus(SqlI18n.t("executing"));
         appendOutput(SqlI18n.t("output_running", compactSql(sql)));
@@ -953,6 +963,17 @@ public class SqlPanel extends JPanel {
         while (anchor > 0 && Character.isWhitespace(text.charAt(anchor - 1))) anchor--;
         if (anchor > 0 && text.charAt(anchor - 1) == ';') anchor--;
         return anchor == position ? statement : segmentAt(text, anchor);
+    }
+
+    /**
+     * Drops the statement terminator, which drivers such as Oracle reject, while keeping it for procedural blocks
+     * ending in {@code END;} where it is part of the syntax.
+     */
+    static String executableSql(String statement) {
+        String sql = statement == null ? "" : statement.trim();
+        if (PROCEDURAL_BLOCK_END.matcher(sql).find()) return sql;
+        while (sql.endsWith(";")) sql = sql.substring(0, sql.length() - 1).trim();
+        return sql;
     }
 
     private static String segmentAt(String text, int position) {

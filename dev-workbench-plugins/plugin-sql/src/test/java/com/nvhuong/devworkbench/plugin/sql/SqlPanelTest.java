@@ -40,6 +40,62 @@ public class SqlPanelTest {
         assertEquals(SqlPanel.statementAt("   ", 1), "");
     }
 
+    @Test public void stripsTerminatingSemicolonButKeepsProceduralBlocks() {
+        assertEquals(SqlPanel.executableSql("SELECT 1;"), "SELECT 1");
+        assertEquals(SqlPanel.executableSql("  SELECT 1 ;; "), "SELECT 1");
+        assertEquals(SqlPanel.executableSql("SELECT 1"), "SELECT 1");
+        assertEquals(SqlPanel.executableSql("BEGIN\n  NULL;\nEND;"), "BEGIN\n  NULL;\nEND;");
+        assertEquals(SqlPanel.executableSql("begin null; end ;"), "begin null; end ;");
+    }
+
+    @Test public void explainsMissingDriverClass() throws Exception {
+        SqlPanel[] panel = new SqlPanel[1];
+        SwingUtilities.invokeAndWait(() -> {
+            panel[0] = new SqlPanel();
+            ((JTextField) field(panel[0], "jdbcUrl")).setText("jdbc:postgresql://localhost:5432/db");
+            ((JTextField) field(panel[0], "driverClass")).setText("org.postgresql.Driver");
+            invoke(panel[0], "connect");
+        });
+        JLabel status = (JLabel) field(panel[0], "status");
+        waitUntil(() -> onEdt(() -> status.getText().contains("org.postgresql.Driver")),
+                () -> "status=" + status.getText());
+        SwingUtilities.invokeAndWait(() -> assertEquals(status.getText(),
+                SqlI18n.t("error", SqlI18n.t("driver_class_not_found", "org.postgresql.Driver"))));
+    }
+
+    @Test public void ignoresRunShortcutWhileExecutionIsDisabled() throws Exception {
+        SqlPanel[] panel = new SqlPanel[1];
+        SwingUtilities.invokeAndWait(() -> {
+            panel[0] = new SqlPanel();
+            ((JTextField) field(panel[0], "jdbcUrl")).setText("jdbc:h2:mem:sql_panel_busy;DB_CLOSE_DELAY=-1");
+            ((JTextField) field(panel[0], "driverClass")).setText("org.h2.Driver");
+            ((JTextField) field(panel[0], "username")).setText("sa");
+            invoke(panel[0], "connect");
+        });
+        javax.swing.JButton execute = (javax.swing.JButton) field(panel[0], "executeButton");
+        JLabel status = (JLabel) field(panel[0], "status");
+        waitUntil(() -> onEdt(execute::isEnabled), () -> "never connected; status=" + status.getText());
+        javax.swing.JTextArea output = (javax.swing.JTextArea) field(panel[0], "outputLog");
+        SwingUtilities.invokeAndWait(() -> {
+            execute.setEnabled(false); // simulates a query or metadata load in progress
+            org.fife.ui.rsyntaxtextarea.RSyntaxTextArea editor = activeEditor(panel[0]);
+            editor.setText("SELECT 1;");
+            invoke(panel[0], "executeSql");
+            assertEquals(output.getText(), "", "Ctrl+Enter must not start a second statement while busy");
+            invoke(panel[0], "disconnect");
+        });
+    }
+
+    private static org.fife.ui.rsyntaxtextarea.RSyntaxTextArea activeEditor(SqlPanel panel) {
+        try {
+            Method method = SqlPanel.class.getDeclaredMethod("activeSqlEditor");
+            method.setAccessible(true);
+            return (org.fife.ui.rsyntaxtextarea.RSyntaxTextArea) method.invoke(panel);
+        } catch (ReflectiveOperationException exception) {
+            throw new IllegalStateException(exception);
+        }
+    }
+
     @Test public void expandsSchemaIntoTablesAfterConnecting() throws Exception {
         SqlPanel[] panel = new SqlPanel[1];
         SwingUtilities.invokeAndWait(() -> {
