@@ -2,6 +2,8 @@ package com.nvhuong.devworkbench.plugin.remote;
 
 import com.nvhuong.devworkbench.plugin.api.PluginStorage;
 import com.nvhuong.devworkbench.util.FontsUtil;
+import com.jediterm.terminal.ui.JediTermWidget;
+import com.jediterm.terminal.ui.settings.DefaultSettingsProvider;
 import net.schmizz.sshj.SSHClient;
 import net.schmizz.sshj.common.KeyType;
 import net.schmizz.sshj.connection.channel.direct.Session;
@@ -17,10 +19,8 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
-import javax.swing.JScrollPane;
 import javax.swing.JSpinner;
 import javax.swing.JTabbedPane;
-import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import javax.swing.SpinnerNumberModel;
@@ -29,8 +29,6 @@ import java.awt.Component;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.Insets;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -40,7 +38,6 @@ import java.util.Base64;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -66,14 +63,16 @@ final class RemotePanel extends JPanel {
         this.storage = storage == null ? PluginStorage.noop() : storage;
         setLayout(new BorderLayout(8, 8));
         setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-        add(createConnectionForm(), BorderLayout.NORTH);
+        JPanel sidebar = createConnectionForm();
+        sidebar.setPreferredSize(new java.awt.Dimension(310, 520));
+        add(sidebar, BorderLayout.WEST);
         add(sessions, BorderLayout.CENTER);
         loadProfiles(null);
     }
 
     private JPanel createConnectionForm() {
-        JPanel form = new JPanel(new MigLayout("insets 0, novisualpadding, fillx, wrap 8", "[][grow,fill][][grow,fill][][grow,fill][][grow,fill]", "[]5[]5[]5[]5[]5[]"));
-        form.setOpaque(false);
+        JPanel form = new JPanel(new MigLayout("insets 12, fillx, wrap 2", "[pref!][grow,fill]", "[]8[]8[]8[]8[]8[]8[]8[]8[]8[]"));
+        form.setBorder(BorderFactory.createTitledBorder(RemoteI18n.t("hosts")));
 
         profiles.setRenderer((list, value, index, selected, focus) -> new javax.swing.DefaultListCellRenderer()
                 .getListCellRendererComponent(list, value == null ? "" : value.name(), index, selected, focus));
@@ -89,31 +88,30 @@ final class RemotePanel extends JPanel {
         delete.addActionListener(event -> deleteProfile());
         fresh.addActionListener(event -> clearForm());
 
-        form.add(new JLabel(RemoteI18n.t("profiles")));
-        form.add(profiles, "span 3,growx,wmin 120");
-        form.add(fresh, "split 4"); form.add(save); form.add(copy); form.add(delete, "wrap");
-        addField(form, 1, RemoteI18n.t("name"), name);
-        form.add(new JLabel(RemoteI18n.t("host"))); form.add(host, "growx,wmin 100");
-        form.add(new JLabel(RemoteI18n.t("port"))); form.add(port, "wmin 70");
-        form.add(new JLabel(RemoteI18n.t("user"))); form.add(user, "growx,wmin 100");
-        form.add(new JLabel(RemoteI18n.t("password"))); form.add(password, "growx,wmin 100,wrap");
-        form.add(new JLabel(RemoteI18n.t("key"))); form.add(keyFile, "span 5,growx,wmin 100");
+        form.add(new JLabel(RemoteI18n.t("profiles"))); form.add(profiles, "growx,wrap");
+        form.add(fresh, "span 2,split 4"); form.add(save); form.add(copy); form.add(delete, "wrap");
+        addField(form, RemoteI18n.t("name"), name);
+        addField(form, RemoteI18n.t("host"), host);
+        addField(form, RemoteI18n.t("port"), port);
+        addField(form, RemoteI18n.t("user"), user);
+        addField(form, RemoteI18n.t("password"), password);
+        form.add(new JLabel(RemoteI18n.t("key"))); form.add(keyFile, "growx,wmin 100,wrap");
         JButton browse = new JButton(RemoteI18n.t("browse"));
         browse.addActionListener(event -> chooseKey());
-        form.add(browse, "split 2");
+        form.add(browse, "span 2,align right,wrap");
+        form.add(savePassword, "span 2,wrap");
         JButton connect = new JButton(RemoteI18n.t("connect"));
         connect.addActionListener(event -> connect());
-        form.add(connect, "wrap");
-        form.add(savePassword, "span 8,wrap");
+        form.add(connect, "span 2,growx,h 34!,wrap");
         JLabel note = new JLabel(RemoteI18n.t("host_key"));
         note.setFont(FontsUtil.getDefaultFontWithOffset(Font.PLAIN, -2));
-        form.add(note, "span 8");
+        form.add(note, "span 2,growx");
         return form;
     }
 
-    private void addField(JPanel panel, int row, String label, Component field) {
+    private void addField(JPanel panel, String label, Component field) {
         panel.add(new JLabel(label));
-        panel.add(field, "span 7,growx,wmin 120,wrap");
+        panel.add(field, "growx,wmin 120,wrap");
     }
 
     private void chooseKey() {
@@ -130,32 +128,20 @@ final class RemotePanel extends JPanel {
             return;
         }
 
-        JTextArea output = new JTextArea();
-        output.setEditable(false);
-        output.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 13));
-        JTextField command = new JTextField();
-        command.setEnabled(false);
-        JPanel terminal = new JPanel(new BorderLayout(4, 4));
-        terminal.add(new JScrollPane(output), BorderLayout.CENTER);
-        terminal.add(command, BorderLayout.SOUTH);
+        JLabel connectionState = new JLabel(RemoteI18n.t("connecting", profile.user(), profile.host()));
+        connectionState.setBorder(BorderFactory.createEmptyBorder(4, 8, 4, 8));
+        JediTermWidget terminalWidget = new JediTermWidget(new DefaultSettingsProvider() {
+            @Override public Font getTerminalFont() { return new Font(Font.MONOSPACED, Font.PLAIN, 14); }
+            @Override public float getTerminalFontSize() { return 14f; }
+            @Override public int getBufferMaxLinesCount() { return 20_000; }
+        });
+        JPanel terminal = new JPanel(new BorderLayout());
+        terminal.add(connectionState, BorderLayout.NORTH);
+        terminal.add(terminalWidget, BorderLayout.CENTER);
         String title = profile.name().isBlank() ? profile.host() : profile.name();
         sessions.addTab(title, terminal);
         sessions.setSelectedComponent(terminal);
         addClosableTab(title, terminal);
-
-        AtomicReference<OutputStream> shellInput = new AtomicReference<>();
-        command.addActionListener(event -> {
-            OutputStream input = shellInput.get();
-            if (input == null) return;
-            String line = command.getText();
-            command.setText("");
-            try {
-                input.write((line + "\n").getBytes(StandardCharsets.UTF_8));
-                input.flush();
-            } catch (Exception exception) {
-                append(output, "\n" + exception.getMessage() + "\n");
-            }
-        });
 
         Thread worker = new Thread(() -> {
             SSHClient client = new SSHClient();
@@ -177,25 +163,20 @@ final class RemotePanel extends JPanel {
                 }
 
                 Session session = client.startSession();
-                session.allocateDefaultPTY();
+                session.allocatePTY("xterm-256color", 120, 40, 0, 0, java.util.Map.of());
                 Session.Shell shell = session.startShell();
-                shellInput.set(shell.getOutputStream());
-                startReader(shell.getInputStream(), output, profile.host());
-                startReader(shell.getErrorStream(), output, profile.host() + "-stderr");
                 SwingUtilities.invokeLater(() -> {
-                    command.setEnabled(true);
-                    command.requestFocusInWindow();
+                    connectionState.setText(RemoteI18n.t("connected", profile.user(), profile.host()));
+                    terminalWidget.setTtyConnector(new SshTtyConnector(shell, title));
+                    terminalWidget.start();
+                    terminalWidget.requestFocusInWindow();
                 });
-                shell.join();
             } catch (Exception exception) {
                 LOG.log(Level.WARNING, "SSH session failed for " + profile.host(), exception);
-                SwingUtilities.invokeLater(() -> append(output,
+                SwingUtilities.invokeLater(() -> connectionState.setText(
                         RemoteI18n.t("connection_error", exception.getMessage())));
-            } finally {
-                shellInput.set(null);
                 try { client.disconnect(); } catch (Exception ignored) { }
                 clients.remove(terminal);
-                SwingUtilities.invokeLater(() -> command.setEnabled(false));
             }
         }, "ssh-session-" + profile.host());
         worker.setDaemon(true);
@@ -247,31 +228,6 @@ final class RemotePanel extends JPanel {
         };
     }
 
-    private void startReader(InputStream input, JTextArea output, String threadSuffix) {
-        Thread reader = new Thread(() -> readOutput(input, output), "ssh-reader-" + threadSuffix);
-        reader.setDaemon(true);
-        reader.start();
-    }
-
-    private void readOutput(InputStream input, JTextArea output) {
-        byte[] data = new byte[2048];
-        try {
-            int count;
-            while ((count = input.read(data)) >= 0) {
-                if (count == 0) continue;
-                String text = new String(data, 0, count, StandardCharsets.UTF_8);
-                SwingUtilities.invokeLater(() -> append(output, text));
-            }
-        } catch (Exception exception) {
-            SwingUtilities.invokeLater(() -> append(output, "\n" + exception.getMessage()));
-        }
-    }
-
-    private void append(JTextArea area, String text) {
-        area.append(text);
-        area.setCaretPosition(area.getDocument().getLength());
-    }
-
     private void addClosableTab(String title, Component session) {
         JPanel tab = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 0));
         tab.setOpaque(false);
@@ -282,6 +238,8 @@ final class RemotePanel extends JPanel {
         close.setContentAreaFilled(false);
         close.setMargin(new Insets(0, 2, 0, 2));
         close.addActionListener(event -> {
+            Component terminalView = ((JPanel) session).getComponent(1);
+            if (terminalView instanceof JediTermWidget widget) widget.close();
             SSHClient client = clients.remove(session);
             if (client != null) {
                 try { client.disconnect(); } catch (Exception exception) {
