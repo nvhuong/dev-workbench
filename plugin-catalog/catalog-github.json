@@ -1,6 +1,6 @@
 {
   "name": "DevWorkbench Official Plugin Catalog (GitHub)",
-  "generatedAt": "2026-11-18T07:19:20Z",
+  "generatedAt": "2026-11-18T08:38:22Z",
   "plugins": [
     {
       "id": "plugin-capture",
@@ -344,6 +344,14 @@
       "description": "JDBC database explorer and SQL workbench.",
       "homepage": "https://github.com/nvhuong/dev-workbench",
       "releases": [
+        {
+          "version": "1.0.2",
+          "downloadUrl": "https://github.com/nvhuong/dev-workbench/releases/download/plugin-sql-v1.0.2/dev-workbench-1.0.2-plugin-sql.jar",
+          "sha256": "e95261372d8bbb6e314778838fd4a4fedb4f7b10c74b1335269978686e0bf0c6",
+          "minAppVersion": "6.0.14",
+          "minPlatformVersion": "4.0.0",
+          "maxPlatformVersion": "4.0.0"
+        },
         {
           "version": "1.0.1",
           "downloadUrl": "https://github.com/nvhuong/dev-workbench/releases/download/plugin-sql-v1.0.1/dev-workbench-1.0.1-plugin-sql.jar",
