@@ -70,7 +70,20 @@ public class RedisPanelLayoutTest {
 
     @Test
     public void connectionActionsShouldAlignWithPasswordRightEdge() throws Exception {
-        for (int width : new int[]{900, 1320, 1800}) {
+        Locale originalLocale = I18nUtil.currentLocale();
+        try {
+            // Vietnamese labels are wider; at 900-1000px the Test/Connect buttons used to be pushed out of view.
+            for (Locale locale : new Locale[]{Locale.ENGLISH, Locale.forLanguageTag("vi")}) {
+                I18nUtil.setLocale(locale);
+                assertConnectionActionsAlignWithPasswordRightEdge(locale);
+            }
+        } finally {
+            I18nUtil.setLocale(originalLocale);
+        }
+    }
+
+    private static void assertConnectionActionsAlignWithPasswordRightEdge(Locale locale) throws Exception {
+        for (int width : new int[]{900, 1000, 1320, 1800}) {
             RedisPanel panel = layoutPanel(width);
             JPanel form = fieldValue(panel, "connectionForm", JPanel.class);
             JPanel btnCard = fieldValue(panel, "btnCard", JPanel.class);
@@ -83,21 +96,21 @@ public class RedisPanelLayoutTest {
             Point testOrigin = SwingUtilities.convertPoint(testBtn.getParent(), testBtn.getLocation(), form);
             int passwordRight = passwordField.getX() + passwordField.getWidth();
             assertEquals(cardOrigin.x + btnCard.getWidth(), passwordRight,
-                    width + " connect button right edge should align with password right edge");
+                    locale + "@" + width + " connect button right edge should align with password right edge");
             assertTrue(testOrigin.x + testBtn.getWidth() < cardOrigin.x,
-                    width + " test connection button should sit left of connect button");
-            assertTrue(passwordRight <= form.getWidth(), width + " password should not be clipped");
-            assertEquals(hostField.getX(), usernameField.getX(), width + " host/user should share the left edge");
-            assertEquals(hostField.getWidth(), usernameField.getWidth(), width + " host/user should share the width");
+                    locale + "@" + width + " test connection button should sit left of connect button");
+            assertTrue(passwordRight <= form.getWidth(), locale + "@" + width + " password should not be clipped");
+            assertEquals(hostField.getX(), usernameField.getX(), locale + "@" + width + " host/user should share the left edge");
+            assertEquals(hostField.getWidth(), usernameField.getWidth(), locale + "@" + width + " host/user should share the width");
             for (String spinnerField : new String[]{"portSpinner", "dbSpinner"}) {
                 JComponent spinner = fieldValue(panel, spinnerField, JComponent.class);
                 Point spinnerOrigin = SwingUtilities.convertPoint(spinner.getParent(), spinner.getLocation(), form);
-                assertEquals(spinnerOrigin.y, hostField.getY(), width + " " + spinnerField + " should share the host row top");
-                assertEquals(spinner.getHeight(), hostField.getHeight(), width + " " + spinnerField + " should match host height");
+                assertEquals(spinnerOrigin.y, hostField.getY(), locale + "@" + width + " " + spinnerField + " should share the host row top");
+                assertEquals(spinner.getHeight(), hostField.getHeight(), locale + "@" + width + " " + spinnerField + " should match host height");
             }
             if (width <= 1320) {
                 assertTrue(passwordRight >= form.getWidth() - 2,
-                        width + " form should fill the available width without trailing gap");
+                        locale + "@" + width + " form should fill the available width without trailing gap");
             }
         }
     }

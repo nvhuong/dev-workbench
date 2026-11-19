@@ -52,13 +52,13 @@ public class RedisPanel extends JPanel {
     private static final String CONNECT_CARD = "connect";
     private static final String DISCONNECT_CARD = "disconnect";
     private static final int GROUP_GAP = 12;
-    private static final int PROFILE_GROUP_MIN_WIDTH = 150;
+    private static final int PROFILE_GROUP_MIN_WIDTH = 110;
     private static final int PROFILE_GROUP_PREF_WIDTH = 240;
-    private static final int HOST_GROUP_MIN_WIDTH = 110;
+    private static final int HOST_GROUP_MIN_WIDTH = 84;
     private static final int HOST_GROUP_PREF_WIDTH = 220;
-    private static final int PORT_DB_GROUP_MIN_WIDTH = 180;
+    private static final int PORT_DB_GROUP_MIN_WIDTH = 165;
     private static final int PORT_DB_GROUP_PREF_WIDTH = 190;
-    private static final int PORT_FIELD_MIN_WIDTH = 84;
+    private static final int PORT_FIELD_MIN_WIDTH = 72;
     private static final int DB_FIELD_WIDTH = 58;
 
     private static final String CMD_GET = "GET";
