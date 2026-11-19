@@ -921,6 +921,14 @@ public class CapturePanel extends JPanel {
         viewPresetButtons.forEach((preset, button) -> button.setSelected(activeViewPresets.contains(preset)));
     }
 
+    /**
+     * Flow id of a view row. The id is the hidden model column 0; reading view column 0 broke once a user dragged
+     * another column to the front of the table.
+     */
+    private static Object flowIdAt(JTable table, int viewRow) {
+        return table.getModel().getValueAt(table.convertRowIndexToModel(viewRow), 0);
+    }
+
     private List<String> selectedFlowIds() {
         if (tablePanel == null || tablePanel.getTable() == null) {
             return List.of();
@@ -932,7 +940,7 @@ public class CapturePanel extends JPanel {
         }
         List<String> flowIds = new ArrayList<>();
         for (int selectedRow : selectedRows) {
-            Object flowId = table.getValueAt(selectedRow, 0);
+            Object flowId = flowIdAt(table, selectedRow);
             if (flowId != null) {
                 flowIds.add(String.valueOf(flowId));
             }
@@ -947,7 +955,7 @@ public class CapturePanel extends JPanel {
         JTable table = tablePanel.getTable();
         table.clearSelection();
         for (int row = 0; row < table.getRowCount(); row++) {
-            Object flowId = table.getValueAt(row, 0);
+            Object flowId = flowIdAt(table, row);
             if (flowId != null && flowIds.contains(String.valueOf(flowId))) {
                 table.addRowSelectionInterval(row, row);
             }
@@ -972,7 +980,7 @@ public class CapturePanel extends JPanel {
         if (row < 0 || row >= table.getRowCount()) {
             return;
         }
-        Object flowId = table.getValueAt(row, 0);
+        Object flowId = flowIdAt(table, row);
         CaptureFlow flow = proxyService.sessionStore().find(String.valueOf(flowId));
         if (flow != null) {
             showFlowDetail(flow);
@@ -2330,7 +2338,7 @@ public class CapturePanel extends JPanel {
         }
         List<CaptureFlow> flows = new ArrayList<>();
         for (int selectedRow : selectedRows) {
-            Object flowId = table.getValueAt(selectedRow, 0);
+            Object flowId = flowIdAt(table, selectedRow);
             CaptureFlow flow = proxyService.sessionStore().find(String.valueOf(flowId));
             if (flow != null) {
                 flows.add(flow);

@@ -176,6 +176,46 @@ public class CapturePanelTest {
     }
 
     /**
+     * The flow id lives in a zero-width model column 0. Selection lookups read view column 0, so after a user dragged
+     * another column to the front they got that column's value (e.g. the sequence number) and found no flow.
+     */
+    @Test
+    public void selectedFlowsSurviveColumnReordering() throws Exception {
+        CapturePanel panel = new CapturePanel(null, PluginStorage.noop());
+        CaptureSessionStore store = CaptureRuntime.proxyService().sessionStore();
+        store.clear();
+        CaptureFlow flow = store.createFlow("GET", "https://api.example.test/orders", "api.example.test", "/orders",
+                Map.of(), new byte[0]);
+        java.lang.reflect.Method refresh = CapturePanel.class.getDeclaredMethod("refreshTable");
+        refresh.setAccessible(true);
+        java.lang.reflect.Method selected = CapturePanel.class.getDeclaredMethod("selectedFlows");
+        selected.setAccessible(true);
+        try {
+            SwingUtilities.invokeAndWait(() -> {
+                try {
+                    refresh.invoke(panel);
+                    java.lang.reflect.Field tablePanelField = CapturePanel.class.getDeclaredField("tablePanel");
+                    tablePanelField.setAccessible(true);
+                    javax.swing.JTable table = ((com.nvhuong.devworkbench.common.component.table.EnhancedTablePanel)
+                            tablePanelField.get(panel)).getTable();
+                    // User drags the URL column in front of the hidden id column (the sequence column equals the id).
+                    table.moveColumn(6, 0);
+                    table.setRowSelectionInterval(0, 0);
+
+                    @SuppressWarnings("unchecked")
+                    List<CaptureFlow> flows = (List<CaptureFlow>) selected.invoke(panel);
+                    assertEquals(flows.size(), 1, "the selected row must still resolve to its flow");
+                    assertSame(flows.get(0), flow);
+                } catch (ReflectiveOperationException exception) {
+                    throw new IllegalStateException(exception);
+                }
+            });
+        } finally {
+            store.clear();
+        }
+    }
+
+    /**
      * The first toolbar row used fixed column widths; with Vietnamese labels it needed ~940px, so in a 900px tool
      * window the retention combo, the status icons and the capture filter field ran past the right edge.
      */
