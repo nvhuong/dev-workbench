@@ -19,6 +19,12 @@ public class I18nBundleRegistry {
         BUNDLES.putIfAbsent(new BundleIdentity(descriptor.bundleName(), descriptor.classLoader()), descriptor);
     }
 
+    /** Removes bundles an owner registered through the given class loader (e.g. a plugin whose load failed). */
+    public static void unregisterBundles(String ownerId, ClassLoader classLoader) {
+        BUNDLES.values().removeIf(descriptor -> descriptor.ownerId().equals(ownerId)
+                && descriptor.classLoader() == classLoader);
+    }
+
     public static List<I18nBundleDescriptor> registeredBundles() {
         return List.copyOf(BUNDLES.values());
     }
