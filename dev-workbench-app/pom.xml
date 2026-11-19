@@ -308,7 +308,11 @@
                                         <exclude>META-INF/NOTICE*</exclude>
                                         <exclude>META-INF/DEPENDENCIES</exclude>
                                         <exclude>**/*.md</exclude>
-                                        <exclude>**/*.txt</exclude>
+                                        <!-- Only drop licence/readme text files. A blanket **/*.txt also removed
+                                             runtime data such as PDFBox's glyphlist.txt, which made every PDF
+                                             export fail with ExceptionInInitializerError in packaged builds. -->
+                                        <exclude>*.txt</exclude>
+                                        <exclude>META-INF/**/*.txt</exclude>
                                         <exclude>**/module-info.class</exclude>
                                         <exclude>**/*.kotlin_module</exclude>
                                         <exclude>**/*.kotlin_builtins</exclude>
