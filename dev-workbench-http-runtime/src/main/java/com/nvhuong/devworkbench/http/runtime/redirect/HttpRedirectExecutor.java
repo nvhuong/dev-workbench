@@ -156,6 +156,20 @@ public class HttpRedirectExecutor {
      * path-relative, and IPv6 authorities without a case-sensitive prefix check.
      */
     private static URL resolveRedirectUrl(URL previousUrl, String location) throws Exception {
+        // java.net.URI follows RFC 2396 for two reference forms that RFC 3986 changed: a query-only reference
+        // ("?page=2") dropped the last path segment and an empty reference jumped to the parent directory.
+        String trimmedLocation = location == null ? "" : location.trim();
+        if (trimmedLocation.isEmpty() || trimmedLocation.startsWith("?")) {
+            String previous = previousUrl.toString();
+            int fragmentIndex = previous.indexOf('#');
+            if (fragmentIndex >= 0) previous = previous.substring(0, fragmentIndex);
+            if (trimmedLocation.isEmpty()) {
+                return new URL(previous);
+            }
+            int queryIndex = previous.indexOf('?');
+            String withoutQuery = queryIndex >= 0 ? previous.substring(0, queryIndex) : previous;
+            return new URL(withoutQuery + trimmedLocation);
+        }
         try {
             URI previousUri = URI.create(HttpUrlUtil.normalizeIpv6Url(previousUrl.toString()));
             URI locationUri = URI.create(HttpUrlUtil.normalizeIpv6Url(location));

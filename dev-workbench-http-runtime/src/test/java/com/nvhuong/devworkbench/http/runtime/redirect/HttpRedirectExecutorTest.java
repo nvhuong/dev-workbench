@@ -131,6 +131,26 @@ public class HttpRedirectExecutorTest {
     }
 
     /**
+     * java.net.URI.resolve follows RFC 2396: a query-only Location ("?page=2") dropped the last path segment and an
+     * empty Location jumped to the parent directory. Redirect targets must follow RFC 3986.
+     */
+    @Test
+    public void shouldResolveRelativeLocationsPerRfc3986() throws Exception {
+        java.net.URL base = new java.net.URL("https://api.example.com/v1/orders?page=1");
+        java.lang.reflect.Method resolve = HttpRedirectExecutor.class.getDeclaredMethod(
+                "resolveRedirectUrl", java.net.URL.class, String.class);
+        resolve.setAccessible(true);
+
+        assertEquals(resolve.invoke(null, base, "?page=2").toString(), "https://api.example.com/v1/orders?page=2");
+        assertEquals(resolve.invoke(null, base, "").toString(), "https://api.example.com/v1/orders?page=1");
+        assertEquals(resolve.invoke(null, base, "detail").toString(), "https://api.example.com/v1/detail");
+        assertEquals(resolve.invoke(null, base, "../items").toString(), "https://api.example.com/items");
+        assertEquals(resolve.invoke(null, base, "/login?next=%2Fv1").toString(), "https://api.example.com/login?next=%2Fv1");
+        assertEquals(resolve.invoke(null, base, "//cdn.example.com/x").toString(), "https://cdn.example.com/x");
+        assertEquals(resolve.invoke(null, base, "http://other.example/y").toString(), "http://other.example/y");
+    }
+
+    /**
      * Authorization/Cookie headers were stripped on cross-origin redirects but Digest credentials (transportAuth) were
      * kept, so a 401 Digest challenge from the redirect target was answered with the user's credentials.
      */
