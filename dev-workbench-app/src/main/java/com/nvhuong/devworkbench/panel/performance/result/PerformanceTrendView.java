@@ -1,5 +1,6 @@
 package com.nvhuong.devworkbench.panel.performance.result;
 
+import com.nvhuong.devworkbench.performance.report.TrendReportPoint;
 import com.nvhuong.devworkbench.performance.core.model.PerformanceTrendSnapshot;
 import com.nvhuong.devworkbench.performance.core.model.PerformanceProtocol;
 import org.jfree.data.time.RegularTimePeriod;
@@ -17,8 +18,5 @@ public interface PerformanceTrendView {
 
     default List<TrendReportPoint> reportPoints() {
         return List.of();
-    }
-
-    record TrendReportPoint(long timestampMs, PerformanceTrendSnapshot snapshot) {
     }
 }

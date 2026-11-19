@@ -1519,8 +1519,12 @@ public class ModuleArchitectureBoundaryTest {
 
     private static List<Path> javaSourceFiles(Path root) throws IOException {
         try (Stream<Path> files = Files.walk(root)) {
+            // Only real source files: build output (e.g. a "target/test-home/.java" prefs directory written by plugin
+            // tests) must not be read as Java sources.
             return files
+                    .filter(Files::isRegularFile)
                     .filter(path -> path.getFileName().toString().endsWith(".java"))
+                    .filter(path -> !path.toString().replace('\\', '/').contains("/target/"))
                     .toList();
         }
     }

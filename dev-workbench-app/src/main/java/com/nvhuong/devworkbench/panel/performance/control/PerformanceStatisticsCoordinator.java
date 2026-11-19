@@ -1,5 +1,6 @@
 package com.nvhuong.devworkbench.panel.performance.control;
 
+import com.nvhuong.devworkbench.performance.report.TrendReportPoint;
 import com.nvhuong.devworkbench.performance.core.model.PerformanceRealtimeMetrics;
 import com.nvhuong.devworkbench.performance.core.model.PerformanceStatsCollector;
 import com.nvhuong.devworkbench.performance.core.model.PerformanceTrendSnapshot;
@@ -131,7 +132,7 @@ public final class PerformanceStatisticsCoordinator {
                 log.debug("Dữ liệu mẫu {} - Số lượng người dùng: {}, HTTP: {}, WS: {}, SSE: {}",
                         period, snapshot.activeUsers(), snapshot.http().samples(), snapshot.webSocket().samples(), snapshot.sse().samples());
                 performanceTrendPanel.addOrUpdate(period, snapshot);
-                performanceReportPanel.setTrendReportPoints(performanceTrendPanel.reportPoints());
+                publishTrendReportPoints();
             });
         });
     }
@@ -159,7 +160,7 @@ public final class PerformanceStatisticsCoordinator {
         log.debug("Đồng bộ hóa dữ liệu được lấy mẫu {} - Số lượng người dùng: {}, HTTP: {}, WS: {}, SSE: {}",
                 period, snapshot.activeUsers(), snapshot.http().samples(), snapshot.webSocket().samples(), snapshot.sse().samples());
         performanceTrendPanel.addOrUpdate(period, snapshot);
-        performanceReportPanel.setTrendReportPoints(performanceTrendPanel.reportPoints());
+        publishTrendReportPoints();
     }
 
     public void appendTerminalIdleTrendPointSync() {
@@ -177,7 +178,7 @@ public final class PerformanceStatisticsCoordinator {
 
         performanceTrendPanel.addOrUpdate(createTrendPeriod(timestampMs),
                 PerformanceTrendSnapshot.terminalIdle());
-        performanceReportPanel.setTrendReportPoints(performanceTrendPanel.reportPoints());
+        publishTrendReportPoints();
     }
 
     public void markRunStarted(long startTimeMs) {
@@ -246,4 +247,11 @@ public final class PerformanceStatisticsCoordinator {
         return new Millisecond(new Date(timestampMs));
     }
 
+
+    /** Hands the trend points to the report panel (absent in headless/trend-only setups, like the trend panel). */
+    private void publishTrendReportPoints() {
+        if (performanceReportPanel != null && performanceTrendPanel != null) {
+            performanceReportPanel.setTrendReportPoints(performanceTrendPanel.reportPoints());
+        }
+    }
 }

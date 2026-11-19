@@ -1,5 +1,6 @@
 package com.nvhuong.devworkbench.panel.performance.result;
 
+import com.nvhuong.devworkbench.performance.report.TrendReportPoint;
 import com.nvhuong.devworkbench.performance.core.model.PerformanceProtocol;
 import com.nvhuong.devworkbench.performance.core.model.PerformanceTrendSnapshot;
 

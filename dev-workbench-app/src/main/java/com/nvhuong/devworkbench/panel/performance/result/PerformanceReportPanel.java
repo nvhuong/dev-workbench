@@ -1,5 +1,6 @@
 package com.nvhuong.devworkbench.panel.performance.result;
 
+import com.nvhuong.devworkbench.performance.report.TrendReportPoint;
 import com.nvhuong.devworkbench.performance.core.model.PerformanceProtocol;
 import com.nvhuong.devworkbench.performance.core.model.PerformanceReportSnapshot;
 import com.nvhuong.devworkbench.performance.core.model.PerformanceStatsSnapshot;
@@ -85,7 +86,7 @@ public class PerformanceReportPanel extends JPanel {
     private JPanel reportCards;
     private PerformanceProtocol selectedProtocol = PerformanceProtocol.HTTP;
     private Set<PerformanceProtocol> availableProtocols = EnumSet.of(PerformanceProtocol.HTTP);
-    private final AtomicReference<List<PerformanceTrendView.TrendReportPoint>> trendPoints =
+    private final AtomicReference<List<TrendReportPoint>> trendPoints =
             new AtomicReference<>(List.of());
     private PerformanceRunPlan reportPlan;
     private List<PerformanceSampleResult> sampleResults = List.of();
@@ -625,7 +626,7 @@ public class PerformanceReportPanel extends JPanel {
         scheduleHtmlReportWrite();
     }
 
-    public void setTrendReportPoints(List<PerformanceTrendView.TrendReportPoint> points) {
+    public void setTrendReportPoints(List<TrendReportPoint> points) {
         trendPoints.set(points == null ? List.of() : List.copyOf(points));
         scheduleHtmlReportWrite();
     }

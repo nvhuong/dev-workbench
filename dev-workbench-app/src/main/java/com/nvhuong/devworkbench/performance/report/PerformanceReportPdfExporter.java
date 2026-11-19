@@ -1,6 +1,5 @@
 package com.nvhuong.devworkbench.performance.report;
 
-import com.nvhuong.devworkbench.panel.performance.result.PerformanceTrendView;
 import com.nvhuong.devworkbench.performance.core.run.PerformanceRunPlan;
 import com.nvhuong.devworkbench.performance.model.PerformanceSampleResult;
 import lombok.experimental.UtilityClass;
@@ -16,7 +15,7 @@ public class PerformanceReportPdfExporter {
     public record ReportContext(String title,
                                 PerformanceRunPlan plan,
                                 String environment,
-                                List<PerformanceTrendView.TrendReportPoint> trendPoints,
+                                List<TrendReportPoint> trendPoints,
                                 List<PerformanceSampleResult> samples,
                                 String error,
                                 List<PerformanceServiceResource> serviceResources) {

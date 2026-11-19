@@ -1,5 +1,6 @@
 package com.nvhuong.devworkbench.panel.performance;
 
+import com.nvhuong.devworkbench.performance.report.TrendReportPoint;
 import com.nvhuong.devworkbench.panel.performance.control.PerformanceRunUiController;
 import com.nvhuong.devworkbench.panel.performance.result.PerformanceReportPanel;
 import com.nvhuong.devworkbench.panel.performance.result.PerformanceResultTablePanel;

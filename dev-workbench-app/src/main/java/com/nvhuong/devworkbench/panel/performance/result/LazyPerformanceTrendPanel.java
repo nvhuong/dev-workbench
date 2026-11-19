@@ -1,5 +1,6 @@
 package com.nvhuong.devworkbench.panel.performance.result;
 
+import com.nvhuong.devworkbench.performance.report.TrendReportPoint;
 import com.nvhuong.devworkbench.common.UiSingletonFactory;
 import com.nvhuong.devworkbench.common.component.ToolWindowSurfaceStyle;
 import com.nvhuong.devworkbench.common.component.placeholder.PerformanceTrendPlaceholderPanel;

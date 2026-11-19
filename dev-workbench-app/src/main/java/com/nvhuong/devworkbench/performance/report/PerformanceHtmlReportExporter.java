@@ -1,6 +1,5 @@
 package com.nvhuong.devworkbench.performance.report;
 
-import com.nvhuong.devworkbench.panel.performance.result.PerformanceTrendView;
 import com.nvhuong.devworkbench.performance.core.model.PerformanceTrendSnapshot;
 import com.nvhuong.devworkbench.performance.core.run.PerformanceRunPlan;
 import com.nvhuong.devworkbench.performance.core.threadgroup.ThreadGroupData;
@@ -170,10 +169,10 @@ public class PerformanceHtmlReportExporter {
         html.append("</div></section>");
     }
 
-    private void appendCharts(StringBuilder html, List<PerformanceTrendView.TrendReportPoint> trendPoints,
+    private void appendCharts(StringBuilder html, List<TrendReportPoint> trendPoints,
                               List<PerformanceSampleResult> samples) {
         boolean fromTrend = hasChartData(trendPoints);
-        List<PerformanceTrendView.TrendReportPoint> points = fromTrend
+        List<TrendReportPoint> points = fromTrend
                 ? trendPoints : chartPointsFromSamples(samples);
         String source = fromTrend ? "Sampled during the run." : "Reconstructed from retained request results.";
         html.append("<section><div class=\"chart-block\"><h2>1.1 Response time</h2><p class=\"muted\">Average and maximum response time over the test duration. ")
@@ -190,7 +189,7 @@ public class PerformanceHtmlReportExporter {
         html.append("</div></section>");
     }
 
-    private boolean hasChartData(List<PerformanceTrendView.TrendReportPoint> points) {
+    private boolean hasChartData(List<TrendReportPoint> points) {
         if (points == null || points.isEmpty()) return false;
         // PerformanceTrendPanel.reportPoints() does not carry per-window sample counts (they are 0), so a positive
         // sample count must not be required; any positive response time or throughput value is chart data.
@@ -217,7 +216,7 @@ public class PerformanceHtmlReportExporter {
         return Double.isFinite(value) && value > 0;
     }
 
-    private List<PerformanceTrendView.TrendReportPoint> chartPointsFromSamples(List<PerformanceSampleResult> samples) {
+    private List<TrendReportPoint> chartPointsFromSamples(List<PerformanceSampleResult> samples) {
         if (samples == null || samples.isEmpty()) return List.of();
         List<PerformanceSampleResult> valid = samples.stream()
                 .filter(sample -> sample != null && sample.getStartTimeMs() > 0 && sample.getElapsedTimeMs() >= 0)
@@ -236,7 +235,7 @@ public class PerformanceHtmlReportExporter {
             buckets.computeIfAbsent(index, ignored -> new ChartBucket()).add(sample);
         }
 
-        List<PerformanceTrendView.TrendReportPoint> points = new ArrayList<>(buckets.size());
+        List<TrendReportPoint> points = new ArrayList<>(buckets.size());
         for (Map.Entry<Long, ChartBucket> entry : buckets.entrySet()) {
             long bucketStart = start + entry.getKey() * bucketWidthMs;
             long bucketEnd = Math.min(end, bucketStart + bucketWidthMs);
@@ -250,7 +249,7 @@ public class PerformanceHtmlReportExporter {
                     0, 0, 0, Double.NaN, Double.NaN, Double.NaN, Double.NaN, bucket.maximumElapsedMs);
             var idle = PerformanceTrendSnapshot.terminalIdle();
             // Record order is (overview, http, webSocket, sse); the charts read http().
-            points.add(new PerformanceTrendView.TrendReportPoint(bucketStart,
+            points.add(new TrendReportPoint(bucketStart,
                     new PerformanceTrendSnapshot(0, 0, 0, http, http, idle.webSocket(), idle.sse())));
         }
         return List.copyOf(points);
@@ -271,7 +270,7 @@ public class PerformanceHtmlReportExporter {
         }
     }
 
-    private void chart(StringBuilder html, List<PerformanceTrendView.TrendReportPoint> points,
+    private void chart(StringBuilder html, List<TrendReportPoint> points,
                        String title, String unit, boolean throughput) {
         final double left = 70, right = 910, top = 22, bottom = 252, width = right - left, height = bottom - top;
         double maximum = 0;
@@ -308,7 +307,7 @@ public class PerformanceHtmlReportExporter {
         html.append("</div></figure>");
     }
 
-    private void appendSeries(StringBuilder html, List<PerformanceTrendView.TrendReportPoint> points,
+    private void appendSeries(StringBuilder html, List<TrendReportPoint> points,
                               double left, double bottom, double width, double height, double maximum,
                               boolean throughput, boolean maxSeries) {
         StringBuilder path = new StringBuilder();

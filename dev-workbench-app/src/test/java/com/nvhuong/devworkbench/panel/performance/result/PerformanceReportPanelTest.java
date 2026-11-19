@@ -1,5 +1,6 @@
 package com.nvhuong.devworkbench.panel.performance.result;
 
+import com.nvhuong.devworkbench.performance.report.TrendReportPoint;
 import com.nvhuong.devworkbench.common.component.button.SegmentedButtonGroupPanel;
 import com.nvhuong.devworkbench.common.component.button.SegmentedToggleButton;
 import com.nvhuong.devworkbench.performance.core.model.PerformanceProtocol;
@@ -7,7 +8,6 @@ import com.nvhuong.devworkbench.performance.core.model.RequestResult;
 import com.nvhuong.devworkbench.performance.core.model.PerformanceStatsCollector;
 import com.nvhuong.devworkbench.performance.core.model.PerformanceStatsSnapshot;
 import com.nvhuong.devworkbench.performance.core.model.PerformanceTrendSnapshot;
-import com.nvhuong.devworkbench.panel.performance.result.PerformanceTrendView.TrendReportPoint;
 import com.nvhuong.devworkbench.performance.model.PerformanceProtocolLabels;
 import com.nvhuong.devworkbench.test.AbstractSwingUiTest;
 import com.nvhuong.devworkbench.util.I18nUtil;

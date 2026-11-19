@@ -1,6 +1,5 @@
 package com.nvhuong.devworkbench.performance.report;
 
-import com.nvhuong.devworkbench.panel.performance.result.PerformanceTrendView;
 import com.nvhuong.devworkbench.performance.core.model.PerformanceTrendSnapshot;
 import com.nvhuong.devworkbench.performance.core.run.PerformanceServiceResource;
 import com.nvhuong.devworkbench.performance.model.PerformanceSampleResult;
@@ -119,14 +118,14 @@ public class PerformanceReportPdfExporterTest {
      */
     @Test
     public void chartsUseTrendPointsAsProducedByTheTrendPanel() {
-        List<PerformanceTrendView.TrendReportPoint> points = new ArrayList<>();
+        List<TrendReportPoint> points = new ArrayList<>();
         long start = System.currentTimeMillis() - 60_000;
         for (int i = 0; i < 12; i++) {
             double average = 120 + i * 10;
             // Same shape as PerformanceTrendPanel.reportPoints(): samples/failures are not tracked there.
             var metrics = new PerformanceTrendSnapshot.ProtocolWindowMetrics(0, 0, 1.5, 8.0 + i,
                     average, 0, 0, 0, Double.NaN, Double.NaN, Double.NaN, Double.NaN, average * 2);
-            points.add(new PerformanceTrendView.TrendReportPoint(start + i * 5_000,
+            points.add(new TrendReportPoint(start + i * 5_000,
                     new PerformanceTrendSnapshot(10, 0, 0, metrics, PerformanceTrendSnapshot.terminalIdle().http(),
                             PerformanceTrendSnapshot.terminalIdle().webSocket(), PerformanceTrendSnapshot.terminalIdle().sse())));
         }
@@ -232,11 +231,11 @@ public class PerformanceReportPdfExporterTest {
                 Arrays.asList(PerformanceReportTableSchema.httpColumns()), rows));
     }
 
-    private PerformanceReportPdfExporter.ReportContext context(List<PerformanceTrendView.TrendReportPoint> points) {
+    private PerformanceReportPdfExporter.ReportContext context(List<TrendReportPoint> points) {
         return context(points, List.of());
     }
 
-    private PerformanceReportPdfExporter.ReportContext context(List<PerformanceTrendView.TrendReportPoint> points,
+    private PerformanceReportPdfExporter.ReportContext context(List<TrendReportPoint> points,
                                                                  List<PerformanceSampleResult> samples) {
         return new PerformanceReportPdfExporter.ReportContext("Performance Test Report · Demo", null,
                 "Staging", points, samples, "", List.of(new PerformanceServiceResource("orders", 3, 2, 4)));
@@ -247,14 +246,14 @@ public class PerformanceReportPdfExporterTest {
                 .successful(false).errorMsg(detail).testResults(List.of(new TestResult("HTTP status", false, detail))).build();
     }
 
-    private List<PerformanceTrendView.TrendReportPoint> trendPoints() {
-        List<PerformanceTrendView.TrendReportPoint> points = new ArrayList<>();
+    private List<TrendReportPoint> trendPoints() {
+        List<TrendReportPoint> points = new ArrayList<>();
         long now = System.currentTimeMillis() - 120_000;
         for (int i = 0; i < 20; i++) {
             double average = 110 + i * 8;
             var metrics = new PerformanceTrendSnapshot.ProtocolWindowMetrics(100, 2, 2.0, 5.5,
                     average, 0, 0, 0, Double.NaN, Double.NaN, Double.NaN, Double.NaN, average * 1.6);
-            points.add(new PerformanceTrendView.TrendReportPoint(now + i * 6_000,
+            points.add(new TrendReportPoint(now + i * 6_000,
                     new PerformanceTrendSnapshot(10, 0, 0, metrics, metrics,
                             PerformanceTrendSnapshot.terminalIdle().webSocket(), PerformanceTrendSnapshot.terminalIdle().sse())));
         }
