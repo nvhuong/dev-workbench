@@ -153,6 +153,8 @@ public class RedisPanel extends JPanel {
     private transient JedisPooled jedis;
     private boolean connected = false;
     private boolean loadingKeys;
+    /** Bumped on every key load and on disconnect so a slow load of a previous connection is discarded. */
+    private long keyLoadGeneration;
     private final RedisConnectionProfileStore connectionProfileStore;
     private final Map<String, RedisConnectionProfile> connectionProfilesByName = new LinkedHashMap<>();
     private boolean loadingConnectionProfiles;
@@ -953,6 +955,8 @@ public class RedisPanel extends JPanel {
     }
 
     private void doDisconnect() {
+        keyLoadGeneration++;
+        setLoadingKeys(false);
         closeJedisQuietly();
         updateConnectedState(false);
         keyListModel.clear();
@@ -978,6 +982,9 @@ public class RedisPanel extends JPanel {
         if (!connected || jedis == null || loadingKeys) return;
         respStatusLabel.setText(t(MessageKeys.TOOLBOX_REDIS_STATUS_LOADING_KEYS));
         setLoadingKeys(true);
+        // Workers use the client captured here: the field changes on disconnect/reconnect.
+        final JedisPooled client = jedis;
+        final long generation = ++keyLoadGeneration;
 
         SwingWorker<KeyLoadResult, Void> worker = new SwingWorker<>() {
             @Override
@@ -987,7 +994,7 @@ public class RedisPanel extends JPanel {
                 ScanParams params = new ScanParams().count(300);
                 Set<String> dedup = new LinkedHashSet<>();
                 do {
-                    var scanResult = jedis.scan(cursor, params);
+                    var scanResult = client.scan(cursor, params);
                     cursor = scanResult.getCursor();
                     for (String key : scanResult.getResult()) {
                         dedup.add(key);
@@ -1004,8 +1011,8 @@ public class RedisPanel extends JPanel {
                 for (int i = 0; i < metaLimit; i++) {
                     String key = result.keys.get(i);
                     try {
-                        result.types.put(key, jedis.type(key));
-                        result.ttls.put(key, jedis.ttl(key));
+                        result.types.put(key, client.type(key));
+                        result.ttls.put(key, client.ttl(key));
                     } catch (Exception ignore) {
                         // ignore single key metadata failures
                     }
@@ -1015,6 +1022,9 @@ public class RedisPanel extends JPanel {
 
             @Override
             protected void done() {
+                if (generation != keyLoadGeneration || client != jedis) {
+                    return; // result of a previous connection
+                }
                 setLoadingKeys(false);
                 try {
                     KeyLoadResult result = get();
@@ -1067,10 +1077,12 @@ public class RedisPanel extends JPanel {
                 JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
         if (opt != JOptionPane.YES_OPTION) return;
 
+        final JedisPooled client = jedis;
+        if (client == null) return;
         SwingWorker<Long, Void> worker = new SwingWorker<>() {
             @Override
             protected Long doInBackground() {
-                return jedis.del(keys.toArray(String[]::new));
+                return client.del(keys.toArray(String[]::new));
             }
 
             @Override
@@ -1107,10 +1119,11 @@ public class RedisPanel extends JPanel {
         respStatusLabel.setText(t(MessageKeys.TOOLBOX_REDIS_STATUS_EXECUTING));
         executeBtn.setEnabled(false);
 
+        final JedisPooled client = jedis;
         SwingWorker<String, Void> worker = new SwingWorker<>() {
             @Override
             protected String doInBackground() {
-                Object result = runRedisCommand(command, key, args, value);
+                Object result = runRedisCommand(client, command, key, args, value);
                 return renderResult(result);
             }
 
@@ -1137,7 +1150,7 @@ public class RedisPanel extends JPanel {
         worker.execute();
     }
 
-    private Object runRedisCommand(String command, String key, String args, String value) {
+    private Object runRedisCommand(JedisPooled jedis, String command, String key, String args, String value) {
         List<String> argList = parseArgs(args);
         return switch (command) {
             case CMD_GET -> jedis.get(key);
@@ -1289,12 +1302,13 @@ public class RedisPanel extends JPanel {
             return;
         }
 
+        final JedisPooled client = jedis;
         SwingWorker<Map<String, Object>, Void> worker = new SwingWorker<>() {
             @Override
             protected Map<String, Object> doInBackground() {
                 Map<String, Object> map = new HashMap<>();
-                map.put("type", jedis.type(key));
-                map.put("ttl", jedis.ttl(key));
+                map.put("type", client.type(key));
+                map.put("ttl", client.ttl(key));
                 return map;
             }
 
@@ -1334,12 +1348,13 @@ public class RedisPanel extends JPanel {
             applyQuickReadCommand("string");
             return;
         }
-        // Thu thập không đồng bộ type，Tránh vào EDT chặn
+        // Fetch the type off the EDT with the client of the current connection.
+        final JedisPooled client = jedis;
         new SwingWorker<String, Void>() {
             @Override
             protected String doInBackground() {
                 try {
-                    return jedis.type(key);
+                    return client.type(key);
                 } catch (Exception ignore) {
                     return "string";
                 }
