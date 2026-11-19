@@ -16,7 +16,14 @@ final class CaptureSessionStore {
 
     private final List<CaptureFlow> flows = new ArrayList<>();
     private final Map<String, CaptureFlow> flowById = new LinkedHashMap<>();
-    private final Map<String, Long> tlsIssueRecordedAt = new LinkedHashMap<>();
+    static final int MAX_TRACKED_TLS_ISSUES = 2_000;
+    /** Last TLS issue per host:port, oldest first; capped so long captures across many hosts stay bounded. */
+    private final Map<String, Long> tlsIssueRecordedAt = new LinkedHashMap<>(16, 0.75f, false) {
+        @Override
+        protected boolean removeEldestEntry(Map.Entry<String, Long> eldest) {
+            return size() > MAX_TRACKED_TLS_ISSUES;
+        }
+    };
     private final CopyOnWriteArrayList<Runnable> listeners = new CopyOnWriteArrayList<>();
     private int maxFlows;
 
@@ -118,6 +125,7 @@ final class CaptureSessionStore {
             if (lastRecordedAt != null && now - lastRecordedAt < TLS_ISSUE_SUPPRESS_MS) {
                 return false;
             }
+            tlsIssueRecordedAt.remove(key); // re-insert so the entry moves to the newest end
             tlsIssueRecordedAt.put(key, now);
         }
 
@@ -295,5 +303,9 @@ final class CaptureSessionStore {
         for (Runnable listener : listeners) {
             listener.run();
         }
+    }
+
+    synchronized int trackedTlsIssueCount() {
+        return tlsIssueRecordedAt.size();
     }
 }
