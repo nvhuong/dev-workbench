@@ -21,7 +21,11 @@ import java.util.function.Supplier;
 public class UiFontCatalog {
 
     private static final int INSPECTION_FONT_SIZE = 13;
-    private static final String CJK_SAMPLE = "Giao diện font chữ tiếng Trung";
+    /**
+     * Probe for the UI script. The UI ships in English and Vietnamese, so a UI-safe font must draw every precomposed
+     * Vietnamese letter (the inherited enum still calls this "CJK" support).
+     */
+    private static final String CJK_SAMPLE = "ăâđêôơư ĂÂĐÊÔƠƯ àảãáạằẳẵắặầẩẫấậèẻẽéẹềểễếệìỉĩíịòỏõóọồổỗốộờởỡớợùủũúụừửữứựỳỷỹýỵ";
     private static final String EMOJI_SAMPLE = "😀🚀✨";
     private static final List<String> LOGICAL_FONT_FAMILIES = List.of(
             Font.DIALOG,
@@ -191,6 +195,11 @@ public class UiFontCatalog {
         if (!isRequestedFamilyResolved(familyName, font)) {
             return FontSupport.NO_CJK;
         }
+        return inspectFont(font);
+    }
+
+    /** Glyph coverage of a resolved font: CJK ideographs first (required for a Chinese UI), then emoji. */
+    static FontSupport inspectFont(Font font) {
         boolean supportsCjk = font.canDisplayUpTo(CJK_SAMPLE) == -1;
         if (!supportsCjk) {
             return FontSupport.NO_CJK;
@@ -217,8 +226,10 @@ public class UiFontCatalog {
         if (support == null) {
             return true;
         }
-        boolean chineseUi = locale != null && "zh".equalsIgnoreCase(locale.getLanguage());
-        return !chineseUi || support.isUiSafe();
+        // Vietnamese (the shipped non-English UI) and Chinese text renders as boxes with a font lacking its glyphs.
+        String language = locale == null ? "" : locale.getLanguage();
+        boolean requiresUiScript = "vi".equalsIgnoreCase(language) || "zh".equalsIgnoreCase(language);
+        return !requiresUiScript || support.isUiSafe();
     }
 
     static final class FontOptionCache {

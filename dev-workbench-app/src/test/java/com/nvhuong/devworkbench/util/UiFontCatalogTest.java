@@ -143,4 +143,37 @@ public class UiFontCatalogTest {
         assertSame(first, second);
         assertSame(cache.getCachedOptions(), loaded);
     }
+
+    /**
+     * The UI is English/Vietnamese. A font without Vietnamese letters (ư, ơ, đ, ạ, ệ...) renders the Vietnamese UI as
+     * boxes, so it must not be reported as UI-safe; the gate used to check only the no longer shipped Chinese locale.
+     */
+    @Test
+    public void fontWithoutVietnameseGlyphsIsNotUiSafeForVietnameseUi() {
+        java.awt.Font basicLatinOnly = fontCoveringUpTo(0x024F, false);
+        java.awt.Font vietnameseCapable = fontCoveringUpTo(0x1EFF, false);
+
+        assertEquals(UiFontCatalog.inspectFont(basicLatinOnly), UiFontCatalog.FontSupport.NO_CJK);
+        assertEquals(UiFontCatalog.inspectFont(vietnameseCapable), UiFontCatalog.FontSupport.NO_EMOJI);
+        assertFalse(UiFontCatalog.isUiFontAllowedForLocale(
+                UiFontCatalog.inspectFont(basicLatinOnly), Locale.forLanguageTag("vi")));
+    }
+
+    /** Font stub that can display every code point up to {@code maxCodePoint} (excluding Latin Extended Additional unless reached). */
+    private static java.awt.Font fontCoveringUpTo(int maxCodePoint, boolean emoji) {
+        return new java.awt.Font(java.awt.Font.SANS_SERIF, java.awt.Font.PLAIN, 13) {
+            @Override
+            public int canDisplayUpTo(String text) {
+                for (int i = 0; i < text.length(); ) {
+                    int codePoint = text.codePointAt(i);
+                    boolean supported = codePoint <= maxCodePoint || (emoji && codePoint >= 0x1F000);
+                    if (!supported && !(codePoint >= 0x0300 && codePoint <= 0x036F && maxCodePoint >= 0x036F)) {
+                        return i;
+                    }
+                    i += Character.charCount(codePoint);
+                }
+                return -1;
+            }
+        };
+    }
 }
