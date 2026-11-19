@@ -256,6 +256,86 @@ public class SqlPanelTest {
     }
 
     /**
+     * Oracle application users often reach tables only through synonyms; listing only TABLE/VIEW showed their schema
+     * as empty. Schemas without objects must also say so instead of showing nothing.
+     */
+    @Test public void listsSynonymsAndExplainsEmptySchemas() throws Exception {
+        SqlPanel panel = connectH2("sql_panel_synonyms",
+                "CREATE TABLE IF NOT EXISTS PUBLIC.ORDERS(ID INT)\\;CREATE SCHEMA IF NOT EXISTS APP\\;"
+                        + "CREATE SYNONYM IF NOT EXISTS APP.ORDERS_SYN FOR PUBLIC.ORDERS\\;CREATE SCHEMA IF NOT EXISTS EMPTY_SCHEMA");
+        JTree tree = (JTree) field(panel, "objectTree");
+        DefaultMutableTreeNode app = awaitScope(panel, "APP");
+        DefaultMutableTreeNode empty = awaitScope(panel, "EMPTY_SCHEMA");
+        SwingUtilities.invokeAndWait(() -> {
+            tree.expandPath(new javax.swing.tree.TreePath(app.getPath()));
+            tree.expandPath(new javax.swing.tree.TreePath(empty.getPath()));
+        });
+        waitUntil(() -> onEdt(() -> childEndingWith(app, "ORDERS_SYN") != null), () -> "synonym not listed");
+        waitUntil(() -> onEdt(() -> empty.getChildCount() == 1
+                        && SqlI18n.t("no_tables").equals(((DefaultMutableTreeNode) empty.getChildAt(0)).getUserObject())),
+                () -> "empty schema shows no explanation");
+        SwingUtilities.invokeAndWait(() -> invoke(panel, "disconnect"));
+    }
+
+    /**
+     * JDBC metadata names are LIKE patterns: "ORDER_ITEMS" also matched "ORDERXITEMS", mixing in its columns. Names
+     * must be escaped, and column nodes must show size, nullability and primary key.
+     */
+    @Test public void columnsBelongToTheExactTableAndShowDetails() throws Exception {
+        SqlPanel panel = connectH2("sql_panel_columns",
+                "CREATE TABLE IF NOT EXISTS PUBLIC.ORDER_ITEMS(ID INT PRIMARY KEY, NAME VARCHAR(50) NOT NULL, NOTE VARCHAR(10))\\;"
+                        + "CREATE TABLE IF NOT EXISTS PUBLIC.ORDERXITEMS(OTHER_COL INT)");
+        JTree tree = (JTree) field(panel, "objectTree");
+        DefaultMutableTreeNode publicScope = awaitScope(panel, "PUBLIC");
+        waitUntil(() -> onEdt(() -> childEndingWith(publicScope, "ORDER_ITEMS") != null), () -> "tables not loaded");
+        DefaultMutableTreeNode orderItems = onEdtValue(() -> childEndingWith(publicScope, "ORDER_ITEMS"));
+        SwingUtilities.invokeAndWait(() -> tree.expandPath(new javax.swing.tree.TreePath(orderItems.getPath())));
+        waitUntil(() -> onEdt(() -> orderItems.getChildCount() >= 3
+                        && !SqlI18n.t("loading").equals(((DefaultMutableTreeNode) orderItems.getChildAt(0)).getUserObject())),
+                () -> "columns not loaded");
+
+        SwingUtilities.invokeAndWait(() -> {
+            List<String> columns = new ArrayList<>();
+            for (int i = 0; i < orderItems.getChildCount(); i++) {
+                columns.add(String.valueOf(((DefaultMutableTreeNode) orderItems.getChildAt(i)).getUserObject()));
+            }
+            assertEquals(columns.size(), 3, columns.toString());
+            assertTrue(columns.stream().noneMatch(column -> column.contains("OTHER_COL")), columns.toString());
+            assertTrue(columns.get(0).startsWith("ID") && columns.get(0).contains("PK"), columns.toString());
+            assertTrue(columns.get(1).contains("(50)") && columns.get(1).contains("NOT NULL"), columns.toString());
+        });
+
+        // "View column details" lists every column property in the results grid.
+        javax.swing.table.DefaultTableModel results = (javax.swing.table.DefaultTableModel) field(panel, "resultModel");
+        SwingUtilities.invokeAndWait(() -> {
+            try {
+                Method details = SqlPanel.class.getDeclaredMethod("showColumnDetails", orderItems.getUserObject().getClass());
+                details.setAccessible(true);
+                details.invoke(panel, orderItems.getUserObject());
+            } catch (ReflectiveOperationException exception) {
+                throw new IllegalStateException(exception);
+            }
+        });
+        waitUntil(() -> onEdt(() -> results.getRowCount() == 3), () -> "column details not shown");
+        SwingUtilities.invokeAndWait(() -> {
+            List<String> headers = new ArrayList<>();
+            for (int i = 0; i < results.getColumnCount(); i++) headers.add(results.getColumnName(i));
+            assertTrue(headers.contains(SqlI18n.t("column_nullable")) && headers.contains(SqlI18n.t("column_primary_key")),
+                    headers.toString());
+            assertEquals(String.valueOf(results.getValueAt(0, 0)), "ID");
+            invoke(panel, "disconnect");
+        });
+    }
+
+    private static <T> T onEdtValue(java.util.function.Supplier<T> supplier) throws Exception {
+        Object[] value = new Object[1];
+        SwingUtilities.invokeAndWait(() -> value[0] = supplier.get());
+        @SuppressWarnings("unchecked")
+        T result = (T) value[0];
+        return result;
+    }
+
+    /**
      * Older Oracle drivers (ojdbc6/7) predate JDBC 4.1: setSchema/getSchema throw AbstractMethodError. The default
      * schema must then be applied with ALTER SESSION and the current schema derived from the login user.
      */

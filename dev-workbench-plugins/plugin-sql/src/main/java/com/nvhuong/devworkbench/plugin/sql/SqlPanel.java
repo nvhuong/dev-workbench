@@ -426,6 +426,9 @@ public class SqlPanel extends JPanel {
             JMenuItem viewData = new JMenuItem(SqlI18n.t("view_data"));
             viewData.addActionListener(event -> openTableQuery(table));
             menu.add(viewData);
+            JMenuItem viewColumns = new JMenuItem(SqlI18n.t("view_columns"));
+            viewColumns.addActionListener(event -> showColumnDetails(table));
+            menu.add(viewColumns);
             JMenuItem copyName = new JMenuItem(SqlI18n.t("copy_qualified_name"));
             copyName.addActionListener(event -> copyText(table.qualifiedName()));
             menu.add(copyName);
@@ -665,6 +668,10 @@ public class SqlPanel extends JPanel {
                     Properties properties = new Properties();
                     if (!user.isBlank()) properties.setProperty("user", user);
                     if (secret.length > 0) properties.setProperty("password", new String(secret));
+                    if (url.startsWith("jdbc:oracle:")) {
+                        // Without it ojdbc's getColumns returns nothing for synonyms.
+                        properties.putIfAbsent("includeSynonyms", "true");
+                    }
                     Connection opened = driver == null
                             ? DriverManager.getConnection(url, properties)
                             : driver.connect(url, properties);
@@ -887,14 +894,56 @@ public class SqlPanel extends JPanel {
         } catch (Exception ignored) {
             identifierQuote = "";
         }
-        try (ResultSet tables = metadata.getTables(scope.catalog(), scope.schema(), null, new String[]{"TABLE", "VIEW"})) {
+        String escape = searchStringEscape(metadata);
+        try (ResultSet tables = metadata.getTables(scope.catalog(), escapePattern(scope.schema(), escape), null,
+                browsableTableTypes(metadata))) {
             while (tables.next()) {
                 String table = tables.getString("TABLE_NAME");
                 TableRef ref = new TableRef(scope.catalog(), scope.schema(), table, identifierQuote);
                 nodes.add(lazyNode(ref));
             }
         }
+        if (nodes.isEmpty()) {
+            nodes.add(new DefaultMutableTreeNode(SqlI18n.t("no_tables")));
+        }
         return nodes;
+    }
+
+    /**
+     * Object types shown in the navigator. Oracle application users usually reach tables through SYNONYMs, so limiting
+     * the list to TABLE/VIEW made their schema look empty; materialized/partitioned tables were missing as well.
+     */
+    static String[] browsableTableTypes(DatabaseMetaData metadata) {
+        java.util.Set<String> wanted = java.util.Set.of("TABLE", "BASE TABLE", "VIEW", "SYNONYM", "ALIAS",
+                "MATERIALIZED VIEW", "PARTITIONED TABLE", "FOREIGN TABLE");
+        List<String> types = new ArrayList<>();
+        try (ResultSet result = metadata.getTableTypes()) {
+            while (result.next()) {
+                String type = result.getString("TABLE_TYPE");
+                if (type != null && wanted.contains(type.trim().toUpperCase(java.util.Locale.ROOT))) {
+                    types.add(type.trim());
+                }
+            }
+        } catch (Exception | AbstractMethodError ignored) {
+            return new String[]{"TABLE", "VIEW"};
+        }
+        return types.isEmpty() ? new String[]{"TABLE", "VIEW"} : types.toArray(String[]::new);
+    }
+
+    /** JDBC metadata name arguments are LIKE patterns: escape "_" and "%" so ORDER_ITEMS does not match ORDERXITEMS. */
+    static String escapePattern(String name, String escape) {
+        if (name == null || escape == null || escape.isEmpty()) {
+            return name;
+        }
+        return name.replace(escape, escape + escape).replace("_", escape + "_").replace("%", escape + "%");
+    }
+
+    private static String searchStringEscape(DatabaseMetaData metadata) {
+        try {
+            return metadata.getSearchStringEscape();
+        } catch (Exception | AbstractMethodError ignored) {
+            return null;
+        }
     }
 
     private void loadColumns(DefaultMutableTreeNode tableNode) {
@@ -906,11 +955,8 @@ public class SqlPanel extends JPanel {
         new SwingWorker<List<ColumnInfo>, Void>() {
             @Override protected List<ColumnInfo> doInBackground() throws Exception {
                 List<ColumnInfo> columns = new ArrayList<>();
-                try (ResultSet result = active.getMetaData().getColumns(table.catalog(), table.schema(), table.table(), null)) {
-                    while (result.next()) {
-                        String column = result.getString("COLUMN_NAME");
-                        columns.add(new ColumnInfo(column, column + "  ·  " + result.getString("TYPE_NAME")));
-                    }
+                for (ColumnDetail detail : readColumnDetails(active.getMetaData(), table)) {
+                    columns.add(new ColumnInfo(detail.name(), detail.summary()));
                 }
                 return columns;
             }
@@ -924,6 +970,9 @@ public class SqlPanel extends JPanel {
                         tableNode.add(new DefaultMutableTreeNode(column.displayName()));
                         metadataSuggestions.add(column.name());
                     });
+                    if (columns.isEmpty()) {
+                        tableNode.add(new DefaultMutableTreeNode(SqlI18n.t("no_columns")));
+                    }
                     ((DefaultTreeModel) objectTree.getModel()).reload(tableNode);
                     setStatus(SqlI18n.t("columns_loaded", columns.size(), table.table()));
                     refreshSuggestions();
@@ -1244,6 +1293,85 @@ public class SqlPanel extends JPanel {
         @Override public String toString() { return displayName; }
     }
     private record ColumnInfo(String name, String displayName) { }
+
+    /** One column of a table as reported by JDBC metadata, with its primary key flag. */
+    record ColumnDetail(String name, String typeName, int size, int scale, boolean nullable, String defaultValue,
+                        boolean primaryKey, String remarks) {
+        String displayType() {
+            String upper = typeName == null ? "" : typeName.toUpperCase(java.util.Locale.ROOT);
+            boolean sized = upper.contains("CHAR") || upper.contains("BINARY") || upper.contains("RAW")
+                    || upper.contains("DECIMAL") || upper.contains("NUMERIC") || upper.equals("NUMBER");
+            if (!sized || size <= 0 || upper.contains("(")) return typeName;
+            return typeName + "(" + size + (scale > 0 ? "," + scale : "") + ")";
+        }
+
+        String summary() {
+            return name + "  ·  " + displayType() + (nullable ? "" : "  ·  NOT NULL") + (primaryKey ? "  ·  PK" : "");
+        }
+    }
+
+    static List<ColumnDetail> readColumnDetails(DatabaseMetaData metadata, TableRef table) throws java.sql.SQLException {
+        java.util.Set<String> primaryKeys = new java.util.HashSet<>();
+        try (ResultSet keys = metadata.getPrimaryKeys(table.catalog(), table.schema(), table.table())) {
+            while (keys.next()) primaryKeys.add(keys.getString("COLUMN_NAME"));
+        } catch (java.sql.SQLException | AbstractMethodError ignored) {
+            // views and synonyms have no primary key metadata on some drivers
+        }
+        String escape = searchStringEscape(metadata);
+        List<ColumnDetail> columns = new ArrayList<>();
+        try (ResultSet result = metadata.getColumns(table.catalog(), escapePattern(table.schema(), escape),
+                escapePattern(table.table(), escape), null)) {
+            while (result.next()) {
+                String name = result.getString("COLUMN_NAME");
+                columns.add(new ColumnDetail(name, result.getString("TYPE_NAME"), result.getInt("COLUMN_SIZE"),
+                        result.getInt("DECIMAL_DIGITS"), result.getInt("NULLABLE") != DatabaseMetaData.columnNoNulls,
+                        safeString(result, "COLUMN_DEF"), primaryKeys.contains(name), safeString(result, "REMARKS")));
+            }
+        }
+        return columns;
+    }
+
+    private static String safeString(ResultSet result, String column) {
+        try {
+            String value = result.getString(column);
+            return value == null ? "" : value.trim();
+        } catch (java.sql.SQLException ignored) {
+            return "";
+        }
+    }
+
+    /** Lists every column property of a table in the results grid ("View column details"). */
+    private void showColumnDetails(TableRef table) {
+        Connection active = connection;
+        if (active == null) return;
+        setStatus(SqlI18n.t("loading_columns", table.table()));
+        new SwingWorker<List<ColumnDetail>, Void>() {
+            @Override protected List<ColumnDetail> doInBackground() throws Exception {
+                return readColumnDetails(active.getMetaData(), table);
+            }
+
+            @Override protected void done() {
+                if (connection != active) return;
+                try {
+                    List<ColumnDetail> columns = get();
+                    resultModel.setRowCount(0);
+                    resultModel.setColumnIdentifiers(new Object[]{SqlI18n.t("column_name"), SqlI18n.t("column_type"),
+                            SqlI18n.t("column_nullable"), SqlI18n.t("column_primary_key"), SqlI18n.t("column_default"),
+                            SqlI18n.t("column_remarks")});
+                    for (ColumnDetail column : columns) {
+                        resultModel.addRow(new Object[]{column.name(), column.displayType(),
+                                column.nullable() ? "YES" : "NO", column.primaryKey() ? "PK" : "",
+                                column.defaultValue(), column.remarks()});
+                    }
+                    resultTabs.setSelectedIndex(0);
+                    setStatus(SqlI18n.t("columns_loaded", columns.size(), table.qualifiedName()));
+                } catch (Exception exception) {
+                    Throwable cause = exception.getCause() == null ? exception : exception.getCause();
+                    setStatus(SqlI18n.t("error", safeMessage(cause)));
+                }
+            }
+        }.execute();
+    }
     private record QueryResult(List<String> columns, List<Object[]> rows, int count, boolean hasRows) { }
     private record TableRef(String catalog, String schema, String table, String identifierQuote) {
         String qualifiedName() {
