@@ -964,16 +964,18 @@ public class DecompilerPanel extends JPanel {
      * sử dụngCFRDịch ngượcClassMã byte
      */
     private String decompileClass(byte[] classBytes, String className) {
+        File tempDir = null;
         try {
             // Tạo một thư mục tạm thời để lưuclasstập tin
-            File tempDir = Files.createTempDirectory("cfr-decompile").toFile();
+            tempDir = Files.createTempDirectory("cfr-decompile").toFile();
 
-            // cứu class tập tin
-            File classFile = new File(tempDir, className);
-            File parentDir = classFile.getParentFile();
-            if (parentDir != null && !parentDir.exists() && !parentDir.mkdirs()) {
-                log.warn("Failed to create parent directory: {}", parentDir);
+            // Archive entry names are untrusted ("../../x.class"): only the sanitized file name is written, inside
+            // a dedicated input directory. CFR derives the output package from the bytecode, not the file path.
+            File inputDir = new File(tempDir, "input");
+            if (!inputDir.mkdirs() && !inputDir.exists()) {
+                log.warn("Failed to create input directory: {}", inputDir);
             }
+            File classFile = new File(inputDir, safeClassFileName(className));
             Files.write(classFile.toPath(), classBytes);
 
             // Tạo một thư mục đầu ra
@@ -1003,15 +1005,28 @@ public class DecompilerPanel extends JPanel {
 
             log.debug("Decompilation result length: {}", result.length());
 
-            // Làm sạch các tập tin tạm thời
-            deleteDirectory(tempDir);
-
             return !result.isEmpty() ? result : "// Failed to decompile: No output from CFR";
 
         } catch (Exception e) {
             log.error("CFR decompilation failed", e);
             return "// Decompilation failed: " + e.getMessage();
+        } finally {
+            // Làm sạch các tập tin tạm thời
+            if (tempDir != null) {
+                deleteDirectory(tempDir);
+            }
         }
+    }
+
+    /** Last path segment of an archive entry (also after a nested "!/"), reduced to a harmless file name. */
+    static String safeClassFileName(String entryName) {
+        String name = entryName == null ? "" : entryName.replace('\\', '/');
+        name = name.substring(name.lastIndexOf('/') + 1);
+        name = name.replaceAll("[^A-Za-z0-9._$-]", "_");
+        if (name.isBlank() || name.equals(".") || name.equals("..") || name.equals(CLASS_EXTENSION)) {
+            name = "Decompiled" + CLASS_EXTENSION;
+        }
+        return name.endsWith(CLASS_EXTENSION) ? name : name + CLASS_EXTENSION;
     }
 
     /**
@@ -1036,7 +1051,9 @@ public class DecompilerPanel extends JPanel {
 
             log.debug("Looking for Java file at: {}", javaFile.getAbsolutePath());
 
-            if (javaFile.exists()) {
+            boolean insideOutput = javaFile.toPath().toAbsolutePath().normalize()
+                    .startsWith(outputDir.toPath().toAbsolutePath().normalize());
+            if (insideOutput && javaFile.exists()) {
                 log.debug("Found Java file directly at expected path");
                 String content = Files.readString(javaFile.toPath(), StandardCharsets.UTF_8);
                 // Dọn dẹp thông tin gỡ lỗi có thể
