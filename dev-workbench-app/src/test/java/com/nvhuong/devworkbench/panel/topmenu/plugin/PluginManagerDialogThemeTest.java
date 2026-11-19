@@ -64,6 +64,12 @@ public class PluginManagerDialogThemeTest {
 
     @Test
     public void statusPalettesShouldRemainReadableInLightAndDarkThemes() {
+        // Earlier tests (or this class' restore step) may have pinned theme tokens with UIManager.put; such
+        // developer overrides survive a look-and-feel switch and would keep light colors in the dark theme.
+        for (String key : new String[]{ThemeColors.SELECTION_BACKGROUND, ThemeColors.WARNING,
+                ThemeColors.TEXT_PRIMARY, ThemeColors.DIALOG_CHROME_BACKGROUND}) {
+            UIManager.put(key, null);
+        }
         assertTrue(DevWorkbenchLightLaf.setup());
         assertReadableStatus(ModernColors.getSuccessDark(), "light success");
         assertReadableStatus(ModernColors.getWarningDark(), "light warning");
