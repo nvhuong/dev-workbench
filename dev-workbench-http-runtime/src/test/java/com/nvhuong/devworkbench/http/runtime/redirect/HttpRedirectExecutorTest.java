@@ -130,6 +130,28 @@ public class HttpRedirectExecutorTest {
         ));
     }
 
+    /**
+     * Authorization/Cookie headers were stripped on cross-origin redirects but Digest credentials (transportAuth) were
+     * kept, so a 401 Digest challenge from the redirect target was answered with the user's credentials.
+     */
+    @Test
+    public void shouldDropDigestCredentialsOnCrossOriginRedirectOnly() {
+        PreparedRequest request = new PreparedRequest();
+        request.method = "GET";
+        request.transportAuth = new com.nvhuong.devworkbench.request.model.TransportAuth(
+                com.nvhuong.devworkbench.request.model.AuthType.DIGEST.getConstant(), "alice", "secret");
+
+        PreparedRequest crossOrigin = HttpRedirectExecutor.prepareRedirectRequest(
+                request, "https://attacker.example/collect", 302, true);
+        PreparedRequest sameOrigin = HttpRedirectExecutor.prepareRedirectRequest(
+                request, "https://api.example.test/next", 302, false);
+
+        assertEquals(crossOrigin.transportAuth, null, "credentials must not follow a redirect to another origin");
+        assertTrue(sameOrigin.transportAuth != null && sameOrigin.transportAuth.isDigest(),
+                "same-origin redirects keep Digest credentials");
+        assertEquals(sameOrigin.transportAuth.username, "alice");
+    }
+
     @Test
     public void shouldPreservePutMethodAndBodyOn302Redirect() {
         PreparedRequest request = new PreparedRequest();

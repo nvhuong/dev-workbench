@@ -226,6 +226,12 @@ public class HttpRedirectExecutor {
             redirectReq.urlencodedList = null;
         }
 
+        // Like Authorization/Cookie below, transport-level credentials (Digest) must not be offered to another origin:
+        // its 401 challenge would otherwise be answered with the user's credentials.
+        if (isCrossDomain) {
+            redirectReq.transportAuth = null;
+        }
+
         // xử lý headers：Loại bỏ cụ thể header
         redirectReq.headersList = cleanHeadersList(
                 redirectReq.headersList,
