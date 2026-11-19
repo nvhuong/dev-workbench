@@ -74,7 +74,12 @@ public class DecompilerPanel extends JPanel {
     private File currentFile;
     private transient JarFile currentJarFile;
     private transient ZipFile currentZipFile;
-    private final Map<String, byte[]> classFileCache = new HashMap<>();
+    /** Bytes of a standalone .class file; archive entries are read on demand (see {@link #entryBytes}). */
+    private final Map<String, byte[]> classFileCache = new java.util.concurrent.ConcurrentHashMap<>();
+    /** Nested JARs that were expanded, keyed by their path ("lib/a.jar" or "lib/a.jar!/b.jar"), backed by temp files. */
+    private final Map<String, NestedJar> nestedJars = new java.util.concurrent.ConcurrentHashMap<>();
+
+    private record NestedJar(JarFile jar, java.nio.file.Path file) { }
 
     public DecompilerPanel() {
         initUI();
@@ -513,6 +518,7 @@ public class DecompilerPanel extends JPanel {
     private void loadJarFile(File file) throws IOException {
         currentJarFile = new JarFile(file);
         classFileCache.clear();
+        closeNestedJars();
 
         // Được tạo cho nút gốcFileNodeData
         FileNodeData rootData = new FileNodeData(file.getName(), true, false);
@@ -529,10 +535,8 @@ public class DecompilerPanel extends JPanel {
 
             // Lưu trữ tất cả các tệp không có thư mục (bao gồm class、jar/zip、tệp văn bản và các loại tệp không xác định khác)
             if (!entry.isDirectory()) {
-                try (InputStream is = currentJarFile.getInputStream(entry)) {
-                    classFileCache.put(entryName, is.readAllBytes());
-                }
-                uncompressedTotal += entry.getSize(); // Kích thước không nén tích lũy
+                // Entries are read when opened: caching every entry made large (fat) JARs exhaust the heap.
+                uncompressedTotal += Math.max(0, entry.getSize());
             }
 
             // Lưu ý:entry.getSize() là kích thước chưa nén nên tổng kích thước của các file con sẽ lớn hơnJARBản thân tập tin
@@ -581,6 +585,7 @@ public class DecompilerPanel extends JPanel {
     private void loadZipFile(File file) throws IOException {
         currentZipFile = new ZipFile(file);
         classFileCache.clear();
+        closeNestedJars();
 
         // Được tạo cho nút gốcFileNodeData
         FileNodeData rootData = new FileNodeData(file.getName(), true, false);
@@ -597,10 +602,7 @@ public class DecompilerPanel extends JPanel {
 
             // Lưu trữ tất cả các tệp không có thư mục (bao gồm class、jar/zip、tệp văn bản và các loại tệp không xác định khác)
             if (!entry.isDirectory()) {
-                try (InputStream is = currentZipFile.getInputStream(entry)) {
-                    classFileCache.put(entryName, is.readAllBytes());
-                }
-                uncompressedTotal += entry.getSize(); // Kích thước không nén tích lũy
+                uncompressedTotal += Math.max(0, entry.getSize());
             }
 
             // Lưu ý:entry.getSize() là kích thước chưa nén nên tổng kích thước của các file con sẽ lớn hơnZIPBản thân tập tin
@@ -649,6 +651,7 @@ public class DecompilerPanel extends JPanel {
      */
     private void loadClassFile(File file) throws IOException {
         classFileCache.clear();
+        closeNestedJars();
         byte[] classBytes = Files.readAllBytes(file.toPath());
         classFileCache.put(file.getName(), classBytes);
 
@@ -778,11 +781,6 @@ public class DecompilerPanel extends JPanel {
             return;
         }
 
-        byte[] jarBytes = classFileCache.get(jarPath);
-        if (jarBytes == null) {
-            NotificationCenter.showWarning("JAR file not found in cache: " + jarPath);
-            return;
-        }
 
         SwingWorker<Void, Void> worker = new SwingWorker<>() {
             @Override
@@ -790,14 +788,20 @@ public class DecompilerPanel extends JPanel {
                 try {
                     statusLabel.setText(DecompilerI18n.t(MessageKeys.TOOLBOX_DECOMPILER_LOADING) + ": " + jarPath);
 
-                    // Tạo tập tin tạm thời để lưu lồng nhauJAR
+                    byte[] jarBytes = entryBytes(jarPath);
+                    if (jarBytes == null) {
+                        throw new IOException("JAR file not found: " + jarPath);
+                    }
+                    // Keep the nested JAR open on a temp file so its entries can be read on demand.
                     File tempJar = Files.createTempFile("nested-jar-", ".jar").toFile();
                     tempJar.deleteOnExit();
                     Files.write(tempJar.toPath(), jarBytes);
+                    JarFile nestedJar = new JarFile(tempJar);
+                    NestedJar previous = nestedJars.put(jarPath, new NestedJar(nestedJar, tempJar.toPath()));
+                    if (previous != null) closeQuietly(previous);
 
-                    // sử dụngJarFileĐọc lồng nhauJAR
                     Map<String, DefaultMutableTreeNode> packageNodes = new HashMap<>();
-                    try (JarFile nestedJar = new JarFile(tempJar)) {
+                    {
                         Enumeration<JarEntry> entries = nestedJar.entries();
                         while (entries.hasMoreElements()) {
                             JarEntry entry = entries.nextElement();
@@ -805,12 +809,6 @@ public class DecompilerPanel extends JPanel {
                             String fullEntryPath = jarPath + "!/" + entryName;
 
                             // Lưu trữ tất cả các tệp không có thư mục (bao gồm class、jar/zip、tệp văn bản và các loại tệp không xác định khác)
-                            if (!entry.isDirectory()) {
-                                try (InputStream is = nestedJar.getInputStream(entry)) {
-                                    classFileCache.put(fullEntryPath, is.readAllBytes());
-                                }
-                            }
-
                             // Thêm vào cây (so với hiện tạiJARnút)
                             addNestedEntryToTree(parentNode, packageNodes, entryName,
                                     fullEntryPath, entry.isDirectory(), entry.getSize());
@@ -820,8 +818,6 @@ public class DecompilerPanel extends JPanel {
                     // Tính toán lồng nhauJARKích thước của tất cả các thư mục trong
                     calculateDirectorySizes(parentNode);
 
-                    // Xóa các tập tin tạm thời
-                    Files.deleteIfExists(tempJar.toPath());
 
                 } catch (Exception e) {
                     log.error("Failed to load nested JAR: {}", jarPath, e);
@@ -899,7 +895,7 @@ public class DecompilerPanel extends JPanel {
      * Dịch ngược và hiển thị mã
      */
     private void decompileAndShow(String className) {
-        byte[] classBytes = classFileCache.get(className);
+        final byte[] classBytes = entryBytesOrNull(className);
         if (classBytes == null) {
             codeArea.setText("// " + DecompilerI18n.t(MessageKeys.TOOLBOX_DECOMPILER_ERROR) +
                     ": Class file not found");
@@ -1196,8 +1192,8 @@ public class DecompilerPanel extends JPanel {
         try {
             String content = null;
 
-            // Đọc từ bộ đệm trước (hỗ trợ lồng nhau JAR các tập tin trong )
-            byte[] cachedBytes = classFileCache.get(fileName);
+            // Standalone class file, top-level or nested archive entry (read on demand).
+            byte[] cachedBytes = entryBytes(fileName);
             if (cachedBytes != null) {
                 content = new String(cachedBytes, StandardCharsets.UTF_8);
             }
@@ -1311,8 +1307,62 @@ public class DecompilerPanel extends JPanel {
                 currentZipFile = null;
             }
             classFileCache.clear();
+            closeNestedJars();
         } catch (IOException e) {
             log.error("Failed to close jar/zip file", e);
+        }
+    }
+
+    /**
+     * Bytes of an entry: a standalone class file, an entry of the open JAR/ZIP, or {@code outer!/inner} of an expanded
+     * nested JAR. Read on demand so large archives are never held in memory as a whole.
+     */
+    private byte[] entryBytes(String path) throws IOException {
+        if (path == null) return null;
+        byte[] cached = classFileCache.get(path);
+        if (cached != null) return cached;
+        int separator = path.lastIndexOf("!/");
+        if (separator >= 0) {
+            NestedJar nested = nestedJars.get(path.substring(0, separator));
+            return nested == null ? null : read(nested.jar(), path.substring(separator + 2));
+        }
+        if (currentJarFile != null) return read(currentJarFile, path);
+        if (currentZipFile != null) return read(currentZipFile, path);
+        return null;
+    }
+
+    private byte[] entryBytesOrNull(String path) {
+        try {
+            return entryBytes(path);
+        } catch (IOException e) {
+            log.warn("Failed to read archive entry {}", path, e);
+            return null;
+        }
+    }
+
+    private static byte[] read(ZipFile archive, String entryName) throws IOException {
+        ZipEntry entry = archive.getEntry(entryName);
+        if (entry == null || entry.isDirectory()) return null;
+        try (InputStream input = archive.getInputStream(entry)) {
+            return input.readAllBytes();
+        }
+    }
+
+    private void closeNestedJars() {
+        for (NestedJar nested : nestedJars.values()) closeQuietly(nested);
+        nestedJars.clear();
+    }
+
+    private static void closeQuietly(NestedJar nested) {
+        try {
+            nested.jar().close();
+        } catch (IOException ignored) {
+            // best effort
+        }
+        try {
+            Files.deleteIfExists(nested.file());
+        } catch (IOException ignored) {
+            // deleteOnExit remains as a fallback
         }
     }
 
