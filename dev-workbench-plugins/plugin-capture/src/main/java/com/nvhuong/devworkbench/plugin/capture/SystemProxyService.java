@@ -293,8 +293,24 @@ final class SystemProxyService {
         }
         Map<String, ProxyServiceSnapshot> currentSnapshots = snapshots;
         try {
+            // Restore every service even if one fails (e.g. a USB/Thunderbolt adapter was unplugged while
+            // capturing); stopping at the first failure would leave the remaining services (often Wi-Fi)
+            // pointing at the stopped capture proxy.
+            Exception failure = null;
             for (Map.Entry<String, ProxyServiceSnapshot> entry : currentSnapshots.entrySet()) {
-                restoreSnapshot(entry.getKey(), entry.getValue());
+                try {
+                    restoreSnapshot(entry.getKey(), entry.getValue());
+                } catch (Exception ex) {
+                    log.warn("Failed to restore system proxy for network service {}", entry.getKey(), ex);
+                    if (failure == null) {
+                        failure = ex;
+                    } else {
+                        failure.addSuppressed(ex);
+                    }
+                }
+            }
+            if (failure != null) {
+                throw failure;
             }
             deleteRecoverySnapshotQuietly();
         } finally {
