@@ -101,8 +101,8 @@ public class UISettingsPanelLayoutTest {
         assertEquals(zh.getProperty("settings.editor.title"), "Phông chữ soạn thảo");
         assertEquals(zh.getProperty("settings.editor.font_name"), "Phông chữ chính của trình soạn thảo:");
         assertEquals(zh.getProperty("settings.editor.font_fallback_name"), "Phông chữ dự phòng cho các ký tự bị thiếu:");
-        assertTrue(zh.getProperty("settings.editor.description").contains("Phông chữ chính bị thiếu ký tự"));
-        assertTrue(zh.getProperty("settings.editor.font_fallback_name.tooltip").contains("Biểu tượng hoặc emoji"));
+        assertTrue(zh.getProperty("settings.editor.description").contains("phông chữ chính bị thiếu ký tự"));
+        assertTrue(zh.getProperty("settings.editor.font_fallback_name.tooltip").contains("ký hiệu hoặc emoji"));
         assertFalse(zh.containsKey("settings.editor.font.default"));
         assertFalse(zh.containsKey("settings.editor.font.fallback_auto"));
         assertFalse(zh.containsKey("settings.editor.font.fallback_none"));
@@ -131,8 +131,8 @@ public class UISettingsPanelLayoutTest {
                 "../dev-workbench-foundation/src/main/java/com/nvhuong/devworkbench/util/MessageKeys.java"
         ));
 
-        assertEquals(zh.getProperty("settings.editor.font.default_resolved"), "Tự động chọn ({0}）");
-        assertEquals(zh.getProperty("settings.editor.font.fallback_auto_resolved"), "Tự động chọn ({0}，gợi ý)");
+        assertEquals(zh.getProperty("settings.editor.font.default_resolved"), "Tự động ({0})");
+        assertEquals(zh.getProperty("settings.editor.font.fallback_auto_resolved"), "Tự động ({0}, khuyên dùng)");
         assertEquals(en.getProperty("settings.editor.font.default_resolved"), "Auto ({0})");
         assertEquals(en.getProperty("settings.editor.font.fallback_auto_resolved"), "Auto ({0}, Recommended)");
         assertTrue(messageKeysSource.contains("SETTINGS_EDITOR_FONT_DEFAULT_RESOLVED"));

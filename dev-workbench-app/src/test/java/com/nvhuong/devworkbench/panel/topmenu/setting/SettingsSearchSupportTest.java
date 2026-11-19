@@ -89,13 +89,13 @@ public class SettingsSearchSupportTest {
     public void visibleTextMatchShouldBePreferredOverEarlierTooltipMatchForPageLocation() {
         JPanel panel = new JPanel();
         JCheckBox requestTabs = new JCheckBox("Yêu cầu trang tab được hiển thị thành nhiều dòng");
-        requestTabs.setToolTipText("Khi được bật, tab yêu cầu được mở ở đầu trình chỉnh sửa yêu cầu sẽ tự động được hiển thị trong các dòng mới");
+        requestTabs.setToolTipText("Khi bật, các tab request mở ở đầu trình soạn thảo request sẽ tự xuống dòng");
         JLabel editorFontSection = new JLabel("Phông chữ soạn thảo");
         panel.add(requestTabs);
         panel.add(editorFontSection);
 
         SettingsSearchMatch match =
-                SettingsSearchSupport.firstMatch(page("Cài đặt chung", panel), "Biên tập viên").orElseThrow();
+                SettingsSearchSupport.firstMatch(page("Cài đặt chung", panel), "soạn thảo").orElseThrow();
 
         assertEquals(match.component(), editorFontSection);
     }
