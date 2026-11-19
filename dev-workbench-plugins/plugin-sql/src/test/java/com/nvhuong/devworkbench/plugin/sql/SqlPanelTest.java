@@ -440,6 +440,64 @@ public class SqlPanelTest {
         });
     }
 
+    /**
+     * Completion must offer columns of the tables used by the statement (also through aliases and lower-case names)
+     * without the user first expanding each table in the navigator, plus common SQL functions.
+     */
+    @Test public void completesStatementColumnsAliasesAndCommonSql() throws Exception {
+        SqlPanel panel = connectH2("sql_panel_column_completion",
+                "CREATE TABLE IF NOT EXISTS PUBLIC.ORDERS(ID INT, CUSTOMER_NAME VARCHAR(20), TOTAL INT)\\;"
+                        + "CREATE TABLE IF NOT EXISTS PUBLIC.CUSTOMERS(ID INT, EMAIL VARCHAR(20))");
+        awaitScope(panel, "PUBLIC");
+        waitUntil(() -> completions(panel, "ORD", 3).contains("ORDERS"), () -> "tables not loaded");
+
+        String aliased = "SELECT o. FROM ORDERS o JOIN CUSTOMERS c ON c.ID = o.ID";
+        int caret = "SELECT o.".length();
+        waitUntil(() -> completions(panel, aliased, caret).contains("o.CUSTOMER_NAME"),
+                () -> "alias columns: " + completions(panel, aliased, caret));
+        assertFalse(completions(panel, aliased, caret).contains("o.EMAIL"), completions(panel, aliased, caret).toString());
+
+        String partial = "SELECT c.em FROM CUSTOMERS c";
+        waitUntil(() -> completions(panel, partial, "SELECT c.em".length()).contains("c.EMAIL"),
+                () -> "partial alias column: " + completions(panel, partial, "SELECT c.em".length()));
+
+        String lower = "select x.cust from orders x";
+        waitUntil(() -> completions(panel, lower, "select x.cust".length()).contains("x.CUSTOMER_NAME"),
+                () -> "lower-case table: " + completions(panel, lower, "select x.cust".length()));
+
+        String plain = "SELECT TOT FROM ORDERS";
+        waitUntil(() -> completions(panel, plain, "SELECT TOT".length()).contains("TOTAL"),
+                () -> "statement column: " + completions(panel, plain, "SELECT TOT".length()));
+
+        String direct = "SELECT ORDERS.TO FROM ORDERS";
+        waitUntil(() -> completions(panel, direct, "SELECT ORDERS.TO".length()).contains("ORDERS.TOTAL"),
+                () -> "table-qualified column: " + completions(panel, direct, "SELECT ORDERS.TO".length()));
+
+        assertTrue(completions(panel, "NV", 2).contains("NVL("), completions(panel, "NV", 2).toString());
+        assertTrue(completions(panel, "ROW_", 4).contains("ROW_NUMBER() OVER ("), completions(panel, "ROW_", 4).toString());
+        assertTrue(completions(panel, "LEFT", 4).contains("LEFT JOIN"), completions(panel, "LEFT", 4).toString());
+        SwingUtilities.invokeAndWait(() -> invoke(panel, "disconnect"));
+    }
+
+    @SuppressWarnings("unchecked")
+    private static List<String> completions(SqlPanel panel, String text, int caret) {
+        List<String>[] result = new List[1];
+        try {
+            SwingUtilities.invokeAndWait(() -> {
+                try {
+                    Method method = SqlPanel.class.getDeclaredMethod("completionsFor", String.class, int.class);
+                    method.setAccessible(true);
+                    result[0] = (List<String>) method.invoke(panel, text, caret);
+                } catch (ReflectiveOperationException exception) {
+                    throw new IllegalStateException(exception);
+                }
+            });
+        } catch (Exception exception) {
+            throw new IllegalStateException(exception);
+        }
+        return result[0];
+    }
+
     private static SqlPanel connectH2(String database, String init) throws Exception {
         SqlPanel[] panel = new SqlPanel[1];
         SwingUtilities.invokeAndWait(() -> {

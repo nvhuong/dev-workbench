@@ -58,6 +58,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.ServiceLoader;
 import java.util.concurrent.ForkJoinPool;
@@ -127,7 +128,43 @@ public class SqlPanel extends JPanel {
             "GROUP BY", "ORDER BY", "HAVING", "LIMIT", "OFFSET", "UNION", "UNION ALL", "CASE", "WHEN", "THEN",
             "ELSE", "END", "INSERT INTO", "VALUES", "UPDATE", "SET", "DELETE FROM", "CREATE TABLE", "ALTER TABLE",
             "DROP TABLE", "CREATE INDEX", "PRIMARY KEY", "FOREIGN KEY", "REFERENCES", "COUNT(*)", "SUM(", "AVG(",
-            "MIN(", "MAX(", "COALESCE(", "ASC", "DESC", "TRUNCATE TABLE", "WITH");
+            "MIN(", "MAX(", "COALESCE(", "ASC", "DESC", "TRUNCATE TABLE", "WITH",
+            // Common clauses and functions (ANSI + Oracle/MySQL/PostgreSQL favourites).
+            "SELECT * FROM", "SELECT COUNT(*) FROM", "LEFT OUTER JOIN", "CROSS JOIN", "NOT IN", "NOT EXISTS",
+            "NOT LIKE", "ANY", "ALL", "INTERSECT", "MINUS", "EXCEPT", "FETCH FIRST", "ROWS ONLY", "PARTITION BY",
+            "OVER (", "ROW_NUMBER() OVER (", "RANK() OVER (", "DENSE_RANK() OVER (", "MERGE INTO", "USING",
+            "CREATE VIEW", "CREATE OR REPLACE VIEW", "CREATE SEQUENCE", "DROP INDEX", "DROP VIEW", "COMMIT", "ROLLBACK",
+            "GRANT", "REVOKE", "UNIQUE", "DEFAULT", "CHECK", "CONSTRAINT", "NVL(", "NVL2(", "DECODE(", "NULLIF(",
+            "IFNULL(", "CAST(", "CONVERT(", "TO_CHAR(", "TO_DATE(", "TO_NUMBER(", "TO_TIMESTAMP(", "TRUNC(", "ROUND(",
+            "ABS(", "MOD(", "UPPER(", "LOWER(", "TRIM(", "LTRIM(", "RTRIM(", "SUBSTR(", "SUBSTRING(", "LENGTH(",
+            "REPLACE(", "CONCAT(", "INSTR(", "LPAD(", "RPAD(", "EXTRACT(", "LISTAGG(", "STRING_AGG(", "GROUP_CONCAT(",
+            "SYSDATE", "SYSTIMESTAMP", "CURRENT_DATE", "CURRENT_TIMESTAMP", "NOW()", "ROWNUM", "DUAL", "ADD_MONTHS(",
+            "MONTHS_BETWEEN(", "LAST_DAY(", "DATE_FORMAT(", "DATEADD(", "DATEDIFF(", "INTERVAL", "VARCHAR2", "NUMBER",
+            "VARCHAR", "INTEGER", "DATE", "TIMESTAMP", "CLOB", "BLOB", "BOOLEAN");
+    /** Clause words that end a {@code FROM} list or cannot be a table alias. */
+    private static final java.util.Set<String> NON_ALIAS_WORDS = java.util.Set.of("ON", "USING", "SET", "VALUES",
+            "WHERE", "SELECT", "LEFT", "RIGHT", "INNER", "OUTER", "JOIN", "FULL", "CROSS", "NATURAL", "GROUP",
+            "ORDER", "HAVING", "LIMIT", "OFFSET", "FETCH", "UNION", "INTERSECT", "MINUS", "EXCEPT", "CONNECT",
+            "START", "WINDOW", "FOR", "DEFAULT", "AS", "WITH", "RETURNING", "PARTITION");
+    private static final String IDENTIFIER = "(?:[\\p{L}_][\\p{L}\\p{N}_$#]*|\"[^\"]+\"|`[^`]+`|\\[[^\\]]+\\])";
+    private static final java.util.regex.Pattern TABLE_ITEM = java.util.regex.Pattern.compile(
+            "^\\s*(" + IDENTIFIER + "(?:\\s*\\.\\s*" + IDENTIFIER + ")*)(?:\\s+(?:AS\\s+)?(" + IDENTIFIER + "))?",
+            java.util.regex.Pattern.CASE_INSENSITIVE);
+    private static final java.util.regex.Pattern TABLE_CLAUSE = java.util.regex.Pattern.compile(
+            "(?i)\\b(FROM|JOIN|UPDATE|INTO)\\s+");
+    private static final java.util.regex.Pattern FROM_LIST_END = java.util.regex.Pattern.compile(
+            "(?i)\\b(?:WHERE|GROUP|ORDER|HAVING|LIMIT|OFFSET|FETCH|UNION|INTERSECT|MINUS|EXCEPT|CONNECT|START|WINDOW"
+                    + "|FOR|ON|USING|NATURAL|CROSS|INNER|LEFT|RIGHT|FULL|JOIN|RETURNING)\\b|[();]");
+    private static final String AUTO_COMPLETION_KEY = "sql.autoCompletion";
+    private static final int RELEVANCE_STATEMENT_COLUMN = 300;
+    private static final int RELEVANCE_TABLE = 200;
+    private static final int RELEVANCE_COLUMN = 150;
+    private static final int RELEVANCE_KEYWORD = 100;
+    /** Tables seen in the navigator, keyed by upper-case table name and by unquoted qualified name. */
+    private final Map<String, TableRef> knownTables = new java.util.concurrent.ConcurrentHashMap<>();
+    /** Column names per table, loaded on demand for completion. */
+    private final Map<TableRef, List<String>> columnCache = new java.util.concurrent.ConcurrentHashMap<>();
+    private final java.util.Set<TableRef> columnLoadsInFlight = java.util.concurrent.ConcurrentHashMap.newKeySet();
 
     public SqlPanel() {
         this(PluginStorage.noop());
@@ -337,16 +374,24 @@ public class SqlPanel extends JPanel {
         completion.setAutoActivationDelay(300);
         completion.setShowDescWindow(false);
         completion.setTriggerKey(javax.swing.KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, InputEvent.CTRL_DOWN_MASK));
+        // Columns load asynchronously and re-open the popup; never insert a lone match behind the user's back.
+        completion.setAutoCompleteSingleChoices(false);
         completion.install(editor);
+        editor.putClientProperty(AUTO_COMPLETION_KEY, completion);
         return editor;
     }
 
-    private static org.fife.ui.autocomplete.DefaultCompletionProvider createCompletionProvider() {
+    private org.fife.ui.autocomplete.DefaultCompletionProvider createCompletionProvider() {
         org.fife.ui.autocomplete.DefaultCompletionProvider provider = new org.fife.ui.autocomplete.DefaultCompletionProvider() {
             @Override
             protected boolean isValidChar(char ch) {
                 // Allow "schema.table" and quoted identifiers to be completed as one word.
                 return super.isValidChar(ch) || ch == '.' || ch == '"' || ch == '`';
+            }
+
+            @Override
+            protected List<org.fife.ui.autocomplete.Completion> getCompletionsImpl(javax.swing.text.JTextComponent comp) {
+                return contextualCompletions(this, comp, super.getCompletionsImpl(comp));
             }
         };
         provider.setAutoActivationRules(true, ".");
@@ -360,17 +405,221 @@ public class SqlPanel extends JPanel {
         for (String suggestion : metadataSuggestions) {
             if (suggestion != null && !suggestion.isBlank()) words.add(suggestion.trim());
         }
+        java.util.Set<String> keywords = new java.util.TreeSet<>(String.CASE_INSENSITIVE_ORDER);
+        keywords.addAll(SQL_KEYWORDS);
+        SQL_SUGGESTIONS.forEach(value -> keywords.add(value.trim()));
         completionProvider.clear();
         for (String word : words) {
-            completionProvider.addCompletion(new org.fife.ui.autocomplete.BasicCompletion(completionProvider, word));
+            org.fife.ui.autocomplete.BasicCompletion completion =
+                    new org.fife.ui.autocomplete.BasicCompletion(completionProvider, word);
+            completion.setRelevance(keywords.contains(word) ? RELEVANCE_KEYWORD
+                    : knownTables.containsKey(unquoteName(word)) ? RELEVANCE_TABLE : RELEVANCE_COLUMN);
+            completionProvider.addCompletion(completion);
         }
+    }
+
+    /**
+     * Context-aware completion: after {@code alias.} / {@code table.} offers that table's columns, after
+     * {@code schema.} its tables, and otherwise ranks the columns of the statement's tables first. Columns of tables
+     * never expanded in the navigator are loaded in the background and the popup is refreshed when they arrive.
+     */
+    private List<org.fife.ui.autocomplete.Completion> contextualCompletions(
+            org.fife.ui.autocomplete.DefaultCompletionProvider provider, javax.swing.text.JTextComponent comp,
+            List<org.fife.ui.autocomplete.Completion> base) {
+        String entered = provider.getAlreadyEnteredText(comp);
+        if (entered == null) entered = "";
+        Map<String, TableRef> statementTables = statementTables(statementAt(comp.getText(), comp.getCaretPosition()));
+        int dot = entered.lastIndexOf('.');
+        if (dot > 0) {
+            String qualifier = entered.substring(0, dot);
+            String partial = unquoteName(entered.substring(dot + 1));
+            String key = unquoteName(qualifier);
+            TableRef table = statementTables.containsKey(key) ? statementTables.get(key) : knownTables.get(key);
+            if (table != null) {
+                List<String> columns = columnsOrLoad(table, comp);
+                List<org.fife.ui.autocomplete.Completion> result = new ArrayList<>();
+                for (String column : columns == null ? List.<String>of() : columns) {
+                    if (column.toUpperCase(java.util.Locale.ROOT).startsWith(partial)) {
+                        result.add(completion(provider, qualifier + "." + column, RELEVANCE_STATEMENT_COLUMN,
+                                table.table()));
+                    }
+                }
+                if (columns == null || !result.isEmpty()) return result;
+            }
+            List<org.fife.ui.autocomplete.Completion> tables = new ArrayList<>();
+            java.util.Set<String> seen = new java.util.HashSet<>();
+            for (TableRef ref : knownTables.values()) {
+                if (ref.schema() != null && ref.schema().equalsIgnoreCase(key)
+                        && ref.table().toUpperCase(java.util.Locale.ROOT).startsWith(partial) && seen.add(ref.table())) {
+                    tables.add(completion(provider, qualifier + "." + ref.table(), RELEVANCE_TABLE, ref.schema()));
+                }
+            }
+            if (!tables.isEmpty()) {
+                tables.sort(java.util.Comparator.comparing(org.fife.ui.autocomplete.Completion::getReplacementText,
+                        String.CASE_INSENSITIVE_ORDER));
+                return tables;
+            }
+            return base;
+        }
+        if (entered.isEmpty() || statementTables.isEmpty()) return base;
+        String prefix = unquoteName(entered);
+        java.util.Map<String, org.fife.ui.autocomplete.Completion> merged = new java.util.LinkedHashMap<>();
+        for (TableRef table : new java.util.LinkedHashSet<>(statementTables.values())) {
+            List<String> columns = columnsOrLoad(table, comp);
+            if (columns == null) continue;
+            for (String column : columns) {
+                if (column.toUpperCase(java.util.Locale.ROOT).startsWith(prefix)) {
+                    merged.putIfAbsent(column.toUpperCase(java.util.Locale.ROOT),
+                            completion(provider, column, RELEVANCE_STATEMENT_COLUMN, table.table()));
+                }
+            }
+        }
+        for (org.fife.ui.autocomplete.Completion completion : base) {
+            merged.putIfAbsent(completion.getReplacementText().toUpperCase(java.util.Locale.ROOT), completion);
+        }
+        return new ArrayList<>(merged.values());
+    }
+
+    private static org.fife.ui.autocomplete.Completion completion(org.fife.ui.autocomplete.CompletionProvider provider,
+                                                                  String text, int relevance, String source) {
+        org.fife.ui.autocomplete.BasicCompletion completion =
+                new org.fife.ui.autocomplete.BasicCompletion(provider, text, source);
+        completion.setRelevance(relevance);
+        return completion;
+    }
+
+    /** Cached column names of {@code table}, or {@code null} while they are being loaded in the background. */
+    private List<String> columnsOrLoad(TableRef table, javax.swing.text.JTextComponent comp) {
+        List<String> cached = columnCache.get(table);
+        if (cached != null) return cached;
+        Connection active = connection;
+        if (active == null) return List.of();
+        if (!columnLoadsInFlight.add(table)) return null;
+        new SwingWorker<List<String>, Void>() {
+            @Override protected List<String> doInBackground() throws Exception {
+                DatabaseMetaData metadata = active.getMetaData();
+                // Unknown names are typed by the user: try them as written, then in the database's usual case.
+                java.util.LinkedHashSet<TableRef> candidates = new java.util.LinkedHashSet<>();
+                candidates.add(table);
+                candidates.add(withCase(table, true));
+                candidates.add(withCase(table, false));
+                for (TableRef candidate : candidates) {
+                    List<String> names = readColumnDetails(metadata, candidate).stream().map(ColumnDetail::name).toList();
+                    if (!names.isEmpty()) return names;
+                }
+                return List.of();
+            }
+
+            @Override protected void done() {
+                columnLoadsInFlight.remove(table);
+                if (connection != active) return;
+                List<String> columns;
+                try {
+                    columns = get();
+                } catch (Exception exception) {
+                    columns = List.of();
+                }
+                columnCache.put(table, columns);
+                Object completion = comp.getClientProperty(AUTO_COMPLETION_KEY);
+                if (!columns.isEmpty() && comp.isFocusOwner()
+                        && completion instanceof org.fife.ui.autocomplete.AutoCompletion autoCompletion) {
+                    autoCompletion.doCompletion();
+                }
+            }
+        }.execute();
+        return null;
+    }
+
+    private static TableRef withCase(TableRef table, boolean upper) {
+        java.util.function.UnaryOperator<String> change = value -> value == null ? null
+                : upper ? value.toUpperCase(java.util.Locale.ROOT) : value.toLowerCase(java.util.Locale.ROOT);
+        return new TableRef(table.catalog(), change.apply(table.schema()), change.apply(table.table()),
+                table.identifierQuote());
+    }
+
+    /** Tables referenced by {@code statement} (FROM lists, JOIN, UPDATE, INTO), keyed by upper-case alias and name. */
+    Map<String, TableRef> statementTables(String statement) {
+        Map<String, TableRef> tables = new java.util.LinkedHashMap<>();
+        if (statement == null || statement.isBlank()) return tables;
+        java.util.regex.Matcher clause = TABLE_CLAUSE.matcher(statement);
+        while (clause.find()) {
+            String rest = statement.substring(clause.end());
+            List<String> items = new ArrayList<>();
+            if ("FROM".equalsIgnoreCase(clause.group(1))) {
+                java.util.regex.Matcher end = FROM_LIST_END.matcher(rest);
+                String list = end.find() ? rest.substring(0, end.start()) : rest;
+                items.addAll(List.of(list.split(",")));
+            } else {
+                items.add(rest);
+            }
+            for (String item : items) {
+                java.util.regex.Matcher matcher = TABLE_ITEM.matcher(item);
+                if (!matcher.find()) continue;
+                String name = matcher.group(1).replaceAll("\\s+", "");
+                if (NON_ALIAS_WORDS.contains(name.toUpperCase(java.util.Locale.ROOT))) continue;
+                TableRef ref = resolveTable(name);
+                tables.putIfAbsent(unquoteName(name), ref);
+                tables.putIfAbsent(unquoteName(ref.table()), ref);
+                String alias = matcher.group(2);
+                if (alias != null && !NON_ALIAS_WORDS.contains(alias.toUpperCase(java.util.Locale.ROOT))) {
+                    tables.put(unquoteName(alias), ref);
+                }
+            }
+        }
+        return tables;
+    }
+
+    private TableRef resolveTable(String name) {
+        TableRef known = knownTables.get(unquoteName(name));
+        if (known != null) return known;
+        String[] parts = name.split("\\.");
+        String table = stripQuotes(parts[parts.length - 1]);
+        String schema = parts.length > 1 ? stripQuotes(parts[parts.length - 2])
+                : defaultScope == null ? null : defaultScope.schema();
+        String catalog = parts.length > 2 ? stripQuotes(parts[parts.length - 3])
+                : parts.length == 1 && defaultScope != null ? defaultScope.catalog() : null;
+        return new TableRef(catalog, schema, table, "");
+    }
+
+    private static String stripQuotes(String identifier) {
+        String value = identifier.trim();
+        if (value.length() >= 2 && ((value.startsWith("\"") && value.endsWith("\""))
+                || (value.startsWith("`") && value.endsWith("`")) || (value.startsWith("[") && value.endsWith("]")))) {
+            return value.substring(1, value.length() - 1);
+        }
+        return value;
+    }
+
+    /** Upper-case lookup key of a possibly quoted, possibly qualified identifier. */
+    private static String unquoteName(String identifier) {
+        if (identifier == null) return "";
+        StringBuilder key = new StringBuilder();
+        for (String part : identifier.split("\\.", -1)) {
+            if (key.length() > 0) key.append('.');
+            key.append(stripQuotes(part));
+        }
+        return key.toString().toUpperCase(java.util.Locale.ROOT);
+    }
+
+    private void rememberTable(TableRef ref) {
+        knownTables.putIfAbsent(unquoteName(ref.table()), ref);
+        String qualified = java.util.stream.Stream.of(ref.schema(), ref.table())
+                .filter(value -> value != null && !value.isBlank())
+                .reduce((left, right) -> left + "." + right).orElse(ref.table());
+        knownTables.put(qualified.toUpperCase(java.util.Locale.ROOT), ref);
+        knownTables.put(unquoteName(ref.qualifiedName()), ref);
     }
 
     /** Completion candidates for a typed prefix, as offered by the editor popup. */
     List<String> completionsFor(String prefix) {
-        String typed = prefix == null ? "" : prefix;
+        return completionsFor(prefix, prefix == null ? 0 : prefix.length());
+    }
+
+    /** Completion candidates with the caret at {@code caret} inside {@code text}. */
+    List<String> completionsFor(String text, int caret) {
+        String typed = text == null ? "" : text;
         javax.swing.JTextArea area = new javax.swing.JTextArea(typed);
-        area.setCaretPosition(typed.length());
+        area.setCaretPosition(Math.max(0, Math.min(caret, typed.length())));
         List<String> result = new ArrayList<>();
         for (org.fife.ui.autocomplete.Completion completion : completionProvider.getCompletions(area)) {
             result.add(completion.getReplacementText());
@@ -751,6 +1000,8 @@ public class SqlPanel extends JPanel {
                     refreshObjectsButton.setEnabled(true);
                     objectTree.setModel(new DefaultTreeModel(snapshot.root()));
                     metadataSuggestions = new ArrayList<>(snapshot.suggestions());
+                    knownTables.clear();
+                    columnCache.clear();
                     refreshSuggestions();
                     setStatus(SqlI18n.t("scopes_loaded", snapshot.schemaCount()));
                     // Show the tables users work with straight away: mark the connection's current schema as the
@@ -871,6 +1122,7 @@ public class SqlPanel extends JPanel {
                             .filter(TableRef.class::isInstance)
                             .map(TableRef.class::cast)
                             .forEach(ref -> {
+                                rememberTable(ref);
                                 metadataSuggestions.add(ref.table());
                                 metadataSuggestions.add(ref.qualifiedName());
                             });
@@ -970,6 +1222,7 @@ public class SqlPanel extends JPanel {
                         tableNode.add(new DefaultMutableTreeNode(column.displayName()));
                         metadataSuggestions.add(column.name());
                     });
+                    columnCache.put(table, columns.stream().map(ColumnInfo::name).toList());
                     if (columns.isEmpty()) {
                         tableNode.add(new DefaultMutableTreeNode(SqlI18n.t("no_columns")));
                     }
@@ -1243,6 +1496,8 @@ public class SqlPanel extends JPanel {
             resultModel.setRowCount(0);
             resultModel.setColumnCount(0);
             metadataSuggestions = new ArrayList<>();
+            knownTables.clear();
+            columnCache.clear();
             defaultScope = null;
             refreshSuggestions();
             updateConnectionControls(false);
