@@ -99,7 +99,7 @@ public class RedisPanelLayoutTest {
                     locale + "@" + width + " connect button right edge should align with password right edge");
             assertTrue(testOrigin.x + testBtn.getWidth() < cardOrigin.x,
                     locale + "@" + width + " test connection button should sit left of connect button");
-            assertTrue(passwordRight <= form.getWidth(), locale + "@" + width + " password should not be clipped");
+            assertTrue(passwordRight <= form.getWidth(), locale + "@" + width + " password should not be clipped: right=" + passwordRight + " form=" + form.getWidth());
             assertEquals(hostField.getX(), usernameField.getX(), locale + "@" + width + " host/user should share the left edge");
             assertEquals(hostField.getWidth(), usernameField.getWidth(), locale + "@" + width + " host/user should share the width");
             for (String spinnerField : new String[]{"portSpinner", "dbSpinner"}) {
