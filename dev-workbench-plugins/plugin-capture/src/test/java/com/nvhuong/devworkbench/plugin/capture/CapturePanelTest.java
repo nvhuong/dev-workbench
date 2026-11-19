@@ -175,6 +175,37 @@ public class CapturePanelTest {
         assertTrue(collectTextAreas(tabs.getComponentAt(1)).stream().noneMatch(RSyntaxTextArea.class::isInstance));
     }
 
+    /**
+     * The first toolbar row used fixed column widths; with Vietnamese labels it needed ~940px, so in a 900px tool
+     * window the retention combo, the status icons and the capture filter field ran past the right edge.
+     */
+    @Test
+    public void topBarControlsStayInsideNarrowWindowsAcrossLocales() {
+        java.util.Locale originalLocale = com.nvhuong.devworkbench.util.I18nUtil.currentLocale();
+        try {
+            for (String language : new String[]{"vi", "en"}) {
+                com.nvhuong.devworkbench.util.I18nUtil.setLocale(java.util.Locale.forLanguageTag(language));
+                for (int width : new int[]{900, 1000, 1400}) {
+                    CapturePanel panel = new CapturePanel(null, PluginStorage.noop());
+                    panel.setSize(width, 720);
+                    layoutTree(panel);
+                    JComponent topBar = (JComponent) panel.getComponent(0);
+                    for (Component child : topBar.getComponents()) {
+                        if (!child.isVisible()) {
+                            continue;
+                        }
+                        int right = child.getX() + child.getWidth();
+                        assertTrue(right <= topBar.getWidth(), language + "@" + width + " "
+                                + child.getClass().getSimpleName() + " ends at " + right
+                                + " beyond top bar width " + topBar.getWidth());
+                    }
+                }
+            }
+        } finally {
+            com.nvhuong.devworkbench.util.I18nUtil.setLocale(originalLocale);
+        }
+    }
+
     @Test
     public void shouldPlaceViewFiltersOnSeparateRowFromTypeFilters() {
         CapturePanel panel = new CapturePanel(null, PluginStorage.noop());

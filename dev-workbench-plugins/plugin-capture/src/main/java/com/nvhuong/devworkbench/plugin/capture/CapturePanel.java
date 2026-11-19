@@ -191,7 +191,9 @@ public class CapturePanel extends JPanel {
     private JComponent buildTopBar() {
         JPanel panel = new JPanel(new MigLayout(
                 "insets 8 10 8 10, fillx, novisualpadding, gapy 4",
-                "[][220!]8[96!]12[]8[]12[]6[82!]push[]",
+                // The bind-host column may shrink to 140px: with fixed widths the row needed ~940px with Vietnamese
+                // labels and ran past the edge of a 900px tool window.
+                "[][140:220:220,fill]8[96!]12[]8[]12[]6[82!]push[]",
                 "[][][][]"));
         ToolWindowSurfaceStyle.applySectionHeader(panel, 0, 0, 8, 0);
 
