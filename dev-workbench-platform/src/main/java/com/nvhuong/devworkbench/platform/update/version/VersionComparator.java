@@ -41,7 +41,7 @@ public class VersionComparator {
      * Xóa tiền tố số phiên bản (ví dụ: 'v'）
      */
     private static String removeVersionPrefix(String version) {
-        return version.startsWith("v") ? version.substring(1) : version;
+        return (version.startsWith("v") || version.startsWith("V")) ? version.substring(1) : version;
     }
 
     private static String coreVersion(String version) {
@@ -50,10 +50,11 @@ public class VersionComparator {
     }
 
     private static String qualifier(String version) {
-        int separatorIndex = qualifierSeparatorIndex(version);
-        return separatorIndex >= 0 && separatorIndex + 1 < version.length()
-                ? version.substring(separatorIndex + 1)
-                : "";
+        // SemVer: "-" starts the pre-release, "+" starts build metadata, which never affects precedence.
+        int plus = version.indexOf('+');
+        String withoutBuild = plus >= 0 ? version.substring(0, plus) : version;
+        int dash = withoutBuild.indexOf('-');
+        return dash >= 0 ? withoutBuild.substring(dash + 1) : "";
     }
 
     private static int qualifierSeparatorIndex(String version) {
@@ -80,7 +81,42 @@ public class VersionComparator {
         if (blank2) {
             return -1;
         }
-        return q1.compareToIgnoreCase(q2);
+        // SemVer 11.4: dot-separated identifiers; numeric ones compare numerically and sort before alphanumeric
+        // ones; a shorter identifier list sorts first. Digit runs inside identifiers ("rc10") compare numerically.
+        String[] ids1 = q1.split("\\.");
+        String[] ids2 = q2.split("\\.");
+        for (int i = 0; i < Math.min(ids1.length, ids2.length); i++) {
+            boolean numeric1 = ids1[i].matches("\\d+");
+            boolean numeric2 = ids2[i].matches("\\d+");
+            int result;
+            if (numeric1 && numeric2) {
+                result = new java.math.BigInteger(ids1[i]).compareTo(new java.math.BigInteger(ids2[i]));
+            } else if (numeric1 || numeric2) {
+                result = numeric1 ? -1 : 1;
+            } else {
+                result = compareNatural(ids1[i], ids2[i]);
+            }
+            if (result != 0) {
+                return result;
+            }
+        }
+        return Integer.compare(ids1.length, ids2.length);
+    }
+
+    private static int compareNatural(String s1, String s2) {
+        java.util.regex.Matcher m1 = java.util.regex.Pattern.compile("\\d+|\\D+").matcher(s1);
+        java.util.regex.Matcher m2 = java.util.regex.Pattern.compile("\\d+|\\D+").matcher(s2);
+        while (m1.find() && m2.find()) {
+            String t1 = m1.group();
+            String t2 = m2.group();
+            boolean digits = Character.isDigit(t1.charAt(0)) && Character.isDigit(t2.charAt(0));
+            int result = digits ? new java.math.BigInteger(t1).compareTo(new java.math.BigInteger(t2))
+                    : t1.compareToIgnoreCase(t2);
+            if (result != 0) {
+                return result;
+            }
+        }
+        return Integer.compare(s1.length(), s2.length());
     }
 
     /**
