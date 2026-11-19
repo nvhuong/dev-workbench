@@ -831,7 +831,7 @@ public class SqlPanel extends JPanel {
         String currentCatalog = null;
         String currentSchema = null;
         try { currentCatalog = active.getCatalog(); } catch (Exception | AbstractMethodError ignored) { }
-        try { currentSchema = active.getSchema(); } catch (Exception | AbstractMethodError ignored) { }
+        currentSchema = currentSchemaOf(active);
         return new MetadataSnapshot(root, completion.stream().distinct().toList(), schemaCount,
                 currentCatalog, currentSchema);
     }
@@ -984,6 +984,47 @@ public class SqlPanel extends JPanel {
         return catalogMatch;
     }
 
+    /**
+     * Sets the session's default schema. Drivers predating JDBC 4.1 (e.g. ojdbc6/7 for Oracle 11g) lack
+     * Connection.setSchema; Oracle then needs ALTER SESSION SET CURRENT_SCHEMA.
+     */
+    static void applyDefaultSchema(Connection connection, String schema) throws java.sql.SQLException {
+        try {
+            connection.setSchema(schema);
+            return;
+        } catch (SQLFeatureNotSupportedException | AbstractMethodError | UnsupportedOperationException unsupported) {
+            if (!isOracle(connection)) throw unsupported instanceof java.sql.SQLException sql ? sql
+                    : new SQLFeatureNotSupportedException("Connection.setSchema is not supported by this driver", unsupported);
+        }
+        try (Statement statement = connection.createStatement()) {
+            statement.execute("ALTER SESSION SET CURRENT_SCHEMA = \"" + schema.replace("\"", "\"\"") + "\"");
+        }
+    }
+
+    /** Current schema of the session; for Oracle drivers without getSchema it is the login user. */
+    static String currentSchemaOf(Connection connection) {
+        try {
+            String schema = connection.getSchema();
+            if (schema != null && !schema.isBlank()) return schema;
+        } catch (Exception | AbstractMethodError ignored) {
+            // fall through to the Oracle default
+        }
+        try {
+            return isOracle(connection) ? connection.getMetaData().getUserName() : null;
+        } catch (Exception | AbstractMethodError ignored) {
+            return null;
+        }
+    }
+
+    private static boolean isOracle(Connection connection) {
+        try {
+            String product = connection.getMetaData().getDatabaseProductName();
+            return product != null && product.toLowerCase(java.util.Locale.ROOT).contains("oracle");
+        } catch (Exception | AbstractMethodError ignored) {
+            return false;
+        }
+    }
+
     /** Makes unqualified SQL run against the selected schema (or catalog) and expands it. */
     private void setDefaultScope(DefaultMutableTreeNode node) {
         Connection active = connection;
@@ -991,7 +1032,7 @@ public class SqlPanel extends JPanel {
         new SwingWorker<Void, Void>() {
             @Override protected Void doInBackground() throws Exception {
                 if (scope.schema() != null) {
-                    active.setSchema(scope.schema());
+                    applyDefaultSchema(active, scope.schema());
                 } else if (scope.catalog() != null) {
                     active.setCatalog(scope.catalog());
                 }

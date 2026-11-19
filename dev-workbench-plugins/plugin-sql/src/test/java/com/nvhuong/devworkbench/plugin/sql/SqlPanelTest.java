@@ -255,6 +255,49 @@ public class SqlPanelTest {
         }
     }
 
+    /**
+     * Older Oracle drivers (ojdbc6/7) predate JDBC 4.1: setSchema/getSchema throw AbstractMethodError. The default
+     * schema must then be applied with ALTER SESSION and the current schema derived from the login user.
+     */
+    @Test public void oracleDriversWithoutJdbc41FallBackToAlterSession() throws Exception {
+        List<String> executed = new ArrayList<>();
+        java.sql.Connection oracle = oldOracleConnection(executed);
+
+        SqlPanel.applyDefaultSchema(oracle, "HR");
+        assertEquals(executed, List.of("ALTER SESSION SET CURRENT_SCHEMA = \"HR\""));
+        assertEquals(SqlPanel.currentSchemaOf(oracle), "SCOTT");
+    }
+
+    private static java.sql.Connection oldOracleConnection(List<String> executed) {
+        java.sql.DatabaseMetaData metadata = (java.sql.DatabaseMetaData) java.lang.reflect.Proxy.newProxyInstance(
+                SqlPanelTest.class.getClassLoader(), new Class<?>[]{java.sql.DatabaseMetaData.class},
+                (proxy, method, args) -> switch (method.getName()) {
+                    case "getDatabaseProductName" -> "Oracle";
+                    case "getUserName" -> "SCOTT";
+                    case "getIdentifierQuoteString" -> "\"";
+                    default -> throw new UnsupportedOperationException(method.getName());
+                });
+        java.sql.Statement statement = (java.sql.Statement) java.lang.reflect.Proxy.newProxyInstance(
+                SqlPanelTest.class.getClassLoader(), new Class<?>[]{java.sql.Statement.class},
+                (proxy, method, args) -> switch (method.getName()) {
+                    case "execute" -> {
+                        executed.add((String) args[0]);
+                        yield false;
+                    }
+                    case "close" -> null;
+                    default -> throw new UnsupportedOperationException(method.getName());
+                });
+        return (java.sql.Connection) java.lang.reflect.Proxy.newProxyInstance(
+                SqlPanelTest.class.getClassLoader(), new Class<?>[]{java.sql.Connection.class},
+                (proxy, method, args) -> switch (method.getName()) {
+                    case "setSchema", "getSchema" -> throw new AbstractMethodError("ojdbc6: " + method.getName());
+                    case "getMetaData" -> metadata;
+                    case "createStatement" -> statement;
+                    case "getCatalog" -> null;
+                    default -> throw new UnsupportedOperationException(method.getName());
+                });
+    }
+
     /** Unqualified SQL ran against the driver's default schema; users could not pick the schema to work in. */
     @Test public void selectedDefaultSchemaIsUsedForUnqualifiedSql() throws Exception {
         SqlPanel panel = connectH2("sql_panel_default_schema",
