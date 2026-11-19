@@ -306,7 +306,7 @@ public class SqlPanelTest {
         });
 
         // "View column details" lists every column property in the results grid.
-        javax.swing.table.DefaultTableModel results = (javax.swing.table.DefaultTableModel) field(panel, "resultModel");
+        javax.swing.table.DefaultTableModel results = (javax.swing.table.DefaultTableModel) field(panel, "structureModel");
         SwingUtilities.invokeAndWait(() -> {
             try {
                 Method details = SqlPanel.class.getDeclaredMethod("showColumnDetails", orderItems.getUserObject().getClass());
@@ -408,6 +408,44 @@ public class SqlPanelTest {
             assertEquals(results.getRowCount(), 1, status.getText());
             assertEquals(String.valueOf(results.getValueAt(0, 0)), "1");
             invoke(panel, "disconnect");
+        });
+    }
+
+    /**
+     * Choosing the default schema and seeing a table's structure were only reachable through right-click menus
+     * (which a macOS Ctrl+click did not even open): the navigator needs a visible schema selector and selecting a
+     * table must show its structure.
+     */
+    @Test public void visibleDefaultSchemaSelectorAndTableStructureTab() throws Exception {
+        SqlPanel panel = connectH2("sql_panel_visible_controls",
+                "CREATE SCHEMA IF NOT EXISTS APP\\;CREATE TABLE IF NOT EXISTS APP.ITEMS(ID INT PRIMARY KEY, LABEL VARCHAR(30))");
+        DefaultMutableTreeNode publicScope = awaitScope(panel, "PUBLIC");
+        DefaultMutableTreeNode appScope = awaitScope(panel, "APP");
+        JLabel status = (JLabel) field(panel, "status");
+        @SuppressWarnings("unchecked")
+        javax.swing.JComboBox<Object> schemas = (javax.swing.JComboBox<Object>) field(panel, "defaultSchemaCombo");
+        waitUntil(() -> onEdt(() -> schemas.getItemCount() >= 2
+                        && publicScope.getUserObject().equals(schemas.getSelectedItem())),
+                () -> "schema selector not filled: " + schemas.getItemCount() + " selected=" + schemas.getSelectedItem());
+
+        SwingUtilities.invokeAndWait(() -> schemas.setSelectedItem(appScope.getUserObject()));
+        waitUntil(() -> onEdt(() -> appScope.getUserObject().equals(field(panel, "defaultScope"))),
+                () -> "default schema not applied; status=" + status.getText());
+
+        JTree tree = (JTree) field(panel, "objectTree");
+        waitUntil(() -> onEdt(() -> childEndingWith(appScope, "ITEMS") != null), () -> "APP tables not loaded");
+        SwingUtilities.invokeAndWait(() -> tree.setSelectionPath(
+                new javax.swing.tree.TreePath(childEndingWith(appScope, "ITEMS").getPath())));
+        javax.swing.table.DefaultTableModel structure =
+                (javax.swing.table.DefaultTableModel) field(panel, "structureModel");
+        javax.swing.JTabbedPane tabs = (javax.swing.JTabbedPane) field(panel, "resultTabs");
+        waitUntil(() -> onEdt(() -> structure.getRowCount() == 2), () -> "structure not shown; status=" + status.getText());
+        SwingUtilities.invokeAndWait(() -> {
+            assertEquals(tabs.getTitleAt(tabs.getSelectedIndex()), SqlI18n.t("structure"));
+            assertEquals(String.valueOf(structure.getValueAt(0, 0)), "ID");
+            assertEquals(String.valueOf(structure.getValueAt(0, 3)), "PK");
+            invoke(panel, "disconnect");
+            assertFalse(schemas.isEnabled());
         });
     }
 

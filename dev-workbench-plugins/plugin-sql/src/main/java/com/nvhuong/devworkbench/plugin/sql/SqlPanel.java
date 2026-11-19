@@ -99,6 +99,16 @@ public class SqlPanel extends JPanel {
         @Override public boolean isCellEditable(int row, int column) { return false; }
     };
     private final JTable resultTable = new JTable(resultModel);
+    /** Visible default-schema selector in the navigator header (the right-click menu alone was hard to find). */
+    private final JComboBox<MetadataScope> defaultSchemaCombo = new JComboBox<>();
+    private boolean updatingSchemaCombo;
+    /** "Structure" tab: columns of the table selected in the navigator. */
+    private final DefaultTableModel structureModel = new DefaultTableModel() {
+        @Override public boolean isCellEditable(int row, int column) { return false; }
+    };
+    private final JTable structureTable = new JTable(structureModel);
+    private final JLabel structureTitle = new JLabel();
+    private long structureRequest;
     private JButton connectButton;
     private JButton disconnectButton;
     private JButton executeButton;
@@ -253,12 +263,23 @@ public class SqlPanel extends JPanel {
         JPanel browser = new JPanel(new BorderLayout(0, 4));
         browser.setOpaque(false);
         // Title on its own line: sharing the narrow navigator width with Refresh cut it to "Database Navigat...".
-        JPanel browserHeader = new JPanel(new MigLayout("insets 0, novisualpadding, wrap 1", "[]", "[]4[]"));
+        JPanel browserHeader = new JPanel(new MigLayout("insets 0, novisualpadding, wrap 1", "[grow, fill]", "[]4[]6[]2[]"));
         browserHeader.setOpaque(false);
         browserHeader.add(SqlWorkbench.sectionTitle(SqlI18n.t("objects")));
         refreshObjectsButton = new JButton(SqlI18n.t("refresh"));
         refreshObjectsButton.addActionListener(event -> loadMetadata());
-        browserHeader.add(refreshObjectsButton);
+        browserHeader.add(refreshObjectsButton, "growx 0");
+        JLabel schemaLabel = new JLabel(SqlI18n.t("default_schema") + ":");
+        browserHeader.add(schemaLabel, "growx 0");
+        defaultSchemaCombo.setEnabled(false);
+        defaultSchemaCombo.setToolTipText(SqlI18n.t("set_default_schema"));
+        defaultSchemaCombo.addActionListener(event -> {
+            if (updatingSchemaCombo || !(defaultSchemaCombo.getSelectedItem() instanceof MetadataScope scope)
+                    || scope.equals(defaultScope)) return;
+            DefaultMutableTreeNode node = findScopeNodeFor(scope);
+            if (node != null) setDefaultScope(node);
+        });
+        browserHeader.add(defaultSchemaCombo, "growx, wmin 80");
         browser.add(browserHeader, BorderLayout.NORTH);
         objectTree.setRootVisible(false);
         objectTree.setShowsRootHandles(true);
@@ -283,15 +304,30 @@ public class SqlPanel extends JPanel {
 
             @Override public void treeWillCollapse(TreeExpansionEvent event) { }
         });
+        objectTree.addTreeSelectionListener(event -> {
+            Object selected = objectTree.getLastSelectedPathComponent();
+            if (selected instanceof DefaultMutableTreeNode node && node.getUserObject() instanceof TableRef table) {
+                showColumnDetails(table);
+            }
+        });
         objectTree.addMouseListener(new java.awt.event.MouseAdapter() {
+            // The popup trigger fires on press (macOS, incl. Ctrl+click) or release (Windows) depending on the platform.
+            @Override public void mousePressed(java.awt.event.MouseEvent event) { maybeShowMenu(event); }
+
+            @Override public void mouseReleased(java.awt.event.MouseEvent event) { maybeShowMenu(event); }
+
+            private void maybeShowMenu(java.awt.event.MouseEvent event) {
+                if (!event.isPopupTrigger()) return;
+                int row = objectTree.getClosestRowForLocation(event.getX(), event.getY());
+                objectTree.setSelectionRow(row);
+                showNavigatorMenu(event.getX(), event.getY());
+                event.consume();
+            }
+
             @Override
             public void mouseClicked(java.awt.event.MouseEvent event) {
-                if (javax.swing.SwingUtilities.isRightMouseButton(event)) {
-                    int row = objectTree.getClosestRowForLocation(event.getX(), event.getY());
-                    objectTree.setSelectionRow(row);
-                    showNavigatorMenu(event.getX(), event.getY());
-                    return;
-                }
+                if (event.isConsumed() || event.isPopupTrigger()) return;
+                if (javax.swing.SwingUtilities.isRightMouseButton(event)) return;
                 if (event.getClickCount() == 2) {
                     Object selected = objectTree.getLastSelectedPathComponent();
                     if (selected instanceof DefaultMutableTreeNode node && node.getUserObject() instanceof TableRef table) {
@@ -337,6 +373,17 @@ public class SqlPanel extends JPanel {
         outputLog.setRows(4);
         resultTabs.addTab(SqlI18n.t("data"), resultScroll);
         resultTabs.addTab(SqlI18n.t("output"), new JScrollPane(outputLog));
+        JPanel structurePanel = new JPanel(new BorderLayout(0, 4));
+        structurePanel.setOpaque(false);
+        structureTitle.setText(SqlI18n.t("structure_hint"));
+        structureTitle.setBorder(BorderFactory.createEmptyBorder(4, 4, 0, 4));
+        structurePanel.add(structureTitle, BorderLayout.NORTH);
+        JScrollPane structureScroll = new JScrollPane(structureTable);
+        ToolWindowSurfaceStyle.applyFramedScrollPaneCard(structureScroll);
+        structurePanel.add(structureScroll, BorderLayout.CENTER);
+        structureTable.setFillsViewportHeight(true);
+        structureTable.setCellSelectionEnabled(true);
+        resultTabs.addTab(SqlI18n.t("structure"), structurePanel);
         JPanel resultSection = SqlWorkbench.editorSection(SqlI18n.t("results"), resultTabs);
         resultTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
         resultTable.setFillsViewportHeight(true);
@@ -1013,6 +1060,7 @@ public class SqlPanel extends JPanel {
                         objectTree.expandPath(new TreePath(current.getPath()));
                         objectTree.scrollPathToVisible(new TreePath(current.getPath()));
                     }
+                    refreshSchemaCombo(snapshot.root());
                 } catch (Exception exception) {
                     executeButton.setEnabled(true);
                     refreshObjectsButton.setEnabled(true);
@@ -1346,16 +1394,51 @@ public class SqlPanel extends JPanel {
                 try {
                     get();
                     defaultScope = scope;
+                    syncSchemaCombo();
                     objectTree.repaint();
                     objectTree.expandPath(new TreePath(node.getPath()));
                     setStatus(SqlI18n.t("default_schema_set", scope.displayName()));
                     appendOutput(SqlI18n.t("default_schema_set", scope.displayName()));
                 } catch (Exception exception) {
+                    syncSchemaCombo();
                     Throwable cause = exception.getCause() == null ? exception : exception.getCause();
                     setStatus(SqlI18n.t("error", safeMessage(cause)));
                 }
             }
         }.execute();
+    }
+
+    private void refreshSchemaCombo(DefaultMutableTreeNode root) {
+        updatingSchemaCombo = true;
+        try {
+            defaultSchemaCombo.removeAllItems();
+            for (int i = 0; root != null && i < root.getChildCount(); i++) {
+                Object value = ((DefaultMutableTreeNode) root.getChildAt(i)).getUserObject();
+                if (value instanceof MetadataScope scope) defaultSchemaCombo.addItem(scope);
+            }
+            defaultSchemaCombo.setSelectedItem(defaultScope);
+            defaultSchemaCombo.setEnabled(connection != null && defaultSchemaCombo.getItemCount() > 0);
+        } finally {
+            updatingSchemaCombo = false;
+        }
+    }
+
+    private void syncSchemaCombo() {
+        updatingSchemaCombo = true;
+        try {
+            defaultSchemaCombo.setSelectedItem(defaultScope);
+        } finally {
+            updatingSchemaCombo = false;
+        }
+    }
+
+    private DefaultMutableTreeNode findScopeNodeFor(MetadataScope scope) {
+        DefaultMutableTreeNode root = (DefaultMutableTreeNode) objectTree.getModel().getRoot();
+        for (int i = 0; root != null && i < root.getChildCount(); i++) {
+            DefaultMutableTreeNode child = (DefaultMutableTreeNode) root.getChildAt(i);
+            if (scope.equals(child.getUserObject())) return child;
+        }
+        return null;
     }
 
     private void insertSelectedSuggestion() {
@@ -1499,6 +1582,10 @@ public class SqlPanel extends JPanel {
             knownTables.clear();
             columnCache.clear();
             defaultScope = null;
+            refreshSchemaCombo(null);
+            structureModel.setRowCount(0);
+            structureModel.setColumnCount(0);
+            structureTitle.setText(SqlI18n.t("structure_hint"));
             refreshSuggestions();
             updateConnectionControls(false);
             setStatus(SqlI18n.t("disconnected"));
@@ -1600,25 +1687,28 @@ public class SqlPanel extends JPanel {
         Connection active = connection;
         if (active == null) return;
         setStatus(SqlI18n.t("loading_columns", table.table()));
+        long request = ++structureRequest;
         new SwingWorker<List<ColumnDetail>, Void>() {
             @Override protected List<ColumnDetail> doInBackground() throws Exception {
                 return readColumnDetails(active.getMetaData(), table);
             }
 
             @Override protected void done() {
-                if (connection != active) return;
+                // Ignore a slow answer for a table the user has already clicked away from.
+                if (connection != active || request != structureRequest) return;
                 try {
                     List<ColumnDetail> columns = get();
-                    resultModel.setRowCount(0);
-                    resultModel.setColumnIdentifiers(new Object[]{SqlI18n.t("column_name"), SqlI18n.t("column_type"),
+                    structureTitle.setText(table.qualifiedName());
+                    structureModel.setRowCount(0);
+                    structureModel.setColumnIdentifiers(new Object[]{SqlI18n.t("column_name"), SqlI18n.t("column_type"),
                             SqlI18n.t("column_nullable"), SqlI18n.t("column_primary_key"), SqlI18n.t("column_default"),
                             SqlI18n.t("column_remarks")});
                     for (ColumnDetail column : columns) {
-                        resultModel.addRow(new Object[]{column.name(), column.displayType(),
+                        structureModel.addRow(new Object[]{column.name(), column.displayType(),
                                 column.nullable() ? "YES" : "NO", column.primaryKey() ? "PK" : "",
                                 column.defaultValue(), column.remarks()});
                     }
-                    resultTabs.setSelectedIndex(0);
+                    resultTabs.setSelectedIndex(resultTabs.indexOfTab(SqlI18n.t("structure")));
                     setStatus(SqlI18n.t("columns_loaded", columns.size(), table.qualifiedName()));
                 } catch (Exception exception) {
                     Throwable cause = exception.getCause() == null ? exception : exception.getCause();
