@@ -54,4 +54,24 @@ public class CaptureFilterExpressionsTest {
                 "(a.com or b.com json) !host:pinned.example.com"
         );
     }
+
+    /**
+     * AND binds tighter than OR, so "(a) or (b)" must be wrapped before adding an exclusion; it starts with "(" and
+     * ends with ")" but those parentheses belong to different groups.
+     */
+    @Test
+    public void shouldWrapOrExpressionsWhoseOuterParenthesesAreSeparateGroups() {
+        assertEquals(
+                CaptureFilterExpressions.excludeHost("(path:/x) or (path:/y)", "h.example.com"),
+                "((path:/x) or (path:/y)) !host:h.example.com"
+        );
+        assertEquals(
+                CaptureFilterExpressions.excludePath("(a.com or b.com)", "/health"),
+                "(a.com or b.com) !path:/health"
+        );
+        assertEquals(
+                CaptureFilterExpressions.excludeHost("a.com OR b.com", "h.example.com"),
+                "(a.com OR b.com) !host:h.example.com"
+        );
+    }
 }

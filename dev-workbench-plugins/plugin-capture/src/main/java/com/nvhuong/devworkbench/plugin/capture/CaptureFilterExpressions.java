@@ -108,8 +108,30 @@ class CaptureFilterExpressions {
 
     private static boolean needsWrapping(String filter) {
         String normalized = filter.toLowerCase(Locale.ROOT);
-        return containsOperator(normalized, "or")
-                && !(filter.startsWith("(") && filter.endsWith(")"));
+        return containsOperator(normalized, "or") && !isSingleGroup(filter);
+    }
+
+    /** True when the opening parenthesis at the start closes at the very end ("(a or b)", not "(a) or (b)"). */
+    private static boolean isSingleGroup(String filter) {
+        if (!filter.startsWith("(") || !filter.endsWith(")")) {
+            return false;
+        }
+        int depth = 0;
+        boolean quoted = false;
+        for (int i = 0; i < filter.length(); i++) {
+            char ch = filter.charAt(i);
+            if (ch == '"') {
+                quoted = !quoted;
+            } else if (!quoted && ch == '(') {
+                depth++;
+            } else if (!quoted && ch == ')') {
+                depth--;
+                if (depth == 0 && i < filter.length() - 1) {
+                    return false;
+                }
+            }
+        }
+        return depth == 0;
     }
 
     private static boolean containsOperator(String filter, String operator) {
