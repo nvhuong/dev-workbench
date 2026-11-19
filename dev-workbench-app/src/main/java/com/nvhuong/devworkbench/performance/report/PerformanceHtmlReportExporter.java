@@ -330,7 +330,8 @@ public class PerformanceHtmlReportExporter {
         html.append("<section><h2>1.3 Requests with slowest response times</h2>");
         appendTable(html, new PerformanceReportMarkdownBuilder.ReportTable("Requests with slowest response times",
                 List.of("Request", "Average (ms)", "90th (ms)", "95th (ms)", "99th (ms)", "Min (ms)", "Max (ms)"),
-                http.rows().subList(0, http.rows().size() - 1).stream().sorted((a,b) -> Double.compare(parse(b[8]), parse(a[8])))
+                http.rows().subList(0, http.rows().size() - 1).stream()
+                        .sorted((a, b) -> Double.compare(durationMs(b[8]), durationMs(a[8])))
                         .limit(5).map(row -> new Object[]{row[0], row[8], row[11], row[12], row[13], row[9], row[10]}).toList()));
         html.append("</section>");
     }
@@ -463,6 +464,33 @@ public class PerformanceHtmlReportExporter {
             case STAIRS -> group.stairsDuration;
             default -> group.duration;
         };
+    }
+
+    /**
+     * Converts TimeDisplayUtil.formatElapsedTime output ("999 ms", "1.50 s" / "1,50 s", "1m 5s") back to milliseconds;
+     * stripping non-digits turned "1m 5s" into 15 and ranked slow requests below fast ones.
+     */
+    static double durationMs(Object value) {
+        String text = value == null ? "" : value.toString().trim();
+        java.util.regex.Matcher minutes = java.util.regex.Pattern.compile("^(\\d+)m\\s*(\\d+)s$").matcher(text);
+        if (minutes.matches()) {
+            return Long.parseLong(minutes.group(1)) * 60_000d + Long.parseLong(minutes.group(2)) * 1_000d;
+        }
+        try {
+            if (text.endsWith("ms")) {
+                return Double.parseDouble(text.substring(0, text.length() - 2).trim().replace(',', '.'));
+            }
+            if (text.endsWith("s")) {
+                return Double.parseDouble(text.substring(0, text.length() - 1).trim().replace(',', '.')) * 1_000d;
+            }
+        } catch (NumberFormatException ignored) {
+            // fall back to plain number parsing
+        }
+        try {
+            return Double.parseDouble(text.replace(',', '.'));
+        } catch (NumberFormatException ignored) {
+            return 0;
+        }
     }
 
     private String cell(Object[] row, int index) { return row.length > index && row[index] != null ? row[index].toString() : "—"; }

@@ -139,6 +139,37 @@ public class PerformanceReportPdfExporterTest {
                 "the response time series must have plotted points");
     }
 
+    /**
+     * Durations are formatted as "999 ms", "1.50 s" or "1m 5s"; the slowest-requests ranking stripped non-digits, so
+     * "1m 5s" became 15 and "1.50 s" 1.5 and requests taking seconds were ranked below sub-second ones.
+     */
+    @Test
+    public void slowestRequestsAreRankedAcrossDurationUnits() {
+        List<Object[]> rows = new ArrayList<>();
+        String[] averages = {"120 ms", "1.50 s", "900 ms", "1m 5s", "2.25 s"};
+        String[] names = {"GET /fast", "GET /second-and-half", "GET /almost-second", "GET /minute", "GET /two-seconds"};
+        for (int i = 0; i < averages.length; i++) {
+            rows.add(new Object[]{names[i], 10, 10, 0, "100.00%", "1.00", "1.00", "1.00",
+                    averages[i], "1 ms", averages[i], averages[i], averages[i], averages[i]});
+        }
+        rows.add(new Object[]{"Total", 50, 50, 0, "100.00%", "5.00", "5.00", "5.00",
+                "13.95 s", "1 ms", "1m 5s", "2.25 s", "1m 5s", "1m 5s"});
+        var table = new PerformanceReportMarkdownBuilder.ReportTable("HTTP",
+                Arrays.asList(PerformanceReportTableSchema.httpColumns()), rows);
+
+        String html = PerformanceHtmlReportExporter.renderHtml(context(List.of()), List.of(table));
+
+        String slowest = html.substring(html.indexOf("1.3 Requests with slowest response times"),
+                html.indexOf("2. Metrics for each request"));
+        int minute = slowest.indexOf("GET /minute");
+        int twoSeconds = slowest.indexOf("GET /two-seconds");
+        int secondAndHalf = slowest.indexOf("GET /second-and-half");
+        int almostSecond = slowest.indexOf("GET /almost-second");
+        int fast = slowest.indexOf("GET /fast");
+        assertTrue(minute >= 0 && minute < twoSeconds && twoSeconds < secondAndHalf
+                && secondAndHalf < almostSecond && almostSecond < fast, slowest);
+    }
+
     /** Without trend data the charts are rebuilt from retained samples; those points also put data in the wrong slot. */
     @Test
     public void chartsRebuiltFromSamplesHavePlottedSeries() {
