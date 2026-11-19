@@ -143,7 +143,20 @@ public class PluginInstallerService {
         String fileName = extractFileName(installUrl, entry.id(), entry.version());
         String suffix = fileName.endsWith(".jar") ? ".jar" : "-" + fileName;
         Path tempFile = Files.createTempFile("dev-workbench-plugin-", suffix);
+        try {
+            return downloadInto(tempFile, entry, progressListener, installController);
+        } catch (Exception | Error e) {
+            // Connection failures (refused, DNS, timeout) happen before the body is read; never leak the temp file.
+            Files.deleteIfExists(tempFile);
+            throw e;
+        }
+    }
 
+    private static Path downloadInto(Path tempFile,
+                                     PluginCatalogEntry entry,
+                                     PluginInstallProgressListener progressListener,
+                                     PluginInstallController installController) throws Exception {
+        String installUrl = entry.installUrl();
         installController.checkCancelled();
         progressListener.onProgress(new PluginInstallProgress(
                 PluginInstallProgress.Stage.CONNECTING,
