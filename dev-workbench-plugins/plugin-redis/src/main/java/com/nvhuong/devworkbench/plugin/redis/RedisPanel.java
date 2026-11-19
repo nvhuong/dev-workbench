@@ -1687,6 +1687,26 @@ public class RedisPanel extends JPanel {
         if (slashIdx >= 0) {
             noScheme = noScheme.substring(0, slashIdx);
         }
+        // Drop URL credentials ("redis://user:pass@host:port"); authentication comes from the auth fields.
+        int userInfoIdx = noScheme.lastIndexOf('@');
+        if (userInfoIdx >= 0) {
+            noScheme = noScheme.substring(userInfoIdx + 1);
+        }
+        // Bracketed IPv6 literal, optionally followed by ":port".
+        if (noScheme.startsWith("[")) {
+            int closeIdx = noScheme.indexOf(']');
+            if (closeIdx > 1) {
+                String ipv6Host = noScheme.substring(1, closeIdx);
+                String rest = noScheme.substring(closeIdx + 1);
+                if (rest.matches(":\\d{1,5}")) {
+                    int port = Integer.parseInt(rest.substring(1));
+                    if (port >= 1 && port <= 65535) {
+                        return new ParsedHostPort(ipv6Host, port);
+                    }
+                }
+                return new ParsedHostPort(ipv6Host, fallbackPort);
+            }
+        }
 
         Matcher matcher = SIMPLE_HOST_PORT_PATTERN.matcher(noScheme);
         if (matcher.matches()) {
@@ -1724,10 +1744,14 @@ public class RedisPanel extends JPanel {
         @Override
         public Component getListCellRendererComponent(JList<?> list, Object value, int index,
                                                       boolean isSelected, boolean cellHasFocus) {
+            // Keys come from the server: never let Swing interpret a key such as "<html>..." as markup.
+            // Disable HTML before super sets the raw key text; only our own escaped TTL markup re-enables it.
+            putClientProperty("html.disable", Boolean.TRUE);
             JLabel lbl = (JLabel) super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
             if (value instanceof String key) {
                 Long ttl = keyTtlMap.get(key);
                 if (ttl != null) {
+                    lbl.putClientProperty("html.disable", null);
                     String metaColor = ModernColors.toHtmlColor(isSelected
                             ? lbl.getForeground()
                             : ModernColors.getTextHint());
