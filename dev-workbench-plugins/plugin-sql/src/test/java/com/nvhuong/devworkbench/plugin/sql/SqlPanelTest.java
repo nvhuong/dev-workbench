@@ -622,6 +622,7 @@ public class SqlPanelTest {
             }
             assertEquals(tabs.getTabCount(), count, "an open saved query is reused, not duplicated");
             assertEquals(tabs.getTitleAt(tabs.getSelectedIndex()), "Báo cáo tháng");
+            panel.transactionPrompt = message -> SqlPanel.PendingChoice.ROLLBACK;
             invoke(panel, "disconnect");
         });
     }
@@ -660,7 +661,139 @@ public class SqlPanelTest {
         waitUntil(() -> "Đơn hàng's".equals(tableRemarks(url, "ORDERS")), () -> "table comment not stored: " + status.getText());
         assertTrue(new SqlHistory(storage).entries().stream().anyMatch(entry -> entry.sql().startsWith("COMMENT ON COLUMN")),
                 "comment DDL must be in the history");
+        SwingUtilities.invokeAndWait(() -> {
+            panel.transactionPrompt = message -> SqlPanel.PendingChoice.COMMIT;
+            invoke(panel, "disconnect");
+        });
+    }
+
+    /** Auto-commit is off by default; changes need Commit, Rollback discards them, disconnect asks what to do. */
+    @Test public void autoCommitIsOffByDefaultWithCommitRollbackAndDisconnectChoice() throws Exception {
+        String url = "jdbc:h2:mem:sql_panel_tx;DB_CLOSE_DELAY=-1";
+        MemoryStorage storage = new MemoryStorage();
+        SqlPanel panel = connectH2("sql_panel_tx", "CREATE TABLE IF NOT EXISTS PUBLIC.T(ID INT)", storage);
+        awaitScope(panel, "PUBLIC");
+        javax.swing.JButton execute = (javax.swing.JButton) field(panel, "executeButton");
+        javax.swing.JButton commit = (javax.swing.JButton) field(panel, "commitButton");
+        javax.swing.JButton rollback = (javax.swing.JButton) field(panel, "rollbackButton");
+        javax.swing.JCheckBox autoCommit = (javax.swing.JCheckBox) field(panel, "autoCommitBox");
+        waitUntil(() -> onEdt(execute::isEnabled), () -> "not connected");
+        SwingUtilities.invokeAndWait(() -> {
+            assertFalse(autoCommit.isSelected(), "auto-commit must default to off");
+            assertFalse(commit.isEnabled());
+            assertFalse(rollback.isEnabled());
+        });
+        assertFalse(((java.sql.Connection) field(panel, "connection")).getAutoCommit());
+
+        runSql(panel, "INSERT INTO T VALUES(1)");
+        waitUntil(() -> onEdt(commit::isEnabled), () -> "commit not enabled after a change");
+        assertEquals(countRows(url), 0, "uncommitted row must be invisible to other sessions");
+        SwingUtilities.invokeAndWait(() -> invoke(panel, "commitTransaction"));
+        waitUntil(() -> countRows(url) == 1, () -> "commit did not persist the row");
+        waitUntil(() -> onEdt(() -> !commit.isEnabled()), () -> "commit still enabled");
+
+        runSql(panel, "INSERT INTO T VALUES(2)");
+        waitUntil(() -> onEdt(rollback::isEnabled), () -> "rollback not enabled");
+        SwingUtilities.invokeAndWait(() -> invoke(panel, "rollbackTransaction"));
+        waitUntil(() -> onEdt(() -> !rollback.isEnabled()), () -> "rollback still enabled");
+        runSql(panel, "SELECT COUNT(*) FROM T");
+        javax.swing.table.DefaultTableModel results = (javax.swing.table.DefaultTableModel) field(panel, "resultModel");
+        waitUntil(() -> onEdt(() -> results.getRowCount() == 1 && "1".equals(String.valueOf(results.getValueAt(0, 0)))),
+                () -> "rolled back row still visible");
+
+        // Disconnect with pending changes: Rollback discards, Commit keeps.
+        runSql(panel, "INSERT INTO T VALUES(3)");
+        waitUntil(() -> onEdt(commit::isEnabled), () -> "pending not tracked");
+        SwingUtilities.invokeAndWait(() -> {
+            panel.transactionPrompt = message -> SqlPanel.PendingChoice.ROLLBACK;
+            invoke(panel, "disconnect");
+        });
+        assertEquals(countRows(url), 1);
+
+        SwingUtilities.invokeAndWait(() -> invoke(panel, "connect"));
+        waitUntil(() -> onEdt(execute::isEnabled), () -> "reconnect failed");
+        runSql(panel, "INSERT INTO T VALUES(4)");
+        waitUntil(() -> onEdt(commit::isEnabled), () -> "pending not tracked after reconnect");
+        SwingUtilities.invokeAndWait(() -> {
+            panel.transactionPrompt = message -> SqlPanel.PendingChoice.CANCEL;
+            invoke(panel, "disconnect");
+        });
+        assertTrue(onEdt(execute::isEnabled), "Cancel must keep the connection open");
+        SwingUtilities.invokeAndWait(() -> {
+            panel.transactionPrompt = message -> SqlPanel.PendingChoice.COMMIT;
+            invoke(panel, "disconnect");
+        });
+        assertEquals(countRows(url), 2);
+
+        // Turning auto-commit on applies to the open connection.
+        SwingUtilities.invokeAndWait(() -> invoke(panel, "connect"));
+        waitUntil(() -> onEdt(execute::isEnabled), () -> "reconnect failed");
+        SwingUtilities.invokeAndWait(() -> autoCommit.doClick());
+        waitUntil(() -> {
+            try {
+                return ((java.sql.Connection) field(panel, "connection")).getAutoCommit();
+            } catch (java.sql.SQLException e) {
+                return false;
+            }
+        }, () -> "auto-commit not applied");
+        runSql(panel, "INSERT INTO T VALUES(5)");
+        waitUntil(() -> countRows(url) == 3, () -> "auto-commit insert not visible");
+        assertFalse(onEdt(commit::isEnabled));
         SwingUtilities.invokeAndWait(() -> invoke(panel, "disconnect"));
+    }
+
+    /** Profiles remember the auto-commit choice; profiles saved before the option load with auto-commit off. */
+    @Test public void profilesPersistAutoCommitAndOldProfilesDefaultToOff() throws Exception {
+        MemoryStorage storage = new MemoryStorage();
+        java.util.function.Function<String, String> b64 = value -> java.util.Base64.getUrlEncoder().withoutPadding()
+                .encodeToString(value.getBytes(java.nio.charset.StandardCharsets.UTF_8));
+        storage.files.put("connection-profiles.txt", String.join("\t", b64.apply("old"), b64.apply("GENERIC"),
+                b64.apply("jdbc:h2:mem:x"), b64.apply(""), b64.apply(""), b64.apply("sa"), b64.apply("")) + "\n");
+        SqlPanel[] panel = new SqlPanel[1];
+        SwingUtilities.invokeAndWait(() -> panel[0] = new SqlPanel(storage));
+        javax.swing.JCheckBox autoCommit = (javax.swing.JCheckBox) field(panel[0], "autoCommitBox");
+        SwingUtilities.invokeAndWait(() -> {
+            assertEquals(((JTextField) field(panel[0], "jdbcUrl")).getText(), "jdbc:h2:mem:x", "old profile not loaded");
+            assertFalse(autoCommit.isSelected());
+            autoCommit.setSelected(true);
+            try {
+                Method current = SqlPanel.class.getDeclaredMethod("currentProfile", String.class);
+                current.setAccessible(true);
+                Object profile = current.invoke(panel[0], "new");
+                Method write = SqlPanel.class.getDeclaredMethod("writeProfiles", List.class);
+                write.setAccessible(true);
+                write.invoke(panel[0], List.of(profile));
+                Method read = SqlPanel.class.getDeclaredMethod("readProfiles");
+                read.setAccessible(true);
+                List<?> loaded = (List<?>) read.invoke(panel[0]);
+                assertEquals(loaded.size(), 1);
+                Method flag = loaded.get(0).getClass().getDeclaredMethod("autoCommit");
+                flag.setAccessible(true);
+                assertEquals(flag.invoke(loaded.get(0)), true);
+            } catch (ReflectiveOperationException e) {
+                throw new IllegalStateException(e);
+            }
+        });
+    }
+
+    private static void runSql(SqlPanel panel, String sql) throws Exception {
+        javax.swing.JButton execute = (javax.swing.JButton) field(panel, "executeButton");
+        waitUntil(() -> onEdt(execute::isEnabled), () -> "busy before " + sql);
+        SwingUtilities.invokeAndWait(() -> {
+            activeEditor(panel).setText(sql);
+            invoke(panel, "executeSql");
+        });
+        waitUntil(() -> onEdt(execute::isEnabled), () -> "still running " + sql);
+    }
+
+    private static int countRows(String url) {
+        try (java.sql.Connection other = java.sql.DriverManager.getConnection(url, "sa", "");
+             java.sql.ResultSet result = other.createStatement().executeQuery("SELECT COUNT(*) FROM PUBLIC.T")) {
+            result.next();
+            return result.getInt(1);
+        } catch (java.sql.SQLException e) {
+            throw new IllegalStateException(e);
+        }
     }
 
     private static String columnRemarks(String url, String table, String column) {

@@ -141,6 +141,25 @@ public class SqlPanel extends JPanel {
     private JButton newProfileButton;
     private final PluginStorage storage;
     private final SqlHistory history;
+    /** Auto-commit of the JDBC connection; off by default so changes need an explicit Commit. */
+    private final javax.swing.JCheckBox autoCommitBox = new javax.swing.JCheckBox();
+    private JButton commitButton;
+    private JButton rollbackButton;
+    private final JLabel transactionLabel = new JLabel();
+    private JLabel autocommitHint;
+    /** True while statements ran without auto-commit and were neither committed nor rolled back. */
+    private boolean transactionPending;
+
+    /** Answer to "uncommitted changes" when disconnecting. */
+    enum PendingChoice { COMMIT, ROLLBACK, CANCEL }
+
+    /** Test seam for the disconnect prompt. */
+    java.util.function.Function<String, PendingChoice> transactionPrompt = message -> {
+        Object[] options = {SqlI18n.t("commit"), SqlI18n.t("rollback"), SqlI18n.t("cancel")};
+        int choice = JOptionPane.showOptionDialog(this, message, SqlI18n.t("pending_title"),
+                JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE, null, options, options[1]);
+        return choice == 0 ? PendingChoice.COMMIT : choice == 1 ? PendingChoice.ROLLBACK : PendingChoice.CANCEL;
+    };
     private final SqlSavedQueries savedQueries;
     private SqlLibraryPanels.HistoryPanel historyPanel;
     private SqlLibraryPanels.SavedPanel savedPanel;
@@ -294,7 +313,7 @@ public class SqlPanel extends JPanel {
         panel.add(password, "wmin 100");
         panel.add(connectButton, "split 2");
         panel.add(disconnectButton, "wrap");
-        JLabel autocommitHint = new JLabel(SqlI18n.t("autocommit_hint"));
+        autocommitHint = new JLabel();
         autocommitHint.setFont(FontsUtil.getDefaultFontWithOffset(Font.PLAIN, -2));
         panel.add(autocommitHint, "span 8, wrap");
         return panel;
@@ -405,6 +424,19 @@ public class SqlPanel extends JPanel {
         executeButton.setFont(executeButton.getFont().deriveFont(Font.BOLD));
         executeButton.addActionListener(event -> executeSql());
         editorToolbar.add(executeButton);
+        editorToolbar.addSeparator();
+        autoCommitBox.setText(SqlI18n.t("auto_commit"));
+        autoCommitBox.setToolTipText(SqlI18n.t("auto_commit_tooltip"));
+        autoCommitBox.setFocusable(false);
+        autoCommitBox.addActionListener(event -> applyAutoCommitChoice());
+        editorToolbar.add(autoCommitBox);
+        commitButton = toolbarButton("commit", null, this::commitTransaction);
+        rollbackButton = toolbarButton("rollback", null, this::rollbackTransaction);
+        editorToolbar.add(commitButton);
+        editorToolbar.add(rollbackButton);
+        transactionLabel.setForeground(com.nvhuong.devworkbench.common.constants.ModernColors.getWarning());
+        transactionLabel.setBorder(BorderFactory.createEmptyBorder(0, 6, 0, 0));
+        editorToolbar.add(transactionLabel);
         editorToolbar.addSeparator();
         editorToolbar.add(toolbarButton("new_sql_tab", null, () -> addSqlTab(null, true)));
         editorToolbar.add(toolbarButton("close_sql_tab", null, this::closeCurrentSqlTab));
@@ -1160,7 +1192,7 @@ public class SqlPanel extends JPanel {
         DatabasePreset preset = (DatabasePreset) databaseType.getSelectedItem();
         return new ConnectionProfile(profileName, preset == null ? DatabasePreset.GENERIC.name() : preset.name(),
                 jdbcUrl.getText().trim(), driverClass.getText().trim(), driverJar.getText().trim(),
-                username.getText().trim(), new String(password.getPassword()));
+                username.getText().trim(), new String(password.getPassword()), autoCommitBox.isSelected());
     }
 
     private void applyProfile(ConnectionProfile profile) {
@@ -1174,6 +1206,8 @@ public class SqlPanel extends JPanel {
         driverJar.setText(profile.driverJar());
         username.setText(profile.username());
         password.setText(profile.password());
+        autoCommitBox.setSelected(profile.autoCommit());
+        updateTransactionControls();
         try { storage.writeString(ACTIVE_PROFILE_FILE, encode(profile.name())); }
         catch (Exception exception) { log.warn("Could not persist active SQL profile", exception); }
     }
@@ -1188,6 +1222,8 @@ public class SqlPanel extends JPanel {
         driverJar.setText("");
         username.setText("");
         password.setText("");
+        autoCommitBox.setSelected(false);
+        updateTransactionControls();
     }
 
     private void saveProfile() {
@@ -1271,9 +1307,11 @@ public class SqlPanel extends JPanel {
         try {
             for (String line : storage.readString(PROFILE_FILE).orElse("").lines().toList()) {
                 String[] fields = line.split("\\t", -1);
-                if (fields.length != 7) continue;
+                // 7 fields: profiles saved before the auto-commit option (loaded with auto-commit off).
+                if (fields.length != 7 && fields.length != 8) continue;
+                boolean autoCommit = fields.length == 8 && Boolean.parseBoolean(decode(fields[7]));
                 all.add(new ConnectionProfile(decode(fields[0]), decode(fields[1]), decode(fields[2]),
-                        decode(fields[3]), decode(fields[4]), decode(fields[5]), decode(fields[6])));
+                        decode(fields[3]), decode(fields[4]), decode(fields[5]), decode(fields[6]), autoCommit));
             }
         } catch (Exception exception) { log.warn("Could not read SQL connection profiles", exception); }
         return all;
@@ -1286,7 +1324,8 @@ public class SqlPanel extends JPanel {
                 content.append(encode(profile.name())).append('\t').append(encode(profile.databaseType())).append('\t')
                         .append(encode(profile.jdbcUrl())).append('\t').append(encode(profile.driverClass())).append('\t')
                         .append(encode(profile.driverJar())).append('\t').append(encode(profile.username())).append('\t')
-                        .append(encode(profile.password())).append('\n');
+                        .append(encode(profile.password())).append('\t')
+                        .append(encode(String.valueOf(profile.autoCommit()))).append('\n');
             }
             storage.writeString(PROFILE_FILE, content.toString());
         } catch (Exception exception) { log.warn("Could not save SQL connection profiles", exception); }
@@ -1300,7 +1339,7 @@ public class SqlPanel extends JPanel {
     private static String encode(String value) { return Base64.getUrlEncoder().withoutPadding().encodeToString(value.getBytes(java.nio.charset.StandardCharsets.UTF_8)); }
     private static String decode(String value) { return new String(Base64.getUrlDecoder().decode(value), java.nio.charset.StandardCharsets.UTF_8); }
     private record ConnectionProfile(String name, String databaseType, String jdbcUrl, String driverClass,
-                                     String driverJar, String username, String password) {
+                                     String driverJar, String username, String password, boolean autoCommit) {
         @Override public String toString() { return name; }
     }
 
@@ -1332,6 +1371,7 @@ public class SqlPanel extends JPanel {
         String driverClassName = driverClass.getText().trim();
         String user = username.getText().trim();
         char[] secret = password.getPassword();
+        boolean autoCommit = autoCommitBox.isSelected();
         new SwingWorker<Connection, Void>() {
             @Override protected Connection doInBackground() throws Exception {
                 URLClassLoader loader = null;
@@ -1370,6 +1410,11 @@ public class SqlPanel extends JPanel {
                             : driver.connect(url, properties);
                     if (opened == null) throw new IllegalArgumentException(SqlI18n.t("driver_rejected_url"));
                     try {
+                        opened.setAutoCommit(autoCommit);
+                    } catch (Exception | AbstractMethodError unsupported) {
+                        log.warn("JDBC driver could not set auto-commit={}", autoCommit, unsupported);
+                    }
+                    try {
                         opened.setNetworkTimeout(ForkJoinPool.commonPool(), METADATA_TIMEOUT_MILLIS);
                     } catch (Exception | AbstractMethodError unsupported) {
                         log.debug("JDBC driver does not support connection network timeout", unsupported);
@@ -1388,6 +1433,7 @@ public class SqlPanel extends JPanel {
             @Override protected void done() {
                 try {
                     connection = get();
+                    transactionPending = false;
                     updateConnectionControls(true);
                     setStatus(SqlI18n.t("connected"));
                     loadMetadata();
@@ -1903,11 +1949,14 @@ public class SqlPanel extends JPanel {
                     }
                     appendOutput(summary + elapsed);
                     recordHistory(sql, true, started, summary);
+                    if (!result.hasRows()) markTransactionPending();
                 } catch (Exception exception) {
                     Throwable cause = exception.getCause() == null ? exception : exception.getCause();
                     setStatus(SqlI18n.t("error", safeMessage(cause)));
                     appendOutput(SqlI18n.t("error", safeMessage(cause)));
                     recordHistory(sql, false, started, safeMessage(cause));
+                    // Some databases (PostgreSQL) abort the open transaction on error until it is rolled back.
+                    markTransactionPending();
                     resultTabs.setSelectedIndex(1);
                 }
             }
@@ -1973,6 +2022,9 @@ public class SqlPanel extends JPanel {
     }
 
     private void disconnect() {
+        if (!finishTransactionBeforeClose()) {
+            return;
+        }
         try {
             metadataLoadSequence++;
             cancelMetadataLoad();
@@ -2001,6 +2053,136 @@ public class SqlPanel extends JPanel {
         }
     }
 
+    private void markTransactionPending() {
+        if (connection == null || autoCommitBox.isSelected()) return;
+        transactionPending = true;
+        updateTransactionControls();
+    }
+
+    private void updateTransactionControls() {
+        updateTransactionControls(connection != null);
+    }
+
+    private void updateTransactionControls(boolean connected) {
+        boolean manual = !autoCommitBox.isSelected();
+        boolean pending = connected && manual && transactionPending;
+        if (commitButton != null) commitButton.setEnabled(pending);
+        if (rollbackButton != null) rollbackButton.setEnabled(pending);
+        transactionLabel.setText(pending ? "● " + SqlI18n.t("transaction_pending") : "");
+        if (autocommitHint != null) {
+            autocommitHint.setText(SqlI18n.t(manual ? "autocommit_off_hint" : "autocommit_on_hint"));
+        }
+    }
+
+    /** Toggling the checkbox while connected applies to the open connection (asks first if changes are pending). */
+    private void applyAutoCommitChoice() {
+        boolean enable = autoCommitBox.isSelected();
+        Connection active = connection;
+        if (active == null) {
+            updateTransactionControls();
+            return;
+        }
+        if (enable && transactionPending && !confirm(SqlI18n.t("auto_commit_enable_pending"))) {
+            autoCommitBox.setSelected(false);
+            return;
+        }
+        if (!executeButton.isEnabled()) {
+            autoCommitBox.setSelected(!enable);
+            setStatus(SqlI18n.t("comment_busy"));
+            return;
+        }
+        runTransactionCommand(active, connectionToUse -> connectionToUse.setAutoCommit(enable),
+                enable ? "SET AUTOCOMMIT ON" : "SET AUTOCOMMIT OFF",
+                SqlI18n.t(enable ? "auto_commit_enabled" : "auto_commit_disabled"),
+                () -> autoCommitBox.setSelected(!enable));
+    }
+
+    private void commitTransaction() {
+        Connection active = connection;
+        if (active == null || !transactionPending) return;
+        runTransactionCommand(active, Connection::commit, "COMMIT", SqlI18n.t("committed"), () -> { });
+    }
+
+    private void rollbackTransaction() {
+        Connection active = connection;
+        if (active == null || !transactionPending) return;
+        runTransactionCommand(active, Connection::rollback, "ROLLBACK", SqlI18n.t("rolled_back"), () -> { });
+    }
+
+    @FunctionalInterface
+    private interface ConnectionAction {
+        void run(Connection connection) throws java.sql.SQLException;
+    }
+
+    /** Runs commit/rollback/auto-commit changes on the shared connection like a statement (one at a time). */
+    private void runTransactionCommand(Connection active, ConnectionAction action, String label, String success,
+                                       Runnable onFailure) {
+        if (!executeButton.isEnabled()) {
+            setStatus(SqlI18n.t("comment_busy"));
+            onFailure.run();
+            return;
+        }
+        executeButton.setEnabled(false);
+        long started = System.nanoTime();
+        new SwingWorker<Void, Void>() {
+            @Override protected Void doInBackground() throws Exception {
+                action.run(active);
+                return null;
+            }
+
+            @Override protected void done() {
+                if (connection != active) return;
+                executeButton.setEnabled(true);
+                try {
+                    get();
+                    transactionPending = false;
+                    setStatus(success);
+                    appendOutput(success);
+                    recordHistory(label, true, started, success);
+                } catch (Exception exception) {
+                    Throwable cause = exception.getCause() == null ? exception : exception.getCause();
+                    onFailure.run();
+                    setStatus(SqlI18n.t("error", safeMessage(cause)));
+                    appendOutput(SqlI18n.t("error", safeMessage(cause)));
+                }
+                updateTransactionControls();
+            }
+        }.execute();
+    }
+
+    /**
+     * Before closing: with uncommitted changes ask Commit / Rollback / Cancel; otherwise roll back silently when
+     * auto-commit is off, because some drivers (Oracle) commit open work on close(). Returns false to keep the
+     * connection open.
+     */
+    private boolean finishTransactionBeforeClose() {
+        Connection active = connection;
+        if (active == null) return true;
+        try {
+            if (active.getAutoCommit()) return true;
+        } catch (Exception | AbstractMethodError ignored) {
+            return true;
+        }
+        PendingChoice choice = transactionPending
+                ? transactionPrompt.apply(SqlI18n.t("pending_disconnect"))
+                : PendingChoice.ROLLBACK;
+        if (choice == null || choice == PendingChoice.CANCEL) return false;
+        try {
+            if (choice == PendingChoice.COMMIT) {
+                active.commit();
+                appendOutput(SqlI18n.t("committed"));
+            } else {
+                active.rollback();
+                if (transactionPending) appendOutput(SqlI18n.t("rolled_back"));
+            }
+        } catch (Exception exception) {
+            setStatus(SqlI18n.t("error", safeMessage(exception)));
+            if (choice == PendingChoice.COMMIT) return false; // keep the connection: nothing was saved
+        }
+        transactionPending = false;
+        return true;
+    }
+
     private synchronized void closeResources() throws Exception {
         if (connection != null) connection.close();
         connection = null;
@@ -2009,6 +2191,8 @@ public class SqlPanel extends JPanel {
     }
 
     private void updateConnectionControls(boolean connected) {
+        if (!connected) transactionPending = false;
+        updateTransactionControls(connected);
         connectButton.setEnabled(!connected);
         disconnectButton.setEnabled(connected);
         executeButton.setEnabled(connected);
@@ -2234,6 +2418,7 @@ public class SqlPanel extends JPanel {
                     get();
                     appendOutput(SqlI18n.t("output_running", compactSql(ddl[0])));
                     recordHistory(ddl[0], true, started, SqlI18n.t("statement_complete"));
+                    markTransactionPending();
                     onSuccess.run();
                 } catch (Exception exception) {
                     Throwable cause = exception.getCause() == null ? exception : exception.getCause();
