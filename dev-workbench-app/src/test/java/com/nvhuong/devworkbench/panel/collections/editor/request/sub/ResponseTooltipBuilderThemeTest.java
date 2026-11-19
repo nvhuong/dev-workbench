@@ -62,12 +62,12 @@ public class ResponseTooltipBuilderThemeTest extends AbstractSwingUiTest {
             JPanel tooltip = ResponseTooltipBuilder.buildSizeTooltipPanel(492, info, sizeInfo);
 
             List<String> labels = collectLabels(tooltip);
-            assertTrue(labels.contains("phản hồi"));
-            assertTrue(labels.contains("tiêu đề phản hồi"));
-            assertTrue(labels.contains("cơ quan phản ứng"));
-            assertTrue(labels.contains("yêu cầu"));
-            assertTrue(labels.contains("Tiêu đề yêu cầu"));
-            assertTrue(labels.contains("Request body"));
+            assertTrue(labels.contains("Response"), labels.toString());
+            assertTrue(labels.contains("Header response"), labels.toString());
+            assertTrue(labels.contains("Body response"), labels.toString());
+            assertTrue(labels.contains("Request"), labels.toString());
+            assertTrue(labels.contains("Header request"), labels.toString());
+            assertTrue(labels.contains("Body request"), labels.toString());
         } finally {
             I18nUtil.setLocale(previousLocale);
         }

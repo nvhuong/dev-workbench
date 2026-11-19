@@ -30,10 +30,10 @@ public class RequestPreparationNetworkLogPublisherTest {
                         "Query parameters: 1 enabled / 2 total", "Path variables: 1 enabled / 1 total",
                         "Form-data rows: 1 enabled / 2 total", "Urlencoded rows: 0 enabled / 1 total",
                         "Pre-request script: present", "TLS verification: Disabled", "HTTP preference: Automatic negotiation"},
-                {Locale.forLanguageTag("vi"), "Định cấu hình tiêu đề yêu cầu: đã bật 1 / Tổng cộng 2",
-                        "Tham số truy vấn: đã bật 1 / Tổng cộng 2", "Biến đường dẫn: đã bật 1 / Tổng cộng 1",
-                        "Form-data Được: đã bật 1 / Tổng cộng 2", "Urlencoded Được: đã bật 0 / Tổng cộng 1",
-                        "Kịch bản trước: đã được định cấu hình", "TLS Certificate verification: disabled", "HTTP Tùy chọn giao thức: Tự động đàm phán"}
+                {Locale.forLanguageTag("vi"), "Header request đã cấu hình: bật 1 / tổng 2",
+                        "Tham số query: bật 1 / tổng 2", "Biến đường dẫn: bật 1 / tổng 1",
+                        "Dòng form-data: bật 1 / tổng 2", "Dòng urlencoded: bật 0 / tổng 1",
+                        "Script trước: đã cấu hình", "Xác minh chứng chỉ TLS: Tắt", "Giao thức HTTP: Tự động thương lượng"}
         };
     }
 
