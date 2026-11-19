@@ -145,6 +145,7 @@ public final class MinioPanel extends JPanel {
         toolbar.add(uploadButton); toolbar.add(downloadButton); toolbar.add(deleteButton); toolbar.add(urlButton);
         right.add(toolbar, BorderLayout.NORTH);
         objects.setAutoCreateRowSorter(true); objects.setFillsViewportHeight(true); objects.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        objects.getColumnModel().getColumn(0).setCellRenderer(new MinioObjectIcons.Renderer()); // type icon per object
         JScrollPane objectScroll = new JScrollPane(objects); ToolWindowSurfaceStyle.applyFramedScrollPaneCard(objectScroll); right.add(objectScroll, BorderLayout.CENTER);
         JSplitPane split = com.nvhuong.devworkbench.common.component.ToolWindowChrome.createHorizontalInnerSplitPane(left, right, 240); split.setResizeWeight(0.25);
         JPanel host = new JPanel(new BorderLayout()); host.setOpaque(false); host.setBorder(BorderFactory.createEmptyBorder(8, 0, 0, 0)); host.add(split, BorderLayout.CENTER);
