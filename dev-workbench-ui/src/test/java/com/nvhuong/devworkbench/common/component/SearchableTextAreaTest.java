@@ -77,7 +77,7 @@ public class SearchableTextAreaTest {
                 new SearchableTextArea(textArea);
 
                 JPopupMenu popupMenu = textArea.getPopupMenu();
-                assertEquals(countMenuTextContaining(popupMenu, "Chọn về đầu dòng/đuôi"), 1);
+                assertEquals(countMenuTextContaining(popupMenu, "Chọn đầu/cuối dòng"), 1);
                 assertFalse(hasMenuTextContaining(popupMenu, "Windows/Linux"));
                 assertFalse(hasMenuTextContaining(popupMenu, "macOS"));
                 if (isMac()) {

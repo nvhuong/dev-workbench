@@ -17,7 +17,7 @@ public class HttpUrlUtilTest {
         assertEquals(displayUrl,
                 "https://example.com/api?" +
                         "nested=https%3A%2F%2Fstatic.example.com%2Fpath%2Fk%3Dv%26next%3D1" +
-                        "&keyword=Tiếng Trung Quốc");
+                        "&keyword=\u4e2d\u6587");
     }
 
     @Test
