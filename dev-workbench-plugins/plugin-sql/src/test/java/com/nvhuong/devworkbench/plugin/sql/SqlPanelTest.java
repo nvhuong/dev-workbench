@@ -174,6 +174,127 @@ public class SqlPanelTest {
         });
     }
 
+    /** Tables were loaded into the model but model.reload() collapsed the schema, so users saw no tables. */
+    @Test public void expandedSchemaStaysOpenAndShowsTables() throws Exception {
+        SqlPanel panel = connectH2("sql_panel_visible", "CREATE TABLE IF NOT EXISTS PUBLIC.ORDERS(ID INT)");
+        JTree tree = (JTree) field(panel, "objectTree");
+        DefaultMutableTreeNode publicScope = awaitScope(panel, "PUBLIC");
+
+        javax.swing.tree.TreePath scopePath = new javax.swing.tree.TreePath(publicScope.getPath());
+        SwingUtilities.invokeAndWait(() -> tree.expandPath(scopePath));
+        waitUntil(() -> onEdt(() -> childEndingWith(publicScope, "ORDERS") != null), () -> "tables not loaded");
+        Thread.sleep(200);
+
+        SwingUtilities.invokeAndWait(() -> {
+            assertTrue(tree.isExpanded(scopePath), "schema must stay expanded after its tables load");
+            DefaultMutableTreeNode orders = childEndingWith(publicScope, "ORDERS");
+            assertTrue(tree.getRowForPath(new javax.swing.tree.TreePath(orders.getPath())) >= 0,
+                    "ORDERS must be visible in the navigator");
+            invoke(panel, "disconnect");
+        });
+    }
+
+    /** After connecting, the connection's current schema is the default and its tables are shown without a click. */
+    @Test public void currentSchemaIsDefaultAndExpandedAfterConnecting() throws Exception {
+        SqlPanel panel = connectH2("sql_panel_auto_default", "CREATE TABLE IF NOT EXISTS PUBLIC.CUSTOMERS(ID INT)");
+        JTree tree = (JTree) field(panel, "objectTree");
+        DefaultMutableTreeNode publicScope = awaitScope(panel, "PUBLIC");
+
+        waitUntil(() -> onEdt(() -> childEndingWith(publicScope, "CUSTOMERS") != null),
+                () -> "tables of the current schema were not shown automatically");
+        SwingUtilities.invokeAndWait(() -> {
+            assertEquals(field(panel, "defaultScope"), publicScope.getUserObject());
+            assertTrue(tree.isExpanded(new javax.swing.tree.TreePath(publicScope.getPath())));
+            invoke(panel, "disconnect");
+        });
+    }
+
+    /** Unqualified SQL ran against the driver's default schema; users could not pick the schema to work in. */
+    @Test public void selectedDefaultSchemaIsUsedForUnqualifiedSql() throws Exception {
+        SqlPanel panel = connectH2("sql_panel_default_schema",
+                "CREATE SCHEMA IF NOT EXISTS APP\\;CREATE TABLE IF NOT EXISTS APP.ITEMS(ID INT)\\;"
+                        + "DELETE FROM APP.ITEMS\\;INSERT INTO APP.ITEMS VALUES(1)");
+        DefaultMutableTreeNode appScope = awaitScope(panel, "APP");
+        JLabel status = (JLabel) field(panel, "status");
+
+        SwingUtilities.invokeAndWait(() -> {
+            try {
+                Method setDefault = SqlPanel.class.getDeclaredMethod("setDefaultScope", DefaultMutableTreeNode.class);
+                setDefault.setAccessible(true);
+                setDefault.invoke(panel, appScope);
+            } catch (ReflectiveOperationException exception) {
+                throw new IllegalStateException(exception);
+            }
+        });
+        waitUntil(() -> onEdt(() -> status.getText().contains("APP")), () -> "status=" + status.getText());
+
+        javax.swing.table.DefaultTableModel results = (javax.swing.table.DefaultTableModel) field(panel, "resultModel");
+        SwingUtilities.invokeAndWait(() -> {
+            activeEditor(panel).setText("SELECT COUNT(*) AS N FROM ITEMS;");
+            invoke(panel, "executeSql");
+        });
+        waitUntil(() -> onEdt(() -> results.getRowCount() == 1 || status.getText().contains("rror")),
+                () -> "status=" + status.getText());
+        SwingUtilities.invokeAndWait(() -> {
+            assertEquals(results.getRowCount(), 1, status.getText());
+            assertEquals(String.valueOf(results.getValueAt(0, 0)), "1");
+            invoke(panel, "disconnect");
+        });
+    }
+
+    /** Suggestions were only offered in a toolbar combo box; the editor itself showed none while typing. */
+    @Test public void editorOffersSqlAndMetadataCompletions() throws Exception {
+        SqlPanel panel = connectH2("sql_panel_completion", "CREATE TABLE IF NOT EXISTS PUBLIC.ORDERS(ORDER_ID INT)");
+        JTree tree = (JTree) field(panel, "objectTree");
+        DefaultMutableTreeNode publicScope = awaitScope(panel, "PUBLIC");
+        SwingUtilities.invokeAndWait(() -> tree.expandPath(new javax.swing.tree.TreePath(publicScope.getPath())));
+        waitUntil(() -> onEdt(() -> childEndingWith(publicScope, "ORDERS") != null), () -> "tables not loaded");
+
+        SwingUtilities.invokeAndWait(() -> {
+            org.fife.ui.rsyntaxtextarea.RSyntaxTextArea editor = activeEditor(panel);
+            assertNotNull(editor.getInputMap().get(javax.swing.KeyStroke.getKeyStroke(
+                            java.awt.event.KeyEvent.VK_SPACE, java.awt.event.InputEvent.CTRL_DOWN_MASK)),
+                    "Ctrl+Space must open SQL completion in the editor");
+            try {
+                Method completions = SqlPanel.class.getDeclaredMethod("completionsFor", String.class);
+                completions.setAccessible(true);
+                @SuppressWarnings("unchecked")
+                List<String> keyword = (List<String>) completions.invoke(panel, "sel");
+                @SuppressWarnings("unchecked")
+                List<String> table = (List<String>) completions.invoke(panel, "ORD");
+                assertTrue(keyword.stream().anyMatch(value -> value.startsWith("SELECT")), keyword.toString());
+                assertTrue(table.stream().anyMatch(value -> value.contains("ORDERS")), table.toString());
+            } catch (ReflectiveOperationException exception) {
+                throw new IllegalStateException(exception);
+            }
+            invoke(panel, "disconnect");
+        });
+    }
+
+    private static SqlPanel connectH2(String database, String init) throws Exception {
+        SqlPanel[] panel = new SqlPanel[1];
+        SwingUtilities.invokeAndWait(() -> {
+            panel[0] = new SqlPanel();
+            ((JTextField) field(panel[0], "jdbcUrl")).setText(
+                    "jdbc:h2:mem:" + database + ";DB_CLOSE_DELAY=-1;INIT=" + init);
+            ((JTextField) field(panel[0], "driverClass")).setText("org.h2.Driver");
+            ((JTextField) field(panel[0], "username")).setText("sa");
+            invoke(panel[0], "connect");
+        });
+        return panel[0];
+    }
+
+    private static DefaultMutableTreeNode awaitScope(SqlPanel panel, String suffix) throws Exception {
+        JTree tree = (JTree) field(panel, "objectTree");
+        JLabel status = (JLabel) field(panel, "status");
+        DefaultMutableTreeNode[] scope = new DefaultMutableTreeNode[1];
+        waitUntil(() -> onEdt(() -> {
+            scope[0] = childEndingWith((DefaultMutableTreeNode) tree.getModel().getRoot(), suffix);
+            return scope[0] != null;
+        }), () -> "schema " + suffix + " not loaded; status=" + status.getText());
+        return scope[0];
+    }
+
     private static DefaultMutableTreeNode childEndingWith(DefaultMutableTreeNode parent, String suffix) {
         if (parent == null) return null;
         List<DefaultMutableTreeNode> children = new ArrayList<>();

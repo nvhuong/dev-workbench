@@ -117,6 +117,17 @@ public class SqlPanel extends JPanel {
     private long timedOutMetadataSequence = -1;
     private List<String> metadataSuggestions = new ArrayList<>();
     private DatabasePreset previousPreset = DatabasePreset.GENERIC;
+    /** Schema (or catalog) that unqualified SQL runs against; shown in bold in the navigator. */
+    private MetadataScope defaultScope;
+    /** Shared by every SQL tab's in-editor completion popup; rebuilt from keywords + loaded metadata. */
+    private final org.fife.ui.autocomplete.DefaultCompletionProvider completionProvider = createCompletionProvider();
+    private static final List<String> SQL_KEYWORDS = List.of(
+            "SELECT", "FROM", "WHERE", "AND", "OR", "NOT", "NULL", "IS NULL", "IS NOT NULL", "IN", "LIKE", "BETWEEN",
+            "EXISTS", "DISTINCT", "AS", "JOIN", "INNER JOIN", "LEFT JOIN", "RIGHT JOIN", "FULL JOIN", "ON",
+            "GROUP BY", "ORDER BY", "HAVING", "LIMIT", "OFFSET", "UNION", "UNION ALL", "CASE", "WHEN", "THEN",
+            "ELSE", "END", "INSERT INTO", "VALUES", "UPDATE", "SET", "DELETE FROM", "CREATE TABLE", "ALTER TABLE",
+            "DROP TABLE", "CREATE INDEX", "PRIMARY KEY", "FOREIGN KEY", "REFERENCES", "COUNT(*)", "SUM(", "AVG(",
+            "MIN(", "MAX(", "COALESCE(", "ASC", "DESC", "TRUNCATE TABLE", "WITH");
 
     public SqlPanel() {
         this(PluginStorage.noop());
@@ -125,6 +136,7 @@ public class SqlPanel extends JPanel {
     public SqlPanel(PluginStorage storage) {
         this.storage = storage == null ? PluginStorage.noop() : storage;
         initUI();
+        refreshCompletions();
         loadProfiles(null);
     }
 
@@ -213,6 +225,18 @@ public class SqlPanel extends JPanel {
         browser.add(browserHeader, BorderLayout.NORTH);
         objectTree.setRootVisible(false);
         objectTree.setShowsRootHandles(true);
+        objectTree.setCellRenderer(new javax.swing.tree.DefaultTreeCellRenderer() {
+            @Override
+            public java.awt.Component getTreeCellRendererComponent(JTree tree, Object value, boolean selected,
+                                                                   boolean expanded, boolean leaf, int row, boolean focus) {
+                java.awt.Component component = super.getTreeCellRendererComponent(
+                        tree, value, selected, expanded, leaf, row, focus);
+                boolean isDefault = value instanceof DefaultMutableTreeNode node
+                        && node.getUserObject() instanceof MetadataScope scope && scope.equals(defaultScope);
+                component.setFont(component.getFont().deriveFont(isDefault ? Font.BOLD : Font.PLAIN));
+                return component;
+            }
+        });
         objectTree.addTreeWillExpandListener(new TreeWillExpandListener() {
             @Override public void treeWillExpand(TreeExpansionEvent event) throws ExpandVetoException {
                 Object value = ((DefaultMutableTreeNode) event.getPath().getLastPathComponent()).getUserObject();
@@ -307,7 +331,51 @@ public class SqlPanel extends JPanel {
         editor.getActionMap().put("run-current-sql", new javax.swing.AbstractAction() {
             @Override public void actionPerformed(java.awt.event.ActionEvent event) { executeSql(); }
         });
+        // In-editor completion: pops up while typing (and on Ctrl+Space) with SQL keywords, tables and columns.
+        org.fife.ui.autocomplete.AutoCompletion completion = new org.fife.ui.autocomplete.AutoCompletion(completionProvider);
+        completion.setAutoActivationEnabled(true);
+        completion.setAutoActivationDelay(300);
+        completion.setShowDescWindow(false);
+        completion.setTriggerKey(javax.swing.KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, InputEvent.CTRL_DOWN_MASK));
+        completion.install(editor);
         return editor;
+    }
+
+    private static org.fife.ui.autocomplete.DefaultCompletionProvider createCompletionProvider() {
+        org.fife.ui.autocomplete.DefaultCompletionProvider provider = new org.fife.ui.autocomplete.DefaultCompletionProvider() {
+            @Override
+            protected boolean isValidChar(char ch) {
+                // Allow "schema.table" and quoted identifiers to be completed as one word.
+                return super.isValidChar(ch) || ch == '.' || ch == '"' || ch == '`';
+            }
+        };
+        provider.setAutoActivationRules(true, ".");
+        return provider;
+    }
+
+    /** Rebuilds the editor completion list from SQL keywords and the metadata loaded so far. */
+    private void refreshCompletions() {
+        java.util.Set<String> words = new java.util.TreeSet<>(String.CASE_INSENSITIVE_ORDER);
+        words.addAll(SQL_KEYWORDS);
+        for (String suggestion : metadataSuggestions) {
+            if (suggestion != null && !suggestion.isBlank()) words.add(suggestion.trim());
+        }
+        completionProvider.clear();
+        for (String word : words) {
+            completionProvider.addCompletion(new org.fife.ui.autocomplete.BasicCompletion(completionProvider, word));
+        }
+    }
+
+    /** Completion candidates for a typed prefix, as offered by the editor popup. */
+    List<String> completionsFor(String prefix) {
+        String typed = prefix == null ? "" : prefix;
+        javax.swing.JTextArea area = new javax.swing.JTextArea(typed);
+        area.setCaretPosition(typed.length());
+        List<String> result = new ArrayList<>();
+        for (org.fife.ui.autocomplete.Completion completion : completionProvider.getCompletions(area)) {
+            result.add(completion.getReplacementText());
+        }
+        return result;
     }
 
     private void addSqlTab(String sql, boolean focus) {
@@ -342,7 +410,11 @@ public class SqlPanel extends JPanel {
         Object selected = objectTree.getLastSelectedPathComponent();
         if (!(selected instanceof DefaultMutableTreeNode node)) return;
         JPopupMenu menu = new JPopupMenu();
-        if (node.getUserObject() instanceof MetadataScope) {
+        if (node.getUserObject() instanceof MetadataScope scope) {
+            JMenuItem setDefault = new JMenuItem(SqlI18n.t("set_default_schema"));
+            setDefault.setEnabled(connection != null && !scope.equals(defaultScope));
+            setDefault.addActionListener(event -> setDefaultScope(node));
+            menu.add(setDefault);
             JMenuItem refresh = new JMenuItem(SqlI18n.t("refresh"));
             refresh.addActionListener(event -> {
                 restorePendingNode(node);
@@ -674,6 +746,15 @@ public class SqlPanel extends JPanel {
                     metadataSuggestions = new ArrayList<>(snapshot.suggestions());
                     refreshSuggestions();
                     setStatus(SqlI18n.t("scopes_loaded", snapshot.schemaCount()));
+                    // Show the tables users work with straight away: mark the connection's current schema as the
+                    // default and expand it (system schemas such as pg_catalog stay collapsed).
+                    DefaultMutableTreeNode current = findScopeNode(snapshot.root(), snapshot.currentCatalog(),
+                            snapshot.currentSchema());
+                    if (current != null) {
+                        defaultScope = (MetadataScope) current.getUserObject();
+                        objectTree.expandPath(new TreePath(current.getPath()));
+                        objectTree.scrollPathToVisible(new TreePath(current.getPath()));
+                    }
                 } catch (Exception exception) {
                     executeButton.setEnabled(true);
                     refreshObjectsButton.setEnabled(true);
@@ -747,7 +828,12 @@ public class SqlPanel extends JPanel {
                 schemaCount++;
             }
         }
-        return new MetadataSnapshot(root, completion.stream().distinct().toList(), schemaCount);
+        String currentCatalog = null;
+        String currentSchema = null;
+        try { currentCatalog = active.getCatalog(); } catch (Exception | AbstractMethodError ignored) { }
+        try { currentSchema = active.getSchema(); } catch (Exception | AbstractMethodError ignored) { }
+        return new MetadataSnapshot(root, completion.stream().distinct().toList(), schemaCount,
+                currentCatalog, currentSchema);
     }
 
     private DefaultMutableTreeNode lazyNode(Object value) {
@@ -777,8 +863,10 @@ public class SqlPanel extends JPanel {
                             .map(DefaultMutableTreeNode::getUserObject)
                             .filter(TableRef.class::isInstance)
                             .map(TableRef.class::cast)
-                            .map(TableRef::qualifiedName)
-                            .forEach(metadataSuggestions::add);
+                            .forEach(ref -> {
+                                metadataSuggestions.add(ref.table());
+                                metadataSuggestions.add(ref.qualifiedName());
+                            });
                     ((DefaultTreeModel) objectTree.getModel()).reload(scopeNode);
                     setStatus(SqlI18n.t("tables_loaded", tables.size(), scope.displayName()));
                     refreshSuggestions();
@@ -870,6 +958,56 @@ public class SqlPanel extends JPanel {
         DefaultComboBoxModel<String> model = new DefaultComboBoxModel<>(metadataSuggestions.toArray(String[]::new));
         suggestions.setModel(model);
         if (selected != null) suggestions.setSelectedItem(selected);
+        refreshCompletions();
+    }
+
+    /** Scope node matching the connection's current schema, or its catalog for catalog-only databases (MySQL). */
+    private DefaultMutableTreeNode findScopeNode(DefaultMutableTreeNode root, String catalog, String schema) {
+        DefaultMutableTreeNode catalogMatch = null;
+        for (int i = 0; i < root.getChildCount(); i++) {
+            DefaultMutableTreeNode child = (DefaultMutableTreeNode) root.getChildAt(i);
+            if (!(child.getUserObject() instanceof MetadataScope scope)) continue;
+            if (schema != null && scope.schema() != null && scope.schema().equalsIgnoreCase(schema)
+                    && (catalog == null || scope.catalog() == null || scope.catalog().equalsIgnoreCase(catalog))) {
+                return child;
+            }
+            if (scope.schema() == null && catalog != null && scope.catalog() != null
+                    && scope.catalog().equalsIgnoreCase(catalog)) {
+                catalogMatch = child;
+            }
+        }
+        return catalogMatch;
+    }
+
+    /** Makes unqualified SQL run against the selected schema (or catalog) and expands it. */
+    private void setDefaultScope(DefaultMutableTreeNode node) {
+        Connection active = connection;
+        if (active == null || !(node.getUserObject() instanceof MetadataScope scope)) return;
+        new SwingWorker<Void, Void>() {
+            @Override protected Void doInBackground() throws Exception {
+                if (scope.schema() != null) {
+                    active.setSchema(scope.schema());
+                } else if (scope.catalog() != null) {
+                    active.setCatalog(scope.catalog());
+                }
+                return null;
+            }
+
+            @Override protected void done() {
+                if (connection != active) return;
+                try {
+                    get();
+                    defaultScope = scope;
+                    objectTree.repaint();
+                    objectTree.expandPath(new TreePath(node.getPath()));
+                    setStatus(SqlI18n.t("default_schema_set", scope.displayName()));
+                    appendOutput(SqlI18n.t("default_schema_set", scope.displayName()));
+                } catch (Exception exception) {
+                    Throwable cause = exception.getCause() == null ? exception : exception.getCause();
+                    setStatus(SqlI18n.t("error", safeMessage(cause)));
+                }
+            }
+        }.execute();
     }
 
     private void insertSelectedSuggestion() {
@@ -1010,6 +1148,7 @@ public class SqlPanel extends JPanel {
             resultModel.setRowCount(0);
             resultModel.setColumnCount(0);
             metadataSuggestions = new ArrayList<>();
+            defaultScope = null;
             refreshSuggestions();
             updateConnectionControls(false);
             setStatus(SqlI18n.t("disconnected"));
@@ -1053,7 +1192,8 @@ public class SqlPanel extends JPanel {
         status.setToolTipText(text);
     }
 
-    private record MetadataSnapshot(DefaultMutableTreeNode root, List<String> suggestions, int schemaCount) { }
+    private record MetadataSnapshot(DefaultMutableTreeNode root, List<String> suggestions, int schemaCount,
+                                    String currentCatalog, String currentSchema) { }
     private record MetadataScope(String catalog, String schema, String displayName) {
         @Override public String toString() { return displayName; }
     }
