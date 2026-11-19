@@ -67,7 +67,9 @@ public class KafkaPanel extends JPanel {
 
     private final List<KafkaConsumedMessage> consumedMessages = new ArrayList<>();
     private final AtomicReference<SwingWorker<Void, List<KafkaConsumedMessage>>> consumeWorkerRef = new AtomicReference<>();
-    private final AtomicReference<KafkaConsumer<String, String>> runningConsumerRef = new AtomicReference<>();
+    private final AtomicReference<org.apache.kafka.clients.consumer.Consumer<String, String>> runningConsumerRef = new AtomicReference<>();
+    /** Creates the consumer for a consume session; replaced by tests with a MockConsumer. */
+    java.util.function.Function<Properties, org.apache.kafka.clients.consumer.Consumer<String, String>> consumerFactory = KafkaConsumer::new;
     /**
      * Bộ nhớ đệm có thể tái sử dụng được Producer，Tránh thiết lập lại kết nối mỗi lần bạn gửi
      */
@@ -800,7 +802,8 @@ public class KafkaPanel extends JPanel {
                 return KafkaClassLoaderSupport.withPluginContextClassLoader(() -> {
                     Properties props = buildConsumerProperties(baseProps, consumerCustomProps, finalGroupId, consumeStartMode, maxPollRecords);
 
-                    try (KafkaConsumer<String, String> consumer = new KafkaConsumer<>(props)) {
+                    org.apache.kafka.clients.consumer.Consumer<String, String> consumer = consumerFactory.apply(props);
+                    try (consumer) {
                         runningConsumerRef.set(consumer);
                         if (selectedPartitions.isEmpty()) {
                             AtomicBoolean startPositionApplied = new AtomicBoolean(false);
@@ -841,6 +844,10 @@ public class KafkaPanel extends JPanel {
                                         KafkaPanelSupport.formatHeaders(rec.headers()),
                                         rec.value() == null ? "" : rec.value()));
                             }
+                            if (isCancelled()) {
+                                // Stopped while this poll was returning: these records belong to a finished session.
+                                break;
+                            }
                             publish(batch);
                         }
                     } catch (WakeupException wakeupException) {
@@ -848,7 +855,8 @@ public class KafkaPanel extends JPanel {
                             throw wakeupException;
                         }
                     } finally {
-                        runningConsumerRef.compareAndSet(runningConsumerRef.get(), null);
+                        // Only forget our own consumer; after stop + restart the reference already holds the new one.
+                        runningConsumerRef.compareAndSet(consumer, null);
                     }
                     return null;
                 });
@@ -856,6 +864,9 @@ public class KafkaPanel extends JPanel {
 
             @Override
             protected void process(List<List<KafkaConsumedMessage>> chunks) {
+                if (isCancelled()) {
+                    return;
+                }
                 for (List<KafkaConsumedMessage> batch : chunks) {
                     consumedMessages.addAll(batch);
                 }
@@ -898,7 +909,7 @@ public class KafkaPanel extends JPanel {
         if (worker != null && !worker.isDone()) {
             worker.cancel(true);
         }
-        KafkaConsumer<String, String> consumer = runningConsumerRef.get();
+        org.apache.kafka.clients.consumer.Consumer<String, String> consumer = runningConsumerRef.get();
         if (consumer != null) {
             consumer.wakeup();
         }

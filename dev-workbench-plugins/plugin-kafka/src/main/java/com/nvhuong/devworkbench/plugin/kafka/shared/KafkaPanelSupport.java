@@ -6,7 +6,6 @@ import com.nvhuong.devworkbench.util.JsonUtil;
 import com.nvhuong.devworkbench.common.component.notification.NotificationCenter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.CommonClientConfigs;
-import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.clients.consumer.OffsetAndMetadata;
 import org.apache.kafka.clients.consumer.OffsetAndTimestamp;
 import org.apache.kafka.common.PartitionInfo;
@@ -187,7 +186,7 @@ public final class KafkaPanelSupport {
     }
 
     public static List<TopicPartition> resolveTopicPartitions(
-            KafkaConsumer<String, String> consumer,
+            org.apache.kafka.clients.consumer.Consumer<String, String> consumer,
             String topic,
             Set<Integer> selectedPartitions) {
         List<PartitionInfo> partitionInfos = consumer.partitionsFor(topic);
@@ -283,7 +282,7 @@ public final class KafkaPanelSupport {
     }
 
     public static void applyConsumeStartPosition(
-            KafkaConsumer<String, String> consumer,
+            org.apache.kafka.clients.consumer.Consumer<String, String> consumer,
             Collection<TopicPartition> partitions,
             KafkaConsumeStartMode consumeStartMode,
             Long consumeStartValue) {
