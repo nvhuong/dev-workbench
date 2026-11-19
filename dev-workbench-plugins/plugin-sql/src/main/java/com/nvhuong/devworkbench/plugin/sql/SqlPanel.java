@@ -442,7 +442,7 @@ public class SqlPanel extends JPanel {
         saveTableCommentButton.addActionListener(event -> saveTableComment());
         structureHeader.add(saveTableCommentButton, "wrap");
         structureHint.setFont(FontsUtil.getDefaultFontWithOffset(Font.PLAIN, -2));
-        structureHint.setForeground(javax.swing.UIManager.getColor("Label.disabledForeground"));
+        structureHint.setForeground(com.nvhuong.devworkbench.common.constants.ModernColors.getTextSecondary());
         structureHeader.add(structureHint, "span 3");
         setStructureEditing(false, null);
         structurePanel.add(structureHeader, BorderLayout.NORTH);
@@ -1104,6 +1104,7 @@ public class SqlPanel extends JPanel {
         Object selected = objectTree.getLastSelectedPathComponent();
         if (!(selected instanceof DefaultMutableTreeNode node)) return;
         JPopupMenu menu = new JPopupMenu();
+        ToolWindowSurfaceStyle.applyPopupMenuCard(menu);
         if (node.getUserObject() instanceof MetadataScope scope) {
             JMenuItem setDefault = new JMenuItem(SqlI18n.t("set_default_schema"));
             setDefault.setEnabled(connection != null && !scope.equals(defaultScope));

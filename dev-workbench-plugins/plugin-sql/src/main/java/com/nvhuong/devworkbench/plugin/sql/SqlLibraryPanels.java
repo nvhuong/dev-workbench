@@ -2,6 +2,7 @@ package com.nvhuong.devworkbench.plugin.sql;
 
 import com.formdev.flatlaf.FlatClientProperties;
 import com.nvhuong.devworkbench.common.component.ToolWindowSurfaceStyle;
+import com.nvhuong.devworkbench.common.constants.ModernColors;
 import com.nvhuong.devworkbench.util.FontsUtil;
 import net.miginfocom.swing.MigLayout;
 
@@ -16,7 +17,6 @@ import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
-import javax.swing.UIManager;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import java.awt.BorderLayout;
@@ -154,6 +154,7 @@ final class SqlLibraryPanels {
 
         private void showMenu(MouseEvent event) {
             JPopupMenu menu = new JPopupMenu();
+            ToolWindowSurfaceStyle.applyPopupMenuCard(menu);
             menu.add(menuItem("history_open", this::open));
             menu.add(menuItem("history_insert", this::insert));
             menu.add(menuItem("history_save", this::save));
@@ -200,7 +201,7 @@ final class SqlLibraryPanels {
             buttons.add(button("saved_delete", this::delete));
             JLabel hint = new JLabel(SqlI18n.t("saved_hint"));
             hint.setFont(FontsUtil.getDefaultFontWithOffset(Font.PLAIN, -2));
-            hint.setForeground(UIManager.getColor("Label.disabledForeground"));
+            hint.setForeground(ModernColors.getTextSecondary());
             buttons.add(hint, "span 2");
             add(buttons, BorderLayout.SOUTH);
             refresh();
@@ -250,6 +251,7 @@ final class SqlLibraryPanels {
 
         private void showMenu(MouseEvent event) {
             JPopupMenu menu = new JPopupMenu();
+            ToolWindowSurfaceStyle.applyPopupMenuCard(menu);
             menu.add(menuItem("saved_open", this::open));
             menu.add(menuItem("history_insert", () -> {
                 SqlSavedQueries.SavedQuery query = selected();
@@ -315,11 +317,8 @@ final class SqlLibraryPanels {
             Color foreground = selected ? list.getSelectionForeground() : list.getForeground();
             setBackground(background);
             setOpaque(true);
-            first.setForeground(value != null && failed.test(value) && !selected
-                    ? UIManager.getColor("Component.error.focusedBorderColor") == null ? Color.RED.darker()
-                    : UIManager.getColor("Component.error.focusedBorderColor") : foreground);
-            Color muted = UIManager.getColor("Label.disabledForeground");
-            second.setForeground(selected || muted == null ? foreground : muted);
+            first.setForeground(value != null && failed.test(value) && !selected ? ModernColors.getError() : foreground);
+            second.setForeground(selected ? foreground : ModernColors.getTextSecondary());
             setToolTipText(value == null ? null : text[0]);
             return this;
         }
