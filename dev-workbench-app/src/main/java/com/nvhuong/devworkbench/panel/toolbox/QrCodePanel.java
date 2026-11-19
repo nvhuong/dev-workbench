@@ -175,7 +175,7 @@ public class QrCodePanel extends JPanel {
             currentImage = null;
             previewLabel.setIcon(null);
             previewLabel.setText(I18nUtil.getMessage(MessageKeys.TOOLBOX_QR_STATUS_EMPTY));
-            previewLabel.setForeground(UIManager.getColor("Label.disabledForeground"));
+            previewLabel.setForeground(ModernColors.getTextSecondary());
             downloadButton.setEnabled(false);
             updateStatus(I18nUtil.getMessage(MessageKeys.TOOLBOX_QR_STATUS_EMPTY), false);
             return;

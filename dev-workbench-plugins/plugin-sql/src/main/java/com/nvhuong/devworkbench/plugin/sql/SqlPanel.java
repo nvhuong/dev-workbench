@@ -14,7 +14,6 @@ import javax.swing.BorderFactory;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
-import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -1018,9 +1017,9 @@ public class SqlPanel extends JPanel {
     }
 
     private void openSqlFile() {
-        JFileChooser chooser = new JFileChooser();
-        chooser.setFileFilter(new javax.swing.filechooser.FileNameExtensionFilter("SQL (*.sql)", "sql", "txt"));
-        if (chooser.showOpenDialog(this) != JFileChooser.APPROVE_OPTION) return;
+        com.formdev.flatlaf.util.SystemFileChooser chooser = com.nvhuong.devworkbench.util.FileChooserUtil.createOpenFileChooser("sql.scriptFile", SqlI18n.t("open_sql_file"));
+        chooser.setFileFilter(com.nvhuong.devworkbench.util.FileChooserUtil.extensionFilter("SQL (*.sql)", "sql", "txt"));
+        if (chooser.showOpenDialog(this) != com.formdev.flatlaf.util.SystemFileChooser.APPROVE_OPTION) return;
         java.nio.file.Path file = chooser.getSelectedFile().toPath();
         try {
             addSqlTab(file.getFileName().toString(), java.nio.file.Files.readString(file), null, true);
@@ -1031,11 +1030,11 @@ public class SqlPanel extends JPanel {
     }
 
     private void saveSqlFile() {
-        JFileChooser chooser = new JFileChooser();
-        chooser.setFileFilter(new javax.swing.filechooser.FileNameExtensionFilter("SQL (*.sql)", "sql"));
+        com.formdev.flatlaf.util.SystemFileChooser chooser = com.nvhuong.devworkbench.util.FileChooserUtil.createSaveFileChooser("sql.scriptFile", SqlI18n.t("save_sql_file"));
+        chooser.setFileFilter(com.nvhuong.devworkbench.util.FileChooserUtil.extensionFilter("SQL (*.sql)", "sql"));
         String title = sqlTabs.getTitleAt(sqlTabs.getSelectedIndex());
         chooser.setSelectedFile(new java.io.File(title.endsWith(".sql") ? title : title + ".sql"));
-        if (chooser.showSaveDialog(this) != JFileChooser.APPROVE_OPTION) return;
+        if (chooser.showSaveDialog(this) != com.formdev.flatlaf.util.SystemFileChooser.APPROVE_OPTION) return;
         java.nio.file.Path file = chooser.getSelectedFile().toPath();
         if (!file.getFileName().toString().contains(".")) file = file.resolveSibling(file.getFileName() + ".sql");
         try {
@@ -1308,11 +1307,10 @@ public class SqlPanel extends JPanel {
     }
 
     private void chooseDriverJar() {
-        JFileChooser chooser = new JFileChooser();
+        com.formdev.flatlaf.util.SystemFileChooser chooser = com.nvhuong.devworkbench.util.FileChooserUtil.createOpenFileChooser("sql.driverJar", SqlI18n.t("driver_jar"));
         chooser.setMultiSelectionEnabled(true);
-        chooser.setFileFilter(new javax.swing.filechooser.FileNameExtensionFilter(
-                SqlI18n.t("driver_jar"), "jar"));
-        if (chooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
+        chooser.setFileFilter(com.nvhuong.devworkbench.util.FileChooserUtil.extensionFilter(SqlI18n.t("driver_jar"), "jar"));
+        if (chooser.showOpenDialog(this) == com.formdev.flatlaf.util.SystemFileChooser.APPROVE_OPTION) {
             java.io.File[] selectedFiles = chooser.getSelectedFiles();
             if (selectedFiles.length == 0 && chooser.getSelectedFile() != null) {
                 selectedFiles = new java.io.File[]{chooser.getSelectedFile()};

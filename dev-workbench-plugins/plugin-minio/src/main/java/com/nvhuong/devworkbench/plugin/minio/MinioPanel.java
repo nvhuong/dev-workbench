@@ -146,7 +146,7 @@ public final class MinioPanel extends JPanel {
         right.add(toolbar, BorderLayout.NORTH);
         objects.setAutoCreateRowSorter(true); objects.setFillsViewportHeight(true); objects.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         JScrollPane objectScroll = new JScrollPane(objects); ToolWindowSurfaceStyle.applyFramedScrollPaneCard(objectScroll); right.add(objectScroll, BorderLayout.CENTER);
-        JSplitPane split = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, left, right); split.setBorder(null); split.setDividerSize(6); split.setResizeWeight(0.25); split.setDividerLocation(240);
+        JSplitPane split = com.nvhuong.devworkbench.common.component.ToolWindowChrome.createHorizontalInnerSplitPane(left, right, 240); split.setResizeWeight(0.25);
         JPanel host = new JPanel(new BorderLayout()); host.setOpaque(false); host.setBorder(BorderFactory.createEmptyBorder(8, 0, 0, 0)); host.add(split, BorderLayout.CENTER);
         return host;
     }
@@ -219,7 +219,7 @@ public final class MinioPanel extends JPanel {
 
     private void uploadObject() {
         MinioClient active=client; String bucket=selectedBucket; if(active==null||bucket==null)return;
-        JFileChooser chooser=new JFileChooser(); if(chooser.showOpenDialog(this)!=JFileChooser.APPROVE_OPTION)return;
+        com.formdev.flatlaf.util.SystemFileChooser chooser=com.nvhuong.devworkbench.util.FileChooserUtil.createOpenFileChooser("minio.upload", MinioI18n.t("upload")); if(chooser.showOpenDialog(this)!=com.formdev.flatlaf.util.SystemFileChooser.APPROVE_OPTION)return;
         Path file=chooser.getSelectedFile().toPath(); String object=JOptionPane.showInputDialog(this,MinioI18n.t("object_name"),file.getFileName().toString());
         if(object==null||object.isBlank())return;
         runAction(MinioI18n.t("uploading"),()->{long size=Files.size(file);String type=Files.probeContentType(file);try(InputStream input=Files.newInputStream(file)){active.putObject(PutObjectArgs.builder().bucket(bucket).object(object.trim()).stream(input,size,-1).contentType(type==null?"application/octet-stream":type).build());}return null;},ignored->loadObjects(bucket));
@@ -227,7 +227,7 @@ public final class MinioPanel extends JPanel {
 
     private void downloadObject() {
         String object=selectedObject(); MinioClient active=client; String bucket=selectedBucket; if(object==null||active==null||bucket==null)return;
-        JFileChooser chooser=new JFileChooser(); chooser.setSelectedFile(Path.of(object).getFileName().toFile()); if(chooser.showSaveDialog(this)!=JFileChooser.APPROVE_OPTION)return;
+        com.formdev.flatlaf.util.SystemFileChooser chooser=com.nvhuong.devworkbench.util.FileChooserUtil.createSaveFileChooser("minio.download", MinioI18n.t("download")); chooser.setSelectedFile(Path.of(object).getFileName().toFile()); if(chooser.showSaveDialog(this)!=com.formdev.flatlaf.util.SystemFileChooser.APPROVE_OPTION)return;
         Path target=chooser.getSelectedFile().toPath();
         runAction(MinioI18n.t("downloading"),()->{try(InputStream input=active.getObject(GetObjectArgs.builder().bucket(bucket).object(object).build())){Files.copy(input,target,StandardCopyOption.REPLACE_EXISTING);}return null;},ignored->setStatus(MinioI18n.t("downloaded",target.getFileName())));
     }

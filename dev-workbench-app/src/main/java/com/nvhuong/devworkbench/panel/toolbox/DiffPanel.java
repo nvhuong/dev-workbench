@@ -173,8 +173,6 @@ public class DiffPanel extends JPanel {
         badge.setForeground(ModernColors.getPrimary());
         badge.setFont(FontsUtil.getDefaultFontWithOffset(Font.BOLD, 0));
         badge.setPreferredSize(new Dimension(28, 28));
-        badge.setBorder(BorderFactory.createLineBorder(
-                ModernColors.withAlpha(ModernColors.getPrimary(), 96), 1, true));
         JLabel sourceTitle = ToolboxWorkbench.sectionTitle(title);
         sourceTitle.setForeground(ModernColors.getTextPrimary());
         JPanel heading = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 0));
@@ -201,11 +199,11 @@ public class DiffPanel extends JPanel {
 
     private void choosePath(boolean isSourceA) {
         boolean folderMode = modeSelector.getSelectedIndex() == 2;
-        JFileChooser chooser = new JFileChooser();
-        chooser.setDialogTitle(I18nUtil.getMessage(isSourceA
-                ? MessageKeys.TOOLBOX_DIFF_SOURCE_A : MessageKeys.TOOLBOX_DIFF_SOURCE_B));
-        chooser.setFileSelectionMode(folderMode
-                ? JFileChooser.DIRECTORIES_ONLY : JFileChooser.FILES_ONLY);
+        String title = I18nUtil.getMessage(isSourceA
+                ? MessageKeys.TOOLBOX_DIFF_SOURCE_A : MessageKeys.TOOLBOX_DIFF_SOURCE_B);
+        com.formdev.flatlaf.util.SystemFileChooser chooser = folderMode
+                ? com.nvhuong.devworkbench.util.FileChooserUtil.createDirectoryChooser("toolbox.diff.folder", title)
+                : com.nvhuong.devworkbench.util.FileChooserUtil.createOpenFileChooser("toolbox.diff.file", title);
         String current = (isSourceA ? sourceAPath : sourceBPath).getText();
         if (!current.isBlank()) {
             Path currentPath = Path.of(current);
@@ -214,9 +212,9 @@ public class DiffPanel extends JPanel {
                 chooser.setCurrentDirectory(initial.toFile());
             }
         }
-        if (chooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
-            (isSourceA ? sourceAPath : sourceBPath).setText(chooser.getSelectedFile().toPath().toAbsolutePath().normalize().toString());
-        }
+        com.nvhuong.devworkbench.util.FileChooserUtil.selectedFile(chooser.showOpenDialog(this), chooser)
+                .ifPresent(file -> (isSourceA ? sourceAPath : sourceBPath)
+                        .setText(file.toPath().toAbsolutePath().normalize().toString()));
     }
 
     private void updateInputMode() {

@@ -13,7 +13,6 @@ import net.miginfocom.swing.MigLayout;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
-import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -80,7 +79,10 @@ final class RemotePanel extends JPanel {
                 return new java.awt.Dimension(Math.max(SIDEBAR_MIN_WIDTH, natural.width), natural.height);
             }
         };
-        form.setBorder(BorderFactory.createTitledBorder(RemoteI18n.t("hosts")));
+        // Explicit section header (tool-window style convention: no titled borders).
+        JLabel formTitle = new JLabel(RemoteI18n.t("hosts"));
+        formTitle.setFont(FontsUtil.getDefaultFontWithOffset(Font.BOLD, -1));
+        form.add(formTitle, "gapbottom 4");
 
         // Keep long profile names from widening the sidebar; the popup still shows full names.
         profiles.setPrototypeDisplayValue(new Profile("Production server", "", 22, "", "", false, ""));
@@ -135,8 +137,8 @@ final class RemotePanel extends JPanel {
     }
 
     private void chooseKey() {
-        JFileChooser chooser = new JFileChooser();
-        if (chooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
+        com.formdev.flatlaf.util.SystemFileChooser chooser = com.nvhuong.devworkbench.util.FileChooserUtil.createOpenFileChooser("remote.privateKey", RemoteI18n.t("key"));
+        if (chooser.showOpenDialog(this) == com.formdev.flatlaf.util.SystemFileChooser.APPROVE_OPTION) {
             keyFile.setText(chooser.getSelectedFile().getAbsolutePath());
         }
     }
