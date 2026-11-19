@@ -50,4 +50,23 @@ public class RequestStreamUiAppenderTest {
         appender.appendSseRawEvent(null, null, "message", "hello");
         appender.finalizeSseResponse(new HttpResponse(), null, System.currentTimeMillis());
     }
+
+    @Test(description = "Long-running SSE/WebSocket streams must not grow the raw transcript without bound")
+    public void rawTranscriptsAreBoundedAndKeepLatestEvents() {
+        RequestStreamUiAppender appender = new RequestStreamUiAppender(null, DateTimeFormatter.ofPattern("HH:mm:ss"));
+        StringBuilder sse = new StringBuilder();
+        StringBuilder webSocket = new StringBuilder();
+        String payload = "x".repeat(200);
+        for (int i = 0; i < 60_000; i++) {
+            appender.appendSseRawEvent(sse, String.valueOf(i), "tick", payload + i);
+            appender.appendWebSocketRawEvent(webSocket, MessageType.RECEIVED, payload + i);
+        }
+        int limit = RequestStreamUiAppender.MAX_RAW_TRANSCRIPT_CHARS;
+        assertTrue(sse.length() <= limit * 5 / 4 + 200, "SSE transcript grew to " + sse.length());
+        assertTrue(webSocket.length() <= limit * 5 / 4 + 200, "WebSocket transcript grew to " + webSocket.length());
+        assertTrue(sse.toString().contains(payload + 59999), "latest SSE event must be kept");
+        assertTrue(webSocket.toString().contains(payload + 59999), "latest WebSocket message must be kept");
+        assertTrue(sse.toString().startsWith(RequestStreamUiAppender.TRUNCATED_TRANSCRIPT_MARKER));
+        assertTrue(webSocket.toString().startsWith(RequestStreamUiAppender.TRUNCATED_TRANSCRIPT_MARKER));
+    }
 }

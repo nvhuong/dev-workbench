@@ -15,6 +15,13 @@ import java.util.List;
 
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 final class RequestStreamUiAppender {
+    /**
+     * Upper bound for the raw SSE/WebSocket transcript kept as the response body (~4 MB of UTF-16). Streams can stay
+     * open for hours; without a bound every event was retained in memory and copied again when the stream closed.
+     */
+    static final int MAX_RAW_TRANSCRIPT_CHARS = 2_000_000;
+    static final String TRUNCATED_TRANSCRIPT_MARKER = "[... earlier stream events truncated ...]\n\n";
+
     private final ResponsePanel responsePanel;
     private final DateTimeFormatter timeFormatter;
 
@@ -51,6 +58,27 @@ final class RequestStreamUiAppender {
                 .append(": ")
                 .append(normalizedText)
                 .append('\n');
+        boundTranscript(webSocketBodyBuilder);
+    }
+
+    /** Keeps the newest part of a transcript; trims in batches so appends stay cheap once the bound is reached. */
+    static void boundTranscript(StringBuilder transcript) {
+        if (transcript.length() <= MAX_RAW_TRANSCRIPT_CHARS * 5 / 4) {
+            return;
+        }
+        int keep = MAX_RAW_TRANSCRIPT_CHARS * 3 / 4;
+        int cut = transcript.length() - keep;
+        // Start the kept part at an SSE event boundary (blank line), else at a line boundary (WebSocket transcript),
+        // so no half event remains.
+        int eventBoundary = transcript.indexOf("\n\n", cut);
+        if (eventBoundary >= 0 && eventBoundary - cut < 64 * 1024) {
+            cut = eventBoundary + 2;
+        } else {
+            int lineBoundary = transcript.indexOf("\n", cut);
+            cut = lineBoundary < 0 ? cut : lineBoundary + 1;
+        }
+        transcript.delete(0, cut);
+        transcript.insert(0, TRUNCATED_TRANSCRIPT_MARKER);
     }
 
     void appendSseMessage(MessageType type, String eventId, String eventType, Long retryMs,
@@ -85,6 +113,7 @@ final class RequestStreamUiAppender {
             sseBodyBuilder.append("data: ").append(line).append('\n');
         }
         sseBodyBuilder.append('\n');
+        boundTranscript(sseBodyBuilder);
     }
 
     void finalizeSseResponse(HttpResponse response, StringBuilder sseBodyBuilder, long queueStartMs) {
