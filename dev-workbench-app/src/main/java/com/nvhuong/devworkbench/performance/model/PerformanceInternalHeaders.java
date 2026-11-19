@@ -6,8 +6,8 @@ import java.util.Locale;
 import java.util.Map;
 
 public final class PerformanceInternalHeaders {
-    private static final String WS_PREFIX = "x-devWorkbench-ws-";
-    private static final String SSE_PREFIX = "x-devWorkbench-sse-";
+    private static final String WS_PREFIX = "x-devworkbench-ws-";
+    private static final String SSE_PREFIX = "x-devworkbench-sse-";
     private static final String WS_ERROR = "X-DevWorkbench-WS-Error";
     private static final String SSE_ERROR = "X-DevWorkbench-SSE-Error";
 
