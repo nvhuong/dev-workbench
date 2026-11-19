@@ -44,6 +44,39 @@ public final class KafkaPanelSupport {
     private KafkaPanelSupport() {
     }
 
+    /** Partition count shown as "?" when a topic could be listed but not described (e.g. missing Describe ACL). */
+    public static final int UNKNOWN_PARTITION_COUNT = -1;
+
+    /**
+     * Builds topic list entries from per-topic describe futures. A topic that cannot be described (authorization,
+     * deleted meanwhile, timeout) is still listed with an unknown partition count instead of failing the whole list.
+     */
+    public static List<com.nvhuong.devworkbench.plugin.kafka.ui.KafkaTopicItem> toTopicItems(
+            List<String> topics,
+            Map<String, org.apache.kafka.common.KafkaFuture<org.apache.kafka.clients.admin.TopicDescription>> descriptions,
+            long waitMs) throws InterruptedException {
+        List<com.nvhuong.devworkbench.plugin.kafka.ui.KafkaTopicItem> items = new ArrayList<>(topics.size());
+        long deadline = System.nanoTime() + java.util.concurrent.TimeUnit.MILLISECONDS.toNanos(Math.max(0, waitMs));
+        for (String topic : topics) {
+            int partitionCount = UNKNOWN_PARTITION_COUNT;
+            var future = descriptions == null ? null : descriptions.get(topic);
+            if (future != null) {
+                long remainingNanos = Math.max(0, deadline - System.nanoTime());
+                try {
+                    partitionCount = future.get(remainingNanos, java.util.concurrent.TimeUnit.NANOSECONDS).partitions().size();
+                } catch (java.util.concurrent.ExecutionException | java.util.concurrent.TimeoutException ex) {
+                    log.debug("Could not describe kafka topic {}: {}", topic, rootMessage(ex));
+                }
+            }
+            items.add(new com.nvhuong.devworkbench.plugin.kafka.ui.KafkaTopicItem(topic, partitionCount));
+        }
+        return items;
+    }
+
+    public static String partitionCountDisplay(int partitionCount) {
+        return partitionCount < 0 ? "?" : String.valueOf(partitionCount);
+    }
+
     public static long futureWaitMs(long clientTimeoutMs) {
         return clientTimeoutMs + FUTURE_WAIT_GRACE_MS;
     }

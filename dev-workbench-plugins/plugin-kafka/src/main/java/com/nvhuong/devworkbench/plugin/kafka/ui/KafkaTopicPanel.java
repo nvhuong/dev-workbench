@@ -65,7 +65,8 @@ public class KafkaTopicPanel extends JPanel {
                     return null;
                 }
                 KafkaTopicItem item = getModel().getElementAt(index);
-                return t(MessageKeys.TOOLBOX_KAFKA_TOPIC_ITEM_TOOLTIP, item.name(), item.partitionCount());
+                return t(MessageKeys.TOOLBOX_KAFKA_TOPIC_ITEM_TOOLTIP, item.name(),
+                        com.nvhuong.devworkbench.plugin.kafka.shared.KafkaPanelSupport.partitionCountDisplay(item.partitionCount()));
             }
         };
         ToolTipManager.sharedInstance().registerComponent(topicList);
@@ -210,7 +211,8 @@ public class KafkaTopicPanel extends JPanel {
                                                       int index, boolean isSelected, boolean cellHasFocus) {
             nameLabel.setText(value == null ? "" : value.name());
             nameLabel.setFont(list.getFont());
-            partitionLabel.setText(value == null ? "" : t(MessageKeys.TOOLBOX_KAFKA_TOPIC_PARTITION_COUNT, value.partitionCount()));
+            partitionLabel.setText(value == null ? "" : t(MessageKeys.TOOLBOX_KAFKA_TOPIC_PARTITION_COUNT,
+                    com.nvhuong.devworkbench.plugin.kafka.shared.KafkaPanelSupport.partitionCountDisplay(value.partitionCount())));
             // FlatLaf Chỉ thành phần gốc của trình kết xuất sẽ được chuyển sang màu lựa chọn ngoài tiêu điểm và các thẻ phụ cần phải được xử lý riêng. Nếu không, đường chọn mất nét trong chủ đề màu sáng sẽ có màu trắng với nền nông và không thể nhìn rõ
             boolean focused = FlatUIUtils.isPermanentFocusOwner(list);
             Color selectionBg = focused ? list.getSelectionBackground()

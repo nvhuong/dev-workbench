@@ -478,14 +478,9 @@ public class KafkaPanel extends JPanel {
                         ListTopicsOptions options = new ListTopicsOptions().listInternal(false).timeoutMs(Integer.parseInt(TIMEOUT_MS));
                         List<String> topics = new ArrayList<>(adminClient.listTopics(options).names().get(ADMIN_FUTURE_WAIT_MS, TimeUnit.MILLISECONDS));
                         Collections.sort(topics);
-                        Map<String, org.apache.kafka.clients.admin.TopicDescription> descriptions =
-                                adminClient.describeTopics(topics).allTopicNames().get(ADMIN_FUTURE_WAIT_MS, TimeUnit.MILLISECONDS);
-                        List<KafkaTopicItem> topicItems = new ArrayList<>(topics.size());
-                        for (String topic : topics) {
-                            int partitionCount = descriptions.get(topic).partitions().size();
-                            topicItems.add(new KafkaTopicItem(topic, partitionCount));
-                        }
-                        return topicItems;
+                        // Per-topic futures: one topic the user may not describe must not fail the whole list.
+                        return KafkaPanelSupport.toTopicItems(topics,
+                                adminClient.describeTopics(topics).topicNameValues(), ADMIN_FUTURE_WAIT_MS);
                     }
                 });
             }
