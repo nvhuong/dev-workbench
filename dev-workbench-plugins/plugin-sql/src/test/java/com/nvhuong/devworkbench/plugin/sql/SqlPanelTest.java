@@ -536,6 +536,140 @@ public class SqlPanelTest {
         return result[0];
     }
 
+    /** Executed statements are kept (also after a restart) and SQL scripts can be saved under a name. */
+    @Test public void recordsHistoryAndSavesNamedQueries() throws Exception {
+        MemoryStorage storage = new MemoryStorage();
+        SqlPanel panel = connectH2("sql_panel_history", "CREATE TABLE IF NOT EXISTS PUBLIC.H(ID INT)", storage);
+        awaitScope(panel, "PUBLIC");
+        JLabel status = (JLabel) field(panel, "status");
+        javax.swing.JButton execute = (javax.swing.JButton) field(panel, "executeButton");
+        waitUntil(() -> onEdt(execute::isEnabled), () -> "not connected: " + status.getText());
+
+        SwingUtilities.invokeAndWait(() -> {
+            activeEditor(panel).setText("SELECT 1 AS X");
+            invoke(panel, "executeSql");
+        });
+        waitUntil(() -> new SqlHistory(storage).entries().size() == 1, () -> "history not saved: " + status.getText());
+        waitUntil(() -> onEdt(execute::isEnabled), () -> "still running");
+        SwingUtilities.invokeAndWait(() -> {
+            activeEditor(panel).setText("SELECT * FROM MISSING_TABLE");
+            invoke(panel, "executeSql");
+        });
+        waitUntil(() -> new SqlHistory(storage).entries().size() == 2, () -> "failed run not saved");
+        SqlHistory.Entry failed = new SqlHistory(storage).entries().get(0);
+        assertEquals(failed.sql(), "SELECT * FROM MISSING_TABLE");
+        assertFalse(failed.success());
+        assertTrue(new SqlHistory(storage).entries().get(1).success());
+
+        javax.swing.JTabbedPane tabs = (javax.swing.JTabbedPane) field(panel, "sqlTabs");
+        SwingUtilities.invokeAndWait(() -> {
+            panel.namePrompt = (message, suggested) -> "Báo cáo tháng";
+            activeEditor(panel).setText("SELECT 1;\nSELECT 2;");
+            panel.saveActiveEditor(false);
+            assertEquals(tabs.getTitleAt(tabs.getSelectedIndex()), "Báo cáo tháng");
+            // Ctrl+S on a saved tab overwrites it without asking again.
+            panel.namePrompt = (message, suggested) -> { throw new AssertionError("must not prompt"); };
+            activeEditor(panel).setText("SELECT 1;\nSELECT 3;");
+            panel.saveActiveEditor(false);
+        });
+        SqlSavedQueries saved = new SqlSavedQueries(storage);
+        assertEquals(saved.list().size(), 1);
+        assertEquals(saved.find("báo cáo tháng").orElseThrow().sql(), "SELECT 1;\nSELECT 3;");
+
+        SwingUtilities.invokeAndWait(() -> {
+            invoke(panel, "addSqlTab", String.class, boolean.class, null, true);
+            int count = tabs.getTabCount();
+            try {
+                Method open = SqlPanel.class.getDeclaredMethod("openSql", String.class, String.class, String.class);
+                open.setAccessible(true);
+                open.invoke(panel, "Báo cáo tháng", "SELECT 1;\nSELECT 3;", "Báo cáo tháng");
+            } catch (ReflectiveOperationException exception) {
+                throw new IllegalStateException(exception);
+            }
+            assertEquals(tabs.getTabCount(), count, "an open saved query is reused, not duplicated");
+            assertEquals(tabs.getTitleAt(tabs.getSelectedIndex()), "Báo cáo tháng");
+            invoke(panel, "disconnect");
+        });
+    }
+
+    /** Comments typed in the Structure tab are stored in the database (COMMENT ON ...). */
+    @Test public void savesTableAndColumnCommentsFromStructureTab() throws Exception {
+        String url = "jdbc:h2:mem:sql_panel_comments;DB_CLOSE_DELAY=-1";
+        MemoryStorage storage = new MemoryStorage();
+        SqlPanel panel = connectH2("sql_panel_comments",
+                "CREATE TABLE IF NOT EXISTS PUBLIC.ORDERS(ID INT PRIMARY KEY, NOTE VARCHAR(20))", storage);
+        DefaultMutableTreeNode publicScope = awaitScope(panel, "PUBLIC");
+        JTree tree = (JTree) field(panel, "objectTree");
+        JLabel status = (JLabel) field(panel, "status");
+        waitUntil(() -> onEdt(() -> childEndingWith(publicScope, "ORDERS") != null), () -> "tables not loaded");
+        SwingUtilities.invokeAndWait(() -> tree.setSelectionPath(
+                new javax.swing.tree.TreePath(childEndingWith(publicScope, "ORDERS").getPath())));
+        javax.swing.table.DefaultTableModel structure =
+                (javax.swing.table.DefaultTableModel) field(panel, "structureModel");
+        waitUntil(() -> onEdt(() -> structure.getRowCount() == 2), () -> "structure not shown: " + status.getText());
+
+        SwingUtilities.invokeAndWait(() -> {
+            assertTrue(structure.isCellEditable(1, 5), "comment column must be editable");
+            assertFalse(structure.isCellEditable(1, 0));
+            structure.setValueAt("Ghi chú của khách", 1, 5);
+        });
+        waitUntil(() -> "Ghi chú của khách".equals(columnRemarks(url, "ORDERS", "NOTE")),
+                () -> "column comment not stored: " + status.getText());
+        waitUntil(() -> onEdt(() -> "Ghi chú của khách".equals(structure.getValueAt(1, 5))), () -> "cell not updated");
+
+        JTextField tableComment = (JTextField) field(panel, "tableCommentField");
+        waitUntil(() -> onEdt(() -> ((javax.swing.JButton) field(panel, "executeButton")).isEnabled()), () -> "busy");
+        SwingUtilities.invokeAndWait(() -> {
+            tableComment.setText("Đơn hàng's");
+            invoke(panel, "saveTableComment");
+        });
+        waitUntil(() -> "Đơn hàng's".equals(tableRemarks(url, "ORDERS")), () -> "table comment not stored: " + status.getText());
+        assertTrue(new SqlHistory(storage).entries().stream().anyMatch(entry -> entry.sql().startsWith("COMMENT ON COLUMN")),
+                "comment DDL must be in the history");
+        SwingUtilities.invokeAndWait(() -> invoke(panel, "disconnect"));
+    }
+
+    private static String columnRemarks(String url, String table, String column) {
+        try (java.sql.Connection connection = java.sql.DriverManager.getConnection(url, "sa", "");
+             java.sql.ResultSet result = connection.getMetaData().getColumns(null, "PUBLIC", table, column)) {
+            return result.next() ? result.getString("REMARKS") : null;
+        } catch (java.sql.SQLException exception) {
+            return exception.toString();
+        }
+    }
+
+    private static String tableRemarks(String url, String table) {
+        try (java.sql.Connection connection = java.sql.DriverManager.getConnection(url, "sa", "");
+             java.sql.ResultSet result = connection.getMetaData().getTables(null, "PUBLIC", table, null)) {
+            return result.next() ? result.getString("REMARKS") : null;
+        } catch (java.sql.SQLException exception) {
+            return exception.toString();
+        }
+    }
+
+    private static void invoke(Object target, String name, Class<?> type1, Class<?> type2, Object arg1, Object arg2) {
+        try {
+            Method method = SqlPanel.class.getDeclaredMethod(name, type1, type2);
+            method.setAccessible(true);
+            method.invoke(target, arg1, arg2);
+        } catch (ReflectiveOperationException exception) {
+            throw new IllegalStateException(exception);
+        }
+    }
+
+    private static SqlPanel connectH2(String database, String init, MemoryStorage storage) throws Exception {
+        SqlPanel[] panel = new SqlPanel[1];
+        SwingUtilities.invokeAndWait(() -> {
+            panel[0] = new SqlPanel(storage);
+            ((JTextField) field(panel[0], "jdbcUrl")).setText(
+                    "jdbc:h2:mem:" + database + ";DB_CLOSE_DELAY=-1;INIT=" + init);
+            ((JTextField) field(panel[0], "driverClass")).setText("org.h2.Driver");
+            ((JTextField) field(panel[0], "username")).setText("sa");
+            invoke(panel[0], "connect");
+        });
+        return panel[0];
+    }
+
     private static SqlPanel connectH2(String database, String init) throws Exception {
         SqlPanel[] panel = new SqlPanel[1];
         SwingUtilities.invokeAndWait(() -> {

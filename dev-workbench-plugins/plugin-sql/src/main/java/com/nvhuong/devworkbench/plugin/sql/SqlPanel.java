@@ -103,11 +103,33 @@ public class SqlPanel extends JPanel {
     private final JComboBox<MetadataScope> defaultSchemaCombo = new JComboBox<>();
     private boolean updatingSchemaCombo;
     /** "Structure" tab: columns of the table selected in the navigator. */
+    private static final int STRUCTURE_COMMENT_COLUMN = 5;
+    /** Only the comment column is editable; an edit is written to the database before the cell changes. */
     private final DefaultTableModel structureModel = new DefaultTableModel() {
-        @Override public boolean isCellEditable(int row, int column) { return false; }
+        @Override public boolean isCellEditable(int row, int column) {
+            return column == STRUCTURE_COMMENT_COLUMN && structureCommentsEditable;
+        }
+
+        @Override public void setValueAt(Object value, int row, int column) {
+            if (applyingStructureValue || column != STRUCTURE_COMMENT_COLUMN) {
+                super.setValueAt(value, row, column);
+                return;
+            }
+            String comment = value == null ? "" : value.toString();
+            if (!comment.equals(String.valueOf(getValueAt(row, column)))) {
+                saveColumnComment(String.valueOf(getValueAt(row, 0)), comment);
+            }
+        }
     };
     private final JTable structureTable = new JTable(structureModel);
     private final JLabel structureTitle = new JLabel();
+    private final JTextField tableCommentField = new JTextField();
+    private final JButton saveTableCommentButton = new JButton();
+    private final JLabel structureHint = new JLabel();
+    private boolean structureCommentsEditable;
+    private boolean applyingStructureValue;
+    private TableRef structureTableRef;
+    private String structureTableComment = "";
     private long structureRequest;
     private JButton connectButton;
     private JButton disconnectButton;
@@ -119,6 +141,23 @@ public class SqlPanel extends JPanel {
     private JButton deleteProfileButton;
     private JButton newProfileButton;
     private final PluginStorage storage;
+    private final SqlHistory history;
+    private final SqlSavedQueries savedQueries;
+    private SqlLibraryPanels.HistoryPanel historyPanel;
+    private SqlLibraryPanels.SavedPanel savedPanel;
+    private final JTabbedPane sideTabs = new JTabbedPane();
+    /** Editor client property: name of the saved query the tab was opened from / saved as. */
+    private static final String SAVED_NAME_KEY = "sql.savedName";
+    /** Cmd on macOS, Ctrl elsewhere (and in headless mode, where the toolkit cannot be asked). */
+    private static final int MENU_SHORTCUT = menuShortcutMask();
+
+    private static int menuShortcutMask() {
+        try {
+            return Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx();
+        } catch (UnsupportedOperationException headless) { // includes HeadlessException
+            return InputEvent.CTRL_DOWN_MASK;
+        }
+    }
     private boolean loadingProfiles;
     private Connection connection;
     private URLClassLoader driverClassLoader;
@@ -182,6 +221,8 @@ public class SqlPanel extends JPanel {
 
     public SqlPanel(PluginStorage storage) {
         this.storage = storage == null ? PluginStorage.noop() : storage;
+        this.history = new SqlHistory(this.storage);
+        this.savedQueries = new SqlSavedQueries(this.storage);
         initUI();
         refreshCompletions();
         loadProfiles(null);
@@ -340,28 +381,38 @@ public class SqlPanel extends JPanel {
         ToolWindowSurfaceStyle.applyFramedScrollPaneCard(treeScroll);
         browser.add(treeScroll, BorderLayout.CENTER);
 
+        SqlLibraryPanels.Host libraryHost = new LibraryHost();
+        historyPanel = new SqlLibraryPanels.HistoryPanel(history, libraryHost);
+        savedPanel = new SqlLibraryPanels.SavedPanel(savedQueries, libraryHost);
+        sideTabs.addTab(SqlI18n.t("side_objects"), browser);
+        sideTabs.addTab(SqlI18n.t("side_history"), historyPanel);
+        sideTabs.addTab(SqlI18n.t("side_saved"), savedPanel);
+        sideTabs.addChangeListener(event -> {
+            if (sideTabs.getSelectedComponent() == historyPanel) historyPanel.refresh();
+            if (sideTabs.getSelectedComponent() == savedPanel) savedPanel.refresh();
+        });
+
         JPanel editor = new JPanel(new BorderLayout(0, 4));
         editor.setOpaque(false);
         JToolBar editorToolbar = new JToolBar();
         editorToolbar.setFloatable(false);
         editorToolbar.setBorder(BorderFactory.createEmptyBorder(0, 0, 4, 0));
-        JButton newSqlTab = new JButton(SqlI18n.t("new_sql_tab"));
-        newSqlTab.addActionListener(event -> addSqlTab(null, true));
-        JButton closeSqlTab = new JButton(SqlI18n.t("close_sql_tab"));
-        closeSqlTab.addActionListener(event -> closeCurrentSqlTab());
-        editorToolbar.add(newSqlTab);
-        editorToolbar.add(closeSqlTab);
-        editorToolbar.addSeparator();
-        suggestions.setEditable(false);
-        suggestions.setMaximumSize(new java.awt.Dimension(260, 30));
-        editorToolbar.add(suggestions);
-        JButton insertSuggestion = new JButton(SqlI18n.t("insert"));
-        insertSuggestion.addActionListener(event -> insertSelectedSuggestion());
-        executeButton = new JButton(SqlI18n.t("execute"));
+        // Run first (the primary action), then tab and file actions; in-editor completion replaced the old
+        // "suggestions" combo + Insert button.
+        executeButton = new JButton(SqlI18n.t("execute") + "  ▶");
+        executeButton.setToolTipText(SqlI18n.t("execute_tooltip", shortcutText(KeyEvent.VK_ENTER)));
+        executeButton.putClientProperty(FlatClientProperties.BUTTON_TYPE, FlatClientProperties.BUTTON_TYPE_BORDERLESS);
+        executeButton.setFont(executeButton.getFont().deriveFont(Font.BOLD));
         executeButton.addActionListener(event -> executeSql());
-        editorToolbar.add(insertSuggestion);
-        editorToolbar.addSeparator();
         editorToolbar.add(executeButton);
+        editorToolbar.addSeparator();
+        editorToolbar.add(toolbarButton("new_sql_tab", null, () -> addSqlTab(null, true)));
+        editorToolbar.add(toolbarButton("close_sql_tab", null, this::closeCurrentSqlTab));
+        editorToolbar.addSeparator();
+        editorToolbar.add(toolbarButton("save_query", SqlI18n.t("save_query_tooltip", shortcutText(KeyEvent.VK_S)),
+                () -> saveActiveEditor(false)));
+        editorToolbar.add(toolbarButton("open_sql_file", null, this::openSqlFile));
+        editorToolbar.add(toolbarButton("save_sql_file", null, this::saveSqlFile));
         editor.add(editorToolbar, BorderLayout.NORTH);
 
         addSqlTab(null, false);
@@ -376,13 +427,30 @@ public class SqlPanel extends JPanel {
         JPanel structurePanel = new JPanel(new BorderLayout(0, 4));
         structurePanel.setOpaque(false);
         structureTitle.setText(SqlI18n.t("structure_hint"));
-        structureTitle.setBorder(BorderFactory.createEmptyBorder(4, 4, 0, 4));
-        structurePanel.add(structureTitle, BorderLayout.NORTH);
+        structureTitle.setFont(structureTitle.getFont().deriveFont(Font.BOLD));
+        structureTitle.putClientProperty("html.disable", Boolean.TRUE);
+        JPanel structureHeader = new JPanel(new MigLayout("insets 4 4 0 4, novisualpadding, fillx",
+                "[pref!][grow,fill][pref!]", "[]4[]2[]"));
+        structureHeader.setOpaque(false);
+        structureHeader.add(structureTitle, "span 3, wrap");
+        structureHeader.add(new JLabel(SqlI18n.t("table_comment") + ":"));
+        tableCommentField.putClientProperty(FlatClientProperties.PLACEHOLDER_TEXT, SqlI18n.t("table_comment_placeholder"));
+        tableCommentField.addActionListener(event -> saveTableComment());
+        structureHeader.add(tableCommentField, "wmin 120");
+        saveTableCommentButton.setText(SqlI18n.t("save_comment"));
+        saveTableCommentButton.addActionListener(event -> saveTableComment());
+        structureHeader.add(saveTableCommentButton, "wrap");
+        structureHint.setFont(FontsUtil.getDefaultFontWithOffset(Font.PLAIN, -2));
+        structureHint.setForeground(javax.swing.UIManager.getColor("Label.disabledForeground"));
+        structureHeader.add(structureHint, "span 3");
+        setStructureEditing(false, null);
+        structurePanel.add(structureHeader, BorderLayout.NORTH);
         JScrollPane structureScroll = new JScrollPane(structureTable);
         ToolWindowSurfaceStyle.applyFramedScrollPaneCard(structureScroll);
         structurePanel.add(structureScroll, BorderLayout.CENTER);
         structureTable.setFillsViewportHeight(true);
         structureTable.setCellSelectionEnabled(true);
+        structureTable.putClientProperty("terminateEditOnFocusLost", Boolean.TRUE);
         resultTabs.addTab(SqlI18n.t("structure"), structurePanel);
         JPanel resultSection = SqlWorkbench.editorSection(SqlI18n.t("results"), resultTabs);
         resultTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
@@ -394,7 +462,7 @@ public class SqlPanel extends JPanel {
         verticalSplit.setResizeWeight(0.45);
         editor.add(verticalSplit, BorderLayout.CENTER);
 
-        JSplitPane split = SqlWorkbench.horizontalSplit(browser, editor, 220);
+        JSplitPane split = SqlWorkbench.horizontalSplit(sideTabs, editor, 250);
         split.setResizeWeight(0.23);
         JPanel host = new JPanel(new BorderLayout());
         host.setOpaque(false);
@@ -412,6 +480,14 @@ public class SqlPanel extends JPanel {
         EditorThemeUtil.loadTheme(editor);
         javax.swing.KeyStroke runKey = javax.swing.KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, InputEvent.CTRL_DOWN_MASK);
         editor.getInputMap().put(runKey, "run-current-sql");
+        if (MENU_SHORTCUT != InputEvent.CTRL_DOWN_MASK) {
+            // macOS: Cmd+Enter as well as Ctrl+Enter.
+            editor.getInputMap().put(javax.swing.KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, MENU_SHORTCUT), "run-current-sql");
+        }
+        editor.getInputMap().put(javax.swing.KeyStroke.getKeyStroke(KeyEvent.VK_S, MENU_SHORTCUT), "save-sql");
+        editor.getActionMap().put("save-sql", new javax.swing.AbstractAction() {
+            @Override public void actionPerformed(java.awt.event.ActionEvent event) { saveActiveEditor(false); }
+        });
         editor.getActionMap().put("run-current-sql", new javax.swing.AbstractAction() {
             @Override public void actionPerformed(java.awt.event.ActionEvent event) { executeSql(); }
         });
@@ -675,14 +751,175 @@ public class SqlPanel extends JPanel {
     }
 
     private void addSqlTab(String sql, boolean focus) {
+        addSqlTab(null, sql, null, focus);
+    }
+
+    private void addSqlTab(String title, String sql, String savedName, boolean focus) {
         RSyntaxTextArea editor = createSqlEditor();
         if (sql != null) editor.setText(sql);
+        editor.setCaretPosition(0);
+        editor.putClientProperty(SAVED_NAME_KEY, savedName);
         JScrollPane scroll = new JScrollPane(editor);
         ToolWindowSurfaceStyle.applyFramedScrollPaneCard(scroll);
-        String title = SqlI18n.t("sql_console", sqlTabSequence++);
-        sqlTabs.addTab(title, scroll);
+        sqlTabs.addTab(title == null || title.isBlank() ? SqlI18n.t("sql_console", sqlTabSequence++) : title, scroll);
         sqlTabs.setSelectedComponent(scroll);
         if (focus) editor.requestFocusInWindow();
+    }
+
+    /** Opens SQL from the history / saved list: reuses the tab already showing that saved query, or an empty tab. */
+    private void openSql(String title, String sql, String savedName) {
+        for (int i = 0; savedName != null && i < sqlTabs.getTabCount(); i++) {
+            RSyntaxTextArea editor = editorAt(i);
+            if (savedName.equalsIgnoreCase(String.valueOf(editor.getClientProperty(SAVED_NAME_KEY)))) {
+                sqlTabs.setSelectedIndex(i);
+                editor.requestFocusInWindow();
+                return;
+            }
+        }
+        RSyntaxTextArea active = activeSqlEditor();
+        if (active.getText().isBlank() && active.getClientProperty(SAVED_NAME_KEY) == null) {
+            active.setText(sql);
+            active.setCaretPosition(0);
+            active.putClientProperty(SAVED_NAME_KEY, savedName);
+            if (title != null) sqlTabs.setTitleAt(sqlTabs.getSelectedIndex(), title);
+            active.requestFocusInWindow();
+            return;
+        }
+        addSqlTab(title, sql, savedName, true);
+    }
+
+    private RSyntaxTextArea editorAt(int index) {
+        return (RSyntaxTextArea) ((JScrollPane) sqlTabs.getComponentAt(index)).getViewport().getView();
+    }
+
+    private void insertSql(String sql) {
+        RSyntaxTextArea editor = activeSqlEditor();
+        String text = editor.getText();
+        int caret = editor.getCaretPosition();
+        String prefix = caret > 0 && !Character.isWhitespace(text.charAt(caret - 1)) ? "\n" : "";
+        editor.insert(prefix + sql, caret);
+        editor.requestFocusInWindow();
+    }
+
+    /** Ctrl/Cmd+S: overwrites the saved query of this tab, or asks for a name (always when {@code askName}). */
+    void saveActiveEditor(boolean askName) {
+        RSyntaxTextArea editor = activeSqlEditor();
+        String sql = editor.getText();
+        if (sql.isBlank()) {
+            setStatus(SqlI18n.t("save_query_empty"));
+            return;
+        }
+        Object current = editor.getClientProperty(SAVED_NAME_KEY);
+        String name;
+        if (!askName && current instanceof String savedName && !savedName.isBlank()) {
+            savedQueries.save(savedName, sql, System.currentTimeMillis());
+            name = savedName;
+        } else {
+            String suggested = current instanceof String savedName ? savedName
+                    : sqlTabs.getTitleAt(sqlTabs.getSelectedIndex());
+            name = saveSqlAs(suggested, sql);
+            if (name == null) return;
+        }
+        editor.putClientProperty(SAVED_NAME_KEY, name);
+        sqlTabs.setTitleAt(sqlTabs.getSelectedIndex(), name);
+        savedPanel.refresh();
+        setStatus(SqlI18n.t("save_query_done", name));
+    }
+
+    /** Prompts for a name (confirming overwrite of another query) and saves; {@code null} if cancelled. */
+    private String saveSqlAs(String suggested, String sql) {
+        String name = askName(SqlI18n.t("save_query_prompt"), suggested);
+        if (name == null) return null;
+        if (savedQueries.find(name).isPresent() && !confirm(SqlI18n.t("save_query_overwrite", name))) return null;
+        savedQueries.save(name, sql, System.currentTimeMillis());
+        savedPanel.refresh();
+        setStatus(SqlI18n.t("save_query_done", name));
+        return name;
+    }
+
+    /** Test seam for the name prompt; {@code null} when cancelled. */
+    java.util.function.BiFunction<String, String, String> namePrompt = (message, suggested) -> {
+        Object value = JOptionPane.showInputDialog(this, message, SqlI18n.t("save_query"),
+                JOptionPane.PLAIN_MESSAGE, null, null, suggested);
+        return value == null ? null : value.toString();
+    };
+    /** Test seam for yes/no confirmations. */
+    java.util.function.Predicate<String> confirmPrompt = message -> JOptionPane.showConfirmDialog(this, message,
+            SqlI18n.t("confirm_title"), JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION;
+
+    private String askName(String message, String suggested) {
+        String name = namePrompt.apply(message, suggested);
+        return name == null || name.isBlank() ? null : name.trim();
+    }
+
+    private boolean confirm(String message) {
+        return confirmPrompt.test(message);
+    }
+
+    private void openSqlFile() {
+        JFileChooser chooser = new JFileChooser();
+        chooser.setFileFilter(new javax.swing.filechooser.FileNameExtensionFilter("SQL (*.sql)", "sql", "txt"));
+        if (chooser.showOpenDialog(this) != JFileChooser.APPROVE_OPTION) return;
+        java.nio.file.Path file = chooser.getSelectedFile().toPath();
+        try {
+            addSqlTab(file.getFileName().toString(), java.nio.file.Files.readString(file), null, true);
+            setStatus(SqlI18n.t("file_opened", file));
+        } catch (Exception exception) {
+            setStatus(SqlI18n.t("error", safeMessage(exception)));
+        }
+    }
+
+    private void saveSqlFile() {
+        JFileChooser chooser = new JFileChooser();
+        chooser.setFileFilter(new javax.swing.filechooser.FileNameExtensionFilter("SQL (*.sql)", "sql"));
+        String title = sqlTabs.getTitleAt(sqlTabs.getSelectedIndex());
+        chooser.setSelectedFile(new java.io.File(title.endsWith(".sql") ? title : title + ".sql"));
+        if (chooser.showSaveDialog(this) != JFileChooser.APPROVE_OPTION) return;
+        java.nio.file.Path file = chooser.getSelectedFile().toPath();
+        if (!file.getFileName().toString().contains(".")) file = file.resolveSibling(file.getFileName() + ".sql");
+        try {
+            if (java.nio.file.Files.exists(file) && !confirm(SqlI18n.t("file_overwrite", file.getFileName()))) return;
+            java.nio.file.Files.writeString(file, activeSqlEditor().getText());
+            setStatus(SqlI18n.t("file_saved", file));
+        } catch (Exception exception) {
+            setStatus(SqlI18n.t("error", safeMessage(exception)));
+        }
+    }
+
+    private static String shortcutText(int keyCode) {
+        return java.awt.event.InputEvent.getModifiersExText(MENU_SHORTCUT) + "+" + KeyEvent.getKeyText(keyCode);
+    }
+
+    private static JButton toolbarButton(String key, String tooltip, Runnable action) {
+        JButton button = new JButton(SqlI18n.t(key));
+        if (tooltip != null) button.setToolTipText(tooltip);
+        button.addActionListener(event -> action.run());
+        return button;
+    }
+
+    private String historyProfileName() {
+        if (profiles.getSelectedItem() instanceof ConnectionProfile profile && profile.name() != null
+                && !profile.name().isBlank()) {
+            return profile.name();
+        }
+        return jdbcUrl.getText().trim();
+    }
+
+    private void recordHistory(String sql, boolean success, long startedNanos, String summary) {
+        history.add(new SqlHistory.Entry(System.currentTimeMillis(), historyProfileName(), sql, success,
+                (System.nanoTime() - startedNanos) / 1_000_000, summary));
+        if (historyPanel != null) historyPanel.refresh();
+    }
+
+    private final class LibraryHost implements SqlLibraryPanels.Host {
+        @Override public void openSql(String title, String sql, String savedName) { SqlPanel.this.openSql(title, sql, savedName); }
+        @Override public void insertSql(String sql) { SqlPanel.this.insertSql(sql); }
+        @Override public void saveActiveEditor(boolean askName) { SqlPanel.this.saveActiveEditor(askName); }
+        @Override public String saveAs(String suggestedName, String sql) { return saveSqlAs(suggestedName, sql); }
+        @Override public String askNewName(String currentName) { return askName(SqlI18n.t("saved_rename_prompt"), currentName); }
+        @Override public boolean confirm(String message) { return SqlPanel.this.confirm(message); }
+        @Override public void copy(String text) { copyText(text); }
+        @Override public void status(String text) { setStatus(text); }
     }
 
     private void closeCurrentSqlTab() {
@@ -967,6 +1204,8 @@ public class SqlPanel extends JPanel {
                     if (url.startsWith("jdbc:oracle:")) {
                         // Without it ojdbc's getColumns returns nothing for synonyms.
                         properties.putIfAbsent("includeSynonyms", "true");
+                        // ojdbc returns no table/column comments (REMARKS) unless asked to.
+                        properties.putIfAbsent("remarksReporting", "true");
                     }
                     Connection opened = driver == null
                             ? DriverManager.getConnection(url, properties)
@@ -1458,6 +1697,7 @@ public class SqlPanel extends JPanel {
         executeButton.setEnabled(false);
         setStatus(SqlI18n.t("executing"));
         appendOutput(SqlI18n.t("output_running", compactSql(sql)));
+        long started = System.nanoTime();
         new SwingWorker<QueryResult, Void>() {
             @Override protected QueryResult doInBackground() throws Exception {
                 try (Statement statement = active.createStatement()) {
@@ -1490,21 +1730,26 @@ public class SqlPanel extends JPanel {
                     resultModel.setRowCount(0);
                     resultModel.setColumnIdentifiers(result.columns().toArray());
                     for (Object[] row : result.rows()) resultModel.addRow(row);
+                    String elapsed = SqlI18n.t("elapsed", (System.nanoTime() - started) / 1_000_000);
+                    String summary;
                     if (result.hasRows()) {
                         resultTabs.setSelectedIndex(0);
-                        setStatus(SqlI18n.t("query_complete", result.count(), MAX_RESULT_ROWS));
-                        appendOutput(SqlI18n.t("output_rows", result.count()));
+                        setStatus(SqlI18n.t("query_complete", result.count(), MAX_RESULT_ROWS) + elapsed);
+                        summary = SqlI18n.t("output_rows", result.count());
                     } else if (result.count() < 0) {
-                        setStatus(SqlI18n.t("statement_complete"));
-                        appendOutput(SqlI18n.t("statement_complete"));
+                        setStatus(SqlI18n.t("statement_complete") + elapsed);
+                        summary = SqlI18n.t("statement_complete");
                     } else {
-                        setStatus(SqlI18n.t("update_complete", result.count()));
-                        appendOutput(SqlI18n.t("output_updated", result.count()));
+                        setStatus(SqlI18n.t("update_complete", result.count()) + elapsed);
+                        summary = SqlI18n.t("output_updated", result.count());
                     }
+                    appendOutput(summary + elapsed);
+                    recordHistory(sql, true, started, summary);
                 } catch (Exception exception) {
                     Throwable cause = exception.getCause() == null ? exception : exception.getCause();
                     setStatus(SqlI18n.t("error", safeMessage(cause)));
                     appendOutput(SqlI18n.t("error", safeMessage(cause)));
+                    recordHistory(sql, false, started, safeMessage(cause));
                     resultTabs.setSelectedIndex(1);
                 }
             }
@@ -1586,6 +1831,10 @@ public class SqlPanel extends JPanel {
             structureModel.setRowCount(0);
             structureModel.setColumnCount(0);
             structureTitle.setText(SqlI18n.t("structure_hint"));
+            structureTableRef = null;
+            structureTableComment = "";
+            tableCommentField.setText("");
+            setStructureEditing(false, null);
             refreshSuggestions();
             updateConnectionControls(false);
             setStatus(SqlI18n.t("disconnected"));
@@ -1688,21 +1937,29 @@ public class SqlPanel extends JPanel {
         if (active == null) return;
         setStatus(SqlI18n.t("loading_columns", table.table()));
         long request = ++structureRequest;
-        new SwingWorker<List<ColumnDetail>, Void>() {
-            @Override protected List<ColumnDetail> doInBackground() throws Exception {
-                return readColumnDetails(active.getMetaData(), table);
+        new SwingWorker<StructureInfo, Void>() {
+            @Override protected StructureInfo doInBackground() throws Exception {
+                DatabaseMetaData metadata = active.getMetaData();
+                return new StructureInfo(readColumnDetails(metadata, table), readTableComment(metadata, table),
+                        metadata.getDatabaseProductName());
             }
 
             @Override protected void done() {
                 // Ignore a slow answer for a table the user has already clicked away from.
                 if (connection != active || request != structureRequest) return;
                 try {
-                    List<ColumnDetail> columns = get();
+                    StructureInfo info = get();
+                    List<ColumnDetail> columns = info.columns();
+                    if (structureTable.isEditing()) structureTable.getCellEditor().cancelCellEditing();
+                    structureTableRef = table;
+                    structureTableComment = info.tableComment();
                     structureTitle.setText(table.qualifiedName());
+                    tableCommentField.setText(info.tableComment());
+                    setStructureEditing(SqlCommentDdl.supported(info.product()), info.product());
                     structureModel.setRowCount(0);
                     structureModel.setColumnIdentifiers(new Object[]{SqlI18n.t("column_name"), SqlI18n.t("column_type"),
                             SqlI18n.t("column_nullable"), SqlI18n.t("column_primary_key"), SqlI18n.t("column_default"),
-                            SqlI18n.t("column_remarks")});
+                            SqlI18n.t("column_remarks") + (structureCommentsEditable ? "  ✎" : "")});
                     for (ColumnDetail column : columns) {
                         structureModel.addRow(new Object[]{column.name(), column.displayType(),
                                 column.nullable() ? "YES" : "NO", column.primaryKey() ? "PK" : "",
@@ -1717,6 +1974,123 @@ public class SqlPanel extends JPanel {
             }
         }.execute();
     }
+    private record StructureInfo(List<ColumnDetail> columns, String tableComment, String product) { }
+
+    private static String readTableComment(DatabaseMetaData metadata, TableRef table) {
+        String escape = searchStringEscape(metadata);
+        try (ResultSet result = metadata.getTables(table.catalog(), escapePattern(table.schema(), escape),
+                escapePattern(table.table(), escape), null)) {
+            while (result.next()) {
+                if (table.table().equals(result.getString("TABLE_NAME"))) {
+                    String remarks = result.getString("REMARKS");
+                    return remarks == null ? "" : remarks.trim();
+                }
+            }
+        } catch (Exception | AbstractMethodError ignored) {
+            // the comment is optional information
+        }
+        return "";
+    }
+
+    private void setStructureEditing(boolean editable, String product) {
+        structureCommentsEditable = editable;
+        tableCommentField.setEditable(editable);
+        tableCommentField.setEnabled(structureTableRef != null);
+        saveTableCommentButton.setEnabled(editable && structureTableRef != null);
+        structureHint.setText(structureTableRef == null ? ""
+                : editable ? SqlI18n.t("comment_edit_hint") : SqlI18n.t("comment_unsupported", product));
+    }
+
+    private void saveTableComment() {
+        TableRef table = structureTableRef;
+        String comment = tableCommentField.getText().trim();
+        if (table == null || !structureCommentsEditable || comment.equals(structureTableComment)) return;
+        runCommentDdl(table, null, comment, () -> {
+            structureTableComment = comment;
+            setStatus(SqlI18n.t("comment_saved_table", table.table()));
+        }, () -> tableCommentField.setText(structureTableComment));
+    }
+
+    private void saveColumnComment(String column, String comment) {
+        TableRef table = structureTableRef;
+        if (table == null) return;
+        runCommentDdl(table, column, comment.trim(), () -> {
+            for (int row = 0; row < structureModel.getRowCount(); row++) {
+                if (column.equals(structureModel.getValueAt(row, 0))) {
+                    applyingStructureValue = true;
+                    try {
+                        structureModel.setValueAt(comment.trim(), row, STRUCTURE_COMMENT_COLUMN);
+                    } finally {
+                        applyingStructureValue = false;
+                    }
+                }
+            }
+            setStatus(SqlI18n.t("comment_saved_column", column));
+        }, () -> { });
+    }
+
+    /**
+     * Writes a table ({@code column == null}) or column comment with the vendor's DDL on the shared connection, so it
+     * waits for (and blocks) query execution like any statement; the DDL is logged and kept in the history.
+     */
+    private void runCommentDdl(TableRef table, String column, String comment, Runnable onSuccess, Runnable onFailure) {
+        Connection active = connection;
+        if (active == null) return;
+        if (!executeButton.isEnabled()) {
+            setStatus(SqlI18n.t("comment_busy"));
+            onFailure.run();
+            return;
+        }
+        executeButton.setEnabled(false);
+        saveTableCommentButton.setEnabled(false);
+        long started = System.nanoTime();
+        String[] ddl = new String[1];
+        new SwingWorker<Void, Void>() {
+            @Override protected Void doInBackground() throws Exception {
+                String product = active.getMetaData().getDatabaseProductName();
+                String qualified = table.qualifiedName();
+                if (column == null) {
+                    ddl[0] = SqlCommentDdl.tableComment(product, qualified, comment);
+                } else {
+                    String definition = null;
+                    if (SqlCommentDdl.dialect(product) == SqlCommentDdl.Dialect.MYSQL) {
+                        try (Statement statement = active.createStatement();
+                             ResultSet result = statement.executeQuery("SHOW CREATE TABLE " + qualified)) {
+                            if (result.next()) definition = SqlCommentDdl.mysqlColumnDefinition(result.getString(2), column);
+                        }
+                    }
+                    ddl[0] = SqlCommentDdl.columnComment(product, qualified,
+                            quoteIdentifier(column, table.identifierQuote()), comment, definition);
+                }
+                try (Statement statement = active.createStatement()) {
+                    statement.execute(ddl[0]);
+                }
+                return null;
+            }
+
+            @Override protected void done() {
+                if (connection != active) return;
+                executeButton.setEnabled(true);
+                saveTableCommentButton.setEnabled(structureCommentsEditable && structureTableRef != null);
+                try {
+                    get();
+                    appendOutput(SqlI18n.t("output_running", compactSql(ddl[0])));
+                    recordHistory(ddl[0], true, started, SqlI18n.t("statement_complete"));
+                    onSuccess.run();
+                } catch (Exception exception) {
+                    Throwable cause = exception.getCause() == null ? exception : exception.getCause();
+                    String message = SqlI18n.t("comment_failed", safeMessage(cause));
+                    setStatus(message);
+                    appendOutput(message);
+                    if (ddl[0] != null) recordHistory(ddl[0], false, started, safeMessage(cause));
+                    onFailure.run();
+                    if (!java.awt.GraphicsEnvironment.isHeadless()) JOptionPane.showMessageDialog(SqlPanel.this, message, SqlI18n.t("save_comment"),
+                            JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        }.execute();
+    }
+
     private record QueryResult(List<String> columns, List<Object[]> rows, int count, boolean hasRows) { }
     private record TableRef(String catalog, String schema, String table, String identifierQuote) {
         String qualifiedName() {
