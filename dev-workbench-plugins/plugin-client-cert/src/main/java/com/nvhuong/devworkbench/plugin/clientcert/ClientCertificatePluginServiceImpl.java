@@ -13,17 +13,23 @@ import javax.net.ssl.KeyManager;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 @Slf4j
 public class ClientCertificatePluginServiceImpl implements ClientCertificatePluginService {
 
-    private static final String CERT_CONFIG_FILE = ConfigPathConstants.CLIENT_CERTIFICATES;
+    private final File configFile;
 
     private final List<ClientCertificate> certificates = new CopyOnWriteArrayList<>();
 
     public ClientCertificatePluginServiceImpl() {
+        this(new File(ConfigPathConstants.CLIENT_CERTIFICATES));
+    }
+
+    ClientCertificatePluginServiceImpl(File configFile) {
+        this.configFile = configFile;
         load();
     }
 
@@ -48,7 +54,7 @@ public class ClientCertificatePluginServiceImpl implements ClientCertificatePlug
     @Override
     public void updateCertificate(ClientCertificate certificate) {
         for (int i = 0; i < certificates.size(); i++) {
-            if (certificates.get(i).getId().equals(certificate.getId())) {
+            if (Objects.equals(certificates.get(i).getId(), certificate.getId())) {
                 certificate.setUpdatedAt(System.currentTimeMillis());
                 certificates.set(i, certificate);
                 save();
@@ -60,7 +66,9 @@ public class ClientCertificatePluginServiceImpl implements ClientCertificatePlug
 
     @Override
     public void deleteCertificate(String id) {
-        certificates.removeIf(certificate -> certificate.getId().equals(id));
+        if (id == null || !certificates.removeIf(certificate -> id.equals(certificate.getId()))) {
+            return;
+        }
         save();
         log.info("Deleted client certificate: {}", id);
     }
@@ -150,7 +158,7 @@ public class ClientCertificatePluginServiceImpl implements ClientCertificatePlug
     }
 
     private void load() {
-        File file = new File(CERT_CONFIG_FILE);
+        File file = configFile;
         if (!file.exists()) {
             log.info("Client certificate config file not found, creating new one");
             return;
@@ -160,9 +168,21 @@ public class ClientCertificatePluginServiceImpl implements ClientCertificatePlug
             String jsonContent = FileUtil.readUtf8String(file);
             JSONArray jsonArray = JSONUtil.parseArray(jsonContent);
             certificates.clear();
+            boolean assignedIds = false;
             for (int i = 0; i < jsonArray.size(); i++) {
                 ClientCertificate certificate = jsonArray.getBean(i, ClientCertificate.class);
+                if (certificate == null) {
+                    continue;
+                }
+                // Entries without an id could not be updated or deleted; give them one and persist it.
+                if (certificate.getId() == null || certificate.getId().isBlank()) {
+                    certificate.setId(UUID.randomUUID().toString());
+                    assignedIds = true;
+                }
                 certificates.add(certificate);
+            }
+            if (assignedIds) {
+                save();
             }
             log.info("Loaded {} client certificate configurations", certificates.size());
         } catch (Exception e) {
@@ -172,7 +192,7 @@ public class ClientCertificatePluginServiceImpl implements ClientCertificatePlug
 
     private void save() {
         try {
-            File file = new File(CERT_CONFIG_FILE);
+            File file = configFile;
             File parent = file.getParentFile();
             if (parent != null && !parent.exists() && !parent.mkdirs()) {
                 log.warn("Failed to create directory: {}", parent.getAbsolutePath());
