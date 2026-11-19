@@ -26,6 +26,13 @@ public class MainFrame extends JFrame {
     private final transient MainFrameStartupLifecycle startupLifecycle;
     private final transient MainWindowStateController windowStateController;
     private transient JPanel startupShellPanel;
+    /**
+     * Fixed content pane: the startup shell and later the main panel are swapped inside it. Replacing the frame's
+     * content pane after the window is visible left macOS (full-window-content title bar) showing a blank window
+     * until it was resized.
+     */
+    private final JPanel contentHost = new JPanel(new BorderLayout());
+    private boolean firstShowRefreshed;
     private boolean closing;
 
     // Chế độ Singleton đảm bảo rằng chỉ có một phiên bản
@@ -99,7 +106,8 @@ public class MainFrame extends JFrame {
 
     private void installStartupShell() {
         startupShellPanel = createStartupShellPanel();
-        setContentPane(startupShellPanel);
+        contentHost.add(startupShellPanel, BorderLayout.CENTER);
+        setContentPane(contentHost);
         MainWindowChrome.applyBackground(this);
     }
 
@@ -125,11 +133,30 @@ public class MainFrame extends JFrame {
         return root;
     }
 
-    private void replaceStartupShellWithContent(Container nextContentPane) {
-        setContentPane(nextContentPane);
+    private void replaceStartupShellWithContent(Container nextContent) {
+        contentHost.removeAll();
+        contentHost.add(nextContent, BorderLayout.CENTER);
         MainWindowChrome.applyBackground(this);
-        revalidate();
+        refreshWholeWindow();
+        // Panels finish their own lazy layout in later EDT events; repaint once more after them so the first
+        // visible frame is never left blank (macOS otherwise waited for a resize).
+        SwingUtilities.invokeLater(this::refreshWholeWindow);
+    }
+
+    /** Re-layouts and repaints the whole window, including the root pane and menu bar. */
+    void refreshWholeWindow() {
+        JRootPane root = getRootPane();
+        if (root != null) {
+            root.revalidate();
+            root.repaint();
+        }
+        validate();
         repaint();
+    }
+
+    /** Content currently shown in the window (startup shell or main panel). */
+    Component currentContent() {
+        return contentHost.getComponentCount() == 0 ? null : contentHost.getComponent(0);
     }
 
     public void whenMainContentLoaded(Runnable callback) {
@@ -148,10 +175,32 @@ public class MainFrame extends JFrame {
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
         addWindowListener(new WindowAdapter() {
             @Override
+            public void windowOpened(WindowEvent e) {
+                refreshAfterFirstShow();
+            }
+
+            @Override
+            public void windowActivated(WindowEvent e) {
+                refreshAfterFirstShow();
+            }
+
+            @Override
             public void windowClosing(WindowEvent e) {
                 BeanFactory.getBean(AppExitCoordinator.class).exitApplication();
             }
         });
+    }
+
+    /**
+     * macOS may drop the paint requests issued while the window is still appearing; force one full refresh once the
+     * window is really on screen.
+     */
+    private void refreshAfterFirstShow() {
+        if (firstShowRefreshed) {
+            return;
+        }
+        firstShowRefreshed = true;
+        SwingUtilities.invokeLater(this::refreshWholeWindow);
     }
 
     /**
