@@ -592,13 +592,16 @@ public class PerformanceTrendPanel extends UiSingletonPanel implements Performan
             double errorRate = value(errors, period);
             if (!Double.isFinite(average) && !Double.isFinite(maximum) && !Double.isFinite(qps)
                     && !Double.isFinite(errorRate)) continue;
+            PerformanceTrendSnapshot.ProtocolWindowMetrics httpMetrics = new PerformanceTrendSnapshot.ProtocolWindowMetrics(
+                    0, 0, errorRate, qps, average,
+                    0, 0, 0, Double.NaN, Double.NaN, Double.NaN, Double.NaN,
+                    maximum);
+            // Record order is (overview, http, webSocket, sse): the report reads http(), so the HTTP series must go
+            // into the http slot too, not only overview (which left the exported charts empty).
             points.add(new TrendReportPoint(timestamp, new PerformanceTrendSnapshot(
                     intValue(users, period), 0, 0,
-                    new PerformanceTrendSnapshot.ProtocolWindowMetrics(
-                            0, 0, errorRate, qps, average,
-                            0, 0, 0, Double.NaN, Double.NaN, Double.NaN, Double.NaN,
-                            maximum),
-                    PerformanceTrendSnapshot.terminalIdle().http(),
+                    httpMetrics,
+                    httpMetrics,
                     PerformanceTrendSnapshot.terminalIdle().webSocket(),
                     PerformanceTrendSnapshot.terminalIdle().sse())));
         }

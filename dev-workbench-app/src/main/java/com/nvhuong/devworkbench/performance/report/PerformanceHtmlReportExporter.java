@@ -192,11 +192,29 @@ public class PerformanceHtmlReportExporter {
 
     private boolean hasChartData(List<PerformanceTrendView.TrendReportPoint> points) {
         if (points == null || points.isEmpty()) return false;
+        // PerformanceTrendPanel.reportPoints() does not carry per-window sample counts (they are 0), so a positive
+        // sample count must not be required; any positive response time or throughput value is chart data.
         return points.stream().filter(point -> point != null && point.snapshot() != null)
-                .map(point -> point.snapshot().http())
+                .map(point -> chartMetrics(point.snapshot()))
                 .anyMatch(metric -> metric.samples() > 0
-                        && (Double.isFinite(metric.avgDurationMs()) || Double.isFinite(metric.maxDurationMs())
-                        || Double.isFinite(metric.sampleRate())));
+                        || positive(metric.avgDurationMs()) || positive(metric.maxDurationMs())
+                        || positive(metric.sampleRate()));
+    }
+
+    /** HTTP window metrics for charts; falls back to overview when a producer only filled that slot. */
+    private static PerformanceTrendSnapshot.ProtocolWindowMetrics chartMetrics(PerformanceTrendSnapshot snapshot) {
+        PerformanceTrendSnapshot.ProtocolWindowMetrics http = snapshot.http();
+        if (hasValues(http) || snapshot.overview() == null) return http;
+        return hasValues(snapshot.overview()) ? snapshot.overview() : http;
+    }
+
+    private static boolean hasValues(PerformanceTrendSnapshot.ProtocolWindowMetrics metric) {
+        return metric != null && (metric.samples() > 0 || positive(metric.avgDurationMs())
+                || positive(metric.maxDurationMs()) || positive(metric.sampleRate()));
+    }
+
+    private static boolean positive(double value) {
+        return Double.isFinite(value) && value > 0;
     }
 
     private List<PerformanceTrendView.TrendReportPoint> chartPointsFromSamples(List<PerformanceSampleResult> samples) {
@@ -231,8 +249,9 @@ public class PerformanceHtmlReportExporter {
                     bucket.count, bucket.failures, failurePercent, throughput, averageMs,
                     0, 0, 0, Double.NaN, Double.NaN, Double.NaN, Double.NaN, bucket.maximumElapsedMs);
             var idle = PerformanceTrendSnapshot.terminalIdle();
+            // Record order is (overview, http, webSocket, sse); the charts read http().
             points.add(new PerformanceTrendView.TrendReportPoint(bucketStart,
-                    new PerformanceTrendSnapshot(0, 0, 0, http, idle.http(), idle.webSocket(), idle.sse())));
+                    new PerformanceTrendSnapshot(0, 0, 0, http, http, idle.webSocket(), idle.sse())));
         }
         return List.copyOf(points);
     }
@@ -257,8 +276,9 @@ public class PerformanceHtmlReportExporter {
         final double left = 70, right = 910, top = 22, bottom = 252, width = right - left, height = bottom - top;
         double maximum = 0;
         for (var point : points) {
-            double avg = throughput ? point.snapshot().http().sampleRate() : point.snapshot().http().avgDurationMs();
-            double max = throughput ? avg : point.snapshot().http().maxDurationMs();
+            PerformanceTrendSnapshot.ProtocolWindowMetrics metric = chartMetrics(point.snapshot());
+            double avg = throughput ? metric.sampleRate() : metric.avgDurationMs();
+            double max = throughput ? avg : metric.maxDurationMs();
             if (Double.isFinite(avg)) maximum = Math.max(maximum, avg);
             if (Double.isFinite(max)) maximum = Math.max(maximum, max);
         }
@@ -293,7 +313,7 @@ public class PerformanceHtmlReportExporter {
                               boolean throughput, boolean maxSeries) {
         StringBuilder path = new StringBuilder();
         for (int i = 0; i < points.size(); i++) {
-            PerformanceTrendSnapshot.ProtocolWindowMetrics metric = points.get(i).snapshot().http();
+            PerformanceTrendSnapshot.ProtocolWindowMetrics metric = chartMetrics(points.get(i).snapshot());
             double value = throughput ? metric.sampleRate() : maxSeries ? metric.maxDurationMs() : metric.avgDurationMs();
             if (!Double.isFinite(value)) continue;
             double x = left + (points.size() <= 1 ? 0 : width * i / (points.size() - 1));
@@ -448,7 +468,35 @@ public class PerformanceHtmlReportExporter {
     private String cell(Object[] row, int index) { return row.length > index && row[index] != null ? row[index].toString() : "—"; }
     private double parse(Object value) { try { return Double.parseDouble(String.valueOf(value).replaceAll("[^0-9.,-]", "").replace(',', '.')); } catch (Exception ignored) { return 0; } }
     private void card(StringBuilder html, String label, String value) { html.append("<article><span>").append(escape(label)).append("</span><strong>").append(escape(value)).append("</strong></article>"); }
-    private String escape(String value) { return value == null ? "" : value.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;").replace("\"", "&quot;").replace("'", "&#39;"); }
+    private String escape(String value) {
+        if (value == null) return "";
+        return stripInvalidXmlChars(value).replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+                .replace("\"", "&quot;").replace("'", "&#39;");
+    }
+
+    /**
+     * The PDF renderer parses the report as XHTML; one control character (ANSI colour codes, NUL...) from an error
+     * message made the whole PDF export fail with "An invalid XML character was found".
+     */
+    static String stripInvalidXmlChars(String value) {
+        StringBuilder cleaned = null;
+        for (int i = 0; i < value.length(); ) {
+            int codePoint = value.codePointAt(i);
+            int length = Character.charCount(codePoint);
+            boolean valid = codePoint == 0x9 || codePoint == 0xA || codePoint == 0xD
+                    || (codePoint >= 0x20 && codePoint <= 0xD7FF)
+                    || (codePoint >= 0xE000 && codePoint <= 0xFFFD)
+                    || (codePoint >= 0x10000 && codePoint <= 0x10FFFF);
+            if (!valid && cleaned == null) {
+                cleaned = new StringBuilder(value.length()).append(value, 0, i);
+            }
+            if (valid && cleaned != null) {
+                cleaned.appendCodePoint(codePoint);
+            }
+            i += length;
+        }
+        return cleaned == null ? value : cleaned.toString();
+    }
 
     private String css() {
         return "@page{size:A4;margin:15mm 12mm}*{box-sizing:border-box}body{margin:0;color:#172b4d;font:10px 'Dev Workbench','Dev Workbench CJK',Arial,sans-serif;background:#f3f6fb}.report{max-width:1180px;margin:auto;padding:22px;background:white}.hero{padding:22px 25px;background:#12243d;color:white;border-radius:10px;margin-bottom:20px}.brand{font-weight:700;letter-spacing:1.4px;font-size:10px;color:#b9d2ff}.brand span{color:#45d6b0}h1{font-size:24px;margin:14px 0 6px}h2{font-size:16px;margin:23px 0 10px;color:#13294b}h3{font-size:12px;margin:16px 0 8px;color:#304969}.muted{color:#697b94}.cards{display:table;width:100%;table-layout:fixed;border-spacing:7px}.cards article{display:table-cell;width:33.33%;padding:11px 12px;background:#f1f5fb;border:1px solid #e1e8f2;border-radius:8px;min-height:54px;page-break-inside:avoid}.summary article{width:25%}article span{display:block;color:#63758e;font-size:9px;margin-bottom:7px}article strong{font-size:13px;color:#162e50;word-wrap:break-word}.chart-block{page-break-inside:avoid}.chart{margin:8px 0 20px;padding:12px;border:1px solid #e0e7f0;border-radius:9px;page-break-inside:avoid}.chart figcaption{font-weight:700;font-size:12px;margin:0 0 7px}.chart svg{display:block;width:100%;height:auto}.grid{stroke:#e5ebf3;stroke-width:1}.axis{stroke:#93a2b7;stroke-width:1}.tick{font-size:10px;fill:#64758c}.series-avg{fill:none;stroke:#2574d9;stroke-width:3}.series-max{fill:none;stroke:#9b67c9;stroke-width:2.5}.legend{color:#64758c;font-size:9px;margin-top:5px}.legend span{margin-right:18px}.legend i{display:inline-block;width:14px;height:3px;background:#2574d9;margin:0 6px 3px 0}.legend .max{background:#9b67c9}.table-wrap{width:100%}table{border-collapse:collapse;width:100%;font-size:8px;margin:8px 0 18px;table-layout:auto}th{background:#eaf0f8;color:#3b4c64;text-align:left;font-weight:700}th,td{padding:6px 5px;border-bottom:1px solid #e4eaf2;vertical-align:top;word-wrap:break-word}tbody tr:nth-child(even){background:#fafbfd}.empty{background:#f6f8fb;border-radius:8px;padding:22px;text-align:center;color:#65758a}.empty p{margin:8px 0 0}footer{border-top:1px solid #e5eaf1;padding-top:12px;margin-top:24px;color:#8290a4;font-size:8px}section{page-break-inside:auto}tr{page-break-inside:avoid} ";

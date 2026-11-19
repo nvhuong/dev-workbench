@@ -112,6 +112,68 @@ public class PerformanceReportPdfExporterTest {
         }
     }
 
+    /**
+     * PerformanceTrendPanel.reportPoints() builds window metrics with a sample count of 0; the exporter required a
+     * positive count, ignored the sampled trend and showed "Chart data is unavailable" whenever no request results
+     * were retained.
+     */
+    @Test
+    public void chartsUseTrendPointsAsProducedByTheTrendPanel() {
+        List<PerformanceTrendView.TrendReportPoint> points = new ArrayList<>();
+        long start = System.currentTimeMillis() - 60_000;
+        for (int i = 0; i < 12; i++) {
+            double average = 120 + i * 10;
+            // Same shape as PerformanceTrendPanel.reportPoints(): samples/failures are not tracked there.
+            var metrics = new PerformanceTrendSnapshot.ProtocolWindowMetrics(0, 0, 1.5, 8.0 + i,
+                    average, 0, 0, 0, Double.NaN, Double.NaN, Double.NaN, Double.NaN, average * 2);
+            points.add(new PerformanceTrendView.TrendReportPoint(start + i * 5_000,
+                    new PerformanceTrendSnapshot(10, 0, 0, metrics, PerformanceTrendSnapshot.terminalIdle().http(),
+                            PerformanceTrendSnapshot.terminalIdle().webSocket(), PerformanceTrendSnapshot.terminalIdle().sse())));
+        }
+
+        String html = PerformanceHtmlReportExporter.renderHtml(context(points, List.of()), httpTable());
+
+        assertFalse(html.contains("Chart data is unavailable"), "sampled trend data must be charted");
+        assertTrue(html.contains("Sampled during the run."), html);
+        assertTrue(html.matches("(?s).*<path fill=\"none\" stroke=\"#2574d9\"[^>]* d=\"M[0-9.]+ [0-9.]+ L.*"),
+                "the response time series must have plotted points");
+    }
+
+    /** Without trend data the charts are rebuilt from retained samples; those points also put data in the wrong slot. */
+    @Test
+    public void chartsRebuiltFromSamplesHavePlottedSeries() {
+        List<PerformanceSampleResult> samples = new ArrayList<>();
+        long start = System.currentTimeMillis() - 30_000;
+        for (int i = 0; i < 40; i++) {
+            samples.add(PerformanceSampleResult.builder().apiId("orders").apiName("orders").responseCode(200)
+                    .successful(true).startTimeMs(start + i * 500L).endTimeMs(start + i * 500L + 80 + i)
+                    .elapsedTimeMs(80 + i).build());
+        }
+
+        String html = PerformanceHtmlReportExporter.renderHtml(context(List.of(), samples), httpTable());
+
+        assertTrue(html.contains("Reconstructed from retained request results."), html);
+        assertTrue(html.matches("(?s).*<path fill=\"none\" stroke=\"#2574d9\"[^>]* d=\"M[0-9.]+ [0-9.]+ L.*"),
+                "the response time series rebuilt from samples must have plotted points");
+    }
+
+    /** Error messages may carry control characters (ANSI colours, NUL); they made the XHTML invalid for the PDF renderer. */
+    @Test
+    public void pdfExportSurvivesControlCharactersInErrorMessages() throws Exception {
+        String html = PerformanceHtmlReportExporter.renderHtml(context(trendPoints(), List.of(
+                failedSample("orders", 0, "\u001b[31mConnection reset\u001b[0m\u0000 by peer\u000b"))), httpTable());
+        Path pdfFile = Files.createTempFile("performance-report-control-", ".pdf");
+        try {
+            PerformanceHtmlReportExporter.exportPdf(pdfFile, html);
+            try (PDDocument document = Loader.loadPDF(pdfFile.toFile())) {
+                String text = new PDFTextStripper().getText(document);
+                assertTrue(text.contains("Connection reset"), text);
+            }
+        } finally {
+            Files.deleteIfExists(pdfFile);
+        }
+    }
+
     @Test
     public void emptyReportDoesNotReplaceExistingFile() throws Exception {
         Path destination = Files.createTempFile("existing-report-", ".pdf");
