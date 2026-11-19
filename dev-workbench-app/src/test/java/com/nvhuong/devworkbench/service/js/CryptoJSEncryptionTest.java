@@ -330,7 +330,7 @@ public class CryptoJSEncryptionTest {
             Value decoded = context.eval("js", "decodeURI('https://example.com/a%2Fb?q=a%2Bb%20c&x=%E6%B5%8B%E8%AF%95#frag')");
             assertEquals(
                     decoded.asString(),
-                    "https://example.com/a%2Fb?q=a%2Bb c&x=Bài kiểm tra#frag",
+                    "https://example.com/a%2Fb?q=a%2Bb c&x=测试#frag",
                     "decodeURI Mã hóa ký tự dành riêng trong đường dẫn và truy vấn phải được giữ nguyên"
             );
         }

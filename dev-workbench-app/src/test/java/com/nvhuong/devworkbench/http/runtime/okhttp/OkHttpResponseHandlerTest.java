@@ -216,7 +216,7 @@ public class OkHttpResponseHandlerTest {
     @Test
     public void shouldKeepRawBytesForNonUtf8Charset() throws Exception {
         Charset gbk = Charset.forName("GBK");
-        byte[] text = "Nội dung Trung Quốc".getBytes(gbk);
+        byte[] text = "中文内容".getBytes(gbk);
         HttpResponse response = new HttpResponse();
 
         OkHttpResponseHandler.handleResponse(
@@ -225,7 +225,7 @@ public class OkHttpResponseHandlerTest {
                 null
         );
 
-        assertEquals(response.body, "Nội dung Trung Quốc");
+        assertEquals(response.body, "中文内容");
         assertEquals(response.rawBodyBytes, text);
     }
 
@@ -404,7 +404,7 @@ public class OkHttpResponseHandlerTest {
                         "attachment; filename*=UTF-8''%E8%AE%A2%E5%8D%95.xlsx", xlsx),
                 response, null);
 
-        assertEquals(response.fileName, "đặt hàng.xlsx");
+        assertEquals(response.fileName, "订单.xlsx");
     }
 
     @Test

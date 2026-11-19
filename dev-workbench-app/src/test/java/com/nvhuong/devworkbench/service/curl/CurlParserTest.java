@@ -1580,10 +1580,10 @@ public class CurlParserTest {
 
         CurlRequest result = CurlParser.parse(curl);
 
-        assertEquals(findParamValue(result.paramsList, "name"), "Trương San");
-        assertEquals(findParamValue(result.paramsList, "city"), "Bắc Kinh");
-        assertEquals(findUrlencodedValue(result.urlencodedList, "keyword"), "Từ khóa tiếng Trung");
-        assertEquals(findUrlencodedValue(result.urlencodedList, "note"), "Bài kiểm tra");
+        assertEquals(findParamValue(result.paramsList, "name"), "张三");
+        assertEquals(findParamValue(result.paramsList, "city"), "北京");
+        assertEquals(findUrlencodedValue(result.urlencodedList, "keyword"), "中文关键词");
+        assertEquals(findUrlencodedValue(result.urlencodedList, "note"), "测试");
     }
 
     @Test(description = "Khi kiểm tra đối tượng yêu cầu nhập URL query Hiển thị dưới dạng văn bản có thể đọc được")
@@ -1593,10 +1593,10 @@ public class CurlParserTest {
         HttpRequestItem item = CurlImportUtil.fromCurl(curl);
 
         assertNotNull(item);
-        assertEquals(item.getUrl(), "https://example.com/api?keyword=Tiếng Trung Quốc&name=Trương San");
+        assertEquals(item.getUrl(), "https://example.com/api?keyword=中文&name=张三");
         assertEquals(item.getParamsList().size(), 2);
-        assertEquals(item.getParamsList().get(0).getValue(), "Tiếng Trung Quốc");
-        assertEquals(item.getParamsList().get(1).getValue(), "Trương San");
+        assertEquals(item.getParamsList().get(0).getValue(), "中文");
+        assertEquals(item.getParamsList().get(1).getValue(), "张三");
         assertEquals(item.getBody(), "");
     }
 
@@ -1610,7 +1610,7 @@ public class CurlParserTest {
         HttpRequestItem item = CurlImportUtil.fromCurl(curl);
 
         assertNotNull(item);
-        assertTrue(item.getUrl().contains("keyword=Tiếng Trung Quốc"), "Tiếng Trung bình thường query Màn hình vẫn có thể đọc được");
+        assertTrue(item.getUrl().contains("keyword=中文"), "Tiếng Trung bình thường query Màn hình vẫn có thể đọc được");
         assertTrue(item.getUrl().contains("https%3A%2F%2Fwww.gstatic.com%2F_"),
                 "Lồng nhau URL của :// không nên như vậy display decode trở nên raw reserved nhân vật");
         assertTrue(item.getUrl().contains("%2Fk%3Dsearch-next.aim%2Fam%3DgBA%2Fd%3D1"),

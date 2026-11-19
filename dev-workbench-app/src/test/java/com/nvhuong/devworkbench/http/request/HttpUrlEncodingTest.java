@@ -13,7 +13,7 @@ public class HttpUrlEncodingTest {
 
     @Test
     public void shouldEncodeUnicodeQueryParameterValues() {
-        String url = "https://httpbin.org/get?q=devWorkbenchtools&lang=en&page=1&size=10&sort=desc&filter=Kiểm tra tiếng Trung";
+        String url = "https://httpbin.org/get?q=devWorkbenchtools&lang=en&page=1&size=10&sort=desc&filter=测试中文";
 
         String encoded = HttpUrlUtil.buildEncodedUrl(url, List.of());
 
@@ -39,7 +39,7 @@ public class HttpUrlEncodingTest {
     public void shouldEncodeUnicodeParamsFromParamsList() {
         String encoded = HttpUrlUtil.buildEncodedUrl(
                 "https://httpbin.org/get?q=devWorkbenchtools",
-                List.of(new HttpParam(true, "filter", "Kiểm tra tiếng Trung"))
+                List.of(new HttpParam(true, "filter", "测试中文"))
         );
 
         assertEquals(

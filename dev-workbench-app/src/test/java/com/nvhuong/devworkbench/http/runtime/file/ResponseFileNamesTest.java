@@ -39,7 +39,7 @@ public class ResponseFileNamesTest {
         assertEquals(ResponseFileNames.parseFileNameFromContentDisposition("attachment; filename=report.csv; size=1"),
                 "report.csv");
         assertEquals(ResponseFileNames.parseFileNameFromContentDisposition(
-                "attachment; filename*=UTF-8''%E6%B5%8B%E8%AF%95.txt"), "Bài kiểm tra.txt");
+                "attachment; filename*=UTF-8''%E6%B5%8B%E8%AF%95.txt"), "测试.txt");
         assertNull(ResponseFileNames.parseFileNameFromContentDisposition("attachment"));
         assertNull(ResponseFileNames.parseFileNameFromContentDisposition(null));
     }
@@ -48,9 +48,9 @@ public class ResponseFileNamesTest {
     public void shouldFollowRfc6266FileNamePrecedenceAndDecoding() {
         // filename* được ưu tiên hơn filename，Không có vấn đề thứ tự xuất hiện
         assertEquals(ResponseFileNames.parseFileNameFromContentDisposition(
-                "attachment; filename=\"fallback.xlsx\"; filename*=UTF-8''%E6%8A%A5%E8%A1%A8.xlsx"), "Báo cáo.xlsx");
+                "attachment; filename=\"fallback.xlsx\"; filename*=UTF-8''%E6%8A%A5%E8%A1%A8.xlsx"), "报表.xlsx");
         assertEquals(ResponseFileNames.parseFileNameFromContentDisposition(
-                "attachment; filename*=utf-8'zh-CN'%E6%8A%A5%E8%A1%A8.xlsx; filename=fallback.xlsx"), "Báo cáo.xlsx");
+                "attachment; filename*=utf-8'zh-CN'%E6%8A%A5%E8%A1%A8.xlsx; filename=fallback.xlsx"), "报表.xlsx");
         assertEquals(ResponseFileNames.parseFileNameFromContentDisposition(
                 "attachment; filename*=ISO-8859-1''na%EFve.txt"), "naïve.txt");
         // filename* Trả lại nếu không hợp lệ filename
@@ -58,9 +58,9 @@ public class ResponseFileNamesTest {
                 "attachment; filename*=UNKNOWN-CHARSET''x.txt; filename=\"ok.txt\""), "ok.txt");
         // Các phương pháp viết không chuẩn phổ biến:URLEncoder Mã hóa,RFC 2047 Các từ được mã hóa, loại bỏ qua, thoát trong dấu ngoặc kép
         assertEquals(ResponseFileNames.parseFileNameFromContentDisposition(
-                "attachment;filename=%E6%8A%A5%E8%A1%A8.xlsx"), "Báo cáo.xlsx");
+                "attachment;filename=%E6%8A%A5%E8%A1%A8.xlsx"), "报表.xlsx");
         assertEquals(ResponseFileNames.parseFileNameFromContentDisposition(
-                "attachment; filename=\"=?UTF-8?B?5oql6KGoLnhsc3g=?=\""), "Báo cáo.xlsx");
+                "attachment; filename=\"=?UTF-8?B?5oql6KGoLnhsc3g=?=\""), "报表.xlsx");
         assertEquals(ResponseFileNames.parseFileNameFromContentDisposition("filename=report.xlsx"), "report.xlsx");
         assertEquals(ResponseFileNames.parseFileNameFromContentDisposition(
                 "attachment; filename=\"a \\\"quoted\\\" name; v2.txt\""), "a _quoted_ name; v2.txt");
@@ -87,7 +87,7 @@ public class ResponseFileNamesTest {
 
     @Test
     public void shouldDecodeUrlFileName() {
-        assertEquals(ResponseFileNames.resolve(null, "/files/%E6%8A%A5%E8%A1%A8.xlsx", ".xlsx"), "Báo cáo.xlsx");
+        assertEquals(ResponseFileNames.resolve(null, "/files/%E6%8A%A5%E8%A1%A8.xlsx", ".xlsx"), "报表.xlsx");
         assertEquals(ResponseFileNames.resolve(null, "/files/a%2F..%2Fb.pdf", ".pdf"), "b.pdf");
     }
 
