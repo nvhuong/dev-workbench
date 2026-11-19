@@ -25,6 +25,53 @@ public class SqlPanelTest {
         assertTrue(panel[0].getComponentCount() > 0);
     }
 
+    /** The navigator title shared a 220px row with the Refresh button and was cut to "Database Navigat...". */
+    @Test public void sectionTitlesAreNotTruncated() throws Exception {
+        java.util.Locale original = com.nvhuong.devworkbench.util.I18nUtil.currentLocale();
+        try {
+            for (String language : new String[]{"vi", "en"}) {
+                List<String> problems = new ArrayList<>();
+                SwingUtilities.invokeAndWait(() -> {
+                    com.nvhuong.devworkbench.util.I18nUtil.setLocale(java.util.Locale.forLanguageTag(language));
+                    SqlPanel panel = new SqlPanel();
+                    panel.setSize(1200, 720);
+                    layoutRecursively(panel);
+                    collectLabels(panel).forEach(label -> {
+                        if (label.getWidth() + 1 < label.getPreferredSize().width) {
+                            problems.add("'" + label.getText() + "' " + label.getWidth() + "/" + label.getPreferredSize().width);
+                        }
+                    });
+                });
+                org.testng.Assert.assertTrue(problems.isEmpty(), language + ": " + problems);
+            }
+        } finally {
+            com.nvhuong.devworkbench.util.I18nUtil.setLocale(original);
+        }
+    }
+
+    private static List<JLabel> collectLabels(java.awt.Container container) {
+        List<JLabel> labels = new ArrayList<>();
+        for (java.awt.Component child : container.getComponents()) {
+            if (child instanceof JLabel label && label.isVisible() && label.getText() != null
+                    && !label.getText().isBlank() && label.getText().length() < 40) {
+                labels.add(label);
+            } else if (child instanceof java.awt.Container nested && !(child instanceof javax.swing.JTable)
+                    && !(child instanceof javax.swing.JTree) && !(child instanceof javax.swing.JComboBox)) {
+                labels.addAll(collectLabels(nested));
+            }
+        }
+        return labels;
+    }
+
+    private static void layoutRecursively(java.awt.Component component) {
+        component.doLayout();
+        if (component instanceof java.awt.Container container) {
+            for (java.awt.Component child : container.getComponents()) {
+                layoutRecursively(child);
+            }
+        }
+    }
+
     @Test public void picksStatementWhenCaretFollowsTerminatingSemicolon() {
         assertEquals(SqlPanel.statementAt("SELECT 1;", 9), "SELECT 1;");
         assertEquals(SqlPanel.statementAt("SELECT 1;  \n", 12), "SELECT 1;");

@@ -203,13 +203,13 @@ public class SqlPanel extends JPanel {
     private JPanel createWorkbench() {
         JPanel browser = new JPanel(new BorderLayout(0, 4));
         browser.setOpaque(false);
-        JPanel browserHeader = new JPanel(new BorderLayout(4, 0));
+        // Title on its own line: sharing the narrow navigator width with Refresh cut it to "Database Navigat...".
+        JPanel browserHeader = new JPanel(new MigLayout("insets 0, novisualpadding, wrap 1", "[]", "[]4[]"));
         browserHeader.setOpaque(false);
-        browserHeader.add(SqlWorkbench.sectionTitle(
-                SqlI18n.t("objects")), BorderLayout.CENTER);
+        browserHeader.add(SqlWorkbench.sectionTitle(SqlI18n.t("objects")));
         refreshObjectsButton = new JButton(SqlI18n.t("refresh"));
         refreshObjectsButton.addActionListener(event -> loadMetadata());
-        browserHeader.add(refreshObjectsButton, BorderLayout.EAST);
+        browserHeader.add(refreshObjectsButton);
         browser.add(browserHeader, BorderLayout.NORTH);
         objectTree.setRootVisible(false);
         objectTree.setShowsRootHandles(true);
