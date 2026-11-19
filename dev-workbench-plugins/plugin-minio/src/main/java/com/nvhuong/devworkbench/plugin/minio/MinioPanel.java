@@ -82,7 +82,10 @@ public final class MinioPanel extends JPanel {
     }
 
     private JPanel createConnectionBar() {
-        JPanel panel = new JPanel(new MigLayout("insets 0, novisualpadding, fillx, wrap 8", "[][grow,fill][][grow,fill][][grow,fill][][]", "[]6[]"));
+        // Four aligned columns: label | field | label | field. Labels never sit in a growing column, so the access key
+        // field gets the same share of width as the endpoint field.
+        JPanel panel = new JPanel(new MigLayout("insets 0, novisualpadding, fillx, wrap 4",
+                "[][grow,fill,sg field]12[][grow,fill,sg field]", "[]6[]6[]"));
         panel.setOpaque(false);
         profiles.setRenderer((list, value, index, selected, focus) ->
                 new javax.swing.DefaultListCellRenderer().getListCellRendererComponent(
@@ -98,8 +101,8 @@ public final class MinioPanel extends JPanel {
         saveProfileButton.addActionListener(event -> saveProfile());
         copyProfileButton.addActionListener(event -> copyProfile());
         deleteProfileButton.addActionListener(event -> deleteProfile());
-        panel.add(new JLabel(MinioI18n.t("profile"))); panel.add(profiles, "span 3,growx,wmin 120");
-        panel.add(newProfileButton, "split 4"); panel.add(saveProfileButton); panel.add(copyProfileButton);
+        panel.add(new JLabel(MinioI18n.t("profile"))); panel.add(profiles, "growx,wmin 120");
+        panel.add(newProfileButton, "span 2,split 4,growx 0"); panel.add(saveProfileButton); panel.add(copyProfileButton);
         panel.add(deleteProfileButton, "wrap");
         endpoint.putClientProperty(FlatClientProperties.PLACEHOLDER_TEXT, MinioI18n.t("endpoint_hint"));
         accessKey.putClientProperty(FlatClientProperties.PLACEHOLDER_TEXT, MinioI18n.t("access_hint"));
@@ -108,21 +111,22 @@ public final class MinioPanel extends JPanel {
         disconnectButton = new JButton(MinioI18n.t("disconnect"));
         connectButton.addActionListener(event -> connect());
         disconnectButton.addActionListener(event -> disconnect());
-        panel.add(new JLabel(MinioI18n.t("endpoint"))); panel.add(endpoint, "span 3,growx,wmin 160");
-        panel.add(new JLabel(MinioI18n.t("access_key"))); panel.add(accessKey, "span 3,growx,wmin 100,wrap");
-        panel.add(new JLabel(MinioI18n.t("secret_key"))); panel.add(secretKey, "span 3,growx,wmin 100");
-        panel.add(connectButton, "split 2"); panel.add(disconnectButton, "wrap");
+        panel.add(new JLabel(MinioI18n.t("endpoint"))); panel.add(endpoint, "growx,wmin 160");
+        panel.add(new JLabel(MinioI18n.t("access_key"))); panel.add(accessKey, "growx,wmin 100,wrap");
+        panel.add(new JLabel(MinioI18n.t("secret_key"))); panel.add(secretKey, "growx,wmin 100");
+        panel.add(connectButton, "span 2,split 2,growx 0"); panel.add(disconnectButton, "wrap");
         return panel;
     }
 
     private JPanel createBrowser() {
         JPanel left = new JPanel(new BorderLayout(0, 6)); left.setOpaque(false);
-        JPanel bucketHeader = new JPanel(new BorderLayout(4, 0)); bucketHeader.setOpaque(false);
-        bucketHeader.add(new JLabel(MinioI18n.t("buckets")), BorderLayout.CENTER);
+        // Title on its own line: next to the two actions it was cut to "Buc..." in the default divider width.
+        JPanel bucketHeader = new JPanel(new BorderLayout(0, 4)); bucketHeader.setOpaque(false);
+        bucketHeader.add(new JLabel(MinioI18n.t("buckets")), BorderLayout.NORTH);
         refreshButton = new JButton(MinioI18n.t("refresh")); refreshButton.addActionListener(event -> loadBuckets());
         createBucketButton = new JButton(MinioI18n.t("create_bucket")); createBucketButton.addActionListener(event -> createBucket());
-        JPanel bucketActions = new JPanel(new FlowLayout(FlowLayout.RIGHT, 4, 0)); bucketActions.setOpaque(false); bucketActions.add(createBucketButton); bucketActions.add(refreshButton);
-        bucketHeader.add(bucketActions, BorderLayout.EAST); left.add(bucketHeader, BorderLayout.NORTH);
+        JPanel bucketActions = new JPanel(new MigLayout("insets 0, novisualpadding, gap 4", "[][]", "[]")); bucketActions.setOpaque(false); bucketActions.add(createBucketButton); bucketActions.add(refreshButton);
+        bucketHeader.add(bucketActions, BorderLayout.CENTER); left.add(bucketHeader, BorderLayout.NORTH);
         buckets.setRootVisible(false); buckets.setShowsRootHandles(true);
         buckets.addTreeSelectionListener(event -> {
             Object node = buckets.getLastSelectedPathComponent();
