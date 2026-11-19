@@ -63,7 +63,7 @@ public class DevWorkbenchCollectionParser {
             if (devworkbenchRoot.containsKey("info") && devworkbenchRoot.containsKey("item")) {
                 // phân tích collection Tên và mô tả
                 JSONObject info = devworkbenchRoot.getJSONObject("info");
-                String collectionName = info.getStr("name", "DevWorkbench");
+                String collectionName = info.getStr("name", "Postman");
                 RequestGroup collectionGroup = new RequestGroup(collectionName);
 
                 // Phân tích mô tả bộ sưu tập
@@ -677,7 +677,8 @@ public class DevWorkbenchCollectionParser {
         // thông tin trạng thái
         savedResponse.setCode(respJson.getInt("code", 200));
         savedResponse.setStatus(respJson.getStr("status", "OK"));
-        savedResponse.setPreviewLanguage(respJson.getStr("_devworkbench_previewlanguage", "text"));
+        savedResponse.setPreviewLanguage(respJson.getStr("_postman_previewlanguage",
+                respJson.getStr("_devworkbench_previewlanguage", "text")));
 
         // tiêu đề phản hồi
         JSONArray headers = respJson.getJSONArray(KEY_HEADER);

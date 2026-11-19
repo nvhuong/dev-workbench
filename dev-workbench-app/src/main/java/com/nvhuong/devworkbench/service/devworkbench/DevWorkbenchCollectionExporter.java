@@ -48,7 +48,7 @@ public class DevWorkbenchCollectionExporter {
     public static JSONObject buildDevWorkbenchCollectionFromTreeNode(DefaultMutableTreeNode groupNode, String groupName) {
         JSONObject collection = new JSONObject();
         JSONObject info = new JSONObject();
-        info.put("_devworkbench_id", UUID.randomUUID().toString());
+        info.put("_postman_id", UUID.randomUUID().toString());
 
         RequestGroup rootGroup = CollectionTreeNodes.group(groupNode).orElse(null);
         if (rootGroup != null) {
@@ -56,7 +56,7 @@ public class DevWorkbenchCollectionExporter {
         }
 
         info.put("name", groupName);
-        info.put("schema", "https://schema.getdevworkbench.com/json/collection/v2.1.0/collection.json");
+        info.put("schema", "https://schema.getpostman.com/json/collection/v2.1.0/collection.json");
 
         // Xuất mô tả bộ sưu tập
         if (rootGroup != null && rootGroup.getDescription() != null && !rootGroup.getDescription().isEmpty()) {
@@ -442,7 +442,7 @@ public class DevWorkbenchCollectionExporter {
         respJson.put("code", savedResp.getCode());
 
         if (savedResp.getPreviewLanguage() != null && !savedResp.getPreviewLanguage().isEmpty()) {
-            respJson.put("_devworkbench_previewlanguage", savedResp.getPreviewLanguage());
+            respJson.put("_postman_previewlanguage", savedResp.getPreviewLanguage());
         }
 
         // tiêu đề phản hồi

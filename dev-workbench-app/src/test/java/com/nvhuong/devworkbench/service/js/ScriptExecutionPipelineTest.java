@@ -142,7 +142,7 @@ public class ScriptExecutionPipelineTest {
     }
 
     @Test
-    public void shouldSupportLegacyDevWorkbenchVariableAndResponseAliasesInPostScript() {
+    public void shouldSupportLegacyPostmanVariableAndResponseAliasesInPostScript() {
         PreparedRequest request = new PreparedRequest();
         ScriptExecutionPipeline pipeline = ScriptExecutionPipeline.builder()
                 .request(request)
@@ -158,7 +158,7 @@ public class ScriptExecutionPipelineTest {
                         pm.setEnvironmentVariable("legacyBearerToken", legacyResponse.BearerToken)
 
                         var response = JSON.parse(pm.response.text())
-                        devworkbench.setEnvironmentVariable("access_token", response.access_token)
+                        postman.setEnvironmentVariable("access_token", response.access_token)
 
                         var accountExpiration = response.accountExpiration;
 

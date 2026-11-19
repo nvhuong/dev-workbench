@@ -55,7 +55,7 @@ import java.util.Map;
  *   <li>pm.expect(value).to.be.below(max) - Khẳng định rằng một giá trị nhỏ hơn một giá trị được chỉ định</li>
  * </ul>
  *
- * @see <a href="https://learning.devworkbench.com/docs/writing-scripts/test-scripts/">DevWorkbench Test Scripts</a>
+ * @see <a href="https://learning.postman.com/docs/writing-scripts/test-scripts/">Postman Test Scripts</a>
  * @author nvhuong
  */
 public class ResponseAssertion {

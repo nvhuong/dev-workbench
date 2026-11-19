@@ -71,9 +71,9 @@ public class DevWorkbenchEnvironmentParser {
             }
         }
         obj.put("values", values);
-        obj.put("_devworkbench_variable_scope", "environment");
-        obj.put("_devworkbench_exported_at", java.time.ZonedDateTime.now().toString());
-        obj.put("_devworkbench_exported_using", "Dev Workbench");
+        obj.put("_postman_variable_scope", "environment");
+        obj.put("_postman_exported_at", java.time.ZonedDateTime.now().toString());
+        obj.put("_postman_exported_using", "Dev Workbench");
         return obj.toStringPretty();
     }
 }

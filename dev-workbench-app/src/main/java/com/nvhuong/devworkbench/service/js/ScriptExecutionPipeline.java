@@ -476,6 +476,8 @@ public class ScriptExecutionPipeline {
         Map<String, Object> bindings = new java.util.LinkedHashMap<>();
         bindings.put("pm", devworkbench);
         bindings.put("devworkbench", devworkbench);
+        // Legacy Postman API object (postman.setEnvironmentVariable...) used by imported Postman scripts.
+        bindings.put("postman", devworkbench);
         bindings.put("request", req);
         bindings.put("env", activeEnv);
         bindings.put("globals", devworkbench.globals);

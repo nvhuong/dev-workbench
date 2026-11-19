@@ -138,9 +138,9 @@ public class DevWorkbenchEnvironmentParserTest {
         cn.hutool.json.JSONObject obj = JSONUtil.parseObj(json);
         assertNotNull(obj.getStr("id"));
         assertEquals(obj.getStr("name"), "Môi trường thử nghiệm");
-        assertEquals(obj.getStr("_devworkbench_variable_scope"), "environment");
-        assertEquals(obj.getStr("_devworkbench_exported_using"), "Dev Workbench");
-        assertNotNull(obj.getStr("_devworkbench_exported_at"));
+        assertEquals(obj.getStr("_postman_variable_scope"), "environment");
+        assertEquals(obj.getStr("_postman_exported_using"), "Dev Workbench");
+        assertNotNull(obj.getStr("_postman_exported_at"));
 
         // Xác thực các biến
         cn.hutool.json.JSONArray values = obj.getJSONArray("values");

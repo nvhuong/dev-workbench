@@ -48,7 +48,7 @@ import java.util.*;
  * }</pre>
  *
  * @author nvhuong
- * @see <a href="https://learning.devworkbench.com/docs/writing-scripts/script-references/devworkbench-sandbox-api-reference/">DevWorkbench Scripting API Reference</a>
+ * @see <a href="https://learning.postman.com/docs/writing-scripts/script-references/postman-sandbox-api-reference/">Postman Scripting API Reference</a>
  */
 @Slf4j
 public class DevWorkbenchApiContext {

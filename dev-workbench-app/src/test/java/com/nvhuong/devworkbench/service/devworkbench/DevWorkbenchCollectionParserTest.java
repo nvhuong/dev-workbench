@@ -25,7 +25,7 @@ public class DevWorkbenchCollectionParserTest {
                 {
                     "info": {
                         "name": "Test Collection",
-                        "schema": "https://schema.getdevworkbench.com/json/collection/v2.1.0/collection.json"
+                        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
                     },
                     "item": [
                         {
@@ -56,7 +56,7 @@ public class DevWorkbenchCollectionParserTest {
                 {
                     "info": {
                         "name": "API Collection",
-                        "schema": "https://schema.getdevworkbench.com/json/collection/v2.1.0/collection.json"
+                        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
                     },
                     "item": [
                         {
@@ -479,7 +479,7 @@ public class DevWorkbenchCollectionParserTest {
         String json = """
                 {
                     "info": {
-                        "schema": "https://schema.getdevworkbench.com/json/collection/v2.1.0/collection.json"
+                        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
                     },
                     "item": [
                         {
@@ -498,7 +498,7 @@ public class DevWorkbenchCollectionParserTest {
 
         // Xác minh kết quả - Nên sử dụng tên mặc định
         assertNotNull(result);
-        assertEquals(result.getGroup().getName(), "DevWorkbench");
+        assertEquals(result.getGroup().getName(), "Postman");
     }
 
     @Test
@@ -507,7 +507,7 @@ public class DevWorkbenchCollectionParserTest {
                 {
                   "info": {
                     "name": "String Request Collection",
-                    "schema": "https://schema.getdevworkbench.com/collection/v2.1.0/collection.json"
+                    "schema": "https://schema.getpostman.com/collection/v2.1.0/collection.json"
                   },
                   "item": [
                     {
@@ -543,7 +543,7 @@ public class DevWorkbenchCollectionParserTest {
                 {
                   "info": {
                     "name": "Header String Collection",
-                    "schema": "https://schema.getdevworkbench.com/collection/v2.1.0/collection.json"
+                    "schema": "https://schema.getpostman.com/collection/v2.1.0/collection.json"
                   },
                   "item": [
                     {
@@ -591,7 +591,7 @@ public class DevWorkbenchCollectionParserTest {
                 {
                   "info": {
                     "name": "Advanced Body Collection",
-                    "schema": "https://schema.getdevworkbench.com/collection/v2.1.0/collection.json"
+                    "schema": "https://schema.getpostman.com/collection/v2.1.0/collection.json"
                   },
                   "item": [
                     {
@@ -646,13 +646,13 @@ public class DevWorkbenchCollectionParserTest {
     public void testParseDevWorkbenchCollection_ExamplesGetUniqueIds() {
         String json = """
                 {
-                    "info": {"name": "Examples", "schema": "https://schema.getdevworkbench.com/json/collection/v2.1.0/collection.json"},
+                    "info": {"name": "Examples", "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"},
                     "item": [{
                         "name": "Get User",
                         "request": {"method": "GET", "url": "https://api.example.com/user"},
                         "response": [
-                            {"name": "OK", "code": 200, "_devworkbench_previewlanguage": "json", "body": "{}"},
-                            {"name": "Not Found", "code": 404, "_devworkbench_previewlanguage": "json", "body": "{}"}
+                            {"name": "OK", "code": 200, "_postman_previewlanguage": "json", "body": "{}"},
+                            {"name": "Not Found", "code": 404, "_postman_previewlanguage": "json", "body": "{}"}
                         ]
                     }]
                 }
