@@ -517,6 +517,40 @@ public class SqlPanelTest {
         SwingUtilities.invokeAndWait(() -> invoke(panel, "disconnect"));
     }
 
+    /** Columns of CTEs ({@code WITH x AS (...)}) and FROM subqueries ({@code (SELECT ...) t}) are offered too. */
+    @Test public void completesColumnsOfCtesAndSubqueries() throws Exception {
+        SqlPanel panel = connectH2("sql_panel_cte_completion",
+                "CREATE TABLE IF NOT EXISTS PUBLIC.ORDERS(ID INT, CUSTOMER_NAME VARCHAR(20), TOTAL INT)\\;"
+                        + "CREATE TABLE IF NOT EXISTS PUBLIC.CUSTOMERS(ID INT, EMAIL VARCHAR(20))");
+        awaitScope(panel, "PUBLIC");
+        waitUntil(() -> completions(panel, "ORD", 3).contains("ORDERS"), () -> "tables not loaded");
+
+        String cte = "WITH big AS (SELECT o.ID, o.TOTAL AS AMOUNT, UPPER(o.CUSTOMER_NAME) cust FROM ORDERS o) "
+                + "SELECT b. FROM big b";
+        int cteCaret = cte.indexOf("b. ") + 2;
+        List<String> cteColumns = completions(panel, cte, cteCaret);
+        assertTrue(cteColumns.containsAll(List.of("b.ID", "b.AMOUNT", "b.cust")), cteColumns.toString());
+        assertFalse(cteColumns.contains("b.TOTAL"), cteColumns.toString());
+
+        String named = "WITH totals (CUSTOMER, SUM_TOTAL) AS (SELECT CUSTOMER_NAME, SUM(TOTAL) FROM ORDERS GROUP BY 1) "
+                + "SELECT totals.SU FROM totals";
+        List<String> explicit = completions(panel, named, named.indexOf(".SU ") + 3);
+        assertEquals(explicit, List.of("totals.SUM_TOTAL"), explicit.toString());
+
+        String subquery = "SELECT s. FROM (SELECT ID, TOTAL FROM ORDERS WHERE TOTAL > (SELECT 1)) s";
+        List<String> sub = completions(panel, subquery, "SELECT s.".length());
+        assertTrue(sub.containsAll(List.of("s.ID", "s.TOTAL")), sub.toString());
+
+        String star = "SELECT t. FROM (SELECT * FROM CUSTOMERS) AS t";
+        waitUntil(() -> completions(panel, star, "SELECT t.".length()).contains("t.EMAIL"),
+                () -> "star subquery: " + completions(panel, star, "SELECT t.".length()));
+
+        String plain = "WITH big AS (SELECT o.TOTAL AS AMOUNT FROM ORDERS o) SELECT AMO FROM big";
+        assertTrue(completions(panel, plain, plain.indexOf("AMO FROM") + 3).contains("AMOUNT"),
+                completions(panel, plain, plain.indexOf("AMO FROM") + 3).toString());
+        SwingUtilities.invokeAndWait(() -> invoke(panel, "disconnect"));
+    }
+
     @SuppressWarnings("unchecked")
     private static List<String> completions(SqlPanel panel, String text, int caret) {
         List<String>[] result = new List[1];

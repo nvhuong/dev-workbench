@@ -194,7 +194,8 @@ public class SqlPanel extends JPanel {
     private static final java.util.Set<String> NON_ALIAS_WORDS = java.util.Set.of("ON", "USING", "SET", "VALUES",
             "WHERE", "SELECT", "LEFT", "RIGHT", "INNER", "OUTER", "JOIN", "FULL", "CROSS", "NATURAL", "GROUP",
             "ORDER", "HAVING", "LIMIT", "OFFSET", "FETCH", "UNION", "INTERSECT", "MINUS", "EXCEPT", "CONNECT",
-            "START", "WINDOW", "FOR", "DEFAULT", "AS", "WITH", "RETURNING", "PARTITION");
+            "START", "WINDOW", "FOR", "DEFAULT", "AS", "WITH", "RETURNING", "PARTITION", "END", "NULL", "AND", "OR",
+            "THEN", "ELSE", "ASC", "DESC");
     private static final String IDENTIFIER = "(?:[\\p{L}_][\\p{L}\\p{N}_$#]*|\"[^\"]+\"|`[^`]+`|\\[[^\\]]+\\])";
     private static final java.util.regex.Pattern TABLE_ITEM = java.util.regex.Pattern.compile(
             "^\\s*(" + IDENTIFIER + "(?:\\s*\\.\\s*" + IDENTIFIER + ")*)(?:\\s+(?:AS\\s+)?(" + IDENTIFIER + "))?",
@@ -551,12 +552,24 @@ public class SqlPanel extends JPanel {
             List<org.fife.ui.autocomplete.Completion> base) {
         String entered = provider.getAlreadyEnteredText(comp);
         if (entered == null) entered = "";
-        Map<String, TableRef> statementTables = statementTables(statementAt(comp.getText(), comp.getCaretPosition()));
+        String statement = statementAt(comp.getText(), comp.getCaretPosition());
+        Map<String, TableRef> statementTables = statementTables(statement);
+        Map<String, List<String>> derived = derivedTables(statement, comp);
         int dot = entered.lastIndexOf('.');
         if (dot > 0) {
             String qualifier = entered.substring(0, dot);
             String partial = unquoteName(entered.substring(dot + 1));
             String key = unquoteName(qualifier);
+            List<String> derivedColumns = derivedColumnsFor(key, derived, statementTables);
+            if (derivedColumns != null) {
+                List<org.fife.ui.autocomplete.Completion> result = new ArrayList<>();
+                for (String column : derivedColumns) {
+                    if (column.toUpperCase(java.util.Locale.ROOT).startsWith(partial)) {
+                        result.add(completion(provider, qualifier + "." + column, RELEVANCE_STATEMENT_COLUMN, key));
+                    }
+                }
+                return result;
+            }
             TableRef table = statementTables.containsKey(key) ? statementTables.get(key) : knownTables.get(key);
             if (table != null) {
                 List<String> columns = columnsOrLoad(table, comp);
@@ -584,9 +597,17 @@ public class SqlPanel extends JPanel {
             }
             return base;
         }
-        if (entered.isEmpty() || statementTables.isEmpty()) return base;
+        if (entered.isEmpty() || (statementTables.isEmpty() && derived.isEmpty())) return base;
         String prefix = unquoteName(entered);
         java.util.Map<String, org.fife.ui.autocomplete.Completion> merged = new java.util.LinkedHashMap<>();
+        for (Map.Entry<String, List<String>> entry : derived.entrySet()) {
+            for (String column : entry.getValue()) {
+                if (column.toUpperCase(java.util.Locale.ROOT).startsWith(prefix)) {
+                    merged.putIfAbsent(column.toUpperCase(java.util.Locale.ROOT),
+                            completion(provider, column, RELEVANCE_STATEMENT_COLUMN, entry.getKey()));
+                }
+            }
+        }
         for (TableRef table : new java.util.LinkedHashSet<>(statementTables.values())) {
             List<String> columns = columnsOrLoad(table, comp);
             if (columns == null) continue;
@@ -601,6 +622,146 @@ public class SqlPanel extends JPanel {
             merged.putIfAbsent(completion.getReplacementText().toUpperCase(java.util.Locale.ROOT), completion);
         }
         return new ArrayList<>(merged.values());
+    }
+
+    private static final java.util.regex.Pattern CTE_START = java.util.regex.Pattern.compile(
+            "(?i)(?:\\bWITH\\s+(?:RECURSIVE\\s+)?|\\)\\s*,\\s*)(" + IDENTIFIER + ")\\s*(?:\\(([^()]*)\\))?\\s*AS\\s*\\(");
+    private static final java.util.regex.Pattern SUBQUERY_START = java.util.regex.Pattern.compile(
+            "(?i)\\b(?:FROM|JOIN)\\s*\\(\\s*(?=SELECT\\b|WITH\\b)");
+    private static final java.util.regex.Pattern AFTER_SUBQUERY_ALIAS = java.util.regex.Pattern.compile(
+            "^\\s*(?:AS\\s+)?(" + IDENTIFIER + ")", java.util.regex.Pattern.CASE_INSENSITIVE);
+
+    /** Columns of a CTE or subquery named by {@code key} (directly or through an alias of the CTE), else {@code null}. */
+    private static List<String> derivedColumnsFor(String key, Map<String, List<String>> derived,
+                                                  Map<String, TableRef> statementTables) {
+        if (derived.containsKey(key)) return derived.get(key);
+        TableRef aliased = statementTables.get(key);
+        return aliased == null ? null : derived.get(unquoteName(aliased.table()));
+    }
+
+    /**
+     * Virtual tables of a statement: {@code WITH name [(cols)] AS (...)} and {@code FROM (SELECT ...) alias}, keyed by
+     * upper-case name, with the columns of their select list ({@code *} expands to the inner tables' columns).
+     */
+    Map<String, List<String>> derivedTables(String statement, javax.swing.text.JTextComponent comp) {
+        Map<String, List<String>> derived = new java.util.LinkedHashMap<>();
+        if (statement == null || statement.isBlank()) return derived;
+        java.util.regex.Matcher cte = CTE_START.matcher(statement);
+        while (cte.find()) {
+            int open = cte.end() - 1;
+            int close = matchingParen(statement, open);
+            if (close < 0) continue;
+            List<String> columns;
+            if (cte.group(2) != null && !cte.group(2).isBlank()) {
+                columns = new ArrayList<>();
+                for (String column : cte.group(2).split(",")) {
+                    if (!column.isBlank()) columns.add(stripQuotes(column.trim()));
+                }
+            } else {
+                columns = selectListColumns(statement.substring(open + 1, close), comp);
+            }
+            derived.put(unquoteName(cte.group(1)), columns);
+        }
+        java.util.regex.Matcher subquery = SUBQUERY_START.matcher(statement);
+        while (subquery.find()) {
+            int open = statement.lastIndexOf('(', subquery.end());
+            int close = matchingParen(statement, open);
+            if (close < 0) continue;
+            java.util.regex.Matcher alias = AFTER_SUBQUERY_ALIAS.matcher(statement.substring(close + 1));
+            if (!alias.find() || NON_ALIAS_WORDS.contains(alias.group(1).toUpperCase(java.util.Locale.ROOT))) continue;
+            derived.put(unquoteName(alias.group(1)), selectListColumns(statement.substring(open + 1, close), comp));
+        }
+        return derived;
+    }
+
+    /** Output column names of a SELECT: aliases, bare/qualified column names; {@code *} expands known columns. */
+    private List<String> selectListColumns(String query, javax.swing.text.JTextComponent comp) {
+        List<String> columns = new ArrayList<>();
+        int select = indexOfTopLevelWord(query, "SELECT", 0);
+        if (select < 0) return columns;
+        int from = indexOfTopLevelWord(query, "FROM", select + 6);
+        String list = query.substring(select + 6, from < 0 ? query.length() : from).trim();
+        list = list.replaceFirst("(?i)^(?:DISTINCT|ALL)\\s+", "");
+        for (String item : splitTopLevel(list)) {
+            String expression = item.trim();
+            if (expression.isEmpty()) continue;
+            if (expression.equals("*") || expression.endsWith(".*")) {
+                Map<String, TableRef> inner = statementTables(query);
+                List<TableRef> tables = new ArrayList<>(new java.util.LinkedHashSet<>(inner.values()));
+                if (expression.endsWith(".*") && expression.length() > 2) {
+                    TableRef only = inner.get(unquoteName(expression.substring(0, expression.length() - 2)));
+                    tables = only == null ? List.of() : List.of(only);
+                }
+                for (TableRef table : tables) {
+                    List<String> tableColumns = columnsOrLoad(table, comp);
+                    if (tableColumns != null) tableColumns.forEach(column -> { if (!columns.contains(column)) columns.add(column); });
+                }
+                continue;
+            }
+            java.util.regex.Matcher alias = java.util.regex.Pattern.compile(
+                    "(?i)(?:\\bAS\\s+|[\\s)])(" + IDENTIFIER + ")\\s*$").matcher(expression);
+            if (alias.find() && !NON_ALIAS_WORDS.contains(alias.group(1).toUpperCase(java.util.Locale.ROOT))) {
+                columns.add(stripQuotes(alias.group(1)));
+                continue;
+            }
+            if (expression.matches(IDENTIFIER + "(?:\\s*\\.\\s*" + IDENTIFIER + ")*")) {
+                String[] parts = expression.split("\\.");
+                columns.add(stripQuotes(parts[parts.length - 1].trim()));
+            }
+        }
+        return columns;
+    }
+
+    private static int matchingParen(String text, int open) {
+        int depth = 0;
+        boolean quoted = false;
+        for (int i = open; i >= 0 && i < text.length(); i++) {
+            char ch = text.charAt(i);
+            if (ch == '\'') quoted = !quoted;
+            if (quoted) continue;
+            if (ch == '(') depth++;
+            if (ch == ')' && --depth == 0) return i;
+        }
+        return -1;
+    }
+
+    private static int indexOfTopLevelWord(String text, String word, int from) {
+        int depth = 0;
+        boolean quoted = false;
+        for (int i = Math.max(0, from); i < text.length(); i++) {
+            char ch = text.charAt(i);
+            if (ch == '\'') quoted = !quoted;
+            if (quoted) continue;
+            if (ch == '(') depth++;
+            else if (ch == ')') depth--;
+            else if (depth == 0 && text.regionMatches(true, i, word, 0, word.length())
+                    && (i == 0 || !Character.isLetterOrDigit(text.charAt(i - 1)) && text.charAt(i - 1) != '_')
+                    && (i + word.length() >= text.length() || !Character.isLetterOrDigit(text.charAt(i + word.length()))
+                    && text.charAt(i + word.length()) != '_')) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    private static List<String> splitTopLevel(String list) {
+        List<String> items = new ArrayList<>();
+        int depth = 0;
+        boolean quoted = false;
+        int start = 0;
+        for (int i = 0; i < list.length(); i++) {
+            char ch = list.charAt(i);
+            if (ch == '\'') quoted = !quoted;
+            if (quoted) continue;
+            if (ch == '(') depth++;
+            else if (ch == ')') depth--;
+            else if (ch == ',' && depth == 0) {
+                items.add(list.substring(start, i));
+                start = i + 1;
+            }
+        }
+        items.add(list.substring(start));
+        return items;
     }
 
     private static org.fife.ui.autocomplete.Completion completion(org.fife.ui.autocomplete.CompletionProvider provider,
