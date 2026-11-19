@@ -44,6 +44,7 @@ final class RemotePanel extends JPanel {
     private static final String PROFILE_FILE = "profiles.json";
     private static final String ACTIVE_PROFILE_FILE = "active-profile.txt";
     private static final Logger LOG = Logger.getLogger(RemotePanel.class.getName());
+    private static final int SIDEBAR_MIN_WIDTH = 320;
 
     private final PluginStorage storage;
     private final JComboBox<Profile> profiles = new JComboBox<>();
@@ -62,17 +63,27 @@ final class RemotePanel extends JPanel {
         this.storage = storage == null ? PluginStorage.noop() : storage;
         setLayout(new BorderLayout(8, 8));
         setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-        JPanel sidebar = createConnectionForm();
-        sidebar.setPreferredSize(new java.awt.Dimension(310, 520));
-        add(sidebar, BorderLayout.WEST);
+        add(createConnectionForm(), BorderLayout.WEST);
         add(sessions, BorderLayout.CENTER);
         loadProfiles(null);
     }
 
+    /**
+     * Labels sit above their fields so the form width does not depend on label length (Vietnamese labels are much
+     * longer than English ones). The sidebar takes its natural width, never less than {@link #SIDEBAR_MIN_WIDTH}.
+     */
     private JPanel createConnectionForm() {
-        JPanel form = new JPanel(new MigLayout("insets 12, fillx, wrap 2", "[pref!][grow,fill]", "[]8[]8[]8[]8[]8[]8[]8[]8[]8[]"));
+        JPanel form = new JPanel(new MigLayout("insets 12, fillx, wrap 1", "[grow,fill]", "")) {
+            @Override
+            public java.awt.Dimension getPreferredSize() {
+                java.awt.Dimension natural = super.getPreferredSize();
+                return new java.awt.Dimension(Math.max(SIDEBAR_MIN_WIDTH, natural.width), natural.height);
+            }
+        };
         form.setBorder(BorderFactory.createTitledBorder(RemoteI18n.t("hosts")));
 
+        // Keep long profile names from widening the sidebar; the popup still shows full names.
+        profiles.setPrototypeDisplayValue(new Profile("Production server", "", 22, "", "", false, ""));
         profiles.setRenderer((list, value, index, selected, focus) -> new javax.swing.DefaultListCellRenderer()
                 .getListCellRendererComponent(list, value == null ? "" : value.name(), index, selected, focus));
         profiles.addActionListener(event -> {
@@ -87,30 +98,40 @@ final class RemotePanel extends JPanel {
         delete.addActionListener(event -> deleteProfile());
         fresh.addActionListener(event -> clearForm());
 
-        form.add(new JLabel(RemoteI18n.t("profiles"))); form.add(profiles, "growx,wrap");
-        form.add(fresh, "span 2,split 4"); form.add(save); form.add(copy); form.add(delete, "wrap");
+        addField(form, RemoteI18n.t("profiles"), profiles);
+        // Four profile actions in a 2x2 grid: a single row does not fit the sidebar with localized labels.
+        JPanel profileActions = new JPanel(new MigLayout("insets 0, fillx, wrap 2", "[grow,fill,sg action][grow,fill,sg action]", "[]4[]"));
+        profileActions.setOpaque(false);
+        profileActions.add(fresh);
+        profileActions.add(save);
+        profileActions.add(copy);
+        profileActions.add(delete);
+        form.add(profileActions, "growx, gapbottom 8");
+
         addField(form, RemoteI18n.t("name"), name);
         addField(form, RemoteI18n.t("host"), host);
         addField(form, RemoteI18n.t("port"), port);
         addField(form, RemoteI18n.t("user"), user);
         addField(form, RemoteI18n.t("password"), password);
-        form.add(new JLabel(RemoteI18n.t("key"))); form.add(keyFile, "growx,wmin 100,wrap");
         JButton browse = new JButton(RemoteI18n.t("browse"));
         browse.addActionListener(event -> chooseKey());
-        form.add(browse, "span 2,align right,wrap");
-        form.add(savePassword, "span 2,wrap");
+        form.add(new JLabel(RemoteI18n.t("key")), "gaptop 4");
+        form.add(keyFile, "split 2, growx, wmin 0");
+        form.add(browse, "growx 0");
+        form.add(savePassword, "gaptop 4");
         JButton connect = new JButton(RemoteI18n.t("connect"));
         connect.addActionListener(event -> connect());
-        form.add(connect, "span 2,growx,h 34!,wrap");
+        form.add(connect, "growx, h 34!, gaptop 8");
         JLabel note = new JLabel(RemoteI18n.t("host_key"));
+        note.setToolTipText(note.getText());
         note.setFont(FontsUtil.getDefaultFontWithOffset(Font.PLAIN, -2));
-        form.add(note, "span 2,growx");
+        form.add(note, "growx, wmin 0");
         return form;
     }
 
     private void addField(JPanel panel, String label, Component field) {
-        panel.add(new JLabel(label));
-        panel.add(field, "growx,wmin 120,wrap");
+        panel.add(new JLabel(label), "gaptop 4");
+        panel.add(field, "growx, wmin 0");
     }
 
     private void chooseKey() {
