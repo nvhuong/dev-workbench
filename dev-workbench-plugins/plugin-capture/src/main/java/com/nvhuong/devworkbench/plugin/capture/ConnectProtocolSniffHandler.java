@@ -1,7 +1,11 @@
 package com.nvhuong.devworkbench.plugin.capture;
 
+import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.ByteBuf;
+import io.netty.channel.Channel;
+import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.channel.ChannelPipeline;
 import io.netty.handler.codec.ByteToMessageDecoder;
 import io.netty.handler.codec.http.HttpObjectAggregator;
@@ -42,6 +46,16 @@ final class ConnectProtocolSniffHandler extends ByteToMessageDecoder {
             return;
         }
         routed = true;
+        if (protocol == Protocol.UNKNOWN) {
+            // Neither TLS nor HTTP (SSH, database protocols, HTTP/2 prior knowledge...): a MITM TLS handshake can only
+            // fail, so relay the bytes untouched instead of dropping the connection.
+            Channel client = ctx.channel();
+            ByteBuf initialBytes = in.readRetainedSlice(in.readableBytes());
+            client.config().setAutoRead(false);
+            ctx.pipeline().remove(this);
+            openRawTunnel(client, initialBytes);
+            return;
+        }
         if (protocol == Protocol.HTTP) {
             installPlainHttpHandlers(ctx);
         } else {
@@ -49,6 +63,40 @@ final class ConnectProtocolSniffHandler extends ByteToMessageDecoder {
         }
         out.add(in.readRetainedSlice(in.readableBytes()));
         ctx.pipeline().remove(this);
+    }
+
+    private void openRawTunnel(Channel client, ByteBuf initialBytes) {
+        connectionContext.addDiagnostic(CaptureDiagnosticEvent.info(
+                CaptureDiagnosticPhase.BYPASS_TUNNEL,
+                CaptureDiagnosticRole.DEV_WORKBENCH_PROXY,
+                t(MessageKeys.TOOLBOX_CAPTURE_DIAGNOSTIC_CONNECT_RAW_TUNNEL),
+                authority,
+                ""
+        ));
+        new Bootstrap()
+                .group(client.eventLoop())
+                .channel(NioSocketChannel.class)
+                .handler(new DirectRelayHandler(client))
+                .connect(targetHost, targetPort)
+                .addListener((ChannelFutureListener) connectFuture -> {
+                    if (!connectFuture.isSuccess()) {
+                        log.warn("Raw CONNECT tunnel to {} failed: {}", authority, summarize(connectFuture.cause()));
+                        initialBytes.release();
+                        client.close();
+                        return;
+                    }
+                    Channel upstream = connectFuture.channel();
+                    client.pipeline().addLast("rawTunnelRelay", new DirectRelayHandler(upstream));
+                    upstream.writeAndFlush(initialBytes).addListener((ChannelFutureListener) writeFuture -> {
+                        if (!writeFuture.isSuccess()) {
+                            upstream.close();
+                            client.close();
+                            return;
+                        }
+                        client.config().setAutoRead(true);
+                        client.read();
+                    });
+                });
     }
 
     static Protocol detectProtocol(ByteBuf bytes) {

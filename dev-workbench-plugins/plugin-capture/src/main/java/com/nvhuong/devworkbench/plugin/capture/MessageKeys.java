@@ -225,6 +225,7 @@ public final class MessageKeys {
     public static final String TOOLBOX_CAPTURE_DIAGNOSTIC_CONNECT_REQUESTED = "toolbox.capture.diagnostic.event.connect_requested";
     public static final String TOOLBOX_CAPTURE_DIAGNOSTIC_CONNECT_PLAIN_HTTP = "toolbox.capture.diagnostic.event.connect_plain_http";
     public static final String TOOLBOX_CAPTURE_DIAGNOSTIC_BYPASS_FILTER = "toolbox.capture.diagnostic.event.bypass_filter";
+    public static final String TOOLBOX_CAPTURE_DIAGNOSTIC_CONNECT_RAW_TUNNEL = "toolbox.capture.diagnostic.event.connect_raw_tunnel";
     public static final String TOOLBOX_CAPTURE_DIAGNOSTIC_MITM_SELECTED = "toolbox.capture.diagnostic.event.mitm_selected";
     public static final String TOOLBOX_CAPTURE_DIAGNOSTIC_MITM_CERT_PREPARED = "toolbox.capture.diagnostic.event.mitm_cert_prepared";
     public static final String TOOLBOX_CAPTURE_DIAGNOSTIC_CONNECT_ACKED = "toolbox.capture.diagnostic.event.connect_acked";
