@@ -57,12 +57,22 @@ public final class ClientCertificateLoader {
         try (BufferedInputStream certInputStream = FileUtil.getInputStream(certificate.getCertPath());
              BufferedInputStream keyInputStream = FileUtil.getInputStream(certificate.getKeyPath())) {
 
-            X509ExtendedKeyManager keyManager = CharSequenceUtil.isNotBlank(certificate.getKeyPassword())
-                    ? PemUtils.loadIdentityMaterial(certInputStream, keyInputStream,
-                    certificate.getKeyPassword().toCharArray())
+            String keyPassword = pemKeyPassword(certificate);
+            X509ExtendedKeyManager keyManager = CharSequenceUtil.isNotBlank(keyPassword)
+                    ? PemUtils.loadIdentityMaterial(certInputStream, keyInputStream, keyPassword.toCharArray())
                     : PemUtils.loadIdentityMaterial(certInputStream, keyInputStream);
 
             return new KeyManager[]{keyManager};
         }
+    }
+
+    /**
+     * The settings dialog has a single password field that is stored as {@code certPassword} for every type,
+     * so it doubles as the PEM private-key passphrase unless an explicit {@code keyPassword} is configured.
+     */
+    private static String pemKeyPassword(ClientCertificate certificate) {
+        return CharSequenceUtil.isNotBlank(certificate.getKeyPassword())
+                ? certificate.getKeyPassword()
+                : certificate.getCertPassword();
     }
 }
