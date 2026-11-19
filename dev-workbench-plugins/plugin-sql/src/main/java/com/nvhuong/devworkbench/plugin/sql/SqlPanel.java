@@ -976,6 +976,11 @@ public class SqlPanel extends JPanel {
                 catalogMatch = child;
             }
         }
+        if (catalogMatch == null && root.getChildCount() == 1
+                && ((DefaultMutableTreeNode) root.getChildAt(0)).getUserObject() instanceof MetadataScope) {
+            // Schemaless databases (SQLite...) expose a single default scope; it is the one being worked in.
+            return (DefaultMutableTreeNode) root.getChildAt(0);
+        }
         return catalogMatch;
     }
 

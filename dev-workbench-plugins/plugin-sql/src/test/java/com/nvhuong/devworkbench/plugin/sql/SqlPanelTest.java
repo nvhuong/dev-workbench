@@ -209,6 +209,52 @@ public class SqlPanelTest {
         });
     }
 
+    /**
+     * Databases without schemas/catalogs (SQLite) get a single "default" scope; it must also be expanded after
+     * connecting so its tables are visible, and completion must offer them.
+     */
+    @Test public void schemalessDatabaseShowsTablesAfterConnecting() throws Exception {
+        java.nio.file.Path db = java.nio.file.Files.createTempFile("sql-panel-", ".sqlite");
+        try (java.sql.Connection setup = java.sql.DriverManager.getConnection("jdbc:sqlite:" + db);
+             java.sql.Statement statement = setup.createStatement()) {
+            statement.execute("CREATE TABLE invoices(id INTEGER PRIMARY KEY, total REAL)");
+        }
+        SqlPanel[] panel = new SqlPanel[1];
+        SwingUtilities.invokeAndWait(() -> {
+            panel[0] = new SqlPanel();
+            ((JTextField) field(panel[0], "jdbcUrl")).setText("jdbc:sqlite:" + db);
+            ((JTextField) field(panel[0], "driverClass")).setText("org.sqlite.JDBC");
+            invoke(panel[0], "connect");
+        });
+        JTree tree = (JTree) field(panel[0], "objectTree");
+        JLabel status = (JLabel) field(panel[0], "status");
+        DefaultMutableTreeNode[] scope = new DefaultMutableTreeNode[1];
+        waitUntil(() -> onEdt(() -> {
+            DefaultMutableTreeNode root = (DefaultMutableTreeNode) tree.getModel().getRoot();
+            scope[0] = root.getChildCount() == 1 ? (DefaultMutableTreeNode) root.getChildAt(0) : null;
+            return scope[0] != null && scope[0].getUserObject().getClass().getSimpleName().equals("MetadataScope");
+        }), () -> "scope not loaded; status=" + status.getText());
+        try {
+            waitUntil(() -> onEdt(() -> childEndingWith(scope[0], "invoices") != null),
+                    () -> "tables of a schemaless database were not shown; status=" + status.getText());
+            SwingUtilities.invokeAndWait(() -> {
+                assertTrue(tree.isExpanded(new javax.swing.tree.TreePath(scope[0].getPath())));
+                try {
+                    Method completions = SqlPanel.class.getDeclaredMethod("completionsFor", String.class);
+                    completions.setAccessible(true);
+                    @SuppressWarnings("unchecked")
+                    List<String> values = (List<String>) completions.invoke(panel[0], "inv");
+                    assertTrue(values.contains("invoices"), values.toString());
+                } catch (ReflectiveOperationException exception) {
+                    throw new IllegalStateException(exception);
+                }
+            });
+        } finally {
+            SwingUtilities.invokeAndWait(() -> invoke(panel[0], "disconnect"));
+            java.nio.file.Files.deleteIfExists(db);
+        }
+    }
+
     /** Unqualified SQL ran against the driver's default schema; users could not pick the schema to work in. */
     @Test public void selectedDefaultSchemaIsUsedForUnqualifiedSql() throws Exception {
         SqlPanel panel = connectH2("sql_panel_default_schema",
