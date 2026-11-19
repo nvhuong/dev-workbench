@@ -80,13 +80,13 @@ public class MockRouteEditorControllerFileInfoTest {
         omitted.setBodySize(4096);
         assertEquals(MockRouteEditorController.bodySizeAfterEdit(omitted, "", List.of(
                 new HttpHeader(true, "Content-Type", "application/pdf")), omitted.getFile()), 4096L, "Các tệp có nội dung chưa được lưu vẫn giữ nguyên kích thước ban đầu");
-        assertEquals(MockRouteEditorController.bodySizeAfterEdit(omitted, "tên", List.of(), null), 6L);
+        assertEquals(MockRouteEditorController.bodySizeAfterEdit(omitted, "名称", List.of(), null), 6L);
 
-        SavedResponse csv = fileExample(true, "tên");
+        SavedResponse csv = fileExample(true, "名称");
         csv.setHeaders(List.of(new HttpHeader(true, "Content-Type", "text/csv; charset=UTF-8")));
         csv.setBodySize(6);
-        assertEquals(MockRouteEditorController.bodySizeAfterEdit(csv, "tên", csv.getHeaders(), csv.getFile()), 6L);
-        assertEquals(MockRouteEditorController.bodySizeAfterEdit(csv, "tên", List.of(
+        assertEquals(MockRouteEditorController.bodySizeAfterEdit(csv, "名称", csv.getHeaders(), csv.getFile()), 6L);
+        assertEquals(MockRouteEditorController.bodySizeAfterEdit(csv, "名称", List.of(
                 new HttpHeader(true, "Content-Type", "text/csv; charset=GBK")), csv.getFile()), 4L, "Thay đổi charset Sau đó tính toán theo bộ ký tự mới");
     }
 

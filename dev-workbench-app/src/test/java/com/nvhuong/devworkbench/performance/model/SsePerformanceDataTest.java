@@ -27,9 +27,9 @@ public class SsePerformanceDataTest {
         ResourceBundle zh = ResourceBundle.getBundle("messages", Locale.forLanguageTag("vi"));
         assertEquals(zh.getString(MessageKeys.PERFORMANCE_SSE_READ_MODE), "Chế độ đọc");
         assertEquals(zh.getString(MessageKeys.PERFORMANCE_SSE_NODE_READ), "SSE Read");
-        assertEquals(zh.getString(MessageKeys.PERFORMANCE_MENU_ADD_SSE_READ), "Thêm vào SSE Read");
+        assertEquals(zh.getString(MessageKeys.PERFORMANCE_MENU_ADD_SSE_READ), "Thêm SSE Read");
         assertEquals(zh.getString(MessageKeys.PERFORMANCE_SSE_HINT_FIRST_MESSAGE),
-                "Nó kết thúc khi nhận được sự kiện đầu tiên; hết thời gian chờ không thành công.");
+                "Kết thúc khi nhận được sự kiện đầu tiên; quá thời gian chờ thì thất bại.");
 
         ResourceBundle en = ResourceBundle.getBundle("messages", Locale.ENGLISH);
         assertEquals(en.getString(MessageKeys.PERFORMANCE_SSE_READ_MODE), "Read");

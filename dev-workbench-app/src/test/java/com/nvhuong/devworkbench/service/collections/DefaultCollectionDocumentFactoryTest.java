@@ -25,7 +25,7 @@ public class DefaultCollectionDocumentFactoryTest {
                 .toList();
         assertTrue(groupNames.contains("Basic HTTP Examples"));
         assertTrue(groupNames.contains("Script Examples (EN)"));
-        assertTrue(groupNames.contains("Ví dụ về kịch bản (tiếng Trung)"));
+        assertTrue(groupNames.contains("Ví dụ tập lệnh (Tiếng Việt)"));
         assertTrue(document.getRoots().stream().allMatch(CollectionNode::isGroup));
         assertTrue(document.getRoots().stream().allMatch(root -> !root.getChildren().isEmpty()));
     }

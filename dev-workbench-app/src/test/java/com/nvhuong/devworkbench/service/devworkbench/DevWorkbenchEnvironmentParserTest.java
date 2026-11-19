@@ -139,7 +139,7 @@ public class DevWorkbenchEnvironmentParserTest {
         assertNotNull(obj.getStr("id"));
         assertEquals(obj.getStr("name"), "Môi trường thử nghiệm");
         assertEquals(obj.getStr("_devworkbench_variable_scope"), "environment");
-        assertEquals(obj.getStr("_devworkbench_exported_using"), "DevWorkbench");
+        assertEquals(obj.getStr("_devworkbench_exported_using"), "Dev Workbench");
         assertNotNull(obj.getStr("_devworkbench_exported_at"));
 
         // Xác thực các biến

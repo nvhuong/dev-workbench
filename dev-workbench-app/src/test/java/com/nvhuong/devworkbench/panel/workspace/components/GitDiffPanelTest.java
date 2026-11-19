@@ -78,7 +78,7 @@ public class GitDiffPanelTest {
         Path zhMessages = repositoryRoot().resolve("dev-workbench-app/src/main/resources/messages_vi.properties");
         Path enMessages = repositoryRoot().resolve("dev-workbench-app/src/main/resources/messages_en.properties");
 
-        assertTrue(Files.readString(zhMessages).contains("git.diff.select_file=Vui lòng chọn file bên trái để xem Diff"));
+        assertTrue(Files.readString(zhMessages).contains("git.diff.select_file=Vui lòng chọn tệp ở bên trái để xem Diff"));
         assertTrue(Files.readString(enMessages).contains("git.diff.select_file=Select a file on the left to view its diff"));
     }
 
@@ -89,8 +89,8 @@ public class GitDiffPanelTest {
 
         String zh = Files.readString(zhMessages);
         String en = Files.readString(enMessages);
-        assertTrue(zh.contains("git.diff.no_text_diff=Tệp đã được thay đổi nhưng văn bản không thể hiển thị Diff"));
-        assertTrue(zh.contains("Tệp quá lớn"));
+        assertTrue(zh.contains("git.diff.no_text_diff=Tệp đã thay đổi nhưng không thể hiển thị văn bản Diff"));
+        assertTrue(zh.contains("tệp quá lớn"));
         assertTrue(en.contains("git.diff.no_text_diff=This file has changes, but no textual diff can be shown"));
         assertTrue(en.contains("too large"));
     }

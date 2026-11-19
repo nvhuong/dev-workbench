@@ -63,7 +63,7 @@ public class GoRequestCodeGeneratorTest {
         request.setBodyType(RequestBodyTypes.BODY_TYPE_FORM_URLENCODED);
         request.setUrlencodedList(Arrays.asList(
                 new HttpFormUrlencoded(true, "tag", "a%20b"),
-                new HttpFormUrlencoded(true, "tag", "Tiếng Trung Quốc &"),
+                new HttpFormUrlencoded(true, "tag", "中文 &"),
                 new HttpFormUrlencoded(true, "empty", null),
                 new HttpFormUrlencoded(false, "disabled", "ignored"),
                 new HttpFormUrlencoded(true, "", "ignored"), null));

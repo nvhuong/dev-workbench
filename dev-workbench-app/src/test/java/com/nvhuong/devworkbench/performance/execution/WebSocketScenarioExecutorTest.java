@@ -125,7 +125,7 @@ public class WebSocketScenarioExecutorTest {
 
     @Test
     public void shouldRetainReadMessagePreviewByUtf8Bytes() {
-        assertEquals(WebSocketReceivedMessageBuffer.retainUtf8Prefix("Xin chàoabc", 4), "Bạn");
+        assertEquals(WebSocketReceivedMessageBuffer.retainUtf8Prefix("你好abc", 4), "你");
         assertEquals(WebSocketReceivedMessageBuffer.retainUtf8Prefix("🙂abc", 4), "🙂");
     }
 

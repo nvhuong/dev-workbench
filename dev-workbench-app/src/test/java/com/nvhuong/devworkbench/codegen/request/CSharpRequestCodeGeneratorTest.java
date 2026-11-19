@@ -233,7 +233,7 @@ public class CSharpRequestCodeGeneratorTest {
         String code = CSharpRequestCodeGenerator.generate(request);
 
         assertTrue(code.contains("var multipartContentType = MediaTypeHeaderValue.Parse(\"" + configured + "\");"), code);
-        assertTrue(code.contains("var multipartBoundary = multipart.Headers.ContentType!Parameters.First(parameter =>"), code);
+        assertTrue(code.contains("var multipartBoundary = multipart.Headers.ContentType!.Parameters.First(parameter =>"), code);
         assertTrue(code.contains("string.Equals(parameter.Name, \"boundary\", StringComparison.OrdinalIgnoreCase)).ToArray()"), code);
         assertTrue(code.contains("multipartContentType.Parameters.Remove(parameter);"), code);
         assertTrue(code.contains("multipartContentType.Parameters.Add(new NameValueHeaderValue(\"boundary\", multipartBoundary.Value));"), code);

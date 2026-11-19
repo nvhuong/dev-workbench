@@ -40,6 +40,6 @@ public class JsonUtilTest {
 
         String unescaped = JsonUtil.unescapeJsonStringContent(escaped);
 
-        assertEquals(unescaped, "Xin chào");
+        assertEquals(unescaped, "你好");
     }
 }

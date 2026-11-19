@@ -62,19 +62,19 @@ public class JsonModelGeneratorTest {
 
     @Test
     public void shouldKeepUnicodePropertyNamesWithoutDuplicates() {
-        String json = "{\"Tên\": \"Ada\", \"tuổi\": 18, \"Địa chỉ vận chuyển\": \"Shanghai\"}";
+        String json = "{\"名称\": \"Ada\", \"年龄\": 18, \"收货地址\": \"Shanghai\"}";
 
         String java = JsonModelGenerator.generate(json, "Response", JsonModelLanguage.JAVA);
         String csharp = JsonModelGenerator.generate(json, "Response", JsonModelLanguage.CSHARP);
         String typeScript = JsonModelGenerator.generate(json, "Response", JsonModelLanguage.TYPESCRIPT);
 
-        assertTrue(java.contains("private String Tên"));
-        assertTrue(java.contains("private Long tuổi"));
-        assertTrue(java.contains("private String Địa chỉ vận chuyển"));
-        assertTrue(java.contains("public String getTên()"));
+        assertTrue(java.contains("private String 名称"));
+        assertTrue(java.contains("private Long 年龄"));
+        assertTrue(java.contains("private String 收货地址"));
+        assertTrue(java.contains("public String get名称()"));
         assertTrue(!java.contains("private String value"));
-        assertTrue(csharp.contains("public string Tên"));
-        assertTrue(typeScript.contains("Tên: string"));
+        assertTrue(csharp.contains("public string 名称"));
+        assertTrue(typeScript.contains("名称: string"));
     }
 
     @Test
