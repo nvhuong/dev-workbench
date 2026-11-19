@@ -213,14 +213,14 @@ public final class MinioPanel extends JPanel {
 
     private void createBucket() {
         MinioClient active=client; if(active==null)return;
-        String name=JOptionPane.showInputDialog(this,MinioI18n.t("bucket_name")); if(name==null||name.isBlank())return;
+        String name=askText(MinioI18n.t("bucket_name"), ""); if(name==null||name.isBlank())return;
         runAction(MinioI18n.t("creating_bucket"), ()->{active.makeBucket(MakeBucketArgs.builder().bucket(name.trim()).build());return null;}, ignored->loadBuckets());
     }
 
     private void uploadObject() {
         MinioClient active=client; String bucket=selectedBucket; if(active==null||bucket==null)return;
         com.formdev.flatlaf.util.SystemFileChooser chooser=com.nvhuong.devworkbench.util.FileChooserUtil.createOpenFileChooser("minio.upload", MinioI18n.t("upload")); if(chooser.showOpenDialog(this)!=com.formdev.flatlaf.util.SystemFileChooser.APPROVE_OPTION)return;
-        Path file=chooser.getSelectedFile().toPath(); String object=JOptionPane.showInputDialog(this,MinioI18n.t("object_name"),file.getFileName().toString());
+        Path file=chooser.getSelectedFile().toPath(); String object=askText(MinioI18n.t("object_name"), file.getFileName().toString());
         if(object==null||object.isBlank())return;
         runAction(MinioI18n.t("uploading"),()->{long size=Files.size(file);String type=Files.probeContentType(file);try(InputStream input=Files.newInputStream(file)){active.putObject(PutObjectArgs.builder().bucket(bucket).object(object.trim()).stream(input,size,-1).contentType(type==null?"application/octet-stream":type).build());}return null;},ignored->loadObjects(bucket));
     }
@@ -276,7 +276,7 @@ public final class MinioPanel extends JPanel {
         ConnectionProfile selected = (ConnectionProfile) profiles.getSelectedItem();
         String profileName = selected == null ? "" : selected.name();
         if (profileName.isBlank()) {
-            profileName = JOptionPane.showInputDialog(this, MinioI18n.t("profile_name"), "MinIO - " + endpoint.getText().trim());
+            profileName = askText(MinioI18n.t("profile_name"), "MinIO - " + endpoint.getText().trim());
             if (profileName == null || profileName.isBlank()) return;
             profileName = profileName.trim();
             if (findProfile(profileName) != null) { setStatus(MinioI18n.t("profile_exists", profileName)); return; }
@@ -289,7 +289,7 @@ public final class MinioPanel extends JPanel {
     }
     private void copyProfile() {
         String base = profiles.getSelectedItem() instanceof ConnectionProfile selected ? selected.name() + " copy" : "MinIO profile copy";
-        String profileName = JOptionPane.showInputDialog(this, MinioI18n.t("profile_copy_prompt"), base);
+        String profileName = askText(MinioI18n.t("profile_copy_prompt"), base);
         if (profileName == null || profileName.isBlank()) return;
         profileName = profileName.trim();
         if (findProfile(profileName) != null) { setStatus(MinioI18n.t("profile_exists", profileName)); return; }
@@ -328,4 +328,10 @@ public final class MinioPanel extends JPanel {
     private static String decode(String value){return new String(Base64.getUrlDecoder().decode(value),java.nio.charset.StandardCharsets.UTF_8);}
     private record ConnectionProfile(String name,String endpoint,String accessKey,String secretKey){@Override public String toString(){return name;}}
     @FunctionalInterface private interface ThrowingSupplier<T>{T get()throws Exception;}
+
+    /** Single-line prompt through the shared TextInputDialog; {@code null} when cancelled. */
+    private String askText(String label, String initialValue) {
+        return com.nvhuong.devworkbench.common.component.dialog.TextInputDialog
+                .showRequired(this, "MinIO", label, initialValue, null).orElse(null);
+    }
 }

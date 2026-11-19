@@ -999,9 +999,8 @@ public class SqlPanel extends JPanel {
 
     /** Test seam for the name prompt; {@code null} when cancelled. */
     java.util.function.BiFunction<String, String, String> namePrompt = (message, suggested) -> {
-        Object value = JOptionPane.showInputDialog(this, message, SqlI18n.t("save_query"),
-                JOptionPane.PLAIN_MESSAGE, null, null, suggested);
-        return value == null ? null : value.toString();
+        return com.nvhuong.devworkbench.common.component.dialog.TextInputDialog
+                .showRequired(this, SqlI18n.t("save_query"), message, suggested, null).orElse(null);
     };
     /** Test seam for yes/no confirmations. */
     java.util.function.Predicate<String> confirmPrompt = message -> JOptionPane.showConfirmDialog(this, message,
@@ -1195,8 +1194,7 @@ public class SqlPanel extends JPanel {
         ConnectionProfile selected = (ConnectionProfile) profiles.getSelectedItem();
         String profileName = selected == null ? "" : selected.name();
         if (profileName.isBlank()) {
-            profileName = JOptionPane.showInputDialog(this, SqlI18n.t("profile_name"),
-                    "SQL - " + jdbcUrl.getText().trim());
+            profileName = askText(SqlI18n.t("profile_name"), "SQL - " + jdbcUrl.getText().trim());
             if (profileName == null || profileName.isBlank()) return;
             profileName = profileName.trim();
             if (findProfile(profileName) != null) {
@@ -1216,7 +1214,7 @@ public class SqlPanel extends JPanel {
     private void copyProfile() {
         String base = profiles.getSelectedItem() instanceof ConnectionProfile selected
                 ? selected.name() + " copy" : "SQL profile copy";
-        String profileName = JOptionPane.showInputDialog(this, SqlI18n.t("profile_copy_prompt"), base);
+        String profileName = askText(SqlI18n.t("profile_copy_prompt"), base);
         if (profileName == null || profileName.isBlank()) return;
         profileName = profileName.trim();
         if (findProfile(profileName) != null) {
@@ -2294,5 +2292,11 @@ public class SqlPanel extends JPanel {
         }
         String driverClass() { return driverClass; }
         @Override public String toString() { return label; }
+    }
+
+    /** Single-line prompt through the shared TextInputDialog; {@code null} when cancelled. */
+    private String askText(String label, String initialValue) {
+        return com.nvhuong.devworkbench.common.component.dialog.TextInputDialog
+                .showRequired(this, "SQL", label, initialValue, null).orElse(null);
     }
 }

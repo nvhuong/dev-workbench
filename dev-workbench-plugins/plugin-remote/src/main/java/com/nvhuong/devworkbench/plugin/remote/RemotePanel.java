@@ -328,7 +328,7 @@ final class RemotePanel extends JPanel {
     private void copyProfile() {
         Profile current = savedProfile(connectionProfile());
         String defaultName = current.name().isBlank() ? RemoteI18n.t("profile_copy_default") : current.name() + " copy";
-        String copyName = JOptionPane.showInputDialog(this, RemoteI18n.t("profile_copy_prompt"), defaultName);
+        String copyName = askText(RemoteI18n.t("profile_copy_prompt"), defaultName);
         if (copyName == null || copyName.isBlank()) return;
         String normalizedName = copyName.trim();
         List<Profile> all = readProfiles();
@@ -441,5 +441,11 @@ final class RemotePanel extends JPanel {
     private record Profile(String name, String host, int port, String user, String keyFile,
                            boolean savePassword, String password) {
         @Override public String toString() { return name + " — " + user + "@" + host + ":" + port; }
+    }
+
+    /** Single-line prompt through the shared TextInputDialog; {@code null} when cancelled. */
+    private String askText(String label, String initialValue) {
+        return com.nvhuong.devworkbench.common.component.dialog.TextInputDialog
+                .showRequired(this, RemoteI18n.t("hosts"), label, initialValue, null).orElse(null);
     }
 }
