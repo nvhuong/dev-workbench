@@ -70,16 +70,7 @@ public class ScriptRedisApi {
         List<String> args = parseArgs(argsObj);
         return switch (command) {
             case "GET" -> jedis.get(key);
-            case "SET" -> {
-                String value = valueObj == null ? "" : String.valueOf(valueObj).strip();
-                if (value.isBlank()) {
-                    value = String.join(" ", args).strip();
-                }
-                if (value.isBlank()) {
-                    throw new IllegalArgumentException("SET requires non-empty value");
-                }
-                yield jedis.set(key, value);
-            }
+            case "SET" -> jedis.set(key, RedisSetValues.forScript(ScriptOptionUtil.normalize(valueObj), args));
             case "DEL" -> jedis.del(key);
             case "EXISTS" -> jedis.exists(key);
             case "TYPE" -> jedis.type(key);

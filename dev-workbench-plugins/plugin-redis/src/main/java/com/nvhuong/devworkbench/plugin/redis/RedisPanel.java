@@ -1141,16 +1141,7 @@ public class RedisPanel extends JPanel {
         List<String> argList = parseArgs(args);
         return switch (command) {
             case CMD_GET -> jedis.get(key);
-            case CMD_SET -> {
-                String actualValue = value == null ? "" : value.strip();
-                if (actualValue.isBlank()) {
-                    actualValue = String.join(" ", argList).strip();
-                }
-                if (actualValue.isBlank()) {
-                    throw new IllegalArgumentException(t(MessageKeys.TOOLBOX_REDIS_ERR_SET_VALUE_REQUIRED));
-                }
-                yield jedis.set(key, actualValue);
-            }
+            case CMD_SET -> jedis.set(key, RedisSetValues.forPanel(value, argList));
             case CMD_DEL -> jedis.del(key);
             case CMD_EXISTS -> jedis.exists(key);
             case CMD_TYPE -> jedis.type(key);
