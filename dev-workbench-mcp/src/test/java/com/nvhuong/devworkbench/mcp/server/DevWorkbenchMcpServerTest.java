@@ -23,7 +23,7 @@ import static org.testng.Assert.assertNotNull;
 
 public class DevWorkbenchMcpServerTest {
 
-    @Test(timeOut = 15_000)
+    @Test(timeOut = 60_000)
     public void shouldCompleteStdioHandshakeAndToolCalls() throws Exception {
         PipedInputStream serverInput = new PipedInputStream();
         PipedOutputStream clientOutput = new PipedOutputStream(serverInput);
@@ -43,7 +43,8 @@ public class DevWorkbenchMcpServerTest {
             writer.println("""
                     {"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2025-11-25","capabilities":{},"clientInfo":{"name":"test","version":"1.0"}}}
                     """.trim());
-            JsonNode initialize = readJsonLine(reader);
+            // The first response includes server start-up (SDK, Jackson, tool schemas): 3.5-6 s on slow CI machines.
+            JsonNode initialize = readJsonLine(reader, 30);
             assertEquals(initialize.get("result").get("serverInfo").get("version").asText(), "1.2.3");
 
             writer.println("{\"jsonrpc\":\"2.0\",\"method\":\"notifications/initialized\"}");
@@ -88,13 +89,17 @@ public class DevWorkbenchMcpServerTest {
     }
 
     private static JsonNode readJsonLine(BufferedReader reader) throws Exception {
+        return readJsonLine(reader, 5);
+    }
+
+    private static JsonNode readJsonLine(BufferedReader reader, int timeoutSeconds) throws Exception {
         String line = CompletableFuture.supplyAsync(() -> {
             try {
                 return reader.readLine();
             } catch (Exception exception) {
                 throw new RuntimeException(exception);
             }
-        }).get(5, TimeUnit.SECONDS);
+        }).get(timeoutSeconds, TimeUnit.SECONDS);
         assertNotNull(line);
         return JsonUtil.readTree(line);
     }
