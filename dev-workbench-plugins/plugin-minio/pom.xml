@@ -2,7 +2,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent><groupId>com.nvhuong.tools</groupId><artifactId>dev-workbench-parent</artifactId><version>${revision}</version><relativePath>../../pom.xml</relativePath></parent>
-  <version>1.0.0</version><artifactId>dev-workbench-plugin-minio</artifactId><packaging>jar</packaging>
+  <version>1.1.0</version><artifactId>dev-workbench-plugin-minio</artifactId><packaging>jar</packaging>
   <properties><host.version>${revision}</host.version><plugin.id>plugin-minio</plugin.id><plugin.name>MinIO Plugin</plugin.name><plugin.entryClass>com.nvhuong.devworkbench.plugin.minio.MinioPlugin</plugin.entryClass><plugin.description>MinIO object storage browser for bucket and object management.</plugin.description><plugin.minAppVersion>6.0.14</plugin.minAppVersion><plugin.minPlatformVersion>${plugin.platform.version}</plugin.minPlatformVersion><plugin.maxPlatformVersion>${plugin.platform.version}</plugin.maxPlatformVersion></properties>
   <dependencies>
     <dependency><groupId>org.testng</groupId><artifactId>testng</artifactId><scope>test</scope></dependency>

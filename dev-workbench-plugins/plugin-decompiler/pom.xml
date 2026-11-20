@@ -15,7 +15,7 @@
         Các phiên bản plug-in được duy trì riêng biệt.
         Bản phát hành độc lập ban đầu từ 5.3.16 Ban đầu, nó sẽ chỉ được tăng riêng khi có thay đổi đối với plugin.
      -->
-    <version>6.0.9</version>
+    <version>6.1.0</version>
     <artifactId>dev-workbench-plugin-decompiler</artifactId>
     <packaging>jar</packaging>
 

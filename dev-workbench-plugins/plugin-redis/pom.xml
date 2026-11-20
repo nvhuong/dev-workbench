@@ -15,7 +15,7 @@
         Các phiên bản plug-in được duy trì riêng biệt.
         Bản phát hành độc lập ban đầu từ 5.3.16 Ban đầu, nó sẽ chỉ được tăng riêng khi có thay đổi đối với plugin.
      -->
-    <version>6.0.11</version>
+    <version>6.1.0</version>
     <artifactId>dev-workbench-plugin-redis</artifactId>
     <packaging>jar</packaging>
 
