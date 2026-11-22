@@ -533,7 +533,54 @@ public class SqlPanel extends JPanel {
         completion.setAutoCompleteSingleChoices(false);
         completion.install(editor);
         editor.putClientProperty(AUTO_COMPLETION_KEY, completion);
+        installWordInsertAutoActivation(editor, completion);
         return editor;
+    }
+
+    /** Opens the completion popup; replaced in tests (the real popup needs a focused, displayable editor). */
+    java.util.function.BiConsumer<RSyntaxTextArea, org.fife.ui.autocomplete.AutoCompletion> completionTrigger =
+            (editor, completion) -> {
+                if (editor.isFocusOwner() && !completion.isPopupVisible()) {
+                    completion.doCompletion();
+                }
+            };
+
+    /**
+     * The completion library auto-activates only when exactly one character is inserted. Vietnamese input methods
+     * (Telex/VNI on macOS, EVKey, OpenKey...) commit a whole word at once, so suggestions never appeared while typing.
+     * Treat a short word inserted in one go like typing: open the popup after the usual delay. Pasted SQL (with
+     * spaces or long) does not trigger it.
+     */
+    private void installWordInsertAutoActivation(RSyntaxTextArea editor,
+                                                 org.fife.ui.autocomplete.AutoCompletion completion) {
+        Timer timer = new Timer(300, event -> completionTrigger.accept(editor, completion));
+        timer.setRepeats(false);
+        editor.getDocument().addDocumentListener(new javax.swing.event.DocumentListener() {
+            @Override public void insertUpdate(javax.swing.event.DocumentEvent event) {
+                if (isCommittedWord(editor, event)) {
+                    timer.restart();
+                }
+            }
+
+            @Override public void removeUpdate(javax.swing.event.DocumentEvent event) { }
+
+            @Override public void changedUpdate(javax.swing.event.DocumentEvent event) { }
+        });
+    }
+
+    static boolean isCommittedWord(RSyntaxTextArea editor, javax.swing.event.DocumentEvent event) {
+        int length = event.getLength();
+        if (length < 2 || length > 40) return false; // 1 char: handled by the library; long: a paste
+        try {
+            String inserted = editor.getDocument().getText(event.getOffset(), length);
+            for (int i = 0; i < inserted.length(); i++) {
+                if (Character.isWhitespace(inserted.charAt(i))) return false;
+            }
+            char last = inserted.charAt(inserted.length() - 1);
+            return Character.isLetterOrDigit(last) || last == '_' || last == '.';
+        } catch (javax.swing.text.BadLocationException ignored) {
+            return false;
+        }
     }
 
     private org.fife.ui.autocomplete.DefaultCompletionProvider createCompletionProvider() {

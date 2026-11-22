@@ -776,6 +776,39 @@ public class SqlPanelTest {
         });
     }
 
+    /**
+     * Vietnamese input methods (Telex/VNI on macOS, EVKey, OpenKey...) commit a whole word in one insert; the
+     * completion library only auto-activates on single-character inserts, so suggestions never appeared while typing.
+     */
+    @Test public void wordsCommittedByInputMethodsOpenSuggestions() throws Exception {
+        SqlPanel[] panel = new SqlPanel[1];
+        java.util.concurrent.atomic.AtomicInteger triggers = new java.util.concurrent.atomic.AtomicInteger();
+        SwingUtilities.invokeAndWait(() -> {
+            panel[0] = new SqlPanel();
+            panel[0].completionTrigger = (editor, completion) -> triggers.incrementAndGet();
+        });
+        org.fife.ui.rsyntaxtextarea.RSyntaxTextArea editor = onEdtValue(() -> activeEditor(panel[0]));
+
+        SwingUtilities.invokeAndWait(() -> insert(editor, "sel"));
+        waitUntil(() -> triggers.get() == 1, () -> "a word inserted at once did not open suggestions");
+
+        SwingUtilities.invokeAndWait(() -> {
+            insert(editor, " ");
+            insert(editor, "SELECT * FROM orders WHERE id = 1"); // pasted SQL: no popup
+            insert(editor, "x");                                  // single key: handled by the library itself
+        });
+        Thread.sleep(700);
+        assertEquals(triggers.get(), 1, "only short words committed at once should trigger suggestions");
+    }
+
+    private static void insert(javax.swing.text.JTextComponent editor, String text) {
+        try {
+            editor.getDocument().insertString(editor.getDocument().getLength(), text, null);
+        } catch (javax.swing.text.BadLocationException e) {
+            throw new IllegalStateException(e);
+        }
+    }
+
     private static void runSql(SqlPanel panel, String sql) throws Exception {
         javax.swing.JButton execute = (javax.swing.JButton) field(panel, "executeButton");
         waitUntil(() -> onEdt(execute::isEnabled), () -> "busy before " + sql);
