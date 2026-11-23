@@ -37,4 +37,12 @@ public class McpServeOptionsTest {
         assertEquals(exception.getMessage(), "--max-response-bytes must be between 1024 and 10485760");
     }
 
+
+    @Test
+    public void writeToolsAreOffUnlessAllowWritesIsGiven() {
+        assertEquals(McpServeOptions.parse(new String[]{"mcp", "serve"}, 2).allowWrites(), false);
+        assertEquals(McpServeOptions.parse(new String[]{"mcp", "serve", "--allow-writes"}, 2).allowWrites(), true);
+        assertEquals(McpServeOptions.parse(new String[]{"mcp", "serve", "/tmp/ws", "--allow-writes",
+                "--max-response-bytes", "2048"}, 2).allowWrites(), true);
+    }
 }

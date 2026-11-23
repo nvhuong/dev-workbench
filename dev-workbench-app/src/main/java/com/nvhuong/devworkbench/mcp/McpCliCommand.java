@@ -77,6 +77,7 @@ public class McpCliCommand {
         out.println("Usage: mcp serve [workspace-directory] [options]");
         out.println("Options:");
         out.println("      --max-response-bytes <n>    Total response-body bytes per tool call (default 65536)");
+        out.println("      --allow-writes              Also expose plugin tools that change data (SQL writes, Redis writes, Kafka send)");
         out.println("  -h, --help                      Show this help");
         out.println("Without a directory, all workspaces registered in Dev Workbench are authorized.");
         out.println("Only newline-delimited MCP JSON-RPC is written to stdout; diagnostics use stderr.");

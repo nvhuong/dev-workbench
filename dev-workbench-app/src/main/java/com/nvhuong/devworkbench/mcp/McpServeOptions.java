@@ -1,13 +1,22 @@
 package com.nvhuong.devworkbench.mcp;
 
-record McpServeOptions(String workspace, int maxResponseBytes) {
+/**
+ * @param allowWrites expose plugin tools that change external state (SQL writes, Redis writes, Kafka sends); off by
+ *                    default so an MCP client can only read unless the user opts in with {@code --allow-writes}
+ */
+record McpServeOptions(String workspace, int maxResponseBytes, boolean allowWrites) {
     static final int DEFAULT_MAX_RESPONSE_BYTES = 64 * 1024;
     static final int MIN_MAX_RESPONSE_BYTES = 1024;
     static final int MAX_MAX_RESPONSE_BYTES = 10 * 1024 * 1024;
 
+    McpServeOptions(String workspace, int maxResponseBytes) {
+        this(workspace, maxResponseBytes, false);
+    }
+
     static McpServeOptions parse(String[] args, int startIndex) {
         String workspace = null;
         int maxResponseBytes = DEFAULT_MAX_RESPONSE_BYTES;
+        boolean allowWrites = false;
         int index = startIndex;
         if (index < args.length && !args[index].startsWith("-")) {
             workspace = args[index++];
@@ -18,10 +27,11 @@ record McpServeOptions(String workspace, int maxResponseBytes) {
                 case "--max-response-bytes" -> maxResponseBytes = parseResponseLimit(
                         requiredValue(args, index++, argument)
                 );
+                case "--allow-writes" -> allowWrites = true;
                 default -> throw new IllegalArgumentException("Unknown option: " + argument);
             }
         }
-        return new McpServeOptions(workspace, maxResponseBytes);
+        return new McpServeOptions(workspace, maxResponseBytes, allowWrites);
     }
 
     static int parseResponseLimit(String value) {

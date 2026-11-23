@@ -92,6 +92,13 @@ public interface PluginContext {
      * Ví dụ {@code redis-messages}。
      * </p>
      */
+    /**
+     * Exposes a tool through the DevWorkbench MCP server. Hosts without MCP support ignore it.
+     */
+    default void registerMcpTool(McpToolContribution tool) {
+        // Runtime implementations add this to the MCP server's tool list.
+    }
+
     default void registerI18nBundle(String bundleName) {
         // Runtime implementations can hook this into the shared i18n registry.
     }

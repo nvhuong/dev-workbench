@@ -22,6 +22,21 @@ final class McpToolSpecifications {
     }
 
     static List<McpServerFeatures.SyncToolSpecification> create(DevWorkbenchMcpBackend backend) {
+        List<McpServerFeatures.SyncToolSpecification> tools = new java.util.ArrayList<>(builtInTools(backend));
+        java.util.Set<String> names = new java.util.HashSet<>(TOOL_NAMES);
+        for (McpExtraTool extra : backend.extraTools()) {
+            if (extra == null || !names.add(extra.name())) {
+                continue; // never shadow a built-in or an earlier tool
+            }
+            ToolHandler handler = extra.handler()::call;
+            tools.add(extra.readOnly()
+                    ? readOnlyTool(extra.name(), extra.title(), extra.description(), extra.inputSchema(), handler, backend)
+                    : actionTool(extra.name(), extra.title(), extra.description(), extra.inputSchema(), handler, backend));
+        }
+        return List.copyOf(tools);
+    }
+
+    private static List<McpServerFeatures.SyncToolSpecification> builtInTools(DevWorkbenchMcpBackend backend) {
         return List.of(
                 readOnlyTool(
                         "list_workspaces",

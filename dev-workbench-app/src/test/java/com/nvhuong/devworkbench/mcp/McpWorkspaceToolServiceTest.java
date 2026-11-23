@@ -388,4 +388,32 @@ public class McpWorkspaceToolServiceTest {
         request.setBodyType(RequestBodyTypes.BODY_TYPE_NONE);
         return request;
     }
+
+    @Test
+    public void pluginToolsAreExposedWithWriteToolsGatedAndResultsCapped() throws Exception {
+        Path workspace = Files.createTempDirectory("dev-workbench-mcp-plugin-tools-");
+        writeWorkspace(workspace, "collection-1", "Users API", request("request-1", "List users", "https://example.test/u"));
+        McpWorkspaceToolService service = new McpWorkspaceToolService(new McpServeOptions(workspace.toString(), 1024));
+        Map<String, Object> schema = Map.of("type", "object");
+        service.pluginTools = () -> List.of(
+                new com.nvhuong.devworkbench.plugin.api.McpToolContribution("sql_query", "Query", "read", schema, true,
+                        arguments -> Map.of("rows", List.of(Map.of("id", 1)))),
+                new com.nvhuong.devworkbench.plugin.api.McpToolContribution("sql_execute", "Execute", "write", schema, false,
+                        arguments -> Map.of("updated", 1)),
+                new com.nvhuong.devworkbench.plugin.api.McpToolContribution("big_read", "Big", "large", schema, true,
+                        arguments -> Map.of("text", "x".repeat(5000))));
+
+        List<String> readOnly = service.extraTools().stream().map(com.nvhuong.devworkbench.mcp.server.McpExtraTool::name).toList();
+        assertEquals(readOnly, List.of("sql_query", "big_read"), "write tools need --allow-writes");
+
+        service.setAllowWrites(true);
+        assertTrue(service.extraTools().stream().anyMatch(tool -> tool.name().equals("sql_execute") && !tool.readOnly()));
+
+        com.nvhuong.devworkbench.mcp.server.McpExtraTool big = service.extraTools().stream()
+                .filter(tool -> tool.name().equals("big_read")).findFirst().orElseThrow();
+        Map<String, Object> capped = big.handler().call(Map.of());
+        assertEquals(capped.get("truncated"), true);
+        assertEquals(capped.get("maxResponseBytes"), 1024);
+        assertEquals(service.extraTools().get(0).handler().call(Map.of()), Map.of("rows", List.of(Map.of("id", 1))));
+    }
 }

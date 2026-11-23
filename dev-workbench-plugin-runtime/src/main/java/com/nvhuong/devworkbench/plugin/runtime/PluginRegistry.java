@@ -33,6 +33,7 @@ public class PluginRegistry {
     private final Map<Class<?>, ServiceRegistration> services = new ConcurrentHashMap<>();
     // Toolbox / Tự động hoàn thành / Snippet Tất cả UI Điểm có thể mở rộng bên
     private final List<ToolboxContribution> toolboxContributions = new CopyOnWriteArrayList<>();
+    private final List<com.nvhuong.devworkbench.plugin.api.McpToolContribution> mcpTools = new CopyOnWriteArrayList<>();
     private final List<PluginMenuContribution> menuContributions = new CopyOnWriteArrayList<>();
     private final List<PluginSettingsContribution> settingsContributions = new CopyOnWriteArrayList<>();
     private final List<PluginUpdateMetadataContribution> updateMetadataContributions = new CopyOnWriteArrayList<>();
@@ -116,6 +117,17 @@ public class PluginRegistry {
         return new ArrayList<>(toolboxContributions);
     }
 
+    /** Registers an MCP tool; a second tool with the same name is ignored (first plugin wins). */
+    public void registerMcpTool(com.nvhuong.devworkbench.plugin.api.McpToolContribution tool) {
+        if (tool != null && mcpTools.stream().noneMatch(existing -> existing.name().equals(tool.name()))) {
+            mcpTools.add(tool);
+        }
+    }
+
+    public List<com.nvhuong.devworkbench.plugin.api.McpToolContribution> getMcpTools() {
+        return new ArrayList<>(mcpTools);
+    }
+
     public void registerMenuContribution(PluginMenuContribution contribution) {
         registerMenuContribution(null, contribution);
     }
@@ -197,6 +209,7 @@ public class PluginRegistry {
         scriptApiFactories.clear();
         services.clear();
         toolboxContributions.clear();
+        mcpTools.clear();
         menuContributions.clear();
         settingsContributions.clear();
         updateMetadataContributions.clear();

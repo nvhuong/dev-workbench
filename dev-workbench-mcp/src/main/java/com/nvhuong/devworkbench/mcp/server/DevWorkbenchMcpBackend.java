@@ -20,6 +20,11 @@ public interface DevWorkbenchMcpBackend {
 
     Map<String, Object> runCollection(Map<String, Object> arguments) throws Exception;
 
+    /** Additional tools (e.g. contributed by plugins), served after the built-in workspace tools. */
+    default java.util.List<McpExtraTool> extraTools() {
+        return java.util.List.of();
+    }
+
     default String sanitizeError(Throwable failure) {
         if (failure == null) {
             return "unknown error";

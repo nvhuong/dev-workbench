@@ -50,7 +50,19 @@ public class DevWorkbenchMcpServerTest {
             writer.println("{\"jsonrpc\":\"2.0\",\"method\":\"notifications/initialized\"}");
             writer.println("{\"jsonrpc\":\"2.0\",\"id\":2,\"method\":\"tools/list\",\"params\":{}}");
             JsonNode tools = readJsonLine(reader);
-            assertEquals(tools.get("result").get("tools").size(), McpToolSpecifications.TOOL_NAMES.size());
+            assertEquals(tools.get("result").get("tools").size(), McpToolSpecifications.TOOL_NAMES.size() + 2,
+                    "built-in tools plus the extra tool; a duplicate name must be dropped");
+            JsonNode extraTool = null;
+            for (JsonNode tool : tools.get("result").get("tools")) {
+                if ("echo_extra".equals(tool.get("name").asText())) extraTool = tool;
+            }
+            assertNotNull(extraTool, "extra tool not listed");
+            assertEquals(extraTool.get("annotations").get("readOnlyHint").asBoolean(), true);
+
+            writer.println("{\"jsonrpc\":\"2.0\",\"id\":5,\"method\":\"tools/call\",\"params\":{\"name\":\"echo_extra\",\"arguments\":{\"text\":\"hi\"}}}");
+            JsonNode echoed = readJsonLine(reader);
+            assertFalse(echoed.get("result").get("isError").asBoolean());
+            assertEquals(echoed.get("result").get("structuredContent").get("echo").asText(), "hi");
 
             writer.println("{\"jsonrpc\":\"2.0\",\"id\":3,\"method\":\"tools/call\",\"params\":{\"name\":\"list_workspaces\",\"arguments\":{}}}");
             JsonNode workspaces = readJsonLine(reader);
@@ -105,6 +117,19 @@ public class DevWorkbenchMcpServerTest {
     }
 
     private static final class FakeBackend implements DevWorkbenchMcpBackend {
+        @Override
+        public List<McpExtraTool> extraTools() {
+            Map<String, Object> schema = Map.of("type", "object", "properties",
+                    Map.of("text", Map.of("type", "string")));
+            return List.of(
+                    new McpExtraTool("echo_extra", "Echo", "Echoes text", schema, true,
+                            arguments -> Map.of("echo", arguments.get("text"))),
+                    new McpExtraTool("list_workspaces", "Shadow", "must be ignored", schema, true,
+                            arguments -> Map.of()),
+                    new McpExtraTool("write_extra", "Write", "A write tool", schema, false,
+                            arguments -> Map.of("ok", true)));
+        }
+
         @Override
         public Map<String, Object> listWorkspaces() {
             return Map.of(

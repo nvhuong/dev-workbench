@@ -39,6 +39,10 @@ final class McpWorkspaceToolService implements DevWorkbenchMcpBackend {
     private final int maxResponseBytes;
     private final WorkspaceRunExecutor runExecutor;
     private final ReentrantLock executionLock = new ReentrantLock();
+    private boolean allowWrites;
+    /** Plugin-contributed MCP tools; replaced in tests. */
+    java.util.function.Supplier<List<com.nvhuong.devworkbench.plugin.api.McpToolContribution>> pluginTools =
+            McpWorkspaceToolService::registeredPluginTools;
 
     McpWorkspaceToolService(McpServeOptions options) {
         this(options, new WorkspaceRunExecutor());
@@ -46,6 +50,53 @@ final class McpWorkspaceToolService implements DevWorkbenchMcpBackend {
 
     McpWorkspaceToolService(McpServeOptions options, WorkspaceRunExecutor runExecutor) {
         this(new McpWorkspaceCatalog(options), options.maxResponseBytes(), runExecutor);
+        this.allowWrites = options.allowWrites();
+    }
+
+    void setAllowWrites(boolean allowWrites) {
+        this.allowWrites = allowWrites;
+    }
+
+    private static List<com.nvhuong.devworkbench.plugin.api.McpToolContribution> registeredPluginTools() {
+        try {
+            return com.nvhuong.devworkbench.plugin.runtime.PluginRuntime.getRegistry().getMcpTools();
+        } catch (RuntimeException | LinkageError unavailable) {
+            return List.of();
+        }
+    }
+
+    /**
+     * Plugin tools (SQL, Redis, Kafka, MinIO, decompiler...). Write tools are only listed with --allow-writes; every
+     * result is capped at --max-response-bytes like the workspace tools.
+     */
+    @Override
+    public List<com.nvhuong.devworkbench.mcp.server.McpExtraTool> extraTools() {
+        List<com.nvhuong.devworkbench.mcp.server.McpExtraTool> tools = new ArrayList<>();
+        for (com.nvhuong.devworkbench.plugin.api.McpToolContribution contribution : pluginTools.get()) {
+            if (contribution == null || (!contribution.readOnly() && !allowWrites)) {
+                continue;
+            }
+            tools.add(new com.nvhuong.devworkbench.mcp.server.McpExtraTool(contribution.name(), contribution.title(),
+                    contribution.description(), contribution.inputSchema(), contribution.readOnly(),
+                    arguments -> limitResponse(contribution.handler().call(arguments))));
+        }
+        return tools;
+    }
+
+    private Map<String, Object> limitResponse(Map<String, Object> result) {
+        Map<String, Object> safe = result == null ? Map.of() : result;
+        String json = com.nvhuong.devworkbench.util.JsonUtil.toJsonStr(safe);
+        byte[] bytes = json.getBytes(java.nio.charset.StandardCharsets.UTF_8);
+        if (bytes.length <= maxResponseBytes) {
+            return safe;
+        }
+        Map<String, Object> truncated = new java.util.LinkedHashMap<>();
+        truncated.put("truncated", true);
+        truncated.put("maxResponseBytes", maxResponseBytes);
+        truncated.put("totalBytes", bytes.length);
+        truncated.put("partialJson", new String(bytes, 0, maxResponseBytes, java.nio.charset.StandardCharsets.UTF_8));
+        truncated.put("hint", "Narrow the request (limit, filter) or raise --max-response-bytes.");
+        return truncated;
     }
 
     McpWorkspaceToolService(McpWorkspaceCatalog workspaceCatalog,

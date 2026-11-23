@@ -134,4 +134,19 @@ public class PluginRegistryTest {
         assertSame(registry.getUpdateMetadataContributions().get(0), contribution);
         assertEquals(registry.getUpdateMetadataContributions().get(0).loadMetadata().get(0).pluginId(), "plugin-kafka");
     }
+
+    @org.testng.annotations.Test
+    public void mcpToolsKeepTheFirstRegistrationPerName() {
+        PluginRegistry registry = new PluginRegistry();
+        java.util.Map<String, Object> schema = java.util.Map.of("type", "object");
+        registry.registerMcpTool(new com.nvhuong.devworkbench.plugin.api.McpToolContribution(
+                "sql_query", "SQL", "first", schema, true, arguments -> java.util.Map.of()));
+        registry.registerMcpTool(new com.nvhuong.devworkbench.plugin.api.McpToolContribution(
+                "sql_query", "SQL", "second", schema, true, arguments -> java.util.Map.of()));
+        registry.registerMcpTool(null);
+        org.testng.Assert.assertEquals(registry.getMcpTools().size(), 1);
+        org.testng.Assert.assertEquals(registry.getMcpTools().get(0).description(), "first");
+        registry.clear();
+        org.testng.Assert.assertTrue(registry.getMcpTools().isEmpty());
+    }
 }

@@ -179,6 +179,11 @@ class PluginLoader {
         }
 
         @Override
+        public void registerMcpTool(com.nvhuong.devworkbench.plugin.api.McpToolContribution tool) {
+            deferOrApply(() -> registry.registerMcpTool(tool));
+        }
+
+        @Override
         public void registerSettingsContribution(com.nvhuong.devworkbench.plugin.api.PluginSettingsContribution contribution) {
             deferOrApply(() -> registry.registerSettingsContribution(
                     descriptor.id(),
