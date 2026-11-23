@@ -476,6 +476,7 @@ public class WebSocketStagePropertyPanel extends JPanel {
         ac.setShowDescWindow(true);
         ac.setParameterAssistanceEnabled(false);
         ac.install(area);
+        com.nvhuong.devworkbench.common.component.editor.InputMethodAutoActivation.install(area, ac);
         return ac;
     }
 

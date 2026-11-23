@@ -51,6 +51,7 @@ final class MockCodeEditorSupport {
         completion.setAutoActivationDelay(180);
         completion.setParameterAssistanceEnabled(true);
         completion.install(editor);
+        com.nvhuong.devworkbench.common.component.editor.InputMethodAutoActivation.install(editor, completion);
         editor.setToolTipText(I18nUtil.getMessage(MessageKeys.MOCK_SERVER_CODE_MOCK_COMPLETION_HINT));
         editor.putClientProperty(COMPLETION_INSTALLED, Boolean.TRUE);
     }

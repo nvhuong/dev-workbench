@@ -394,6 +394,8 @@ public class ScriptPanel extends JPanel {
         ac.setShowDescWindow(true);
         ac.setParameterAssistanceEnabled(false);
         ac.install(area);
+        // Vietnamese/IME input commits words at once; AutoCompletion alone only reacts to single characters.
+        com.nvhuong.devworkbench.common.component.editor.InputMethodAutoActivation.install(area, ac);
         return ac;
     }
 }
