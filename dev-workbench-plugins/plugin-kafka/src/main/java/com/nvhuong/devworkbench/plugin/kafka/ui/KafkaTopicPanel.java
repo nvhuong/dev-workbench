@@ -166,24 +166,48 @@ public class KafkaTopicPanel extends JPanel {
             FontMetrics fm = g2.getFontMetrics();
             int maxWidth = Math.max(40, component.getWidth() - 24);
             int y = 16 + fm.getAscent();
-            StringBuilder line = new StringBuilder();
-            for (int i = 0; i < text.length(); i++) {
-                char ch = text.charAt(i);
-                if (ch != '\n' && fm.stringWidth(line.toString() + ch) <= maxWidth) {
-                    line.append(ch);
-                    continue;
-                }
-                drawCentered(g2, fm, line.toString(), component.getWidth(), y);
+            for (String line : wrapLines(text, fm, maxWidth)) {
+                drawCentered(g2, fm, line, component.getWidth(), y);
                 y += fm.getHeight();
-                line.setLength(0);
-                if (ch != '\n') {
-                    line.append(ch);
-                }
             }
-            drawCentered(g2, fm, line.toString(), component.getWidth(), y);
         } finally {
             g2.dispose();
         }
+    }
+
+    /**
+     * Wraps at spaces (the old per-character wrapping split Vietnamese/English words mid-word); only a single word
+     * wider than {@code maxWidth} is broken by character. Explicit line breaks are kept.
+     */
+    static java.util.List<String> wrapLines(String text, FontMetrics fm, int maxWidth) {
+        java.util.List<String> lines = new java.util.ArrayList<>();
+        for (String paragraph : (text == null ? "" : text).split("\n", -1)) {
+            StringBuilder line = new StringBuilder();
+            for (String word : paragraph.trim().split(" +")) {
+                if (word.isEmpty()) continue;
+                String candidate = line.isEmpty() ? word : line + " " + word;
+                if (fm.stringWidth(candidate) <= maxWidth) {
+                    line.setLength(0);
+                    line.append(candidate);
+                    continue;
+                }
+                if (!line.isEmpty()) {
+                    lines.add(line.toString());
+                    line.setLength(0);
+                }
+                // A word wider than the line: break it by character.
+                for (int i = 0; i < word.length(); i++) {
+                    char ch = word.charAt(i);
+                    if (!line.isEmpty() && fm.stringWidth(line.toString() + ch) > maxWidth) {
+                        lines.add(line.toString());
+                        line.setLength(0);
+                    }
+                    line.append(ch);
+                }
+            }
+            lines.add(line.toString());
+        }
+        return lines;
     }
 
     private static void drawCentered(Graphics2D g2, FontMetrics fm, String line, int width, int y) {
