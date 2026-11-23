@@ -1,6 +1,6 @@
 {
   "name": "DevWorkbench Official Plugin Catalog (GitHub)",
-  "generatedAt": "2026-11-23T17:13:29Z",
+  "generatedAt": "2026-11-23T17:15:57Z",
   "plugins": [
     {
       "id": "plugin-capture",
@@ -256,6 +256,14 @@
       "description": "MinIO object storage browser for bucket and object management.",
       "homepage": "https://github.com/nvhuong/dev-workbench",
       "releases": [
+        {
+          "version": "1.1.0",
+          "downloadUrl": "https://github.com/nvhuong/dev-workbench/releases/download/plugin-minio-v1.1.0/dev-workbench-1.1.0-plugin-minio.jar",
+          "sha256": "2182e5aa22a3c8e2f7ede50f316b43980eb09ce47d4f98127574adcaedde6f6a",
+          "minAppVersion": "6.0.14",
+          "minPlatformVersion": "4.0.0",
+          "maxPlatformVersion": "4.0.0"
+        },
         {
           "version": "1.0.0",
           "downloadUrl": "https://github.com/nvhuong/dev-workbench/releases/download/plugin-minio-v1.0.0/dev-workbench-1.0.0-plugin-minio.jar",
