@@ -140,6 +140,8 @@ JAR Để chỉ cho phép một không gian làm việc, trong `"serve"` Thêm t
 
 Các thông số tùy chọn `--max-response-bytes <n>` Hãy kiểm soát một lần Tool Tổng số lượng nội dung phản hồi được cuộc gọi trả về, mặc định là 64 KiB，Có thể được đặt thành 1 KiB～10 MiB。Trình khởi chạy gốc sẽ đưa nó vào ngay `args`；JAR cách để đặt `"serve"` sau đó.
 
+Tham số `--allow-writes` bật các tool ghi của plugin (`sql_execute`, `redis_write`, `kafka_send`, `minio_presigned_url`). Mặc định chỉ có các tool đọc; không có cờ này thì tool ghi không xuất hiện trong `tools/list` và gọi trực tiếp sẽ báo không tìm thấy.
+
 ### 7. Khắc phục sự cố cài đặt
 
 - Chạy trực tiếp trước `DevWorkbenchMCP --help`；Có thể hiển thị thông tin trợ giúp cho trình khởi chạy và phần mềm tích hợp JRE trọn.
@@ -158,6 +160,20 @@ Các thông số tùy chọn `--max-response-bytes <n>` Hãy kiểm soát một 
 | `list_requests` | `workspaceId?`、`collectionId?`、`query?`、`limit?` | Tìm các yêu cầu đã lưu |
 | `run_request` | `workspaceId?`、`requestId`、`environmentId?`、`environmentOverrides?` | Thực hiện một HTTP yêu cầu |
 | `run_collection` | `workspaceId?`、`collectionId`、`environmentId?`、`environmentOverrides?`、`iterations?`、`bail?` | Thực hiện toàn bộ bộ sưu tập |
+
+### Tool của plugin
+
+Plugin đã cài (trong `<thư mục dữ liệu>/plugins/installed`) có thể đăng ký thêm tool qua `PluginContext.registerMcpTool(McpToolContribution)`. Tool của plugin không bao giờ ghi đè tên tool có sẵn. Mọi kết nối đều dùng **profile đã lưu trong plugin** theo tên, nên mật khẩu/khóa không đi qua AI client và không bao giờ được trả về.
+
+| Plugin | Tool đọc (luôn bật) | Tool ghi (cần `--allow-writes`) |
+|---|---|---|
+| SQL | `sql_list_profiles`, `sql_list_tables`, `sql_describe_table`, `sql_query` (chỉ một câu SELECT/WITH/SHOW/DESCRIBE/EXPLAIN, kết nối read-only, tối đa 1000 dòng, timeout 60 s) | `sql_execute` (một câu lệnh, commit khi thành công, rollback khi lỗi) |
+| Redis | `redis_list_profiles`, `redis_scan_keys` (SCAN, không chặn), `redis_read` (GET, EXISTS, TYPE, TTL, HGET, HGETALL, LRANGE, SMEMBERS, ZRANGE) | `redis_write` (SET với `ttlSeconds` tùy chọn, DEL) |
+| Kafka | `kafka_list_profiles`, `kafka_list_topics`, `kafka_poll` (consumer group tạm, không commit offset) | `kafka_send` |
+| MinIO | `minio_list_profiles`, `minio_list_buckets`, `minio_list_objects`, `minio_read_object` (tối đa 1 MB, text nếu là UTF-8) | `minio_presigned_url` (link ai có cũng tải được) |
+| Decompiler | `decompiler_list_classes`, `decompiler_decompile_class` (file .jar/.war/.ear/.zip/.class trên máy) | — |
+
+Kết quả mọi tool bị giới hạn bởi `--max-response-bytes`; khi vượt, trả về `truncated: true` kèm `partialJson`.
 
 ### Ngữ nghĩa lựa chọn không gian làm việc và môi trường
 
@@ -213,7 +229,7 @@ MCP Client
 dev-workbench-mcp
   ├─ official MCP Java SDK
   ├─ stdio lifecycle
-  ├─ Sáu tool schema + annotations
+  ├─ Sáu tool schema + annotations + tool của plugin
   └─ DevWorkbenchMcpBackend
                 │
                 ▼
@@ -228,12 +244,13 @@ dev-workbench-app
        └─ HTTP runtime
 ```
 
-`dev-workbench-mcp` Chỉ có lớp giao thức, không có lớp phụ thuộc app、Swing、Lưu trữ không gian làm việc hoặc thực hiện các yêu cầu cụ thể.app hoàn thành backend Và tái sử dụng chuỗi thực thi không đầu hiện có nên không có bản sao nào được tạo ra DevWorkbench các biến, tập lệnh,Cookie、TLS và HTTP Ngữ nghĩa. Không có plug-in nào được thay đổi lần này SPI，Cũng không cần khuyến mãi `plugin.platform.version`。
+`dev-workbench-mcp` Chỉ có lớp giao thức, không có lớp phụ thuộc app、Swing、Lưu trữ không gian làm việc hoặc thực hiện các yêu cầu cụ thể.app hoàn thành backend Và tái sử dụng chuỗi thực thi không đầu hiện có nên không có bản sao nào được tạo ra DevWorkbench các biến, tập lệnh,Cookie、TLS và HTTP Ngữ nghĩa. SPI plugin chỉ được thêm phương thức mặc định `PluginContext.registerMcpTool`, tương thích ngược nên không cần tăng `plugin.platform.version`; plugin gọi nó trong `try/catch (LinkageError)` để vẫn chạy trên host cũ.
 
 ## Ranh giới an ninh
 
 - Chế độ không gian làm việc đơn chỉ cho phép các thư mục trong tham số khởi động; chế độ đa không gian làm việc chỉ cho phép DevWorkbench Không gian làm việc trong sổ đăng ký.
 - MCP v1 Không có tệp bộ sưu tập hoặc môi trường nào được ghi và không có công cụ nhập, lưu và xóa nào được cung cấp.
+- Tool ghi của plugin chỉ được bật khi khởi động với `--allow-writes`; tool đọc của SQL dùng kết nối read-only, tự động commit tắt và chặn script nhiều câu lệnh.
 - Giá trị môi trường không được trả về thông qua công cụ liệt kê; ghi đè một lần sẽ không được ghi vào đĩa. Nhưng mục tiêu API Các giá trị đầu vào có thể được lặp lại trong nội dung phản hồi, nội dung này có thể chứa dữ liệu cá nhân hoặc doanh nghiệp, do đó chỉ có thể có các kết nối đáng tin cậy MCP khách hàng.
 - Tiêu đề phản hồi xác thực phổ biến, tùy chỉnh token/key/password/secret cái đầu,URL user-info、Các tham số truy vấn nhạy cảm và các giá trị khóa nhạy cảm phổ biến trong nội dung phản hồi sẽ được giải mẫn cảm; giải mẫn cảm chung không thể xác định tất cả các lĩnh vực kinh doanh và không thể thay thế việc phân loại dữ liệu và các quyền tối thiểu ở phía máy chủ.
 - Nội dung phản hồi có giới hạn byte trên và liệu nó có bị cắt bớt và số byte ban đầu được trả về hay không; số lượng tối đa được trả về cho mỗi cuộc gọi là 100 lời yêu cầu/Chi tiết phản hồi, số lượng bị bỏ qua được trả về khi vượt quá, số lượng tóm tắt vẫn bao gồm toàn bộ lần chạy.

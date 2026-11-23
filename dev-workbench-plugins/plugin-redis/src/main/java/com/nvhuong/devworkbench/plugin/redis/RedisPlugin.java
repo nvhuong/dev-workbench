@@ -17,6 +17,11 @@ public class RedisPlugin implements DevWorkbenchPlugin {
     public void onLoad(PluginContext context) {
         context.registerI18nBundle(RedisI18n.BUNDLE_NAME);
         context.registerScriptApi("redis", ScriptRedisApi::new);
+        try {
+            RedisMcpTools.register(context);
+        } catch (LinkageError olderHost) {
+            // Hosts without MCP tool support keep the toolbox and script API.
+        }
         PluginContributionSupport.registerToolbox(
                 context,
                 "redis",

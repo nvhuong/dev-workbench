@@ -9,6 +9,11 @@ public class DecompilerPlugin implements DevWorkbenchPlugin {
     @Override
     public void onLoad(PluginContext context) {
         context.registerI18nBundle(DecompilerI18n.BUNDLE_NAME);
+        try {
+            DecompilerMcpTools.register(context);
+        } catch (LinkageError olderHost) {
+            // Hosts without MCP tool support keep the toolbox.
+        }
         PluginContributionSupport.registerToolbox(
                 context,
                 "decompiler",

@@ -959,7 +959,7 @@ public class DecompilerPanel extends JPanel {
     /**
      * sử dụngCFRDịch ngượcClassMã byte
      */
-    private String decompileClass(byte[] classBytes, String className) {
+    static String decompileClass(byte[] classBytes, String className) {
         File tempDir = null;
         try {
             // Tạo một thư mục tạm thời để lưuclasstập tin
@@ -1028,7 +1028,7 @@ public class DecompilerPanel extends JPanel {
     /**
      * Đọc phiên bản đã dịch ngược từ thư mục đầu ra Java tập tin
      */
-    private String readDecompiledFile(File outputDir, String className) {
+    private static String readDecompiledFile(File outputDir, String className) {
         try {
             log.debug("Reading decompiled file for class: {} from dir: {}", className, outputDir.getAbsolutePath());
 
@@ -1083,7 +1083,7 @@ public class DecompilerPanel extends JPanel {
     /**
      * Liệt kê nội dung thư mục (để gỡ lỗi)
      */
-    private void listDirectoryContents(File dir, String indent) {
+    private static void listDirectoryContents(File dir, String indent) {
         File[] files = dir.listFiles();
         if (files != null) {
             for (File file : files) {
@@ -1098,7 +1098,7 @@ public class DecompilerPanel extends JPanel {
     /**
      * Tìm kiếm đệ quy tất cả các mục trong một thư mục .java tập tin
      */
-    private File[] findJavaFiles(File dir) {
+    private static File[] findJavaFiles(File dir) {
         if (!dir.isDirectory()) {
             return new File[0];
         }
@@ -1111,7 +1111,7 @@ public class DecompilerPanel extends JPanel {
     /**
      * Tìm kiếm đệ quy Java tập tin
      */
-    private void findJavaFilesRecursive(File dir, List<File> javaFiles) {
+    private static void findJavaFilesRecursive(File dir, List<File> javaFiles) {
         File[] files = dir.listFiles();
         if (files != null) {
             for (File file : files) {
@@ -1127,7 +1127,7 @@ public class DecompilerPanel extends JPanel {
     /**
      * Làm sạch mã đã dịch ngược và xóa thông tin gỡ lỗi
      */
-    private String cleanupDecompiledCode(String code) {
+    private static String cleanupDecompiledCode(String code) {
         // Chia theo hàng
         String[] lines = code.split("\n");
         StringBuilder cleaned = new StringBuilder();
@@ -1158,7 +1158,7 @@ public class DecompilerPanel extends JPanel {
     /**
      * Xác định xem đó có phải là dòng thông tin gỡ lỗi hay không
      */
-    private boolean isDebugLine(String trimmed) {
+    private static boolean isDebugLine(String trimmed) {
         return trimmed.startsWith("Analysing ") ||
                 trimmed.startsWith("Processing ") ||
                 trimmed.startsWith("Decompiling ") ||
@@ -1535,7 +1535,7 @@ public class DecompilerPanel extends JPanel {
     /**
      * Xóa thư mục
      */
-    private void deleteDirectory(File dir) {
+    private static void deleteDirectory(File dir) {
         if (dir.isDirectory()) {
             File[] files = dir.listFiles();
             if (files != null) {

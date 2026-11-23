@@ -14,6 +14,11 @@ public class KafkaPlugin implements DevWorkbenchPlugin {
         // Máy chủ sẽ kết nối các khả năng này với các tập lệnh sau.Toolbox、Hoàn thành tổng Snippet Chờ các địa điểm khác nhau.
         context.registerI18nBundle(KafkaI18n.BUNDLE_NAME);
         context.registerScriptApi("kafka", ScriptKafkaApi::new);
+        try {
+            KafkaMcpTools.register(context);
+        } catch (LinkageError olderHost) {
+            // Hosts without MCP tool support keep the toolbox and script API.
+        }
         PluginContributionSupport.registerToolbox(
                 context,
                 "kafka",

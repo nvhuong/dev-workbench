@@ -8,6 +8,11 @@ public class MinioPlugin implements DevWorkbenchPlugin {
     @Override
     public void onLoad(PluginContext context) {
         context.registerI18nBundle(MinioI18n.BUNDLE);
+        try {
+            MinioMcpTools.register(context);
+        } catch (LinkageError olderHost) {
+            // Hosts without MCP tool support keep the toolbox.
+        }
         PluginContributionSupport.registerToolbox(
                 context,
                 "minio",
