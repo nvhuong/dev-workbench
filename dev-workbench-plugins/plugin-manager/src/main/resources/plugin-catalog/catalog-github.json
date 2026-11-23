@@ -1,6 +1,6 @@
 {
   "name": "DevWorkbench Official Plugin Catalog (GitHub)",
-  "generatedAt": "2026-11-23T17:19:07Z",
+  "generatedAt": "2026-11-23T17:20:30Z",
   "plugins": [
     {
       "id": "plugin-capture",
@@ -184,6 +184,14 @@
       "description": "Kafka toolbox panel, pm.plugin(\"kafka\") script API, completions and snippets.",
       "homepage": "https://github.com/nvhuong/dev-workbench",
       "releases": [
+        {
+          "version": "6.1.0",
+          "downloadUrl": "https://github.com/nvhuong/dev-workbench/releases/download/plugin-kafka-v6.1.0/dev-workbench-6.1.0-plugin-kafka.jar",
+          "sha256": "284a853556d1ff15b97319b7755cfc67a5320f55a3278de49372b09170fbb56e",
+          "minAppVersion": "6.0.14",
+          "minPlatformVersion": "4.0.0",
+          "maxPlatformVersion": "4.0.0"
+        },
         {
           "version": "6.0.11",
           "downloadUrl": "https://github.com/nvhuong/dev-workbench/releases/download/plugin-kafka-v6.0.11/dev-workbench-6.0.11-plugin-kafka.jar",
