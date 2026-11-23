@@ -1,6 +1,6 @@
 {
   "name": "DevWorkbench Official Plugin Catalog (GitHub)",
-  "generatedAt": "2026-11-23T17:15:57Z",
+  "generatedAt": "2026-11-23T17:17:44Z",
   "plugins": [
     {
       "id": "plugin-capture",
@@ -8,6 +8,14 @@
       "description": "HTTP capture toolbox panel with a local explicit proxy.",
       "homepage": "https://github.com/nvhuong/dev-workbench",
       "releases": [
+        {
+          "version": "6.1.0",
+          "downloadUrl": "https://github.com/nvhuong/dev-workbench/releases/download/plugin-capture-v6.1.0/dev-workbench-6.1.0-plugin-capture.jar",
+          "sha256": "3db1c98448660fa6fb2306c201b3f4baa1f42cbce379553ba43315b4b379a177",
+          "minAppVersion": "6.0.14",
+          "minPlatformVersion": "4.0.0",
+          "maxPlatformVersion": "4.0.0"
+        },
         {
           "version": "6.0.14",
           "downloadUrl": "https://github.com/nvhuong/dev-workbench/releases/download/plugin-capture-v6.0.14/dev-workbench-6.0.14-plugin-capture.jar",
