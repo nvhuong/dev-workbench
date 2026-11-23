@@ -1,6 +1,6 @@
 {
   "name": "DevWorkbench Official Plugin Catalog (GitHub)",
-  "generatedAt": "2026-11-23T17:21:48Z",
+  "generatedAt": "2026-11-23T17:23:30Z",
   "plugins": [
     {
       "id": "plugin-capture",
@@ -96,6 +96,14 @@
       "description": "Client certificate management and mTLS key material loading.",
       "homepage": "https://github.com/nvhuong/dev-workbench",
       "releases": [
+        {
+          "version": "6.1.0",
+          "downloadUrl": "https://github.com/nvhuong/dev-workbench/releases/download/plugin-client-cert-v6.1.0/dev-workbench-6.1.0-plugin-client-cert.jar",
+          "sha256": "20b17fa7230ca3b576e61c03844b4a3efd0e6426f586ae9397c90843bc41d0fc",
+          "minAppVersion": "6.0.7",
+          "minPlatformVersion": "4.0.0",
+          "maxPlatformVersion": "4.0.0"
+        },
         {
           "version": "6.0.8",
           "downloadUrl": "https://github.com/nvhuong/dev-workbench/releases/download/plugin-client-cert-v6.0.8/dev-workbench-6.0.8-plugin-client-cert.jar",
