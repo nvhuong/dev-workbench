@@ -1,6 +1,6 @@
 {
   "name": "DevWorkbench Official Plugin Catalog (GitHub)",
-  "generatedAt": "2026-11-23T17:20:30Z",
+  "generatedAt": "2026-11-23T17:21:48Z",
   "plugins": [
     {
       "id": "plugin-capture",
@@ -136,6 +136,14 @@
       "description": "Java decompiler toolbox panel powered by CFR.",
       "homepage": "https://github.com/nvhuong/dev-workbench",
       "releases": [
+        {
+          "version": "6.1.0",
+          "downloadUrl": "https://github.com/nvhuong/dev-workbench/releases/download/plugin-decompiler-v6.1.0/dev-workbench-6.1.0-plugin-decompiler.jar",
+          "sha256": "18bf87590eb04d02732503d27e968bf8874656eb3ec9798344c2e64862ce8684",
+          "minAppVersion": "6.0.14",
+          "minPlatformVersion": "4.0.0",
+          "maxPlatformVersion": "4.0.0"
+        },
         {
           "version": "6.0.9",
           "downloadUrl": "https://github.com/nvhuong/dev-workbench/releases/download/plugin-decompiler-v6.0.9/dev-workbench-6.0.9-plugin-decompiler.jar",
