@@ -1,6 +1,9 @@
 package com.nvhuong.devworkbench.panel.functional;
 
 import com.formdev.flatlaf.extras.FlatSVGIcon;
+import com.formdev.flatlaf.util.SystemFileChooser;
+import com.nvhuong.devworkbench.common.component.notification.NotificationCenter;
+import com.nvhuong.devworkbench.common.constants.Icons;
 import com.nvhuong.devworkbench.common.component.ToolWindowActionToolbar;
 import com.nvhuong.devworkbench.common.component.AppToolWindowChrome;
 import com.nvhuong.devworkbench.common.component.ToolWindowSurfaceStyle;
@@ -136,7 +139,85 @@ public class ExecutionResultsPanel extends JPanel {
                 I18nUtil.getMessage(MessageKeys.FUNCTIONAL_TOOLTIP_REFRESH));
         refreshBtn.addActionListener(e -> refreshData());
 
-        return ToolWindowActionToolbar.inlineRight(expandAllBtn, collapseAllBtn, refreshBtn);
+        JButton exportImageBtn = createIconButton("icons/export.svg",
+                I18nUtil.getMessage(MessageKeys.FUNCTIONAL_REPORT_EXPORT));
+        exportImageBtn.addActionListener(e -> exportReportImage(exportImageBtn));
+
+        return ToolWindowActionToolbar.inlineRight(exportImageBtn, expandAllBtn, collapseAllBtn, refreshBtn);
+    }
+
+    /**
+     * Saves the whole run (summary, every request row and failure details) as a PNG report.
+     */
+    private void exportReportImage(JButton button) {
+        if (executionHistory == null || executionHistory.getIterations().isEmpty()) {
+            NotificationCenter.showWarning(I18nUtil.getMessage(MessageKeys.FUNCTIONAL_REPORT_EMPTY));
+            return;
+        }
+        SystemFileChooser chooser = FileChooserUtil.createSaveFileChooser(
+                "functional.report.image", I18nUtil.getMessage(MessageKeys.FUNCTIONAL_REPORT_EXPORT));
+        chooser.setFileFilter(FileChooserUtil.extensionFilter(
+                I18nUtil.getMessage(MessageKeys.FUNCTIONAL_REPORT_FILE_FILTER) + " (*.png)", "png"));
+        chooser.setSelectedFile(new java.io.File("functional-report-"
+                + new SimpleDateFormat("yyyyMMdd-HHmmss").format(new Date()) + ".png"));
+        if (chooser.showSaveDialog(this) != SystemFileChooser.APPROVE_OPTION) return;
+        java.nio.file.Path selected = chooser.getSelectedFile().toPath();
+        java.nio.file.Path destination = selected.toString().toLowerCase(java.util.Locale.ROOT).endsWith(".png")
+                ? selected : java.nio.file.Path.of(selected + ".png");
+        // Labels and data are read on the EDT; rendering and writing happen in the background.
+        BatchExecutionHistory history = executionHistory;
+        FunctionalReportImage.Labels labels = reportLabels();
+        Image logo = Icons.LOGO.getImage();
+        button.setEnabled(false);
+        new SwingWorker<Void, Void>() {
+            @Override
+            protected Void doInBackground() throws Exception {
+                FunctionalReportImage.write(
+                        FunctionalReportImage.render(history, labels, logo, System.currentTimeMillis()), destination);
+                return null;
+            }
+
+            @Override
+            protected void done() {
+                button.setEnabled(true);
+                try {
+                    get();
+                    NotificationCenter.showSuccess(I18nUtil.getMessage(MessageKeys.FUNCTIONAL_REPORT_SAVED) + " " + destination);
+                } catch (Exception ex) {
+                    NotificationCenter.showError(I18nUtil.getMessage(MessageKeys.FUNCTIONAL_REPORT_FAILED));
+                }
+            }
+        }.execute();
+    }
+
+    static FunctionalReportImage.Labels reportLabels() {
+        return new FunctionalReportImage.Labels(
+                I18nUtil.getMessage(MessageKeys.FUNCTIONAL_REPORT_TITLE),
+                I18nUtil.getMessage(MessageKeys.FUNCTIONAL_REPORT_GENERATED),
+                new String[]{
+                        I18nUtil.getMessage(MessageKeys.FUNCTIONAL_STATS_TOTAL_ITERATIONS),
+                        I18nUtil.getMessage(MessageKeys.FUNCTIONAL_STATS_TOTAL_REQUESTS),
+                        I18nUtil.getMessage(MessageKeys.FUNCTIONAL_STATS_SUCCESS_RATE),
+                        I18nUtil.getMessage(MessageKeys.FUNCTIONAL_STATS_TOTAL_TIME),
+                        I18nUtil.getMessage(MessageKeys.FUNCTIONAL_STATS_START_TIME),
+                        I18nUtil.getMessage(MessageKeys.FUNCTIONAL_STATS_END_TIME),
+                        I18nUtil.getMessage(MessageKeys.FUNCTIONAL_STATS_AVERAGE_TIME),
+                        I18nUtil.getMessage(MessageKeys.FUNCTIONAL_STATS_STATUS)},
+                I18nUtil.getMessage(MessageKeys.FUNCTIONAL_STATS_STATUS_COMPLETED),
+                new String[]{
+                        I18nUtil.getMessage(MessageKeys.FUNCTIONAL_TABLE_ITERATION),
+                        I18nUtil.getMessage(MessageKeys.FUNCTIONAL_TABLE_REQUEST_NAME),
+                        I18nUtil.getMessage(MessageKeys.FUNCTIONAL_REPORT_COLUMN_URL),
+                        I18nUtil.getMessage(MessageKeys.FUNCTIONAL_TABLE_METHOD),
+                        I18nUtil.getMessage(MessageKeys.FUNCTIONAL_TABLE_STATUS),
+                        I18nUtil.getMessage(MessageKeys.FUNCTIONAL_TABLE_TIME),
+                        I18nUtil.getMessage(MessageKeys.FUNCTIONAL_TABLE_COLUMN_RESULT)},
+                I18nUtil.getMessage(MessageKeys.FUNCTIONAL_REPORT_RESULT_PASS),
+                I18nUtil.getMessage(MessageKeys.FUNCTIONAL_REPORT_RESULT_FAIL),
+                I18nUtil.getMessage(MessageKeys.FUNCTIONAL_REPORT_RESULT_NONE),
+                I18nUtil.getMessage(MessageKeys.FUNCTIONAL_REPORT_FAILURES),
+                I18nUtil.getMessage(MessageKeys.FUNCTIONAL_REPORT_MORE_ROWS),
+                I18nUtil.getMessage(MessageKeys.FUNCTIONAL_STATUS_SKIPPED));
     }
 
     private JButton createIconButton(String iconPath, String tooltip) {
@@ -694,28 +775,13 @@ public class ExecutionResultsPanel extends JPanel {
     }
 
     private JPanel createStatsPanel() {
-        // Tính toán thống kê
-        int totalIterations = executionHistory.getIterations().size();
-        int totalRequests = executionHistory.getIterations().stream()
-                .mapToInt(iter -> iter.getRequestResults().size())
-                .sum();
-        long totalTime = executionHistory.getExecutionTime();
-        String skippedText = I18nUtil.getMessage(MessageKeys.FUNCTIONAL_STATUS_SKIPPED);
-        long passedTests = executionHistory.getIterations().stream()
-                .flatMap(iter -> iter.getRequestResults().stream())
-                .filter(req -> AssertionResult.PASS.equals(req.getAssertion()))
-                .count();
-        long failedTests = executionHistory.getIterations().stream()
-                .flatMap(iter -> iter.getRequestResults().stream())
-                .filter(req -> AssertionResult.FAIL.equals(req.getAssertion()) ||
-                        (req.getAssertion() != null &&
-                                !AssertionResult.PASS.equals(req.getAssertion()) &&
-                                !AssertionResult.NO_TESTS.equals(req.getAssertion()) &&
-                                !skippedText.equals(req.getStatus())))
-                .count();
-        long totalTestsWithAssertions = passedTests + failedTests;
-        double successRate = totalTestsWithAssertions > 0 ? (double) passedTests / totalTestsWithAssertions * 100 : 0;
-        long avgTime = totalRequests > 0 ? totalTime / totalRequests : 0;
+        FunctionalRunStats stats = FunctionalRunStats.of(executionHistory,
+                I18nUtil.getMessage(MessageKeys.FUNCTIONAL_STATUS_SKIPPED));
+        int totalIterations = stats.iterations();
+        int totalRequests = stats.requests();
+        long totalTime = stats.totalTimeMs();
+        double successRate = stats.successRate();
+        long avgTime = stats.averageTimeMs();
 
         // sử dụng GridBagLayout hoàn thành4Thẻ cột, chiều rộng thích ứng
         JPanel statsPanel = new JPanel(new GridBagLayout());
