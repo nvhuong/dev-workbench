@@ -16,13 +16,9 @@
 
 ## Functional and performance testing
 
-| Functional test | Performance report |
+| Functional test | Performance trend |
 |:---:|:---:|
-| ![Functional test](functional.png) | ![Performance report](performance.png) |
-
-| Performance trend |
-|:---:|
-| ![Performance trend](performance-trend.png) |
+| ![Functional test](functional.png) | ![Performance trend](performance-trend.png) |
 
 ## Plugins
 

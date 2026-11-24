@@ -1,8 +1,8 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
   <defs>
     <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#2F80ED"/>
-      <stop offset="1" stop-color="#5B3FD6"/>
+      <stop offset="0" stop-color="#5CD68E"/>
+      <stop offset="1" stop-color="#23A86A"/>
     </linearGradient>
     <linearGradient id="bolt" x1="0" y1="0" x2="0" y2="1">
       <stop offset="0" stop-color="#FFE27A"/>
@@ -10,7 +10,7 @@
     </linearGradient>
     <linearGradient id="gloss" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFFFFF" stop-opacity="0.16"/><stop offset="0.55" stop-color="#FFFFFF" stop-opacity="0"/></linearGradient>
     <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
-      <feDropShadow dx="0" dy="10" stdDeviation="14" flood-color="#1B1464" flood-opacity="0.35"/>
+      <feDropShadow dx="0" dy="10" stdDeviation="14" flood-color="#0E4D2E" flood-opacity="0.35"/>
     </filter>
   </defs>
   <rect x="64" y="64" width="896" height="896" rx="208" fill="url(#bg)"/>

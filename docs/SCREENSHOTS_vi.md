@@ -16,13 +16,9 @@
 
 ## Functional test và kiểm thử hiệu năng
 
-| Functional test | Báo cáo kiểm thử tải |
+| Functional test | Biểu đồ xu hướng hiệu năng |
 |:---:|:---:|
-| ![Functional test](functional.png) | ![Báo cáo kiểm thử tải](performance.png) |
-
-| Biểu đồ xu hướng hiệu năng |
-|:---:|
-| ![Xu hướng hiệu năng](performance-trend.png) |
+| ![Functional test](functional.png) | ![Xu hướng hiệu năng](performance-trend.png) |
 
 ## Plugin
 

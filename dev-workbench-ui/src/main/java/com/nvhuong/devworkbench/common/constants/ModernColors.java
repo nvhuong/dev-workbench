@@ -61,29 +61,29 @@ public final class ModernColors {
     // ==================== Màu sắc chính ====================
 
     /**
-     * Màu chính - IDEA-inspired Blue
+     * Màu chính - xanh lá nhạt
      */
-    public static final Color PRIMARY = new Color(55, 113, 225);
+    public static final Color PRIMARY = new Color(52, 179, 107);
 
     /**
-     * Màu chủ đạo là màu tối - IDEA-inspired Blue-600
+     * Màu chủ đạo là màu tối - xanh lá đậm
      */
-    public static final Color PRIMARY_DARK = new Color(47, 98, 201);
+    public static final Color PRIMARY_DARK = new Color(44, 154, 92);
 
     /**
-     * Màu sắc chủ đạo là siêu tối - IDEA-inspired Blue-700
+     * Màu sắc chủ đạo là siêu tối - xanh lá rất đậm
      */
-    public static final Color PRIMARY_DARKER = new Color(40, 84, 173);
+    public static final Color PRIMARY_DARKER = new Color(36, 128, 77);
 
     /**
-     * Màu sắc chủ đạo là ánh sáng - IDEA-inspired Blue-400
+     * Màu sắc chủ đạo là ánh sáng - xanh lá sáng
      */
-    public static final Color PRIMARY_LIGHT = new Color(94, 143, 240);
+    public static final Color PRIMARY_LIGHT = new Color(95, 203, 141);
 
     /**
-     * Màu sắc chủ đạo là siêu nhẹ - IDEA-inspired Blue-100
+     * Màu sắc chủ đạo là siêu nhẹ - xanh lá rất nhạt
      */
-    public static final Color PRIMARY_LIGHTER = new Color(212, 227, 255);
+    public static final Color PRIMARY_LIGHTER = new Color(211, 242, 223);
 
     // ==================== Màu sắc phụ trợ ====================
 
@@ -110,14 +110,14 @@ public final class ModernColors {
     // ==================== Màu sắc nhấn mạnh ====================
 
     /**
-     * Màu nhấn - Cyan-500
+     * Màu nhấn - xanh ngọc
      */
-    public static final Color ACCENT = new Color(6, 182, 212);
+    public static final Color ACCENT = new Color(47, 196, 160);
 
     /**
-     * Màu sắc nhấn là ánh sáng - Cyan-400
+     * Màu nhấn sáng - xanh ngọc nhạt
      */
-    public static final Color ACCENT_LIGHT = new Color(34, 211, 238);
+    public static final Color ACCENT_LIGHT = new Color(126, 224, 196);
 
     // ==================== thành công/sai lầm/Màu cảnh báo ====================
 

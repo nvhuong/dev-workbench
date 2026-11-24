@@ -134,7 +134,7 @@ public class DevWorkbenchLafThemePropertiesTest {
     @Test
     public void shouldExposeSemanticColorsThroughUiManagerAfterLafSetup() {
         assertTrue(DevWorkbenchLightLaf.setup());
-        assertThemeBrandColors(new Color(55, 113, 225), new Color(212, 227, 255));
+        assertThemeBrandColors(new Color(52, 179, 107), new Color(211, 242, 223));
         assertThemeSurfaceColors(
                 new Color(15, 23, 42),
                 new Color(233, 234, 238),
@@ -142,8 +142,8 @@ public class DevWorkbenchLafThemePropertiesTest {
                 new Color(233, 234, 238),
                 Color.WHITE,
                 Color.WHITE,
-                new Color(226, 235, 254),
-                new Color(242, 246, 255),
+                new Color(224, 245, 232),
+                new Color(240, 250, 244),
                 new Color(233, 234, 238)
         );
         assertHttpSemanticColors(
@@ -158,7 +158,7 @@ public class DevWorkbenchLafThemePropertiesTest {
         );
 
         assertTrue(DevWorkbenchDarkLaf.setup());
-        assertThemeBrandColors(new Color(53, 116, 240), new Color(43, 67, 113));
+        assertThemeBrandColors(new Color(61, 187, 115), new Color(37, 70, 58));
         assertThemeSurfaceColors(
                 new Color(201, 204, 211),
                 new Color(38, 40, 44),
