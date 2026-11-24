@@ -29,7 +29,7 @@ public class PerformanceTreeNodeFactory {
         HttpRequestItem defaultReq = new HttpRequestItem();
         defaultReq.setName(I18nUtil.getMessage(MessageKeys.PERFORMANCE_DEFAULT_REQUEST));
         defaultReq.setMethod("GET");
-        defaultReq.setUrl("https://www.baidu.com");
+        defaultReq.setUrl("https://httpbin.org/get");
         DefaultMutableTreeNode req = new DefaultMutableTreeNode(
                 new PerformanceTreeNode(defaultReq.getName(), NodeType.REQUEST, defaultReq)
         );

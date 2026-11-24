@@ -42,6 +42,8 @@ public class RequestEditorEmptyStatePanel extends JPanel {
 
     private final Runnable newRequestAction;
     private JPanel shortcutPanel;
+    private JLabel titleLabel;
+    private JLabel hintButton;
 
     public RequestEditorEmptyStatePanel() {
         this(RequestEditorEmptyStatePanel::openNewRequestTab);
@@ -72,6 +74,32 @@ public class RequestEditorEmptyStatePanel extends JPanel {
         cardPanel.setBorder(BorderFactory.createEmptyBorder(CARD_PADDING, CARD_PADDING, CARD_PADDING, CARD_PADDING));
         addCenteredContent(cardPanel);
         return cardPanel;
+    }
+
+    /**
+     * Text colors are explicit (not UIResource), so a theme switch would keep the old theme's colors; re-apply them
+     * whenever Swing updates the component tree for a new look and feel.
+     */
+    @Override
+    public void updateUI() {
+        super.updateUI();
+        applyThemeColors();
+    }
+
+    private void applyThemeColors() {
+        if (titleLabel != null) {
+            titleLabel.setForeground(RequestEditorEmptyStateTheme.titleForeground());
+        }
+        if (hintButton != null) {
+            hintButton.setForeground(RequestEditorEmptyStateTheme.hintForeground());
+        }
+        if (shortcutPanel != null) {
+            for (Component component : shortcutPanel.getComponents()) {
+                if (component instanceof JLabel label) {
+                    label.setForeground(RequestEditorEmptyStateTheme.shortcutForeground());
+                }
+            }
+        }
     }
 
     /**
@@ -192,6 +220,7 @@ public class RequestEditorEmptyStatePanel extends JPanel {
         label.setHorizontalAlignment(SwingConstants.CENTER);
         label.setForeground(RequestEditorEmptyStateTheme.titleForeground());
         label.setFont(FontsUtil.getDefaultFontWithOffset(Font.BOLD, 13));
+        titleLabel = label;
         return label;
     }
 
@@ -209,6 +238,7 @@ public class RequestEditorEmptyStatePanel extends JPanel {
         hintButton.getAccessibleContext().setAccessibleName(hintButton.getText());
         installKeyboardActivation(hintButton);
         hintButton.addMouseListener(createHintButtonMouseListener(hintButton));
+        this.hintButton = hintButton;
         return hintButton;
     }
 

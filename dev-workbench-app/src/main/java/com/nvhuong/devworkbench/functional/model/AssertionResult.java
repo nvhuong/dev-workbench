@@ -4,11 +4,11 @@ import lombok.Getter;
 
 @Getter
 public enum AssertionResult {
-    PASS("✅"),
+    PASS("✓"),
 
-    FAIL("❌"),
+    FAIL("✗"),
 
-    NO_TESTS("💨");
+    NO_TESTS("–");
 
     private final String displayValue;
 

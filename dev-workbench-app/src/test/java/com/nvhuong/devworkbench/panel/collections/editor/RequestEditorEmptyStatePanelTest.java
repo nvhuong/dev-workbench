@@ -1,6 +1,8 @@
 package com.nvhuong.devworkbench.panel.collections.editor;
 
 import com.nvhuong.devworkbench.service.setting.ShortcutManager;
+import com.nvhuong.devworkbench.util.I18nUtil;
+import com.nvhuong.devworkbench.util.MessageKeys;
 import com.nvhuong.devworkbench.test.AbstractSwingUiTest;
 import org.testng.annotations.Test;
 
@@ -11,6 +13,7 @@ import java.awt.event.KeyEvent;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertNotEquals;
 import static org.testng.Assert.assertNotNull;
 
 public class RequestEditorEmptyStatePanelTest extends AbstractSwingUiTest {
@@ -49,6 +52,44 @@ public class RequestEditorEmptyStatePanelTest extends AbstractSwingUiTest {
         } finally {
             ShortcutManager.setShortcut(ShortcutManager.SAVE_REQUEST, previousKeyCode, previousModifiers);
         }
+    }
+
+    @Test
+    public void textColorsShouldFollowThemeSwitch() throws Exception {
+        LookAndFeel original = UIManager.getLookAndFeel();
+        try {
+            UIManager.setLookAndFeel(new com.formdev.flatlaf.FlatLightLaf());
+            RequestEditorEmptyStatePanel panel = new RequestEditorEmptyStatePanel(() -> {
+            });
+            JLabel title = findLabel(panel, I18nUtil.getMessage(MessageKeys.CREATE_NEW_REQUEST));
+            assertNotNull(title);
+            Color lightTitle = title.getForeground();
+
+            UIManager.setLookAndFeel(new com.formdev.flatlaf.FlatDarkLaf());
+            SwingUtilities.updateComponentTreeUI(panel);
+
+            assertEquals(title.getForeground(), RequestEditorEmptyStateTheme.titleForeground());
+            assertNotEquals(title.getForeground(), lightTitle, "title must not keep the light theme color");
+            JComponent hint = findFocusableLabel(panel);
+            assertEquals(hint.getForeground(), RequestEditorEmptyStateTheme.hintForeground());
+        } finally {
+            UIManager.setLookAndFeel(original);
+        }
+    }
+
+    private static JLabel findLabel(Container container, String text) {
+        for (Component component : container.getComponents()) {
+            if (component instanceof JLabel label && text.equals(label.getText())) {
+                return label;
+            }
+            if (component instanceof Container child) {
+                JLabel found = findLabel(child, text);
+                if (found != null) {
+                    return found;
+                }
+            }
+        }
+        return null;
     }
 
     private static JComponent findFocusableLabel(Container container) {

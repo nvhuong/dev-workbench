@@ -826,7 +826,7 @@ public class ExecutionResultsPanel extends JPanel {
         if (table.getColumnModel().getColumnCount() > 0) {
             // Iteration cột - Cần phải được hiển thị "Iteration"（9ký tự)+ "#1"
             table.getColumnModel().getColumn(0).setMinWidth(75);
-            table.getColumnModel().getColumn(0).setMaxWidth(90);
+            table.getColumnModel().getColumn(0).setMaxWidth(110);
             table.getColumnModel().getColumn(0).setPreferredWidth(80);
 
             // Request Name cột - Có thể rộng hơn để hiển thị tên yêu cầu đầy đủ
@@ -835,23 +835,23 @@ public class ExecutionResultsPanel extends JPanel {
 
             // Method cột - Cần phải được hiển thị "Method"（6ký tự)+ "DELETE"（7ký tự)
             table.getColumnModel().getColumn(2).setMinWidth(75);
-            table.getColumnModel().getColumn(2).setMaxWidth(90);
-            table.getColumnModel().getColumn(2).setPreferredWidth(80);
+            table.getColumnModel().getColumn(2).setMaxWidth(135);
+            table.getColumnModel().getColumn(2).setPreferredWidth(120);
 
             // Status cột - Cần phải được hiển thị "Status"（6ký tự)+ Mã trạng thái (3số chữ số)
             table.getColumnModel().getColumn(3).setMinWidth(70);
-            table.getColumnModel().getColumn(3).setMaxWidth(85);
-            table.getColumnModel().getColumn(3).setPreferredWidth(75);
+            table.getColumnModel().getColumn(3).setMaxWidth(115);
+            table.getColumnModel().getColumn(3).setPreferredWidth(100);
 
             // Time cột - Cần phải được hiển thị "Time"（4ký tự)+ thời gian (ví dụ: "123 ms"）
             table.getColumnModel().getColumn(4).setMinWidth(75);
-            table.getColumnModel().getColumn(4).setMaxWidth(100);
-            table.getColumnModel().getColumn(4).setPreferredWidth(85);
+            table.getColumnModel().getColumn(4).setMaxWidth(120);
+            table.getColumnModel().getColumn(4).setPreferredWidth(100);
 
             // Result cột - Cần phải được hiển thị "Result"（6ký tự)+ emoji/trạng thái
             table.getColumnModel().getColumn(5).setMinWidth(65);
-            table.getColumnModel().getColumn(5).setMaxWidth(80);
-            table.getColumnModel().getColumn(5).setPreferredWidth(70);
+            table.getColumnModel().getColumn(5).setMaxWidth(100);
+            table.getColumnModel().getColumn(5).setPreferredWidth(85);
         }
     }
 

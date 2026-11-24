@@ -526,23 +526,23 @@ public class FunctionalPanel extends UiSingletonPanel {
 
             // Method column - Cần đủ chiều rộng để hiển thị "Method"（6ký tự)+ nội dung(DELETEdài nhất7ký tự)
             table.getColumnModel().getColumn(3).setMinWidth(75);
-            table.getColumnModel().getColumn(3).setMaxWidth(90);
-            table.getColumnModel().getColumn(3).setPreferredWidth(80);
+            table.getColumnModel().getColumn(3).setMaxWidth(135);
+            table.getColumnModel().getColumn(3).setPreferredWidth(120);
 
             // Status column - Cần đủ chiều rộng để hiển thị "Status"（6ký tự)+ Mã trạng thái (3số chữ số)
             table.getColumnModel().getColumn(4).setMinWidth(70);
-            table.getColumnModel().getColumn(4).setMaxWidth(85);
-            table.getColumnModel().getColumn(4).setPreferredWidth(75);
+            table.getColumnModel().getColumn(4).setMaxWidth(115);
+            table.getColumnModel().getColumn(4).setPreferredWidth(100);
 
             // Time column - Cần đủ chiều rộng để hiển thị "Time"（4ký tự)+ thời gian (ví dụ: "123 ms"）
             table.getColumnModel().getColumn(5).setMinWidth(75);
-            table.getColumnModel().getColumn(5).setMaxWidth(100);
-            table.getColumnModel().getColumn(5).setPreferredWidth(85);
+            table.getColumnModel().getColumn(5).setMaxWidth(120);
+            table.getColumnModel().getColumn(5).setPreferredWidth(100);
 
             // Result column - Cần đủ chiều rộng để hiển thị "Result"（6ký tự)+ emoji
             table.getColumnModel().getColumn(6).setMinWidth(65);
-            table.getColumnModel().getColumn(6).setMaxWidth(80);
-            table.getColumnModel().getColumn(6).setPreferredWidth(70);
+            table.getColumnModel().getColumn(6).setMaxWidth(100);
+            table.getColumnModel().getColumn(6).setPreferredWidth(85);
         }
     }
 
