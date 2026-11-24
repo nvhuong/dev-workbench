@@ -1981,6 +1981,7 @@ public class SqlPanel extends JPanel {
                     resultModel.setRowCount(0);
                     resultModel.setColumnIdentifiers(result.columns().toArray());
                     for (Object[] row : result.rows()) resultModel.addRow(row);
+                    SqlResultColumns.fit(resultTable);
                     String elapsed = SqlI18n.t("elapsed", (System.nanoTime() - started) / 1_000_000);
                     String summary;
                     if (result.hasRows()) {
