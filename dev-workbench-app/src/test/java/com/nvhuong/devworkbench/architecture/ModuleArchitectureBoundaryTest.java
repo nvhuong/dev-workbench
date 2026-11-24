@@ -1272,9 +1272,9 @@ public class ModuleArchitectureBoundaryTest {
         Path root = repositoryRoot();
         List<Path> files = List.of(
                 root.resolve("AGENTS.md"),
-                root.resolve("docs/ARCHITECTURE_MODULES_zh.md"),
-                root.resolve("docs/PLUGINS_zh.md"),
-                root.resolve("docs/PLUGIN_RUNTIME_ARCHITECTURE_zh.md"),
+                root.resolve("docs/ARCHITECTURE_MODULES_vi.md"),
+                root.resolve("docs/PLUGINS_vi.md"),
+                root.resolve("docs/PLUGIN_RUNTIME_ARCHITECTURE_vi.md"),
                 root.resolve(".codex/skills/module-architecture-boundaries/SKILL.md"),
                 root.resolve(".codex/skills/fontsutil-font-usage/SKILL.md"),
                 root.resolve(".codex/skills/swing-flatlaf-miglayout-principles/SKILL.md")

@@ -1271,8 +1271,8 @@ customHeaders.forEach(function(header) {
 // Thêm tham số truy vấn theo lô
 const commonParams = {
     'appId': pm.environment.get('appId') || 'default',
-    'lang': 'zh-CN',
-    'timezone': 'Asia/Shanghai',
+    'lang': 'vi-VN',
+    'timezone': 'Asia/Ho_Chi_Minh',
     'platform': 'web'
 };
 
@@ -2179,7 +2179,7 @@ pm.environment.set('dateYMD', moment().format('YYYY-MM-DD'));
 pm.environment.set('dateYMDHMS', moment().format('YYYY-MM-DD HH:mm:ss'));
 pm.environment.set('dateISO', moment().toISOString());
 pm.environment.set('timestamp', moment().valueOf().toString());
-pm.environment.set('dateChina', moment().format('YYYYNămMMmặt trăngDDNgày HHthời gianmmđiểmssgiây'));
+pm.environment.set('dateVN', moment().format('DD/MM/YYYY HH:mm:ss'));
 
 // 11. Xử lý múi giờ (nếu được hỗ trợ)
 const utc = moment.utc();
@@ -2875,8 +2875,8 @@ pm.test("Kiểm tra xác nhận tùy chỉnh", function () {
 
 ```javascript
 // Pre-request Script: Kiểm tra đa ngôn ngữ quốc tế
-const languages = ['zh-CN', 'en-US', 'ja-JP', 'ko-KR', 'fr-FR'];
-const currentLang = pm.environment.get('testLanguage') || 'zh-CN';
+const languages = ['vi-VN', 'en-US', 'ja-JP', 'ko-KR', 'fr-FR'];
+const currentLang = pm.environment.get('testLanguage') || 'vi-VN';
 
 // Đặt tiêu đề yêu cầu ngôn ngữ
 pm.request.headers.upsert({
@@ -2894,18 +2894,18 @@ console.log('Ngôn ngữ kiểm tra hiện tại:', currentLang);
 // Post-request Script: Xác thực phản hồi đa ngôn ngữ
 pm.test("Xác thực phản hồi đa ngôn ngữ", function () {
     const jsonData = pm.response.json();
-    const lang = pm.request.headers.get('Accept-Language') || 'zh-CN';
+    const lang = pm.request.headers.get('Accept-Language') || 'vi-VN';
 
     // Kiểm tra trường ngôn ngữ trong phản hồi
     if (jsonData.message) {
         console.log('Trả lời tin nhắn (' + lang + '):', jsonData.message);
 
-        // Xác minh rằng phản hồi bằng tiếng Trung có chứa các ký tự tiếng Trung
-        if (lang === 'zh-CN') {
-            pm.expect(jsonData.message).to.match(/[\u4e00-\u9fa5]/);
+        // Phản hồi tiếng Việt phải có chữ cái có dấu của tiếng Việt
+        if (lang === 'vi-VN') {
+            pm.expect(jsonData.message).to.match(/[ăâđêôơưạảấầẩẫậắằẳẵặẹẻẽếềểễệỉịọỏốồổỗộớờởỡợụủứừửữựỳỵỷỹ]/i);
         }
 
-        // Xác minh rằng các câu trả lời bằng tiếng Anh chỉ chứaASCIInhân vật
+        // Xác minh rằng các câu trả lời bằng tiếng Anh chỉ chứa ký tự ASCII
         if (lang === 'en-US') {
             pm.expect(jsonData.message).to.match(/^[\x00-\x7F]*$/);
         }

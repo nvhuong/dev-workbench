@@ -1,10 +1,10 @@
 # Nguyên tắc đóng góp | Contributing Guide
 
-[English](#english) | [Tiếng Trung Quốc](#Tiếng Trung Quốc)
+[English](#english) | [Tiếng Việt](#tiếng-việt)
 
 ---
 
-## Tiếng Trung Quốc
+## Tiếng Việt
 
 Cảm ơn bạn vì điều đó DevWorkbench sự chú ý! Chúng tôi hoan nghênh sự đóng góp dưới mọi hình thức.
 
@@ -12,7 +12,7 @@ Cảm ơn bạn vì điều đó DevWorkbench sự chú ý! Chúng tôi hoan ngh
 
 Trước khi gửi đóng góp của bạn, vui lòng đảm bảo:
 
-1. Đọc [README](../README_zh.md) Tìm hiểu về dự án
+1. Đọc [README](../README_vi.md) Tìm hiểu về dự án
 2. Đã tìm kiếm [Issues](https://github.com/nvhuong/dev-workbench/issues) Xác nhận rằng vấn đề chưa được báo cáo
 3. Đã đọc hướng dẫn đóng góp này
 

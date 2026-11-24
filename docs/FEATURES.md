@@ -121,7 +121,7 @@ if (Number(input.amount) === 0.5) {
 - ✅ Bound response bodies and details, redact common credentials and error paths, and reserve stdout for MCP JSON-RPC
 - 🔒 MCP can make real external requests and return API responses to its client; authorize only trusted clients and required workspaces
 
-See the [MCP Server guide](MCP_SERVER_DESIGN_zh.md) for installation and complete boundaries.
+See the [MCP Server guide](MCP_SERVER_DESIGN_vi.md) for installation and complete boundaries.
 
 ---
 
@@ -249,7 +249,7 @@ See the [MCP Server guide](MCP_SERVER_DESIGN_zh.md) for installation and complet
 - ✅ Search and replace
 
 ### Internationalization
-- ✅ Simplified Chinese (Tiếng Trung giản thể)
+- ✅ Vietnamese (Tiếng Việt)
 - ✅ English
 - 🚧 More languages coming soon
 

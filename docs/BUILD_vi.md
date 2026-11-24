@@ -7,7 +7,7 @@ Tài liệu này chỉ nói về hai điều:
 
 Kiến trúc plug-in, phát triển plug-in cục bộ, trực tuyến/Để biết hướng dẫn cài đặt ngoại tuyến, hãy xem:
 
-- `docs/PLUGINS_zh.md`
+- `docs/PLUGINS_vi.md`
 
 ## Điều kiện tiên quyết
 
@@ -87,7 +87,7 @@ Nếu bạn muốn xây dựng tất cả các plugin cùng một lúc: .
 mvn clean package -DskipTests
 ```
 
-Thêm cài đặt plug-in, gói ngoại tuyến,catalog và ghi chú phân phối độc lập, xem `docs/PLUGINS_zh.md`。
+Thêm cài đặt plug-in, gói ngoại tuyến,catalog và ghi chú phân phối độc lập, xem `docs/PLUGINS_vi.md`。
 
 ---
 

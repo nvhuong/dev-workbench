@@ -5,5 +5,5 @@
 - https://www.svgrepo.com/
 - https://freesvgicons.com/search?q=http
 - https://flowbite.com/icons/
-- https://www.remove.bg/zh Xóa nền ảnh
+- https://www.remove.bg/ Xóa nền ảnh
 - https://www.photopea.com Thay đổi kích thước

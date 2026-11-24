@@ -43,4 +43,4 @@ Nếu điều bạn muốn làm là:
 
 - Xây dựng gói phát hành: xem `build/`
 - Plug-in được phát triển cục bộ/Xác minh cài đặt: Xem `scripts/plugin-dev.sh`
-- Kiến trúc plug-in và hướng dẫn sử dụng: xem `docs/PLUGINS_zh.md`
+- Kiến trúc plug-in và hướng dẫn sử dụng: xem `docs/PLUGINS_vi.md`

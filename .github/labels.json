@@ -25,7 +25,7 @@
   {"name": "windows", "color": "0078d7", "description": "Windowsnền tảng | Windows platform"},
   {"name": "macos", "color": "999999", "description": "macOSnền tảng | macOS platform"},
   {"name": "linux", "color": "fcc624", "description": "Linuxnền tảng | Linux platform"},
-  {"name": "chinese", "color": "d4c5f9", "description": "Tiếng Trung Quốc | Chinese language"},
+  {"name": "vietnamese", "color": "d4c5f9", "description": "Tiếng Việt | Vietnamese language"},
   {"name": "english", "color": "d4c5f9", "description": "Tiếng Anh | English language"},
   {"name": "good first issue", "color": "7057ff", "description": "Câu hỏi dành cho người mới | Good for newcomers"},
   {"name": "help wanted", "color": "008672", "description": "Cần giúp đỡ | Extra attention is needed"},

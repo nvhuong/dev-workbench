@@ -77,7 +77,7 @@ Tài liệu này giải thích DevWorkbench Đã thêm dự án GitHub tập tin
 - 🏷️ Xác định loại câu hỏi từ tiêu đề và nội dung (bug、feature、question）
 - 🧩 Identify relevant components (ui、api、performance、workspace Chờ đợi)
 - 💻 Identify the operating system (Windows、macOS、Linux）
-- 🌐 Recognize language (Chinese, English)
+- 🌐 Recognize language (Vietnamese, English)
 
 **tác dụng**: Tự động phân loại các vấn đề để thuận tiện cho việc quản lý và tìm kiếm
 
@@ -326,7 +326,7 @@ Vào Actions Trang chạy `Publish WinGet Manifest`，Chọn `mode=update`，Đi
    - `linux` - Linux nền tảng
 
 6. **Language tag**
-   - `chinese` - Tiếng Trung Quốc
+   - `vietnamese` - Tiếng Việt
    - `english` - Tiếng Anh
 
 7. **Thẻ đặc biệt**

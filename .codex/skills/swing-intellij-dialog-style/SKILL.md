@@ -95,4 +95,4 @@ scrollPane.setBorder(BorderFactory.createCompoundBorder(
 - Compile the app module: `mvn -q -pl dev-workbench-app -am -DskipTests compile`.
 - Run focused existing tests when a component has one, for example `StepIndicatorTest`.
 - For editable fields, manually reason or visually verify that the default state, focused state, and disabled state are distinguishable.
-- Check Chinese and English labels for truncation and excessive fixed-width assumptions.
+- Check Vietnamese and English labels for truncation and excessive fixed-width assumptions.

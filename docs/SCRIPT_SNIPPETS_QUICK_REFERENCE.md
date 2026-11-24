@@ -999,4 +999,4 @@ console.log('✓ Post-request Hoàn thành');
 
 ---
 
-**Để biết thêm chi tiết vui lòng tham khảo:** [SCRIPT_API_REFERENCE_zh.md](./SCRIPT_API_REFERENCE_zh.md)
+**Để biết thêm chi tiết vui lòng tham khảo:** [SCRIPT_API_REFERENCE_vi.md](./SCRIPT_API_REFERENCE_vi.md)

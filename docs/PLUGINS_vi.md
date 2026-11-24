@@ -14,7 +14,7 @@ Nếu bạn chỉ quan tâm đến một câu, bạn có thể nhớ câu này t
 
 Nếu bạn muốn xem nó bây giờ runtime Triển khai hạt nhân chứ không phải phát triển/Đối với quá trình phát hành, bạn có thể đọc trực tiếp: .
 
-- [PLUGIN_RUNTIME_ARCHITECTURE_zh.md](./PLUGIN_RUNTIME_ARCHITECTURE_zh.md)
+- [PLUGIN_RUNTIME_ARCHITECTURE_vi.md](./PLUGIN_RUNTIME_ARCHITECTURE_vi.md)
 
 ## 1. Phân lớp thành phần và nguyên tắc
 

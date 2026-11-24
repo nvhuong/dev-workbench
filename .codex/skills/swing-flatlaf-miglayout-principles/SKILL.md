@@ -1,6 +1,6 @@
 ---
 name: swing-flatlaf-miglayout-principles
-description: Use when modifying DevWorkbench Swing forms, tool-window panels, localized English/Chinese text layouts, or FlatLaf/MigLayout layouts, especially when refactors introduce clipped focus rings, truncated text, clipped status badges, dense spacing, border conflicts, rounded-card corner leaks, or inconsistent form structure.
+description: Use when modifying DevWorkbench Swing forms, tool-window panels, localized English/Vietnamese text layouts, or FlatLaf/MigLayout layouts, especially when refactors introduce clipped focus rings, truncated text, clipped status badges, dense spacing, border conflicts, rounded-card corner leaks, or inconsistent form structure.
 ---
 
 # Swing FlatLaf MigLayout Principles
@@ -35,7 +35,7 @@ Use this skill when editing Swing form layouts in this repo. The goal is not jus
    Reuse the simpler top-bar/form-row patterns already used in other toolbox panels where possible.
 
 6. Treat localized text as variable-width UI.
-   English status strings and Chinese labels can have very different widths. Do not rely on one locale fitting a fixed row.
+   English status strings and Vietnamese labels can have very different widths. Do not rely on one locale fitting a fixed row.
 
 ## Preferred fix order
 
@@ -74,14 +74,14 @@ Use this skill when editing Swing form layouts in this repo. The goal is not jus
 
 ## Localized text width
 
-- Treat every user-visible string as variable width across Chinese and English. Never tune a container only against the current screenshot locale.
+- Treat every user-visible string as variable width across Vietnamese and English. Never tune a container only against the current screenshot locale.
 - For compact UI surfaces such as toolbar buttons, tabs, sidebars, badges, table headers, and custom-painted summaries, decide which text is primary and which text may truncate before changing layout.
 - Use separate short i18n keys for compact commands or tabs when the full label is too long. Keep the full phrase in tooltips, detail panels, or accessible text instead of forcing one key to serve every surface.
 - Prefer layout capacity over font-size reduction: adjust `growx`, `wmin 0`, column constraints, dynamic preferred sizes, or custom `FontMetrics` measurement before considering typography.
 - For custom painting, measure translated labels with the actual `FontsUtil` font and allocate label/value areas dynamically. Avoid fixed label widths chosen from one locale.
 - Do not ellipsize critical labels or command text first. Ellipsize secondary values, metadata, long hostnames, certificate names, and paths; provide a tooltip or detail view with the full value.
 - Buttons with localized text should use familiar icons plus concise labels when space is tight. Icon-only buttons need tooltips and accessible names.
-- When fixing localized truncation, add a test at the source of the layout rule: assert the longest English and Chinese labels fit or that truncation has a full-value tooltip. Prefer width-budget tests over screenshot assertions.
+- When fixing localized truncation, add a test at the source of the layout rule: assert the longest English and Vietnamese labels fit or that truncation has a full-value tooltip. Prefer width-budget tests over screenshot assertions.
 
 ## Rounded tool-window card chrome
 
@@ -113,7 +113,7 @@ Use this skill when editing Swing form layouts in this repo. The goal is not jus
 
 ## Repo-specific guidance
 
-- For module placement before changing shared UI, read `docs/ARCHITECTURE_MODULES_zh.md` and keep reusable Swing components, colors, fonts, icons, notifications, and editor theme helpers in `dev-workbench-ui`.
+- For module placement before changing shared UI, read `docs/ARCHITECTURE_MODULES_vi.md` and keep reusable Swing components, colors, fonts, icons, notifications, and editor theme helpers in `dev-workbench-ui`.
 - Kafka top connection form is the known reference case:
   `dev-workbench-plugins/plugin-kafka/src/main/java/com/nvhuong/devworkbench/plugin/kafka/connection/ui/KafkaConnectionPanel.java`
 - The correct direction there was:
@@ -184,6 +184,6 @@ After the fix, verify all of the following:
 2. Focus a combo box in the same area.
 3. Confirm the highlight ring is visible on top, bottom, left, and right.
 4. Confirm spacing still looks intentional when the control is unfocused.
-5. For truncation fixes, verify the longest English and Chinese labels/statuses in the affected fixed-width container.
+5. For truncation fixes, verify the longest English and Vietnamese labels/statuses in the affected fixed-width container.
 6. For buttons, tabs, and custom-painted text, verify any truncated value has a tooltip or detail path with the full text.
 7. Rebuild with `mvn -q -DskipTests compile`.

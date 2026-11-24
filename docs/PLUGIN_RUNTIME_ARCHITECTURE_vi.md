@@ -12,7 +12,7 @@ Nó không lặp lại chính nó“Cách phát triển plug-in”hoặc“Cách
 
 Để biết các tài liệu tổng quan có liên quan, xem:
 
-- [PLUGINS_zh.md](./PLUGINS_zh.md)
+- [PLUGINS_vi.md](./PLUGINS_vi.md)
 
 ## 1. cấu trúc hiện tại
 

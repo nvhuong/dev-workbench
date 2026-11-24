@@ -23,5 +23,5 @@ mvn clean package -DskipTests
 
 Để biết thêm hướng dẫn, hãy xem:
 
-- `docs/PLUGINS_zh.md`
-- `docs/BUILD_zh.md`
+- `docs/PLUGINS_vi.md`
+- `docs/BUILD_vi.md`

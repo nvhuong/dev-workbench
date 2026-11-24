@@ -32,9 +32,9 @@ jobs:
             const body = (item.body || '').toLowerCase();
             const labels = [];
 
-            // Phát hiện ngôn ngữ: Nếu nội dung có chứa ký tự tiếng Trung thì hãy thêm vào 'chinese' Nhãn
-            if (body.includes('chinese') || /[\u4e00-\u9fa5]/.test(body)) {
-              labels.push('chinese');
+            // Phát hiện ngôn ngữ: nội dung có chữ cái riêng của tiếng Việt thì gắn nhãn 'vietnamese'
+            if (/[ăâđêôơưạảấầẩẫậắằẳẵặẹẻẽếềểễệỉịọỏốồổỗộớờởỡợụủứừửữựỳỵỷỹ]/.test(title + ' ' + body)) {
+              labels.push('vietnamese');
             }
 
             // Đã phát hiện từ tiêu đề issue loại

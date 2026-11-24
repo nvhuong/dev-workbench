@@ -9,7 +9,7 @@ Use this skill before adding shared code or moving code between modules. The goa
 
 ## Source of truth
 
-Read `docs/ARCHITECTURE_MODULES_zh.md` first when the task is about module placement, architecture cleanup, shared UI, plugin contracts, i18n, theme, font, settings, startup, update, welcome/help, request core, collection core, API core, or performance core.
+Read `docs/ARCHITECTURE_MODULES_vi.md` first when the task is about module placement, architecture cleanup, shared UI, plugin contracts, i18n, theme, font, settings, startup, update, welcome/help, request core, collection core, API core, or performance core.
 
 ## Placement rules
 
@@ -89,7 +89,7 @@ If preserving compatibility is the goal instead, keep a binary-compatible facade
 
 ## SVG Icon Guidance
 
-- `README.md` and `README_zh.md` declare SVG icons are sourced from Lucide / `lucide-icons/lucide` under the ISC license. For new or refreshed generic UI/action/sidebar icons, start from Lucide before inventing custom paths.
+- `README.md` and `README_vi.md` declare SVG icons are sourced from Lucide / `lucide-icons/lucide` under the ISC license. For new or refreshed generic UI/action/sidebar icons, start from Lucide before inventing custom paths.
 - Keep single-color themeable SVGs as `viewBox="0 0 24 24"`, `fill="none"`, `stroke="currentColor"`, `stroke-width="2"`, `stroke-linecap="round"`, and `stroke-linejoin="round"` to match existing sidebar icons.
 - Use `IconUtil.createThemed(...)` for neutral sidebar/status/tool icons so light and dark themes can recolor them. Use fixed-color SVGs or `IconUtil.create(...)` only for brand, protocol, or status assets that intentionally carry their own colors.
 - Resource ownership still applies: generic actions in `dev-workbench-ui`, app/domain icons in app, plugin icons in plugin resources. Do not duplicate `icons/*.svg` names across modules.

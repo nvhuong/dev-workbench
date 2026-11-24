@@ -255,7 +255,7 @@ java -DdevWorkbench.data.dir="$RUNNER_TEMP/dev-workbench-data" \
   -e "CI"
 ```
 
-Secret Không nên nộp cho workspace。Có thể vào CI tạm thời checkout Được sử dụng ở Trung Quốc `jq` Tiêm một bản sao của môi trường: .
+Không nên commit secret vào workspace. Trong CI, có thể dùng `jq` để chèn secret vào một bản sao tạm thời của file môi trường:
 
 ```bash
 jq --arg token "$API_TOKEN" '
@@ -325,4 +325,4 @@ java -jar dev-workbench-app/target/dev-workbench-*.jar \
 
 This command sends a request and completes two assertions.
 
-Kiểm tra chức năng CLI Xem [`FUNCTIONAL_CLI_zh.md`](FUNCTIONAL_CLI_zh.md)。
+Kiểm tra chức năng CLI Xem [`FUNCTIONAL_CLI_vi.md`](FUNCTIONAL_CLI_vi.md)。

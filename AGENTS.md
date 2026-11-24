@@ -47,7 +47,7 @@ When choosing a module, use this rule set:
 - Inside `dev-workbench-app`, do not recreate a generic `com.nvhuong.devworkbench.model` package for HTTP runtime exchange data. Domain-specific app models belong with their owner package, for example `functional.model`, `script.model`, `stream`, `snippet`, `history`, `certificate`, `variable`, `environment`, and `service.curl`.
 - Do not put SPI code, shared UI components, or shared foundation utilities directly into `dev-workbench-app`.
 
-Reference module rules: `docs/ARCHITECTURE_MODULES_zh.md`.
+Reference module rules: `docs/ARCHITECTURE_MODULES_vi.md`.
 
 ---
 
@@ -219,7 +219,7 @@ Platform update code must not import app `SettingManager`; use `UpdateSettingsPr
 - **Plugin service interfaces** (`GitPluginService`, `ClientCertificatePluginService`, `RequestCollectionImportService`) live in `dev-workbench-plugin-api` under `com.nvhuong.devworkbench.plugin.api.service`. Plugins register implementations via `context.registerService(GitPluginService.class, impl)`. Host code retrieves them through `PluginAccess.getService(Type.class)` or typed app-side accessors such as `GitServiceAccess` and `ClientCertificatePluginAccess` in `com.nvhuong.devworkbench.plugin.host`.
 - Version model: `revision` = host release version; `plugin.platform.version` = plugin compatibility boundary for SPI, runtime wiring, and public APIs in platform modules that plugins may depend on. Only bump `plugin.platform.version` when those boundaries change incompatibly.
 - Catalog source of truth: `pom.xml → descriptor → release asset → catalog`. Do not hand-edit `plugin-catalog/` or the bundled fallback in `plugin-manager/src/main/resources/plugin-catalog/` independently — update both together.
-- Reference runtime architecture: `docs/PLUGIN_RUNTIME_ARCHITECTURE_zh.md`.
+- Reference runtime architecture: `docs/PLUGIN_RUNTIME_ARCHITECTURE_vi.md`.
 
 ---
 

@@ -1,70 +1,35 @@
-# 🖼️ Screenshots Gallery
+# 🖼️ Screenshots
 
-## Application Icon & Welcome Screen
+[Tiếng Việt](SCREENSHOTS_vi.md)
 
-|                                 Icon                                  |                                  Welcome Screen                                   |
-|:---------------------------------------------------------------------:|:---------------------------------------------------------------------------------:|
-|                          ![icon](icon.png)                          |                        ![welcome](welcome.png)                        |
+## API debugging
 
-## Main Interface
+| Request and response | Dark theme |
+|:---:|:---:|
+| ![API request and response](collections.png) | ![Dark theme](dark-collections.png) |
 
-### Collections Management
-|                                 Collections                                  |                                  Import Collections                                   |
-|:----------------------------------------------------------------------------:|:--------------------------------------------------------------------------------------:|
-|                   ![collections](collections.png)                   |             ![collections-import](collections-import.png)             |
+## Scripts
 
-### Dark Mode
-|                                 Dark Collections                                  |                                  Dark Performance Trend                                   |
-|:---------------------------------------------------------------------------------:|:-----------------------------------------------------------------------------------------:|
-|            ![dark-collections](dark-collections.png)            |          ![dark-performance-trend](dark-performance-trend.png)          |
+| Script editor and snippets |
+|:---:|
+| ![Script snippets](script-snippets.png) |
 
-## Environment & Functional Testing
+## Functional and performance testing
 
-### Functional Testing
-|                                 Functional Testing                                  |                                  Functional Test 1                                   |                                  Functional Test 2                                   |
-|:-----------------------------------------------------------------------------------:|:------------------------------------------------------------------------------------:|:------------------------------------------------------------------------------------:|
-|                     ![functional](functional.png)                     |                  ![functional_1](functional_1.png)                  |                  ![functional_2](functional_2.png)                  |
+| Functional test | Performance report |
+|:---:|:---:|
+| ![Functional test](functional.png) | ![Performance report](performance.png) |
 
-|                                 Functional Results                                  |
-|:-----------------------------------------------------------------------------------:|
-|                ![functional-results](functional-results.png)                |
+| Performance trend |
+|:---:|
+| ![Performance trend](performance-trend.png) |
 
-## Performance Testing
+## Plugins
 
-### Main Interface
-|                                 Performance Testing                                  |
-|:------------------------------------------------------------------------------------:|
-|                   ![performance](performance.png)                   |
+| SQL | Redis |
+|:---:|:---:|
+| ![SQL plugin](plugin-sql.png) | ![Redis plugin](plugin-redis.png) |
 
-### Reports & Analysis
-|                                 Performance Report                                  |                                  Performance Trend                                   |
-|:-----------------------------------------------------------------------------------:|:------------------------------------------------------------------------------------:|
-|             ![performance-report](performance-report.png)             |              ![performance-trend](performance-trend.png)              |
-
-### Thread Group Modes
-|                                 Fixed Threads                                  |                                  Ramp-up Threads                                   |
-|:------------------------------------------------------------------------------:|:----------------------------------------------------------------------------------:|
-| ![performance-threadgroup-fixed](performance-threadgroup-fixed.png) | ![performance-threadgroup-rampup](performance-threadgroup-rampup.png) |
-
-|                                 Spike Threads                                  |                                  Stairs Threads                                   |
-|:------------------------------------------------------------------------------:|:---------------------------------------------------------------------------------:|
-| ![performance-threadgroup-spike](performance-threadgroup-spike.png) | ![performance-threadgroup-stairs](performance-threadgroup-stairs.png) |
-
-## Script Support
-
-### Tests Script
-|                                  Tests Script                                   |
-|:-------------------------------------------------------------------------------:|
-|                    ![script-post](script-post.png)                    |
-
-### Script Snippets
-|                                 Code Snippets Library                                  |
-|:--------------------------------------------------------------------------------------:|
-|               ![script-snippets](script-snippets.png)               |
-
-## Git Integration
-
-### Git Commit
-|                                 Git Workspace Commit                                  |
-|:-------------------------------------------------------------------------------------:|
-|           ![workspaces-gitcommit](workspaces-gitcommit.png)           |
+| Plugin Center |
+|:---:|
+| ![Plugin Center](plugin-center.png) |

@@ -276,7 +276,7 @@ java -DdevWorkbench.data.dir="$RUNNER_TEMP/dev-workbench-data" \
   -e "CI"
 ```
 
-Secret Không nên viết Git workspace。Có thể vào CI tạm thời checkout Được sử dụng ở Trung Quốc `jq` tiêm: .
+Không nên ghi secret vào Git workspace. Trong CI, có thể dùng `jq` để chèn secret vào bản checkout tạm thời:
 
 ```bash
 jq --arg token "$API_TOKEN" '
@@ -342,4 +342,4 @@ java -jar dev-workbench-app/target/dev-workbench-*.jar \
 
 This command reads `functional_config.json` yêu cầu đã chọn và hai dòng nội tuyến CSV，Thực hiện hai vòng, gửi hai yêu cầu và hoàn thành bốn xác nhận.
 
-tập trung CLI Xem [`COLLECTION_CLI_zh.md`](COLLECTION_CLI_zh.md)。
+tập trung CLI Xem [`COLLECTION_CLI_vi.md`](COLLECTION_CLI_vi.md)。

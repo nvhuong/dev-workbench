@@ -121,7 +121,7 @@ if (Number(input.amount) === 0.5) {
 - ✅ Có giới hạn trên đối với nội dung và thông tin chi tiết của phản hồi, đồng thời, dữ liệu xác thực chung và đường dẫn lỗi sẽ bị loại bỏ.stdout Chỉ đầu ra MCP JSON-RPC
 - 🔒 MCP Một yêu cầu thực sự bên ngoài có thể được thực hiện và phản hồi được trả về cho khách hàng. Chỉ những khách hàng đáng tin cậy và không gian làm việc cần thiết mới được ủy quyền
 
-Xem cài đặt với đường viền hoàn chỉnh [MCP Server Tài liệu](MCP_SERVER_DESIGN_zh.md)。
+Xem cài đặt với đường viền hoàn chỉnh [MCP Server Tài liệu](MCP_SERVER_DESIGN_vi.md)。
 
 ---
 
@@ -248,8 +248,8 @@ Xem cài đặt với đường viền hoàn chỉnh [MCP Server Tài liệu](MC
 - ✅ Gấp mã
 - ✅ Tìm kiếm và thay thế
 
-### quốc tế hóa
-- ✅ Tiếng Trung giản thể
+### Đa ngôn ngữ
+- ✅ Tiếng Việt
 - ✅ English
 - 🚧 Sắp có thêm nhiều ngôn ngữ
 

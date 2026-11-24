@@ -4,7 +4,7 @@
 
 # DevWorkbench
 
-**An open-source DevWorkbench-style API client + JMeter-style load testing desktop app**<br>
+**An open-source Postman-style API client + JMeter-style load testing desktop app**<br>
 *Local-first · Git workspaces · Headless CLI · Built-in MCP Server*
 
 [![GitHub release](https://img.shields.io/github/v/release/nvhuong/dev-workbench?style=flat-square&color=brightgreen)](https://github.com/nvhuong/dev-workbench/releases)
@@ -13,7 +13,7 @@
 [![Java](https://img.shields.io/badge/Java-21+-ED8B00?style=flat-square&logo=openjdk&logoColor=white)](https://openjdk.org/)
 [![Platform](https://img.shields.io/badge/Platform-Windows%20%7C%20macOS%20%7C%20Linux-0078D4?style=flat-square)](https://github.com/nvhuong/dev-workbench/releases)
 
-[Tiếng Trung giản thể](README_zh.md) · [📦 Download](#-download-and-install) · [🤖 Install MCP](#-mcp-server) · [📖 Docs](#-documentation) · [💬 Discuss](https://github.com/nvhuong/dev-workbench/discussions)
+[Tiếng Việt](README_vi.md) · [📦 Download](#-download-and-install) · [🤖 Install MCP](#-mcp-server) · [📖 Docs](#-documentation) · [💬 Discuss](https://github.com/nvhuong/dev-workbench/discussions)
 
 </div>
 
@@ -21,15 +21,16 @@
 
 ## What is DevWorkbench?
 
-DevWorkbench combines **DevWorkbench-style API debugging** and **JMeter-style performance testing** in one Java 21 desktop application. Collections, environments, and test data stay local by default, while Git workspaces support team collaboration. The same workspace can also run in CI through the headless CLI or be exposed to AI clients such as Codex, Claude Desktop, and Cursor through MCP.
+DevWorkbench combines **Postman-style API debugging** and **JMeter-style performance testing** in one Java 21 desktop application. Collections, environments, and test data stay local by default, while Git workspaces support team collaboration. The same workspace can also run in CI through the headless CLI or be exposed to AI clients such as Codex, Claude Desktop, and Cursor through MCP.
 
 | Core capability | What it provides |
 |---|---|
 | 🔌 API debugging | HTTP/HTTPS, SSE, WebSocket, auth, cookies, multiple body types, response inspection, and network logs |
-| 🧩 Collections and scripts | DevWorkbench v2.1 / cURL import, environments, pre/post scripts, assertions, and request chaining |
+| 🧩 Collections and scripts | Postman v2.1 / cURL import, environments, pre/post scripts, assertions, and request chaining |
 | ⚡ Performance testing | Thread groups, timers, extractors, live metrics, PDF reports, and distributed master/worker runs |
 | 🏢 Local and Git workspaces | Isolated collections, environments, and settings with user-controlled storage |
-| 🤖 MCP and headless CLI | Let AI run saved APIs; run collections, functional tests, and load plans in CI |
+| 🧰 Plugins | SQL (Oracle, MySQL, PostgreSQL…), Redis, Kafka, MinIO, Remote (SSH terminal), Capture, Decompiler, Client Certificate |
+| 🤖 MCP and headless CLI | Let AI run saved APIs and use the plugins; run collections, functional tests, and load plans in CI |
 
 📖 [See the full feature list](docs/FEATURES.md)
 
@@ -37,20 +38,20 @@ DevWorkbench combines **DevWorkbench-style API debugging** and **JMeter-style pe
 
 <table>
   <tr>
-    <th width="50%">DevWorkbench-style API debugging</th>
-    <th width="50%">JMeter-style performance testing</th>
+    <th width="50%">API debugging</th>
+    <th width="50%">Performance testing</th>
   </tr>
   <tr>
     <td><a href="docs/collections.png"><img src="docs/collections.png" alt="Collections and response viewer" width="100%"></a></td>
     <td><a href="docs/performance-trend.png"><img src="docs/performance-trend.png" alt="Performance trend dashboard" width="100%"></a></td>
   </tr>
   <tr>
-    <th width="50%">Scripts, assertions, and snippets</th>
-    <th width="50%">Git workspace collaboration</th>
+    <th width="50%">SQL plugin</th>
+    <th width="50%">Scripts and snippets</th>
   </tr>
   <tr>
+    <td><a href="docs/plugin-sql.png"><img src="docs/plugin-sql.png" alt="SQL plugin" width="100%"></a></td>
     <td><a href="docs/script-snippets.png"><img src="docs/script-snippets.png" alt="Script snippets and editor support" width="100%"></a></td>
-    <td><a href="docs/workspaces-gitcommit.png"><img src="docs/workspaces-gitcommit.png" alt="Git workspace management" width="100%"></a></td>
   </tr>
 </table>
 
@@ -140,9 +141,9 @@ JSON-based clients such as Claude Desktop and Cursor normally place the object a
 
 AI can list workspaces, collections, environments, and saved requests, then use `run_request` or `run_collection` to select a workspace and environment for that call and execute HTTP APIs. Environment values are not exposed by listing tools. API response bodies are returned to the MCP client, so do not authorize workspaces containing sensitive business data to an untrusted client.
 
-MCP can discover and execute only saved HTTP requests in authorized workspaces; it cannot construct an arbitrary URL on demand. API response bodies are returned to the MCP client, and requests can cause real business side effects, so only trusted MCP clients should receive access to production workspaces.
+MCP can discover and execute only saved HTTP requests in authorized workspaces; it cannot construct an arbitrary URL on demand. Installed plugins add tools for SQL, Redis, Kafka, MinIO, and the decompiler; they connect through the profiles saved in each plugin, so passwords never pass through the AI client. Tools that change data (`sql_execute`, `redis_write`, `kafka_send`, `minio_presigned_url`) are only available when `--allow-writes` is added to `args`. API response bodies are returned to the MCP client, and requests can cause real business side effects, so only trusted MCP clients should receive access to production workspaces.
 
-📖 [Full MCP setup, tools, architecture, and security guide (Chinese)](docs/MCP_SERVER_DESIGN_zh.md)
+📖 [Full MCP setup, tools, architecture, and security guide (Vietnamese)](docs/MCP_SERVER_DESIGN_vi.md)
 
 ## 🚀 Quick start
 
@@ -162,7 +163,7 @@ mvn -pl dev-workbench-app -am -DskipTests clean package
 java -jar dev-workbench-app/target/dev-workbench-*.jar
 ```
 
-📖 [Full build guide (Chinese)](docs/BUILD_zh.md)
+📖 [Full build guide (Vietnamese)](docs/BUILD_vi.md)
 
 ## 🧪 Headless CLI
 
@@ -173,21 +174,21 @@ java -jar dev-workbench.jar collection run /srv/api-workspace -c "Basic HTTP Exa
 java -jar dev-workbench.jar functional run /srv/api-workspace --bail --out target/result.json
 ```
 
-- [Collection CLI guide (Chinese)](docs/COLLECTION_CLI_zh.md)
-- [Functional CLI guide (Chinese)](docs/FUNCTIONAL_CLI_zh.md)
-- [Distributed load testing guide (Chinese)](docs/PERFORMANCE_CLUSTER_LOAD_TEST_zh.md)
+- [Collection CLI guide (Vietnamese)](docs/COLLECTION_CLI_vi.md)
+- [Functional CLI guide (Vietnamese)](docs/FUNCTIONAL_CLI_vi.md)
+- [Distributed load testing guide (Vietnamese)](docs/PERFORMANCE_CLUSTER_LOAD_TEST_vi.md)
 
 ## 📚 Documentation
 
 | Guide | Contents |
 |---|---|
 | [Feature reference](docs/FEATURES.md) | API debugging, scripts, Mock Server, performance testing, and workspaces |
-| [MCP Server](docs/MCP_SERVER_DESIGN_zh.md) | Setup, tool inputs, workspace/environment routing, architecture, and security |
-| [Collection CLI](docs/COLLECTION_CLI_zh.md) | Headless collection runs, variables, data, uploads, and CI exit codes |
-| [Functional CLI](docs/FUNCTIONAL_CLI_zh.md) | Run functional tests from `functional_config.json` |
-| [Plugin architecture](docs/PLUGINS_zh.md) | Plugin development and online/offline installation |
-| [Script API](docs/SCRIPT_API_REFERENCE_zh.md) | Pre-request and test script reference |
-| [Build guide](docs/BUILD_zh.md) | Source builds and native installers |
+| [MCP Server](docs/MCP_SERVER_DESIGN_vi.md) | Setup, tool inputs, workspace/environment routing, architecture, and security |
+| [Collection CLI](docs/COLLECTION_CLI_vi.md) | Headless collection runs, variables, data, uploads, and CI exit codes |
+| [Functional CLI](docs/FUNCTIONAL_CLI_vi.md) | Run functional tests from `functional_config.json` |
+| [Plugin architecture](docs/PLUGINS_vi.md) | Plugin development and online/offline installation |
+| [Script API](docs/SCRIPT_API_REFERENCE_vi.md) | Pre-request and test script reference |
+| [Build guide](docs/BUILD_vi.md) | Source builds and native installers |
 | [FAQ](docs/FQA.MD) | Installation and usage questions |
 
 ## 🛠️ Development and contributing
@@ -210,7 +211,7 @@ If DevWorkbench helps you, consider giving it a [Star](https://github.com/nvhuon
 
 <div align="center">
 
-**DevWorkbench-style API debugging, JMeter-style performance testing**
+**Postman-style API debugging, JMeter-style performance testing**
 
 Made with ❤️ by [nvhuong](https://github.com/nvhuong)
 
