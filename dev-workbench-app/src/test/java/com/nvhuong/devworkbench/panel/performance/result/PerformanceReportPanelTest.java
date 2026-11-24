@@ -269,10 +269,10 @@ public class PerformanceReportPanelTest extends AbstractSwingUiTest {
         ResourceBundle zh = ResourceBundle.getBundle("messages", Locale.forLanguageTag("vi"));
         assertEquals(zh.getString(MessageKeys.PERFORMANCE_REPORT_COLUMN_AVG_SESSION), "Thời gian lấy mẫu trung bình");
         assertEquals(zh.getString(MessageKeys.PERFORMANCE_REPORT_COLUMN_AVG_STREAM), "Thời gian lấy mẫu trung bình");
-        assertEquals(zh.getString(MessageKeys.PERFORMANCE_REPORT_COLUMN_P95_SESSION), "P95 Lấy mẫu tốn thời gian");
-        assertEquals(zh.getString(MessageKeys.PERFORMANCE_REPORT_COLUMN_P95_STREAM), "P95 Lấy mẫu tốn thời gian");
-        assertEquals(zh.getString(MessageKeys.PERFORMANCE_REPORT_COLUMN_SENT_KB_PER_SEC), "gửi KB/s");
-        assertEquals(zh.getString(MessageKeys.PERFORMANCE_REPORT_COLUMN_RECEIVED_KB_PER_SEC), "nhận KB/s");
+        assertEquals(zh.getString(MessageKeys.PERFORMANCE_REPORT_COLUMN_P95_SESSION), "Thời gian lấy mẫu P95");
+        assertEquals(zh.getString(MessageKeys.PERFORMANCE_REPORT_COLUMN_P95_STREAM), "Thời gian lấy mẫu P95");
+        assertEquals(zh.getString(MessageKeys.PERFORMANCE_REPORT_COLUMN_SENT_KB_PER_SEC), "Gửi KB/giây");
+        assertEquals(zh.getString(MessageKeys.PERFORMANCE_REPORT_COLUMN_RECEIVED_KB_PER_SEC), "Nhận KB/giây");
         assertEquals(zh.getString(MessageKeys.PERFORMANCE_TREND_SESSION_DURATION_MS), "Thời lượng phiên hoạt động (ms)");
         assertEquals(zh.getString(MessageKeys.PERFORMANCE_TREND_STREAM_DURATION_MS), "Thời lượng luồng hoạt động (ms)");
         assertEquals(zh.getString(MessageKeys.PERFORMANCE_TREND_ACTIVE_WS), "Số lượng phiên");

@@ -188,8 +188,13 @@ Xem cài đặt với đường viền hoàn chỉnh [MCP Server Tài liệu](MC
   - Phân tích tỷ lệ lỗi
   - thành công/Thống kê thất bại
 - ✅ Phân tích cây kết quả
-- ✅ Biểu đồ xu hướng hiệu suất
-- ✅ Xuất kết quả kiểm tra
+- ✅ Biểu đồ xu hướng hiệu năng
+- ✅ Xuất báo cáo ra HTML hoặc PDF (khổ A4), theo ngôn ngữ của app
+
+### Functional test
+- ✅ Chạy lần lượt các request đã lưu, hỗ trợ dữ liệu CSV cho nhiều vòng lặp
+- ✅ Tổng quan kết quả: tỷ lệ đạt, thời gian, trạng thái và assertion của từng request
+- ✅ Xuất báo cáo lượt chạy ra ảnh PNG (tổng quan, toàn bộ request, chi tiết lỗi)
 
 ---
 

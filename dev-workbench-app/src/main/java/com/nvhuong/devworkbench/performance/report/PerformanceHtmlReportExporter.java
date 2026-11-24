@@ -41,7 +41,7 @@ public class PerformanceHtmlReportExporter {
         if (populated.isEmpty()) {
             throw new IllegalArgumentException(I18nUtil.getMessage(MessageKeys.PERFORMANCE_REPORT_MARKDOWN_EMPTY));
         }
-        var safe = context == null ? new PerformanceReportPdfExporter.ReportContext("Performance Test Report", null,
+        var safe = context == null ? new PerformanceReportPdfExporter.ReportContext(message(MessageKeys.PERFORMANCE_REPORT_MARKDOWN_TITLE), null,
                 "", List.of(), List.of(), "", List.of()) : context;
         StringBuilder html = new StringBuilder(24_000);
         html.append("<!DOCTYPE html><html xmlns=\"http://www.w3.org/1999/xhtml\" lang=\"").append(I18nUtil.currentLocale().toLanguageTag()).append("\"><head>")
@@ -56,11 +56,11 @@ public class PerformanceHtmlReportExporter {
         appendSummary(html, populated);
         appendCharts(html, safe.trendPoints(), safe.samples());
         appendSlowest(html, populated);
-        html.append("<section><h2>2. Metrics for each request</h2>");
+        html.append("<section><h2>").append(escape(message(MessageKeys.PERFORMANCE_HTML_METRICS_SECTION))).append("</h2>");
         for (var table : populated) appendTable(html, table);
         html.append("</section>");
         appendErrors(html, safe.error(), populated, safe.samples());
-        html.append("<footer>Dev Workbench · Performance Test Report</footer></main></body></html>");
+        html.append("<footer>").append(escape(message(MessageKeys.PERFORMANCE_HTML_FOOTER))).append("</footer></main></body></html>");
         return html.toString();
     }
 
@@ -111,7 +111,7 @@ public class PerformanceHtmlReportExporter {
     }
 
     private void appendSetup(StringBuilder html, PerformanceReportPdfExporter.ReportContext context) {
-        html.append("<section><h2>Test setup</h2>");
+        html.append("<section><h2>" + escape(message(MessageKeys.PERFORMANCE_HTML_SETUP)) + "</h2>");
         String users = "—", duration = "—", load = "—", environment = context.environment().isBlank() ? "—" : context.environment();
         if (context.plan() != null) {
             List<ThreadGroupData> groups = new ArrayList<>();
@@ -120,24 +120,31 @@ public class PerformanceHtmlReportExporter {
                 ThreadGroupData group = groups.getFirst();
                 users = String.valueOf(maxUsers(group));
                 duration = durationSeconds(group) + " s";
-                load = group.threadMode.name().replace('_', ' ');
+                load = message(group.threadMode.getMessageKey());
             }
         }
         html.append("<div class=\"cards setup\">");
-        card(html, "Virtual users", users);
-        card(html, "Duration", duration);
-        card(html, "Load profile", load);
+        card(html, message(MessageKeys.PERFORMANCE_HTML_VIRTUAL_USERS), users);
+        card(html, message(MessageKeys.PERFORMANCE_HTML_DURATION), duration);
+        card(html, message(MessageKeys.PERFORMANCE_HTML_LOAD_PROFILE), load);
         html.append("</div><div class=\"cards setup\">");
-        card(html, "Environment", environment);
-        card(html, "Start time", context.plan() == null ? "—" : formatStartTime(context.plan().getGeneratedAt()));
-        card(html, "Run source", context.plan() == null ? "Local" : context.plan().getGeneratedBy());
+        card(html, message(MessageKeys.PERFORMANCE_HTML_ENVIRONMENT), environment);
+        card(html, message(MessageKeys.PERFORMANCE_HTML_START_TIME), context.plan() == null ? "—" : formatStartTime(context.plan().getGeneratedAt()));
+        card(html, message(MessageKeys.PERFORMANCE_HTML_RUN_SOURCE), context.plan() == null ? message(MessageKeys.PERFORMANCE_HTML_LOCAL) : context.plan().getGeneratedBy());
         if (!context.serviceResources().isEmpty()) {
-            html.append("</div><h3>Service resources</h3><table><thead><tr><th>Service</th><th>Instances</th><th>CPU / instance</th><th>Total CPU</th><th>RAM / instance</th><th>Total RAM</th></tr></thead><tbody>");
+            html.append("</div><h3>").append(escape(message(MessageKeys.PERFORMANCE_HTML_SERVICE_RESOURCES))).append("</h3><table><thead><tr>");
+            for (String key : List.of(MessageKeys.PERFORMANCE_HTML_SERVICE, MessageKeys.PERFORMANCE_HTML_INSTANCES,
+                    MessageKeys.PERFORMANCE_HTML_CPU_PER_INSTANCE, MessageKeys.PERFORMANCE_HTML_TOTAL_CPU,
+                    MessageKeys.PERFORMANCE_HTML_RAM_PER_INSTANCE, MessageKeys.PERFORMANCE_HTML_TOTAL_RAM)) {
+                html.append("<th>").append(escape(message(key))).append("</th>");
+            }
+            html.append("</tr></thead><tbody>");
+            String cores = " " + escape(message(MessageKeys.PERFORMANCE_HTML_CORES));
             for (var resource : context.serviceResources()) {
                 html.append("<tr><td>").append(escape(resource.getServiceName())).append("</td><td>")
                         .append(resource.getInstances()).append("</td><td>").append(resource.getCpuCores())
-                        .append(" cores</td><td>").append(resource.getCpuCores() * resource.getInstances())
-                        .append(" cores</td><td>").append(resource.getMemoryGb()).append(" GB</td><td>")
+                        .append(cores).append("</td><td>").append(resource.getCpuCores() * resource.getInstances())
+                        .append(cores).append("</td><td>").append(resource.getMemoryGb()).append(" GB</td><td>")
                         .append(resource.getMemoryGb() * resource.getInstances()).append(" GB</td></tr>");
             }
             html.append("</tbody></table><div class=\"cards setup\">");
@@ -155,17 +162,17 @@ public class PerformanceHtmlReportExporter {
 
     private void appendSummary(StringBuilder html, List<PerformanceReportMarkdownBuilder.ReportTable> tables) {
         var http = tables.stream().filter(table -> table.columns().size() == 14).findFirst().orElse(null);
-        html.append("<section><h2>1. Summary</h2><div class=\"cards summary\">");
+        html.append("<section><h2>" + escape(message(MessageKeys.PERFORMANCE_HTML_SUMMARY)) + "</h2><div class=\"cards summary\">");
         if (http != null) {
             Object[] total = http.rows().getLast();
-            card(html, "Total requests", cell(total, 1));
-            card(html, "Throughput", cell(total, 5) + " requests/s");
-            card(html, "Average response time", cell(total, 8));
+            card(html, message(MessageKeys.PERFORMANCE_HTML_TOTAL_REQUESTS), cell(total, 1));
+            card(html, message(MessageKeys.PERFORMANCE_HTML_THROUGHPUT), cell(total, 5) + " " + message(MessageKeys.PERFORMANCE_HTML_REQUESTS_PER_SECOND));
+            card(html, message(MessageKeys.PERFORMANCE_HTML_AVERAGE_RESPONSE), cell(total, 8));
             double totalRequests = parse(total[1]);
             double failures = parse(total[3]);
-            card(html, "Error rate", totalRequests <= 0 ? "0.00%"
+            card(html, message(MessageKeys.PERFORMANCE_HTML_ERROR_RATE), totalRequests <= 0 ? "0.00%"
                     : String.format(Locale.ROOT, "%.2f%%", failures * 100d / totalRequests));
-        } else html.append("<p class=\"muted\">Summary metrics are unavailable for this protocol.</p>");
+        } else html.append("<p class=\"muted\">").append(escape(message(MessageKeys.PERFORMANCE_HTML_SUMMARY_UNAVAILABLE))).append("</p>");
         html.append("</div></section>");
     }
 
@@ -174,18 +181,20 @@ public class PerformanceHtmlReportExporter {
         boolean fromTrend = hasChartData(trendPoints);
         List<TrendReportPoint> points = fromTrend
                 ? trendPoints : chartPointsFromSamples(samples);
-        String source = fromTrend ? "Sampled during the run." : "Reconstructed from retained request results.";
-        html.append("<section><div class=\"chart-block\"><h2>1.1 Response time</h2><p class=\"muted\">Average and maximum response time over the test duration. ")
+        String source = escape(message(fromTrend ? MessageKeys.PERFORMANCE_HTML_SAMPLED : MessageKeys.PERFORMANCE_HTML_RECONSTRUCTED));
+        html.append("<section><div class=\"chart-block\"><h2>").append(escape(message(MessageKeys.PERFORMANCE_HTML_RESPONSE_TIME_SECTION))).append("</h2><p class=\"muted\">")
+                .append(escape(message(MessageKeys.PERFORMANCE_HTML_RESPONSE_TIME_DESC))).append(" ")
                 .append(source).append("</p>");
         if (points.isEmpty()) {
-            html.append("<div class=\"empty\">Chart data is unavailable.</div>");
+            html.append("<div class=\"empty\">").append(escape(message(MessageKeys.PERFORMANCE_HTML_CHART_UNAVAILABLE))).append("</div>");
         } else {
-            chart(html, points, "Response time", "ms", false);
+            chart(html, points, message(MessageKeys.PERFORMANCE_HTML_RESPONSE_TIME), "ms", false);
         }
-        html.append("</div><div class=\"chart-block\"><h2>1.2 Throughput</h2><p class=\"muted\">Requests completed per second. ")
+        html.append("</div><div class=\"chart-block\"><h2>").append(escape(message(MessageKeys.PERFORMANCE_HTML_THROUGHPUT_SECTION))).append("</h2><p class=\"muted\">")
+                .append(escape(message(MessageKeys.PERFORMANCE_HTML_THROUGHPUT_DESC))).append(" ")
                 .append(source).append("</p>");
-        if (points.isEmpty()) html.append("<div class=\"empty\">Chart data is unavailable.</div>");
-        else chart(html, points, "Throughput", "req/s", true);
+        if (points.isEmpty()) html.append("<div class=\"empty\">").append(escape(message(MessageKeys.PERFORMANCE_HTML_CHART_UNAVAILABLE))).append("</div>");
+        else chart(html, points, message(MessageKeys.PERFORMANCE_HTML_THROUGHPUT), "req/s", true);
         html.append("</div></section>");
     }
 
@@ -302,8 +311,8 @@ public class PerformanceHtmlReportExporter {
             html.append("<text text-anchor=\"middle\" x=\"").append(x).append("\" y=\"278\" fill=\"#64758c\" font-size=\"10\">")
                     .append(TIME.format(Instant.ofEpochMilli(points.get(index).timestampMs()))).append("</text>");
         }
-        html.append("</svg><div class=\"legend\"><span><i class=\"avg\"></i>").append(throughput ? "Requests/s" : "Average (ms)").append("</span>");
-        if (!throughput) html.append("<span><i class=\"max\"></i>Maximum (ms)</span>");
+        html.append("</svg><div class=\"legend\"><span><i class=\"avg\"></i>").append(escape(message(throughput ? MessageKeys.PERFORMANCE_HTML_REQUESTS_PER_SECOND_LEGEND : MessageKeys.PERFORMANCE_HTML_AVERAGE_MS))).append("</span>");
+        if (!throughput) html.append("<span><i class=\"max\"></i>").append(escape(message(MessageKeys.PERFORMANCE_HTML_MAXIMUM_MS))).append("</span>");
         html.append("</div></figure>");
     }
 
@@ -319,16 +328,18 @@ public class PerformanceHtmlReportExporter {
             double y = bottom - Math.max(0, Math.min(1, value / maximum)) * height;
             path.append(path.isEmpty() ? "M" : " L").append(String.format(Locale.ROOT, "%.1f %.1f", x, y));
         }
-        html.append("<path fill=\"none\" stroke=\"").append(maxSeries ? "#9b67c9" : "#2574d9")
+        html.append("<path fill=\"none\" stroke=\"").append(maxSeries ? "#9b67c9" : "#2fa564")
                 .append("\" stroke-width=\"").append(maxSeries ? "2.5" : "3").append("\" d=\"").append(path).append("\"/>");
     }
 
     private void appendSlowest(StringBuilder html, List<PerformanceReportMarkdownBuilder.ReportTable> tables) {
         var http = tables.stream().filter(table -> table.columns().size() == 14).findFirst().orElse(null);
         if (http == null || http.rows().size() <= 1) return;
-        html.append("<section><h2>1.3 Requests with slowest response times</h2>");
-        appendTable(html, new PerformanceReportMarkdownBuilder.ReportTable("Requests with slowest response times",
-                List.of("Request", "Average (ms)", "90th (ms)", "95th (ms)", "99th (ms)", "Min (ms)", "Max (ms)"),
+        html.append("<section><h2>").append(escape(message(MessageKeys.PERFORMANCE_HTML_SLOWEST_SECTION))).append("</h2>");
+        appendTable(html, new PerformanceReportMarkdownBuilder.ReportTable(message(MessageKeys.PERFORMANCE_HTML_SLOWEST),
+                List.of(message(MessageKeys.PERFORMANCE_HTML_REQUEST), message(MessageKeys.PERFORMANCE_HTML_AVERAGE_MS),
+                        "P90 (ms)", "P95 (ms)", "P99 (ms)", message(MessageKeys.PERFORMANCE_HTML_MIN_MS),
+                        message(MessageKeys.PERFORMANCE_HTML_MAX_MS)),
                 http.rows().subList(0, http.rows().size() - 1).stream()
                         .sorted((a, b) -> Double.compare(durationMs(b[8]), durationMs(a[8])))
                         .limit(5).map(row -> new Object[]{row[0], row[8], row[11], row[12], row[13], row[9], row[10]}).toList()));
@@ -350,7 +361,7 @@ public class PerformanceHtmlReportExporter {
     private void appendErrors(StringBuilder html, String error,
                               List<PerformanceReportMarkdownBuilder.ReportTable> tables,
                               List<PerformanceSampleResult> samples) {
-        html.append("<section><h2>3. Errors</h2>");
+        html.append("<section><h2>").append(escape(message(MessageKeys.PERFORMANCE_HTML_ERRORS_SECTION))).append("</h2>");
         Map<ErrorGroupKey, ErrorGroup> groups = new LinkedHashMap<>();
         if (samples != null) {
             for (PerformanceSampleResult sample : samples) {
@@ -526,6 +537,6 @@ public class PerformanceHtmlReportExporter {
     }
 
     private String css() {
-        return "@page{size:A4;margin:15mm 12mm}*{box-sizing:border-box}body{margin:0;color:#172b4d;font:10px 'Dev Workbench','Dev Workbench CJK',Arial,sans-serif;background:#f3f6fb}.report{max-width:1180px;margin:auto;padding:22px;background:white}.hero{padding:22px 25px;background:#12243d;color:white;border-radius:10px;margin-bottom:20px}.brand{font-weight:700;letter-spacing:1.4px;font-size:10px;color:#b9d2ff}.brand span{color:#45d6b0}h1{font-size:24px;margin:14px 0 6px}h2{font-size:16px;margin:23px 0 10px;color:#13294b}h3{font-size:12px;margin:16px 0 8px;color:#304969}.muted{color:#697b94}.cards{display:table;width:100%;table-layout:fixed;border-spacing:7px}.cards article{display:table-cell;width:33.33%;padding:11px 12px;background:#f1f5fb;border:1px solid #e1e8f2;border-radius:8px;min-height:54px;page-break-inside:avoid}.summary article{width:25%}article span{display:block;color:#63758e;font-size:9px;margin-bottom:7px}article strong{font-size:13px;color:#162e50;word-wrap:break-word}.chart-block{page-break-inside:avoid}.chart{margin:8px 0 20px;padding:12px;border:1px solid #e0e7f0;border-radius:9px;page-break-inside:avoid}.chart figcaption{font-weight:700;font-size:12px;margin:0 0 7px}.chart svg{display:block;width:100%;height:auto}.grid{stroke:#e5ebf3;stroke-width:1}.axis{stroke:#93a2b7;stroke-width:1}.tick{font-size:10px;fill:#64758c}.series-avg{fill:none;stroke:#2574d9;stroke-width:3}.series-max{fill:none;stroke:#9b67c9;stroke-width:2.5}.legend{color:#64758c;font-size:9px;margin-top:5px}.legend span{margin-right:18px}.legend i{display:inline-block;width:14px;height:3px;background:#2574d9;margin:0 6px 3px 0}.legend .max{background:#9b67c9}.table-wrap{width:100%}table{border-collapse:collapse;width:100%;font-size:8px;margin:8px 0 18px;table-layout:auto}th{background:#eaf0f8;color:#3b4c64;text-align:left;font-weight:700}th,td{padding:6px 5px;border-bottom:1px solid #e4eaf2;vertical-align:top;word-wrap:break-word}tbody tr:nth-child(even){background:#fafbfd}.empty{background:#f6f8fb;border-radius:8px;padding:22px;text-align:center;color:#65758a}.empty p{margin:8px 0 0}footer{border-top:1px solid #e5eaf1;padding-top:12px;margin-top:24px;color:#8290a4;font-size:8px}section{page-break-inside:auto}tr{page-break-inside:avoid} ";
+        return "@page{size:A4;margin:15mm 12mm}*{box-sizing:border-box}body{margin:0;color:#172b4d;font:10px 'Dev Workbench','Dev Workbench CJK',Arial,sans-serif;background:#f3f6fb}.report{max-width:1180px;margin:auto;padding:22px;background:white}.hero{padding:22px 25px;background:#12243d;color:white;border-radius:10px;margin-bottom:20px}.brand{font-weight:700;letter-spacing:1.4px;font-size:10px;color:#b9d2ff}.brand span{color:#5fcb8d}h1{font-size:24px;margin:14px 0 6px}h2{font-size:16px;margin:23px 0 10px;color:#13294b}h3{font-size:12px;margin:16px 0 8px;color:#304969}.muted{color:#697b94}.cards{display:table;width:100%;table-layout:fixed;border-spacing:7px}.cards article{display:table-cell;width:33.33%;padding:11px 12px;background:#f1f5fb;border:1px solid #e1e8f2;border-radius:8px;min-height:54px;page-break-inside:avoid}.summary article{width:25%}article span{display:block;color:#63758e;font-size:9px;margin-bottom:7px}article strong{font-size:13px;color:#162e50;word-wrap:break-word}.chart-block{page-break-inside:avoid}.chart{margin:8px 0 20px;padding:12px;border:1px solid #e0e7f0;border-radius:9px;page-break-inside:avoid}.chart figcaption{font-weight:700;font-size:12px;margin:0 0 7px}.chart svg{display:block;width:100%;height:auto}.grid{stroke:#e5ebf3;stroke-width:1}.axis{stroke:#93a2b7;stroke-width:1}.tick{font-size:10px;fill:#64758c}.series-avg{fill:none;stroke:#2fa564;stroke-width:3}.series-max{fill:none;stroke:#9b67c9;stroke-width:2.5}.legend{color:#64758c;font-size:9px;margin-top:5px}.legend span{margin-right:18px}.legend i{display:inline-block;width:14px;height:3px;background:#2fa564;margin:0 6px 3px 0}.legend .max{background:#9b67c9}.table-wrap{width:100%}table{border-collapse:collapse;width:100%;font-size:8px;margin:8px 0 18px;table-layout:auto}th{background:#eaf0f8;color:#3b4c64;text-align:left;font-weight:700}th,td{padding:6px 5px;border-bottom:1px solid #e4eaf2;vertical-align:top;word-wrap:break-word}td{white-space:nowrap}td:first-child{white-space:normal}.errors td{white-space:normal}tbody tr:nth-child(even){background:#fafbfd}.empty{background:#f6f8fb;border-radius:8px;padding:22px;text-align:center;color:#65758a}.empty p{margin:8px 0 0}footer{border-top:1px solid #e5eaf1;padding-top:12px;margin-top:24px;color:#8290a4;font-size:8px}section{page-break-inside:auto}tr{page-break-inside:avoid}@media print{body{background:white}} ";
     }
 }

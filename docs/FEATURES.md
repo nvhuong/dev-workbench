@@ -189,7 +189,12 @@ See the [MCP Server guide](MCP_SERVER_DESIGN_vi.md) for installation and complet
   - Success/failure statistics
 - ✅ Result tree analysis
 - ✅ Performance trend charts
-- ✅ Export test results
+- ✅ Export the report as HTML or PDF (A4), following the app language
+
+### Functional Testing
+- ✅ Run saved requests in order, with CSV data-driven iterations
+- ✅ Results overview: pass rate, timings, per-request status and assertions
+- ✅ Export the run as a PNG report image (summary, every request, failure details)
 
 ---
 

@@ -4,6 +4,7 @@ import com.nvhuong.devworkbench.performance.core.model.PerformanceTrendSnapshot;
 import com.nvhuong.devworkbench.performance.core.run.PerformanceServiceResource;
 import com.nvhuong.devworkbench.performance.model.PerformanceSampleResult;
 import com.nvhuong.devworkbench.script.model.TestResult;
+import com.nvhuong.devworkbench.util.I18nUtil;
 import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.text.PDFTextStripper;
@@ -18,6 +19,25 @@ import java.util.List;
 import static org.testng.Assert.*;
 
 public class PerformanceReportPdfExporterTest {
+    @Test
+    public void reportFollowsTheAppLanguage() {
+        boolean originalVietnamese = I18nUtil.isVietnamese();
+        try {
+            I18nUtil.setLocale("vi");
+            String html = PerformanceHtmlReportExporter.renderHtml(context(trendPoints(), List.of()), httpTable());
+            assertTrue(html.contains("1. Tổng quan"), html);
+            assertTrue(html.contains("1.1 Thời gian phản hồi"), html);
+            assertTrue(html.contains("2. Số liệu từng request"), html);
+            assertTrue(html.contains("Tổng CPU"), html);
+            for (String english : List.of("Test setup", "1. Summary", "Metrics for each request", "Total CPU",
+                    "Chart data is unavailable")) {
+                assertFalse(html.contains(english), "untranslated: " + english);
+            }
+        } finally {
+            I18nUtil.setLocale(originalVietnamese ? "vi" : "en");
+        }
+    }
+
     @Test
     public void generatesAccessibleHtmlAndRendersTheSameReportToPdf() throws Exception {
         var tables = httpTable();
@@ -134,7 +154,7 @@ public class PerformanceReportPdfExporterTest {
 
         assertFalse(html.contains("Chart data is unavailable"), "sampled trend data must be charted");
         assertTrue(html.contains("Sampled during the run."), html);
-        assertTrue(html.matches("(?s).*<path fill=\"none\" stroke=\"#2574d9\"[^>]* d=\"M[0-9.]+ [0-9.]+ L.*"),
+        assertTrue(html.matches("(?s).*<path fill=\"none\" stroke=\"#2fa564\"[^>]* d=\"M[0-9.]+ [0-9.]+ L.*"),
                 "the response time series must have plotted points");
     }
 
@@ -183,7 +203,7 @@ public class PerformanceReportPdfExporterTest {
         String html = PerformanceHtmlReportExporter.renderHtml(context(List.of(), samples), httpTable());
 
         assertTrue(html.contains("Reconstructed from retained request results."), html);
-        assertTrue(html.matches("(?s).*<path fill=\"none\" stroke=\"#2574d9\"[^>]* d=\"M[0-9.]+ [0-9.]+ L.*"),
+        assertTrue(html.matches("(?s).*<path fill=\"none\" stroke=\"#2fa564\"[^>]* d=\"M[0-9.]+ [0-9.]+ L.*"),
                 "the response time series rebuilt from samples must have plotted points");
     }
 

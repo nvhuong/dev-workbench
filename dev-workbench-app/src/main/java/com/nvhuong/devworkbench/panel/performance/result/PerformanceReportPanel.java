@@ -153,7 +153,11 @@ public class PerformanceReportPanel extends JPanel {
         JButton htmlButton = ModernButtonFactory.createButton(
                 I18nUtil.getMessage(MessageKeys.PERFORMANCE_REPORT_HTML_OPEN), false);
         htmlButton.addActionListener(e -> openHtmlReport());
-        toolbar.add(ToolWindowActionToolbar.inlineRight(copyReportButton, htmlButton, pdfButton), BorderLayout.EAST);
+        JButton htmlExportButton = ModernButtonFactory.createButton(
+                I18nUtil.getMessage(MessageKeys.PERFORMANCE_REPORT_HTML_EXPORT), false);
+        htmlExportButton.addActionListener(e -> exportHtmlReport(htmlExportButton));
+        toolbar.add(ToolWindowActionToolbar.inlineRight(copyReportButton, htmlButton, htmlExportButton, pdfButton),
+                BorderLayout.EAST);
         return toolbar;
     }
 
@@ -733,7 +737,7 @@ public class PerformanceReportPanel extends JPanel {
         }
         SystemFileChooser chooser = FileChooserUtil.createSaveFileChooser(
                 "performance.report.pdf", I18nUtil.getMessage(MessageKeys.PERFORMANCE_REPORT_PDF_EXPORT));
-        chooser.setFileFilter(FileChooserUtil.extensionFilter(I18nUtil.getMessage(MessageKeys.PERFORMANCE_REPORT_PDF_EXPORT) + " (*.pdf)", "pdf"));
+        chooser.setFileFilter(FileChooserUtil.extensionFilter("PDF (*.pdf)", "pdf"));
         chooser.setSelectedFile(new java.io.File("performance-report.pdf"));
         if (chooser.showSaveDialog(this) != SystemFileChooser.APPROVE_OPTION) return;
         List<PerformanceSampleResult> exportSamples = performanceResultSamples();
@@ -769,19 +773,85 @@ public class PerformanceReportPanel extends JPanel {
         }.execute();
     }
 
+    /**
+     * Saves a standalone copy of the HTML report where the user chooses (the live report lives in the app data
+     * directory and is overwritten by the next run).
+     */
+    private void exportHtmlReport(JButton button) {
+        var tables = reportTables();
+        if (tables.stream().allMatch(table -> table.rows().isEmpty())) {
+            NotificationCenter.showWarning(I18nUtil.getMessage(MessageKeys.PERFORMANCE_REPORT_MARKDOWN_EMPTY));
+            return;
+        }
+        SystemFileChooser chooser = FileChooserUtil.createSaveFileChooser(
+                "performance.report.html", I18nUtil.getMessage(MessageKeys.PERFORMANCE_REPORT_HTML_EXPORT));
+        chooser.setFileFilter(FileChooserUtil.extensionFilter("HTML (*.html)", "html", "htm"));
+        chooser.setSelectedFile(new java.io.File("performance-report.html"));
+        if (chooser.showSaveDialog(this) != SystemFileChooser.APPROVE_OPTION) return;
+        Path selected = chooser.getSelectedFile().toPath();
+        String lower = selected.toString().toLowerCase(Locale.ROOT);
+        Path destination = lower.endsWith(".html") || lower.endsWith(".htm") ? selected : Path.of(selected + ".html");
+        if (Files.exists(destination) && JOptionPane.showConfirmDialog(this,
+                I18nUtil.getMessage(MessageKeys.PERFORMANCE_REPORT_HTML_OVERWRITE),
+                I18nUtil.getMessage(MessageKeys.PERFORMANCE_REPORT_HTML_EXPORT),
+                JOptionPane.YES_NO_OPTION) != JOptionPane.YES_OPTION) return;
+        PerformanceReportPdfExporter.ReportContext context = new PerformanceReportPdfExporter.ReportContext(
+                I18nUtil.getMessage(MessageKeys.PERFORMANCE_REPORT_MARKDOWN_TITLE), reportPlan, reportEnvironment,
+                List.copyOf(trendPoints.get()), performanceResultSamples(), reportError, serviceResources);
+        String html = PerformanceHtmlReportExporter.renderHtml(context, tables);
+        button.setEnabled(false);
+        new SwingWorker<Void, Void>() {
+            @Override protected Void doInBackground() throws Exception {
+                PerformanceHtmlReportExporter.exportHtml(destination, html);
+                return null;
+            }
+            @Override protected void done() {
+                button.setEnabled(true);
+                try {
+                    get();
+                    NotificationCenter.showSuccess(I18nUtil.getMessage(MessageKeys.PERFORMANCE_REPORT_HTML_SAVED) + " " + destination);
+                } catch (Exception ex) {
+                    log.error("Failed to export performance HTML to {}", destination, ex);
+                    NotificationCenter.showError(I18nUtil.getMessage(MessageKeys.PERFORMANCE_REPORT_HTML_FAILED));
+                }
+            }
+        }.execute();
+    }
+
     private void openHtmlReport() {
         if (htmlReportPath == null || !Files.isRegularFile(htmlReportPath)) {
             NotificationCenter.showWarning(I18nUtil.getMessage(MessageKeys.PERFORMANCE_REPORT_HTML_NOT_READY));
             return;
         }
         try {
-            if (!Desktop.isDesktopSupported()) throw new IOException("Desktop browser integration is unavailable");
-            Desktop.getDesktop().browse(htmlReportPath.toUri());
+            openInBrowser(htmlReportPath);
         } catch (Exception ex) {
             log.error("Failed to open performance HTML report at {}", htmlReportPath, ex);
             NotificationCenter.showError(I18nUtil.getMessage(MessageKeys.PERFORMANCE_REPORT_HTML_OPEN_FAILED)
                     + " " + htmlReportPath);
         }
+    }
+
+    /**
+     * Desktop.browse is missing on many Linux desktops (no GNOME libraries); fall back to opening the file with the
+     * default application and finally to xdg-open.
+     */
+    static void openInBrowser(Path file) throws IOException {
+        Desktop desktop = Desktop.isDesktopSupported() ? Desktop.getDesktop() : null;
+        if (desktop != null && desktop.isSupported(Desktop.Action.BROWSE)) {
+            desktop.browse(file.toUri());
+            return;
+        }
+        if (desktop != null && desktop.isSupported(Desktop.Action.OPEN)) {
+            desktop.open(file.toFile());
+            return;
+        }
+        String os = System.getProperty("os.name", "").toLowerCase(Locale.ROOT);
+        if (!os.contains("win") && !os.contains("mac")) {
+            new ProcessBuilder("xdg-open", file.toString()).redirectErrorStream(true).start();
+            return;
+        }
+        throw new IOException("No way to open " + file + " in a browser on this platform");
     }
 
     private void scheduleHtmlReportWrite() {
