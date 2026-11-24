@@ -55,7 +55,7 @@ public class RequestPreparationNetworkLogPublisherTest {
                 assertFalse(message.contains(repeatedOrPrivate), message);
             }
             assertFalse(message.contains("Post-response script"), message);
-            assertFalse(message.contains("Tái bút"), message);
+            assertFalse(message.contains("Script sau"), message);
             assertFalse(message.contains("+0ms"), message);
         } finally {
             I18nUtil.setLocale(originalLocale);

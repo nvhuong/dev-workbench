@@ -337,7 +337,7 @@ public class ScriptExecutionPipeline {
     }
 
     /**
-     * Quá trình thực hiện hoàn chỉnh: pre-script -> Tái bút
+     * Quá trình thực hiện hoàn chỉnh: pre-script -> post-script
      * Nếu tập lệnh trước không thành công, tập lệnh sau sẽ không được thực thi
      *
      * @param response HTTP đối tượng phản hồi

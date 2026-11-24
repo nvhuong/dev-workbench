@@ -58,7 +58,7 @@ public class SearchableTextAreaTest {
 
                 JPopupMenu popupMenu = textArea.getPopupMenu();
                 assertTrue(hasMenuTextContaining(popupMenu, "Chọn tất cả"));
-                assertTrue(hasMenuTextContaining(popupMenu, "nếp gấp"));
+                assertTrue(hasMenuTextContaining(popupMenu, "Thu gọn"));
                 assertFalse(hasMenuTextContaining(popupMenu, "Select All"));
                 assertFalse(hasMenuTextContaining(popupMenu, "Folding"));
             });
@@ -101,7 +101,7 @@ public class SearchableTextAreaTest {
                 new SearchableTextArea(textArea);
 
                 JPopupMenu popupMenu = textArea.getPopupMenu();
-                assertTrue(hasMenuTextContaining(popupMenu, "Sao chép chìa khóa"));
+                assertTrue(hasMenuTextContaining(popupMenu, "Sao chép khóa"));
                 assertTrue(hasMenuTextContaining(popupMenu, "Sao chép giá trị"));
                 assertTrue(hasMenuTextContaining(popupMenu, "Sao chép lựa chọn"));
                 assertTrue(hasMenuTextContaining(popupMenu, "Sao chép tất cả"));
@@ -123,7 +123,7 @@ public class SearchableTextAreaTest {
 
                 firePopupWillBecomeVisible(textArea.getPopupMenu());
 
-                assertTrue(findMenuItem(textArea.getPopupMenu(), "Sao chép chìa khóa").isEnabled());
+                assertTrue(findMenuItem(textArea.getPopupMenu(), "Sao chép khóa").isEnabled());
                 assertTrue(findMenuItem(textArea.getPopupMenu(), "Sao chép giá trị").isEnabled());
             });
         } finally {

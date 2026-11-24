@@ -64,8 +64,8 @@ public class ResponseHeadersPanelTest extends AbstractSwingUiTest {
 
             JTable table = findResponseHeadersTable(panel);
 
-            assertEquals(table.getColumnName(0), "tên");
-            assertEquals(table.getColumnName(1), "giá trị");
+            assertEquals(table.getColumnName(0), "Tên");
+            assertEquals(table.getColumnName(1), "Giá trị");
         } finally {
             I18nUtil.setLocale(originalLocale);
         }

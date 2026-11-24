@@ -95,7 +95,7 @@ public class PerformanceToolbarStructureTest extends AbstractSwingUiTest {
     public void workerEndpointChineseLabelShouldBeLocalizedAndShort() {
         ResourceBundle zhMessages = ResourceBundle.getBundle("messages", Locale.forLanguageTag("vi"));
 
-        assertEquals(zhMessages.getString("performance.remote.workers.label"), "nút");
+        assertEquals(zhMessages.getString("performance.remote.workers.label"), "Worker");
     }
 
     @Test

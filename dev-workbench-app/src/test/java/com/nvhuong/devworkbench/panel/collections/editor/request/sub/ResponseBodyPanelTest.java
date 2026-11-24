@@ -93,7 +93,7 @@ public class ResponseBodyPanelTest extends AbstractSwingUiTest {
         JPopupMenu popupMenu = panel.getResponseBodyPane().getPopupMenu();
 
         assertFalse(hasAnyMenuItem(popupMenu, "Undo", "Can't Redo", "Cut", "Paste", "Delete",
-                "Hoàn tác", "Không thể phục hồi", "Cắt", "Dán", "xóa bỏ"));
+                "Hoàn tác", "Không thể phục hồi", "Cắt", "Dán", "Xóa"));
         assertTrue(hasMenuItem(popupMenu, UiI18n.get(UiMessageKeys.EDITOR_POPUP_COPY_SELECTED)));
         assertTrue(hasMenuItem(popupMenu, UiI18n.get(UiMessageKeys.EDITOR_POPUP_COPY_ALL)));
         assertTrue(hasMenuItem(popupMenu, UiI18n.get(UiMessageKeys.EDITOR_POPUP_SELECT_ALL)));

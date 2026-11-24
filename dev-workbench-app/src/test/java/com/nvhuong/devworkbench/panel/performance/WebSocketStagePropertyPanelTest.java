@@ -79,10 +79,10 @@ public class WebSocketStagePropertyPanelTest extends AbstractSwingUiTest {
     public void shouldUseCompactWebSocketSendLabels() {
         ResourceBundle zh = ResourceBundle.getBundle("messages", Locale.forLanguageTag("vi"));
         assertEquals(zh.getString(MessageKeys.PERFORMANCE_WS_SEND_NONE), "Không được gửi");
-        assertEquals(zh.getString(MessageKeys.PERFORMANCE_WS_SEND_REQUEST_BODY), "gửi");
+        assertEquals(zh.getString(MessageKeys.PERFORMANCE_WS_SEND_REQUEST_BODY), "Gửi");
         assertEquals(zh.getString(MessageKeys.PERFORMANCE_WS_SEND_REQUEST_BODY_REPEAT), "Gửi đi gửi lại nhiều lần");
-        assertEquals(zh.getString(MessageKeys.PERFORMANCE_WS_SEND_TAB_MESSAGE_TEMPLATE), "Content");
-        assertEquals(zh.getString(MessageKeys.PERFORMANCE_WS_SEND_TAB_PRE_SCRIPT), "Pre-script");
+        assertEquals(zh.getString(MessageKeys.PERFORMANCE_WS_SEND_TAB_MESSAGE_TEMPLATE), "Nội dung");
+        assertEquals(zh.getString(MessageKeys.PERFORMANCE_WS_SEND_TAB_PRE_SCRIPT), "Script trước");
 
         ResourceBundle en = ResourceBundle.getBundle("messages", Locale.ENGLISH);
         assertEquals(en.getString(MessageKeys.PERFORMANCE_WS_SEND_NONE), "No Send");
@@ -94,27 +94,27 @@ public class WebSocketStagePropertyPanelTest extends AbstractSwingUiTest {
 
     @Test
     public void shouldDescribeReadAsNonClosingStep() {
-        ResourceBundle zh = ResourceBundle.getBundle("messages", Locale.forLanguageTag("vi"));
-        assertEquals(zh.getString(MessageKeys.PERFORMANCE_MENU_ADD_WS_READ), "Thêm vào WS Read");
-        assertEquals(zh.getString(MessageKeys.PERFORMANCE_WS_NODE_READ), "WS Read");
-        assertEquals(zh.getString(MessageKeys.PERFORMANCE_WS_READ_MODE), "Chế độ đọc");
-        assertEquals(zh.getString(MessageKeys.PERFORMANCE_WS_COMPLETION_FIRST_MESSAGE), "đọc 1 dải");
-        assertEquals(zh.getString(MessageKeys.PERFORMANCE_WS_COMPLETION_MATCHED_MESSAGE), "Đọc có chứa văn bản");
-        assertEquals(zh.getString(MessageKeys.PERFORMANCE_WS_COMPLETION_MESSAGE_COUNT), "đọc N dải");
-        assertEquals(zh.getString(MessageKeys.PERFORMANCE_WS_COMPLETION_FIXED_DURATION), "Quan sát một lúc");
-        assertEquals(zh.getString(MessageKeys.PERFORMANCE_WS_MESSAGE_FILTER), "Chứa văn bản");
-        assertEquals(zh.getString(MessageKeys.PERFORMANCE_WS_HINT_MEMORY),
-                "Nội dung thư chỉ được giữ lại nếu quá trình lọc, xác nhận hoặc trích xuất yêu cầu.");
-        String firstMessageHint = zh.getString(MessageKeys.PERFORMANCE_WS_HINT_FIRST_MESSAGE);
-        assertEquals(firstMessageHint, "đọc 1 Thanh tiếp tục; hết thời gian chờ không thành công.");
-        assertEquals(zh.getString(MessageKeys.PERFORMANCE_WS_HINT_MATCHED_MESSAGE),
+        ResourceBundle vi = ResourceBundle.getBundle("messages", Locale.forLanguageTag("vi"));
+        assertEquals(vi.getString(MessageKeys.PERFORMANCE_MENU_ADD_WS_READ), "Thêm WS Read");
+        assertEquals(vi.getString(MessageKeys.PERFORMANCE_WS_NODE_READ), "WS Read");
+        assertEquals(vi.getString(MessageKeys.PERFORMANCE_WS_READ_MODE), "Chế độ đọc");
+        assertEquals(vi.getString(MessageKeys.PERFORMANCE_WS_COMPLETION_FIRST_MESSAGE), "1 message");
+        assertEquals(vi.getString(MessageKeys.PERFORMANCE_WS_COMPLETION_MATCHED_MESSAGE), "Đến khi có nội dung chứa");
+        assertEquals(vi.getString(MessageKeys.PERFORMANCE_WS_COMPLETION_MESSAGE_COUNT), "N message");
+        assertEquals(vi.getString(MessageKeys.PERFORMANCE_WS_COMPLETION_FIXED_DURATION), "Quan sát trong khoảng thời gian");
+        assertEquals(vi.getString(MessageKeys.PERFORMANCE_WS_MESSAGE_FILTER), "Chứa");
+        assertEquals(vi.getString(MessageKeys.PERFORMANCE_WS_HINT_MEMORY),
+                "Nội dung message chỉ được giữ lại khi cần cho bộ lọc, assertion hoặc extractor.");
+        String firstMessageHint = vi.getString(MessageKeys.PERFORMANCE_WS_HINT_FIRST_MESSAGE);
+        assertEquals(firstMessageHint, "Tiếp tục sau 1 message; hết thời gian chờ thì thất bại.");
+        assertEquals(vi.getString(MessageKeys.PERFORMANCE_WS_HINT_MATCHED_MESSAGE),
                 "Tiếp tục khi đọc văn bản có chứa; đây là lọc, không phải khẳng định.");
-        assertEquals(zh.getString(MessageKeys.PERFORMANCE_WS_HINT_FIXED_DURATION),
-                "Tiếp tục sau khi quan sát thời gian đã đặt; không ngắt kết nối sớm.");
-        assertEquals(zh.getString(MessageKeys.PERFORMANCE_WS_HINT_MESSAGE_COUNT),
-                "Tiếp tục khi đạt được số mục tiêu; thất bại nếu không đạt được mục tiêu sau khi hết thời gian chờ.");
-        assertEquals(zh.getString(MessageKeys.PERFORMANCE_WS_CLOSE_HINT),
-                "Chủ động đóng bước hiện tại khi thực hiện bước này WebSocket kết nối;Read Bước này chỉ chịu trách nhiệm đọc tin nhắn và không chịu trách nhiệm đóng kết nối.");
+        assertEquals(vi.getString(MessageKeys.PERFORMANCE_WS_HINT_FIXED_DURATION),
+                "Tiếp tục sau khoảng thời gian đã đặt; kết nối bị đóng sớm thì thất bại.");
+        assertEquals(vi.getString(MessageKeys.PERFORMANCE_WS_HINT_MESSAGE_COUNT),
+                "Tiếp tục khi đủ số message; hết thời gian chờ mà chưa đủ thì thất bại.");
+        assertEquals(vi.getString(MessageKeys.PERFORMANCE_WS_CLOSE_HINT),
+                "Khi tới bước này, kết nối WebSocket hiện tại sẽ được đóng chủ động; bước WS Read chỉ nhận message, không đóng kết nối.");
 
         ResourceBundle en = ResourceBundle.getBundle("messages", Locale.ENGLISH);
         assertEquals(en.getString(MessageKeys.PERFORMANCE_MENU_ADD_WS_READ), "Add WS Read");
