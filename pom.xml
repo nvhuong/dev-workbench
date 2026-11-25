@@ -48,7 +48,7 @@
             plugin-* Không theo dõi ở đây để tự động nâng cấp mà ở mỗi cái pom.xml Phiên bản được duy trì riêng biệt.
             Bạn có thể nhấn nó sau“Bất kỳ plug-in nào đã được thay đổi thì chỉ có plug-in đó mới được phát hành”Việc phát hành nhịp điệu độc lập.
          -->
-        <revision>6.3.3</revision>
+        <revision>6.3.4</revision>
         <!--
             Phiên bản tương thích với nền tảng plug-in.
             Nó thể hiện“plugin SPI / Ranh giới lắp ráp thời gian chạy”，Không giống như chủ nhà revision。
