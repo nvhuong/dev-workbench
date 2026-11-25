@@ -1,6 +1,6 @@
 {
   "name": "DevWorkbench Official Plugin Catalog (GitHub)",
-  "generatedAt": "2026-11-23T17:23:30Z",
+  "generatedAt": "2026-11-25T16:27:41Z",
   "plugins": [
     {
       "id": "plugin-capture",
@@ -104,6 +104,14 @@
       "description": "Manage saved servers and concurrent SSH terminal sessions.",
       "homepage": "https://github.com/nvhuong/dev-workbench",
       "releases": [
+        {
+          "version": "1.3.0",
+          "downloadUrl": "https://github.com/nvhuong/dev-workbench/releases/download/plugin-remote-v1.3.0/dev-workbench-1.3.0-plugin-remote.jar",
+          "sha256": "4e05d3fd51a2b65b2b449e7ee6b196f5b9b098ba756f775e3d97eedcbc028670",
+          "minAppVersion": "6.0.14",
+          "minPlatformVersion": "4.0.0",
+          "maxPlatformVersion": "4.0.0"
+        },
         {
           "version": "1.2.0",
           "downloadUrl": "https://github.com/nvhuong/dev-workbench/releases/download/plugin-remote-v1.2.0/dev-workbench-1.2.0-plugin-remote.jar",
