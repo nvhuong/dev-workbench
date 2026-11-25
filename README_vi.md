@@ -138,8 +138,9 @@ Muốn chỉ cho phép một workspace: truyền đường dẫn tuyệt đối 
 ### AI làm được gì
 
 - **API đã lưu:** liệt kê workspace, collection, môi trường, request; chạy `run_request` hoặc `run_collection`. Giá trị biến môi trường không bị lộ qua các tool liệt kê. MCP chỉ chạy được request đã lưu, không tự tạo URL tùy ý.
-- **Plugin:** đọc dữ liệu SQL, Redis, Kafka, MinIO và decompile class, dùng profile kết nối đã lưu trong từng plugin (mật khẩu không đi qua AI).
-- **Ghi dữ liệu** (`sql_execute`, `redis_write`, `kafka_send`, `minio_presigned_url`) chỉ bật khi thêm `--allow-writes` vào `args`.
+- **Functional test, lịch sử, mock server:** `run_functional`, `list_request_history`, `list_mock_servers`; kiểm thử hiệu năng: `list_performance_plans`.
+- **Elasticsearch, InfluxDB và plugin:** đọc dữ liệu SQL, Redis, Kafka, MinIO, Elasticsearch, InfluxDB, decompile class, xem server SSH; dùng profile kết nối đã lưu (mật khẩu không đi qua AI).
+- **Ghi dữ liệu hoặc tạo tải** (`run_performance`, `remote_exec`, `sql_execute`, `redis_write`, `kafka_send`, `elasticsearch_write`, `influxdb_write`, `minio_presigned_url`) chỉ bật khi thêm `--allow-writes` vào `args`.
 
 Response của API và dữ liệu đọc được sẽ gửi về MCP client, và request có thể gây tác động thật. Chỉ cấp quyền workspace thật (production) cho MCP client đáng tin cậy.
 

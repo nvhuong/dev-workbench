@@ -403,17 +403,22 @@ public class McpWorkspaceToolServiceTest {
                 new com.nvhuong.devworkbench.plugin.api.McpToolContribution("big_read", "Big", "large", schema, true,
                         arguments -> Map.of("text", "x".repeat(5000))));
 
-        List<String> readOnly = service.extraTools().stream().map(com.nvhuong.devworkbench.mcp.server.McpExtraTool::name).toList();
-        assertEquals(readOnly, List.of("sql_query", "big_read"), "write tools need --allow-writes");
+        service.toolboxTools = List::of;
+        List<String> names = service.extraTools().stream().map(com.nvhuong.devworkbench.mcp.server.McpExtraTool::name).toList();
+        assertTrue(names.containsAll(List.of("sql_query", "big_read", "run_functional", "list_request_history")), names.toString());
+        assertFalse(names.contains("sql_execute"), "write tools need --allow-writes");
+        assertFalse(names.contains("run_performance"), "load tests need --allow-writes");
 
         service.setAllowWrites(true);
         assertTrue(service.extraTools().stream().anyMatch(tool -> tool.name().equals("sql_execute") && !tool.readOnly()));
+        assertTrue(service.extraTools().stream().anyMatch(tool -> tool.name().equals("run_performance")));
 
         com.nvhuong.devworkbench.mcp.server.McpExtraTool big = service.extraTools().stream()
                 .filter(tool -> tool.name().equals("big_read")).findFirst().orElseThrow();
         Map<String, Object> capped = big.handler().call(Map.of());
         assertEquals(capped.get("truncated"), true);
         assertEquals(capped.get("maxResponseBytes"), 1024);
-        assertEquals(service.extraTools().get(0).handler().call(Map.of()), Map.of("rows", List.of(Map.of("id", 1))));
+        assertEquals(service.extraTools().stream().filter(tool -> tool.name().equals("sql_query")).findFirst().orElseThrow()
+                .handler().call(Map.of()), Map.of("rows", List.of(Map.of("id", 1))));
     }
 }

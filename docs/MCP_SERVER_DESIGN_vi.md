@@ -140,7 +140,7 @@ JAR Để chỉ cho phép một không gian làm việc, trong `"serve"` Thêm t
 
 Các thông số tùy chọn `--max-response-bytes <n>` Hãy kiểm soát một lần Tool Tổng số lượng nội dung phản hồi được cuộc gọi trả về, mặc định là 64 KiB，Có thể được đặt thành 1 KiB～10 MiB。Trình khởi chạy gốc sẽ đưa nó vào ngay `args`；JAR cách để đặt `"serve"` sau đó.
 
-Tham số `--allow-writes` bật các tool ghi của plugin (`sql_execute`, `redis_write`, `kafka_send`, `minio_presigned_url`). Mặc định chỉ có các tool đọc; không có cờ này thì tool ghi không xuất hiện trong `tools/list` và gọi trực tiếp sẽ báo không tìm thấy.
+Tham số `--allow-writes` bật các tool ghi dữ liệu hoặc tạo tác động lớn: `run_performance`, `elasticsearch_write`, `influxdb_write`, `sql_execute`, `redis_write`, `kafka_send`, `minio_presigned_url`, `remote_exec`. Mặc định chỉ có các tool đọc; không có cờ này thì tool ghi không xuất hiện trong `tools/list` và gọi trực tiếp sẽ báo không tìm thấy.
 
 ### 7. Khắc phục sự cố cài đặt
 
@@ -161,6 +161,19 @@ Tham số `--allow-writes` bật các tool ghi của plugin (`sql_execute`, `red
 | `run_request` | `workspaceId?`、`requestId`、`environmentId?`、`environmentOverrides?` | Thực hiện một HTTP yêu cầu |
 | `run_collection` | `workspaceId?`、`collectionId`、`environmentId?`、`environmentOverrides?`、`iterations?`、`bail?` | Thực hiện toàn bộ bộ sưu tập |
 
+### Tool của các tính năng khác trong app
+
+| Tính năng | Tool đọc (luôn bật) | Tool hành động |
+|---|---|---|
+| Functional test | — | `run_functional`: chạy functional test đã lưu trong workspace (`functional_config.json`), trả kết quả từng request như `run_collection` |
+| Kiểm thử hiệu năng | `list_performance_plans` | `run_performance` (cần `--allow-writes`): chạy kịch bản đã lưu, luôn dừng sau `maxDurationSeconds` (mặc định 120, tối đa 900) |
+| Lịch sử request | `list_request_history` (mới nhất trước, che giá trị nhạy cảm, `includeBodies` để xem trước body) | — |
+| Mock server | `list_mock_servers` (địa chỉ, route; không trả access key) | — |
+| Elasticsearch | `elasticsearch_list_profiles`, `elasticsearch_request` (GET/HEAD, POST tới `_search`, `_count`, `_msearch`, `_sql`…) | `elasticsearch_write` (cần `--allow-writes`) |
+| InfluxDB | `influxdb_list_profiles`, `influxdb_query` (InfluxQL SELECT/SHOW, Flux không có `to()`) | `influxdb_write` (line protocol, cần `--allow-writes`) |
+
+Capture không có tool MCP: dữ liệu bắt được chỉ nằm trong bộ nhớ của app desktop, còn MCP chạy ở tiến trình riêng. Client certificate được áp dụng tự động khi `run_request`/`run_collection` gọi tới host tương ứng.
+
 ### Tool của plugin
 
 Plugin đã cài (trong `<thư mục dữ liệu>/plugins/installed`) có thể đăng ký thêm tool qua `PluginContext.registerMcpTool(McpToolContribution)`. Tool của plugin không bao giờ ghi đè tên tool có sẵn. Mọi kết nối đều dùng **profile đã lưu trong plugin** theo tên, nên mật khẩu/khóa không đi qua AI client và không bao giờ được trả về.
@@ -172,6 +185,7 @@ Plugin đã cài (trong `<thư mục dữ liệu>/plugins/installed`) có thể 
 | Kafka | `kafka_list_profiles`, `kafka_list_topics`, `kafka_poll` (consumer group tạm, không commit offset) | `kafka_send` |
 | MinIO | `minio_list_profiles`, `minio_list_buckets`, `minio_list_objects`, `minio_read_object` (tối đa 1 MB, text nếu là UTF-8) | `minio_presigned_url` (link ai có cũng tải được) |
 | Decompiler | `decompiler_list_classes`, `decompiler_decompile_class` (file .jar/.war/.ear/.zip/.class trên máy) | — |
+| Remote (SSH) | `remote_list_profiles` | `remote_exec`: chạy một lệnh, trả exit code, stdout/stderr (tối đa 100 KB). Chỉ kết nối host đã tin cậy trong `~/.ssh/known_hosts` |
 
 Kết quả mọi tool bị giới hạn bởi `--max-response-bytes`; khi vượt, trả về `truncated: true` kèm `partialJson`.
 

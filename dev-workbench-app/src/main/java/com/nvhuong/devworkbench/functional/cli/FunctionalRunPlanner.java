@@ -12,7 +12,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-final class FunctionalRunPlanner implements WorkspaceRunPlanner {
+public final class FunctionalRunPlanner implements WorkspaceRunPlanner {
 
     @Override
     public WorkspaceRunPlan plan(WorkspaceRunWorkspace workspace, CollectionDocument document) {

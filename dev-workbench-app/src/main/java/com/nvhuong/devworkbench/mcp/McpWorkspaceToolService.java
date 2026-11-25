@@ -43,6 +43,11 @@ final class McpWorkspaceToolService implements DevWorkbenchMcpBackend {
     /** Plugin-contributed MCP tools; replaced in tests. */
     java.util.function.Supplier<List<com.nvhuong.devworkbench.plugin.api.McpToolContribution>> pluginTools =
             McpWorkspaceToolService::registeredPluginTools;
+    /** Elasticsearch and InfluxDB toolbox tools; replaced in tests. */
+    java.util.function.Supplier<List<com.nvhuong.devworkbench.plugin.api.McpToolContribution>> toolboxTools =
+            com.nvhuong.devworkbench.panel.toolbox.ToolboxMcpTools::tools;
+    /** Functional, load test, history and mock server tools. */
+    final McpAppTools appTools = new McpAppTools(this);
 
     McpWorkspaceToolService(McpServeOptions options) {
         this(options, new WorkspaceRunExecutor());
@@ -72,7 +77,13 @@ final class McpWorkspaceToolService implements DevWorkbenchMcpBackend {
     @Override
     public List<com.nvhuong.devworkbench.mcp.server.McpExtraTool> extraTools() {
         List<com.nvhuong.devworkbench.mcp.server.McpExtraTool> tools = new ArrayList<>();
-        for (com.nvhuong.devworkbench.plugin.api.McpToolContribution contribution : pluginTools.get()) {
+        for (com.nvhuong.devworkbench.mcp.server.McpExtraTool tool : appTools.tools()) {
+            tools.add(new com.nvhuong.devworkbench.mcp.server.McpExtraTool(tool.name(), tool.title(), tool.description(),
+                    tool.inputSchema(), tool.readOnly(), arguments -> limitResponse(tool.handler().call(arguments))));
+        }
+        List<com.nvhuong.devworkbench.plugin.api.McpToolContribution> contributions = new ArrayList<>(toolboxTools.get());
+        contributions.addAll(pluginTools.get());
+        for (com.nvhuong.devworkbench.plugin.api.McpToolContribution contribution : contributions) {
             if (contribution == null || (!contribution.readOnly() && !allowWrites)) {
                 continue;
             }
@@ -280,6 +291,38 @@ final class McpWorkspaceToolService implements DevWorkbenchMcpBackend {
         );
         result.put("workspaceId", authorized.id());
         return result;
+    }
+
+    /** Runs a planned set of saved requests exactly like run_collection (used by run_functional). */
+    Map<String, Object> executePlan(McpAuthorizedWorkspace authorized,
+                                    String environment,
+                                    Map<String, String> environmentOverrides,
+                                    boolean bail,
+                                    com.nvhuong.devworkbench.workspace.cli.WorkspaceRunPlanner planner) throws Exception {
+        Map<String, Object> result = execute(authorized.runWorkspace(), environment, environmentOverrides, 1, bail,
+                (resolvedWorkspace, document) -> {
+                    WorkspaceRunPlan plan = planner.plan(resolvedWorkspace, document);
+                    requireHttpRequests(plan.requests());
+                    return plan;
+                });
+        result.put("workspaceId", authorized.id());
+        return result;
+    }
+
+    McpAuthorizedWorkspace resolveWorkspace(Map<String, Object> arguments) {
+        return workspaceCatalog.resolve(arguments);
+    }
+
+    List<Environment> environmentsOf(McpAuthorizedWorkspace authorized) {
+        return readEnvironments(authorized.runWorkspace());
+    }
+
+    ReentrantLock executionLock() {
+        return executionLock;
+    }
+
+    boolean allowWrites() {
+        return allowWrites;
     }
 
     private Map<String, Object> execute(WorkspaceRunWorkspace workspace,
