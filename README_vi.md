@@ -144,7 +144,7 @@ Muốn chỉ cho phép một workspace: truyền đường dẫn tuyệt đối 
 
 Response của API và dữ liệu đọc được sẽ gửi về MCP client, và request có thể gây tác động thật. Chỉ cấp quyền workspace thật (production) cho MCP client đáng tin cậy.
 
-📖 [Hướng dẫn MCP đầy đủ: cài đặt, tool, kiến trúc, bảo mật](docs/MCP_SERVER_DESIGN_vi.md)
+📖 [Kết nối với Claude, Codex, Gemini, Kilo Code, Cursor…](docs/MCP_CLIENTS_vi.md) · [Hướng dẫn MCP đầy đủ: tool, kiến trúc, bảo mật](docs/MCP_SERVER_DESIGN_vi.md)
 
 ## 🚀 Bắt đầu nhanh
 

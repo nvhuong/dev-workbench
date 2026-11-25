@@ -143,7 +143,7 @@ AI can list workspaces, collections, environments, and saved requests, then use 
 
 MCP can discover and execute only saved HTTP requests in authorized workspaces; it cannot construct an arbitrary URL on demand. MCP also runs functional tests (`run_functional`), lists request history, mock servers and load test plans, and queries Elasticsearch and InfluxDB. Installed plugins add tools for SQL, Redis, Kafka, MinIO, SSH servers and the decompiler. Everything connects through saved profiles, so passwords never pass through the AI client. Tools that change data or generate load (`run_performance`, `remote_exec`, `sql_execute`, `redis_write`, `kafka_send`, `elasticsearch_write`, `influxdb_write`, `minio_presigned_url`) are only available when `--allow-writes` is added to `args`. API response bodies are returned to the MCP client, and requests can cause real business side effects, so only trusted MCP clients should receive access to production workspaces.
 
-📖 [Full MCP setup, tools, architecture, and security guide (Vietnamese)](docs/MCP_SERVER_DESIGN_vi.md)
+📖 [Client setup for Claude, Codex, Gemini, Kilo Code, Cursor… (Vietnamese)](docs/MCP_CLIENTS_vi.md) · [Full MCP tools, architecture, and security guide (Vietnamese)](docs/MCP_SERVER_DESIGN_vi.md)
 
 ## 🚀 Quick start
 

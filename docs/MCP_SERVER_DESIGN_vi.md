@@ -1,5 +1,7 @@
 # DevWorkbench MCP Server
 
+> Hướng dẫn kết nối từng AI client (Claude Code, Claude Desktop, Codex, Gemini CLI, Kilo Code, Cline, Cursor, Windsurf, VS Code): [MCP_CLIENTS_vi.md](MCP_CLIENTS_vi.md).
+
 DevWorkbench Tiêu chuẩn tích hợp MCP stdio Server，cho phép Codex、Claude Desktop、Cursor Đợi khách hàng khám phá không gian làm việc, chọn không gian làm việc và môi trường, đồng thời thực hiện lệnh đã lưu trên mỗi lệnh gọi công cụ HTTP yêu cầu.MCP Trực tiếp tái sử dụng chuỗi thực thi không đầu mà không cần thao tác từ xa Swing trang, nó cũng không sửa đổi lựa chọn hiện tại trên màn hình nền. Thực hiện trao đổi thư từ [Issue #169](https://github.com/nvhuong/dev-workbench/issues/169)。
 
 ## Cài đặt và cấu hình
