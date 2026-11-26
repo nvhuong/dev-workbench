@@ -153,6 +153,8 @@ Trong extension có thể vào **Settings → MCP → Add Server → Local (stdi
 
 Bật tool ghi: `"command": ["/Applications/DevWorkbench.app/Contents/MacOS/DevWorkbenchMCP", "--allow-writes"]`.
 
+**Cài tự động:** `scripts/install-kilo-mcp.sh` tự tìm `DevWorkbenchMCP`, ghi vào `~/.config/kilo/kilo.jsonc` và giữ nguyên các mục khác. Tùy chọn: `--project` (chỉ dự án hiện tại), `--allow-writes`, `--workspace <thư mục>`, `--command <đường dẫn>`, `--uninstall`. File cũ được sao lưu trước khi sửa.
+
 Kilo Code bản cũ dùng `mcp_settings.json` / `.kilocode/mcp.json` với định dạng `mcpServers` giống [Cline](#cline--roo-code).
 
 ## Cline / Roo Code
