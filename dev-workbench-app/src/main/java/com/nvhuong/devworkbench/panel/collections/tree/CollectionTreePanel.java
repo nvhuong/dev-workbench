@@ -23,6 +23,9 @@ import com.nvhuong.devworkbench.service.collections.CollectionDocumentRegistry;
 import com.nvhuong.devworkbench.panel.collections.tree.adapter.SwingCollectionRequestSaveCoordinator;
 import com.nvhuong.devworkbench.service.collections.CollectionTreeNodeTypes;
 import com.nvhuong.devworkbench.service.collections.CollectionTreeNodes;
+import com.nvhuong.devworkbench.common.component.notification.NotificationCenter;
+import com.nvhuong.devworkbench.util.I18nUtil;
+import com.nvhuong.devworkbench.util.MessageKeys;
 import com.nvhuong.devworkbench.service.collections.CollectionTreeRootRegistry;
 import com.nvhuong.devworkbench.service.collections.OpenedRequestTabsStore;
 import com.nvhuong.devworkbench.service.collections.CollectionTreeQueryService;
@@ -156,6 +159,7 @@ public class CollectionTreePanel extends UiSingletonPanel {
 
     @Override
     protected void registerListeners() {
+        startExternalChangeWatcher();
         RequestTreeCoordinator treeCoordinator = new RequestTreeCoordinator(requestTree, this);
         requestTree.addKeyListener(new RequestTreeKeyboardHandler(requestTree, this, treeCoordinator));
         RequestTreeMouseHandler mouseHandler = new RequestTreeMouseHandler(requestTree, this, treeCoordinator);
@@ -209,6 +213,44 @@ public class CollectionTreePanel extends UiSingletonPanel {
             return;
         }
         expandAndSelectFirstGroupIfPresent();
+    }
+
+    /**
+     * Reloads the tree when collections.json is changed outside the app (for example by the MCP server), keeping the
+     * expanded folders and the selection. Checks the file stamp only, every two seconds.
+     */
+    private void startExternalChangeWatcher() {
+        Timer watcher = new Timer(2000, event -> reloadIfChangedExternally());
+        watcher.setRepeats(true);
+        watcher.start();
+    }
+
+    void reloadIfChangedExternally() {
+        if (collectionTreePersistence == null || !collectionTreePersistence.hasExternalChange()) {
+            return;
+        }
+        java.util.Set<String> expandedGroupIds = new java.util.HashSet<>();
+        var expanded = requestTree.getExpandedDescendants(new TreePath(rootTreeNode.getPath()));
+        while (expanded != null && expanded.hasMoreElements()) {
+            Object last = expanded.nextElement().getLastPathComponent();
+            if (last instanceof DefaultMutableTreeNode node) {
+                CollectionTreeNodes.group(node).ifPresent(group -> expandedGroupIds.add(group.getId()));
+            }
+        }
+        collectionTreePersistence.loadIntoTree();
+        restoreExpandedGroups(rootTreeNode, expandedGroupIds);
+        NotificationCenter.showInfo(I18nUtil.getMessage(MessageKeys.COLLECTIONS_RELOADED_EXTERNALLY));
+    }
+
+    private void restoreExpandedGroups(DefaultMutableTreeNode node, java.util.Set<String> groupIds) {
+        for (int i = 0; i < node.getChildCount(); i++) {
+            DefaultMutableTreeNode child = (DefaultMutableTreeNode) node.getChildAt(i);
+            var group = CollectionTreeNodes.group(child);
+            if (group.isPresent() && groupIds.contains(group.get().getId())) {
+                requestTree.expandPath(new TreePath(child.getPath()));
+                restoreExpandedGroups(child, groupIds);
+            }
+        }
     }
 
     private void expandAndSelectFirstGroupIfPresent() {

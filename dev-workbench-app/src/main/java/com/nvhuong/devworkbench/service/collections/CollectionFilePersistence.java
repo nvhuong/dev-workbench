@@ -14,6 +14,11 @@ public class CollectionFilePersistence {
     private static final ConcurrentHashMap<String, Boolean> LOADING_STATUS = new ConcurrentHashMap<>();
 
     private String filePath;
+    /** Size and modification time of collections.json after our last load or save. */
+    private volatile String lastStamp = "";
+    /** Node ids of the document we last loaded or saved: the base for the three-way merge in save(). */
+    private volatile java.util.Set<String> baseIds = java.util.Set.of();
+    private volatile boolean reloadRequested;
 
     public CollectionFilePersistence(String filePath) {
         this.filePath = filePath;
@@ -27,10 +32,13 @@ public class CollectionFilePersistence {
                 if (!file.exists()) {
                     CollectionDocument defaultDocument = defaultDocument(defaultDocumentSupplier);
                     saveIgnoringLoadGuard(defaultDocument);
+                    remember(defaultDocument);
                     log.info("Collection file not found, created default document: {}", filePath);
                     return defaultDocument;
                 }
-                return CollectionDocumentJsonCodec.read(file);
+                CollectionDocument document = CollectionDocumentJsonCodec.read(file);
+                remember(document);
+                return document;
             } finally {
                 setFileLoading(false);
             }
@@ -49,7 +57,24 @@ public class CollectionFilePersistence {
                 return false;
             }
             try {
-                saveIgnoringLoadGuard(document);
+                CollectionDocument toSave = document;
+                boolean mergedExternalAdditions = false;
+                File file = new File(filePath);
+                if (file.isFile() && !lastStamp.isEmpty() && !stamp(file).equals(lastStamp)) {
+                    // collections.json changed outside the app (e.g. the MCP server added a request): keep those
+                    // additions instead of overwriting them with the in-memory tree.
+                    CollectionExternalMerge.Result merged = CollectionExternalMerge.keepExternalAdditions(
+                            document, CollectionDocumentJsonCodec.read(file), baseIds);
+                    toSave = merged.document();
+                    if (merged.added() > 0) {
+                        mergedExternalAdditions = true;
+                        log.info("Kept {} collection item(s) added outside the app in {}", merged.added(), filePath);
+                    }
+                }
+                saveIgnoringLoadGuard(toSave);
+                remember(toSave);
+                // The tree on screen does not show the merged items yet: ask the UI to reload.
+                reloadRequested = mergedExternalAdditions;
                 log.debug("Saved collection document to: {}", filePath);
                 return true;
             } catch (Exception ex) {
@@ -73,6 +98,33 @@ public class CollectionFilePersistence {
         synchronized (FILE_LOCKS.computeIfAbsent(oldPath, ignored -> new Object())) {
             this.filePath = path;
             return loadOrCreate(defaultDocumentSupplier);
+        }
+    }
+
+    /**
+     * True when collections.json was changed by another process since the app last loaded or saved it, or when a
+     * save had to merge in such changes; the caller should reload the tree.
+     */
+    public boolean hasExternalChange() {
+        if (isFileLoading()) return false;
+        if (reloadRequested) return true;
+        File file = new File(filePath);
+        return file.isFile() && !lastStamp.isEmpty() && !stamp(file).equals(lastStamp);
+    }
+
+    private void remember(CollectionDocument document) {
+        lastStamp = stamp(new File(filePath));
+        baseIds = CollectionExternalMerge.ids(document);
+        reloadRequested = false;
+    }
+
+    private static String stamp(File file) {
+        try {
+            var attributes = java.nio.file.Files.readAttributes(file.toPath(),
+                    java.nio.file.attribute.BasicFileAttributes.class);
+            return attributes.size() + ":" + attributes.lastModifiedTime().toMillis();
+        } catch (IOException missing) {
+            return "";
         }
     }
 

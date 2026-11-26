@@ -41,6 +41,11 @@ public class SwingCollectionTreePersistence {
         }
     }
 
+    /** True when collections.json was changed by another process (for example the MCP server). */
+    public boolean hasExternalChange() {
+        return filePersistence.hasExternalChange();
+    }
+
     public void saveCurrentTree() {
         filePersistence.save(currentDocument());
     }

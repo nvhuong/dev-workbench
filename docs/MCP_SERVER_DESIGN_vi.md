@@ -161,6 +161,8 @@ Tham số `--allow-writes` bật các tool ghi dữ liệu hoặc tạo tác đ�
 | `list_environments` | `workspaceId?` | Liệt kê tên môi trường và biến, không trả về giá trị biến |
 | `list_requests` | `workspaceId?`、`collectionId?`、`query?`、`limit?` | Tìm các yêu cầu đã lưu |
 | `run_request` | `workspaceId?`、`requestId`、`environmentId?`、`environmentOverrides?` | Thực hiện một HTTP yêu cầu |
+| `create_request`, `update_request`, `delete_request` | `workspaceId?`、`parentId` / `requestId`、tên, method, URL, headers, params, body, auth… | Tạo, sửa, xóa request (cần `--allow-writes`) |
+| `create_collection`, `create_folder`, `list_folders` | `workspaceId?`、`name`、`parentId?` | Tạo collection và thư mục; liệt kê để lấy `parentId` (cần `--allow-writes` cho tạo) |
 | `run_collection` | `workspaceId?`、`collectionId`、`environmentId?`、`environmentOverrides?`、`iterations?`、`bail?` | Thực hiện toàn bộ bộ sưu tập |
 
 ### Tool của các tính năng khác trong app
@@ -265,7 +267,7 @@ dev-workbench-app
 ## Ranh giới an ninh
 
 - Chế độ không gian làm việc đơn chỉ cho phép các thư mục trong tham số khởi động; chế độ đa không gian làm việc chỉ cho phép DevWorkbench Không gian làm việc trong sổ đăng ký.
-- MCP v1 Không có tệp bộ sưu tập hoặc môi trường nào được ghi và không có công cụ nhập, lưu và xóa nào được cung cấp.
+- Chỉ các tool `create_collection`, `create_folder`, `create_request`, `update_request`, `delete_request` mới ghi `collections.json`, và chỉ khi chạy với `--allow-writes`. Môi trường không bao giờ bị ghi qua MCP. Mỗi lần ghi đi qua file tạm rồi thay thế, nên không làm hỏng file; app desktop tự tải lại cây khi thấy file đổi và giữ các request mà MCP thêm vào khi cùng lúc lưu.
 - Tool ghi của plugin chỉ được bật khi khởi động với `--allow-writes`; tool đọc của SQL dùng kết nối read-only, tự động commit tắt và chặn script nhiều câu lệnh.
 - Giá trị môi trường không được trả về thông qua công cụ liệt kê; ghi đè một lần sẽ không được ghi vào đĩa. Nhưng mục tiêu API Các giá trị đầu vào có thể được lặp lại trong nội dung phản hồi, nội dung này có thể chứa dữ liệu cá nhân hoặc doanh nghiệp, do đó chỉ có thể có các kết nối đáng tin cậy MCP khách hàng.
 - Tiêu đề phản hồi xác thực phổ biến, tùy chỉnh token/key/password/secret cái đầu,URL user-info、Các tham số truy vấn nhạy cảm và các giá trị khóa nhạy cảm phổ biến trong nội dung phản hồi sẽ được giải mẫn cảm; giải mẫn cảm chung không thể xác định tất cả các lĩnh vực kinh doanh và không thể thay thế việc phân loại dữ liệu và các quyền tối thiểu ở phía máy chủ.

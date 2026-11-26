@@ -48,6 +48,8 @@ final class McpWorkspaceToolService implements DevWorkbenchMcpBackend {
             com.nvhuong.devworkbench.panel.toolbox.ToolboxMcpTools::tools;
     /** Functional, load test, history and mock server tools. */
     final McpAppTools appTools = new McpAppTools(this);
+    /** Create, update and delete saved requests, collections and folders. */
+    final McpCollectionTools collectionTools = new McpCollectionTools(this);
 
     McpWorkspaceToolService(McpServeOptions options) {
         this(options, new WorkspaceRunExecutor());
@@ -77,7 +79,9 @@ final class McpWorkspaceToolService implements DevWorkbenchMcpBackend {
     @Override
     public List<com.nvhuong.devworkbench.mcp.server.McpExtraTool> extraTools() {
         List<com.nvhuong.devworkbench.mcp.server.McpExtraTool> tools = new ArrayList<>();
-        for (com.nvhuong.devworkbench.mcp.server.McpExtraTool tool : appTools.tools()) {
+        List<com.nvhuong.devworkbench.mcp.server.McpExtraTool> hostTools = new ArrayList<>(collectionTools.tools());
+        hostTools.addAll(appTools.tools());
+        for (com.nvhuong.devworkbench.mcp.server.McpExtraTool tool : hostTools) {
             tools.add(new com.nvhuong.devworkbench.mcp.server.McpExtraTool(tool.name(), tool.title(), tool.description(),
                     tool.inputSchema(), tool.readOnly(), arguments -> limitResponse(tool.handler().call(arguments))));
         }

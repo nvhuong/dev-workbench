@@ -27,9 +27,27 @@ public class CollectionDocumentJsonCodec {
         return fromJson(JSONUtil.readJSONArray(file, StandardCharsets.UTF_8));
     }
 
+    /**
+     * Writes through a temporary file in the same directory and then replaces the target, so a crash or a concurrent
+     * reader (the MCP server, the desktop app) never sees a half-written collections.json.
+     */
     public void write(File file, CollectionDocument document) throws IOException {
-        try (Writer writer = new OutputStreamWriter(new FileOutputStream(file), StandardCharsets.UTF_8)) {
-            writer.write(toJson(document).toStringPretty());
+        java.nio.file.Path target = file.toPath().toAbsolutePath();
+        java.nio.file.Path directory = target.getParent();
+        if (directory != null) java.nio.file.Files.createDirectories(directory);
+        java.nio.file.Path temp = java.nio.file.Files.createTempFile(directory, "." + target.getFileName(), ".tmp");
+        try {
+            try (Writer writer = new OutputStreamWriter(new FileOutputStream(temp.toFile()), StandardCharsets.UTF_8)) {
+                writer.write(toJson(document).toStringPretty());
+            }
+            try {
+                java.nio.file.Files.move(temp, target, java.nio.file.StandardCopyOption.REPLACE_EXISTING,
+                        java.nio.file.StandardCopyOption.ATOMIC_MOVE);
+            } catch (java.nio.file.AtomicMoveNotSupportedException unsupported) {
+                java.nio.file.Files.move(temp, target, java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+            }
+        } finally {
+            java.nio.file.Files.deleteIfExists(temp);
         }
     }
 

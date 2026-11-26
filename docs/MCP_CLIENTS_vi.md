@@ -243,7 +243,7 @@ Khởi động lại AI client, mở cuộc trò chuyện mới và thử lần 
 
 | Nhóm | Tool đọc (luôn bật) | Tool hành động |
 |---|---|---|
-| Workspace, collection, môi trường | `list_workspaces`, `list_collections`, `list_environments`, `list_requests` | `run_request`, `run_collection` |
+| Workspace, collection, môi trường | `list_workspaces`, `list_collections`, `list_environments`, `list_requests`, `list_folders` | `run_request`, `run_collection`, `create_collection`, `create_folder`, `create_request`, `update_request`, `delete_request` ✱ |
 | Functional test | — | `run_functional` |
 | Kiểm thử hiệu năng | `list_performance_plans` | `run_performance` ✱ |
 | Lịch sử, mock server | `list_request_history`, `list_mock_servers` | — |

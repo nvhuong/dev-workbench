@@ -1461,6 +1461,7 @@ public final class MessageKeys {
     public static final String FUNCTIONAL_TOOLTIP_EXPAND_ALL = "functional.tooltip.expand_all";
     public static final String FUNCTIONAL_TOOLTIP_COLLAPSE_ALL = "functional.tooltip.collapse_all";
     public static final String FUNCTIONAL_TOOLTIP_REFRESH = "functional.tooltip.refresh";
+    public static final String COLLECTIONS_RELOADED_EXTERNALLY = "collections.reloaded_externally";
     public static final String FUNCTIONAL_REPORT_EXPORT = "functional.report.export";
     public static final String FUNCTIONAL_REPORT_TITLE = "functional.report.title";
     public static final String FUNCTIONAL_REPORT_GENERATED = "functional.report.generated";
